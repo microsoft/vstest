@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </param>
         public DataCollectorTypeUriAttribute(string typeUri)
         {
-            this.TypeUri = typeUri;
+            TypeUri = typeUri;
         }
 
         /// <summary>

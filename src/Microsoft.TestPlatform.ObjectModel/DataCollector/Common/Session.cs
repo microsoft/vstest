@@ -14,8 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     {
         private Guid sessionId;
 
-        private static SessionId empty = new SessionId(Guid.Empty);
-
         public SessionId()
         {
             sessionId = Guid.NewGuid();
@@ -27,10 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         [DataMember]
-        public static SessionId Empty
-        {
-            get { return empty; }
-        }
+        public static SessionId Empty { get; } = new SessionId(Guid.Empty);
 
         [DataMember]
         public Guid Id
@@ -40,14 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 
         public override bool Equals(object obj)
         {
-            SessionId id = obj as SessionId;
-
-            if (id == null)
-            {
-                return false;
-            }
-
-            return sessionId.Equals(id.sessionId);
+            return obj is SessionId id && sessionId.Equals(id.sessionId);
         }
 
         public override int GetHashCode()

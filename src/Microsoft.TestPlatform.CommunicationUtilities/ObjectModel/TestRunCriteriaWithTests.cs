@@ -28,10 +28,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         [JsonConstructor]
         public TestRunCriteriaWithTests(IEnumerable<TestCase> tests, string package, string runSettings, TestExecutionContext testExecutionContext)
         {
-            this.Tests = tests;
-            this.Package = package;
-            this.RunSettings = runSettings;
-            this.TestExecutionContext = testExecutionContext;
+            Tests = tests;
+            Package = package;
+            RunSettings = runSettings;
+            TestExecutionContext = testExecutionContext;
         }
 
         /// <summary>

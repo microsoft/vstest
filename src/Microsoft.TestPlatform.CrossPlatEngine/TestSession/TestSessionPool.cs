@@ -16,18 +16,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     /// </summary>
     public class TestSessionPool
     {
-        private static object instanceLockObject = new object();
+        private static readonly object instanceLockObject = new();
         private static volatile TestSessionPool instance;
 
-        private object lockObject = new object();
-        private Dictionary<TestSessionInfo, ProxyTestSessionManager> sessionPool;
+        private readonly object lockObject = new();
+        private readonly Dictionary<TestSessionInfo, ProxyTestSessionManager> sessionPool;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestSessionPool"/> class.
         /// </summary>
         internal TestSessionPool()
         {
-            this.sessionPool = new Dictionary<TestSessionInfo, ProxyTestSessionManager>();
+            sessionPool = new Dictionary<TestSessionInfo, ProxyTestSessionManager>();
         }
 
         /// <summary>
@@ -40,22 +40,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
             get
             {
-                if (TestSessionPool.instance == null)
+                if (instance == null)
                 {
-                    lock (TestSessionPool.instanceLockObject)
+                    lock (instanceLockObject)
                     {
-                        if (TestSessionPool.instance == null)
+                        if (instance == null)
                         {
-                            TestSessionPool.instance = new TestSessionPool();
+                            instance = new TestSessionPool();
                         }
                     }
                 }
 
-                return TestSessionPool.instance;
+                return instance;
             }
             internal set
             {
-                TestSessionPool.instance = value;
+                instance = value;
             }
         }
 
@@ -71,16 +71,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             TestSessionInfo testSessionInfo,
             ProxyTestSessionManager proxyManager)
         {
-            lock (this.lockObject)
+            lock (lockObject)
             {
                 // Check if the session info already exists.
-                if (this.sessionPool.ContainsKey(testSessionInfo))
+                if (sessionPool.ContainsKey(testSessionInfo))
                 {
                     return false;
                 }
 
                 // Adds an association between session info and proxy manager to the pool.
-                this.sessionPool.Add(testSessionInfo, proxyManager);
+                sessionPool.Add(testSessionInfo, proxyManager);
                 return true;
             }
         }
@@ -98,17 +98,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             // Should we stop the request as well ? Probably yes.
             IProxyTestSessionManager proxyManager = null;
 
-            lock (this.lockObject)
+            lock (lockObject)
             {
                 // Check if the session info exists.
-                if (!this.sessionPool.ContainsKey(testSessionInfo))
+                if (!sessionPool.ContainsKey(testSessionInfo))
                 {
                     return false;
                 }
 
                 // Remove the session from the pool.
-                proxyManager = this.sessionPool[testSessionInfo];
-                this.sessionPool.Remove(testSessionInfo);
+                proxyManager = sessionPool[testSessionInfo];
+                sessionPool.Remove(testSessionInfo);
             }
 
             // Kill the session.
@@ -130,15 +130,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             string runSettings)
         {
             ProxyTestSessionManager sessionManager = null;
-            lock (this.lockObject)
+            lock (lockObject)
             {
-                if (!this.sessionPool.ContainsKey(testSessionInfo))
+                if (!sessionPool.ContainsKey(testSessionInfo))
                 {
                     return null;
                 }
 
                 // Gets the session manager reference from the pool.
-                sessionManager = this.sessionPool[testSessionInfo];
+                sessionManager = sessionPool[testSessionInfo];
             }
 
             try
@@ -170,15 +170,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         public virtual bool ReturnProxy(TestSessionInfo testSessionInfo, int proxyId)
         {
             ProxyTestSessionManager sessionManager = null;
-            lock (this.lockObject)
+            lock (lockObject)
             {
-                if (!this.sessionPool.ContainsKey(testSessionInfo))
+                if (!sessionPool.ContainsKey(testSessionInfo))
                 {
                     return false;
                 }
 
                 // Gets the session manager reference from the pool.
-                sessionManager = this.sessionPool[testSessionInfo];
+                sessionManager = sessionPool[testSessionInfo];
             }
 
             try

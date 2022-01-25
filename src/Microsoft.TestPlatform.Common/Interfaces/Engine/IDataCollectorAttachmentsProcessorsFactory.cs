@@ -38,8 +38,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 
         public DataCollectorAttachmentProcessor(string friendlyName, IDataCollectorAttachmentProcessor dataCollectorAttachmentProcessor)
         {
-            this.FriendlyName = string.IsNullOrEmpty(friendlyName) ? throw new ArgumentException("Invalid FriendlyName", nameof(friendlyName)) : friendlyName;
-            this.DataCollectorAttachmentProcessorInstance = dataCollectorAttachmentProcessor ?? throw new ArgumentNullException(nameof(dataCollectorAttachmentProcessor));
+            FriendlyName = string.IsNullOrEmpty(friendlyName) ? throw new ArgumentException("Invalid FriendlyName", nameof(friendlyName)) : friendlyName;
+            DataCollectorAttachmentProcessorInstance = dataCollectorAttachmentProcessor ?? throw new ArgumentNullException(nameof(dataCollectorAttachmentProcessor));
         }
     }
 }

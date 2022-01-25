@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
     {
         public const char EscapeCharacter = '\\';
         private static readonly char[] SpecialCharacters = { '\\', '(', ')', '&', '|', '=', '!', '~' };
-        private static readonly HashSet<char> SpecialCharactersSet = new HashSet<char>(SpecialCharacters);
+        private static readonly HashSet<char> SpecialCharactersSet = new(SpecialCharacters);
 
         /// <summary>
         /// Escapes a set of special characters for filter (%, (, ), &, |, =, !, ~) by replacing them with their escape sequences.

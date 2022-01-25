@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// </summary>
     public class DiscoveryEventsHandleConverter : ITestDiscoveryEventsHandler2
     {
-        private ITestDiscoveryEventsHandler testDiscoveryEventsHandler;
+        private readonly ITestDiscoveryEventsHandler _testDiscoveryEventsHandler;
 
         /// <summary>
         /// The Discovery Complete Handler.
@@ -25,7 +25,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="testDiscoveryEventsHandler"></param>
         public DiscoveryEventsHandleConverter(ITestDiscoveryEventsHandler testDiscoveryEventsHandler)
         {
-            this.testDiscoveryEventsHandler = testDiscoveryEventsHandler ?? throw new ArgumentNullException(nameof(testDiscoveryEventsHandler));
+            this._testDiscoveryEventsHandler = testDiscoveryEventsHandler ?? throw new ArgumentNullException(nameof(testDiscoveryEventsHandler));
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="rawMessage"></param>
         public void HandleRawMessage(string rawMessage)
         {
-            this.testDiscoveryEventsHandler.HandleRawMessage(rawMessage);
+            _testDiscoveryEventsHandler.HandleRawMessage(rawMessage);
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="message"></param>
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            this.testDiscoveryEventsHandler.HandleLogMessage(level, message);
+            _testDiscoveryEventsHandler.HandleLogMessage(level, message);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="lastChunk"></param>
         public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
-            this.testDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs.TotalCount, lastChunk, discoveryCompleteEventArgs.IsAborted);
+            _testDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs.TotalCount, lastChunk, discoveryCompleteEventArgs.IsAborted);
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="discoveredTestCases"></param>
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
-            this.testDiscoveryEventsHandler.HandleDiscoveredTests(discoveredTestCases);
+            _testDiscoveryEventsHandler.HandleDiscoveredTests(discoveredTestCases);
         }
     }
 }

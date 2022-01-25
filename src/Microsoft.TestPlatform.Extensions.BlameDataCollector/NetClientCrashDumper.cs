@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     internal class NetClientCrashDumper : ICrashDumper
     {
         private string outputDirectory;
-        private IFileHelper fileHelper;
+        private readonly IFileHelper fileHelper;
 
         public NetClientCrashDumper(IFileHelper fileHelper)
         {
@@ -32,8 +32,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
         public IEnumerable<string> GetDumpFiles(bool processCrashed)
         {
-            return this.fileHelper.DirectoryExists(this.outputDirectory)
-               ? this.fileHelper.GetFiles(this.outputDirectory, "*_crashdump*.dmp", SearchOption.AllDirectories)
+            return fileHelper.DirectoryExists(outputDirectory)
+               ? fileHelper.GetFiles(outputDirectory, "*_crashdump*.dmp", SearchOption.AllDirectories)
                : Array.Empty<string>();
         }
 

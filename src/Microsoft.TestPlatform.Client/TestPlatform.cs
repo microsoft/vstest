@@ -68,8 +68,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             IFileHelper filehelper,
             TestRuntimeProviderManager testHostProviderManager)
         {
-            this.TestEngine = testEngine;
-            this.fileHelper = filehelper;
+            TestEngine = testEngine;
+            fileHelper = filehelper;
             this.testHostProviderManager = testHostProviderManager;
         }
 
@@ -90,25 +90,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
 
             // Update cache with Extension folder's files.
-            this.AddExtensionAssemblies(discoveryCriteria.RunSettings);
+            AddExtensionAssemblies(discoveryCriteria.RunSettings);
 
             // Update extension assemblies from source when design mode is false.
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
             if (!runConfiguration.DesignMode)
             {
-                this.AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
+                AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
             }
 
             // Initialize loggers.
-            var loggerManager = this.TestEngine.GetLoggerManager(requestData);
+            var loggerManager = TestEngine.GetLoggerManager(requestData);
             loggerManager.Initialize(discoveryCriteria.RunSettings);
 
-            var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
+            var testHostManager = testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             ThrowExceptionIfTestHostManagerIsNull(testHostManager, discoveryCriteria.RunSettings);
 
             testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
-            var discoveryManager = this.TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria);
+            var discoveryManager = TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria);
             discoveryManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
             return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager, loggerManager);
@@ -125,21 +125,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 throw new ArgumentNullException(nameof(testRunCriteria));
             }
 
-            this.AddExtensionAssemblies(testRunCriteria.TestRunSettings);
+            AddExtensionAssemblies(testRunCriteria.TestRunSettings);
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
 
             // Update extension assemblies from source when design mode is false.
             if (!runConfiguration.DesignMode)
             {
-                this.AddExtensionAssembliesFromSource(testRunCriteria);
+                AddExtensionAssembliesFromSource(testRunCriteria);
             }
 
             // Initialize loggers.
-            var loggerManager = this.TestEngine.GetLoggerManager(requestData);
+            var loggerManager = TestEngine.GetLoggerManager(requestData);
             loggerManager.Initialize(testRunCriteria.TestRunSettings);
 
-            var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
+            var testHostManager = testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
             ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
 
             testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
             }
 
-            var executionManager = this.TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria);
+            var executionManager = TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria);
             executionManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
             return new TestRunRequest(requestData, testRunCriteria, executionManager, loggerManager);
@@ -167,7 +167,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 throw new ArgumentNullException(nameof(testSessionCriteria));
             }
 
-            this.AddExtensionAssemblies(testSessionCriteria.RunSettings);
+            AddExtensionAssemblies(testSessionCriteria.RunSettings);
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testSessionCriteria.RunSettings);
             if (!runConfiguration.DesignMode)
@@ -175,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 return false;
             }
 
-            var testSessionManager = this.TestEngine.GetTestSessionManager(requestData, testSessionCriteria);
+            var testSessionManager = TestEngine.GetTestSessionManager(requestData, testSessionCriteria);
             if (testSessionManager == null)
             {
                 // The test session manager is null because the combination of runsettings and
@@ -202,13 +202,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             IEnumerable<string> pathToAdditionalExtensions,
             bool skipExtensionFilters)
         {
-            this.TestEngine.GetExtensionManager().UseAdditionalExtensions(pathToAdditionalExtensions, skipExtensionFilters);
+            TestEngine.GetExtensionManager().UseAdditionalExtensions(pathToAdditionalExtensions, skipExtensionFilters);
         }
 
         /// <inheritdoc/>
         public void ClearExtensions()
         {
-            this.TestEngine.GetExtensionManager().ClearExtensions();
+            TestEngine.GetExtensionManager().ClearExtensions();
         }
 
         private void ThrowExceptionIfTestHostManagerIsNull(
@@ -248,7 +248,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                     }
 
                     var extensionAssemblies = new List<string>(
-                        this.fileHelper.EnumerateFiles(
+                        fileHelper.EnumerateFiles(
                             adapterPath,
                             SearchOption.AllDirectories,
                             TestPlatformConstants.TestAdapterEndsWithPattern,
@@ -258,7 +258,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
                     if (extensionAssemblies.Count > 0)
                     {
-                        this.UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
+                        UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
                     }
                 }
             }
@@ -295,10 +295,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             {
                 var sourceDirectory = Path.GetDirectoryName(source);
                 if (!string.IsNullOrEmpty(sourceDirectory)
-                    && this.fileHelper.DirectoryExists(sourceDirectory))
+                    && fileHelper.DirectoryExists(sourceDirectory))
                 {
                     loggersToUpdate.AddRange(
-                        this.fileHelper.EnumerateFiles(
+                        fileHelper.EnumerateFiles(
                             sourceDirectory,
                             SearchOption.TopDirectoryOnly,
                             TestPlatformConstants.TestLoggerEndsWithPattern));
@@ -307,7 +307,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
             if (loggersToUpdate.Count > 0)
             {
-                this.UpdateExtensions(loggersToUpdate, skipExtensionFilters: false);
+                UpdateExtensions(loggersToUpdate, skipExtensionFilters: false);
             }
         }
 

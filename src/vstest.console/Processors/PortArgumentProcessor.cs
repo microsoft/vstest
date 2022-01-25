@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using TestPlatformHelpers;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     /// Argument Processor for the "--Port|/Port" command line argument.
@@ -42,12 +42,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new PortArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new PortArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -58,18 +58,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() =>
+                    executor = new Lazy<IArgumentExecutor>(() =>
                     new PortArgumentExecutor(CommandLineOptions.Instance, TestRequestManager.Instance));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -99,17 +99,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Used for getting sources.
         /// </summary>
-        private CommandLineOptions commandLineOptions;
+        private readonly CommandLineOptions commandLineOptions;
 
         /// <summary>
         /// Test Request Manager
         /// </summary>
-        private ITestRequestManager testRequestManager;
+        private readonly ITestRequestManager testRequestManager;
 
         /// <summary>
         /// Initializes Design mode when called
         /// </summary>
-        private Func<int, IProcessHelper, IDesignModeClient> designModeInitializer;
+        private readonly Func<int, IProcessHelper, IDesignModeClient> designModeInitializer;
 
         /// <summary>
         /// IDesignModeClient
@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Process helper for process management actions.
         /// </summary>
-        private IProcessHelper processHelper;
+        private readonly IProcessHelper processHelper;
 
         #endregion
 
@@ -151,7 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         internal PortArgumentExecutor(CommandLineOptions options, ITestRequestManager testRequestManager, Func<int, IProcessHelper, IDesignModeClient> designModeInitializer, IProcessHelper processHelper)
         {
             Contract.Requires(options != null);
-            this.commandLineOptions = options;
+            commandLineOptions = options;
             this.testRequestManager = testRequestManager;
             this.designModeInitializer = designModeInitializer;
             this.processHelper = processHelper;
@@ -172,9 +172,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(CommandLineResources.InvalidPortArgument);
             }
 
-            this.commandLineOptions.Port = portNumber;
-            this.commandLineOptions.IsDesignMode = true;
-            this.designModeClient = this.designModeInitializer?.Invoke(this.commandLineOptions.ParentProcessId, this.processHelper);
+            commandLineOptions.Port = portNumber;
+            commandLineOptions.IsDesignMode = true;
+            designModeClient = designModeInitializer?.Invoke(commandLineOptions.ParentProcessId, processHelper);
         }
 
         /// <summary>
@@ -185,11 +185,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             try
             {
-                this.designModeClient?.ConnectToClientAndProcessRequests(this.commandLineOptions.Port, this.testRequestManager);
+                designModeClient?.ConnectToClientAndProcessRequests(commandLineOptions.Port, testRequestManager);
             }
             catch (TimeoutException ex)
             {
-                throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, string.Format(CommandLineResources.DesignModeClientTimeoutError, this.commandLineOptions.Port)), ex);
+                throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, string.Format(CommandLineResources.DesignModeClientTimeoutError, commandLineOptions.Port)), ex);
             }
 
             return ArgumentProcessorResult.Success;

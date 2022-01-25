@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
     /// </summary>
     public class PerformanceTestBase : IntegrationTestBase
     {
-        private PerfAnalyzer perfAnalyzer;
+        private readonly PerfAnalyzer perfAnalyzer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PerformanceTestBase"/> class.
@@ -18,7 +18,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public PerformanceTestBase()
             : base()
         {
-            this.perfAnalyzer = new PerfAnalyzer();
+            perfAnalyzer = new PerfAnalyzer();
         }
 
         /// <summary>
@@ -37,14 +37,14 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         {
             // Start session and listen
 #if NETFRAMEWORK
-            this.perfAnalyzer.EnableProvider();
+            perfAnalyzer.EnableProvider();
 #endif
             // Run Test
-            this.InvokeVsTestForExecution(testAsset, testAdapterPath, ".NETFramework,Version=v4.5.1", runSettings);
+            InvokeVsTestForExecution(testAsset, testAdapterPath, ".NETFramework,Version=v4.5.1", runSettings);
 
             // Stop Listening
 #if NETFRAMEWORK
-            this.perfAnalyzer.DisableProvider();
+            perfAnalyzer.DisableProvider();
 #endif
         }
 
@@ -64,14 +64,14 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         {
             // Start session and listen
 #if NETFRAMEWORK
-            this.perfAnalyzer.EnableProvider();
+            perfAnalyzer.EnableProvider();
 #endif
             // Run Test
-            this.InvokeVsTestForDiscovery(testAsset, testAdapterPath, runSettings, ".NETFramework,Version=v4.5.1");
+            InvokeVsTestForDiscovery(testAsset, testAdapterPath, runSettings, ".NETFramework,Version=v4.5.1");
 
             // Stop Listening
 #if NETFRAMEWORK
-            this.perfAnalyzer.DisableProvider();
+            perfAnalyzer.DisableProvider();
 #endif
         }
 
@@ -80,7 +80,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         /// </summary>
         public void AnalyzePerfData()
         {
-            this.perfAnalyzer.AnalyzeEventsData();
+            perfAnalyzer.AnalyzeEventsData();
         }
 
         /// <summary>
@@ -91,42 +91,42 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         /// </returns>
         public double GetExecutionTime()
         {
-            return this.perfAnalyzer.GetElapsedTimeByTaskName(Constants.ExecutionTask);
+            return perfAnalyzer.GetElapsedTimeByTaskName(Constants.ExecutionTask);
         }
 
         public double GetDiscoveryTime()
         {
-            return this.perfAnalyzer.GetElapsedTimeByTaskName(Constants.DiscoveryTask);
+            return perfAnalyzer.GetElapsedTimeByTaskName(Constants.DiscoveryTask);
         }
 
         public double GetVsTestTime()
         {
-            return this.perfAnalyzer.GetElapsedTimeByTaskName(Constants.VsTestConsoleTask);
+            return perfAnalyzer.GetElapsedTimeByTaskName(Constants.VsTestConsoleTask);
         }
 
         public double GetTestHostTime()
         {
-            return this.perfAnalyzer.GetElapsedTimeByTaskName(Constants.TestHostTask);
+            return perfAnalyzer.GetElapsedTimeByTaskName(Constants.TestHostTask);
         }
 
         public double GetAdapterSearchTime()
         {
-            return this.perfAnalyzer.GetElapsedTimeByTaskName(Constants.AdapterSearchTask);
+            return perfAnalyzer.GetElapsedTimeByTaskName(Constants.AdapterSearchTask);
         }
 
         public IDictionary<string,string> GetDiscoveryData()
         {
-            return this.perfAnalyzer.GetEventDataByTaskName(Constants.AdapterDiscoveryTask);
+            return perfAnalyzer.GetEventDataByTaskName(Constants.AdapterDiscoveryTask);
         }
 
         public IDictionary<string, string> GetExecutionData()
         {
-            return this.perfAnalyzer.GetEventDataByTaskName(Constants.AdapterExecutionTask);
+            return perfAnalyzer.GetEventDataByTaskName(Constants.AdapterExecutionTask);
         }
 
         public double GetAdapterExecutionTime(string executorUri)
         {
-            return this.perfAnalyzer.GetAdapterExecutionTime(executorUri);
+            return perfAnalyzer.GetAdapterExecutionTime(executorUri);
         }
     }
 }

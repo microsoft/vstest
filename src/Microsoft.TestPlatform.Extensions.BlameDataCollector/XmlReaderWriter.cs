@@ -91,7 +91,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
 
             xmlDocument.AppendChild(blameTestRoot);
-            using (var stream = this.fileHelper.GetStream(filePath, FileMode.Create))
+            using (var stream = fileHelper.GetStream(filePath, FileMode.Create))
             {
                 xmlDocument.Save(stream);
             }
@@ -108,7 +108,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         {
             ValidateArg.NotNull(filePath, nameof(filePath));
 
-            if (!this.fileHelper.Exists(filePath))
+            if (!fileHelper.Exists(filePath))
             {
                 throw new FileNotFoundException();
             }
@@ -118,7 +118,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 // Reading test sequence
                 var xmlDocument = new XmlDocument();
-                using (var stream = this.fileHelper.GetStream(filePath, FileMode.Open))
+                using (var stream = fileHelper.GetStream(filePath, FileMode.Open))
                 {
                     xmlDocument.Load(stream);
                 }
@@ -132,7 +132,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                                                node.Attributes[Constants.TestNameAttribute].Value,
                         Source = node.Attributes[Constants.TestSourceAttribute].Value,
                         DisplayName = node.Attributes[Constants.TestDisplayNameAttribute].Value,
-                        IsCompleted = node.Attributes[Constants.TestCompletedAttribute].Value == "True" ? true : false
+                        IsCompleted = node.Attributes[Constants.TestCompletedAttribute].Value == "True"
                     };
                     testCaseList.Add(testCase);
                 }

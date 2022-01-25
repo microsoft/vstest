@@ -48,28 +48,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Serializer for the data objects
         /// </summary>
-        private IDataSerializer dataSerializer;
+        private readonly IDataSerializer dataSerializer;
 
         /// <summary>
         /// Event used to maintain client connection state
         /// </summary>
-        private ManualResetEvent clientConnectedEvent = new ManualResetEvent(false);
+        private readonly ManualResetEvent clientConnectedEvent = new(false);
 
         /// <summary>
         /// Event used to maintain client connection state
         /// </summary>
-        private ManualResetEvent clientConnectionAcceptedEvent = new ManualResetEvent(false);
+        private readonly ManualResetEvent clientConnectionAcceptedEvent = new(false);
 
         /// <summary>
         /// Sync object for sending messages
         /// SendMessage over socket channel is NOT thread-safe
         /// </summary>
-        private object sendSyncObject = new object();
+        private readonly object sendSyncObject = new();
 
         /// <summary>
         /// Sync object for receiving messages
         /// </summary>
-        private object receiveSyncObject = new object();
+        private readonly object receiveSyncObject = new();
 
         private Socket socket;
 
@@ -95,11 +95,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Port of the listener</returns>
         public IPEndPoint HostServer(IPEndPoint endpoint)
         {
-            this.tcpListener = new TcpListener(endpoint);
-            this.tcpListener.Start();
-            EqtTrace.Info("Listening on Endpoint : {0}", (IPEndPoint)this.tcpListener.LocalEndpoint);
+            tcpListener = new TcpListener(endpoint);
+            tcpListener.Start();
+            EqtTrace.Info("Listening on Endpoint : {0}", (IPEndPoint)tcpListener.LocalEndpoint);
 
-            return (IPEndPoint)this.tcpListener.LocalEndpoint;
+            return (IPEndPoint)tcpListener.LocalEndpoint;
         }
 
         /// <summary>
@@ -108,21 +108,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public async Task AcceptClientAsync()
         {
-            if (this.tcpListener != null)
+            if (tcpListener != null)
             {
-                this.clientConnectedEvent.Reset();
+                clientConnectedEvent.Reset();
 
-                var client = await this.tcpListener.AcceptTcpClientAsync();
-                this.socket = client.Client;
-                this.socket.NoDelay = true;
+                var client = await tcpListener.AcceptTcpClientAsync();
+                socket = client.Client;
+                socket.NoDelay = true;
 
                 // Using Buffered stream only in case of write, and Network stream in case of read.
                 var bufferedStream = new PlatformStream().CreateBufferedStream(client.GetStream(), SocketConstants.BufferSize);
                 var networkStream = client.GetStream();
-                this.binaryReader = new BinaryReader(networkStream);
-                this.binaryWriter = new BinaryWriter(bufferedStream);
+                binaryReader = new BinaryReader(networkStream);
+                binaryWriter = new BinaryWriter(bufferedStream);
 
-                this.clientConnectedEvent.Set();
+                clientConnectedEvent.Set();
                 if (EqtTrace.IsInfoEnabled)
                 {
                     EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
@@ -138,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>True if Client is connected, false otherwise</returns>
         public bool WaitForClientConnection(int clientConnectionTimeout)
         {
-            return this.clientConnectedEvent.WaitOne(clientConnectionTimeout);
+            return clientConnectedEvent.WaitOne(clientConnectionTimeout);
         }
 
         /// <summary>
@@ -146,10 +146,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         public void StopServer()
         {
-            this.tcpListener?.Stop();
-            this.tcpListener = null;
-            this.binaryReader?.Dispose();
-            this.binaryWriter?.Dispose();
+            tcpListener?.Stop();
+            tcpListener = null;
+            binaryReader?.Dispose();
+            binaryWriter?.Dispose();
         }
 
         #endregion
@@ -165,12 +165,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             // TODO: pass cancellation token, if user cancels the operation, so we don't wait 50 secs to connect
             // for now added a check for validation of this.tcpclient
-            this.clientConnectionAcceptedEvent.Reset();
+            clientConnectionAcceptedEvent.Reset();
             EqtTrace.Info("Trying to connect to server on socket : {0} ", endpoint);
-            this.tcpClient = new TcpClient { NoDelay = true };
-            this.socket = this.tcpClient.Client;
+            tcpClient = new TcpClient { NoDelay = true };
+            socket = tcpClient.Client;
 
-            Stopwatch watch = new Stopwatch();
+            Stopwatch watch = new();
             watch.Start();
             var connectionTimeout = EnvironmentHelper.GetConnectionTimeout() * 1000;
             do
@@ -178,15 +178,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 try
                 {
                     EqtTrace.Verbose("SocketCommunicationManager : SetupClientAsync : Attempting to connect to the server.");
-                    await this.tcpClient.ConnectAsync(endpoint.Address, endpoint.Port);
+                    await tcpClient.ConnectAsync(endpoint.Address, endpoint.Port);
 
-                    if (this.tcpClient.Connected)
+                    if (tcpClient.Connected)
                     {
                         // Using Buffered stream only in case of write, and Network stream in case of read.
-                        var bufferedStream = new PlatformStream().CreateBufferedStream(this.tcpClient.GetStream(), SocketConstants.BufferSize);
-                        var networkStream = this.tcpClient.GetStream();
-                        this.binaryReader = new BinaryReader(networkStream);
-                        this.binaryWriter = new BinaryWriter(bufferedStream);
+                        var bufferedStream = new PlatformStream().CreateBufferedStream(tcpClient.GetStream(), SocketConstants.BufferSize);
+                        var networkStream = tcpClient.GetStream();
+                        binaryReader = new BinaryReader(networkStream);
+                        binaryWriter = new BinaryWriter(bufferedStream);
 
                         if (EqtTrace.IsInfoEnabled)
                         {
@@ -194,7 +194,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
                         }
 
-                        this.clientConnectionAcceptedEvent.Set();
+                        clientConnectionAcceptedEvent.Set();
                     }
                 }
                 catch (Exception ex)
@@ -202,7 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     EqtTrace.Error("Connection Failed with error {0}, retrying", ex.ToString());
                 }
             }
-            while ((this.tcpClient != null) && !this.tcpClient.Connected && watch.ElapsedMilliseconds < connectionTimeout);
+            while ((tcpClient != null) && !tcpClient.Connected && watch.ElapsedMilliseconds < connectionTimeout);
         }
 
         /// <summary>
@@ -214,7 +214,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>True, if Server got a connection from client</returns>
         public bool WaitForServerConnection(int connectionTimeout)
         {
-            return this.clientConnectionAcceptedEvent.WaitOne(connectionTimeout);
+            return clientConnectionAcceptedEvent.WaitOne(connectionTimeout);
         }
 
         /// <summary>
@@ -224,14 +224,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
 #if NETFRAMEWORK
             // tcpClient.Close() calls tcpClient.Dispose().
-            this.tcpClient?.Close();
+            tcpClient?.Close();
 #else
             // tcpClient.Close() not available for netstandard1.5.
-            this.tcpClient?.Dispose();
+            tcpClient?.Dispose();
 #endif
-            this.tcpClient = null;
-            this.binaryReader?.Dispose();
-            this.binaryWriter?.Dispose();
+            tcpClient = null;
+            binaryReader?.Dispose();
+            binaryWriter?.Dispose();
         }
 
         #endregion
@@ -242,8 +242,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="messageType">Type of Message to be sent, for instance TestSessionStart</param>
         public void SendMessage(string messageType)
         {
-            var serializedObject = this.dataSerializer.SerializeMessage(messageType);
-            this.WriteAndFlushToChannel(serializedObject);
+            var serializedObject = dataSerializer.SerializeMessage(messageType);
+            WriteAndFlushToChannel(serializedObject);
         }
 
         /// <summary>
@@ -253,8 +253,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="payload">payload to be sent</param>
         public void SendMessage(string messageType, object payload)
         {
-            var rawMessage = this.dataSerializer.SerializePayload(messageType, payload);
-            this.WriteAndFlushToChannel(rawMessage);
+            var rawMessage = dataSerializer.SerializePayload(messageType, payload);
+            WriteAndFlushToChannel(rawMessage);
         }
 
         /// <summary>
@@ -265,8 +265,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="version">version to be sent</param>
         public void SendMessage(string messageType, object payload, int version)
         {
-            var rawMessage = this.dataSerializer.SerializePayload(messageType, payload, version);
-            this.WriteAndFlushToChannel(rawMessage);
+            var rawMessage = dataSerializer.SerializePayload(messageType, payload, version);
+            WriteAndFlushToChannel(rawMessage);
         }
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="rawMessage">serialized message</param>
         public void SendRawMessage(string rawMessage)
         {
-            this.WriteAndFlushToChannel(rawMessage);
+            WriteAndFlushToChannel(rawMessage);
         }
 
         /// <summary>
@@ -284,13 +284,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Returns message read from the binary reader</returns>
         public Message ReceiveMessage()
         {
-            var rawMessage = this.ReceiveRawMessage();
-            if (!string.IsNullOrEmpty(rawMessage))
-            {
-                return this.dataSerializer.DeserializeMessage(rawMessage);
-            }
-
-            return null;
+            var rawMessage = ReceiveRawMessage();
+            return !string.IsNullOrEmpty(rawMessage) ? dataSerializer.DeserializeMessage(rawMessage) : null;
         }
 
         /// <summary>
@@ -304,13 +299,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </returns>
         public async Task<Message> ReceiveMessageAsync(CancellationToken cancellationToken)
         {
-            var rawMessage = await this.ReceiveRawMessageAsync(cancellationToken);
-            if (!string.IsNullOrEmpty(rawMessage))
-            {
-                return this.dataSerializer.DeserializeMessage(rawMessage);
-            }
-
-            return null;
+            var rawMessage = await ReceiveRawMessageAsync(cancellationToken);
+            return !string.IsNullOrEmpty(rawMessage) ? dataSerializer.DeserializeMessage(rawMessage) : null;
         }
 
         /// <summary>
@@ -319,10 +309,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns> Raw message string </returns>
         public string ReceiveRawMessage()
         {
-            lock (this.receiveSyncObject)
+            lock (receiveSyncObject)
             {
                 // Reading message on binaryreader is not thread-safe
-                return this.binaryReader?.ReadString();
+                return binaryReader?.ReadString();
             }
         }
 
@@ -337,7 +327,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </returns>
         public async Task<string> ReceiveRawMessageAsync(CancellationToken cancellationToken)
         {
-            var str = await Task.Run(() => this.TryReceiveRawMessage(cancellationToken));
+            var str = await Task.Run(() => TryReceiveRawMessage(cancellationToken));
             return str;
         }
 
@@ -349,7 +339,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns> TestPlatform object </returns>
         public T DeserializePayload<T>(Message message)
         {
-            return this.dataSerializer.DeserializePayload<T>(message);
+            return dataSerializer.DeserializePayload<T>(message);
         }
 
         private string TryReceiveRawMessage(CancellationToken cancellationToken)
@@ -362,9 +352,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 try
                 {
-                    if (this.socket.Poll(STREAMREADTIMEOUT, SelectMode.SelectRead))
+                    if (socket.Poll(STREAMREADTIMEOUT, SelectMode.SelectRead))
                     {
-                        str = this.ReceiveRawMessage();
+                        str = ReceiveRawMessage();
                         success = true;
                     }
                 }
@@ -405,10 +395,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             // Writing Message on binarywriter is not Thread-Safe
             // Need to sync one by one to avoid buffer corruption
-            lock (this.sendSyncObject)
+            lock (sendSyncObject)
             {
-                this.binaryWriter?.Write(rawMessage);
-                this.binaryWriter?.Flush();
+                binaryWriter?.Write(rawMessage);
+                binaryWriter?.Flush();
             }
         }
     }

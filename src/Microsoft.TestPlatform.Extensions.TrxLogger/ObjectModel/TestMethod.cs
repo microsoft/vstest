@@ -13,54 +13,28 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// </summary>
     internal sealed class TestMethod : IXmlTestStore
     {
-        private string className;
-        private string name; // test method name
-        private bool isValid;
-
         public TestMethod(string name, string className)
         {
             Debug.Assert(!string.IsNullOrEmpty(name), "name is null");
             Debug.Assert(!string.IsNullOrEmpty(className), "className is null");
-            this.name = name;
-            this.className = className;
+            this.Name = name;
+            ClassName = className;
         }
 
         /// <summary>
         /// Gets the name.
         /// </summary>
-        public string Name
-        {
-            get
-            {
-                return this.name;
-            }
-        }
+        public string Name { get; private set; }
 
         /// <summary>
         /// Gets the class name.
         /// </summary>
-        public string ClassName
-        {
-            get
-            {
-                return this.className;
-            }
-        }
+        public string ClassName { get; private set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether is valid.
         /// </summary>
-        public bool IsValid
-        {
-            get
-            {
-                return this.isValid;
-            }
-            set
-            {
-                this.isValid = value;
-            }
-        }
+        public bool IsValid { get; set; }
 
         #region Override
 
@@ -75,9 +49,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public override bool Equals(object obj)
         {
-            TestMethod otherTestMethod = obj as TestMethod;
-            return otherTestMethod != null && this.name == otherTestMethod.name
-                   && this.className == otherTestMethod.className && this.isValid == otherTestMethod.isValid;
+            return obj is TestMethod otherTestMethod && Name == otherTestMethod.Name
+                   && ClassName == otherTestMethod.ClassName && IsValid == otherTestMethod.IsValid;
         }
 
         /// <summary>
@@ -88,7 +61,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public override int GetHashCode()
         {
-            return this.Name?.GetHashCode() ?? 0;
+            return Name?.GetHashCode() ?? 0;
         }
 
         #endregion Override
@@ -106,10 +79,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </param>
         public void Save(XmlElement element, XmlTestStoreParameters parameters)
         {
-            XmlPersistence helper = new XmlPersistence();
-            helper.SaveSimpleField(element, "@className", this.className, string.Empty);
-            helper.SaveSimpleField(element, "@name", this.name, string.Empty);
-            helper.SaveSimpleField(element, "isValid", this.isValid, false);
+            XmlPersistence helper = new();
+            helper.SaveSimpleField(element, "@className", ClassName, string.Empty);
+            helper.SaveSimpleField(element, "@name", Name, string.Empty);
+            helper.SaveSimpleField(element, "isValid", IsValid, false);
         }
 
         #endregion

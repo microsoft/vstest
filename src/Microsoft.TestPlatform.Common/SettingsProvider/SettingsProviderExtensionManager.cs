@@ -16,8 +16,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
-    using ObjectModelCommonResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
+    using CommonResources = Resources.Resources;
+    using ObjectModelCommonResources = ObjectModel.Resources.CommonResources;
 
     /// <summary>
     /// Manages the settings provider extensions.
@@ -30,18 +30,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
     {
         #region Fields
         private static SettingsProviderExtensionManager settingsProviderExtensionManager;
-        private static object synclock = new object();
+        private static readonly object synclock = new();
 
         /// <summary>
         /// The settings providers which are available.
         /// </summary>
-        private IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> settingsProviders;
-        private Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> settingsProvidersMap;
+        private readonly IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> settingsProviders;
 
         /// <summary>
         /// Used for logging errors.
         /// </summary>
-        private IMessageLogger logger;
+        private readonly IMessageLogger logger;
 
         #endregion
 
@@ -54,22 +53,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
         /// The settings providers are imported as non-shared because we need different settings provider
         /// instances to be used for each run settings.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         protected SettingsProviderExtensionManager(
             IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> settingsProviders,
             IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> unfilteredSettingsProviders,
             IMessageLogger logger)
         {
-            ValidateArg.NotNull<IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>>(settingsProviders, nameof(settingsProviders));
-            ValidateArg.NotNull<IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>>>(unfilteredSettingsProviders, nameof(unfilteredSettingsProviders));
-            ValidateArg.NotNull<IMessageLogger>(logger, nameof(logger));
+            ValidateArg.NotNull(settingsProviders, nameof(settingsProviders));
+            ValidateArg.NotNull(unfilteredSettingsProviders, nameof(unfilteredSettingsProviders));
+            ValidateArg.NotNull(logger, nameof(logger));
 
             this.settingsProviders = settingsProviders;
-            this.UnfilteredSettingsProviders = unfilteredSettingsProviders;
+            UnfilteredSettingsProviders = unfilteredSettingsProviders;
             this.logger = logger;
 
             // Populate the map to avoid threading issues
-            this.PopulateMap();
+            PopulateMap();
         }
 
         #endregion
@@ -79,20 +77,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
         /// <summary>
         /// Gets the Unfiltered list of settings providers.  Used for the /ListSettingsProviders command line argument.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> UnfilteredSettingsProviders { get; private set; }
 
         /// <summary>
         /// Gets the map of settings name to settings provider.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> SettingsProvidersMap
-        {
-            get
-            {
-                return this.settingsProvidersMap;
-            }
-        }
+        public Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> SettingsProvidersMap { get; private set; }
 
         #endregion
 
@@ -184,7 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
                 throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(settingsName));
             }
 
-            this.SettingsProvidersMap.TryGetValue(settingsName, out LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> settingsProvider);
+            SettingsProvidersMap.TryGetValue(settingsName, out LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> settingsProvider);
 
             return settingsProvider;
         }
@@ -197,13 +187,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
         /// </summary>
         private void PopulateMap()
         {
-            this.settingsProvidersMap = new Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>();
+            SettingsProvidersMap = new Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>();
 
-            foreach (var settingsProvider in this.settingsProviders)
+            foreach (var settingsProvider in settingsProviders)
             {
-                if (this.settingsProvidersMap.ContainsKey(settingsProvider.Metadata.SettingsName))
+                if (SettingsProvidersMap.ContainsKey(settingsProvider.Metadata.SettingsName))
                 {
-                    this.logger.SendMessage(
+                    logger.SendMessage(
                         TestMessageLevel.Error,
                         string.Format(
                             CultureInfo.CurrentUICulture,
@@ -212,7 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
                 }
                 else
                 {
-                    this.settingsProvidersMap.Add(settingsProvider.Metadata.SettingsName, settingsProvider);
+                    SettingsProvidersMap.Add(settingsProvider.Metadata.SettingsName, settingsProvider);
                 }
             }
         }
@@ -229,7 +219,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
         /// <param name="settingsName">Test settings name</param>
         public TestSettingsProviderMetadata(string settingsName)
         {
-            this.SettingsName = settingsName;
+            SettingsName = settingsName;
         }
 
         /// <summary>

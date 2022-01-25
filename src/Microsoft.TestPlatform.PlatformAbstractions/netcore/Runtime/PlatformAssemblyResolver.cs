@@ -24,12 +24,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <param name="directories"> The search directories. </param>
         public PlatformAssemblyResolver()
         {
-            AssemblyLoadContext.Default.Resolving += this.AssemblyResolverEvent;
+            AssemblyLoadContext.Default.Resolving += AssemblyResolverEvent;
         }
 
         ~PlatformAssemblyResolver()
         {
-            this.Dispose(false);
+            Dispose(false);
         }
 
         /// <inheritdoc/>
@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
 
             // Use SupressFinalize in case a subclass
             // of this type implements a finalizer.
@@ -46,14 +46,14 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
         protected void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            if (!disposed)
             {
                 if (disposing)
                 {
-                    AssemblyLoadContext.Default.Resolving -= this.AssemblyResolverEvent;
+                    AssemblyLoadContext.Default.Resolving -= AssemblyResolverEvent;
                 }
 
-                this.disposed = true;
+                disposed = true;
             }
         }
 
@@ -69,13 +69,9 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <returns>
         /// The <see cref="Assembly"/>.
         /// </returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "<Justification>")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom", Justification = "<Justification>")]
         private Assembly AssemblyResolverEvent(object sender, object eventArgs)
         {
-            AssemblyName args = eventArgs as AssemblyName;
-
-            return args == null ? null : this.AssemblyResolve(this, new AssemblyResolveEventArgs(args.Name));
+            return eventArgs is not AssemblyName args ? null : AssemblyResolve(this, new AssemblyResolveEventArgs(args.Name));
         }
     }
 }

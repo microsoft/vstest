@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     /// </summary>
     internal class TestCaseDiscoverySink : ITestCaseDiscoverySink
     {
-        private DiscoveryResultCache discoveryRequestCache;
+        private readonly DiscoveryResultCache discoveryRequestCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestCaseDiscoverySink"/> class.
@@ -28,9 +28,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="discoveredTest"> The discovered test. </param>
         public void SendTestCase(TestCase discoveredTest)
         {
-            if (this.discoveryRequestCache != null)
+            if (discoveryRequestCache != null)
             {
-                this.discoveryRequestCache.AddTest(discoveredTest);
+                discoveryRequestCache.AddTest(discoveredTest);
             }
         }
     }

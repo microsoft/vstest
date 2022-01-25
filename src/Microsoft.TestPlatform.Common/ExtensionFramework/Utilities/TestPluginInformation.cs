@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             if (testExtensionType != null)
             {
-                this.AssemblyQualifiedName = testExtensionType.AssemblyQualifiedName;
+                AssemblyQualifiedName = testExtensionType.AssemblyQualifiedName;
             }
         }
 
@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             get
             {
-                return this.AssemblyQualifiedName;
+                return AssemblyQualifiedName;
             }
         }
 
@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             get
             {
-                return new object[] { this.AssemblyQualifiedName };
+                return new object[] { AssemblyQualifiedName };
             }
         }
 

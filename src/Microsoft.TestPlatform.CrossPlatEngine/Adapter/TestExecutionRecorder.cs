@@ -18,17 +18,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
     /// </summary>
     internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionRecorder
     {
-        private List<AttachmentSet> attachmentSets;
-        private ITestRunCache testRunCache;
-        private ITestCaseEventsHandler testCaseEventsHandler;
+        private readonly List<AttachmentSet> attachmentSets;
+        private readonly ITestRunCache testRunCache;
+        private readonly ITestCaseEventsHandler testCaseEventsHandler;
 
         /// <summary>
         /// Contains TestCase Ids for test cases that are in progress
         /// Start has been recorded but End has not yet been recorded.
         /// </summary>
-        private HashSet<Guid> testCaseInProgressMap;
+        private readonly HashSet<Guid> testCaseInProgressMap;
 
-        private object testCaseInProgressSyncObject = new object();
+        private readonly object testCaseInProgressSyncObject = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestExecutionRecorder"/> class.
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         {
             this.testRunCache = testRunCache;
             this.testCaseEventsHandler = testCaseEventsHandler;
-            this.attachmentSets = new List<AttachmentSet>();
+            attachmentSets = new List<AttachmentSet>();
 
             // As a framework guideline, we should get events in this order:
             // 1. Test Case Start.
@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
             // 3. Test Case Result.
             // If that is not that case.
             // If Test Adapters don't send the events in the above order, Test Case Results are cached till the Test Case End event is received.
-            this.testCaseInProgressMap = new HashSet<Guid>();
+            testCaseInProgressMap = new HashSet<Guid>();
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         {
             get
             {
-                return new Collection<AttachmentSet>(this.attachmentSets);
+                return new Collection<AttachmentSet>(attachmentSets);
             }
         }
 
@@ -69,17 +69,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         public void RecordStart(TestCase testCase)
         {
             EqtTrace.Verbose("TestExecutionRecorder.RecordStart: Starting test: {0}.", testCase?.FullyQualifiedName);
-            this.testRunCache.OnTestStarted(testCase);
+            testRunCache.OnTestStarted(testCase);
 
-            if (this.testCaseEventsHandler != null)
+            if (testCaseEventsHandler != null)
             {
-                lock (this.testCaseInProgressSyncObject)
+                lock (testCaseInProgressSyncObject)
                 {
                     // Do not send TestCaseStart for a test in progress
-                    if (!this.testCaseInProgressMap.Contains(testCase.Id))
+                    if (!testCaseInProgressMap.Contains(testCase.Id))
                     {
-                        this.testCaseInProgressMap.Add(testCase.Id);
-                        this.testCaseEventsHandler.SendTestCaseStart(testCase);
+                        testCaseInProgressMap.Add(testCase.Id);
+                        testCaseEventsHandler.SendTestCaseStart(testCase);
                     }
                 }
             }
@@ -94,15 +94,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         public void RecordResult(TestResult testResult)
         {
             EqtTrace.Verbose("TestExecutionRecorder.RecordResult: Received result for test: {0}.", testResult?.TestCase?.FullyQualifiedName);
-            if (this.testCaseEventsHandler != null)
+            if (testCaseEventsHandler != null)
             {
                 // Send TestCaseEnd in case RecordEnd was not called.
-                this.SendTestCaseEnd(testResult.TestCase, testResult.Outcome);
-                this.testCaseEventsHandler.SendTestResult(testResult);
+                SendTestCaseEnd(testResult.TestCase, testResult.Outcome);
+                testCaseEventsHandler.SendTestResult(testResult);
             }
 
             // Test Result should always be flushed, even if datacollecter attachment is missing
-            this.testRunCache.OnNewTestResult(testResult);
+            testRunCache.OnNewTestResult(testResult);
         }
 
         /// <summary>
@@ -114,8 +114,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         public void RecordEnd(TestCase testCase, TestOutcome outcome)
         {
             EqtTrace.Verbose("TestExecutionRecorder.RecordEnd: test: {0} execution completed.", testCase?.FullyQualifiedName);
-            this.testRunCache.OnTestCompletion(testCase);
-            this.SendTestCaseEnd(testCase, outcome);
+            testRunCache.OnTestCompletion(testCase);
+            SendTestCaseEnd(testCase, outcome);
         }
 
         /// <summary>
@@ -125,18 +125,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         /// <param name="outcome"></param>
         private void SendTestCaseEnd(TestCase testCase, TestOutcome outcome)
         {
-            if (this.testCaseEventsHandler != null)
+            if (testCaseEventsHandler != null)
             {
-                lock (this.testCaseInProgressSyncObject)
+                lock (testCaseInProgressSyncObject)
                 {
                     // TestCaseEnd must always be preceded by TestCaseStart for a given test case id
-                    if (this.testCaseInProgressMap.Contains(testCase.Id))
+                    if (testCaseInProgressMap.Contains(testCase.Id))
                     {
                         // Send test case end event to handler.
-                        this.testCaseEventsHandler.SendTestCaseEnd(testCase, outcome);
+                        testCaseEventsHandler.SendTestCaseEnd(testCase, outcome);
 
                         // Remove it from map so that we send only one TestCaseEnd for every TestCaseStart.
-                        this.testCaseInProgressMap.Remove(testCase.Id);
+                        testCaseInProgressMap.Remove(testCase.Id);
                     }
                 }
             }
@@ -148,7 +148,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         /// <param name="attachments"> The attachment sets. </param>
         public void RecordAttachments(IList<AttachmentSet> attachments)
         {
-            this.attachmentSets.AddRange(attachments);
+            attachmentSets.AddRange(attachments);
         }
     }
 }

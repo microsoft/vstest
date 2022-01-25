@@ -32,11 +32,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new TestSourceArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new TestSourceArgumentProcessorCapabilities());
                 }
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -47,16 +47,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new TestSourceArgumentExecutor(CommandLineOptions.Instance));
+                    executor = new Lazy<IArgumentExecutor>(() => new TestSourceArgumentExecutor(CommandLineOptions.Instance));
                 }
 
-                return this.executor;
+                return executor;
             }
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Used for adding sources to the test manager.
         /// </summary>
-        private CommandLineOptions testSources;
+        private readonly CommandLineOptions testSources;
 
         #endregion
 
@@ -111,8 +111,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            Contract.Assert(this.testSources != null);
-            this.testSources.AddSource(argument);
+            Contract.Assert(testSources != null);
+            testSources.AddSource(argument);
         }
 
         /// <summary>

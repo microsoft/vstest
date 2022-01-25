@@ -33,26 +33,26 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         public TestRunAttachmentsProcessingEventHandler()
         {
-            this.Errors = new List<string>();
-            this.Attachments = new List<AttachmentSet>();
-            this.ProgressArgs = new List<TestRunAttachmentsProcessingProgressEventArgs>();
+            Errors = new List<string>();
+            Attachments = new List<AttachmentSet>();
+            ProgressArgs = new List<TestRunAttachmentsProcessingProgressEventArgs>();
         }
 
         public void EnsureSuccess()
         {
-            if (this.Errors.Any())
+            if (Errors.Any())
             {
-                throw new InvalidOperationException($"Test run reported errors:{Environment.NewLine}{string.Join(Environment.NewLine + Environment.NewLine, this.Errors)}");
+                throw new InvalidOperationException($"Test run reported errors:{Environment.NewLine}{string.Join(Environment.NewLine + Environment.NewLine, Errors)}");
             }
         }
 
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            this.LogMessage = message;
-            this.TestMessageLevel = level;
+            LogMessage = message;
+            TestMessageLevel = level;
             if (level == TestMessageLevel.Error) 
             {
-                this.Errors.Add(message);
+                Errors.Add(message);
             }
         }
 
@@ -77,7 +77,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             if(attachments != null)
             {
-                this.Attachments.AddRange(attachments);
+                Attachments.AddRange(attachments);
             }
         }
 
@@ -85,7 +85,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             if (lastChunk != null)
             {
-                this.Attachments.AddRange(lastChunk);
+                Attachments.AddRange(lastChunk);
             }
 
             if (attachmentsProcessingCompleteEventArgs.Error != null)

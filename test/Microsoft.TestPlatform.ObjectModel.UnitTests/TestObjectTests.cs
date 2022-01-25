@@ -13,7 +13,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
     [TestClass]
     public class TestObjectTests
     {
-        private static TestCase testCase = new TestCase(
+        private static readonly TestCase testCase = new(
                                                "sampleTestClass.sampleTestCase",
                                                new Uri("executor://sampleTestExecutor"),
                                                "sampleTest.dll")
@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         [TestMethod]
         public void TestCaseIdShouldReturnGuidWhenTestPropertiesIdIsSet()
         {
-            Guid expected = new Guid("{8167845C-9CDB-476F-9F2B-1B1C1FE01B7D}");
+            Guid expected = new("{8167845C-9CDB-476F-9F2B-1B1C1FE01B7D}");
             testCase.Id = expected;
             var actual = testCase.Id;
             Assert.AreEqual(expected, actual);

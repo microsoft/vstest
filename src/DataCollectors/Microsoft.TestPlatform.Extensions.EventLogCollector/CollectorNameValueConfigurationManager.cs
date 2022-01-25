@@ -26,7 +26,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <summary>
         /// The name/value pairs loaded from the configuration XML element
         /// </summary>
-        private IDictionary<string, string> nameValuePairs = new Dictionary<string, string>();
 
         #endregion
 
@@ -52,8 +51,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             foreach (XmlNode settingNode in configurationElement.ChildNodes)
             {
                 // Skip all non-elements
-                var settingElement = settingNode as XmlElement;
-                if (settingElement == null)
+                if (settingNode is not XmlElement settingElement)
                 {
                     continue;
                 }
@@ -84,7 +82,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
                 // Save the name/value pair in the dictionary. Note that duplicate settings are
                 // overwritten with the last occurrence's value.
-                if (this.nameValuePairs.ContainsKey(settingName))
+                if (NameValuePairs.ContainsKey(settingName))
                 {
                     if (EqtTrace.IsVerboseEnabled)
                     {
@@ -94,7 +92,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     }
                 }
 
-                this.nameValuePairs[settingName] = settingValue;
+                NameValuePairs[settingName] = settingValue;
             }
         }
 
@@ -102,7 +100,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         #region Public properties
 
-        internal IDictionary<string, string> NameValuePairs => this.nameValuePairs;
+        internal IDictionary<string, string> NameValuePairs { get; } = new Dictionary<string, string>();
 
         /// <summary>
         /// Gets the value of the setting specified by name, or null if it was not found
@@ -118,11 +116,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     return null;
                 }
 
-                this.nameValuePairs.TryGetValue(name, out var settingValue);
+                NameValuePairs.TryGetValue(name, out var settingValue);
                 return settingValue;
             }
 
-            set => this.nameValuePairs[name] = value;
+            set => NameValuePairs[name] = value;
         }
         #endregion
     }

@@ -23,18 +23,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     [TestClass]
     public class TestAdapterPathArgumentProcessorTests
     {
-        RunSettings currentActiveSetting;
+        RunSettings _currentActiveSetting;
 
         [TestInitialize]
         public void TestInit()
         {
-            currentActiveSetting = RunSettingsManager.Instance.ActiveRunSettings;
+            _currentActiveSetting = RunSettingsManager.Instance.ActiveRunSettings;
         }
 
         [TestCleanup]
         public void TestClean()
         {
-            RunSettingsManager.Instance.SetActiveRunSettings(currentActiveSetting);
+            RunSettingsManager.Instance.SetActiveRunSettings(_currentActiveSetting);
         }
 
 

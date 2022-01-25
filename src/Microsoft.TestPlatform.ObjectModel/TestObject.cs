@@ -14,14 +14,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// <summary>
     ///  Base class for test related classes.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1012:AbstractTypesShouldNotHaveConstructors")]
     [DataContract]
     public abstract class TestObject
     {
         #region Fields
 
-        private static CustomKeyValueConverter keyValueConverter = new CustomKeyValueConverter();
-        private static CustomStringArrayConverter stringArrayConverter = new CustomStringArrayConverter();
+        private static readonly CustomKeyValueConverter keyValueConverter = new();
+        private static readonly CustomStringArrayConverter stringArrayConverter = new();
 
         /// <summary>
         /// The store for all the properties registered.
@@ -38,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.store.ToList();
+                return store.ToList();
             }
 
             set
@@ -59,14 +58,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                     // Do not call SetPropertyValue(TestProperty property, object value) as it does not
                     // invoke ConvertPropertyFrom and does not store the properties in correct types.
-                    this.SetPropertyValue(property.Key, property.Value, CultureInfo.InvariantCulture);
+                    SetPropertyValue(property.Key, property.Value, CultureInfo.InvariantCulture);
                 }
             }
         }
 
         public IEnumerable<KeyValuePair<TestProperty, object>> GetProperties()
         {
-            return this.store;
+            return store;
         }
 
         #endregion Fields
@@ -75,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         protected TestObject()
         {
-            this.store = new Dictionary<TestProperty, object>();
+            store = new Dictionary<TestProperty, object>();
         }
 
         [OnSerializing]
@@ -85,17 +84,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public void CacheLazyValuesOnSerializing(StreamingContext context)
 #endif
         {
-            var lazyValues = this.store.Where(kvp => kvp.Value is ILazyPropertyValue).ToArray();
+            var lazyValues = store.Where(kvp => kvp.Value is ILazyPropertyValue).ToArray();
 
             foreach (var kvp in lazyValues)
             {
                 var lazyValue = (ILazyPropertyValue)kvp.Value;
                 var value = lazyValue.Value;
-                this.store.Remove(kvp.Key);
+                store.Remove(kvp.Key);
 
                 if (value != null)
                 {
-                    this.store.Add(kvp.Key, value);
+                    store.Add(kvp.Key, value);
                 }
             }
         }
@@ -109,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         public virtual IEnumerable<TestProperty> Properties
         {
-            get { return this.store.Keys; }
+            get { return store.Keys; }
         }
 
         /// <summary>
@@ -129,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 defaultValue = Activator.CreateInstance(valueType);
             }
 
-            return this.ProtectedGetPropertyValue(property, defaultValue);
+            return ProtectedGetPropertyValue(property, defaultValue);
         }
 
         /// <summary>
@@ -141,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>property value</returns>
         public T GetPropertyValue<T>(TestProperty property, T defaultValue)
         {
-            return this.GetPropertyValue<T>(property, defaultValue, CultureInfo.InvariantCulture);
+            return GetPropertyValue(property, defaultValue, CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -152,7 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="value">value to be set</param>
         public void SetPropertyValue<T>(TestProperty property, T value)
         {
-            this.SetPropertyValue<T>(property, value, CultureInfo.InvariantCulture);
+            SetPropertyValue(property, value, CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -163,7 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="value">value to be set</param>
         public void SetPropertyValue<T>(TestProperty property, LazyPropertyValue<T> value)
         {
-            this.SetPropertyValue<T>(property, value, CultureInfo.InvariantCulture);
+            SetPropertyValue(property, value, CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -173,7 +172,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="value">value to be set</param>
         public void SetPropertyValue(TestProperty property, object value)
         {
-            this.ProtectedSetPropertyValue(property, value);
+            ProtectedSetPropertyValue(property, value);
         }
 
         /// <summary>
@@ -183,10 +182,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public void RemovePropertyValue(TestProperty property)
         {
             ValidateArg.NotNull(property, nameof(property));
-
-            if (this.store.TryGetValue(property, out var value))
+            if (store.TryGetValue(property, out _))
             {
-                this.store.Remove(property);
+                store.Remove(property);
             }
         }
 
@@ -199,7 +197,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             ValidateArg.NotNull(property, nameof(property));
             ValidateArg.NotNull(culture, nameof(culture));
 
-            object objValue = this.ProtectedGetPropertyValue(property, defaultValue);
+            object objValue = ProtectedGetPropertyValue(property, defaultValue);
 
             return ConvertPropertyTo<T>(property, culture, objValue);
         }
@@ -214,7 +212,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
-            this.ProtectedSetPropertyValue(property, objValue);
+            ProtectedSetPropertyValue(property, objValue);
         }
 
         /// <summary>
@@ -227,7 +225,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
-            this.ProtectedSetPropertyValue(property, objValue);
+            ProtectedSetPropertyValue(property, objValue);
         }
 
         #endregion Property Values
@@ -242,7 +240,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             ValidateArg.NotNull(property, nameof(property));
 
-            if (!this.store.TryGetValue(property, out var value))
+            if (!store.TryGetValue(property, out var value))
             {
                 value = defaultValue;
             }
@@ -257,14 +255,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             ValidateArg.NotNull(property, nameof(property));
 
-            if (property.ValidateValueCallback == null || property.ValidateValueCallback(value))
-            {
-                this.store[property] = value;
-            }
-            else
-            {
-                throw new ArgumentException(property.Label);
-            }
+            store[property] = property.ValidateValueCallback == null || property.ValidateValueCallback(value)
+                ? value
+                : throw new ArgumentException(property.Label);
         }
 
         /// <summary>
@@ -374,12 +367,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                if (this.traits == null)
+                if (traits == null)
                 {
-                    this.traits = new TraitCollection(this);
+                    traits = new TraitCollection(this);
                 }
 
-                return this.traits;
+                return traits;
             }
         }
     }

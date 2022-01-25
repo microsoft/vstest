@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     /// </summary>
     public class DesignModeTestEventsRegistrar : ITestDiscoveryEventsRegistrar, ITestRunEventsRegistrar
     {
-        private IDesignModeClient designModeClient;
+        private readonly IDesignModeClient designModeClient;
 
         public DesignModeTestEventsRegistrar(IDesignModeClient designModeClient)
         {
@@ -55,12 +55,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         private void OnRawMessageReceived(object sender, string rawMessage)
         {
             // Directly send the data to translation layer instead of de-serializing it here
-            this.designModeClient.SendRawMessage(rawMessage);
+            designModeClient.SendRawMessage(rawMessage);
         }
 
         public void LogWarning(string message)
         {
-            this.designModeClient.SendTestMessage(TestMessageLevel.Warning, message);
+            designModeClient.SendTestMessage(TestMessageLevel.Warning, message);
         }
     }
 }

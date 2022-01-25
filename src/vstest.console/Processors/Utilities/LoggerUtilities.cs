@@ -30,9 +30,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                 settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
             }
 
-            var logger = default(LoggerSettings);
             var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(settings) ?? new LoggerRunSettings();
 
+
+            LoggerSettings logger;
             try
             {
                 // Logger as uri in command line.

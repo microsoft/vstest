@@ -21,14 +21,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         private void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
-            this.runEventHandler = new RunEventHandler();
+            vstestConsoleWrapper = GetVsTestConsoleWrapper();
+            runEventHandler = new RunEventHandler();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            this.vstestConsoleWrapper?.EndSession();
+            vstestConsoleWrapper?.EndSession();
         }
 
         [TestMethod]
@@ -36,23 +36,23 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
             var sources = new List<string>
                               {
-                                  this.GetAssetFullPath("SimpleTestProject.dll")
+                                  GetAssetFullPath("SimpleTestProject.dll")
                               };
 
-            this.vstestConsoleWrapper.RunTests(
+            vstestConsoleWrapper.RunTests(
                 sources,
-                this.GetDefaultRunSettings(),
+                GetDefaultRunSettings(),
                 new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName=SampleUnitTestProject.UnitTest1.PassingTest" },
-                this.runEventHandler);
+                runEventHandler);
 
             // Assert
-            Assert.AreEqual(1, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(TestOutcome.Passed, this.runEventHandler.TestResults.FirstOrDefault().Outcome);
+            Assert.AreEqual(1, runEventHandler.TestResults.Count);
+            Assert.AreEqual(TestOutcome.Passed, runEventHandler.TestResults.FirstOrDefault().Outcome);
         }
 
         [TestMethod]
@@ -60,32 +60,32 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithFastFilter(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
             var sources = new List<string>
                               {
-                                  this.GetAssetFullPath("SimpleTestProject.dll")
+                                  GetAssetFullPath("SimpleTestProject.dll")
                               };
 
-            this.vstestConsoleWrapper.RunTests(
+            vstestConsoleWrapper.RunTests(
                 sources,
-                this.GetDefaultRunSettings(),
+                GetDefaultRunSettings(),
                 new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName=SampleUnitTestProject.UnitTest1.PassingTest | FullyQualifiedName=SampleUnitTestProject.UnitTest1.FailingTest" },
-                this.runEventHandler);
+                runEventHandler);
 
             // Assert
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+            Assert.AreEqual(2, runEventHandler.TestResults.Count);
+            Assert.AreEqual(1, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+            Assert.AreEqual(1, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
         }
 
         private IList<string> GetTestAssemblies()
         {
             var testAssemblies = new List<string>
                                      {
-                                         this.GetAssetFullPath("SimpleTestProject.dll"),
-                                         this.GetAssetFullPath("SimpleTestProject2.dll")
+                                         GetAssetFullPath("SimpleTestProject.dll"),
+                                         GetAssetFullPath("SimpleTestProject2.dll")
                                      };
 
             return testAssemblies;

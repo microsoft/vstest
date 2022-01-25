@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         public TestLoggerPluginInformation(Type testLoggerType)
             : base(testLoggerType)
         {
-            this.FriendlyName = GetFriendlyName(testLoggerType);
+            FriendlyName = GetFriendlyName(testLoggerType);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             get
             {
-                return new Object[] { this.ExtensionUri, this.FriendlyName };
+                return new Object[] { ExtensionUri, FriendlyName };
             }
         }
 

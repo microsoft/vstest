@@ -16,60 +16,60 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
         [TestInitialize]
         public void TestInit()
         {
-            this.pathResolver = new PathResolver();
+            pathResolver = new PathResolver();
         }
 
         [TestMethod]
         public void PathResolverShouldReturnNullForEmptyArguments()
         {
-            var newFilePath = this.pathResolver.GetTargetPath(new string[] { });
+            var newFilePath = pathResolver.GetTargetPath(new string[] { });
             Assert.IsNull(newFilePath, "Empty arguments should return null");
         }
 
         [TestMethod]
         public void PathResolverShouldReturnNullForInvalidArguments()
         {
-            var newFilePath = this.pathResolver.GetTargetPath(new string[] { "asd", "asd", "asd" });
+            var newFilePath = pathResolver.GetTargetPath(new string[] { "asd", "asd", "asd" });
             Assert.IsNull(newFilePath, "Invalid arguments should return null");
         }
 
         [TestMethod]
         public void PathResolverShouldReturnNullForRelativePaths()
         {
-            var newFilePath = this.pathResolver.GetTargetPath(new string[] { "asd.testsettings" });
+            var newFilePath = pathResolver.GetTargetPath(new string[] { "asd.testsettings" });
             Assert.IsNull(newFilePath, "Relative paths should return null");
         }
 
         [TestMethod]
         public void PathResolverShouldReturnNullForRelativePathsWithTwoArguments()
         {
-            var newFilePath = this.pathResolver.GetTargetPath(new string[] { "asd.Testsettings", "C:\\asd.runsettings" });
+            var newFilePath = pathResolver.GetTargetPath(new string[] { "asd.Testsettings", "C:\\asd.runsettings" });
             Assert.IsNull(newFilePath, "Relative paths should return null");
         }
 
         [TestMethod]
         public void PathResolverShouldNotReturnNullForPathsWithExtensionInCapitals()
         {
-            var newFilePath = this.pathResolver.GetTargetPath(new string[] { "C:\\asd.TestSEettings", "C:\\asd.RuNSettings" });
+            var newFilePath = pathResolver.GetTargetPath(new string[] { "C:\\asd.TestSEettings", "C:\\asd.RuNSettings" });
             Assert.IsNotNull(newFilePath, "Relative paths should not return null");
         }
 
         [TestMethod]
         public void PathResolverShouldReturnNullForRelativePathsForRunsettings()
         {
-            var newFilePath = this.pathResolver.GetTargetPath(new string[] { "C:\\asd.testsettings", "asd.runsettings" });
+            var newFilePath = pathResolver.GetTargetPath(new string[] { "C:\\asd.testsettings", "asd.runsettings" });
             Assert.IsNull(newFilePath, "Relative paths should return null");
         }
 
         [TestMethod]
         public void PathResolverShouldReturnRunsettingsPathOfSameLocationAsTestSettings()
         {
-            var newFilePath = this.pathResolver.GetTargetPath(new string[] { "C:\\asd.testsettings" });
+            var newFilePath = pathResolver.GetTargetPath(new string[] { "C:\\asd.testsettings" });
             Assert.IsNotNull(newFilePath, "File path should not be null.");
             Assert.IsTrue(string.Equals(Path.GetExtension(newFilePath), ".runsettings"), "File path should be .runsettings");
             Assert.IsTrue(newFilePath.Contains("C:\\asd_"), "File should be of same name as testsettings");
             var time = newFilePath.Substring(7, 19);
-            Assert.IsTrue(DateTime.TryParseExact(time, "MM-dd-yyyy_hh-mm-ss", CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime date), "File name should have datetime");
+            Assert.IsTrue(DateTime.TryParseExact(time, "MM-dd-yyyy_hh-mm-ss", CultureInfo.CurrentCulture, DateTimeStyles.None, out _), "File name should have datetime");
         }
     }
 }

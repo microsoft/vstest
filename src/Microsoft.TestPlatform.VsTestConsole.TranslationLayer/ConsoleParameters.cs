@@ -20,10 +20,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// </summary>
     public class ConsoleParameters
     {
-        internal static readonly ConsoleParameters Default = new ConsoleParameters();
+        internal static readonly ConsoleParameters Default = new();
 
-        private string logFilePath = null;
-        private IFileHelper fileHelper;
+        private string _logFilePath = null;
+        private readonly IFileHelper _fileHelper;
 
         /// <summary>
         /// Create instance of <see cref="ConsoleParameters"/>
@@ -37,7 +37,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="fileHelper"> Object of type <see cref="IFileHelper"/></param>
         public ConsoleParameters(IFileHelper fileHelper)
         {
-            this.fileHelper = fileHelper;
+            this._fileHelper = fileHelper;
         }
 
 #if NETFRAMEWORK
@@ -62,20 +62,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             get
             {
-                return logFilePath;
+                return _logFilePath;
             }
 
             set
             {
                 ValidateArg.NotNullOrEmpty(value, "LogFilePath");
                 var directoryPath = Path.GetDirectoryName(value);
-                if (!string.IsNullOrEmpty(directoryPath) && !fileHelper.DirectoryExists(directoryPath))
+                if (!string.IsNullOrEmpty(directoryPath) && !_fileHelper.DirectoryExists(directoryPath))
                 {
                     Directory.CreateDirectory(directoryPath);
                 }
 
                 // Ensure path is double quoted. if path has white space then it can create problem.
-                this.logFilePath = value.AddDoubleQuote();
+                _logFilePath = value.AddDoubleQuote();
             }
         }
 

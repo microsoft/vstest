@@ -40,14 +40,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+            var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
 
-            this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), this.FrameworkArgValue, string.Empty);
+            InvokeVsTestForExecution(assemblyPaths, GetTestAdapterPath(), FrameworkArgValue, string.Empty);
 
-            this.ValidateSummaryStatus(2, 2, 2);
-            this.ExitCodeEquals(1); // failing tests
+            ValidateSummaryStatus(2, 2, 2);
+            ExitCodeEquals(1); // failing tests
         }
 
         [TestMethod]
@@ -55,31 +55,31 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void DiscoverAllTests(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            this.InvokeVsTestForDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            InvokeVsTestForDiscovery(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue);
 
             var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
-            this.ValidateDiscoveredTests(listOfTests);
-            this.ExitCodeEquals(0);
+            ValidateDiscoveredTests(listOfTests);
+            ExitCodeEquals(0);
         }
 
         public override string GetConsoleRunnerPath()
         {
             string consoleRunnerPath = string.Empty;
 
-            if (this.IsDesktopRunner())
+            if (IsDesktopRunner())
             {
                 consoleRunnerPath = Path.Combine(portablePackageFolder, "tools", "net451", "vstest.console.exe");
             }
-            else if (this.IsNetCoreRunner())
+            else if (IsNetCoreRunner())
             {
                 var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
-                consoleRunnerPath = Path.Combine(this.testEnvironment.ToolsDirectory, executablePath);
+                consoleRunnerPath = Path.Combine(testEnvironment.ToolsDirectory, executablePath);
             }
             else
             {
-                Assert.Fail("Unknown Runner framework - [{0}]", this.testEnvironment.RunnerFramework);
+                Assert.Fail("Unknown Runner framework - [{0}]", testEnvironment.RunnerFramework);
             }
 
             Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);

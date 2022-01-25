@@ -13,21 +13,21 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Utilities
     [TestClass]
     public class InstallationContextTests
     {
-        private Mock<IFileHelper> mockFileHelper;
-        private InstallationContext installationContext;
+        private readonly Mock<IFileHelper> mockFileHelper;
+        private readonly InstallationContext installationContext;
 
         public InstallationContextTests()
         {
-            this.mockFileHelper = new Mock<IFileHelper>();
-            this.installationContext = new InstallationContext(this.mockFileHelper.Object);
+            mockFileHelper = new Mock<IFileHelper>();
+            installationContext = new InstallationContext(mockFileHelper.Object);
         }
 
         [TestMethod]
         public void TryGetVisualStudioDirectoryShouldReturnTrueIfVSIsFound()
         {
-            this.mockFileHelper.Setup(m => m.Exists(It.IsAny<string>())).Returns(true);
+            mockFileHelper.Setup(m => m.Exists(It.IsAny<string>())).Returns(true);
 
-            Assert.IsTrue(this.installationContext.TryGetVisualStudioDirectory(out string visualStudioDirectory), "VS Install Directory returned false");
+            Assert.IsTrue(installationContext.TryGetVisualStudioDirectory(out string visualStudioDirectory), "VS Install Directory returned false");
 
             Assert.IsTrue(Directory.Exists(visualStudioDirectory), "VS Install Directory doesn't exist");
         }
@@ -35,9 +35,9 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Utilities
         [TestMethod]
         public void TryGetVisualStudioDirectoryShouldReturnFalseIfVSIsNotFound()
         {
-            this.mockFileHelper.Setup(m => m.Exists(It.IsAny<string>())).Returns(false);
+            mockFileHelper.Setup(m => m.Exists(It.IsAny<string>())).Returns(false);
 
-            Assert.IsFalse(this.installationContext.TryGetVisualStudioDirectory(out string visualStudioDirectory), "VS Install Directory returned true");
+            Assert.IsFalse(installationContext.TryGetVisualStudioDirectory(out string visualStudioDirectory), "VS Install Directory returned true");
 
             Assert.IsTrue(string.IsNullOrEmpty(visualStudioDirectory), "VS Install Directory is not empty");
         }
@@ -45,7 +45,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Utilities
         [TestMethod]
         public void GetVisualStudioPathShouldReturnPathToDevenvExecutable()
         {
-            var devenvPath = this.installationContext.GetVisualStudioPath(@"C:\temp");
+            var devenvPath = installationContext.GetVisualStudioPath(@"C:\temp");
 
             Assert.AreEqual(@"C:\temp\devenv.exe", devenvPath.Replace("/", "\\"));
         }
@@ -61,7 +61,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Utilities
                 @"C:\temp\CommonExtensions\Microsoft\TeamFoundation\Team Explorer",
                 @"C:\temp"
             };
-            var commonLocations = this.installationContext.GetVisualStudioCommonLocations(@"C:\temp").Select(p => p.Replace("/", "\\")).ToArray();
+            var commonLocations = installationContext.GetVisualStudioCommonLocations(@"C:\temp").Select(p => p.Replace("/", "\\")).ToArray();
 
             CollectionAssert.AreEquivalent(expectedLocations, commonLocations);
         }

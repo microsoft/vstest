@@ -17,21 +17,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     [TestClass]
     public class DataCollectorInformationTests
     {
-        private DataCollectorInformation dataCollectorInfo;
+        private readonly DataCollectorInformation dataCollectorInfo;
 
-        private List<KeyValuePair<string, string>> envVarList;
+        private readonly List<KeyValuePair<string, string>> envVarList;
 
-        private Mock<DataCollector2> mockDataCollector;
+        private readonly Mock<DataCollector2> mockDataCollector;
 
         public DataCollectorInformationTests()
         {
-            this.envVarList = new List<KeyValuePair<string, string>>();
-            this.mockDataCollector = new Mock<DataCollector2>();
-            this.mockDataCollector.As<ITestExecutionEnvironmentSpecifier>().Setup(x => x.GetTestExecutionEnvironmentVariables()).Returns(this.envVarList);
-            this.mockDataCollector.Protected().Setup("Dispose", true);
+            envVarList = new List<KeyValuePair<string, string>>();
+            mockDataCollector = new Mock<DataCollector2>();
+            mockDataCollector.As<ITestExecutionEnvironmentSpecifier>().Setup(x => x.GetTestExecutionEnvironmentVariables()).Returns(envVarList);
+            mockDataCollector.Protected().Setup("Dispose", true);
             var mockMessageSink = new Mock<IMessageSink>();
-            this.dataCollectorInfo = new DataCollectorInformation(
-                this.mockDataCollector.Object,
+            dataCollectorInfo = new DataCollectorInformation(
+                mockDataCollector.Object,
                 null,
                 new DataCollectorConfig(typeof(CustomDataCollector)),
                 null,
@@ -44,21 +44,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void InitializeDataCollectorShouldInitializeDataCollector()
         {
-            this.envVarList.Add(new KeyValuePair<string, string>("key", "value"));
+            envVarList.Add(new KeyValuePair<string, string>("key", "value"));
 
-            this.dataCollectorInfo.InitializeDataCollector();
-            this.dataCollectorInfo.SetTestExecutionEnvironmentVariables();
+            dataCollectorInfo.InitializeDataCollector();
+            dataCollectorInfo.SetTestExecutionEnvironmentVariables();
 
-            CollectionAssert.AreEqual(this.envVarList, this.dataCollectorInfo.TestExecutionEnvironmentVariables.ToList());
+            CollectionAssert.AreEqual(envVarList, dataCollectorInfo.TestExecutionEnvironmentVariables.ToList());
         }
 
         [TestMethod]
         public void DisposeShouldInvokeDisposeOfDatacollector()
         {
-            this.dataCollectorInfo.InitializeDataCollector();
-            this.dataCollectorInfo.DisposeDataCollector();
+            dataCollectorInfo.InitializeDataCollector();
+            dataCollectorInfo.DisposeDataCollector();
 
-            this.mockDataCollector.Protected().Verify("Dispose", Times.Once(), true);
+            mockDataCollector.Protected().Verify("Dispose", Times.Once(), true);
         }
     }
 }

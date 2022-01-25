@@ -211,9 +211,9 @@ namespace testhost.UnitTests
                     XDocument.Load(new MemoryStream(Encoding.UTF8.GetBytes(testHostConfigText))));
             }
 
-            public AppDomain NewAppDomain => this.appDomain;
+            public AppDomain NewAppDomain => appDomain;
 
-            public IEngineInvoker ActualInvoker => this.actualInvoker;
+            public IEngineInvoker ActualInvoker => actualInvoker;
         }
 
         private class MockEngineInvoker : MarshalByRefObject, IEngineInvoker
@@ -222,7 +222,7 @@ namespace testhost.UnitTests
 
             public void Invoke(IDictionary<string, string> argsDictionary)
             {
-                this.DomainFriendlyName = AppDomain.CurrentDomain.FriendlyName;
+                DomainFriendlyName = AppDomain.CurrentDomain.FriendlyName;
             }
         }
     }

@@ -12,8 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// <summary>
     /// The class that enables us to get debug information from both managed and native binaries.
     /// </summary>
-    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly",
-         Justification = "Dia is a specific name.")]
     public class DiaSession : INavigationSession
     {
         /// <summary>
@@ -63,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         public void Dispose()
         {
-            this.symbolReader?.Dispose();
+            symbolReader?.Dispose();
         }
 
         /// <summary>
@@ -75,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <remarks> Leaving this method in place to preserve back compatibility. </remarks>
         public DiaNavigationData GetNavigationData(string declaringTypeName, string methodName)
         {
-            return (DiaNavigationData)this.GetNavigationDataForMethod(declaringTypeName, methodName);
+            return (DiaNavigationData)GetNavigationDataForMethod(declaringTypeName, methodName);
         }
 
         /// <summary>
@@ -89,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             ValidateArg.NotNullOrEmpty(declaringTypeName, nameof(declaringTypeName));
             ValidateArg.NotNullOrEmpty(methodName, nameof(methodName));
             methodName = methodName.TrimEnd(TestNameStripChars);
-            return this.symbolReader.GetNavigationData(declaringTypeName, methodName);
+            return symbolReader.GetNavigationData(declaringTypeName, methodName);
         }
 
         private static ISymbolReader GetSymbolReader(string binaryPath)
@@ -100,12 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             // The alternate search path should be an input from Adapters, but since it is not so currently adding a HACK
             pdbFilePath = !File.Exists(pdbFilePath) ? Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(pdbFilePath)) : pdbFilePath;
             using var stream = new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read);
-            if (PortablePdbReader.IsPortable(stream))
-            {
-                return new PortableSymbolReader();
-            }
-
-            return new FullSymbolReader();
+            return PortablePdbReader.IsPortable(stream) ? new PortableSymbolReader() : new FullSymbolReader();
         }
     }
 }

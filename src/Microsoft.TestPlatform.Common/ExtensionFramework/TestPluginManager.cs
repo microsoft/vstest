@@ -42,7 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <returns>Data type of the test extension</returns>
         public static Type GetTestExtensionType(string extensionTypeName)
         {
-            Type extensionType = null;
+            Type extensionType;
             try
             {
                 extensionType = Type.GetType(extensionTypeName, true);
@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             out IEnumerable<LazyExtension<IExtension, IMetadata>> filtered) where TMetadata : IMetadata where TPluginInfo : TestPluginInformation
         {
             var extensions = TestPluginCache.Instance.DiscoverTestExtensions<TPluginInfo, IExtension>(endsWithPattern);
-            this.GetExtensions<TPluginInfo, IExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
+            GetExtensions<TPluginInfo, IExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             bool skipCache = false) where TMetadata : IMetadata where TPluginInfo : TestPluginInformation
         {
             var extensions = TestPluginCache.Instance.GetTestExtensions<TPluginInfo, IExtension>(extensionAssembly, skipCache);
-            this.GetExtensions<TPluginInfo, IExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
+            GetExtensions<TPluginInfo, IExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
         }
 
         #endregion
@@ -233,7 +233,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             var unfilteredExtensions = new List<LazyExtension<IExtension, Dictionary<string, object>>>();
             var filteredExtensions = new List<LazyExtension<IExtension, IMetadata>>();
 
-            var testPlugins = this.GetValuesFromDictionary(testPluginInfo);
+            var testPlugins = GetValuesFromDictionary(testPluginInfo);
             foreach (var plugin in testPlugins)
             {
                 if (!string.IsNullOrEmpty(plugin.IdentifierData))

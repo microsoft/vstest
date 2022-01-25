@@ -17,18 +17,18 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         #region Fields
 
         [StoreXmlSimpleField("Text", "")]
-        private string text;
+        private readonly string _text;
 
-        private Exception exception;
+        private readonly Exception _exception;
 
         [StoreXmlSimpleField("@computerName", "")]
-        private string computer;
+        private readonly string _computer;
 
         [StoreXmlSimpleField("@outcome")]
-        private TestOutcome outcome;
+        private readonly TestOutcome _outcome;
 
         [StoreXmlSimpleField]
-        private DateTime timestamp;
+        private readonly DateTime _timestamp;
 
         #endregion
 
@@ -53,11 +53,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             Debug.Assert(computer != null, "computer is null");
 
-            this.text = textMessage;
-            this.exception = ex;
-            this.computer = computer;
-            this.outcome = outcome;
-            this.timestamp = DateTime.UtcNow;
+            _text = textMessage;
+            _exception = ex;
+            this._computer = computer;
+            this._outcome = outcome;
+            _timestamp = DateTime.UtcNow;
         }
 
         #endregion
@@ -75,9 +75,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </param>
         public void Save(XmlElement element, XmlTestStoreParameters parameters)
         {
-            XmlPersistence helper = new XmlPersistence();
+            XmlPersistence helper = new();
             helper.SaveSingleFields(element, this, parameters);
-            helper.SaveSimpleField(element, "Exception", this.exception, null);
+            helper.SaveSimpleField(element, "Exception", _exception, null);
         }
 
         #endregion

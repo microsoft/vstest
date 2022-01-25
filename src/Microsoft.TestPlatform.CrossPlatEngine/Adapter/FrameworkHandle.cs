@@ -14,28 +14,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
-    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using CrossPlatEngineResources = Resources.Resources;
 
     /// <summary>
     /// Handle to the framework which is passed to the test executors.
     /// </summary>
     internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisposable
     {
-        /// <summary>
-        /// boolean that gives the value of EnableShutdownAfterTestRun.
-        /// Default value is set to false in the constructor.
-        /// </summary>
-        private bool enableShutdownAfterTestRun;
 
         /// <summary>
         /// Context in which the current run is executing.
         /// </summary>
-        private TestExecutionContext testExecutionContext;
+        private readonly TestExecutionContext testExecutionContext;
 
         /// <summary>
         /// DebugLauncher for launching additional adapter processes under debugger
         /// </summary>
-        private ITestRunEventsHandler testRunEventsHandler;
+        private readonly ITestRunEventsHandler testRunEventsHandler;
 
         /// <summary>
         /// Specifies whether the handle is disposed or not
@@ -63,18 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         /// and should be used only when absolutely required as using it degrades the performance of the subsequent run.
         /// It throws InvalidOperationException when it is attempted to be enabled when keepAlive is false.
         /// </summary>
-        public bool EnableShutdownAfterTestRun
-        {
-            get
-            {
-                return this.enableShutdownAfterTestRun;
-            }
-
-            set
-            {
-                this.enableShutdownAfterTestRun = value;
-            }
-        }
+        public bool EnableShutdownAfterTestRun { get; set; }
 
         /// <summary>
         /// Launch the specified process with the debugger attached.
@@ -88,13 +72,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         {
             // If an adapter attempts to launch a process after the run is complete (=> this object is disposed)
             // throw an error. 
-            if (this.isDisposed)
+            if (isDisposed)
             {
                 throw new ObjectDisposedException("IFrameworkHandle");
             }
 
             // If it is not a debug run, then throw an error
-            if (!this.testExecutionContext.IsDebug)
+            if (!testExecutionContext.IsDebug)
             {
                 throw new InvalidOperationException(CrossPlatEngineResources.LaunchDebugProcessNotAllowedForANonDebugRun);
             }
@@ -107,18 +91,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
                 WorkingDirectory = workingDirectory
             };
 
-            return this.testRunEventsHandler.LaunchProcessWithDebuggerAttached(processInfo);
+            return testRunEventsHandler.LaunchProcessWithDebuggerAttached(processInfo);
         }
 
         /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
-            return ((ITestRunEventsHandler2)this.testRunEventsHandler).AttachDebuggerToProcess(pid);
+            return ((ITestRunEventsHandler2)testRunEventsHandler).AttachDebuggerToProcess(pid);
         }
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
 
             // Use SupressFinalize in case a subclass
             // of this valueType implements a finalizer.
@@ -129,10 +113,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         {
             // If you need thread safety, use a lock around these
             // operations, as well as in your methods that use the resource.
-            if (!this.isDisposed)
+            if (!isDisposed)
             {
                 // Indicate that the instance has been disposed.
-                this.isDisposed = true;
+                isDisposed = true;
             }
         }
     }

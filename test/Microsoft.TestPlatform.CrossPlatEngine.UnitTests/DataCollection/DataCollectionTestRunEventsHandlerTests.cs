@@ -30,25 +30,25 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestInitialize]
         public void InitializeTests()
         {
-            this.baseTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
-            this.proxyDataCollectionManager = new Mock<IProxyDataCollectionManager>();
-            this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.testRunEventHandler = new DataCollectionTestRunEventsHandler(this.baseTestRunEventsHandler.Object, this.proxyDataCollectionManager.Object, this.mockDataSerializer.Object, CancellationToken.None);
+            baseTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+            proxyDataCollectionManager = new Mock<IProxyDataCollectionManager>();
+            mockDataSerializer = new Mock<IDataSerializer>();
+            testRunEventHandler = new DataCollectionTestRunEventsHandler(baseTestRunEventsHandler.Object, proxyDataCollectionManager.Object, mockDataSerializer.Object, CancellationToken.None);
         }
 
         [TestMethod]
         public void HandleLogMessageShouldSendMessageToBaseTestRunEventsHandler()
         {
-            this.testRunEventHandler.HandleLogMessage(TestMessageLevel.Informational, null);
-            this.baseTestRunEventsHandler.Verify(th => th.HandleLogMessage(0, null), Times.AtLeast(1));
+            testRunEventHandler.HandleLogMessage(TestMessageLevel.Informational, null);
+            baseTestRunEventsHandler.Verify(th => th.HandleLogMessage(0, null), Times.AtLeast(1));
         }
 
         [TestMethod]
         public void HandleRawMessageShouldSendMessageToBaseTestRunEventsHandler()
         {
-            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.BeforeTestRunStart });
-            this.testRunEventHandler.HandleRawMessage(null);
-            this.baseTestRunEventsHandler.Verify(th => th.HandleRawMessage(null), Times.AtLeast(1));
+            mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.BeforeTestRunStart });
+            testRunEventHandler.HandleRawMessage(null);
+            baseTestRunEventsHandler.Verify(th => th.HandleRawMessage(null), Times.AtLeast(1));
         }
 
         [TestMethod]
@@ -56,12 +56,12 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         {
             var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new TimeSpan());
 
-            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
-            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
+            mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
+            mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
                 .Returns(new TestRunCompletePayload() { TestRunCompleteArgs = testRunCompleteEventArgs });
 
-            this.testRunEventHandler.HandleRawMessage(string.Empty);
-            this.proxyDataCollectionManager.Verify(
+            testRunEventHandler.HandleRawMessage(string.Empty);
+            proxyDataCollectionManager.Verify(
                 dcm => dcm.AfterTestRunEnd(false, It.IsAny<ITestRunEventsHandler>()),
                 Times.Once);
         }
@@ -71,16 +71,16 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         {
             var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new TimeSpan());
 
-            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
-            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
+            mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
+            mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
                 .Returns(new TestRunCompletePayload() { TestRunCompleteArgs = testRunCompleteEventArgs });
 
             var cancellationTokenSource = new CancellationTokenSource();
-            testRunEventHandler = new DataCollectionTestRunEventsHandler(this.baseTestRunEventsHandler.Object, this.proxyDataCollectionManager.Object, this.mockDataSerializer.Object, cancellationTokenSource.Token);
+            testRunEventHandler = new DataCollectionTestRunEventsHandler(baseTestRunEventsHandler.Object, proxyDataCollectionManager.Object, mockDataSerializer.Object, cancellationTokenSource.Token);
 
             testRunEventHandler.HandleRawMessage(string.Empty);
 
-            this.proxyDataCollectionManager.Verify(
+            proxyDataCollectionManager.Verify(
                 dcm => dcm.AfterTestRunEnd(false, It.IsAny<ITestRunEventsHandler>()),
                 Times.Once);
         }
@@ -90,17 +90,17 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         {
             var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new TimeSpan());
 
-            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
-            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
+            mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
+            mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
                 .Returns(new TestRunCompletePayload() { TestRunCompleteArgs = testRunCompleteEventArgs });
 
             var cancellationTokenSource = new CancellationTokenSource();
-            testRunEventHandler = new DataCollectionTestRunEventsHandler(this.baseTestRunEventsHandler.Object, this.proxyDataCollectionManager.Object, this.mockDataSerializer.Object, cancellationTokenSource.Token);
+            testRunEventHandler = new DataCollectionTestRunEventsHandler(baseTestRunEventsHandler.Object, proxyDataCollectionManager.Object, mockDataSerializer.Object, cancellationTokenSource.Token);
             cancellationTokenSource.Cancel();
 
             testRunEventHandler.HandleRawMessage(string.Empty);
 
-            this.proxyDataCollectionManager.Verify(
+            proxyDataCollectionManager.Verify(
                 dcm => dcm.AfterTestRunEnd(true, It.IsAny<ITestRunEventsHandler>()),
                 Times.Once);
         }
@@ -114,18 +114,18 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             };
 
             var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new TimeSpan());
-            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
-            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
+            mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
+            mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
                 .Returns(new TestRunCompletePayload() { TestRunCompleteArgs = testRunCompleteEventArgs });
-            this.proxyDataCollectionManager.Setup(p => p.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()))
+            proxyDataCollectionManager.Setup(p => p.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()))
                 .Returns(new DataCollectionResult(null, invokedDataCollectors));
-            this.mockDataSerializer.Setup(r => r.SerializePayload(It.IsAny<string>(), It.IsAny<object>())).Callback((string message, object o) =>
+            mockDataSerializer.Setup(r => r.SerializePayload(It.IsAny<string>(), It.IsAny<object>())).Callback((string message, object o) =>
             {
                 Assert.AreEqual(1, ((TestRunCompletePayload)o).TestRunCompleteArgs.InvokedDataCollectors.Count);
                 Assert.AreEqual(invokedDataCollectors[0], ((TestRunCompletePayload)o).TestRunCompleteArgs.InvokedDataCollectors[0]);
             });
 
-            testRunEventHandler = new DataCollectionTestRunEventsHandler(this.baseTestRunEventsHandler.Object, this.proxyDataCollectionManager.Object, this.mockDataSerializer.Object, CancellationToken.None);
+            testRunEventHandler = new DataCollectionTestRunEventsHandler(baseTestRunEventsHandler.Object, proxyDataCollectionManager.Object, mockDataSerializer.Object, CancellationToken.None);
             testRunEventHandler.HandleRawMessage(string.Empty);
 
             var testRunCompleteEventArgs2 = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new TimeSpan());
@@ -133,7 +133,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             Assert.AreEqual(1, testRunCompleteEventArgs2.InvokedDataCollectors.Count);
             Assert.AreEqual(invokedDataCollectors[0], testRunCompleteEventArgs2.InvokedDataCollectors[0]);
 
-            this.proxyDataCollectionManager.Verify(
+            proxyDataCollectionManager.Verify(
                 dcm => dcm.AfterTestRunEnd(false, It.IsAny<ITestRunEventsHandler>()),
                 Times.Once);
         }
@@ -142,13 +142,13 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void GetCombinedAttachmentSetsShouldReturnCombinedAttachments()
         {
-            Collection<AttachmentSet> Attachments1 = new Collection<AttachmentSet>();
-            AttachmentSet attachmentset1 = new AttachmentSet(new Uri("DataCollection://Attachment/v1"), "AttachmentV1");
+            Collection<AttachmentSet> Attachments1 = new();
+            AttachmentSet attachmentset1 = new(new Uri("DataCollection://Attachment/v1"), "AttachmentV1");
             attachmentset1.Attachments.Add(new UriDataAttachment(new Uri("DataCollection://Attachment/v11"), "AttachmentV1-Attachment1"));
             Attachments1.Add(attachmentset1);
 
-            Collection<AttachmentSet> Attachments2 = new Collection<AttachmentSet>();
-            AttachmentSet attachmentset2 = new AttachmentSet(new Uri("DataCollection://Attachment/v1"), "AttachmentV1");
+            Collection<AttachmentSet> Attachments2 = new();
+            AttachmentSet attachmentset2 = new(new Uri("DataCollection://Attachment/v1"), "AttachmentV1");
             attachmentset2.Attachments.Add(new UriDataAttachment(new Uri("DataCollection://Attachment/v12"), "AttachmentV1-Attachment2"));
 
             Attachments2.Add(attachmentset2);
@@ -162,8 +162,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void GetCombinedAttachmentSetsShouldReturnFirstArgumentIfSecondArgumentIsNull()
         {
-            Collection<AttachmentSet> Attachments1 = new Collection<AttachmentSet>();
-            AttachmentSet attachmentset1 = new AttachmentSet(new Uri("DataCollection://Attachment/v1"), "AttachmentV1");
+            Collection<AttachmentSet> Attachments1 = new();
+            AttachmentSet attachmentset1 = new(new Uri("DataCollection://Attachment/v1"), "AttachmentV1");
             attachmentset1.Attachments.Add(new UriDataAttachment(new Uri("DataCollection://Attachment/v11"), "AttachmentV1-Attachment1"));
             Attachments1.Add(attachmentset1);
 

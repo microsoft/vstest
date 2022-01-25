@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string MergeMethodName = "MergeCoverageReportsAsync";
         private const string CoverageMergeOperationName = "CoverageMergeOperation";
 
-        private static readonly Uri CodeCoverageDataCollectorUri = new Uri(CoverageUri);
+        private static readonly Uri CodeCoverageDataCollectorUri = new(CoverageUri);
         private static Assembly CodeCoverageAssembly;
         private static object ClassInstance;
         private static MethodInfo MergeMethodInfo;
@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             if (coverageReportFilePaths.Count > 1)
             {
-                var mergedCoverageReports = await this.MergeCodeCoverageFilesAsync(coverageReportFilePaths, progressReporter, cancellationToken).ConfigureAwait(false);
+                var mergedCoverageReports = await MergeCodeCoverageFilesAsync(coverageReportFilePaths, progressReporter, cancellationToken).ConfigureAwait(false);
                 var resultAttachmentSet = new AttachmentSet(CodeCoverageDataCollectorUri, CoverageFriendlyName);
 
                 foreach (var coverageReport in mergedCoverageReports)
@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 // We took a dependency on Coverage.CoreLib.Net. In the unlikely case it cannot be
                 // resolved, this method call will throw an exception that will be caught and
                 // absorbed here.
-                var result = await this.MergeCodeCoverageFilesAsync(files, cancellationToken).ConfigureAwait(false);
+                var result = await MergeCodeCoverageFilesAsync(files, cancellationToken).ConfigureAwait(false);
                 progressReporter?.Report(100);
                 return result;
             }

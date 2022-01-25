@@ -17,7 +17,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 
         public CustomKeyValueConverterTests()
         {
-            this.customKeyValueConverter = new CustomKeyValueConverter();
+            customKeyValueConverter = new CustomKeyValueConverter();
         }
 
         [TestMethod]
@@ -25,7 +25,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         {
             var json = "[{ \"Key\": \"key1\", \"Value\": \"val1\" }]";
 
-            var data = this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
+            var data = customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
 
             Assert.IsNotNull(data);
             Assert.AreEqual(1, data.Length);
@@ -38,7 +38,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         {
             var json = "[{ \"Key\": \"key1\", \"Value\": \"val1\" }, { \"Key\": \"key2\", \"Value\": \"val2\" }]";
 
-            var data = this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
+            var data = customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
 
             Assert.IsNotNull(data);
             Assert.AreEqual(2, data.Length);
@@ -53,7 +53,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         {
             var json = "[]";
 
-            var data = this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
+            var data = customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
 
             Assert.IsNotNull(data);
             Assert.AreEqual(0, data.Length);
@@ -64,7 +64,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         {
             var json = "[{ \"Key\": \"\", \"Value\": \"\" }]";
 
-            var data = this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
+            var data = customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
 
             Assert.AreEqual(1, data.Length);
             Assert.AreEqual(string.Empty, data[0].Key);
@@ -76,7 +76,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         {
             var json = "[{ \"Key\": \"key1\", \"Value\": \"val1\" }, { \"Key\": \"key1\", \"Value\": \"val2\" }]";
 
-            var data = this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
+            var data = customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
 
             Assert.IsNotNull(data);
             Assert.AreEqual(2, data.Length);
@@ -89,7 +89,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         [TestMethod]
         public void CustomKeyValueConverterShouldDeserializeNullValue()
         {
-            var data = this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, null) as KeyValuePair<string, string>[];
+            var data = customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, null) as KeyValuePair<string, string>[];
 
             Assert.IsNull(data);
         }

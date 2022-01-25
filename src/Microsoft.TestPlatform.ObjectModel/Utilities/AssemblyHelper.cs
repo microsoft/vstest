@@ -18,8 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
     public static class AssemblyHelper
     {
 #if NETFRAMEWORK
-        private static Version defaultVersion = new Version();
-        private static Version version45 = new Version("4.5");
+        private static readonly Version defaultVersion = new();
+        private static readonly Version version45 = new("4.5");
 
         /// <summary>
         /// Checks whether the source assembly directly references given assembly or not.
@@ -313,13 +313,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// When test run is targeted for .Net4.0, set target framework of test appdomain to be v4.0.
         /// With this done tests would be executed in 4.0 compatibility mode even when  .Net4.5 is installed.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Failure to set this property should be ignored.")]
         internal static void SetNETFrameworkCompatiblityMode(AppDomainSetup setup, IRunContext runContext)
         {
             try
             {
                 RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runContext.RunSettings.SettingsXml);
-                if (null != runConfiguration && (Enum.Equals(runConfiguration.TargetFramework, FrameworkVersion.Framework40) ||
+                if (null != runConfiguration && (Equals(runConfiguration.TargetFramework, FrameworkVersion.Framework40) ||
                     string.Equals(runConfiguration.TargetFramework.ToString(), Constants.DotNetFramework40, StringComparison.OrdinalIgnoreCase)))
                 {
                     if (EqtTrace.IsVerboseEnabled)
@@ -344,12 +343,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             ValidateArg.NotNull(assembly, nameof(assembly));
             ValidateArg.NotNullOrWhiteSpace(fullyQualifiedName, nameof(fullyQualifiedName));
 
-            if(assembly.GetType(fullyQualifiedName) is Type attribute)
-            {
-                return assembly.GetCustomAttributes(attribute);
-            }
-
-            return assembly
+            return assembly.GetType(fullyQualifiedName) is Type attribute
+                ? assembly.GetCustomAttributes(attribute)
+                : assembly
                 .GetCustomAttributes()
                 .Where(i => i.GetType().FullName == fullyQualifiedName);
         }

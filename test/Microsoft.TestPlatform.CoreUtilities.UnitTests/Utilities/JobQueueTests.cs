@@ -18,10 +18,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         public void ConstructorThrowsWhenNullProcessHandlerIsProvided()
         {
             JobQueue<string> jobQueue = null;
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                jobQueue = new JobQueue<string>(null, "dp", int.MaxValue, int.MaxValue, false, (message) => { });
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => jobQueue = new JobQueue<string>(null, "dp", int.MaxValue, int.MaxValue, false, (message) => { }));
 
             if (jobQueue != null)
             {
@@ -33,18 +30,9 @@ namespace TestPlatform.CoreUtilities.UnitTests
         public void ThrowsWhenNullEmptyOrWhiteSpaceDisplayNameIsProvided()
         {
             JobQueue<string> jobQueue = null;
-            Assert.ThrowsException<ArgumentException>(() =>
-            {
-                jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), null, int.MaxValue, int.MaxValue, false, (message) => { });
-            });
-            Assert.ThrowsException<ArgumentException>(() =>
-            {
-                jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "", int.MaxValue, int.MaxValue, false, (message) => { });
-            });
-            Assert.ThrowsException<ArgumentException>(() =>
-            {
-                jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "    ", int.MaxValue, int.MaxValue, false, (message) => { });
-            });
+            Assert.ThrowsException<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), null, int.MaxValue, int.MaxValue, false, (message) => { }));
+            Assert.ThrowsException<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "", int.MaxValue, int.MaxValue, false, (message) => { }));
+            Assert.ThrowsException<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "    ", int.MaxValue, int.MaxValue, false, (message) => { }));
 
             if (jobQueue != null)
             {
@@ -57,10 +45,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         {
             // Setup the job process handler to keep track of the jobs.
             var jobsProcessed = new List<int>();
-            Action<int> processHandler = (job) =>
-            {
-                jobsProcessed.Add(job);
-            };
+            Action<int> processHandler = (job) => jobsProcessed.Add(job);
 
             // Setup Test Data.
             var job1 = 1;
@@ -85,10 +70,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         {
             // Setup the job process handler to keep track of the jobs.
             var jobsProcessed = new List<int>();
-            Action<string> processHandler = (job) =>
-            {
-                jobsProcessed.Add(Thread.CurrentThread.ManagedThreadId);
-            };
+            Action<string> processHandler = (job) => jobsProcessed.Add(Thread.CurrentThread.ManagedThreadId);
 
             // Queue the jobs and verify they are processed on a background thread.
             using (var queue = new JobQueue<string>(processHandler, "dp", int.MaxValue, int.MaxValue, false, (message) => { }))
@@ -105,10 +87,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
             var queue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "dp", int.MaxValue, int.MaxValue, false, (message) => { });
             queue.Dispose();
 
-            Assert.ThrowsException<ObjectDisposedException>(() =>
-            {
-                queue.QueueJob("dp", 0);
-            });
+            Assert.ThrowsException<ObjectDisposedException>(() => queue.QueueJob("dp", 0));
         }
 
         [TestMethod]
@@ -117,10 +96,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
             var queue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "dp", int.MaxValue, int.MaxValue, false, (message) => { });
             queue.Dispose();
 
-            Assert.ThrowsException<ObjectDisposedException>(() =>
-            {
-                queue.Resume();
-            });
+            Assert.ThrowsException<ObjectDisposedException>(() => queue.Resume());
         }
 
         [TestMethod]
@@ -129,10 +105,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
             var queue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "dp", int.MaxValue, int.MaxValue, false, (message) => { });
             queue.Dispose();
 
-            Assert.ThrowsException<ObjectDisposedException>(() =>
-            {
-                queue.Pause();
-            });
+            Assert.ThrowsException<ObjectDisposedException>(() => queue.Pause());
         }
 
         [TestMethod]
@@ -141,14 +114,10 @@ namespace TestPlatform.CoreUtilities.UnitTests
             var queue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "dp", int.MaxValue, int.MaxValue, false, (message) => { });
             queue.Dispose();
 
-            Assert.ThrowsException<ObjectDisposedException>(() =>
-            {
-                queue.Flush();
-            });
+            Assert.ThrowsException<ObjectDisposedException>(() => queue.Flush());
         }
 
         [TestMethod]
-        [SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "queue is required to be disposed twice.")]
         public void DisposeDoesNotThrowWhenCalledTwice()
         {
             var queue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "dp", int.MaxValue, int.MaxValue, false, (message) => { });
@@ -160,11 +129,8 @@ namespace TestPlatform.CoreUtilities.UnitTests
         public void OncePausedNoFurtherJobsAreProcessedUntilResumeIsCalled()
         {
             // Setup the job process handler to keep track of the jobs it is called with.
-            List<string> processedJobs = new List<string>();
-            Action<string> processHandler = (job) =>
-            {
-                processedJobs.Add(job);
-            };
+            List<string> processedJobs = new();
+            Action<string> processHandler = (job) => processedJobs.Add(job);
 
             // Queue the jobs after paused and verify they are not processed until resumed.
             using (var queue = new JobQueue<string>(processHandler, "dp", int.MaxValue, int.MaxValue, false, (message) => { }))
@@ -190,10 +156,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
             using var queue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "dp", int.MaxValue, int.MaxValue, false, (message) => { });
             queue.Pause();
 
-            Assert.ThrowsException<InvalidOperationException>(() =>
-            {
-                queue.Dispose();
-            });
+            Assert.ThrowsException<InvalidOperationException>(() => queue.Dispose());
 
             queue.Resume();
         }
@@ -203,10 +166,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         {
             // Setup the job process handler to keep track of the jobs it has processed.
             var jobsProcessed = 0;
-            Action<string> processHandler = (job) =>
-            {
-                jobsProcessed++;
-            };
+            Action<string> processHandler = (job) => jobsProcessed++;
 
             // Queue several jobs and verify they have been processed when wait returns.
             using var queue = new JobQueue<string>(processHandler, "dp", int.MaxValue, int.MaxValue, false, (message) => { });
@@ -222,8 +182,8 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void TestBlockAtEnqueueDueToLength()
         {
-            ManualResetEvent allowJobProcessingHandlerToProceed = new ManualResetEvent(false);
-            AutoResetEvent jobProcessed = new AutoResetEvent(false);
+            ManualResetEvent allowJobProcessingHandlerToProceed = new(false);
+            AutoResetEvent jobProcessed = new(false);
 
             // process handler for the jobs in queue. It blocks on a job till the queue gets full and the handler sets the
             // event allowHandlerToProceed.
@@ -236,7 +196,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
                 }
             };
 
-            using JobQueueWrapper queue = new JobQueueWrapper(processHandler, 5, int.MaxValue, true, allowJobProcessingHandlerToProceed);
+            using JobQueueWrapper queue = new(processHandler, 5, int.MaxValue, true, allowJobProcessingHandlerToProceed);
             // run the same thing multiple times to ensure that the queue isn't in a erroneous state after being blocked.
             for (int i = 0; i < 10; i++)
             {
@@ -276,8 +236,8 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void TestBlockAtEnqueueDueToSize()
         {
-            ManualResetEvent allowJobProcessingHandlerToProceed = new ManualResetEvent(false);
-            AutoResetEvent jobProcessed = new AutoResetEvent(false);
+            ManualResetEvent allowJobProcessingHandlerToProceed = new(false);
+            AutoResetEvent jobProcessed = new(false);
 
             // process handler for the jobs in queue. It blocks on a job till the queue gets full and the handler sets the
             // event allowHandlerToProceed.
@@ -290,7 +250,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
                 }
             };
 
-            using JobQueueWrapper queue = new JobQueueWrapper(processHandler, int.MaxValue, 40, true, allowJobProcessingHandlerToProceed);
+            using JobQueueWrapper queue = new(processHandler, int.MaxValue, 40, true, allowJobProcessingHandlerToProceed);
             // run the same thing multiple times to ensure that the queue isn't in a erroneous state after being blocked.
             for (int i = 0; i < 10; i++)
             {
@@ -330,8 +290,8 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void TestBlockingDisabled()
         {
-            ManualResetEvent allowJobProcessingHandlerToProceed = new ManualResetEvent(false);
-            AutoResetEvent jobProcessed = new AutoResetEvent(false);
+            ManualResetEvent allowJobProcessingHandlerToProceed = new(false);
+            AutoResetEvent jobProcessed = new(false);
 
             // process handler for the jobs in queue. It blocks on a job till the test method sets the
             // event allowHandlerToProceed.
@@ -344,7 +304,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
                 }
             };
 
-            using JobQueueWrapper queue = new JobQueueWrapper(processHandler, 2, int.MaxValue, false, allowJobProcessingHandlerToProceed);
+            using JobQueueWrapper queue = new(processHandler, 2, int.MaxValue, false, allowJobProcessingHandlerToProceed);
             // run the same thing multiple times to ensure that the queue isn't in a erroneous state after first run.
             for (int i = 0; i < 10; i++)
             {
@@ -383,12 +343,9 @@ namespace TestPlatform.CoreUtilities.UnitTests
             var jobProcessed = new AutoResetEvent(false);
 
             // process handler for the jobs in queue.
-            Action<string> processHandler = (job) =>
-            {
-                jobProcessed.Set();
-            };
+            Action<string> processHandler = (job) => jobProcessed.Set();
 
-            using JobQueueNonBlocking queue = new JobQueueNonBlocking(processHandler);
+            using JobQueueNonBlocking queue = new(processHandler);
             // run the same thing multiple times to ensure that the queue isn't in a erroneous state after first run.
             for (var i = 0; i < 10; i++)
             {
@@ -455,14 +412,14 @@ namespace TestPlatform.CoreUtilities.UnitTests
                                     ManualResetEvent queueGotBlocked)
                 : base(processJob, "foo", maxNoOfStringsQueueCanHold, maxNoOfBytesQueueCanHold, isBoundsEnabled, (message) => { })
             {
-                this.IsEnqueueBlocked = false;
+                IsEnqueueBlocked = false;
                 this.queueGotBlocked = queueGotBlocked;
             }
 
             protected override bool WaitForQueueToGetEmpty()
             {
-                this.IsEnqueueBlocked = true;
-                this.queueGotBlocked.Set();
+                IsEnqueueBlocked = true;
+                queueGotBlocked.Set();
                 return base.WaitForQueueToGetEmpty();
             }
 
@@ -475,7 +432,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
                 set;
             }
 
-            private ManualResetEvent queueGotBlocked;
+            private readonly ManualResetEvent queueGotBlocked;
         }
 
         /// <summary>

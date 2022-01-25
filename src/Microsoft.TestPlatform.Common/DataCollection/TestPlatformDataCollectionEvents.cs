@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <summary>
         /// Maps the type of event args to the multi cast delegate for that event
         /// </summary>
-        private Dictionary<Type, EventInvoker> eventArgsToEventInvokerMap;
+        private readonly Dictionary<Type, EventInvoker> eventArgsToEventInvokerMap;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPlatformDataCollectionEvents"/> class by mapping the types of expected event args to the multi cast
@@ -26,13 +26,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </summary>
         internal TestPlatformDataCollectionEvents()
         {
-            this.eventArgsToEventInvokerMap = new Dictionary<Type, EventInvoker>(4)
+            eventArgsToEventInvokerMap = new Dictionary<Type, EventInvoker>(4)
             {
-                [typeof(TestHostLaunchedEventArgs)] = this.OnTestHostLaunched,
-                [typeof(SessionStartEventArgs)] = this.OnSessionStart,
-                [typeof(SessionEndEventArgs)] = this.OnSessionEnd,
-                [typeof(TestCaseStartEventArgs)] = this.OnTestCaseStart,
-                [typeof(TestCaseEndEventArgs)] = this.OnTestCaseEnd
+                [typeof(TestHostLaunchedEventArgs)] = OnTestHostLaunched,
+                [typeof(SessionStartEventArgs)] = OnSessionStart,
+                [typeof(SessionEndEventArgs)] = OnSessionEnd,
+                [typeof(TestCaseStartEventArgs)] = OnTestCaseStart,
+                [typeof(TestCaseEndEventArgs)] = OnTestCaseEnd
             };
         }
 
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             ValidateArg.NotNull(e, "DataCollectionEventArgs");
 
 
-            if (this.eventArgsToEventInvokerMap.TryGetValue(e.GetType(), out var onEvent))
+            if (eventArgsToEventInvokerMap.TryGetValue(e.GetType(), out var onEvent))
             {
                 onEvent(e);
             }
@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         internal bool AreTestCaseEventsSubscribed()
         {
             bool valueOnFailure = false;
-            return (HasEventListener(this.TestCaseStart, valueOnFailure) || HasEventListener(this.TestCaseEnd, valueOnFailure));
+            return (HasEventListener(TestCaseStart, valueOnFailure) || HasEventListener(TestCaseEnd, valueOnFailure));
         }
 
         private bool HasEventListener(MulticastDelegate eventToCheck, bool valueOnFailure)
@@ -109,12 +109,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 }
 
                 Delegate[] listeners = eventToCheck.GetInvocationList();
-                if (listeners == null || listeners.Length == 0)
-                {
-                    return false;
-                }
-
-                return true;
+                return listeners != null && listeners.Length != 0;
             }
             catch (Exception ex)
             {
@@ -135,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </param>
         private void OnTestHostLaunched(DataCollectionEventArgs e)
         {
-            this.TestHostLaunched.SafeInvoke(this, e, "DataCollectionEvents.TestHostLaunched");
+            TestHostLaunched.SafeInvoke(this, e, "DataCollectionEvents.TestHostLaunched");
         }
 
         /// <summary>
@@ -146,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </param>
         private void OnSessionStart(DataCollectionEventArgs e)
         {
-            this.SessionStart.SafeInvoke(this, e, "DataCollectionEvents.SessionStart");
+            SessionStart.SafeInvoke(this, e, "DataCollectionEvents.SessionStart");
         }
 
         /// <summary>
@@ -157,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </param>
         private void OnSessionEnd(DataCollectionEventArgs e)
         {
-            this.SessionEnd.SafeInvoke(this, e, "DataCollectionEvents.SessionEnd");
+            SessionEnd.SafeInvoke(this, e, "DataCollectionEvents.SessionEnd");
         }
 
         /// <summary>
@@ -168,7 +163,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </param>
         private void OnTestCaseStart(DataCollectionEventArgs e)
         {
-            this.TestCaseStart.SafeInvoke(this, e, "DataCollectionEvents.TestCaseStart");
+            TestCaseStart.SafeInvoke(this, e, "DataCollectionEvents.TestCaseStart");
         }
 
         /// <summary>
@@ -179,7 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </param>
         private void OnTestCaseEnd(DataCollectionEventArgs e)
         {
-            this.TestCaseEnd.SafeInvoke(this, e, "DataCollectionEvents.TestCaseEnd");
+            TestCaseEnd.SafeInvoke(this, e, "DataCollectionEvents.TestCaseEnd");
         }
     }
 }

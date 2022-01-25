@@ -50,12 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                     return PlatformOperatingSystem.Windows;
                 }
 
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                {
-                    return PlatformOperatingSystem.OSX;
-                }
-
-                return PlatformOperatingSystem.Unix;
+                return RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? PlatformOperatingSystem.OSX : PlatformOperatingSystem.Unix;
             }
         }
 

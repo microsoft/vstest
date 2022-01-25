@@ -20,14 +20,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         public DiscoveryEventHandler()
         {
-            this.DiscoveredTestCases = new List<TestCase>();
+            DiscoveredTestCases = new List<TestCase>();
         }
 
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
             if (discoveredTestCases != null)
             {
-                this.DiscoveredTestCases.AddRange(discoveredTestCases);
+                DiscoveredTestCases.AddRange(discoveredTestCases);
             }
         }
 
@@ -35,7 +35,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             if (lastChunk != null)
             {
-                this.DiscoveredTestCases.AddRange(lastChunk);
+                DiscoveredTestCases.AddRange(lastChunk);
             }
         }
 
@@ -79,8 +79,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         public DiscoveryEventHandler2()
         {
-            this.DiscoveredTestCases = new List<TestCase>();
-            this.testMessages = new List<TestMessage>();
+            DiscoveredTestCases = new List<TestCase>();
+            testMessages = new List<TestMessage>();
         }
 
         public void HandleRawMessage(string rawMessage)
@@ -90,24 +90,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            this.testMessages.Add(new TestMessage(level, message));
+            testMessages.Add(new TestMessage(level, message));
         }
 
         public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
             if (lastChunk != null)
             {
-                this.DiscoveredTestCases.AddRange(lastChunk);
+                DiscoveredTestCases.AddRange(lastChunk);
             }
 
-            this.Metrics = discoveryCompleteEventArgs.Metrics;
+            Metrics = discoveryCompleteEventArgs.Metrics;
         }
 
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
             if (discoveredTestCases != null)
             {
-                this.DiscoveredTestCases.AddRange(discoveredTestCases);
+                DiscoveredTestCases.AddRange(discoveredTestCases);
             }
         }
     }
@@ -127,7 +127,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         public DiscoveryEventHandlerForBatchSize()
         {
-            this.DiscoveredTestCases = new List<TestCase>();
+            DiscoveredTestCases = new List<TestCase>();
         }
 
         public void HandleRawMessage(string rawMessage)
@@ -144,7 +144,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             if (lastChunk != null)
             {
-                this.DiscoveredTestCases.AddRange(lastChunk);
+                DiscoveredTestCases.AddRange(lastChunk);
             }
         }
 
@@ -152,7 +152,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             if (lastChunk != null)
             {
-                this.DiscoveredTestCases.AddRange(lastChunk);
+                DiscoveredTestCases.AddRange(lastChunk);
             }
         }
 
@@ -160,8 +160,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             if (discoveredTestCases != null && discoveredTestCases.Any())
             {
-                this.DiscoveredTestCases.AddRange(discoveredTestCases);
-                this.BatchSize = discoveredTestCases.Count();
+                DiscoveredTestCases.AddRange(discoveredTestCases);
+                BatchSize = discoveredTestCases.Count();
             }
         }
     }

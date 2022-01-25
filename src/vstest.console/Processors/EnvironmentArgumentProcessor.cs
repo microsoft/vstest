@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     /// Argument Executor for the "-e|--Environment|/e|/Environment" command line argument.
@@ -36,18 +36,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(
+                    executor = new Lazy<IArgumentExecutor>(
                         () => new ArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, ConsoleOutput.Instance)
                     );
                 }
 
-                return this.executor;
+                return executor;
             }
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
 
@@ -55,12 +55,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -81,17 +81,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             /// <summary>
             /// Used when warning about overriden environment variables.
             /// </summary>
-            private IOutput output;
+            private readonly IOutput output;
 
             /// <summary>
             /// Used when setting Environemnt variables.
             /// </summary>
-            private IRunSettingsProvider runSettingsProvider;
+            private readonly IRunSettingsProvider runSettingsProvider;
 
             /// <summary>
             /// Used when checking and forcing InIsolation mode.
             /// </summary>
-            private CommandLineOptions commandLineOptions;
+            private readonly CommandLineOptions commandLineOptions;
             #endregion
 
             public ArgumentExecutor(CommandLineOptions commandLineOptions, IRunSettingsProvider runSettingsProvider, IOutput output)
@@ -110,9 +110,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             public void Initialize(string argument)
             {
                 Contract.Assert(!string.IsNullOrWhiteSpace(argument));
-                Contract.Assert(this.output != null);
-                Contract.Assert(this.commandLineOptions != null);
-                Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsProvider.ActiveRunSettings.SettingsXml));
+                Contract.Assert(output != null);
+                Contract.Assert(commandLineOptions != null);
+                Contract.Assert(!string.IsNullOrWhiteSpace(runSettingsProvider.ActiveRunSettings.SettingsXml));
                 Contract.EndContractBlock();
 
                 var key = argument;
@@ -124,17 +124,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     key = key.Substring(0, key.IndexOf("="));
                 }
 
-                var node = this.runSettingsProvider.QueryRunSettingsNode($"RunConfiguration.EnvironmentVariables.{key}");
+                var node = runSettingsProvider.QueryRunSettingsNode($"RunConfiguration.EnvironmentVariables.{key}");
                 if(node != null)
                 {
                     output.Warning(true, CommandLineResources.EnvironmentVariableXIsOverriden, key);
                 }
 
-                this.runSettingsProvider.UpdateRunSettingsNode($"RunConfiguration.EnvironmentVariables.{key}", value);
+                runSettingsProvider.UpdateRunSettingsNode($"RunConfiguration.EnvironmentVariables.{key}", value);
                 
-                if(!this.commandLineOptions.InIsolation) { 
-                    this.commandLineOptions.InIsolation = true;
-                    this.runSettingsProvider.UpdateRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath, "true");
+                if(!commandLineOptions.InIsolation) { 
+                    commandLineOptions.InIsolation = true;
+                    runSettingsProvider.UpdateRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath, "true");
                 }
             }
 

@@ -24,23 +24,23 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 
         public SocketClientTests()
         {
-            this.socketClient = new SocketClient();
+            socketClient = new SocketClient();
 
             var endpoint = new IPEndPoint(IPAddress.Loopback, 0);
-            this.tcpListener = new TcpListener(endpoint);
+            tcpListener = new TcpListener(endpoint);
         }
 
-        protected override TcpClient Client => this.tcpClient;
+        protected override TcpClient Client => tcpClient;
 
         public void Dispose()
         {
-            this.socketClient.Stop();
+            socketClient.Stop();
 #if NETFRAMEWORK
             // tcpClient.Close() calls tcpClient.Dispose().
-            this.tcpClient?.Close();
+            tcpClient?.Close();
 #else
             // tcpClient.Close() not available for netcoreapp1.0
-            this.tcpClient?.Dispose();
+            tcpClient?.Dispose();
 #endif
             GC.SuppressFinalize(this);
         }
@@ -48,11 +48,11 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         [TestMethod]
         public void SocketClientStartShouldConnectToLoopbackOnGivenPort()
         {
-            var connectionInfo = this.StartLocalServer();
+            var connectionInfo = StartLocalServer();
 
-            this.socketClient.Start(connectionInfo);
+            socketClient.Start(connectionInfo);
 
-            var acceptClientTask = this.tcpListener.AcceptTcpClientAsync();
+            var acceptClientTask = tcpListener.AcceptTcpClientAsync();
             Assert.IsTrue(acceptClientTask.Wait(TIMEOUT));
             Assert.IsTrue(acceptClientTask.Result.Connected);
         }
@@ -63,12 +63,12 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         {
             var dummyConnectionInfo = "5345";
 
-            this.socketClient.Start(dummyConnectionInfo);
+            socketClient.Start(dummyConnectionInfo);
 
             var exceptionThrown = false;
             try
             {
-                this.socketClient.Start(dummyConnectionInfo);
+                socketClient.Start(dummyConnectionInfo);
             }
             catch (PlatformNotSupportedException)
             {
@@ -86,10 +86,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         [TestMethod]
         public void SocketClientStopShouldRaiseClientDisconnectedEventOnClientDisconnection()
         {
-            var waitEvent = this.SetupClientDisconnect(out ICommunicationChannel _);
+            var waitEvent = SetupClientDisconnect(out ICommunicationChannel _);
 
             // Close the communication from client side
-            this.socketClient.Stop();
+            socketClient.Stop();
 
             Assert.IsTrue(waitEvent.WaitOne(TIMEOUT));
         }
@@ -97,16 +97,16 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         [TestMethod]
         public void SocketClientShouldRaiseClientDisconnectedEventIfConnectionIsBroken()
         {
-            var waitEvent = this.SetupClientDisconnect(out ICommunicationChannel _);
+            var waitEvent = SetupClientDisconnect(out ICommunicationChannel _);
 
             // Close the communication from server side
-            this.tcpClient.GetStream().Dispose();
+            tcpClient.GetStream().Dispose();
 #if NETFRAMEWORK
             // tcpClient.Close() calls tcpClient.Dispose().
-            this.tcpClient?.Close();
+            tcpClient?.Close();
 #else
             // tcpClient.Close() not available for netcoreapp1.0
-            this.tcpClient?.Dispose();
+            tcpClient?.Dispose();
 #endif
             Assert.IsTrue(waitEvent.WaitOne(TIMEOUT));
         }
@@ -114,22 +114,22 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         [TestMethod]
         public void SocketClientStopShouldStopCommunication()
         {
-            var waitEvent = this.SetupClientDisconnect(out ICommunicationChannel _);
+            var waitEvent = SetupClientDisconnect(out ICommunicationChannel _);
 
             // Close the communication from socket client side
-            this.socketClient.Stop();
+            socketClient.Stop();
 
             // Validate that write on server side fails
             waitEvent.WaitOne(TIMEOUT);
-            Assert.ThrowsException<IOException>(() => WriteData(this.Client));
+            Assert.ThrowsException<IOException>(() => WriteData(Client));
         }
 
         [TestMethod]
         public void SocketClientStopShouldCloseChannel()
         {
-            var waitEvent = this.SetupClientDisconnect(out ICommunicationChannel channel);
+            var waitEvent = SetupClientDisconnect(out ICommunicationChannel channel);
 
-            this.socketClient.Stop();
+            socketClient.Stop();
 
             waitEvent.WaitOne(TIMEOUT);
             Assert.ThrowsException<CommunicationException>(() => channel.Send(DUMMYDATA));
@@ -139,21 +139,21 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         {
             ICommunicationChannel channel = null;
             ConnectedEventArgs serverConnectedEvent = null;
-            ManualResetEvent waitEvent = new ManualResetEvent(false);
-            this.socketClient.Connected += (sender, eventArgs) =>
+            ManualResetEvent waitEvent = new(false);
+            socketClient.Connected += (sender, eventArgs) =>
             {
                 serverConnectedEvent = eventArgs;
                 channel = eventArgs.Channel;
                 waitEvent.Set();
             };
 
-            var connectionInfo = this.StartLocalServer();
-            this.socketClient.Start(connectionInfo);
+            var connectionInfo = StartLocalServer();
+            socketClient.Start(connectionInfo);
 
-            var acceptClientTask = this.tcpListener.AcceptTcpClientAsync();
+            var acceptClientTask = tcpListener.AcceptTcpClientAsync();
             if (acceptClientTask.Wait(TimeSpan.FromMilliseconds(1000)))
             {
-                this.tcpClient = acceptClientTask.Result;
+                tcpClient = acceptClientTask.Result;
                 waitEvent.WaitOne(1000);
             }
 
@@ -164,8 +164,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         private ManualResetEvent SetupClientDisconnect(out ICommunicationChannel channel)
         {
             var waitEvent = new ManualResetEvent(false);
-            this.socketClient.Disconnected += (s, e) => { waitEvent.Set(); };
-            channel = this.SetupChannel(out ConnectedEventArgs _);
+            socketClient.Disconnected += (s, e) => waitEvent.Set();
+            channel = SetupChannel(out ConnectedEventArgs _);
             channel.MessageReceived += (sender, args) =>
             {
             };
@@ -174,9 +174,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 
         private string StartLocalServer()
         {
-            this.tcpListener.Start();
+            tcpListener.Start();
 
-            return ((IPEndPoint)this.tcpListener.LocalEndpoint).ToString();
+            return ((IPEndPoint)tcpListener.LocalEndpoint).ToString();
         }
     }
 }

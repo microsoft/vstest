@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             // If the type of property is unexpected, then fail as otherwise we will not be to serialize it over the wcf channel and serialize it in db.
             if (valueType == typeof(KeyValuePair<string, string>[]))
             {
-                this.ValueType = "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]";
+                ValueType = "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]";
             }
             else if (valueType == typeof(string)
                 || valueType == typeof(Uri)
@@ -54,25 +54,25 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 // are different in desktop and coreclr. Thus AQN in coreclr includes System.Private.CoreLib which
                 // is not available on the desktop.
                 // Note that this doesn't handle generic types. Such types will fail during serialization.
-                this.ValueType = valueType.FullName;
+                ValueType = valueType.FullName;
             }
             else if (valueType.GetTypeInfo().IsValueType)
             {
                 // In case of custom types, let the assembly qualified name be available to help
                 // deserialization on the client.
-                this.ValueType = valueType.AssemblyQualifiedName;
+                ValueType = valueType.AssemblyQualifiedName;
             }
             else
             {
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.UnexpectedTypeOfProperty, valueType, id));
             }
 
-            this.Id = id;
-            this.Label = label;
-            this.Category = category;
-            this.Description = description;
-            this.ValidateValueCallback = validateValueCallback;
-            this.Attributes = attributes;
+            Id = id;
+            Label = label;
+            Category = category;
+            Description = description;
+            ValidateValueCallback = validateValueCallback;
+            Attributes = attributes;
             this.valueType = valueType;
         }
 
@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public override int GetHashCode()
         {
-            return this.Id.GetHashCode();
+            return Id.GetHashCode();
         }
 
         /// <inheritdoc/>
@@ -142,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public bool Equals(TestProperty other)
         {
-            return (other != null) && (this.Id == other.Id);
+            return (other != null) && (Id == other.Id);
         }
 
         #endregion IEquatable
@@ -152,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public override string ToString()
         {
-            return this.Id;
+            return Id;
         }
 
         /// <summary>
@@ -160,19 +160,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         /// <remarks>Only works for the valueType that is in the currently executing assembly or in Mscorlib.dll. The default valueType is of string valueType.</remarks>
         /// <returns>The valueType of the test property</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This could take a bit time, is not simple enough to be a property.")]
         public Type GetValueType()
         {
-            if (this.valueType == null)
+            if (valueType == null)
             {
-                this.valueType = this.GetType(this.ValueType);
+                valueType = GetType(ValueType);
             }
 
-            return this.valueType;
+            return valueType;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Use this in the body in debug mode")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We use the default type whenever exception thrown")]
         private Type GetType(string typeName)
         {
             ValidateArg.NotNull(typeName, nameof(typeName));
@@ -192,15 +189,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 // For UAP the type namespace for System.Uri,System.TimeSpan and System.DateTimeOffset differs from the desktop version.
                 if (type == null && typeName.StartsWith("System.Uri"))
                 {
-                    type = typeof(System.Uri);
+                    type = typeof(Uri);
                 }
                 else if (type == null && typeName.StartsWith("System.TimeSpan"))
                 {
-                    type = typeof(System.TimeSpan);
+                    type = typeof(TimeSpan);
                 }
                 else if (type == null && typeName.StartsWith("System.DateTimeOffset"))
                 {
-                    type = typeof(System.DateTimeOffset);
+                    type = typeof(DateTimeOffset);
                 }
                 else if (type == null && typeName.StartsWith("System.Int16"))
                 {
@@ -230,7 +227,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 {
                     System.Diagnostics.Debug.Fail("The test property type " + typeName + " of property " + this.id + "is not supported.");
 #else
-                System.Diagnostics.Debug.WriteLine("The test property type " + typeName + " of property " + this.Id + "is not supported.");
+                System.Diagnostics.Debug.WriteLine("The test property type " + typeName + " of property " + Id + "is not supported.");
 #endif
 #if FullCLR
                 }
@@ -252,8 +249,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         #region Static Fields
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.MSInternal", "CA908:AvoidTypesThatRequireJitCompilationInPrecompiledAssemblies")]
-        private static Dictionary<string, KeyValuePair<TestProperty, HashSet<Type>>> s_properties = new Dictionary<string, KeyValuePair<TestProperty, HashSet<Type>>>();
+        private static readonly Dictionary<string, KeyValuePair<TestProperty, HashSet<Type>>> s_properties = new();
 
 #if FullCLR
         private static string s_visualStudioPKT = "b03f5f7f11d50a3a";
@@ -264,7 +260,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         #region Static Methods
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.MSInternal", "CA908:AvoidTypesThatRequireJitCompilationInPrecompiledAssemblies")]
         public static void ClearRegisteredProperties()
         {
             lock (s_properties)
@@ -273,7 +268,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.MSInternal", "CA908:AvoidTypesThatRequireJitCompilationInPrecompiledAssemblies")]
         public static TestProperty Find(string id)
         {
             ValidateArg.NotNull(id, nameof(id));
@@ -311,7 +305,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             return Register(id, label, string.Empty, string.Empty, valueType, null, attributes, owner);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.MSInternal", "CA908:AvoidTypesThatRequireJitCompilationInPrecompiledAssemblies")]
         public static TestProperty Register(string id, string label, string category, string description, Type valueType, ValidateValueCallback validateValueCallback, TestPropertyAttributes attributes, Type owner)
         {
             ValidateArg.NotNullOrEmpty(id, nameof(id));
@@ -384,17 +377,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public object GetRealObject(StreamingContext context)
         {
-            var registeredProperty = TestProperty.Find(this.Id);
+            var registeredProperty = Find(Id);
             if (registeredProperty == null)
             {
-                registeredProperty = TestProperty.Register(
-                    this.Id,
-                    this.Label,
-                    this.Category,
-                    this.Description,
-                    this.GetValueType(),
-                    this.ValidateValueCallback,
-                    this.Attributes,
+                registeredProperty = Register(
+                    Id,
+                    Label,
+                    Category,
+                    Description,
+                    GetValueType(),
+                    ValidateValueCallback,
+                    Attributes,
                     typeof(TestObject));
             }
 

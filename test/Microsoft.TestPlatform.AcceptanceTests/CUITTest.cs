@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource]
         public void CUITRunAllTests(RunnerInfo runnerInfo)
         {
-            SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
             CUITRunAll(runnerInfo.RunnerFramework);
         }
 
@@ -28,10 +28,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyAbsolutePath = testEnvironment.GetTestAsset("CUITTestProject.dll", "net451");
             var resultsDirectory = GetResultsDirectory();
-            var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: resultsDirectory);
+            var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: resultsDirectory);
 
-            this.InvokeVsTest(arguments);
-            this.ValidateSummaryStatus(1, 0, 0);
+            InvokeVsTest(arguments);
+            ValidateSummaryStatus(1, 0, 0);
 
             TryRemoveDirectory(resultsDirectory);
         }

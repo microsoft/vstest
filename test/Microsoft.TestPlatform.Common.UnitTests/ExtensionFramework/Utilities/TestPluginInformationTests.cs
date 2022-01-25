@@ -11,29 +11,29 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
     [TestClass]
     public class TestPluginInformationTests
     {
-        private TestableTestPluginInformation testPluginInformation;
+        private readonly TestableTestPluginInformation testPluginInformation;
 
         public TestPluginInformationTests()
         {
-            this.testPluginInformation = new TestableTestPluginInformation(typeof(TestPluginInformationTests));
+            testPluginInformation = new TestableTestPluginInformation(typeof(TestPluginInformationTests));
         }
 
         [TestMethod]
         public void AssemblyQualifiedNameShouldReturnTestExtensionTypesName()
         {
-            Assert.AreEqual(typeof(TestPluginInformationTests).AssemblyQualifiedName, this.testPluginInformation.AssemblyQualifiedName);
+            Assert.AreEqual(typeof(TestPluginInformationTests).AssemblyQualifiedName, testPluginInformation.AssemblyQualifiedName);
         }
 
         [TestMethod]
         public void IdentifierDataShouldReturnTestExtensionTypesName()
         {
-            Assert.AreEqual(typeof(TestPluginInformationTests).AssemblyQualifiedName, this.testPluginInformation.IdentifierData);
+            Assert.AreEqual(typeof(TestPluginInformationTests).AssemblyQualifiedName, testPluginInformation.IdentifierData);
         }
 
         [TestMethod]
         public void MetadataShouldReturnTestExtensionTypesAssemblyQualifiedName()
         {
-            CollectionAssert.AreEqual(new object[] { typeof(TestPluginInformationTests).AssemblyQualifiedName }, this.testPluginInformation.Metadata.ToArray());
+            CollectionAssert.AreEqual(new object[] { typeof(TestPluginInformationTests).AssemblyQualifiedName }, testPluginInformation.Metadata.ToArray());
         }
     }
 

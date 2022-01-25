@@ -16,19 +16,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// Process id of the test host
         /// </summary>
-        private int processId;
-
         #endregion
 
         #region Public properties
 
-        public int TestHostProcessId
-        {
-            get
-            {
-                return processId;
-            }
-        }
+        public int TestHostProcessId { get; private set; }
 
         #endregion
 
@@ -46,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         public TestHostLaunchedEventArgs(DataCollectionContext context, int processId)
             : base(context)
         {
-            this.processId = processId;
+            TestHostProcessId = processId;
         }
 
         #endregion

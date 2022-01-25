@@ -37,10 +37,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         private readonly ICommunicationManager communicationManager;
         private readonly IDataSerializer dataSerializer;
 
-        private ProtocolConfig protocolConfig = ObjectModel.Constants.DefaultProtocolConfig;
-        private IEnvironment platformEnvironment;
-        private TestSessionMessageLogger testSessionMessageLogger;
-        private object lockObject = new object();
+        private readonly ProtocolConfig protocolConfig = ObjectModel.Constants.DefaultProtocolConfig;
+        private readonly IEnvironment platformEnvironment;
+        private readonly TestSessionMessageLogger testSessionMessageLogger;
+        private readonly object lockObject = new();
 
         protected Action<Message> onCustomTestHostLaunchAckReceived;
         protected Action<Message> onAttachDebuggerAckRecieved;
@@ -70,8 +70,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             this.communicationManager = communicationManager;
             this.dataSerializer = dataSerializer;
             this.platformEnvironment = platformEnvironment;
-            this.testSessionMessageLogger = TestSessionMessageLogger.Instance;
-            this.testSessionMessageLogger.TestRunMessage += this.TestRunMessageHandler;
+            testSessionMessageLogger = TestSessionMessageLogger.Instance;
+            testSessionMessageLogger.TestRunMessage += TestRunMessageHandler;
         }
 
         /// <summary>
@@ -99,20 +99,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         public void ConnectToClientAndProcessRequests(int port, ITestRequestManager testRequestManager)
         {
             EqtTrace.Info("Trying to connect to server on port : {0}", port);
-            this.communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
+            communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
 
             var connectionTimeoutInSecs = EnvironmentHelper.GetConnectionTimeout();
 
             // Wait for the connection to the server and listen for requests.
-            if (this.communicationManager.WaitForServerConnection(connectionTimeoutInSecs * 1000))
+            if (communicationManager.WaitForServerConnection(connectionTimeoutInSecs * 1000))
             {
-                this.communicationManager.SendMessage(MessageType.SessionConnected);
-                this.ProcessRequests(testRequestManager);
+                communicationManager.SendMessage(MessageType.SessionConnected);
+                ProcessRequests(testRequestManager);
             }
             else
             {
                 EqtTrace.Error("DesignModeClient : ConnectToClientAndProcessRequests : Client timed out while connecting to the server.");
-                this.Dispose();
+                Dispose();
                 throw new TimeoutException(
                     string.Format(
                         CultureInfo.CurrentUICulture,
@@ -129,11 +129,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         {
             // Dispose off the communications to end the session
             // this should end the "ProcessRequests" loop with an exception
-            this.Dispose();
+            Dispose();
 
             EqtTrace.Info("DesignModeClient: Parent process exited, Exiting myself..");
 
-            this.platformEnvironment.Exit(1);
+            platformEnvironment.Exit(1);
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             {
                 try
                 {
-                    var message = this.communicationManager.ReceiveMessage();
+                    var message = communicationManager.ReceiveMessage();
 
                     if (EqtTrace.IsInfoEnabled)
                     {
@@ -161,38 +161,38 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     {
                         case MessageType.VersionCheck:
                             {
-                                var version = this.dataSerializer.DeserializePayload<int>(message);
-                                this.protocolConfig.Version = Math.Min(version, this.protocolConfig.Version);
-                                this.communicationManager.SendMessage(MessageType.VersionCheck, this.protocolConfig.Version);
+                                var version = dataSerializer.DeserializePayload<int>(message);
+                                protocolConfig.Version = Math.Min(version, protocolConfig.Version);
+                                communicationManager.SendMessage(MessageType.VersionCheck, protocolConfig.Version);
                                 break;
                             }
 
                         case MessageType.ExtensionsInitialize:
                             {
                                 // Do not filter the Editor/IDE provided extensions by name
-                                var extensionPaths = this.communicationManager.DeserializePayload<IEnumerable<string>>(message);
+                                var extensionPaths = communicationManager.DeserializePayload<IEnumerable<string>>(message);
                                 testRequestManager.InitializeExtensions(extensionPaths, skipExtensionFilters: true);
                                 break;
                             }
 
                         case MessageType.StartTestSession:
                             {
-                                var testSessionPayload = this.communicationManager.DeserializePayload<StartTestSessionPayload>(message);
-                                this.StartTestSession(testSessionPayload, testRequestManager);
+                                var testSessionPayload = communicationManager.DeserializePayload<StartTestSessionPayload>(message);
+                                StartTestSession(testSessionPayload, testRequestManager);
                                 break;
                             }
 
                         case MessageType.StopTestSession:
                             {
-                                var testSessionInfo = this.communicationManager.DeserializePayload<TestSessionInfo>(message);
-                                this.StopTestSession(testSessionInfo);
+                                var testSessionInfo = communicationManager.DeserializePayload<TestSessionInfo>(message);
+                                StopTestSession(testSessionInfo);
                                 break;
                             }
 
                         case MessageType.StartDiscovery:
                             {
-                                var discoveryPayload = this.dataSerializer.DeserializePayload<DiscoveryRequestPayload>(message);
-                                this.StartDiscovery(discoveryPayload, testRequestManager);
+                                var discoveryPayload = dataSerializer.DeserializePayload<DiscoveryRequestPayload>(message);
+                                StartDiscovery(discoveryPayload, testRequestManager);
                                 break;
                             }
 
@@ -200,9 +200,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         case MessageType.GetTestRunnerProcessStartInfoForRunSelected:
                             {
                                 var testRunPayload =
-                                    this.communicationManager.DeserializePayload<TestRunRequestPayload>(
+                                    communicationManager.DeserializePayload<TestRunRequestPayload>(
                                         message);
-                                this.StartTestRun(testRunPayload, testRequestManager, shouldLaunchTesthost: true);
+                                StartTestRun(testRunPayload, testRequestManager, shouldLaunchTesthost: true);
                                 break;
                             }
 
@@ -210,17 +210,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         case MessageType.TestRunSelectedTestCasesDefaultHost:
                             {
                                 var testRunPayload =
-                                    this.communicationManager.DeserializePayload<TestRunRequestPayload>(
+                                    communicationManager.DeserializePayload<TestRunRequestPayload>(
                                         message);
-                                this.StartTestRun(testRunPayload, testRequestManager, shouldLaunchTesthost: false);
+                                StartTestRun(testRunPayload, testRequestManager, shouldLaunchTesthost: false);
                                 break;
                             }
 
                         case MessageType.TestRunAttachmentsProcessingStart:
                             {
                                 var testRunAttachmentsProcessingPayload =
-                                    this.communicationManager.DeserializePayload<TestRunAttachmentsProcessingPayload>(message);
-                                this.StartTestRunAttachmentsProcessing(testRunAttachmentsProcessingPayload, testRequestManager);
+                                    communicationManager.DeserializePayload<TestRunAttachmentsProcessingPayload>(message);
+                                StartTestRunAttachmentsProcessing(testRunAttachmentsProcessingPayload, testRequestManager);
                                 break;
                             }
 
@@ -250,13 +250,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                         case MessageType.CustomTestHostLaunchCallback:
                             {
-                                this.onCustomTestHostLaunchAckReceived?.Invoke(message);
+                                onCustomTestHostLaunchAckReceived?.Invoke(message);
                                 break;
                             }
 
                         case MessageType.EditorAttachDebuggerCallback:
                             {
-                                this.onAttachDebuggerAckRecieved?.Invoke(message);
+                                onAttachDebuggerAckRecieved?.Invoke(message);
                                 break;
                             }
 
@@ -264,7 +264,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                             {
                                 EqtTrace.Info("DesignModeClient: Session End message received from server. Closing the connection.");
                                 isSessionEnd = true;
-                                this.Dispose();
+                                Dispose();
                                 break;
                             }
 
@@ -279,7 +279,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 {
                     EqtTrace.Error("DesignModeClient: Error processing request: {0}", ex);
                     isSessionEnd = true;
-                    this.Dispose();
+                    Dispose();
                 }
             }
             while (!isSessionEnd);
@@ -299,17 +299,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// </returns>
         public int LaunchCustomHost(TestProcessStartInfo testProcessStartInfo, CancellationToken cancellationToken)
         {
-            lock (this.lockObject)
+            lock (lockObject)
             {
                 var waitHandle = new AutoResetEvent(false);
                 Message ackMessage = null;
-                this.onCustomTestHostLaunchAckReceived = (ackRawMessage) =>
+                onCustomTestHostLaunchAckReceived = (ackRawMessage) =>
                 {
                     ackMessage = ackRawMessage;
                     waitHandle.Set();
                 };
 
-                this.communicationManager.SendMessage(MessageType.CustomTestHostLaunch, testProcessStartInfo);
+                communicationManager.SendMessage(MessageType.CustomTestHostLaunch, testProcessStartInfo);
 
                 // LifeCycle of the TP through DesignModeClient is maintained by the IDEs or user-facing-clients like LUTs, who call TestPlatform
                 // TP is handing over the control of launch to these IDEs and so, TP has to wait indefinite
@@ -320,18 +320,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                 cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
 
-                this.onCustomTestHostLaunchAckReceived = null;
+                onCustomTestHostLaunchAckReceived = null;
 
-                var ackPayload = this.dataSerializer.DeserializePayload<CustomHostLaunchAckPayload>(ackMessage);
+                var ackPayload = dataSerializer.DeserializePayload<CustomHostLaunchAckPayload>(ackMessage);
 
-                if (ackPayload.HostProcessId > 0)
-                {
-                    return ackPayload.HostProcessId;
-                }
-                else
-                {
-                    throw new TestPlatformException(ackPayload.ErrorMessage);
-                }
+                return ackPayload.HostProcessId > 0 ? ackPayload.HostProcessId : throw new TestPlatformException(ackPayload.ErrorMessage);
             }
         }
 
@@ -341,29 +334,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             // If an attach request is issued but there is no support for attaching on the other
             // side of the communication channel, we simply return and let the caller know the
             // request failed.
-            if (this.protocolConfig.Version < ObjectModel.Constants.MinimumProtocolVersionWithDebugSupport)
+            if (protocolConfig.Version < ObjectModel.Constants.MinimumProtocolVersionWithDebugSupport)
             {
                 return false;
             }
 
-            lock (this.lockObject)
+            lock (lockObject)
             {
                 var waitHandle = new AutoResetEvent(false);
                 Message ackMessage = null;
-                this.onAttachDebuggerAckRecieved = (ackRawMessage) =>
+                onAttachDebuggerAckRecieved = (ackRawMessage) =>
                 {
                     ackMessage = ackRawMessage;
                     waitHandle.Set();
                 };
 
-                this.communicationManager.SendMessage(MessageType.EditorAttachDebugger, pid);
+                communicationManager.SendMessage(MessageType.EditorAttachDebugger, pid);
 
                 WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
 
                 cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
-                this.onAttachDebuggerAckRecieved = null;
+                onAttachDebuggerAckRecieved = null;
 
-                var ackPayload = this.dataSerializer.DeserializePayload<EditorAttachDebuggerAckPayload>(ackMessage);
+                var ackPayload = dataSerializer.DeserializePayload<EditorAttachDebuggerAckPayload>(ackMessage);
                 if (!ackPayload.Attached)
                 {
                     EqtTrace.Warning(ackPayload.ErrorMessage);
@@ -379,14 +372,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="rawMessage"></param>
         public void SendRawMessage(string rawMessage)
         {
-            this.communicationManager.SendRawMessage(rawMessage);
+            communicationManager.SendRawMessage(rawMessage);
         }
 
         /// <inheritdoc />
         public void SendTestMessage(TestMessageLevel level, string message)
         {
             var payload = new TestMessagePayload { MessageLevel = level, Message = message };
-            this.communicationManager.SendMessage(MessageType.TestMessage, payload);
+            communicationManager.SendMessage(MessageType.TestMessage, payload);
         }
 
         /// <summary>
@@ -446,14 +439,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                     testRunPayload.DebuggingEnabled)
                                 : null;
 
-                        testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
+                        testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), protocolConfig);
                     }
                     catch (Exception ex)
                     {
                         EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
 
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
-                        this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+                        communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
                         var runCompletePayload = new TestRunCompletePayload()
                         {
                             TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue),
@@ -461,7 +454,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         };
 
                         // Send run complete to translation layer
-                        this.communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
+                        communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
                     }
                 });
         }
@@ -474,14 +467,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     try
                     {
                         testRequestManager.ResetOptions();
-                        testRequestManager.DiscoverTests(discoveryRequestPayload, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
+                        testRequestManager.DiscoverTests(discoveryRequestPayload, new DesignModeTestEventsRegistrar(this), protocolConfig);
                     }
                     catch (Exception ex)
                     {
                         EqtTrace.Error("DesignModeClient: Exception in StartDiscovery: " + ex);
 
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
-                        this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+                        communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
 
                         var payload = new DiscoveryCompletePayload()
                         {
@@ -491,7 +484,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         };
 
                         // Send run complete to translation layer
-                        this.communicationManager.SendMessage(MessageType.DiscoveryComplete, payload);
+                        communicationManager.SendMessage(MessageType.DiscoveryComplete, payload);
                     }
                 });
         }
@@ -503,14 +496,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 {
                     try
                     {
-                        testRequestManager.ProcessTestRunAttachments(attachmentsProcessingPayload, new TestRunAttachmentsProcessingEventsHandler(this.communicationManager), this.protocolConfig);
+                        testRequestManager.ProcessTestRunAttachments(attachmentsProcessingPayload, new TestRunAttachmentsProcessingEventsHandler(communicationManager), protocolConfig);
                     }
                     catch (Exception ex)
                     {
                         EqtTrace.Error("DesignModeClient: Exception in StartTestRunAttachmentsProcessing: " + ex);
 
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
-                        this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+                        communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
 
                         var payload = new TestRunAttachmentsProcessingCompletePayload()
                         {
@@ -518,7 +511,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         };
 
                         // Send run complete to translation layer
-                        this.communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, payload);
+                        communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, payload);
                     }
                 });
         }
@@ -527,7 +520,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         {
             Task.Run(() =>
             {
-                var eventsHandler = new TestSessionEventsHandler(this.communicationManager);
+                var eventsHandler = new TestSessionEventsHandler(communicationManager);
 
                 try
                 {
@@ -536,7 +529,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         : null;
 
                     requestManager.ResetOptions();
-                    requestManager.StartTestSession(payload, customLauncher, eventsHandler, this.protocolConfig);
+                    requestManager.StartTestSession(payload, customLauncher, eventsHandler, protocolConfig);
                 }
                 catch (Exception ex)
                 {
@@ -552,7 +545,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         {
             Task.Run(() =>
             {
-                var eventsHandler = new TestSessionEventsHandler(this.communicationManager);
+                var eventsHandler = new TestSessionEventsHandler(communicationManager);
 
                 try
                 {
@@ -580,7 +573,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             {
                 if (disposing)
                 {
-                    this.communicationManager?.StopClient();
+                    communicationManager?.StopClient();
                 }
 
                 disposedValue = true;

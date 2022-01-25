@@ -21,8 +21,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
         /// </param>
         public TestRuntimeMetadata(string extension, string friendlyName)
         {
-            this.ExtensionUri = extension;
-            this.FriendlyName = friendlyName;
+            ExtensionUri = extension;
+            FriendlyName = friendlyName;
         }
 
         /// <summary>

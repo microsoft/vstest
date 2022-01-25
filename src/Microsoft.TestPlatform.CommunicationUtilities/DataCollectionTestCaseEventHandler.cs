@@ -17,9 +17,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     /// </summary>
     internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEventHandler
     {
-        private ICommunicationManager communicationManager;
-        private IDataCollectionManager dataCollectionManager;
-        private IDataSerializer dataSerializer;
+        private readonly ICommunicationManager communicationManager;
+        private readonly IDataCollectionManager dataCollectionManager;
+        private readonly IDataSerializer dataSerializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionTestCaseEventHandler"/> class.
@@ -45,21 +45,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <inheritdoc />
         public int InitializeCommunication()
         {
-            var endpoint = this.communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0));
-            this.communicationManager.AcceptClientAsync();
+            var endpoint = communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0));
+            communicationManager.AcceptClientAsync();
             return endpoint.Port;
         }
 
         /// <inheritdoc />
         public bool WaitForRequestHandlerConnection(int connectionTimeout)
         {
-            return this.communicationManager.WaitForClientConnection(connectionTimeout);
+            return communicationManager.WaitForClientConnection(connectionTimeout);
         }
 
         /// <inheritdoc />
         public void Close()
         {
-            this.communicationManager?.StopServer();
+            communicationManager?.StopServer();
         }
 
         /// <inheritdoc />
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
             do
             {
-                var message = this.communicationManager.ReceiveMessage();
+                var message = communicationManager.ReceiveMessage();
                 switch (message.MessageType)
                 {
                     case MessageType.DataCollectionTestStart:
@@ -78,9 +78,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                             EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case starting.");
                         }
 
-                        var testCaseStartEventArgs = this.dataSerializer.DeserializePayload<TestCaseStartEventArgs>(message);
-                        this.dataCollectionManager.TestCaseStarted(testCaseStartEventArgs);
-                        this.communicationManager.SendMessage(MessageType.DataCollectionTestStartAck);
+                        var testCaseStartEventArgs = dataSerializer.DeserializePayload<TestCaseStartEventArgs>(message);
+                        dataCollectionManager.TestCaseStarted(testCaseStartEventArgs);
+                        communicationManager.SendMessage(MessageType.DataCollectionTestStartAck);
 
                         if (EqtTrace.IsInfoEnabled)
                         {
@@ -95,9 +95,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                             EqtTrace.Info("DataCollectionTestCaseEventHandler : Test case completing.");
                         }
 
-                        var testCaseEndEventArgs = this.dataSerializer.DeserializePayload<TestCaseEndEventArgs>(message);
-                        var attachmentSets = this.dataCollectionManager.TestCaseEnded(testCaseEndEventArgs);
-                        this.communicationManager.SendMessage(MessageType.DataCollectionTestEndResult, attachmentSets);
+                        var testCaseEndEventArgs = dataSerializer.DeserializePayload<TestCaseEndEventArgs>(message);
+                        var attachmentSets = dataCollectionManager.TestCaseEnded(testCaseEndEventArgs);
+                        communicationManager.SendMessage(MessageType.DataCollectionTestEndResult, attachmentSets);
 
                         if (EqtTrace.IsInfoEnabled)
                         {
@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                             EqtTrace.Info("DataCollectionTestCaseEventHandler: Test session ended");
                         }
 
-                        this.Close();
+                        Close();
 
                         break;
 

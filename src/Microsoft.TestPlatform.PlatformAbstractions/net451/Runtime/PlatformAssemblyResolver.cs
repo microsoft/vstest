@@ -23,12 +23,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// </summary>
         public PlatformAssemblyResolver()
         {
-            AppDomain.CurrentDomain.AssemblyResolve += this.AssemblyResolverEvent;
+            AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolverEvent;
         }
 
         ~PlatformAssemblyResolver()
         {
-            this.Dispose(false);
+            Dispose(false);
         }
 
         /// <inheritdoc/>
@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
 
             // Use SupressFinalize in case a subclass
             // of this type implements a finalizer.
@@ -45,14 +45,14 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
         protected void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            if (!disposed)
             {
                 if (disposing)
                 {
-                    AppDomain.CurrentDomain.AssemblyResolve -= this.AssemblyResolverEvent;
+                    AppDomain.CurrentDomain.AssemblyResolve -= AssemblyResolverEvent;
                 }
 
-                this.disposed = true;
+                disposed = true;
             }
         }
 
@@ -68,13 +68,9 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <returns>
         /// The <see cref="Assembly"/>.
         /// </returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Justification")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom", Justification = "Justification")]
         private Assembly AssemblyResolverEvent(object sender, object eventArgs)
         {
-            ResolveEventArgs args = eventArgs as ResolveEventArgs;
-
-            return args == null ? null : this.AssemblyResolve(this, new AssemblyResolveEventArgs(args.Name));
+            return eventArgs is not ResolveEventArgs args ? null : AssemblyResolve(this, new AssemblyResolveEventArgs(args.Name));
         }
     }
 }

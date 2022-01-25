@@ -20,14 +20,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFrameworkRunner(NETFX452_48)]
         public void RunningTestWithAFailingDebugAssertDoesNotCrashTheHostingProcess(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
             var resultsDir = GetResultsDirectory();
 
-            var assemblyPath = this.BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
-            this.InvokeVsTest(arguments);
+            var assemblyPath = BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+            InvokeVsTest(arguments);
 
-            this.ValidateSummaryStatus(passedTestsCount: 1, failedTestsCount: 0, 0);
+            ValidateSummaryStatus(passedTestsCount: 1, failedTestsCount: 0, 0);
             TryRemoveDirectory(resultsDir);
         }
     }

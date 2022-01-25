@@ -12,9 +12,9 @@ namespace Microsoft.TestPlatform.SmokeTests
         [TestMethod]
         public void DiscoverAllTests()
         {
-            this.InvokeVsTestForDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, ".NETFramework,Version=v4.5.1");
+            InvokeVsTestForDiscovery(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, ".NETFramework,Version=v4.5.1");
             var listOfTests = new string[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
-            this.ValidateDiscoveredTests(listOfTests);
+            ValidateDiscoveredTests(listOfTests);
         }
     }
 }

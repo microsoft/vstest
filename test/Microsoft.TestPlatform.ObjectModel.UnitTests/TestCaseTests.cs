@@ -57,8 +57,8 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         public void TestCaseLocalExtensionDataIsPubliclySettableGettableProperty()
         {
             var dummyData = "foo";
-            this.testCase.LocalExtensionData = dummyData;
-            Assert.AreEqual("foo", this.testCase.LocalExtensionData);
+            testCase.LocalExtensionData = dummyData;
+            Assert.AreEqual("foo", testCase.LocalExtensionData);
         }
 
         #region GetSetPropertyValue Tests
@@ -67,126 +67,126 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         public void TestCaseGetPropertyValueForCodeFilePathShouldReturnCorrectValue()
         {
             var testCodeFilePath = "C:\\temp\foo.cs";
-            this.testCase.CodeFilePath = testCodeFilePath;
+            testCase.CodeFilePath = testCodeFilePath;
 
-            Assert.AreEqual(testCodeFilePath, this.testCase.GetPropertyValue(TestCaseProperties.CodeFilePath));
+            Assert.AreEqual(testCodeFilePath, testCase.GetPropertyValue(TestCaseProperties.CodeFilePath));
         }
 
         [TestMethod]
         public void TestCaseGetPropertyValueForDisplayNameShouldReturnCorrectValue()
         {
             var testDisplayName = "testCaseDisplayName";
-            this.testCase.DisplayName = testDisplayName;
+            testCase.DisplayName = testDisplayName;
 
-            Assert.AreEqual(testDisplayName, this.testCase.GetPropertyValue(TestCaseProperties.DisplayName));
+            Assert.AreEqual(testDisplayName, testCase.GetPropertyValue(TestCaseProperties.DisplayName));
         }
 
         [TestMethod]
         public void TestCaseGetPropertyValueForExecutorUriShouldReturnCorrectValue()
         {
             var testExecutorUri = new Uri("http://foo");
-            this.testCase.ExecutorUri = testExecutorUri;
+            testCase.ExecutorUri = testExecutorUri;
 
-            Assert.AreEqual(testExecutorUri, this.testCase.GetPropertyValue(TestCaseProperties.ExecutorUri));
+            Assert.AreEqual(testExecutorUri, testCase.GetPropertyValue(TestCaseProperties.ExecutorUri));
         }
 
         [TestMethod]
         public void TestCaseGetPropertyValueForFullyQualifiedNameShouldReturnCorrectValue()
         {
             var testFullyQualifiedName = "fullyQualifiedName.Test1";
-            this.testCase.FullyQualifiedName = testFullyQualifiedName;
+            testCase.FullyQualifiedName = testFullyQualifiedName;
 
-            Assert.AreEqual(testFullyQualifiedName, this.testCase.GetPropertyValue(TestCaseProperties.FullyQualifiedName));
+            Assert.AreEqual(testFullyQualifiedName, testCase.GetPropertyValue(TestCaseProperties.FullyQualifiedName));
         }
 
         [TestMethod]
         public void TestCaseGetPropertyValueForIdShouldReturnCorrectValue()
         {
             var testId = new Guid("{7845816C-9CDB-37DA-9ADF-1B1C1FE01B7D}");
-            this.testCase.Id = testId;
+            testCase.Id = testId;
 
-            Assert.AreEqual(testId, this.testCase.GetPropertyValue(TestCaseProperties.Id));
+            Assert.AreEqual(testId, testCase.GetPropertyValue(TestCaseProperties.Id));
         }
 
         [TestMethod]
         public void TestCaseGetPropertyValueForLineNumberShouldReturnCorrectValue()
         {
             var testLineNumber = 34;
-            this.testCase.LineNumber = testLineNumber;
+            testCase.LineNumber = testLineNumber;
 
-            Assert.AreEqual(testLineNumber, this.testCase.GetPropertyValue(TestCaseProperties.LineNumber));
+            Assert.AreEqual(testLineNumber, testCase.GetPropertyValue(TestCaseProperties.LineNumber));
         }
 
         [TestMethod]
         public void TestCaseGetPropertyValueForSourceShouldReturnCorrectValue()
         {
             var testSource = "C://temp/foobar.dll";
-            this.testCase.Source = testSource;
+            testCase.Source = testSource;
 
-            Assert.AreEqual(testSource, this.testCase.GetPropertyValue(TestCaseProperties.Source));
+            Assert.AreEqual(testSource, testCase.GetPropertyValue(TestCaseProperties.Source));
         }
 
         [TestMethod]
         public void TestCaseSetPropertyValueForCodeFilePathShouldSetValue()
         {
             var testCodeFilePath = "C:\\temp\foo.cs";
-            this.testCase.SetPropertyValue(TestCaseProperties.CodeFilePath, testCodeFilePath);
+            testCase.SetPropertyValue(TestCaseProperties.CodeFilePath, testCodeFilePath);
 
-            Assert.AreEqual(testCodeFilePath, this.testCase.CodeFilePath);
+            Assert.AreEqual(testCodeFilePath, testCase.CodeFilePath);
         }
 
         [TestMethod]
         public void TestCaseSetPropertyValueForDisplayNameShouldSetValue()
         {
             var testDisplayName = "testCaseDisplayName";
-            this.testCase.SetPropertyValue(TestCaseProperties.DisplayName, testDisplayName);
+            testCase.SetPropertyValue(TestCaseProperties.DisplayName, testDisplayName);
 
-            Assert.AreEqual(testDisplayName, this.testCase.DisplayName);
+            Assert.AreEqual(testDisplayName, testCase.DisplayName);
         }
 
         [TestMethod]
         public void TestCaseSetPropertyValueForExecutorUriShouldSetValue()
         {
             var testExecutorUri = new Uri("http://foo");
-            this.testCase.SetPropertyValue(TestCaseProperties.ExecutorUri, testExecutorUri);
+            testCase.SetPropertyValue(TestCaseProperties.ExecutorUri, testExecutorUri);
 
-            Assert.AreEqual(testExecutorUri, this.testCase.ExecutorUri);
+            Assert.AreEqual(testExecutorUri, testCase.ExecutorUri);
         }
 
         [TestMethod]
         public void TestCaseSetPropertyValueForFullyQualifiedNameShouldSetValue()
         {
             var testFullyQualifiedName = "fullyQualifiedName.Test1";
-            this.testCase.SetPropertyValue(TestCaseProperties.FullyQualifiedName, testFullyQualifiedName);
+            testCase.SetPropertyValue(TestCaseProperties.FullyQualifiedName, testFullyQualifiedName);
 
-            Assert.AreEqual(testFullyQualifiedName, this.testCase.FullyQualifiedName);
+            Assert.AreEqual(testFullyQualifiedName, testCase.FullyQualifiedName);
         }
 
         [TestMethod]
         public void TestCaseSetPropertyValueForIdShouldSetValue()
         {
             var testId = new Guid("{7845816C-9CDB-37DA-9ADF-1B1C1FE01B7D}");
-            this.testCase.SetPropertyValue(TestCaseProperties.Id, testId);
+            testCase.SetPropertyValue(TestCaseProperties.Id, testId);
 
-            Assert.AreEqual(testId, this.testCase.Id);
+            Assert.AreEqual(testId, testCase.Id);
         }
 
         [TestMethod]
         public void TestCaseSetPropertyValueForLineNumberShouldSetValue()
         {
             var testLineNumber = 34;
-            this.testCase.SetPropertyValue(TestCaseProperties.LineNumber, testLineNumber);
+            testCase.SetPropertyValue(TestCaseProperties.LineNumber, testLineNumber);
 
-            Assert.AreEqual(testLineNumber, this.testCase.LineNumber);
+            Assert.AreEqual(testLineNumber, testCase.LineNumber);
         }
 
         [TestMethod]
         public void TestCaseSetPropertyValueForSourceShouldSetValue()
         {
             var testSource = "C://temp/foobar.dll";
-            this.testCase.SetPropertyValue(TestCaseProperties.Source, testSource);
+            testCase.SetPropertyValue(TestCaseProperties.Source, testSource);
 
-            Assert.AreEqual(testSource, this.testCase.Source);
+            Assert.AreEqual(testSource, testCase.Source);
         }
 
         #endregion

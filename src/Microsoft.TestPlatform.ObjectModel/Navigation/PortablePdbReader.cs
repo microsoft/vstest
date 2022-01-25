@@ -48,8 +48,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 throw new Exception("Given stream is not portable stream");
             }
 
-            this.provider = MetadataReaderProvider.FromPortablePdbStream(stream);
-            this.reader = this.provider.GetMetadataReader();
+            provider = MetadataReaderProvider.FromPortablePdbStream(stream);
+            reader = provider.GetMetadataReader();
         }
 
         /// <summary>
@@ -57,9 +57,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         /// </summary>
         public void Dispose()
         {
-            this.provider?.Dispose();
-            this.provider = null;
-            this.reader = null;
+            provider?.Dispose();
+            provider = null;
+            reader = null;
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
             var handle = GetMethodDebugInformationHandle(methodInfo);
 
-            return this.GetDiaNavigationData(handle);
+            return GetDiaNavigationData(handle);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
         private DiaNavigationData GetDiaNavigationData(MethodDebugInformationHandle handle)
         {
-            if (this.reader == null)
+            if (reader == null)
             {
                 throw new ObjectDisposedException(nameof(PortablePdbReader));
             }
@@ -139,8 +139,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             DiaNavigationData diaNavigationData = null;
             try
             {
-                var methodDebugDefinition = this.reader.GetMethodDebugInformation(handle);
-                var fileName = this.GetMethodFileName(methodDebugDefinition);
+                var methodDebugDefinition = reader.GetMethodDebugInformation(handle);
+                var fileName = GetMethodFileName(methodDebugDefinition);
                 GetMethodMinAndMaxLineNumber(methodDebugDefinition, out var minLineNumber, out var maxLineNumber);
 
                 diaNavigationData = new DiaNavigationData(fileName, minLineNumber, maxLineNumber);
@@ -158,8 +158,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             var fileName = string.Empty;
             if (!methodDebugDefinition.Document.IsNil)
             {
-                var document = this.reader.GetDocument(methodDebugDefinition.Document);
-                fileName = this.reader.GetString(document.Name);
+                var document = reader.GetDocument(methodDebugDefinition.Document);
+                fileName = reader.GetString(document.Name);
             }
 
             return fileName;

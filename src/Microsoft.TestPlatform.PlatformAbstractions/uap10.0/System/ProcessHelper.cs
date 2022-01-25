@@ -84,19 +84,14 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public PlatformArchitecture GetCurrentProcessArchitecture()
         {
-            if (IntPtr.Size == 8)
-            {
-                return PlatformArchitecture.X64;
-            }
-
-            return PlatformArchitecture.X86;
+            return IntPtr.Size == 8 ? PlatformArchitecture.X64 : PlatformArchitecture.X86;
         }
 
         /// <inheritdoc/>
         public string GetNativeDllDirectory()
         {
             // For UWP the native dll's are to be kept in same directory
-            return this.GetCurrentProcessLocation();
+            return GetCurrentProcessLocation();
         }
 
         /// <inheritdoc/>

@@ -25,14 +25,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// Sync object for sending messages
         /// Write for binarywriter is NOT thread-safe
         /// </summary>
-        private object writeSyncObject = new object();
+        private readonly object writeSyncObject = new();
 
         public LengthPrefixCommunicationChannel(Stream stream)
         {
-            this.reader = new BinaryReader(stream, Encoding.UTF8, true);
+            reader = new BinaryReader(stream, Encoding.UTF8, true);
 
             // Using the Buffered stream while writing, improves the write performance. By reducing the number of writes.
-            this.writer = new BinaryWriter(new PlatformStream().CreateBufferedStream(stream, SocketConstants.BufferSize), Encoding.UTF8, true);
+            writer = new BinaryWriter(new PlatformStream().CreateBufferedStream(stream, SocketConstants.BufferSize), Encoding.UTF8, true);
         }
 
         /// <inheritdoc />
@@ -45,10 +45,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 // Writing Message on binarywriter is not Thread-Safe
                 // Need to sync one by one to avoid buffer corruption
-                lock (this.writeSyncObject)
+                lock (writeSyncObject)
                 {
-                    this.writer.Write(data);
-                    this.writer.Flush();
+                    writer.Write(data);
+                    writer.Flush();
                 }
             }
             catch (Exception ex)
@@ -66,10 +66,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // Try read data even if no one is listening to the data stream. Some server
             // implementations (like Sockets) depend on the read operation to determine if a
             // connection is closed.
-            if (this.MessageReceived != null)
+            if (MessageReceived != null)
             {
-                var data = this.reader.ReadString();
-                this.MessageReceived.SafeInvoke(this, new MessageReceivedEventArgs { Data = data }, "LengthPrefixCommunicationChannel: MessageReceived");
+                var data = reader.ReadString();
+                MessageReceived.SafeInvoke(this, new MessageReceivedEventArgs { Data = data }, "LengthPrefixCommunicationChannel: MessageReceived");
             }
 
             return Task.FromResult(0);
@@ -79,8 +79,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void Dispose()
         {
             EqtTrace.Verbose("LengthPrefixCommunicationChannel.Dispose: Dispose reader and writer.");
-            this.reader.Dispose();
-            this.writer.Dispose();
+            reader.Dispose();
+            writer.Dispose();
             GC.SuppressFinalize(this);
         }
     }

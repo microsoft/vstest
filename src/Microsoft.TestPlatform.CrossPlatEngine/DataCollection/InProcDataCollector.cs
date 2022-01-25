@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <summary>
         /// DataCollector Class Type
         /// </summary>
-        private Type dataCollectorType;
+        private readonly Type dataCollectorType;
 
         /// <summary>
         /// Instance of the
@@ -34,12 +34,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <summary>
         /// Config XML from the runsettings for current datacollector
         /// </summary>
-        private string configXml;
+        private readonly string configXml;
 
         /// <summary>
         /// AssemblyLoadContext for current platform
         /// </summary>
-        private IAssemblyLoadContext assemblyLoadContext;
+        private readonly IAssemblyLoadContext assemblyLoadContext;
 
         public InProcDataCollector(
             string codeBase,
@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.configXml = configXml;
             this.assemblyLoadContext = assemblyLoadContext;
 
-            var assembly = this.LoadInProcDataCollectorExtension(codeBase);
+            var assembly = LoadInProcDataCollectorExtension(codeBase);
 
             Func<Type, bool> filterPredicate;
             if (Path.GetFileName(codeBase) == Constants.CoverletDataCollectorCodebase)
@@ -86,8 +86,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 filterPredicate = (x) => x.AssemblyQualifiedName.Equals(assemblyQualifiedName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo());
             }
 
-            this.dataCollectorType = assembly?.GetTypes().FirstOrDefault(filterPredicate);
-            this.AssemblyQualifiedName = this.dataCollectorType?.AssemblyQualifiedName;
+            dataCollectorType = assembly?.GetTypes().FirstOrDefault(filterPredicate);
+            AssemblyQualifiedName = dataCollectorType?.AssemblyQualifiedName;
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="inProcDataCollectionSink">Sink object to send data</param>
         public void LoadDataCollector(IDataCollectionSink inProcDataCollectionSink)
         {
-            this.dataCollectorObject = CreateObjectFromType(dataCollectorType);
+            dataCollectorObject = CreateObjectFromType(dataCollectorType);
             InitializeDataCollector(dataCollectorObject, inProcDataCollectionSink);
         }
 
@@ -112,17 +112,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="methodArg">Arguments for the method</param>
         public void TriggerInProcDataCollectionMethod(string methodName, InProcDataCollectionArgs methodArg)
         {
-            var methodInfo = GetMethodInfoFromType(this.dataCollectorObject.GetType(), methodName, new[] { methodArg.GetType() });
+            var methodInfo = GetMethodInfoFromType(dataCollectorObject.GetType(), methodName, new[] { methodArg.GetType() });
 
             if (methodName.Equals(Constants.TestSessionStartMethodName))
             {
                 var testSessionStartArgs = (TestSessionStartArgs)methodArg;
                 testSessionStartArgs.Configuration = configXml;
-                methodInfo?.Invoke(this.dataCollectorObject, new object[] { testSessionStartArgs });
+                methodInfo?.Invoke(dataCollectorObject, new object[] { testSessionStartArgs });
             }
             else
             {
-                methodInfo?.Invoke(this.dataCollectorObject, new object[] { methodArg });
+                methodInfo?.Invoke(dataCollectorObject, new object[] { methodArg });
             }
         }
 
@@ -141,11 +141,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private static object CreateObjectFromType(Type type)
         {
-            object obj = null;
-
             var constructorInfo = type.GetConstructor(Type.EmptyTypes);
-            obj = constructorInfo?.Invoke(new object[] { });
-
+            object obj = constructorInfo?.Invoke(new object[] { });
             return obj;
         }
 
@@ -159,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             Assembly assembly = null;
             try
             {
-                assembly = this.assemblyLoadContext.LoadAssemblyFromPath(Environment.ExpandEnvironmentVariables(codeBase));
+                assembly = assemblyLoadContext.LoadAssemblyFromPath(Environment.ExpandEnvironmentVariables(codeBase));
             }
             catch (Exception ex)
             {

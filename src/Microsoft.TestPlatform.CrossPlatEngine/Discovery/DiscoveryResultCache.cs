@@ -19,17 +19,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <summary>
         /// Callback used when cache is full.
         /// </summary>
-        private OnReportTestCases onReportTestCases;
-
-        /// <summary>
-        /// Total tests discovered in this request
-        /// </summary>
-        private long totalDiscoveredTests;
+        private readonly OnReportTestCases onReportTestCases;
 
         /// <summary>
         /// Max size of the test case buffer
         /// </summary>
-        private long cacheSize;
+        private readonly long cacheSize;
 
         /// <summary>
         /// Timeout that triggers sending test cases regardless of cache size.
@@ -49,7 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <summary>
         /// Sync object
         /// </summary>
-        private object syncObject = new object();
+        private readonly object syncObject = new();
 
         #endregion
 
@@ -67,11 +62,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             this.cacheSize = cacheSize;
             this.onReportTestCases = onReportTestCases;
-            this.lastUpdate = DateTime.Now;
-            this.cacheTimeout = discoveredTestEventTimeout;
+            lastUpdate = DateTime.Now;
+            cacheTimeout = discoveredTestEventTimeout;
 
-            this.tests = new List<TestCase>();
-            this.totalDiscoveredTests = 0;
+            tests = new List<TestCase>();
+            TotalDiscoveredTests = 0;
         }
 
         /// <summary>
@@ -87,20 +82,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             get
             {
                 // This needs to new list to avoid concurrency issues.
-                return new List<TestCase>(this.tests);
+                return new List<TestCase>(tests);
             }
         }
 
         /// <summary>
         /// Gets the total discovered tests
         /// </summary>
-        public long TotalDiscoveredTests
-        {
-            get
-            {
-                return this.totalDiscoveredTests;
-            }
-        }
+        public long TotalDiscoveredTests { get; private set; }
 
         /// <summary>
         /// Adds a test to the cache.
@@ -116,20 +105,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 return;
             }
 
-            lock (this.syncObject)
+            lock (syncObject)
             {
-                this.tests.Add(test);
-                this.totalDiscoveredTests++;
+                tests.Add(test);
+                TotalDiscoveredTests++;
 
                 // Send test cases when the specified cache size has been reached or
                 // after the specified cache timeout has been hit.
-                var timeDelta = DateTime.Now - this.lastUpdate;
-                if (this.tests.Count >= this.cacheSize || (timeDelta > this.cacheTimeout && this.tests.Count > 0))
+                var timeDelta = DateTime.Now - lastUpdate;
+                if (tests.Count >= cacheSize || (timeDelta > cacheTimeout && tests.Count > 0))
                 {
                     // Pass on the buffer to the listener and clear the old one
-                    this.onReportTestCases(this.tests);
-                    this.tests = new List<TestCase>();
-                    this.lastUpdate = DateTime.Now;
+                    onReportTestCases(tests);
+                    tests = new List<TestCase>();
+                    lastUpdate = DateTime.Now;
 
                     EqtTrace.Verbose("DiscoveryResultCache.AddTest: Notified the onReportTestCases callback.");
                 }

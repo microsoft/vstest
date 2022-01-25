@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     ///  An argument processor that allows the user to specify the target platform architecture
@@ -40,12 +40,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new PlatformArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new PlatformArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -56,17 +56,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new PlatformArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
+                    executor = new Lazy<IArgumentExecutor>(() => new PlatformArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -95,9 +95,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Used for getting sources.
         /// </summary>
-        private CommandLineOptions commandLineOptions;
+        private readonly CommandLineOptions commandLineOptions;
 
-        private IRunSettingsProvider runSettingsManager;
+        private readonly IRunSettingsProvider runSettingsManager;
 
         public const string RunSettingsPath = "RunConfiguration.TargetPlatform";
 
@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             Contract.Requires(options != null);
             Contract.Requires(runSettingsManager != null);
-            this.commandLineOptions = options;
+            commandLineOptions = options;
             this.runSettingsManager = runSettingsManager;
         }
 
@@ -137,8 +137,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 .Where(e => e != Architecture.AnyCPU && e != Architecture.Default)
                 .ToList();
 
-            Architecture platform;
-            var validPlatform = Enum.TryParse(argument, true, out platform);
+            var validPlatform = Enum.TryParse(argument, true, out Architecture platform);
             if (validPlatform)
             {
                 // Ensure that the case-insensitively parsed enum is in the list of valid platforms.
@@ -151,8 +150,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (validPlatform)
             {
                 RunSettingsHelper.Instance.IsDefaultTargetArchitecture = false;
-                this.commandLineOptions.TargetArchitecture = platform;
-                this.runSettingsManager.UpdateRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath, platform.ToString());
+                commandLineOptions.TargetArchitecture = platform;
+                runSettingsManager.UpdateRunSettingsNode(RunSettingsPath, platform.ToString());
             }
             else
             {
@@ -162,7 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("Using platform:{0}", this.commandLineOptions.TargetArchitecture);
+                EqtTrace.Info("Using platform:{0}", commandLineOptions.TargetArchitecture);
             }
         }
 

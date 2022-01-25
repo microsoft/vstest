@@ -19,7 +19,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestInitialize]
         public void TestInit()
         {
-            this.discoveryContext = new DiscoveryContext();
+            discoveryContext = new DiscoveryContext();
         }
 
         /// <summary>
@@ -28,9 +28,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void GetTestCaseFilterShouldReturnNullIfFilterExpressionIsNull()
         {
-            this.discoveryContext.FilterExpressionWrapper = null;
+            discoveryContext.FilterExpressionWrapper = null;
 
-            Assert.IsNull(this.discoveryContext.GetTestCaseFilter(null, (s) => { return null; }));
+            Assert.IsNull(discoveryContext.GetTestCaseFilter(null, (s) => null));
         }
 
         /// <summary>
@@ -39,9 +39,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void GetTestCaseFilterShouldNotThrowIfPropertyValueOnlyPassed()
         {
-            this.discoveryContext.FilterExpressionWrapper = new FilterExpressionWrapper("Infinity");
+            discoveryContext.FilterExpressionWrapper = new FilterExpressionWrapper("Infinity");
 
-            var filter = this.discoveryContext.GetTestCaseFilter(new List<string>{ "FullyQualifiedName" }, (s) => { return null; });
+            var filter = discoveryContext.GetTestCaseFilter(new List<string>{ "FullyQualifiedName" }, (s) => null);
 
             Assert.IsNotNull(filter);
         }
@@ -52,9 +52,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void GetTestCaseFilterShouldNotThrowOnInvalidProperties()
         {
-            this.discoveryContext.FilterExpressionWrapper = new FilterExpressionWrapper("highlyunlikelyproperty=unused");
+            discoveryContext.FilterExpressionWrapper = new FilterExpressionWrapper("highlyunlikelyproperty=unused");
 
-            var filter = this.discoveryContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => { return null; });
+            var filter = discoveryContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => null);
 
             Assert.IsNotNull(filter);
         }
@@ -65,9 +65,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void GetTestCaseFilterShouldReturnTestCaseFilter()
         {
-            this.discoveryContext.FilterExpressionWrapper = new FilterExpressionWrapper("TestCategory=Important");
+            discoveryContext.FilterExpressionWrapper = new FilterExpressionWrapper("TestCategory=Important");
 
-            var filter = this.discoveryContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => { return null; });
+            var filter = discoveryContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => null);
 
             Assert.IsNotNull(filter);
             Assert.AreEqual("TestCategory=Important", filter.TestCaseFilterValue);

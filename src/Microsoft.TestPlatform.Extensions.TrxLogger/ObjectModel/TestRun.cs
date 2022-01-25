@@ -12,7 +12,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
-    using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+    using TrxLoggerResources = VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
     /// <summary>
     /// Class having information about a test run.
@@ -34,30 +34,30 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         //
         // The summary parsing code is in XmlTestReader.ReadTestRunSummary.
         [StoreXmlSimpleField]
-        private Guid id;
+        private Guid _id;
 
         [StoreXmlSimpleField]
-        private string name;
+        private string _name;
 
         [StoreXmlSimpleField("@runUser", "")]
-        private string runUser;
+        private string _runUser;
 
-        private TestRunConfiguration runConfig;
+        private TestRunConfiguration _runConfig;
 
         #endregion Summary fields
 
         #region Non-summary fields
         [StoreXmlSimpleField("Times/@creation")]
-        private DateTime created;
+        private DateTime _created;
 
         [StoreXmlSimpleField("Times/@queuing")]
-        private DateTime queued;
+        private DateTime _queued;
 
         [StoreXmlSimpleField("Times/@start")]
-        private DateTime started;
+        private DateTime _started;
 
         [StoreXmlSimpleField("Times/@finish")]
-        private DateTime finished;
+        private DateTime _finished;
 
         #endregion
 
@@ -73,10 +73,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </param>
         internal TestRun(Guid runId)
         {
-            this.Initialize();
+            Initialize();
 
             EqtAssert.IsTrue(!Guid.Empty.Equals(runId), "Can't use Guid.Empty for run ID.");
-            this.id = runId;
+            _id = runId;
         }
 
         #endregion Constructors
@@ -88,13 +88,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             get
             {
-                return this.runConfig;
+                return _runConfig;
             }
 
             set
             {
                 EqtAssert.ParameterNotNull(value, "RunConfiguration");
-                this.runConfig = value;
+                _runConfig = value;
             }
         }
 
@@ -105,12 +105,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             get
             {
-                return this.started;
+                return _started;
             }
 
             set
             {
-                this.started = value;
+                _started = value;
             }
         }
 
@@ -119,8 +119,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         internal DateTime Finished
         {
-            get { return this.finished; }
-            set { this.finished = value; }
+            get { return _finished; }
+            set { _finished = value; }
         }
 
         /// <summary>
@@ -130,13 +130,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             get
             {
-                return this.name;
+                return _name;
             }
 
             set
             {
                 EqtAssert.StringNotNullOrEmpty(value, "Name");
-                this.name = value;
+                _name = value;
             }
         }
 
@@ -145,7 +145,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         internal Guid Id
         {
-            get { return this.id; }
+            get { return _id; }
         }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         internal string GetResultFilesDirectory(TestResult result)
         {
             EqtAssert.ParameterNotNull(result, nameof(result));
-            return Path.Combine(this.GetResultsDirectory(), result.RelativeTestResultsDirectory);
+            return Path.Combine(GetResultsDirectory(), result.RelativeTestResultsDirectory);
         }
 
         /// <summary>
@@ -172,19 +172,19 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <remarks>This method is called by public properties/methods, so it needs to throw on error</remarks>
         internal string GetResultsDirectory()
         {
-            if (this.RunConfiguration == null)
+            if (RunConfiguration == null)
             {
                 Debug.Fail("'RunConfiguration' is null");
                 throw new Exception(String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunConfigInRun));
             }
 
-            if (string.IsNullOrEmpty(this.RunConfiguration.RunDeploymentRootDirectory))
+            if (string.IsNullOrEmpty(RunConfiguration.RunDeploymentRootDirectory))
             {
                 Debug.Fail("'RunConfiguration.RunDeploymentRootDirectory' is null or empty");
                 throw new Exception(String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunDeploymentRootInRunConfig));
             }
 
-            return this.RunConfiguration.RunDeploymentInDirectory;
+            return RunConfiguration.RunDeploymentInDirectory;
         }
 
         private static string FormatDateTimeForRunName(DateTime timeStamp)
@@ -196,23 +196,23 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
         private void Initialize()
         {
-            this.id = Guid.NewGuid();
-            this.name = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_TestRunName, Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
+            _id = Guid.NewGuid();
+            _name = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_TestRunName, Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
 
             // Fix for issue (https://github.com/Microsoft/vstest/issues/213). Since there is no way to find current user in linux machine.
             // We are catching PlatformNotSupportedException for non windows machine.
             try
             {
-                this.runUser = WindowsIdentity.GetCurrent().Name;
+                _runUser = WindowsIdentity.GetCurrent().Name;
             }
             catch (PlatformNotSupportedException)
             {
-                this.runUser = string.Empty;
+                _runUser = string.Empty;
             }
-            this.created = DateTime.UtcNow;
-            this.queued = DateTime.UtcNow;
-            this.started = DateTime.UtcNow;
-            this.finished = DateTime.UtcNow;
+            _created = DateTime.UtcNow;
+            _queued = DateTime.UtcNow;
+            _started = DateTime.UtcNow;
+            _finished = DateTime.UtcNow;
         }
     }
 }

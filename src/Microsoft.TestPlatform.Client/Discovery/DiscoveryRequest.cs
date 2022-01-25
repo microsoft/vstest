@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
     /// </summary>
     public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHandler2
     {
-        private IDataSerializer dataSerializer;
+        private readonly IDataSerializer dataSerializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryRequest"/> class.
@@ -51,9 +51,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
             IDataSerializer dataSerializer)
         {
             this.requestData = requestData;
-            this.DiscoveryCriteria = criteria;
-            this.DiscoveryManager = discoveryManager;
-            this.LoggerManager = loggerManager;
+            DiscoveryCriteria = criteria;
+            DiscoveryManager = discoveryManager;
+            LoggerManager = loggerManager;
             this.dataSerializer = dataSerializer;
         }
 
@@ -67,34 +67,34 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 EqtTrace.Verbose("DiscoveryRequest.DiscoverAsync: Starting.");
             }
 
-            lock (this.syncObject)
+            lock (syncObject)
             {
-                if (this.disposed)
+                if (disposed)
                 {
                     throw new ObjectDisposedException("DiscoveryRequest");
                 }
 
                 // Reset the discovery completion event
-                this.discoveryCompleted.Reset();
+                discoveryCompleted.Reset();
 
-                this.discoveryInProgress = true;
+                DiscoveryInProgress = true;
                 try
                 {
-                    this.discoveryStartTime = DateTime.UtcNow;
+                    discoveryStartTime = DateTime.UtcNow;
 
                     // Collecting Data Point Number of sources sent for discovery
-                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForDiscovery, this.DiscoveryCriteria.Sources.Count());
+                    requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForDiscovery, DiscoveryCriteria.Sources.Count());
 
                     // Invoke OnDiscoveryStart event
-                    var discoveryStartEvent = new DiscoveryStartEventArgs(this.DiscoveryCriteria);
-                    this.LoggerManager.HandleDiscoveryStart(discoveryStartEvent);
-                    this.OnDiscoveryStart.SafeInvoke(this, discoveryStartEvent, "DiscoveryRequest.DiscoveryStart");
+                    var discoveryStartEvent = new DiscoveryStartEventArgs(DiscoveryCriteria);
+                    LoggerManager.HandleDiscoveryStart(discoveryStartEvent);
+                    OnDiscoveryStart.SafeInvoke(this, discoveryStartEvent, "DiscoveryRequest.DiscoveryStart");
 
-                    this.DiscoveryManager.DiscoverTests(this.DiscoveryCriteria, this);
+                    DiscoveryManager.DiscoverTests(DiscoveryCriteria, this);
                 }
                 catch
                 {
-                    this.discoveryInProgress = false;
+                    DiscoveryInProgress = false;
                     throw;
                 }
             }
@@ -115,16 +115,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 EqtTrace.Verbose("DiscoveryRequest.Abort: Aborting.");
             }
 
-            lock (this.syncObject)
+            lock (syncObject)
             {
-                if (this.disposed)
+                if (disposed)
                 {
                     throw new ObjectDisposedException("DiscoveryRequest");
                 }
 
-                if (this.discoveryInProgress)
+                if (DiscoveryInProgress)
                 {
-                    this.DiscoveryManager.Abort();
+                    DiscoveryManager.Abort();
                 }
                 else
                 {
@@ -154,19 +154,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 EqtTrace.Verbose("DiscoveryRequest.WaitForCompletion: Waiting with timeout {0}.", timeout);
             }
 
-            if (this.disposed)
+            if (disposed)
             {
                 throw new ObjectDisposedException("DiscoveryRequest");
             }
 
             // This method is not synchronized as it can lead to dead-lock
             // (the discoveryCompletionEvent cannot be raised unless that lock is released)
-            if (this.discoveryCompleted != null)
-            {
-                return this.discoveryCompleted.WaitOne(timeout);
-            }
-
-            return true;
+            return discoveryCompleted == null || discoveryCompleted.WaitOne(timeout);
         }
 
         /// <summary>
@@ -210,10 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// Get the status for the discovery
         /// Returns true if discovery is in progress
         /// </summary>
-        internal bool DiscoveryInProgress
-        {
-            get { return this.discoveryInProgress; }
-        }
+        internal bool DiscoveryInProgress { get; private set; }
 
         /// <summary>
         /// Parent discovery manager
@@ -235,9 +227,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete: Starting. Aborted:{0}, TotalTests:{1}", discoveryCompleteEventArgs.IsAborted, discoveryCompleteEventArgs.TotalCount);
             }
 
-            lock (this.syncObject)
+            lock (syncObject)
             {
-                if (this.disposed)
+                if (disposed)
                 {
                     if (EqtTrace.IsWarningEnabled)
                     {
@@ -248,7 +240,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 }
 
                 // If discovery event is already raised, ignore current one.
-                if (this.discoveryCompleted.WaitOne(0))
+                if (discoveryCompleted.WaitOne(0))
                 {
                     if (EqtTrace.IsVerboseEnabled)
                     {
@@ -260,7 +252,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
                 // Close the discovery session and terminate any test host processes. This operation should never
                 // throw.
-                this.DiscoveryManager?.Close();
+                DiscoveryManager?.Close();
 
                 try
                 {
@@ -270,19 +262,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     if (lastChunk != null && lastChunk.Any())
                     {
                         var discoveredTestsEvent = new DiscoveredTestsEventArgs(lastChunk);
-                        this.LoggerManager.HandleDiscoveredTests(discoveredTestsEvent);
-                        this.OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.DiscoveryComplete");
+                        LoggerManager.HandleDiscoveredTests(discoveredTestsEvent);
+                        OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.DiscoveryComplete");
                     }
 
-                    this.LoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs);
-                    this.OnDiscoveryComplete.SafeInvoke(this, discoveryCompleteEventArgs, "DiscoveryRequest.DiscoveryComplete");
+                    LoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs);
+                    OnDiscoveryComplete.SafeInvoke(this, discoveryCompleteEventArgs, "DiscoveryRequest.DiscoveryComplete");
                 }
                 finally
                 {
                     // Notify the waiting handle that discovery is complete
-                    if (this.discoveryCompleted != null)
+                    if (discoveryCompleted != null)
                     {
-                        this.discoveryCompleted.Set();
+                        discoveryCompleted.Set();
                         if (EqtTrace.IsVerboseEnabled)
                         {
                             EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete: Notified the discovery complete event.");
@@ -296,8 +288,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                         }
                     }
 
-                    this.discoveryInProgress = false;
-                    var discoveryFinalTimeTaken = DateTime.UtcNow - this.discoveryStartTime;
+                    DiscoveryInProgress = false;
+                    var discoveryFinalTimeTaken = DateTime.UtcNow - discoveryStartTime;
 
                     // Fill in the Metrics From Test Host Process
                     var metrics = discoveryCompleteEventArgs.Metrics;
@@ -305,12 +297,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     {
                         foreach (var metric in metrics)
                         {
-                            this.requestData.MetricsCollection.Add(metric.Key, metric.Value);
+                            requestData.MetricsCollection.Add(metric.Key, metric.Value);
                         }
                     }
 
                     // Collecting Total Time Taken
-                    this.requestData.MetricsCollection.Add(
+                    requestData.MetricsCollection.Add(
                         TelemetryDataConstants.TimeTakenInSecForDiscovery, discoveryFinalTimeTaken.TotalSeconds);
                 }
             }
@@ -329,9 +321,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 EqtTrace.Verbose("DiscoveryRequest.SendDiscoveredTests: Starting.");
             }
 
-            lock (this.syncObject)
+            lock (syncObject)
             {
-                if (this.disposed)
+                if (disposed)
                 {
                     if (EqtTrace.IsWarningEnabled)
                     {
@@ -342,8 +334,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 }
 
                 var discoveredTestsEvent = new DiscoveredTestsEventArgs(discoveredTestCases);
-                this.LoggerManager.HandleDiscoveredTests(discoveredTestsEvent);
-                this.OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.OnDiscoveredTests");
+                LoggerManager.HandleDiscoveredTests(discoveredTestsEvent);
+                OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.OnDiscoveredTests");
             }
 
             if (EqtTrace.IsInfoEnabled)
@@ -364,9 +356,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 EqtTrace.Verbose("DiscoveryRequest.SendDiscoveryMessage: Starting.");
             }
 
-            lock (this.syncObject)
+            lock (syncObject)
             {
-                if (this.disposed)
+                if (disposed)
                 {
                     if (EqtTrace.IsWarningEnabled)
                     {
@@ -377,8 +369,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 }
 
                 var testRunMessageEvent = new TestRunMessageEventArgs(level, message);
-                this.LoggerManager.HandleDiscoveryMessage(testRunMessageEvent);
-                this.OnDiscoveryMessage.SafeInvoke(this, testRunMessageEvent, "DiscoveryRequest.OnTestMessageRecieved");
+                LoggerManager.HandleDiscoveryMessage(testRunMessageEvent);
+                OnDiscoveryMessage.SafeInvoke(this, testRunMessageEvent, "DiscoveryRequest.OnTestMessageRecieved");
             }
 
             if (EqtTrace.IsInfoEnabled)
@@ -395,18 +387,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         {
             // Note: Deserialize rawMessage only if required.
 
-            var message = this.LoggerManager.LoggersInitialized || this.requestData.IsTelemetryOptedIn 
-                          ? this.dataSerializer.DeserializeMessage(rawMessage) 
+            var message = LoggerManager.LoggersInitialized || requestData.IsTelemetryOptedIn 
+                          ? dataSerializer.DeserializeMessage(rawMessage) 
                           : null;
 
             if (string.Equals(message?.MessageType, MessageType.DiscoveryComplete))
             {
-                var discoveryCompletePayload = this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
+                var discoveryCompletePayload = dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
                 rawMessage = UpdateRawMessageWithTelemetryInfo(discoveryCompletePayload, message) ?? rawMessage;
                 HandleLoggerManagerDiscoveryComplete(discoveryCompletePayload);
             }
 
-            this.OnRawMessageReceived?.Invoke(this, rawMessage);
+            OnRawMessageReceived?.Invoke(this, rawMessage);
         }
 
         /// <summary>
@@ -415,19 +407,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <param name="discoveryCompletePayload">Discovery complete payload.</param>
         private void HandleLoggerManagerDiscoveryComplete(DiscoveryCompletePayload discoveryCompletePayload)
         {
-            if (this.LoggerManager.LoggersInitialized && discoveryCompletePayload != null)
+            if (LoggerManager.LoggersInitialized && discoveryCompletePayload != null)
             {
                 // Send last chunk to logger manager.
                 if (discoveryCompletePayload.LastDiscoveredTests != null)
                 {
                     var discoveredTestsEventArgs = new DiscoveredTestsEventArgs(discoveryCompletePayload.LastDiscoveredTests);
-                    this.LoggerManager.HandleDiscoveredTests(discoveredTestsEventArgs);
+                    LoggerManager.HandleDiscoveredTests(discoveredTestsEventArgs);
                 }
 
                 // Send discovery complete to logger manager.
                 var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
                 discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
-                this.LoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs);
+                LoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs);
             }
         }
 
@@ -441,23 +433,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         {
             var rawMessage = default(string);
 
-            if (this.requestData.IsTelemetryOptedIn)
+            if (requestData.IsTelemetryOptedIn)
             {
                 if (discoveryCompletePayload != null)
                 {
                     if (discoveryCompletePayload.Metrics == null)
                     {
-                        discoveryCompletePayload.Metrics = this.requestData.MetricsCollection.Metrics;
+                        discoveryCompletePayload.Metrics = requestData.MetricsCollection.Metrics;
                     }
                     else
                     {
-                        foreach (var kvp in this.requestData.MetricsCollection.Metrics)
+                        foreach (var kvp in requestData.MetricsCollection.Metrics)
                         {
                             discoveryCompletePayload.Metrics[kvp.Key] = kvp.Value;
                         }
                     }
 
-                    var discoveryFinalTimeTakenForDesignMode = DateTime.UtcNow - this.discoveryStartTime;
+                    var discoveryFinalTimeTakenForDesignMode = DateTime.UtcNow - discoveryStartTime;
 
                     // Collecting Total Time Taken
                     discoveryCompletePayload.Metrics[TelemetryDataConstants.TimeTakenInSecForDiscovery] = discoveryFinalTimeTakenForDesignMode.TotalSeconds;
@@ -467,14 +459,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 {
                     var version = message1.Version;
 
-                    rawMessage = this.dataSerializer.SerializePayload(
+                    rawMessage = dataSerializer.SerializePayload(
                         MessageType.DiscoveryComplete,
                         discoveryCompletePayload,
                         version);
                 }
                 else
                 {
-                    rawMessage = this.dataSerializer.SerializePayload(
+                    rawMessage = dataSerializer.SerializePayload(
                         MessageType.DiscoveryComplete,
                         discoveryCompletePayload);
                 }
@@ -493,7 +485,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// </summary>
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
 
             GC.SuppressFinalize(this);
         }
@@ -505,21 +497,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 EqtTrace.Verbose("DiscoveryRequest.Dispose: Starting.");
             }
 
-            lock (this.syncObject)
+            lock (syncObject)
             {
-                if (!this.disposed)
+                if (!disposed)
                 {
                     if (disposing)
                     {
-                        if (this.discoveryCompleted != null)
+                        if (discoveryCompleted != null)
                         {
-                            this.discoveryCompleted.Dispose();
+                            discoveryCompleted.Dispose();
                         }
                     }
 
                     // Indicate that object has been disposed
-                    this.discoveryCompleted = null;
-                    this.disposed = true;
+                    discoveryCompleted = null;
+                    disposed = true;
                 }
             }
 
@@ -546,17 +538,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <summary>
         /// It get set when current discovery request is completed.
         /// </summary>
-        private ManualResetEvent discoveryCompleted = new ManualResetEvent(false);
+        private ManualResetEvent discoveryCompleted = new(false);
 
         /// <summary>
         /// Sync object for various operations
         /// </summary>
-        private object syncObject = new Object();
-
-        /// <summary>
-        /// Whether or not the test discovery is in progress.
-        /// </summary>
-        private bool discoveryInProgress;
+        private readonly object syncObject = new();
 
         /// <summary>
         /// Discovery Start Time

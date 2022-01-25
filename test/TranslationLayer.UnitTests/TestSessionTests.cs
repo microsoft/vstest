@@ -21,8 +21,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     public class TestSessionTests
     {
         private readonly string testSettings = "TestSettings";
-        private readonly List<string> testSources = new List<string> { "Hello", "World" };
-        private readonly List<TestCase> testCases = new List<TestCase>
+        private readonly List<string> testSources = new() { "Hello", "World" };
+        private readonly List<TestCase> testCases = new()
         {
             new TestCase("a.b.c", new Uri("d://uri"), "a.dll"),
             new TestCase("d.e.f", new Uri("g://uri"), "d.dll")
@@ -36,23 +36,23 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         [TestInitialize]
         public void TestInitialize()
         {
-            this.testSessionInfo = new TestSessionInfo();
-            this.mockTestSessionEventsHandler = new Mock<ITestSessionEventsHandler>();
-            this.mockVsTestConsoleWrapper = new Mock<IVsTestConsoleWrapper>();
+            testSessionInfo = new TestSessionInfo();
+            mockTestSessionEventsHandler = new Mock<ITestSessionEventsHandler>();
+            mockVsTestConsoleWrapper = new Mock<IVsTestConsoleWrapper>();
 
-            this.testSession = new TestSession(
-                this.testSessionInfo,
-                this.mockTestSessionEventsHandler.Object,
-                this.mockVsTestConsoleWrapper.Object);
+            testSession = new TestSession(
+                testSessionInfo,
+                mockTestSessionEventsHandler.Object,
+                mockVsTestConsoleWrapper.Object);
         }
 
         #region ITestSession
         [TestMethod]
         public void AbortTestRunShouldCallConsoleWrapperAbortTestRun()
         {
-            this.testSession.AbortTestRun();
+            testSession.AbortTestRun();
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.AbortTestRun(),
                 Times.Once);
         }
@@ -60,9 +60,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         [TestMethod]
         public void CancelDiscoveryShouldCallConsoleWrapperCancelDiscovery()
         {
-            this.testSession.CancelDiscovery();
+            testSession.CancelDiscovery();
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.CancelDiscovery(),
                 Times.Once);
         }
@@ -70,9 +70,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         [TestMethod]
         public void CancelTestRunShouldCallConsoleWrapperCancelTestRun()
         {
-            this.testSession.CancelTestRun();
+            testSession.CancelTestRun();
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.CancelTestRun(),
                 Times.Once);
         }
@@ -80,17 +80,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         [TestMethod]
         public void DiscoverTestsShouldCallConsoleWrapperDiscoverTestsWithCorrectArguments1()
         {
-            this.testSession.DiscoverTests(
-                this.testSources,
-                this.testSettings,
+            testSession.DiscoverTests(
+                testSources,
+                testSettings,
                 new Mock<ITestDiscoveryEventsHandler>().Object);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.DiscoverTests(
-                    this.testSources,
-                    this.testSettings,
+                    testSources,
+                    testSettings,
                     null,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     It.IsAny<ITestDiscoveryEventsHandler2>()),
                 Times.Once);
         }
@@ -101,18 +101,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testPlatformOptions = new TestPlatformOptions();
             var mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
-            this.testSession.DiscoverTests(
-                this.testSources,
-                this.testSettings,
+            testSession.DiscoverTests(
+                testSources,
+                testSettings,
                 testPlatformOptions,
                 mockTestDiscoveryEventsHandler.Object);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.DiscoverTests(
-                    this.testSources,
-                    this.testSettings,
+                    testSources,
+                    testSettings,
                     testPlatformOptions,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestDiscoveryEventsHandler.Object),
                 Times.Once);
         }
@@ -122,17 +122,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
-            this.testSession.RunTests(
-                this.testSources,
-                this.testSettings,
+            testSession.RunTests(
+                testSources,
+                testSettings,
                 mockTestRunEventsHandler.Object);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTests(
-                    this.testSources,
-                    this.testSettings,
+                    testSources,
+                    testSettings,
                     null,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object),
                 Times.Once);
         }
@@ -143,18 +143,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testPlatformOptions = new TestPlatformOptions();
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
-            this.testSession.RunTests(
-                this.testSources,
-                this.testSettings,
+            testSession.RunTests(
+                testSources,
+                testSettings,
                 testPlatformOptions,
                 mockTestRunEventsHandler.Object);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTests(
-                    this.testSources,
-                    this.testSettings,
+                    testSources,
+                    testSettings,
                     testPlatformOptions,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object),
                 Times.Once);
         }
@@ -164,17 +164,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
-            this.testSession.RunTests(
-                this.testCases,
-                this.testSettings,
+            testSession.RunTests(
+                testCases,
+                testSettings,
                 mockTestRunEventsHandler.Object);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTests(
-                    this.testCases,
-                    this.testSettings,
+                    testCases,
+                    testSettings,
                     null,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object),
                 Times.Once);
         }
@@ -185,18 +185,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testPlatformOptions = new TestPlatformOptions();
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
-            this.testSession.RunTests(
-                this.testCases,
-                this.testSettings,
+            testSession.RunTests(
+                testCases,
+                testSettings,
                 testPlatformOptions,
                 mockTestRunEventsHandler.Object);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTests(
-                    this.testCases,
-                    this.testSettings,
+                    testCases,
+                    testSettings,
                     testPlatformOptions,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object),
                 Times.Once);
         }
@@ -207,18 +207,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
-            this.testSession.RunTestsWithCustomTestHost(
-                this.testSources,
-                this.testSettings,
+            testSession.RunTestsWithCustomTestHost(
+                testSources,
+                testSettings,
                 mockTestRunEventsHandler.Object,
                 mockTestHostLauncher.Object);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTestsWithCustomTestHost(
-                    this.testSources,
-                    this.testSettings,
+                    testSources,
+                    testSettings,
                     null,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object,
                     mockTestHostLauncher.Object),
                 Times.Once);
@@ -231,19 +231,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
-            this.testSession.RunTestsWithCustomTestHost(
-                this.testSources,
-                this.testSettings,
+            testSession.RunTestsWithCustomTestHost(
+                testSources,
+                testSettings,
                 testPlatformOptions,
                 mockTestRunEventsHandler.Object,
                 mockTestHostLauncher.Object);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTestsWithCustomTestHost(
-                    this.testSources,
-                    this.testSettings,
+                    testSources,
+                    testSettings,
                     testPlatformOptions,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object,
                     mockTestHostLauncher.Object),
                 Times.Once);
@@ -255,18 +255,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
-            this.testSession.RunTestsWithCustomTestHost(
-                this.testCases,
-                this.testSettings,
+            testSession.RunTestsWithCustomTestHost(
+                testCases,
+                testSettings,
                 mockTestRunEventsHandler.Object,
                 mockTestHostLauncher.Object);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTestsWithCustomTestHost(
-                    this.testCases,
-                    this.testSettings,
+                    testCases,
+                    testSettings,
                     null,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object,
                     mockTestHostLauncher.Object),
                 Times.Once);
@@ -279,19 +279,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
-            this.testSession.RunTestsWithCustomTestHost(
-                this.testCases,
-                this.testSettings,
+            testSession.RunTestsWithCustomTestHost(
+                testCases,
+                testSettings,
                 testPlatformOptions,
                 mockTestRunEventsHandler.Object,
                 mockTestHostLauncher.Object);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTestsWithCustomTestHost(
-                    this.testCases,
-                    this.testSettings,
+                    testCases,
+                    testSettings,
                     testPlatformOptions,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object,
                     mockTestHostLauncher.Object),
                 Times.Once);
@@ -300,12 +300,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         [TestMethod]
         public void StopTestSessionShouldCallConsoleWrapperStopTestSessionWithCorrectArguments1()
         {
-            this.testSession.StopTestSession();
+            testSession.StopTestSession();
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.StopTestSession(
-                    this.testSessionInfo,
-                    this.mockTestSessionEventsHandler.Object),
+                    testSessionInfo,
+                    mockTestSessionEventsHandler.Object),
                 Times.Once);
         }
 
@@ -314,11 +314,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var mockTestSessionEventsHandler2 = new Mock<ITestSessionEventsHandler>();
 
-            this.testSession.StopTestSession(mockTestSessionEventsHandler2.Object);
+            testSession.StopTestSession(mockTestSessionEventsHandler2.Object);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.StopTestSession(
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestSessionEventsHandler2.Object),
                 Times.Once);
         }
@@ -328,18 +328,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         [TestMethod]
         public async Task DiscoverTestsAsyncShouldCallConsoleWrapperDiscoverTestsWithCorrectArguments1()
         {
-            await this.testSession.DiscoverTestsAsync(
-                    this.testSources,
-                    this.testSettings,
+            await testSession.DiscoverTestsAsync(
+                    testSources,
+                    testSettings,
                     new Mock<ITestDiscoveryEventsHandler>().Object)
                 .ConfigureAwait(false);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.DiscoverTestsAsync(
-                    this.testSources,
-                    this.testSettings,
+                    testSources,
+                    testSettings,
                     null,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     It.IsAny<ITestDiscoveryEventsHandler2>()),
                 Times.Once);
         }
@@ -350,19 +350,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testPlatformOptions = new TestPlatformOptions();
             var mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
-            await this.testSession.DiscoverTestsAsync(
-                    this.testSources,
-                    this.testSettings,
+            await testSession.DiscoverTestsAsync(
+                    testSources,
+                    testSettings,
                     testPlatformOptions,
                     mockTestDiscoveryEventsHandler.Object)
                 .ConfigureAwait(false); ;
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.DiscoverTestsAsync(
-                    this.testSources,
-                    this.testSettings,
+                    testSources,
+                    testSettings,
                     testPlatformOptions,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestDiscoveryEventsHandler.Object),
                 Times.Once);
         }
@@ -372,18 +372,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
-            await this.testSession.RunTestsAsync(
-                    this.testSources,
-                    this.testSettings,
+            await testSession.RunTestsAsync(
+                    testSources,
+                    testSettings,
                     mockTestRunEventsHandler.Object)
                 .ConfigureAwait(false);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTestsAsync(
-                    this.testSources,
-                    this.testSettings,
+                    testSources,
+                    testSettings,
                     null,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object),
                 Times.Once);
         }
@@ -394,19 +394,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testPlatformOptions = new TestPlatformOptions();
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
-            await this.testSession.RunTestsAsync(
-                    this.testSources,
-                    this.testSettings,
+            await testSession.RunTestsAsync(
+                    testSources,
+                    testSettings,
                     testPlatformOptions,
                     mockTestRunEventsHandler.Object)
                 .ConfigureAwait(false);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTestsAsync(
-                    this.testSources,
-                    this.testSettings,
+                    testSources,
+                    testSettings,
                     testPlatformOptions,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object),
                 Times.Once);
         }
@@ -416,18 +416,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
-            await this.testSession.RunTestsAsync(
-                    this.testCases,
-                    this.testSettings,
+            await testSession.RunTestsAsync(
+                    testCases,
+                    testSettings,
                     mockTestRunEventsHandler.Object)
                 .ConfigureAwait(false);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTestsAsync(
-                    this.testCases,
-                    this.testSettings,
+                    testCases,
+                    testSettings,
                     null,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object),
                 Times.Once);
         }
@@ -438,19 +438,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testPlatformOptions = new TestPlatformOptions();
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
-            await this.testSession.RunTestsAsync(
-                    this.testCases,
-                    this.testSettings,
+            await testSession.RunTestsAsync(
+                    testCases,
+                    testSettings,
                     testPlatformOptions,
                     mockTestRunEventsHandler.Object)
                 .ConfigureAwait(false); ;
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTestsAsync(
-                    this.testCases,
-                    this.testSettings,
+                    testCases,
+                    testSettings,
                     testPlatformOptions,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object),
                 Times.Once);
         }
@@ -461,19 +461,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
-            await this.testSession.RunTestsWithCustomTestHostAsync(
-                    this.testSources,
-                    this.testSettings,
+            await testSession.RunTestsWithCustomTestHostAsync(
+                    testSources,
+                    testSettings,
                     mockTestRunEventsHandler.Object,
                     mockTestHostLauncher.Object)
                 .ConfigureAwait(false);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTestsWithCustomTestHostAsync(
-                    this.testSources,
-                    this.testSettings,
+                    testSources,
+                    testSettings,
                     null,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object,
                     mockTestHostLauncher.Object),
                 Times.Once);
@@ -486,20 +486,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
-            await this.testSession.RunTestsWithCustomTestHostAsync(
-                    this.testSources,
-                    this.testSettings,
+            await testSession.RunTestsWithCustomTestHostAsync(
+                    testSources,
+                    testSettings,
                     testPlatformOptions,
                     mockTestRunEventsHandler.Object,
                     mockTestHostLauncher.Object)
                 .ConfigureAwait(false);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTestsWithCustomTestHostAsync(
-                    this.testSources,
-                    this.testSettings,
+                    testSources,
+                    testSettings,
                     testPlatformOptions,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object,
                     mockTestHostLauncher.Object),
                 Times.Once);
@@ -511,19 +511,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
-            await this.testSession.RunTestsWithCustomTestHostAsync(
-                    this.testCases,
-                    this.testSettings,
+            await testSession.RunTestsWithCustomTestHostAsync(
+                    testCases,
+                    testSettings,
                     mockTestRunEventsHandler.Object,
                     mockTestHostLauncher.Object)
                 .ConfigureAwait(false);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTestsWithCustomTestHostAsync(
-                    this.testCases,
-                    this.testSettings,
+                    testCases,
+                    testSettings,
                     null,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object,
                     mockTestHostLauncher.Object),
                 Times.Once);
@@ -536,20 +536,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
-            await this.testSession.RunTestsWithCustomTestHostAsync(
-                    this.testCases,
-                    this.testSettings,
+            await testSession.RunTestsWithCustomTestHostAsync(
+                    testCases,
+                    testSettings,
                     testPlatformOptions,
                     mockTestRunEventsHandler.Object,
                     mockTestHostLauncher.Object)
                 .ConfigureAwait(false);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.RunTestsWithCustomTestHostAsync(
-                    this.testCases,
-                    this.testSettings,
+                    testCases,
+                    testSettings,
                     testPlatformOptions,
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestRunEventsHandler.Object,
                     mockTestHostLauncher.Object),
                 Times.Once);
@@ -558,12 +558,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         [TestMethod]
         public async Task StopTestSessionAsyncShouldCallConsoleWrapperStopTestSessionWithCorrectArguments1()
         {
-            await this.testSession.StopTestSessionAsync().ConfigureAwait(false);
+            await testSession.StopTestSessionAsync().ConfigureAwait(false);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.StopTestSessionAsync(
-                    this.testSessionInfo,
-                    this.mockTestSessionEventsHandler.Object),
+                    testSessionInfo,
+                    mockTestSessionEventsHandler.Object),
                 Times.Once);
         }
 
@@ -572,13 +572,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var mockTestSessionEventsHandler2 = new Mock<ITestSessionEventsHandler>();
 
-            await this.testSession.StopTestSessionAsync(
+            await testSession.StopTestSessionAsync(
                     mockTestSessionEventsHandler2.Object)
                 .ConfigureAwait(false);
 
-            this.mockVsTestConsoleWrapper.Verify(
+            mockVsTestConsoleWrapper.Verify(
                 vtcw => vtcw.StopTestSessionAsync(
-                    this.testSessionInfo,
+                    testSessionInfo,
                     mockTestSessionEventsHandler2.Object),
                 Times.Once);
         }

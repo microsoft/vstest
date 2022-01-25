@@ -22,12 +22,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
             var logEnabled = Environment.GetEnvironmentVariable("VSTEST_LOGTELEMETRY");
             bool logTelemery = !string.IsNullOrEmpty(logEnabled) && logEnabled.Equals("1", StringComparison.Ordinal);
 
-            if (isTelemetryOptedIn && !isDesignMode && logTelemery)
-            {
-                return await Task.FromResult<IMetricsPublisher>(new TextFileTelemetryPublisher());
-            }
-
-            return await Task.FromResult<IMetricsPublisher>(new NoOpMetricsPublisher());
+            return isTelemetryOptedIn && !isDesignMode && logTelemery
+                ? await Task.FromResult<IMetricsPublisher>(new TextFileTelemetryPublisher())
+                : await Task.FromResult<IMetricsPublisher>(new NoOpMetricsPublisher());
         }
     }
 }

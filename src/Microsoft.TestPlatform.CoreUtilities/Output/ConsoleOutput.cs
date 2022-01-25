@@ -13,19 +13,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     /// </summary>
     public class ConsoleOutput : IOutput
     {
-        private static object lockObject = new object();
+        private static readonly object lockObject = new();
         private static ConsoleOutput consoleOutput = null;
 
-        private TextWriter standardOutput = null;
-        private TextWriter standardError = null;
+        private readonly TextWriter standardOutput = null;
+        private readonly TextWriter standardError = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleOutput"/> class.
         /// </summary>
         internal ConsoleOutput()
         {
-            this.standardOutput = Console.Out;
-            this.standardError = Console.Error;
+            standardOutput = Console.Out;
+            standardError = Console.Error;
         }
 
         /// <summary>
@@ -59,8 +59,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="level">Level of the message.</param>
         public void WriteLine(string message, OutputLevel level)
         {
-            this.Write(message, level);
-            this.Write(Environment.NewLine, level);
+            Write(message, level);
+            Write(Environment.NewLine, level);
         }
 
         /// <summary>
@@ -74,15 +74,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 case OutputLevel.Information:
                 case OutputLevel.Warning:
-                    this.standardOutput.Write(message);
+                    standardOutput.Write(message);
                     break;
 
                 case OutputLevel.Error:
-                    this.standardError.Write(message);
+                    standardError.Write(message);
                     break;
 
                 default:
-                    this.standardOutput.Write("ConsoleOutput.WriteLine: The output level is unrecognized: {0}", level);
+                    standardOutput.Write("ConsoleOutput.WriteLine: The output level is unrecognized: {0}", level);
                     break;
             }
         }

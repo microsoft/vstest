@@ -15,16 +15,16 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
     public class CodeCoverageRunSettingsProcessorTests
     {
         #region Members
-        private XmlElement defaultSettings;
+        private readonly XmlElement defaultSettings;
 
-        private CodeCoverageRunSettingsProcessor processor;
+        private readonly CodeCoverageRunSettingsProcessor processor;
         #endregion
 
         #region Constructors
         public CodeCoverageRunSettingsProcessorTests()
         {
-            this.defaultSettings = this.GetDefaultConfiguration();
-            this.processor = new CodeCoverageRunSettingsProcessor(this.defaultSettings);
+            defaultSettings = GetDefaultConfiguration();
+            processor = new CodeCoverageRunSettingsProcessor(defaultSettings);
         }
         #endregion
 
@@ -44,7 +44,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         public void MissingCodeCoverageTagShouldAddDefaultTag()
         {
             const string settings = "<Configuration></Configuration>";
-            string expected = $"{this.defaultSettings.OuterXml}";
+            string expected = $"{defaultSettings.OuterXml}";
 
             Assert.AreEqual(expected, processor.Process(settings).OuterXml);
         }
@@ -56,12 +56,12 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var processedNode = processor.Process(settings);
             Assert.IsNotNull(processedNode);
 
-            var codeCoverageNodes = this.ExtractNodes(processedNode, this.defaultSettings, "./CodeCoverage");
+            var codeCoverageNodes = ExtractNodes(processedNode, defaultSettings, "./CodeCoverage");
 
-            this.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./ModulePaths/Exclude");
-            this.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Functions/Exclude");
-            this.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Attributes/Exclude");
-            this.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Sources/Exclude");
+            CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./ModulePaths/Exclude");
+            CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Functions/Exclude");
+            CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Attributes/Exclude");
+            CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Sources/Exclude");
         }
 
         [TestMethod]
@@ -205,12 +205,12 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var processedNode = processor.Process(settings);
             Assert.IsNotNull(processedNode);
 
-            var codeCoverageNodes = this.ExtractNodes(processedNode, expectedResultDocument.DocumentElement, "./CodeCoverage");
+            var codeCoverageNodes = ExtractNodes(processedNode, expectedResultDocument.DocumentElement, "./CodeCoverage");
 
-            this.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./ModulePaths/Exclude");
-            this.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Functions/Exclude");
-            this.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Attributes/Exclude");
-            this.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Sources/Exclude");
+            CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./ModulePaths/Exclude");
+            CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Functions/Exclude");
+            CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Attributes/Exclude");
+            CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Sources/Exclude");
         }
         #endregion
 
@@ -243,8 +243,8 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
         private Tuple<XmlNode, XmlNode> ExtractNodes(XmlNode currentSettingsRoot, XmlNode defaultSettingsRoot, string path)
         {
-            var currentNode = this.ExtractNode(currentSettingsRoot, path);
-            var defaultNode = this.ExtractNode(defaultSettingsRoot, path);
+            var currentNode = ExtractNode(currentSettingsRoot, path);
+            var defaultNode = ExtractNode(defaultSettingsRoot, path);
             Assert.IsNotNull(currentNode);
             Assert.IsNotNull(defaultNode);
 
@@ -253,7 +253,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
         private void CompareResults(XmlNode currentSettingsRoot, XmlNode defaultSettingsRoot, string path)
         {
-            var nodes = this.ExtractNodes(currentSettingsRoot, defaultSettingsRoot, path);
+            var nodes = ExtractNodes(currentSettingsRoot, defaultSettingsRoot, path);
 
             Assert.AreEqual(nodes.Item1.ChildNodes.Count, nodes.Item2.ChildNodes.Count);
 

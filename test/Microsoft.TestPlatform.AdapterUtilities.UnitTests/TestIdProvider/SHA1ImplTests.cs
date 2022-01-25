@@ -110,7 +110,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.UnitTests.TestIdProvider
             var shaHasher1 = new AdapterUtilities.TestIdProvider.Sha1Implementation();
 
             // Act
-            var bytes = UTF8Encoding.UTF8.GetBytes(message);
+            var bytes = Encoding.UTF8.GetBytes(message);
             var digest1 = ToHex(shaHasher1.ComputeHash(bytes));
 
             // Assert

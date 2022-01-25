@@ -39,7 +39,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void CheckInitializeLogFileTest()
         {
-            Assert.AreEqual<string>(logFile, EqtTrace.LogFile, "Expected log file to be {0}", logFile);
+            Assert.AreEqual(logFile, EqtTrace.LogFile, "Expected log file to be {0}", logFile);
         }
 
         [TestMethod]

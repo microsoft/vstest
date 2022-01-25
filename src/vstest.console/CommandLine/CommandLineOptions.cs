@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Utilities.Helpers;
     using Utilities.Helpers.Interfaces;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
     using vstest.console.Internal;
     using System.Globalization;
 
@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <summary>
         /// The default retrieval timeout for fetching of test results or test cases
         /// </summary>
-        private readonly TimeSpan DefaultRetrievalTimeout = new TimeSpan(0, 0, 0, 1, 500);
+        private readonly TimeSpan DefaultRetrievalTimeout = new(0, 0, 0, 1, 500);
 
         #endregion
 
@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
         private static CommandLineOptions instance;
 
-        private List<string> sources = new List<string>();
+        private List<string> sources = new();
 
         private Architecture architecture;
 
@@ -80,10 +80,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </summary>
         protected CommandLineOptions()
         {
-            this.BatchSize = DefaultBatchSize;
-            this.TestStatsEventTimeout = this.DefaultRetrievalTimeout;
-            this.FileHelper = new FileHelper();
-            this.FilePatternParser = new FilePatternParser();
+            BatchSize = DefaultBatchSize;
+            TestStatsEventTimeout = DefaultRetrievalTimeout;
+            FileHelper = new FileHelper();
+            FilePatternParser = new FilePatternParser();
 #if TODO
             UseVsixExtensions = Utilities.GetAppSettingValue(UseVsixExtensionsKey, false);
 #endif
@@ -110,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             get
             {
-                return this.sources.AsReadOnly();
+                return sources.AsReadOnly();
             }
         }
 
@@ -202,12 +202,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             get
             {
-                return this.architecture;
+                return architecture;
             }
             set
             {
-                this.architecture = value;
-                this.ArchitectureSpecified = true;
+                architecture = value;
+                ArchitectureSpecified = true;
             }
         }
 
@@ -248,12 +248,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             get
             {
-                return this.frameworkVersion;
+                return frameworkVersion;
             }
             set
             {
-                this.frameworkVersion = value;
-                this.FrameworkVersionSpecified = true;
+                frameworkVersion = value;
+                FrameworkVersionSpecified = true;
             }
         }
 
@@ -301,7 +301,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidArgument, source), ex);
             }
             // Add the matching files to source list
-            this.sources = this.sources.Union(matchingFiles).ToList();
+            sources = sources.Union(matchingFiles).ToList();
         }
 
         #endregion

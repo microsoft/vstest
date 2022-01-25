@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 TestSessionInfo = testSessionInfo
             };
 
-            this.communicationManager.SendMessage(MessageType.StartTestSessionCallback, ackPayload);
+            communicationManager.SendMessage(MessageType.StartTestSessionCallback, ackPayload);
         }
 
         /// <inheritdoc />
@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 IsStopped = stopped
             };
 
-            this.communicationManager.SendMessage(MessageType.StopTestSessionCallback, ackPayload);
+            communicationManager.SendMessage(MessageType.StopTestSessionCallback, ackPayload);
         }
 
         /// <inheritdoc />
@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 Message = message
             };
 
-            this.communicationManager.SendMessage(MessageType.TestMessage, messagePayload);
+            communicationManager.SendMessage(MessageType.TestMessage, messagePayload);
         }
 
         /// <inheritdoc />

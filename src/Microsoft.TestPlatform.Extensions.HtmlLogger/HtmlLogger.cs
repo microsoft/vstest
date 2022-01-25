@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         {
             this.fileHelper = fileHelper;
             this.htmlTransformer = htmlTransformer;
-            this.xmlSerializer = dataContractSerializer;
+            xmlSerializer = dataContractSerializer;
         }
 
         /// <summary>
@@ -141,15 +141,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             }
 
             parametersDictionary = parameters;
-
-            if (parameters.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && parameters.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out string logFileNameValue))
+            if (parameters.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out _) && parameters.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out _))
             {
                 var htmlParameterErrorMsg = string.Format(CultureInfo.CurrentCulture, HtmlResource.PrefixAndNameProvidedError);
                 EqtTrace.Error(htmlParameterErrorMsg);
                 throw new ArgumentException(htmlParameterErrorMsg);
             }
 
-            this.Initialize(events, parameters[DefaultLoggerParameterNames.TestRunDirectory]);
+            Initialize(events, parameters[DefaultLoggerParameterNames.TestRunDirectory]);
         }
 
         /// <summary>
@@ -285,9 +284,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 PassPercentage = TotalTests == 0 ? 0 : PassedTests * 100 / TotalTests,
                 TotalRunTime = GetFormattedDurationString(e.ElapsedTimeInRunningTests),
             };
-            if (this.parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && !string.IsNullOrWhiteSpace(logFilePrefixValue))
+            if (parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && !string.IsNullOrWhiteSpace(logFilePrefixValue))
             {
-                var framework = this.parametersDictionary[DefaultLoggerParameterNames.TargetFramework];
+                var framework = parametersDictionary[DefaultLoggerParameterNames.TargetFramework];
                 if (framework != null)
                 {
                     framework = NuGetFramework.Parse(framework).GetShortFolderName();
@@ -295,13 +294,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 }
 
                 logFilePrefixValue = logFilePrefixValue + DateTime.Now.ToString("_yyyyMMddHHmmss", DateTimeFormatInfo.InvariantInfo) + $".{HtmlLoggerConstants.HtmlFileExtension}";
-                this.HtmlFilePath = Path.Combine(TestResultsDirPath, logFilePrefixValue);
+                HtmlFilePath = Path.Combine(TestResultsDirPath, logFilePrefixValue);
             }
             else
             {
                 if (parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out string logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue))
                 {
-                    this.HtmlFilePath = Path.Combine(TestResultsDirPath, logFileNameValue);
+                    HtmlFilePath = Path.Combine(TestResultsDirPath, logFileNameValue);
                 }
             }
 
@@ -341,7 +340,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             {
                 if (XmlFilePath != null)
                 {
-                    this.fileHelper.Delete(XmlFilePath);
+                    fileHelper.Delete(XmlFilePath);
                 }
             }
 
@@ -401,7 +400,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// <returns></returns>
         internal string GetFormattedDurationString(TimeSpan duration)
         {
-            if (duration == default(TimeSpan))
+            if (duration == default)
             {
                 return null;
             }

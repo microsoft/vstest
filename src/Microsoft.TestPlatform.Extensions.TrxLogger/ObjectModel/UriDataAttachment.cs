@@ -17,18 +17,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// </summary>
     internal class UriDataAttachment : IDataAttachment, IXmlTestStore
     {
-        private readonly TrxFileHelper trxFileHelper;
+        private readonly TrxFileHelper _trxFileHelper;
         #region Private fields
 
         /// <summary>
         /// The name for the attachment
         /// </summary>
-        private string description;
-
-        /// <summary>
-        /// The URI pointing to the resource that forms the data for this attachment
-        /// </summary>
-        private Uri uri;
 
         #endregion
 
@@ -42,7 +36,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <exception cref="ArgumentNullException">'uri' is null</exception>
         public UriDataAttachment(string description, Uri uri, TrxFileHelper trxFileHelper)
         {
-            this.trxFileHelper = trxFileHelper;
+            this._trxFileHelper = trxFileHelper;
 
             Initialize(description, uri);
         }
@@ -52,24 +46,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <summary>
         /// Gets short description for the attachment.
         /// </summary>
-        public string Description
-        {
-            get
-            {
-                return this.description;
-            }
-        }
+        public string Description { get; private set; }
 
         /// <summary>
         /// Gets the URI that can be used to obtain the data of this attachment
         /// </summary>
-        public Uri Uri
-        {
-            get
-            {
-                return this.uri;
-            }
-        }
+        public Uri Uri { get; private set; }
 
         #endregion
 
@@ -88,8 +70,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             EqtAssert.ParameterNotNull(element, nameof(element));
 
-            XmlPersistence helper = new XmlPersistence();
-            helper.SaveSimpleField(element, ".", this.description, null);
+            XmlPersistence helper = new();
+            helper.SaveSimpleField(element, ".", Description, null);
 
             // The URI is not a true URI, it must always be a local path represented as a URI. Also, the URI can be absolute or
             // relative. We use OriginalString because:
@@ -98,7 +80,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             //   - LocalPath only works for an absolute URI
             // Due to the above assumption, that it is always an absolute or relative local path to a file, it's simplest and
             // safest to treat the URI as a string and just use OriginalString.
-            helper.SaveSimpleField(element, "@href", this.uri.OriginalString, null);
+            helper.SaveSimpleField(element, "@href", Uri.OriginalString, null);
         }
 
         #endregion
@@ -116,19 +98,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             Debug.Assert(!string.IsNullOrEmpty(baseDirectory), "'baseDirectory' is null or empty");
             Debug.Assert(baseDirectory == baseDirectory.Trim(), "'baseDirectory' contains whitespace at the ends");
 
-            if (useAbsoluteUri != this.uri.IsAbsoluteUri)
+            if (useAbsoluteUri != Uri.IsAbsoluteUri)
             {
-                Uri uriToUse;
-                if (useAbsoluteUri)
-                {
-                    uriToUse = new Uri(Path.Combine(baseDirectory, this.uri.OriginalString), UriKind.Absolute);
-                }
-                else
-                {
-                    uriToUse = new Uri(trxFileHelper.MakePathRelative(this.uri.OriginalString, baseDirectory), UriKind.Relative);
-                }
-
-                return new UriDataAttachment(this.description, uriToUse, trxFileHelper);
+                Uri uriToUse = useAbsoluteUri
+                    ? new Uri(Path.Combine(baseDirectory, Uri.OriginalString), UriKind.Absolute)
+                    : new Uri(_trxFileHelper.MakePathRelative(Uri.OriginalString, baseDirectory), UriKind.Relative);
+                return new UriDataAttachment(Description, uriToUse, _trxFileHelper);
             }
 
             // The URI in this instance is already how we want it, and since this class is immutable, no need to clone
@@ -144,8 +119,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             EqtAssert.ParameterNotNull(desc, nameof(desc));
             EqtAssert.ParameterNotNull(uri, nameof(uri));
 
-            this.description = desc;
-            this.uri = uri;
+            Description = desc;
+            Uri = uri;
         }
 
         #endregion

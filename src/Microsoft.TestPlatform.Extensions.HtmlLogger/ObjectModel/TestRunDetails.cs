@@ -30,6 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel
         /// <summary>
         /// List of all the results
         /// </summary>
-        [DataMember] public List<TestResultCollection> ResultCollectionList = new List<TestResultCollection>();
+        [DataMember] public List<TestResultCollection> ResultCollectionList = new();
     }
 }

@@ -21,15 +21,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     /// </summary>
     internal class ParallelRunEventsHandler : ITestRunEventsHandler2
     {
-        private IProxyExecutionManager proxyExecutionManager;
+        private readonly IProxyExecutionManager proxyExecutionManager;
 
-        private ITestRunEventsHandler actualRunEventsHandler;
+        private readonly ITestRunEventsHandler actualRunEventsHandler;
 
-        private IParallelProxyExecutionManager parallelProxyExecutionManager;
+        private readonly IParallelProxyExecutionManager parallelProxyExecutionManager;
 
-        private ParallelRunDataAggregator runDataAggregator;
+        private readonly ParallelRunDataAggregator runDataAggregator;
 
-        private IDataSerializer dataSerializer;
+        private readonly IDataSerializer dataSerializer;
 
         protected IRequestData requestData;
 
@@ -70,16 +70,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             if (parallelRunComplete)
             {
-                var completedArgs = new TestRunCompleteEventArgs(this.runDataAggregator.GetAggregatedRunStats(),
-                    this.runDataAggregator.IsCanceled,
-                    this.runDataAggregator.IsAborted,
-                    this.runDataAggregator.GetAggregatedException(),
-                    new Collection<AttachmentSet>(this.runDataAggregator.RunCompleteArgsAttachments),
-                    new Collection<InvokedDataCollector>(this.runDataAggregator.InvokedDataCollectors),
-                    this.runDataAggregator.ElapsedTime);
+                var completedArgs = new TestRunCompleteEventArgs(runDataAggregator.GetAggregatedRunStats(),
+                    runDataAggregator.IsCanceled,
+                    runDataAggregator.IsAborted,
+                    runDataAggregator.GetAggregatedException(),
+                    new Collection<AttachmentSet>(runDataAggregator.RunCompleteArgsAttachments),
+                    new Collection<InvokedDataCollector>(runDataAggregator.InvokedDataCollectors),
+                    runDataAggregator.ElapsedTime);
 
                 // Collect Final RunState
-                this.requestData.MetricsCollection.Add(TelemetryDataConstants.RunState, this.runDataAggregator.IsAborted ? "Aborted" : this.runDataAggregator.IsCanceled ? "Canceled" : "Completed");
+                requestData.MetricsCollection.Add(TelemetryDataConstants.RunState, runDataAggregator.IsAborted ? "Aborted" : runDataAggregator.IsCanceled ? "Canceled" : "Completed");
 
                 // Collect Aggregated Metrics Data
                 var aggregatedRunDataMetrics = runDataAggregator.GetAggregatedRunDataMetrics();
@@ -105,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             // Update run stats, executorUris, etc.
             // we need this data when we send the final run complete
-            this.runDataAggregator.Aggregate(
+            runDataAggregator.Aggregate(
                 testRunCompleteArgs.TestRunStatistics,
                 executorUris,
                 testRunCompleteArgs.Error,
@@ -117,10 +117,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 testRunCompleteArgs.InvokedDataCollectors);
 
             // Aggregate Run Data Metrics
-            this.runDataAggregator.AggregateRunDataMetrics(testRunCompleteArgs.Metrics);
+            runDataAggregator.AggregateRunDataMetrics(testRunCompleteArgs.Metrics);
 
-            return this.parallelProxyExecutionManager.HandlePartialRunComplete(
-                this.proxyExecutionManager,
+            return parallelProxyExecutionManager.HandlePartialRunComplete(
+                proxyExecutionManager,
                 testRunCompleteArgs,
                 null, // lastChunk should be null as we already sent this data above
                 runContextAttachments,
@@ -133,9 +133,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             // To send a rawmessge - we need to create rawmessage from an aggregated payload object
             var testRunCompletePayload = new TestRunCompletePayload()
             {
-                ExecutorUris = this.runDataAggregator.ExecutorUris,
+                ExecutorUris = runDataAggregator.ExecutorUris,
                 LastRunTests = null,
-                RunAttachments = this.runDataAggregator.RunContextAttachments,
+                RunAttachments = runDataAggregator.RunContextAttachments,
                 TestRunCompleteArgs = completedArgs
             };
 
@@ -143,8 +143,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             ConvertToRawMessageAndSend(MessageType.ExecutionComplete, testRunCompletePayload);
 
             // send actual test run complete to clients
-            this.actualRunEventsHandler.HandleTestRunComplete(
-                completedArgs, null, this.runDataAggregator.RunContextAttachments, this.runDataAggregator.ExecutorUris);
+            actualRunEventsHandler.HandleTestRunComplete(
+                completedArgs, null, runDataAggregator.RunContextAttachments, runDataAggregator.ExecutorUris);
         }
 
         public void HandleRawMessage(string rawMessage)
@@ -152,40 +152,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             // In case of parallel - we can send everything but handle complete
             // HandleComplete is not true-end of the overall execution as we only get completion of one executor here
             // Always aggregate data, deserialize and raw for complete events
-            var message = this.dataSerializer.DeserializeMessage(rawMessage);
+            var message = dataSerializer.DeserializeMessage(rawMessage);
 
             // Do not deserialize further - just send if not execution complete
             if (!string.Equals(MessageType.ExecutionComplete, message.MessageType))
             {
-                this.actualRunEventsHandler.HandleRawMessage(rawMessage);
+                actualRunEventsHandler.HandleRawMessage(rawMessage);
             }
         }
 
         public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
         {
-            this.actualRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
+            actualRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
         }
 
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            this.actualRunEventsHandler.HandleLogMessage(level, message);
+            actualRunEventsHandler.HandleLogMessage(level, message);
         }
 
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
-            return this.actualRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+            return actualRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
         }
 
         /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
-            return ((ITestRunEventsHandler2)this.actualRunEventsHandler).AttachDebuggerToProcess(pid);
+            return ((ITestRunEventsHandler2)actualRunEventsHandler).AttachDebuggerToProcess(pid);
         }
 
         private void ConvertToRawMessageAndSend(string messageType, object payload)
         {
-            var rawMessage = this.dataSerializer.SerializePayload(messageType, payload);
-            this.actualRunEventsHandler.HandleRawMessage(rawMessage);
+            var rawMessage = dataSerializer.SerializePayload(messageType, payload);
+            actualRunEventsHandler.HandleRawMessage(rawMessage);
         }
     }
 }

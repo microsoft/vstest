@@ -24,112 +24,112 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
     [TestClass]
     public class DiscoveryRequestTests
     {
-        DiscoveryRequest discoveryRequest;
-        Mock<IProxyDiscoveryManager> discoveryManager;
+        readonly DiscoveryRequest discoveryRequest;
+        readonly Mock<IProxyDiscoveryManager> discoveryManager;
         private readonly Mock<ITestLoggerManager> loggerManager;
-        DiscoveryCriteria discoveryCriteria;
-        private Mock<IRequestData> mockRequestData;
-        private Mock<IDataSerializer> mockDataSerializer;
+        readonly DiscoveryCriteria discoveryCriteria;
+        private readonly Mock<IRequestData> mockRequestData;
+        private readonly Mock<IDataSerializer> mockDataSerializer;
 
         public DiscoveryRequestTests()
         {
-            this.discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 1, null);
-            this.discoveryManager = new Mock<IProxyDiscoveryManager>();
-            this.loggerManager = new Mock<ITestLoggerManager>();
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
-            this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.discoveryRequest = new DiscoveryRequest(this.mockRequestData.Object, this.discoveryCriteria, this.discoveryManager.Object, loggerManager.Object, this.mockDataSerializer.Object);
+            discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 1, null);
+            discoveryManager = new Mock<IProxyDiscoveryManager>();
+            loggerManager = new Mock<ITestLoggerManager>();
+            mockRequestData = new Mock<IRequestData>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+            mockDataSerializer = new Mock<IDataSerializer>();
+            discoveryRequest = new DiscoveryRequest(mockRequestData.Object, discoveryCriteria, discoveryManager.Object, loggerManager.Object, mockDataSerializer.Object);
         }
 
         [TestMethod]
         public void ConstructorSetsDiscoveryCriteriaAndDiscoveryManager()
         {
-            Assert.AreEqual(this.discoveryCriteria, this.discoveryRequest.DiscoveryCriteria);
-            Assert.AreEqual(this.discoveryManager.Object, (this.discoveryRequest as DiscoveryRequest).DiscoveryManager);
+            Assert.AreEqual(discoveryCriteria, discoveryRequest.DiscoveryCriteria);
+            Assert.AreEqual(discoveryManager.Object, (discoveryRequest as DiscoveryRequest).DiscoveryManager);
         }
 
         [TestMethod]
         public void DiscoveryAsycIfDiscoveryRequestIsDisposedThrowsObjectDisposedException()
         {
-            this.discoveryRequest.Dispose();
+            discoveryRequest.Dispose();
 
-            Assert.ThrowsException<ObjectDisposedException>(() => this.discoveryRequest.DiscoverAsync());
+            Assert.ThrowsException<ObjectDisposedException>(() => discoveryRequest.DiscoverAsync());
         }
 
         [TestMethod]
         public void DiscoverAsyncSetsDiscoveryInProgressAndCallManagerToDiscoverTests()
         {
-            this.discoveryRequest.DiscoverAsync();
+            discoveryRequest.DiscoverAsync();
 
-            Assert.IsTrue((this.discoveryRequest as DiscoveryRequest).DiscoveryInProgress);
-            this.discoveryManager.Verify(dm => dm.DiscoverTests(this.discoveryCriteria, this.discoveryRequest as DiscoveryRequest), Times.Once);
+            Assert.IsTrue((discoveryRequest as DiscoveryRequest).DiscoveryInProgress);
+            discoveryManager.Verify(dm => dm.DiscoverTests(discoveryCriteria, discoveryRequest as DiscoveryRequest), Times.Once);
         }
 
         [TestMethod]
         public void DiscoveryAsyncIfDiscoverTestsThrowsExceptionSetsDiscoveryInProgressToFalseAndThrowsThatException()
         {
-            this.discoveryManager.Setup(dm => dm.DiscoverTests(this.discoveryCriteria, this.discoveryRequest as DiscoveryRequest)).Throws(new Exception("DummyException"));
+            discoveryManager.Setup(dm => dm.DiscoverTests(discoveryCriteria, discoveryRequest as DiscoveryRequest)).Throws(new Exception("DummyException"));
             try
             {
-                this.discoveryRequest.DiscoverAsync();
+                discoveryRequest.DiscoverAsync();
             }
             catch (Exception ex)
             {
                 Assert.IsTrue(ex is Exception);
                 Assert.AreEqual("DummyException", ex.Message);
-                Assert.IsFalse((this.discoveryRequest as DiscoveryRequest).DiscoveryInProgress);
+                Assert.IsFalse((discoveryRequest as DiscoveryRequest).DiscoveryInProgress);
             }
         }
 
         [TestMethod]
         public void AbortIfDiscoveryRequestDisposedShouldThrowObjectDisposedException()
         {
-            this.discoveryRequest.Dispose();
-            Assert.ThrowsException<ObjectDisposedException>(() => this.discoveryRequest.Abort());
+            discoveryRequest.Dispose();
+            Assert.ThrowsException<ObjectDisposedException>(() => discoveryRequest.Abort());
         }
 
         [TestMethod]
         public void AbortIfDiscoveryIsinProgressShouldCallDiscoveryManagerAbort()
         {
             // Just to set the IsDiscoveryInProgress flag
-            this.discoveryRequest.DiscoverAsync();
+            discoveryRequest.DiscoverAsync();
 
-            this.discoveryRequest.Abort();
-            this.discoveryManager.Verify(dm => dm.Abort(), Times.Once);
+            discoveryRequest.Abort();
+            discoveryManager.Verify(dm => dm.Abort(), Times.Once);
         }
 
         [TestMethod]
         public void AbortIfDiscoveryIsNotInProgressShouldNotCallDiscoveryManagerAbort()
         {
             // DiscoveryAsync has not been called, discoveryInProgress should be false
-            this.discoveryRequest.Abort();
-            this.discoveryManager.Verify(dm => dm.Abort(), Times.Never);
+            discoveryRequest.Abort();
+            discoveryManager.Verify(dm => dm.Abort(), Times.Never);
         }
 
         [TestMethod]
         public void WaitForCompletionIfDiscoveryRequestDisposedShouldThrowObjectDisposedException()
         {
-            this.discoveryRequest.Dispose();
-            Assert.ThrowsException<ObjectDisposedException>(() => this.discoveryRequest.WaitForCompletion());
+            discoveryRequest.Dispose();
+            Assert.ThrowsException<ObjectDisposedException>(() => discoveryRequest.WaitForCompletion());
         }
 
         [TestMethod]
         public void HandleDiscoveryCompleteShouldCloseDiscoveryManager()
         {
-            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+            var eventsHandler = discoveryRequest as ITestDiscoveryEventsHandler2;
 
             eventsHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(1, false), Enumerable.Empty<TestCase>());
-            this.discoveryManager.Verify(dm => dm.Close(), Times.Once);
+            discoveryManager.Verify(dm => dm.Close(), Times.Once);
         }
 
         [TestMethod]
         public void HandleDiscoveryCompleteShouldCloseDiscoveryManagerBeforeRaiseDiscoveryComplete()
         {
             var events = new List<string>();
-            this.discoveryManager.Setup(dm => dm.Close()).Callback(() => events.Add("close"));
-            this.discoveryRequest.OnDiscoveryComplete += (s, e) => events.Add("complete");
-            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+            discoveryManager.Setup(dm => dm.Close()).Callback(() => events.Add("close"));
+            discoveryRequest.OnDiscoveryComplete += (s, e) => events.Add("complete");
+            var eventsHandler = discoveryRequest as ITestDiscoveryEventsHandler2;
 
             eventsHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(1, false), Enumerable.Empty<TestCase>());
 
@@ -145,10 +145,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         public void DiscoverAsyncShouldInvokeOnDiscoveryStart()
         {
             bool onDiscoveryStartHandlerCalled = false;
-            this.discoveryRequest.OnDiscoveryStart += (s, e) => onDiscoveryStartHandlerCalled = true;
+            discoveryRequest.OnDiscoveryStart += (s, e) => onDiscoveryStartHandlerCalled = true;
 
             // Action
-            this.discoveryRequest.DiscoverAsync();
+            discoveryRequest.DiscoverAsync();
 
             // Assert
             Assert.IsTrue(onDiscoveryStartHandlerCalled, "DiscoverAsync should invoke OnDiscoveryStart event");
@@ -158,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         public void DiscoverAsyncShouldInvokeHandleDiscoveryStartofLoggerManager()
         {
             // Action
-            this.discoveryRequest.DiscoverAsync();
+            discoveryRequest.DiscoverAsync();
 
             // Assert
             loggerManager.Verify(lm => lm.HandleDiscoveryStart(It.IsAny<DiscoveryStartEventArgs>()), Times.Once);
@@ -174,9 +174,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             };
 
             mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
-            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+            var eventsHandler = discoveryRequest as ITestDiscoveryEventsHandler2;
             var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false);
             discoveryCompleteEventArgs.Metrics = dict;
 
@@ -192,12 +192,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         public void HandleRawMessageShouldHandleRawMessage()
         {
             bool onDiscoveryCompleteInvoked = false;
-            this.discoveryRequest.OnRawMessageReceived += (object sender, string e) =>
-                {
-                    onDiscoveryCompleteInvoked = true;
-                };
+            discoveryRequest.OnRawMessageReceived += (object sender, string e) => onDiscoveryCompleteInvoked = true;
 
-            this.discoveryRequest.HandleRawMessage(string.Empty);
+            discoveryRequest.HandleRawMessage(string.Empty);
 
             Assert.IsTrue(onDiscoveryCompleteInvoked);
         }
@@ -206,32 +203,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         public void HandleRawMessageShouldAddVSTestDataPointsIfTelemetryOptedIn()
         {
             bool onDiscoveryCompleteInvoked = true;
-            this.mockRequestData.Setup(x => x.IsTelemetryOptedIn).Returns(true);
-            this.discoveryRequest.OnRawMessageReceived += (object sender, string e) =>
-                {
-                    onDiscoveryCompleteInvoked = true;
-                };
+            mockRequestData.Setup(x => x.IsTelemetryOptedIn).Returns(true);
+            discoveryRequest.OnRawMessageReceived += (object sender, string e) => onDiscoveryCompleteInvoked = true;
 
-            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
+            mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
                 .Returns(new Message() { MessageType = MessageType.DiscoveryComplete });
 
-            this.mockDataSerializer.Setup(x => x.DeserializePayload<DiscoveryCompletePayload>(It.IsAny<Message>()))
+            mockDataSerializer.Setup(x => x.DeserializePayload<DiscoveryCompletePayload>(It.IsAny<Message>()))
                 .Returns(new DiscoveryCompletePayload());
 
-            this.discoveryRequest.HandleRawMessage(string.Empty);
+            discoveryRequest.HandleRawMessage(string.Empty);
 
-            this.mockDataSerializer.Verify(x => x.SerializePayload(It.IsAny<string>(), It.IsAny<DiscoveryCompletePayload>()), Times.Once);
-            this.mockRequestData.Verify(x => x.MetricsCollection, Times.AtLeastOnce);
+            mockDataSerializer.Verify(x => x.SerializePayload(It.IsAny<string>(), It.IsAny<DiscoveryCompletePayload>()), Times.Once);
+            mockRequestData.Verify(x => x.MetricsCollection, Times.AtLeastOnce);
             Assert.IsTrue(onDiscoveryCompleteInvoked);
         }
 
         [TestMethod]
         public void HandleRawMessageShouldInvokeHandleDiscoveryCompleteOfLoggerManager()
         {
-            this.loggerManager.Setup(x => x.LoggersInitialized).Returns(true);
-            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
+            loggerManager.Setup(x => x.LoggersInitialized).Returns(true);
+            mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
                 .Returns(new Message() { MessageType = MessageType.DiscoveryComplete });
-            this.mockDataSerializer.Setup(x => x.DeserializePayload<DiscoveryCompletePayload>(It.IsAny<Message>()))
+            mockDataSerializer.Setup(x => x.DeserializePayload<DiscoveryCompletePayload>(It.IsAny<Message>()))
                 .Returns(new DiscoveryCompletePayload()
                 {
                     TotalTests = 1,
@@ -239,16 +233,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
                     LastDiscoveredTests = Enumerable.Empty<TestCase>()
                 });
 
-            this.discoveryRequest.HandleRawMessage(string.Empty);
+            discoveryRequest.HandleRawMessage(string.Empty);
 
-            this.loggerManager.Verify(lm => lm.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>()), Times.Once);
+            loggerManager.Verify(lm => lm.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>()), Times.Once);
         }
 
         [TestMethod]
         public void HandleDiscoveryCompleteShouldInvokeHandleDiscoveryCompleteOfLoggerManager()
         {
             var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false);
-            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+            var eventsHandler = discoveryRequest as ITestDiscoveryEventsHandler2;
             eventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, Enumerable.Empty<TestCase>());
 
             loggerManager.Verify(lm => lm.HandleDiscoveryComplete(discoveryCompleteEventArgs), Times.Once);
@@ -258,7 +252,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         public void HandleDiscoveryCompleteShouldNotInvokeHandleDiscoveredTestsIfLastChunkNotPresent()
         {
             var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false);
-            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+            var eventsHandler = discoveryRequest as ITestDiscoveryEventsHandler2;
             eventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, Enumerable.Empty<TestCase>());
 
             loggerManager.Verify(lm => lm.HandleDiscoveredTests(It.IsAny<DiscoveredTestsEventArgs>()), Times.Never);
@@ -267,16 +261,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         [TestMethod]
         public void HandleDiscoveryCompleteShouldInvokeHandleDiscoveredTestsIfLastChunkPresent()
         {
-            var activeTestCases = new List<ObjectModel.TestCase>
+            var activeTestCases = new List<TestCase>
             {
-                new ObjectModel.TestCase(
+                new TestCase(
                     "A.C.M2",
                     new Uri("executor://dummy"),
                     "A")
             };
 
             var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false);
-            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+            var eventsHandler = discoveryRequest as ITestDiscoveryEventsHandler2;
             eventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, activeTestCases);
 
             loggerManager.Verify(lm => lm.HandleDiscoveredTests(It.IsAny<DiscoveredTestsEventArgs>()), Times.Once);

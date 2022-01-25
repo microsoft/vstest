@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.SmokeTests
     [TestClass]
     public class DataCollectorTests : IntegrationTestBase
     {
-        private static string InProcTestResultFile = Path.Combine(Path.GetTempPath(), "inproctest.txt");
+        private static readonly string InProcTestResultFile = Path.Combine(Path.GetTempPath(), "inproctest.txt");
         private const string InProDataCollectorTestProject = "SimpleTestProject.dll";
         [TestMethod]
         public void RunAllWithInProcDataCollectorSettings()
@@ -18,10 +18,10 @@ namespace Microsoft.TestPlatform.SmokeTests
             // Delete File if already exists
             File.Delete(InProcTestResultFile);
 
-            var runSettings = this.GetInProcDataCollectionRunsettingsFile();
+            var runSettings = GetInProcDataCollectionRunsettingsFile();
 
-            this.InvokeVsTestForExecution(testEnvironment.GetTestAsset(DataCollectorTests.InProDataCollectorTestProject), this.GetTestAdapterPath(), ".NETFramework,Version=v4.5.1", runSettings);
-            this.ValidateSummaryStatus(1, 1, 1);
+            InvokeVsTestForExecution(testEnvironment.GetTestAsset(InProDataCollectorTestProject), GetTestAdapterPath(), ".NETFramework,Version=v4.5.1", runSettings);
+            ValidateSummaryStatus(1, 1, 1);
 
             ValidateInProcDataCollectionOutput();
         }
@@ -38,7 +38,7 @@ namespace Microsoft.TestPlatform.SmokeTests
 
         private string GetInProcDataCollectionRunsettingsFile()
         {
-            var runSettings = Path.Combine(Path.GetDirectoryName(testEnvironment.GetTestAsset(DataCollectorTests.InProDataCollectorTestProject)), "runsettingstest.runsettings");
+            var runSettings = Path.Combine(Path.GetDirectoryName(testEnvironment.GetTestAsset(InProDataCollectorTestProject)), "runsettingstest.runsettings");
             var inprocasm = testEnvironment.GetTestAsset("SimpleDataCollector.dll");
             var fileContents = @"<RunSettings>
                                     <InProcDataCollectionRunSettings>

@@ -12,14 +12,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     // <inheritdoc />
     internal class InProcDataCollectionSink : IDataCollectionSink
     {
-        private IDictionary<Guid, TestCaseDataCollectionData> testCaseDataCollectionDataMap;
+        private readonly IDictionary<Guid, TestCaseDataCollectionData> testCaseDataCollectionDataMap;
 
         /// <summary>
         /// In process data collection sink
         /// </summary>
         public InProcDataCollectionSink()
         {
-            this.testCaseDataCollectionDataMap = new Dictionary<Guid, TestCaseDataCollectionData>();
+            testCaseDataCollectionDataMap = new Dictionary<Guid, TestCaseDataCollectionData>();
         }
 
         // <inheritdoc />
@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             ValidateArg.NotNullOrEmpty(dataCollectionContext.TestCase.Id.ToString(), "dataCollectionContext.TestCase.Id");
 
             var testCaseId = dataCollectionContext.TestCase.Id;
-            this.AddKeyValuePairToDictionary(testCaseId, key, value);
+            AddKeyValuePairToDictionary(testCaseId, key, value);
         }
 
         /// <summary>
@@ -40,9 +40,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <returns>test data collection dictionary </returns>
         public IDictionary<string, string> GetDataCollectionDataSetForTestCase(Guid testCaseId)
         {
-            TestCaseDataCollectionData testCaseDataCollection = null;
 
-            if (!this.testCaseDataCollectionDataMap.TryGetValue(testCaseId, out testCaseDataCollection))
+            if (!testCaseDataCollectionDataMap.TryGetValue(testCaseId, out TestCaseDataCollectionData testCaseDataCollection))
             {
                 if (EqtTrace.IsWarningEnabled)
                 {
@@ -53,22 +52,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             }
             else
             {
-                this.testCaseDataCollectionDataMap.Remove(testCaseId);
+                testCaseDataCollectionDataMap.Remove(testCaseId);
                 return testCaseDataCollection.CollectionData;
             }
         }
 
         private void AddKeyValuePairToDictionary(Guid testCaseId, string key, string value)
         {
-            if (!this.testCaseDataCollectionDataMap.ContainsKey(testCaseId))
+            if (!testCaseDataCollectionDataMap.ContainsKey(testCaseId))
             {
                 var testCaseCollectionData = new TestCaseDataCollectionData();
                 testCaseCollectionData.AddOrUpdateData(key, value);
-                this.testCaseDataCollectionDataMap[testCaseId] = testCaseCollectionData;
+                testCaseDataCollectionDataMap[testCaseId] = testCaseCollectionData;
             }
             else
             {
-                this.testCaseDataCollectionDataMap[testCaseId].AddOrUpdateData(key, value);
+                testCaseDataCollectionDataMap[testCaseId].AddOrUpdateData(key, value);
             }
         }
 
@@ -76,16 +75,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             public TestCaseDataCollectionData()
             {
-                this.CollectionData = new Dictionary<string, string>();
+                CollectionData = new Dictionary<string, string>();
             }
 
             internal IDictionary<string, string> CollectionData { get; private set; }
 
             internal void AddOrUpdateData(string key, string value)
             {
-                if (!this.CollectionData.ContainsKey(key))
+                if (!CollectionData.ContainsKey(key))
                 {
-                    this.CollectionData[key] = value;
+                    CollectionData[key] = value;
                 }
                 else
                 {
@@ -93,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     {
                         EqtTrace.Warning("The data for in-proc data collector with key {0} has already been set. Will be reset with new value", key);
                     }
-                    this.CollectionData[key] = value;
+                    CollectionData[key] = value;
                 }
             }
         }

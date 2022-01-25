@@ -26,10 +26,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         [JsonConstructor]
         public TestRunCriteriaWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string package, string runSettings, TestExecutionContext testExecutionContext)
         {
-            this.AdapterSourceMap = adapterSourceMap;
-            this.Package = package;
-            this.RunSettings = runSettings;
-            this.TestExecutionContext = testExecutionContext;
+            AdapterSourceMap = adapterSourceMap;
+            Package = package;
+            RunSettings = runSettings;
+            TestExecutionContext = testExecutionContext;
         }
 
         /// <summary>

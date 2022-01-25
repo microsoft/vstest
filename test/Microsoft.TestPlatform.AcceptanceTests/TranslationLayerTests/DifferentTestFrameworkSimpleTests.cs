@@ -23,14 +23,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         private void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
-            this.runEventHandler = new RunEventHandler();
+            vstestConsoleWrapper = GetVsTestConsoleWrapper();
+            runEventHandler = new RunEventHandler();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            this.vstestConsoleWrapper?.EndSession();
+            vstestConsoleWrapper?.EndSession();
         }
 
 
@@ -39,26 +39,26 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithNunitAdapter(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
             var sources = new List<string>
                               {
-                                  this.GetAssetFullPath("NUTestProject.dll")
+                                  GetAssetFullPath("NUTestProject.dll")
                               };
 
-            this.vstestConsoleWrapper.RunTests(
+            vstestConsoleWrapper.RunTests(
                 sources,
-                this.GetDefaultRunSettings(),
-                this.runEventHandler);
+                GetDefaultRunSettings(),
+                runEventHandler);
 
             var testCase =
-                this.runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("PassTestMethod1"));
+                runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("PassTestMethod1"));
 
             // Assert
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+            Assert.AreEqual(2, runEventHandler.TestResults.Count);
+            Assert.AreEqual(1, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+            Assert.AreEqual(1, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
 
             // Release builds optimize code, hence line numbers are different.
             if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
@@ -78,36 +78,29 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithXunitAdapter(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
             // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
-            string testAssemblyPath = null;
-            if (this.testEnvironment.TargetFramework.Equals("net451"))
-            {
-                testAssemblyPath = testEnvironment.GetTestAsset("XUTestProject.dll", "net46");
-            }
-            else
-            {
-                testAssemblyPath = testEnvironment.GetTestAsset("XUTestProject.dll");
-            }
-
+            string testAssemblyPath = testEnvironment.TargetFramework.Equals("net451")
+                ? testEnvironment.GetTestAsset("XUTestProject.dll", "net46")
+                : testEnvironment.GetTestAsset("XUTestProject.dll");
             var sources = new List<string> { testAssemblyPath };
-            var testAdapterPath = Directory.EnumerateFiles(this.GetTestAdapterPath(UnitTestFramework.XUnit), "*.TestAdapter.dll").ToList();
-            this.vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
+            var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(UnitTestFramework.XUnit), "*.TestAdapter.dll").ToList();
+            vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
 
-            this.vstestConsoleWrapper.RunTests(
+            vstestConsoleWrapper.RunTests(
                 sources,
-                this.GetDefaultRunSettings(),
-                this.runEventHandler);
+                GetDefaultRunSettings(),
+                runEventHandler);
 
             var testCase =
-                this.runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("xUnitTestProject.Class1.PassTestMethod1"));
+                runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("xUnitTestProject.Class1.PassTestMethod1"));
 
             // Assert
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+            Assert.AreEqual(2, runEventHandler.TestResults.Count);
+            Assert.AreEqual(1, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+            Assert.AreEqual(1, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
 
             // Release builds optimize code, hence line numbers are different.
             if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
@@ -125,29 +118,29 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetFullTargetFrameworkDataSource]
         public void RunTestsWithChutzpahAdapter(RunnerInfo runnerInfo)
         {
-            SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
             var sources = new List<string>
                               {
-                                  Path.Combine(this.testEnvironment.TestAssetsPath, "test.js")
+                                  Path.Combine(testEnvironment.TestAssetsPath, "test.js")
                               };
 
-            var testAdapterPath = Directory.EnumerateFiles(this.GetTestAdapterPath(UnitTestFramework.Chutzpah), "*.TestAdapter.dll").ToList();
-            this.vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
+            var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(UnitTestFramework.Chutzpah), "*.TestAdapter.dll").ToList();
+            vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
 
-            this.vstestConsoleWrapper.RunTests(
+            vstestConsoleWrapper.RunTests(
                 sources,
-                this.GetDefaultRunSettings(),
-                this.runEventHandler);
+                GetDefaultRunSettings(),
+                runEventHandler);
 
             var testCase =
-                this.runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("TestMethod1"));
+                runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("TestMethod1"));
 
             // Assert
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+            Assert.AreEqual(2, runEventHandler.TestResults.Count);
+            Assert.AreEqual(1, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+            Assert.AreEqual(1, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
             Assert.AreEqual(1, testCase.FirstOrDefault().TestCase.LineNumber);
         }
     }

@@ -402,7 +402,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
         [TestMethod]
         public void ClosedGenericMethod3()
         {
-            var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
+            _ = _compilation.GetSpecialType(SpecialType.System_Int32);
             var @float = _compilation.GetSpecialType(SpecialType.System_Single);
             var @string = _compilation.GetSpecialType(SpecialType.System_String);
             var outerInner = _compilation.GetTypeByMetadataName("TestClasses.Outer+Inner");
@@ -839,7 +839,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
             string expectedManagedMethodName)
         {
             // Generate the fqn for the Reflection MethodInfo
-            ManagedNameHelper.GetManagedName(methodInfo, out var managedTypeName, out var managedMethodName, out var hierarchyValues);
+            ManagedNameHelper.GetManagedName(methodInfo, out var managedTypeName, out var managedMethodName, out _);
 
             Assert.AreEqual(expectedManagedTypeName, managedTypeName);
             Assert.AreEqual(expectedManagedMethodName, managedMethodName);

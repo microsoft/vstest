@@ -37,7 +37,7 @@ namespace Microsoft.TestPlatform.AttachVS
                     {
                         try
                         {
-                            return new { Process = p, StartTime = p.StartTime, HasExited = p.HasExited };
+                            return new { Process = p, p.StartTime, p.HasExited };
                         }
                         catch
                         {
@@ -105,14 +105,13 @@ namespace Microsoft.TestPlatform.AttachVS
                 var moniker = new IMoniker[1];
                 while (enumMoniker.Next(1, moniker, IntPtr.Zero) == 0 && moniker[0] != null)
                 {
-                    string dn;
 
-                    moniker[0].GetDisplayName(bindCtx, null, out dn);
+                    moniker[0].GetDisplayName(bindCtx, null, out string dn);
 
                     if (dn.StartsWith("!VisualStudio.DTE.") && dn.EndsWith(dteSuffix))
                     {
-                        object dte, dbg, lps;
-                        runninObjectTable.GetObject(moniker[0], out dte);
+                        object dbg, lps;
+                        runninObjectTable.GetObject(moniker[0], out object dte);
 
                         // The COM object can be busy, we retry few times, hoping that it won't be busy next time.
                         for (var i = 0; i < 10; i++)
@@ -233,7 +232,7 @@ namespace Microsoft.TestPlatform.AttachVS
 
         private static Process GetParentProcess(Process process)
         {
-            var id = -1;
+            int id;
             try
             {
                 var handle = process.Handle;

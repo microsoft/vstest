@@ -26,9 +26,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             if (testDiscovererType != null)
             {
-                this.FileExtensions = GetFileExtensions(testDiscovererType);
-                this.DefaultExecutorUri = GetDefaultExecutorUri(testDiscovererType);
-                this.AssemblyType = GetAssemblyType(testDiscovererType);
+                FileExtensions = GetFileExtensions(testDiscovererType);
+                DefaultExecutorUri = GetDefaultExecutorUri(testDiscovererType);
+                AssemblyType = GetAssemblyType(testDiscovererType);
             }
         }
 
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             get
             {
-                return new object[] { this.FileExtensions, this.DefaultExecutorUri, this.AssemblyType };
+                return new object[] { FileExtensions, DefaultExecutorUri, AssemblyType };
             }
         }
 
@@ -125,14 +125,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// <returns> Supported assembly type. </returns>
         private AssemblyType GetAssemblyType(Type testDiscovererType)
         {
-            var assemblyType = default(AssemblyType);
 
             // Get Category
             var attribute = testDiscovererType.GetTypeInfo().GetCustomAttribute(typeof(CategoryAttribute));
             var category = (attribute as CategoryAttribute)?.Category;
 
             // Get assembly type from category.
-            Enum.TryParse(category, true, out assemblyType);
+            Enum.TryParse(category, true, out AssemblyType assemblyType);
             return assemblyType;
         }
     }

@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     internal class EnableBlameArgumentProcessor : IArgumentProcessor
     {
@@ -44,12 +44,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new EnableBlameArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new EnableBlameArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -60,16 +60,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableBlameArgumentExecutor(RunSettingsManager.Instance, new PlatformEnvironment(), new FileHelper()));
+                    executor = new Lazy<IArgumentExecutor>(() => new EnableBlameArgumentExecutor(RunSettingsManager.Instance, new PlatformEnvironment(), new FileHelper()));
                 }
 
-                return this.executor;
+                return executor;
             }
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -100,17 +100,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Blame logger and data collector friendly name
         /// </summary>
-        private static string BlameFriendlyName = "blame";
+        private static readonly string BlameFriendlyName = "blame";
 
         /// <summary>
         /// Run settings manager
         /// </summary>
-        private IRunSettingsProvider runSettingsManager;
+        private readonly IRunSettingsProvider runSettingsManager;
 
         /// <summary>
         /// Platform environment
         /// </summary>
-        private IEnvironment environment;
+        private readonly IEnvironment environment;
 
         /// <summary>
         /// For file related operation
@@ -123,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             this.runSettingsManager = runSettingsManager;
             this.environment = environment;
-            this.Output = ConsoleOutput.Instance;
+            Output = ConsoleOutput.Instance;
             this.fileHelper = fileHelper;
         }
 
@@ -199,18 +199,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private void InitializeBlame(bool enableCrashDump, bool enableHangDump, Dictionary<string, string> collectDumpParameters)
         {
             // Add Blame Logger
-            LoggerUtilities.AddLoggerToRunSettings(BlameFriendlyName, null, this.runSettingsManager);
+            LoggerUtilities.AddLoggerToRunSettings(BlameFriendlyName, null, runSettingsManager);
 
             // Add Blame Data Collector
-            CollectArgumentExecutor.AddDataCollectorToRunSettings(BlameFriendlyName, this.runSettingsManager, this.fileHelper);
+            CollectArgumentExecutor.AddDataCollectorToRunSettings(BlameFriendlyName, runSettingsManager, fileHelper);
 
 
             // Add default run settings if required.
-            if (this.runSettingsManager.ActiveRunSettings?.SettingsXml == null)
+            if (runSettingsManager.ActiveRunSettings?.SettingsXml == null)
             {
-                this.runSettingsManager.AddDefaultRunSettings();
+                runSettingsManager.AddDefaultRunSettings();
             }
-            var settings = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
+            var settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
 
             // Get results directory from RunSettingsManager
             var resultsDirectory = GetResultsDirectory(settings);
@@ -311,11 +311,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private bool IsDumpCollectionSupported()
         {
             var dumpCollectionSupported =
-                this.environment.OperatingSystem == PlatformOperatingSystem.Unix ||
-                this.environment.OperatingSystem == PlatformOperatingSystem.OSX ||
-                (this.environment.OperatingSystem == PlatformOperatingSystem.Windows
-                && this.environment.Architecture != PlatformArchitecture.ARM64
-                && this.environment.Architecture != PlatformArchitecture.ARM);
+                environment.OperatingSystem == PlatformOperatingSystem.Unix ||
+                environment.OperatingSystem == PlatformOperatingSystem.OSX ||
+                (environment.OperatingSystem == PlatformOperatingSystem.Windows
+                && environment.Architecture != PlatformArchitecture.ARM64
+                && environment.Architecture != PlatformArchitecture.ARM);
 
             if (!dumpCollectionSupported)
             {

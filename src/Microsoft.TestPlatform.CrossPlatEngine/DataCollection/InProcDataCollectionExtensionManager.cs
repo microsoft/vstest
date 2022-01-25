@@ -26,15 +26,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     {
         internal IDictionary<string, IInProcDataCollector> InProcDataCollectors;
 
-        private IDataCollectionSink inProcDataCollectionSink;
+        private readonly IDataCollectionSink inProcDataCollectionSink;
 
         private const string DataCollectorEndsWithPattern = @"Collector.dll";
 
-        private string defaultCodeBase;
+        private readonly string defaultCodeBase;
 
-        private List<string> codeBasePaths;
+        private readonly List<string> codeBasePaths;
 
-        private IFileHelper fileHelper;
+        private readonly IFileHelper fileHelper;
 
         /// <summary>
         /// Loaded in-proc datacollectors collection
@@ -59,29 +59,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         protected InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase, TestPluginCache testPluginCache, IFileHelper fileHelper)
         {
-            this.InProcDataCollectors = new Dictionary<string, IInProcDataCollector>();
-            this.inProcDataCollectionSink = new InProcDataCollectionSink();
+            InProcDataCollectors = new Dictionary<string, IInProcDataCollector>();
+            inProcDataCollectionSink = new InProcDataCollectionSink();
             this.defaultCodeBase = defaultCodeBase;
             this.fileHelper = fileHelper;
-            this.codeBasePaths = new List<string> { this.defaultCodeBase };
+            codeBasePaths = new List<string> { this.defaultCodeBase };
 
             // Get Datacollector code base paths from test plugin cache
             var extensionPaths = testPluginCache.GetExtensionPaths(DataCollectorEndsWithPattern);
             foreach (var extensionPath in extensionPaths)
             {
-                this.codeBasePaths.Add(Path.GetDirectoryName(extensionPath));
+                codeBasePaths.Add(Path.GetDirectoryName(extensionPath));
             }
 
             // Initialize InProcDataCollectors
-            this.InitializeInProcDataCollectors(runSettings);
+            InitializeInProcDataCollectors(runSettings);
 
-            if (this.IsInProcDataCollectionEnabled)
+            if (IsInProcDataCollectionEnabled)
             {
-                testEventsPublisher.TestCaseEnd += this.TriggerTestCaseEnd;
-                testEventsPublisher.TestCaseStart += this.TriggerTestCaseStart;
-                testEventsPublisher.TestResult += this.TriggerUpdateTestResult;
-                testEventsPublisher.SessionStart += this.TriggerTestSessionStart;
-                testEventsPublisher.SessionEnd += this.TriggerTestSessionEnd;
+                testEventsPublisher.TestCaseEnd += TriggerTestCaseEnd;
+                testEventsPublisher.TestCaseStart += TriggerTestCaseStart;
+                testEventsPublisher.TestResult += TriggerUpdateTestResult;
+                testEventsPublisher.SessionStart += TriggerTestSessionStart;
+                testEventsPublisher.SessionEnd += TriggerTestSessionEnd;
             }
         }
 
@@ -110,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 interfaceTypeInfo,
                 configuration?.OuterXml);
 
-            inProcDataCollector.LoadDataCollector(this.inProcDataCollectionSink);
+            inProcDataCollector.LoadDataCollector(inProcDataCollectionSink);
 
             return inProcDataCollector;
         }
@@ -126,8 +126,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </param>
         private void TriggerTestSessionStart(object sender, SessionStartEventArgs e)
         {
-            TestSessionStartArgs testSessionStartArgs = new TestSessionStartArgs(this.GetSessionStartProperties(e));
-            this.TriggerInProcDataCollectionMethods(Constants.TestSessionStartMethodName, testSessionStartArgs);
+            TestSessionStartArgs testSessionStartArgs = new(GetSessionStartProperties(e));
+            TriggerInProcDataCollectionMethods(Constants.TestSessionStartMethodName, testSessionStartArgs);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private void TriggerTestSessionEnd(object sender, SessionEndEventArgs e)
         {
             var testSessionEndArgs = new TestSessionEndArgs();
-            this.TriggerInProcDataCollectionMethods(Constants.TestSessionEndMethodName, testSessionEndArgs);
+            TriggerInProcDataCollectionMethods(Constants.TestSessionEndMethodName, testSessionEndArgs);
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private void TriggerTestCaseStart(object sender, TestCaseStartEventArgs e)
         {
             var testCaseStartArgs = new TestCaseStartArgs(e.TestElement);
-            this.TriggerInProcDataCollectionMethods(Constants.TestCaseStartMethodName, testCaseStartArgs);
+            TriggerInProcDataCollectionMethods(Constants.TestCaseStartMethodName, testCaseStartArgs);
         }
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             var dataCollectionContext = new DataCollectionContext(e.TestElement);
             var testCaseEndArgs = new TestCaseEndArgs(dataCollectionContext, e.TestOutcome);
-            this.TriggerInProcDataCollectionMethods(Constants.TestCaseEndMethodName, testCaseEndArgs);
+            TriggerInProcDataCollectionMethods(Constants.TestCaseEndMethodName, testCaseEndArgs);
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private void TriggerUpdateTestResult(object sender, TestResultEventArgs e)
         {
             // Just set the cached in-proc data if already exists
-            this.SetInProcDataCollectionDataInTestResult(e.TestResult);
+            SetInProcDataCollectionDataInTestResult(e.TestResult);
         }
 
         /// <summary>
@@ -212,16 +212,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 // Initialize if we have at least one
                 if (inProcDataCollectionSettingsPresentInRunSettings)
                 {
-                    this.inProcDataCollectorSettingsCollection = inProcDataCollectionRunSettings.DataCollectorSettingsList;
+                    inProcDataCollectorSettingsCollection = inProcDataCollectionRunSettings.DataCollectorSettingsList;
 
                     var interfaceTypeInfo = typeof(InProcDataCollection).GetTypeInfo();
-                    foreach (var inProcDc in this.inProcDataCollectorSettingsCollection)
+                    foreach (var inProcDc in inProcDataCollectorSettingsCollection)
                     {
-                        var codeBase = this.GetCodebase(inProcDc.CodeBase);
+                        var codeBase = GetCodebase(inProcDc.CodeBase);
                         var assemblyQualifiedName = inProcDc.AssemblyQualifiedName;
                         var configuration = inProcDc.Configuration;
-                        var inProcDataCollector = this.CreateDataCollector(assemblyQualifiedName, codeBase, configuration, interfaceTypeInfo);
-                        this.InProcDataCollectors[inProcDataCollector.AssemblyQualifiedName] = inProcDataCollector;
+                        var inProcDataCollector = CreateDataCollector(assemblyQualifiedName, codeBase, configuration, interfaceTypeInfo);
+                        InProcDataCollectors[inProcDataCollector.AssemblyQualifiedName] = inProcDataCollector;
                     }
                 }
             }
@@ -231,7 +231,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             }
             finally
             {
-                this.IsInProcDataCollectionEnabled = this.InProcDataCollectors.Any();
+                IsInProcDataCollectionEnabled = InProcDataCollectors.Any();
             }
         }
 
@@ -245,10 +245,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             if (!Path.IsPathRooted(codeBase))
             {
-                foreach (var extensionPath in this.codeBasePaths)
+                foreach (var extensionPath in codeBasePaths)
                 {
                     var assemblyPath = Path.Combine(extensionPath, codeBase);
-                    if (this.fileHelper.Exists(assemblyPath))
+                    if (fileHelper.Exists(assemblyPath))
                     {
                         return assemblyPath;
                     }
@@ -271,7 +271,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             try
             {
-                foreach (var inProcDc in this.InProcDataCollectors.Values)
+                foreach (var inProcDc in InProcDataCollectors.Values)
                 {
                     inProcDc.TriggerInProcDataCollectionMethod(methodName, methodArg);
                 }
@@ -292,9 +292,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private void SetInProcDataCollectionDataInTestResult(TestResult testResult)
         {
             // Loops through each datacollector reads the data collection data and sets as TestResult property.
-            foreach (var entry in this.InProcDataCollectors)
+            foreach (var entry in InProcDataCollectors)
             {
-                var dataCollectionData = ((InProcDataCollectionSink)this.inProcDataCollectionSink).GetDataCollectionDataSetForTestCase(testResult.TestCase.Id);
+                var dataCollectionData = ((InProcDataCollectionSink)inProcDataCollectionSink).GetDataCollectionDataSetForTestCase(testResult.TestCase.Id);
 
                 foreach (var keyValuePair in dataCollectionData)
                 {

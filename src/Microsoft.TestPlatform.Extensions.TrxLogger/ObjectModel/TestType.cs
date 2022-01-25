@@ -13,7 +13,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     internal sealed class TestType : IXmlTestStore
     {
         [StoreXmlSimpleField(".")]
-        private Guid typeId;
+        private Guid _typeId;
 
         public TestType(Guid id)
         {
@@ -22,30 +22,23 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 throw new ArgumentNullException(nameof(id));
             }
 
-            this.typeId = id;
+            _typeId = id;
         }
 
         public Guid Id
         {
-            get { return this.typeId; }
+            get { return _typeId; }
         }
 
         public override bool Equals(object obj)
         {
-            TestType tt = obj as TestType;
-
-            if (tt == null)
-            {
-                return false;
-            }
-
-            return this.typeId.Equals(tt.typeId);
+            return obj is TestType tt && _typeId.Equals(tt._typeId);
         }
 
 
         public override int GetHashCode()
         {
-            return this.typeId.GetHashCode();
+            return _typeId.GetHashCode();
         }
 
         #region IXmlTestStore Members

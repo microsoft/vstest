@@ -15,12 +15,12 @@ namespace vstest.console.UnitTests.Processors
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     [TestClass]
-    public class CLIRunSettingsArgumentProcessorTests
+    public class CliRunSettingsArgumentProcessorTests
     {
-        private TestableRunSettingsProvider settingsProvider;
-        private CLIRunSettingsArgumentExecutor executor;
-        private CommandLineOptions commandLineOptions;
-        private readonly string DefaultRunSettings = string.Join(Environment.NewLine, 
+        private TestableRunSettingsProvider _settingsProvider;
+        private CLIRunSettingsArgumentExecutor _executor;
+        private CommandLineOptions _commandLineOptions;
+        private readonly string _defaultRunSettings = string.Join(Environment.NewLine, 
         "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
 "<RunSettings>",
 "  <DataCollectionRunSettings>",
@@ -28,7 +28,7 @@ namespace vstest.console.UnitTests.Processors
 "  </DataCollectionRunSettings>",
 "</RunSettings>");
 
-        private readonly string RunSettingsWithDeploymentDisabled = string.Join(Environment.NewLine,
+        private readonly string _runSettingsWithDeploymentDisabled = string.Join(Environment.NewLine,
             "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
             "<RunSettings>",
             "  <DataCollectionRunSettings>",
@@ -39,7 +39,7 @@ namespace vstest.console.UnitTests.Processors
             "  </MSTest>",
             "</RunSettings>");
 
-        private readonly string RunSettingsWithDeploymentEnabled = string.Join(Environment.NewLine,
+        private readonly string _runSettingsWithDeploymentEnabled = string.Join(Environment.NewLine,
             "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
             "<RunSettings>",
             "  <DataCollectionRunSettings>",
@@ -53,15 +53,15 @@ namespace vstest.console.UnitTests.Processors
         [TestInitialize]
         public void Init()
         {
-            this.commandLineOptions = CommandLineOptions.Instance;
-            this.settingsProvider = new TestableRunSettingsProvider();
-            this.executor = new CLIRunSettingsArgumentExecutor(this.settingsProvider, this.commandLineOptions);
+            _commandLineOptions = CommandLineOptions.Instance;
+            _settingsProvider = new TestableRunSettingsProvider();
+            _executor = new CLIRunSettingsArgumentExecutor(_settingsProvider, _commandLineOptions);
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            this.commandLineOptions.Reset();
+            _commandLineOptions.Reset();
         }
 
         [TestMethod]
@@ -105,25 +105,25 @@ namespace vstest.console.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldNotThrowExceptionIfArgumentIsNull()
         {
-            this.executor.Initialize((string[])null);
+            _executor.Initialize((string[])null);
 
-            Assert.IsNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNull(_settingsProvider.ActiveRunSettings);
         }
 
         [TestMethod]
         public void InitializeShouldNotThrowExceptionIfArgumentIsEmpty()
         {
-            this.executor.Initialize(new string[0]);
+            _executor.Initialize(new string[0]);
 
-            Assert.IsNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNull(_settingsProvider.ActiveRunSettings);
         }
 
         [TestMethod]
         public void InitializeShouldCreateEmptyRunSettingsIfArgumentsHasOnlyWhiteSpace()
         {
-            this.executor.Initialize(new string[] { " " });
+            _executor.Initialize(new string[] { " " });
 
-            Assert.IsNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNull(_settingsProvider.ActiveRunSettings);
         }
 
         [TestMethod]
@@ -131,10 +131,10 @@ namespace vstest.console.UnitTests.Processors
         {
             var args = new string[] { "MSTest.DeploymentEnabled=False" };
 
-            this.executor.Initialize(args);
+            _executor.Initialize(args);
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(_runSettingsWithDeploymentDisabled, _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -142,10 +142,10 @@ namespace vstest.console.UnitTests.Processors
         {
             var args = new string[] { "MSTest.DeploymentEnabled=False", "MSTest1" };
 
-            this.executor.Initialize(args);
+            _executor.Initialize(args);
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(_runSettingsWithDeploymentDisabled, _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [DataRow("Testameter.Parameter(name=\"asf\",value=\"rgq\")")]
@@ -156,7 +156,7 @@ namespace vstest.console.UnitTests.Processors
             var args = new string[] { arg };
             var str = string.Format(CommandLineResources.MalformedRunSettingsKey);
 
-            CommandLineException ex = Assert.ThrowsException<CommandLineException>(() => this.executor.Initialize(args));
+            CommandLineException ex = Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(args));
 
             Assert.AreEqual(str, ex.Message);
         }
@@ -166,10 +166,10 @@ namespace vstest.console.UnitTests.Processors
         {
             var args = new string[] { " MSTest.DeploymentEnabled =False" };
 
-            this.executor.Initialize(args);
+            _executor.Initialize(args);
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(_runSettingsWithDeploymentDisabled, _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -177,7 +177,7 @@ namespace vstest.console.UnitTests.Processors
         {
             var args = new string[] { "MST est.DeploymentEnabled=False" };
 
-            Action action = () => this.executor.Initialize(args);
+            Action action = () => _executor.Initialize(args);
 
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 action,
@@ -185,13 +185,13 @@ namespace vstest.console.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldEncodeXMLIfInvalidXMLCharsArePresent()
+        public void InitializeShouldEncodeXmlIfInvalidXmlCharsArePresent()
         {
             var args = new string[] { "MSTest.DeploymentEnabled=F>a><l<se" };
 
-            this.executor.Initialize(args);
+            _executor.Initialize(args);
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
             Assert.AreEqual(string.Join(Environment.NewLine, "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
 "<RunSettings>",
 "  <DataCollectionRunSettings>",
@@ -200,7 +200,7 @@ namespace vstest.console.UnitTests.Processors
 "  <MSTest>",
 "    <DeploymentEnabled>F&gt;a&gt;&lt;l&lt;se</DeploymentEnabled>",
 "  </MSTest>",
-"</RunSettings>"), settingsProvider.ActiveRunSettings.SettingsXml);
+"</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -208,10 +208,10 @@ namespace vstest.console.UnitTests.Processors
         {
             var args = new string[] { "MSTest.DeploymentEnabled=False", "=value" };
 
-            this.executor.Initialize(args);
+            _executor.Initialize(args);
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(_runSettingsWithDeploymentDisabled, _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -219,14 +219,14 @@ namespace vstest.console.UnitTests.Processors
         {
 
             var runSettings = new RunSettings();
-            runSettings.LoadSettingsXml(DefaultRunSettings);
-            this.settingsProvider.SetActiveRunSettings(runSettings);
+            runSettings.LoadSettingsXml(_defaultRunSettings);
+            _settingsProvider.SetActiveRunSettings(runSettings);
 
             var args = new string[] { "MSTest.DeploymentEnabled=" };
-            this.executor.Initialize(args);
+            _executor.Initialize(args);
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual(DefaultRunSettings, this.settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(_defaultRunSettings, _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -234,14 +234,14 @@ namespace vstest.console.UnitTests.Processors
         {
 
             var runSettings = new RunSettings();
-            runSettings.LoadSettingsXml(DefaultRunSettings);
-            settingsProvider.SetActiveRunSettings(runSettings);
+            runSettings.LoadSettingsXml(_defaultRunSettings);
+            _settingsProvider.SetActiveRunSettings(runSettings);
 
             var args = new string[] { "MSTest.DeploymentEnabled=True" };
-            this.executor.Initialize(args);
+            _executor.Initialize(args);
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual(RunSettingsWithDeploymentEnabled, settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(_runSettingsWithDeploymentEnabled, _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
 
@@ -250,13 +250,13 @@ namespace vstest.console.UnitTests.Processors
         {
 
             var runSettings = new RunSettings();
-            runSettings.LoadSettingsXml(DefaultRunSettings);
-            settingsProvider.SetActiveRunSettings(runSettings);
+            runSettings.LoadSettingsXml(_defaultRunSettings);
+            _settingsProvider.SetActiveRunSettings(runSettings);
 
             var args = new string[] { "MSTest.DeploymentEnabled= " };
-            this.executor.Initialize(args);
+            _executor.Initialize(args);
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
             Assert.AreEqual(string.Join(Environment.NewLine, "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
 "<RunSettings>",
 "  <DataCollectionRunSettings>",
@@ -266,7 +266,7 @@ namespace vstest.console.UnitTests.Processors
 "    <DeploymentEnabled>",
 "    </DeploymentEnabled>",
 "  </MSTest>",
-"</RunSettings>"), settingsProvider.ActiveRunSettings.SettingsXml);
+"</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -274,14 +274,14 @@ namespace vstest.console.UnitTests.Processors
         {
 
             var runSettings = new RunSettings();
-            runSettings.LoadSettingsXml(DefaultRunSettings);
-            settingsProvider.SetActiveRunSettings(runSettings);
+            runSettings.LoadSettingsXml(_defaultRunSettings);
+            _settingsProvider.SetActiveRunSettings(runSettings);
 
             var args = new string[] { $"RunConfiguration.TargetFrameworkVersion={Constants.DotNetFramework46}" };
-            this.executor.Initialize(args);
+            _executor.Initialize(args);
 
-            Assert.IsTrue(this.commandLineOptions.FrameworkVersionSpecified);
-            Assert.AreEqual(Constants.DotNetFramework46, this.commandLineOptions.TargetFrameworkVersion.Name);
+            Assert.IsTrue(_commandLineOptions.FrameworkVersionSpecified);
+            Assert.AreEqual(Constants.DotNetFramework46, _commandLineOptions.TargetFrameworkVersion.Name);
         }
 
         [TestMethod]
@@ -289,14 +289,14 @@ namespace vstest.console.UnitTests.Processors
         {
 
             var runSettings = new RunSettings();
-            runSettings.LoadSettingsXml(DefaultRunSettings);
-            settingsProvider.SetActiveRunSettings(runSettings);
+            runSettings.LoadSettingsXml(_defaultRunSettings);
+            _settingsProvider.SetActiveRunSettings(runSettings);
 
             var args = new string[] { $"RunConfiguration.TargetPlatform={nameof(Architecture.ARM)}" };
-            this.executor.Initialize(args);
+            _executor.Initialize(args);
 
-            Assert.IsTrue(this.commandLineOptions.ArchitectureSpecified);
-            Assert.AreEqual(Architecture.ARM, this.commandLineOptions.TargetArchitecture);
+            Assert.IsTrue(_commandLineOptions.ArchitectureSpecified);
+            Assert.AreEqual(Architecture.ARM, _commandLineOptions.TargetArchitecture);
         }
 
         [TestMethod]
@@ -304,14 +304,14 @@ namespace vstest.console.UnitTests.Processors
         {
 
             var runSettings = new RunSettings();
-            runSettings.LoadSettingsXml(DefaultRunSettings);
-            settingsProvider.SetActiveRunSettings(runSettings);
+            runSettings.LoadSettingsXml(_defaultRunSettings);
+            _settingsProvider.SetActiveRunSettings(runSettings);
 
             var args = new string[] { };
-            this.executor.Initialize(args);
+            _executor.Initialize(args);
 
-            Assert.IsFalse(this.commandLineOptions.ArchitectureSpecified);
-            Assert.IsFalse(this.commandLineOptions.FrameworkVersionSpecified);
+            Assert.IsFalse(_commandLineOptions.ArchitectureSpecified);
+            Assert.IsFalse(_commandLineOptions.FrameworkVersionSpecified);
         }
 
         [DynamicData(nameof(TestRunParameterArgValidTestCases), DynamicDataSourceType.Method)]
@@ -320,10 +320,10 @@ namespace vstest.console.UnitTests.Processors
         {
             var args = new string[] { arg };
 
-            this.executor.Initialize(args);
+            _executor.Initialize(args);
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual(runSettingsWithTestRunParameters, settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(runSettingsWithTestRunParameters, _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [DynamicData(nameof(TestRunParameterArgInvalidTestCases), DynamicDataSourceType.Method)]
@@ -333,17 +333,17 @@ namespace vstest.console.UnitTests.Processors
             var args = new string[] { arg };
             var str = string.Format(CommandLineResources.InvalidTestRunParameterArgument, arg);
 
-            CommandLineException ex = Assert.ThrowsException<CommandLineException>(() => this.executor.Initialize(args));
+            CommandLineException ex = Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(args));
 
             Assert.AreEqual(str, ex.Message);
         }
 
         public static IEnumerable<object[]> TestRunParameterArgInvalidTestCases()
         {
-            return invalidTestCases;
+            return InvalidTestCases;
         }
 
-        private static readonly List<object[]> invalidTestCases = new List<object[]>
+        private static readonly List<object[]> InvalidTestCases = new()
         {
             new object[] { "TestRunParameters.Parameter(name=asf,value=rgq)" },
             new object[] { "TestRunParameters.Parameter(name=\"asf\",value=\"rgq\" )"},
@@ -372,10 +372,10 @@ namespace vstest.console.UnitTests.Processors
 
         public static IEnumerable<object[]> TestRunParameterArgValidTestCases()
         {
-            return validTestCases;
+            return ValidTestCases;
         }
 
-        private static readonly List<object[]> validTestCases = new List<object[]>
+        private static readonly List<object[]> ValidTestCases = new()
         {
             new object[] { "TestRunParameters.Parameter(name=\"weburl\",value=\"&><\")" ,
              string.Join(Environment.NewLine, "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -470,10 +470,10 @@ namespace vstest.console.UnitTests.Processors
                 "  </TestRunParameters>",
                 "</RunSettings>"});
 
-            this.executor.Initialize(args);
+            _executor.Initialize(args);
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual(runsettings, settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(runsettings, _settingsProvider.ActiveRunSettings.SettingsXml);
         }
     }
 }

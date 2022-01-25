@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+    using CommonResources = Resources.Resources;
 
     /// <summary>
     /// Generic base class for managing extensions and looking them up by their URI.
@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <summary>
         /// Used for logging errors.
         /// </summary>
-        private IMessageLogger logger;
+        private readonly IMessageLogger logger;
 
         #endregion
 
@@ -49,16 +49,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             IEnumerable<LazyExtension<TExtension, TMetadata>> testExtensions,
             IMessageLogger logger)
         {
-            ValidateArg.NotNull<IEnumerable<LazyExtension<TExtension, Dictionary<string, object>>>>(unfilteredTestExtensions, nameof(unfilteredTestExtensions));
-            ValidateArg.NotNull<IEnumerable<LazyExtension<TExtension, TMetadata>>>(testExtensions, nameof(testExtensions));
-            ValidateArg.NotNull<IMessageLogger>(logger, nameof(logger));
+            ValidateArg.NotNull(unfilteredTestExtensions, nameof(unfilteredTestExtensions));
+            ValidateArg.NotNull(testExtensions, nameof(testExtensions));
+            ValidateArg.NotNull(logger, nameof(logger));
 
             this.logger = logger;
-            this.TestExtensions = testExtensions;
-            this.UnfilteredTestExtensions = unfilteredTestExtensions;
+            TestExtensions = testExtensions;
+            UnfilteredTestExtensions = unfilteredTestExtensions;
 
             // Populate the map to avoid threading issues
-            this.PopulateMap();
+            PopulateMap();
         }
 
         #endregion
@@ -114,9 +114,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <returns>The test extension or null if one was not found.</returns>
         public LazyExtension<TExtension, TMetadata> TryGetTestExtension(Uri extensionUri)
         {
-            ValidateArg.NotNull<Uri>(extensionUri, nameof(extensionUri));
+            ValidateArg.NotNull(extensionUri, nameof(extensionUri));
 
-            this.TestExtensionByUri.TryGetValue(extensionUri, out var testExtension);
+            TestExtensionByUri.TryGetValue(extensionUri, out var testExtension);
 
             return testExtension;
         }
@@ -126,17 +126,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </summary>
         /// <param name="extensionUri">The URI of the test extension to be looked up.</param>
         /// <returns>The test extension or null if one was not found.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1057:StringUriOverloadsCallSystemUriOverloads", Justification = "Case insensitiveness needs to be supported.")]
         public LazyExtension<TExtension, TMetadata> TryGetTestExtension(string extensionUri)
         {
-            ValidateArg.NotNull<string>(extensionUri, nameof(extensionUri));
+            ValidateArg.NotNull(extensionUri, nameof(extensionUri));
 
             LazyExtension<TExtension, TMetadata> testExtension = null;
-            foreach (var availableExtensionUri in this.TestExtensionByUri.Keys)
+            foreach (var availableExtensionUri in TestExtensionByUri.Keys)
             {
                 if (string.Equals(extensionUri, availableExtensionUri.AbsoluteUri, StringComparison.OrdinalIgnoreCase))
                 {
-                    this.TestExtensionByUri.TryGetValue(availableExtensionUri, out testExtension);
+                    TestExtensionByUri.TryGetValue(availableExtensionUri, out testExtension);
                     break;
                 }
             }
@@ -150,14 +149,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </summary>
         private void PopulateMap()
         {
-            this.TestExtensionByUri = new Dictionary<Uri, LazyExtension<TExtension, TMetadata>>();
+            TestExtensionByUri = new Dictionary<Uri, LazyExtension<TExtension, TMetadata>>();
 
-            if (this.TestExtensions == null)
+            if (TestExtensions == null)
             {
                 return;
             }
 
-            foreach (var extension in this.TestExtensions)
+            foreach (var extension in TestExtensions)
             {
                 // Convert the extension uri string to an actual uri.
                 Uri uri = null;
@@ -167,9 +166,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 }
                 catch (FormatException e)
                 {
-                    if (this.logger != null)
+                    if (logger != null)
                     {
-                        this.logger.SendMessage(
+                        logger.SendMessage(
                             TestMessageLevel.Warning,
                             string.Format(CultureInfo.CurrentUICulture, CommonResources.InvalidExtensionUriFormat, extension.Metadata.ExtensionUri, e));
                     }
@@ -178,15 +177,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 if (uri != null)
                 {
                     // Make sure we are not trying to add an extension with a duplicate uri.
-                    if (!this.TestExtensionByUri.ContainsKey(uri))
+                    if (!TestExtensionByUri.ContainsKey(uri))
                     {
-                        this.TestExtensionByUri.Add(uri, extension);
+                        TestExtensionByUri.Add(uri, extension);
                     }
                     else
                     {
-                        if (this.logger != null)
+                        if (logger != null)
                         {
-                            this.logger.SendMessage(
+                            logger.SendMessage(
                                 TestMessageLevel.Warning,
                                 string.Format(CultureInfo.CurrentUICulture, CommonResources.DuplicateExtensionUri, extension.Metadata.ExtensionUri));
                         }

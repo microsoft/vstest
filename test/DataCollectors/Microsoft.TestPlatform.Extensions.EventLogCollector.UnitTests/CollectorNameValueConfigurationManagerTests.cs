@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         [TestMethod]
         public void ConstructorShouldInitializeNameValuePairDictionary()
         {
-            XmlDocument xmlDocument = new XmlDocument();
+            XmlDocument xmlDocument = new();
             using (XmlReader reader = XmlReader.Create(new StringReader(ConfigurationString)))
             {
                 xmlDocument.Load(reader);
@@ -35,7 +35,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         [TestMethod]
         public void ConstructorShouldNotInitializeNameValuePairIfEmptyXmlElementIsPassed()
         {
-            XmlDocument xmlDocument = new XmlDocument();
+            XmlDocument xmlDocument = new();
             using (XmlReader reader = XmlReader.Create(new StringReader(EmptyConfigurationString)))
             {
                 xmlDocument.Load(reader);

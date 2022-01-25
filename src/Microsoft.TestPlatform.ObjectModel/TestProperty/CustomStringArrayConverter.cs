@@ -20,21 +20,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            var strings = value as string[];
-            if (strings != null)
-            {
-                return strings;
-            }
-
-            return base.ConvertTo(context, culture, value, destinationType);
+            return value is string[] strings ? strings : base.ConvertTo(context, culture, value, destinationType);
         }
 
         /// <inheritdoc/>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             // String[] are used by adapters. E.g. TestCategory[]
-            var data = value as string;
-            if (data != null)
+            if (value is string data)
             {
                 using var stream = new MemoryStream(Encoding.Unicode.GetBytes(data));
                 var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(string[]));

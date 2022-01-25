@@ -23,18 +23,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
         private static readonly string TimoutErrorMessage =
             "datacollector process failed to connect to vstest.console process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
-        private Mock<IProcessHelper> mockProcessHelper;
-        private Mock<IEnvironment> mockEnvironment;
-        private Mock<IDataCollectionRequestHandler> mockDataCollectionRequestHandler;
-        private DataCollectorMain dataCollectorMain;
+        private readonly Mock<IProcessHelper> mockProcessHelper;
+        private readonly Mock<IEnvironment> mockEnvironment;
+        private readonly Mock<IDataCollectionRequestHandler> mockDataCollectionRequestHandler;
+        private readonly DataCollectorMain dataCollectorMain;
 
         public DataCollectorMainTests()
         {
-            this.mockProcessHelper = new Mock<IProcessHelper>();
-            this.mockEnvironment = new Mock<IEnvironment>();
-            this.mockDataCollectionRequestHandler = new Mock<IDataCollectionRequestHandler>();
-            this.dataCollectorMain = new DataCollectorMain(this.mockProcessHelper.Object, this.mockEnvironment.Object, this.mockDataCollectionRequestHandler.Object);
-            this.mockDataCollectionRequestHandler.Setup(rh => rh.WaitForRequestSenderConnection(It.IsAny<int>())).Returns(true);
+            mockProcessHelper = new Mock<IProcessHelper>();
+            mockEnvironment = new Mock<IEnvironment>();
+            mockDataCollectionRequestHandler = new Mock<IDataCollectionRequestHandler>();
+            dataCollectorMain = new DataCollectorMain(mockProcessHelper.Object, mockEnvironment.Object, mockDataCollectionRequestHandler.Object);
+            mockDataCollectionRequestHandler.Setup(rh => rh.WaitForRequestSenderConnection(It.IsAny<int>())).Returns(true);
         }
 
         [TestCleanup]
@@ -47,16 +47,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         public void RunShouldTimeoutBasedOnEnvVariable()
         {
             Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, "10");
-            this.dataCollectorMain.Run(args);
-            this.mockDataCollectionRequestHandler.Verify(rh => rh.WaitForRequestSenderConnection(10 * 1000));
+            dataCollectorMain.Run(args);
+            mockDataCollectionRequestHandler.Verify(rh => rh.WaitForRequestSenderConnection(10 * 1000));
         }
 
         [TestMethod]
         public void RunShouldTimeoutBasedDefaulValueIfEnvVariableNotSet()
         {
-            this.dataCollectorMain.Run(args);
+            dataCollectorMain.Run(args);
 
-            this.mockDataCollectionRequestHandler.Verify(rh => rh.WaitForRequestSenderConnection(EnvironmentHelper.DefaultConnectionTimeout * 1000));
+            mockDataCollectionRequestHandler.Verify(rh => rh.WaitForRequestSenderConnection(EnvironmentHelper.DefaultConnectionTimeout * 1000));
         }
 
         [TestMethod]
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
 #endif
             // Action
-            this.dataCollectorMain.Run(argsWithEmptyDiagArg); // Passing tracelevel as info and diag file path is empty.
+            dataCollectorMain.Run(argsWithEmptyDiagArg); // Passing tracelevel as info and diag file path is empty.
 
             // Verify
             Assert.AreEqual(TraceLevel.Off, (TraceLevel)EqtTrace.TraceLevel);
@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             EqtTrace.TraceLevel = PlatformTraceLevel.Info;
 #endif
             // Action
-            this.dataCollectorMain.Run(argsWithInvalidTraceLevel);
+            dataCollectorMain.Run(argsWithInvalidTraceLevel);
 
             // Verify
             Assert.AreEqual(TraceLevel.Verbose, (TraceLevel)EqtTrace.TraceLevel);
@@ -101,7 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
 #endif
             // Action
-            this.dataCollectorMain.Run(args); // Trace level is set as info in args.
+            dataCollectorMain.Run(args); // Trace level is set as info in args.
 
             // Verify
             Assert.AreEqual(TraceLevel.Info, (TraceLevel)EqtTrace.TraceLevel);
@@ -110,9 +110,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void RunShouldThrowIfTimeoutOccured()
         {
-            this.mockDataCollectionRequestHandler.Setup(rh => rh.WaitForRequestSenderConnection(It.IsAny<int>())).Returns(false);
-            var message = Assert.ThrowsException<TestPlatformException>(() => this.dataCollectorMain.Run(args)).Message;
-            Assert.AreEqual(DataCollectorMainTests.TimoutErrorMessage, message);
+            mockDataCollectionRequestHandler.Setup(rh => rh.WaitForRequestSenderConnection(It.IsAny<int>())).Returns(false);
+            var message = Assert.ThrowsException<TestPlatformException>(() => dataCollectorMain.Run(args)).Message;
+            Assert.AreEqual(TimoutErrorMessage, message);
         }
     }
 }

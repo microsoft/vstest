@@ -49,13 +49,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </returns>
         public static TestLoggerExtensionManager Create(IMessageLogger messageLogger)
         {
-            IEnumerable<LazyExtension<ITestLogger, ITestLoggerCapabilities>> filteredTestExtensions;
-            IEnumerable<LazyExtension<ITestLogger, Dictionary<string, object>>> unfilteredTestExtensions;
 
             TestPluginManager.Instance.GetSpecificTestExtensions<TestLoggerPluginInformation, ITestLogger, ITestLoggerCapabilities, TestLoggerMetadata>(
                 TestPlatformConstants.TestLoggerEndsWithPattern,
-                out unfilteredTestExtensions,
-                out filteredTestExtensions);
+                out IEnumerable<LazyExtension<ITestLogger, Dictionary<string, object>>> unfilteredTestExtensions,
+                out IEnumerable<LazyExtension<ITestLogger, ITestLoggerCapabilities>> filteredTestExtensions);
 
             return new TestLoggerExtensionManager(unfilteredTestExtensions, filteredTestExtensions, messageLogger);
         }
@@ -77,8 +75,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </param>
         public TestLoggerMetadata(string extension, string friendlyName)
         {
-            this.ExtensionUri = extension;
-            this.FriendlyName = friendlyName;
+            ExtensionUri = extension;
+            FriendlyName = friendlyName;
         }
 
         /// <summary>

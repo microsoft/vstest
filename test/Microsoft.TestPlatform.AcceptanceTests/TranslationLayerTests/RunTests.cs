@@ -26,14 +26,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         private void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
-            this.runEventHandler = new RunEventHandler();
+            vstestConsoleWrapper = GetVsTestConsoleWrapper();
+            runEventHandler = new RunEventHandler();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            this.vstestConsoleWrapper?.EndSession();
+            vstestConsoleWrapper?.EndSession();
         }
 
         [TestMethod]
@@ -41,16 +41,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void RunAllTests(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.runEventHandler);
+            vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetDefaultRunSettings(), runEventHandler);
 
             // Assert
-            Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+            Assert.AreEqual(6, runEventHandler.TestResults.Count);
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
         }
 
         [TestMethod]
@@ -60,16 +60,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             var numOfProcesses = Process.GetProcessesByName("vstest.console").Length;
 
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.runEventHandler);
-            this.vstestConsoleWrapper?.EndSession();
+            vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetDefaultRunSettings(), runEventHandler);
+            vstestConsoleWrapper?.EndSession();
 
             // Assert
             Assert.AreEqual(numOfProcesses, Process.GetProcessesByName("vstest.console").Length);
 
-            this.vstestConsoleWrapper = null;
+            vstestConsoleWrapper = null;
         }
 
         [TestMethod]
@@ -77,23 +77,23 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithTelemetryOptedIn(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
-            this.vstestConsoleWrapper.RunTests(
-                this.GetTestAssemblies(),
-                this.GetDefaultRunSettings(),
+            vstestConsoleWrapper.RunTests(
+                GetTestAssemblies(),
+                GetDefaultRunSettings(),
                 new TestPlatformOptions() { CollectMetrics = true },
-                this.runEventHandler);
+                runEventHandler);
 
             // Assert
-            Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
-            Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetDevice));
-            Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetFramework));
-            Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetOS));
-            Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForRun));
-            Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution));
-            Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.RunState));
+            Assert.AreEqual(6, runEventHandler.TestResults.Count);
+            Assert.IsTrue(runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetDevice));
+            Assert.IsTrue(runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetFramework));
+            Assert.IsTrue(runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetOS));
+            Assert.IsTrue(runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForRun));
+            Assert.IsTrue(runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution));
+            Assert.IsTrue(runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.RunState));
         }
 
         [TestMethod]
@@ -101,18 +101,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithTelemetryOptedOut(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
-            this.vstestConsoleWrapper.RunTests(
-                this.GetTestAssemblies(),
-                this.GetDefaultRunSettings(),
+            vstestConsoleWrapper.RunTests(
+                GetTestAssemblies(),
+                GetDefaultRunSettings(),
                 new TestPlatformOptions() { CollectMetrics = false },
-                this.runEventHandler);
+                runEventHandler);
 
             // Assert
-            Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(0, this.runEventHandler.Metrics.Count);
+            Assert.AreEqual(6, runEventHandler.TestResults.Count);
+            Assert.AreEqual(0, runEventHandler.Metrics.Count);
         }
 
         [TestMethod]
@@ -120,8 +120,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void RunTestsShouldThrowOnStackOverflowException(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
             if (IntegrationTestEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
             {
@@ -130,19 +130,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 return;
             }
 
-            var source = new[] { this.GetAssetFullPath("SimpleTestProject3.dll") };
+            var source = new[] { GetAssetFullPath("SimpleTestProject3.dll") };
 
-            this.vstestConsoleWrapper.RunTests(
+            vstestConsoleWrapper.RunTests(
                 source,
-                this.GetDefaultRunSettings(),
+                GetDefaultRunSettings(),
                 new TestPlatformOptions() { TestCaseFilter = "ExitWithStackoverFlow" },
-                this.runEventHandler);
+                runEventHandler);
 
             var errorMessage = runnerInfo.TargetFramework == "net451"
                 ? $"The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.{Environment.NewLine}"
                 : $"The active test run was aborted. Reason: Test host process crashed : Process is terminating due to StackOverflowException.{Environment.NewLine}";
 
-            Assert.AreEqual(errorMessage, this.runEventHandler.LogMessage);
+            Assert.AreEqual(errorMessage, runEventHandler.LogMessage);
         }
 
         [TestMethod]
@@ -151,11 +151,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
         public void RunTestsShouldShowProperWarningOnNoTestsForTestCaseFilter(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
             var testAssemblyName = "SimpleTestProject2.dll";
-            var source = new List<string>() { this.GetAssetFullPath(testAssemblyName) };
+            var source = new List<string>() { GetAssetFullPath(testAssemblyName) };
 
             var veryLongTestCaseFilter =
                 "FullyQualifiedName=VeryLongTestCaseNameeeeeeeeeeeeee" +
@@ -164,27 +164,27 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" +
                 "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
-            this.vstestConsoleWrapper.RunTests(
+            vstestConsoleWrapper.RunTests(
                 source,
-                this.GetDefaultRunSettings(),
+                GetDefaultRunSettings(),
                 new TestPlatformOptions() { TestCaseFilter = veryLongTestCaseFilter },
-                this.runEventHandler);
+                runEventHandler);
 
             var expectedFilter = veryLongTestCaseFilter.Substring(0, 256) + "...";
 
             // Assert
-            StringAssert.StartsWith(this.runEventHandler.LogMessage, $"No test matches the given testcase filter `{expectedFilter}` in");
-            StringAssert.EndsWith(this.runEventHandler.LogMessage, testAssemblyName);
+            StringAssert.StartsWith(runEventHandler.LogMessage, $"No test matches the given testcase filter `{expectedFilter}` in");
+            StringAssert.EndsWith(runEventHandler.LogMessage, testAssemblyName);
 
-            Assert.AreEqual(TestMessageLevel.Warning, this.runEventHandler.TestMessageLevel);
+            Assert.AreEqual(TestMessageLevel.Warning, runEventHandler.TestMessageLevel);
         }
 
         private IList<string> GetTestAssemblies()
         {
             var testAssemblies = new List<string>
                                      {
-                                         this.GetAssetFullPath("SimpleTestProject.dll"),
-                                         this.GetAssetFullPath("SimpleTestProject2.dll")
+                                         GetAssetFullPath("SimpleTestProject.dll"),
+                                         GetAssetFullPath("SimpleTestProject2.dll")
                                      };
 
             return testAssemblies;

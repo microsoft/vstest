@@ -1,7 +1,7 @@
+
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#pragma warning disable SA1402 // FileMayOnlyContainASingleClass. This is a ported class from ObjectModel.
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
@@ -34,16 +34,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Type of argument.
         /// </returns>
         [DebuggerStepThrough]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is shared source. This method may not be called in the current assembly.")]
         public static T NotNull<T>([ValidatedNotNull]T arg, string parameterName)
             where T : class
         {
-            if (arg == null)
-            {
-                throw new ArgumentNullException(parameterName);
-            }
-
-            return arg;
+            return arg ?? throw new ArgumentNullException(parameterName);
         }
 
         /// <summary>
@@ -64,12 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DebuggerStepThrough]
         public static string NotNullOrEmpty([ValidatedNotNull]string arg, string parameterName)
         {
-            if (string.IsNullOrEmpty(arg))
-            {
-                throw new ArgumentNullException(parameterName);
-            }
-
-            return arg;
+            return string.IsNullOrEmpty(arg) ? throw new ArgumentNullException(parameterName) : arg;
         }
 
         /// <summary>
@@ -90,12 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DebuggerStepThrough]
         public static string NotNullOrWhiteSpace([ValidatedNotNull]string arg, string parameterName)
         {
-            if (string.IsNullOrWhiteSpace(arg))
-            {
-                throw new ArgumentNullException(parameterName);
-            }
-
-            return arg;
+            return string.IsNullOrWhiteSpace(arg) ? throw new ArgumentNullException(parameterName) : arg;
         }
 
         /// <summary>
@@ -119,7 +103,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="arg">The argument to check.</param>
         /// <param name="parameterName">The parameter name of the argument.</param>
         [DebuggerStepThrough]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is shared source. This method may not be called in the current assembly.")]
         public static void NotNegative(long arg, string parameterName)
         {
             if (arg < 0)
@@ -154,8 +137,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="parameterName">The parameter name of the argument.</param>
         /// <typeparam name="T">The type of the expected argument.</typeparam>
         [DebuggerStepThrough]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "This is shared source. This method may not be called in the current assembly.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is shared source. This method may not be called in the current assembly.")]
         public static void TypeOf<T>([ValidatedNotNull]object arg, string parameterName)
             where T : class
         {
@@ -181,7 +162,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="parameterName">The parameter name of the argument.</param>
         /// <param name="propertyName">The property name of the argument.</param>
         [DebuggerStepThrough]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is shared source. This method may not be called in the current assembly.")]
         public static void NotNull([ValidatedNotNull]object arg, string parameterName, string propertyName)
         {
             if (arg == null)
@@ -198,7 +178,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="parameterName">The parameter name of the argument.</param>
         /// <param name="propertyName">The property name of the argument.</param>
         [DebuggerStepThrough]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is shared source. This method may not be called in the current assembly.")]
         public static void NotNegative(int arg, string parameterName, string propertyName)
         {
             if (arg < 0)
@@ -215,7 +194,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="parameterName">The parameter name of the argument.</param>
         /// <param name="propertyName">The property name of the argument.</param>
         [DebuggerStepThrough]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is shared source. This method may not be called in the current assembly.")]
         public static void NotNullOrEmpty([ValidatedNotNull]string arg, string parameterName, string propertyName)
         {
             NotNull(arg, parameterName, propertyName);

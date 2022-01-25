@@ -40,11 +40,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private long batchSize;
 
         /// <summary>
-        /// Specifies the Test Session Timeout in milliseconds
-        /// </summary>
-        private long testSessionTimeout;
-
-        /// <summary>
         /// Directory in which rocksteady/adapter should keep their run specific data.
         /// </summary>
         private string resultsDirectory;
@@ -70,19 +65,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private bool designMode;
 
         /// <summary>
-        /// Specify to run tests in isolation
-        /// </summary>
-        private bool inIsolation;
-
-        /// <summary>
         /// False indicates that the test adapter should not collect source information for discovered tests
         /// </summary>
         private bool shouldCollectSourceInformation;
-
-        /// <summary>
-        /// Gets the targetDevice IP for UWP app deployment
-        /// </summary>
-        private string targetDevice;
 
         #endregion
 
@@ -94,23 +79,23 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public RunConfiguration() : base(Constants.RunConfigurationSettingsName)
         {
             // Set defaults for target platform, framework version type and results directory.
-            this.platform = Constants.DefaultPlatform;
-            this.framework = Framework.DefaultFramework;
-            this.resultsDirectory = Constants.DefaultResultsDirectory;
-            this.SolutionDirectory = null;
-            this.TreatTestAdapterErrorsAsWarnings = Constants.DefaultTreatTestAdapterErrorsAsWarnings;
-            this.BinariesRoot = null;
-            this.testAdaptersPaths = null;
-            this.maxCpuCount = Constants.DefaultCpuCount;
-            this.batchSize = Constants.DefaultBatchSize;
-            this.testSessionTimeout = 0;
-            this.disableAppDomain = false;
-            this.disableParallelization = false;
-            this.designMode = false;
-            this.inIsolation = false;
-            this.shouldCollectSourceInformation = false;
-            this.targetDevice = null;
-            this.ExecutionThreadApartmentState = Constants.DefaultExecutionThreadApartmentState;
+            platform = Constants.DefaultPlatform;
+            framework = Framework.DefaultFramework;
+            resultsDirectory = Constants.DefaultResultsDirectory;
+            SolutionDirectory = null;
+            TreatTestAdapterErrorsAsWarnings = Constants.DefaultTreatTestAdapterErrorsAsWarnings;
+            BinariesRoot = null;
+            testAdaptersPaths = null;
+            maxCpuCount = Constants.DefaultCpuCount;
+            batchSize = Constants.DefaultBatchSize;
+            TestSessionTimeout = 0;
+            disableAppDomain = false;
+            disableParallelization = false;
+            designMode = false;
+            InIsolation = false;
+            shouldCollectSourceInformation = false;
+            TargetDevice = null;
+            ExecutionThreadApartmentState = Constants.DefaultExecutionThreadApartmentState;
         }
 
         #endregion
@@ -133,13 +118,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.resultsDirectory;
+                return resultsDirectory;
             }
 
             set
             {
-                this.resultsDirectory = value;
-                this.ResultsDirectorySet = true;
+                resultsDirectory = value;
+                ResultsDirectorySet = true;
             }
         }
 
@@ -150,12 +135,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.maxCpuCount;
+                return maxCpuCount;
             }
             set
             {
-                this.maxCpuCount = value;
-                this.MaxCpuCountSet = true;
+                maxCpuCount = value;
+                MaxCpuCountSet = true;
             }
         }
 
@@ -166,29 +151,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.batchSize;
+                return batchSize;
             }
             set
             {
-                this.batchSize = value;
-                this.BatchSizeSet = true;
+                batchSize = value;
+                BatchSizeSet = true;
             }
         }
 
         /// <summary>
         /// Gets or sets the testSessionTimeout. Should be non-negative integer.
         /// </summary>
-        public long TestSessionTimeout
-        {
-            get
-            {
-                return this.testSessionTimeout;
-            }
-            set
-            {
-                this.testSessionTimeout = value;
-            }
-        }
+        public long TestSessionTimeout { get; set; }
 
         /// <summary>
         /// Gets or sets the design mode value.
@@ -197,31 +172,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.designMode;
+                return designMode;
             }
 
             set
             {
-                this.designMode = value;
-                this.DesignModeSet = true;
+                designMode = value;
+                DesignModeSet = true;
             }
         }
 
         /// <summary>
         /// Gets or sets a value indicating whether to run tests in isolation or not.
         /// </summary>
-        public bool InIsolation
-        {
-            get
-            {
-                return this.inIsolation;
-            }
-
-            set
-            {
-                this.inIsolation = value;
-            }
-        }
+        public bool InIsolation { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether test adapter needs to collect source information for discovered tests
@@ -230,13 +194,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return (this.CollectSourceInformationSet) ? this.shouldCollectSourceInformation : this.designMode;
+                return (CollectSourceInformationSet) ? shouldCollectSourceInformation : designMode;
             }
 
             set
             {
-                this.shouldCollectSourceInformation = value;
-                this.CollectSourceInformationSet = true;
+                shouldCollectSourceInformation = value;
+                CollectSourceInformationSet = true;
             }
         }
 
@@ -247,13 +211,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.disableAppDomain;
+                return disableAppDomain;
             }
 
             set
             {
-                this.disableAppDomain = value;
-                this.DisableAppDomainSet = true;
+                disableAppDomain = value;
+                DisableAppDomainSet = true;
             }
         }
 
@@ -264,13 +228,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.disableParallelization;
+                return disableParallelization;
             }
 
             set
             {
-                this.disableParallelization = value;
-                this.DisableParallelizationSet = true;
+                disableParallelization = value;
+                DisableParallelizationSet = true;
             }
         }
 
@@ -281,13 +245,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.platform;
+                return platform;
             }
 
             set
             {
-                this.platform = value;
-                this.TargetPlatformSet = true;
+                platform = value;
+                TargetPlatformSet = true;
             }
         }
 
@@ -298,13 +262,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.framework;
+                return framework;
             }
 
             set
             {
-                this.framework = value;
-                this.TargetFrameworkSet = true;
+                framework = value;
+                TargetFrameworkSet = true;
             }
         }
         /// <summary>
@@ -324,7 +288,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                switch (this.framework?.Name)
+                switch (framework?.Name)
                 {
                     case Constants.DotNetFramework35:
                         return FrameworkVersion.Framework35;
@@ -343,26 +307,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.framework = Framework.FromString(value.ToString());
-                this.TargetFrameworkSet = true;
+                framework = Framework.FromString(value.ToString());
+                TargetFrameworkSet = true;
             }
         }
 
         /// <summary>
         /// Gets or sets the target device IP. For Phone this value is Device, for emulators "Mobile Emulator 10.0.15063.0 WVGA 4 inch 1GB"
         /// </summary>
-        public string TargetDevice
-        {
-            get
-            {
-                return this.targetDevice;
-            }
-
-            set
-            {
-                this.targetDevice = value;
-            }
-        }
+        public string TargetDevice { get; set; }
 
         /// <summary>
         /// Gets or sets the paths used for test adapters lookup in test platform.
@@ -371,16 +324,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.testAdaptersPaths;
+                return testAdaptersPaths;
             }
 
             set
             {
-                this.testAdaptersPaths = value;
+                testAdaptersPaths = value;
 
-                if (this.testAdaptersPaths != null)
+                if (testAdaptersPaths != null)
                 {
-                    this.TestAdaptersPathsSet = true;
+                    TestAdaptersPathsSet = true;
                 }
             }
         }
@@ -508,105 +461,103 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
 #if !NETSTANDARD1_0
         /// <inheritdoc/>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public override XmlElement ToXml()
         {
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
 
             XmlElement root = doc.CreateElement(Constants.RunConfigurationSettingsName);
 
             XmlElement resultDirectory = doc.CreateElement("ResultsDirectory");
-            resultDirectory.InnerXml = this.ResultsDirectory;
+            resultDirectory.InnerXml = ResultsDirectory;
             root.AppendChild(resultDirectory);
 
             XmlElement targetPlatform = doc.CreateElement("TargetPlatform");
-            targetPlatform.InnerXml = this.TargetPlatform.ToString();
+            targetPlatform.InnerXml = TargetPlatform.ToString();
             root.AppendChild(targetPlatform);
 
             XmlElement maxCpuCount = doc.CreateElement("MaxCpuCount");
-            maxCpuCount.InnerXml = this.MaxCpuCount.ToString();
+            maxCpuCount.InnerXml = MaxCpuCount.ToString();
             root.AppendChild(maxCpuCount);
 
             XmlElement batchSize = doc.CreateElement("BatchSize");
-            batchSize.InnerXml = this.BatchSize.ToString();
+            batchSize.InnerXml = BatchSize.ToString();
             root.AppendChild(batchSize);
 
             XmlElement testSessionTimeout = doc.CreateElement("TestSessionTimeout");
-            testSessionTimeout.InnerXml = this.TestSessionTimeout.ToString();
+            testSessionTimeout.InnerXml = TestSessionTimeout.ToString();
             root.AppendChild(testSessionTimeout);
 
             XmlElement designMode = doc.CreateElement("DesignMode");
-            designMode.InnerXml = this.DesignMode.ToString();
+            designMode.InnerXml = DesignMode.ToString();
             root.AppendChild(designMode);
 
             XmlElement inIsolation = doc.CreateElement("InIsolation");
-            inIsolation.InnerXml = this.InIsolation.ToString();
+            inIsolation.InnerXml = InIsolation.ToString();
             root.AppendChild(inIsolation);
 
             XmlElement collectSourceInformation = doc.CreateElement("CollectSourceInformation");
-            collectSourceInformation.InnerXml = this.ShouldCollectSourceInformation.ToString();
+            collectSourceInformation.InnerXml = ShouldCollectSourceInformation.ToString();
             root.AppendChild(collectSourceInformation);
 
             XmlElement disableAppDomain = doc.CreateElement("DisableAppDomain");
-            disableAppDomain.InnerXml = this.DisableAppDomain.ToString();
+            disableAppDomain.InnerXml = DisableAppDomain.ToString();
             root.AppendChild(disableAppDomain);
 
             XmlElement disableParallelization = doc.CreateElement("DisableParallelization");
-            disableParallelization.InnerXml = this.DisableParallelization.ToString();
+            disableParallelization.InnerXml = DisableParallelization.ToString();
             root.AppendChild(disableParallelization);
 
             XmlElement targetFrameworkVersion = doc.CreateElement("TargetFrameworkVersion");
-            targetFrameworkVersion.InnerXml = this.TargetFramework.ToString();
+            targetFrameworkVersion.InnerXml = TargetFramework.ToString();
             root.AppendChild(targetFrameworkVersion);
 
             XmlElement executionThreadApartmentState = doc.CreateElement("ExecutionThreadApartmentState");
-            executionThreadApartmentState.InnerXml = this.ExecutionThreadApartmentState.ToString();
+            executionThreadApartmentState.InnerXml = ExecutionThreadApartmentState.ToString();
             root.AppendChild(executionThreadApartmentState);
 
-            if (this.TestAdaptersPaths != null)
+            if (TestAdaptersPaths != null)
             {
                 XmlElement testAdaptersPaths = doc.CreateElement("TestAdaptersPaths");
-                testAdaptersPaths.InnerXml = this.TestAdaptersPaths;
+                testAdaptersPaths.InnerXml = TestAdaptersPaths;
                 root.AppendChild(testAdaptersPaths);
             }
 
             XmlElement treatTestAdapterErrorsAsWarnings = doc.CreateElement("TreatTestAdapterErrorsAsWarnings");
-            treatTestAdapterErrorsAsWarnings.InnerXml = this.TreatTestAdapterErrorsAsWarnings.ToString();
+            treatTestAdapterErrorsAsWarnings.InnerXml = TreatTestAdapterErrorsAsWarnings.ToString();
             root.AppendChild(treatTestAdapterErrorsAsWarnings);
 
-            if (this.BinariesRoot != null)
+            if (BinariesRoot != null)
             {
                 XmlElement binariesRoot = doc.CreateElement("BinariesRoot");
-                binariesRoot.InnerXml = this.BinariesRoot;
+                binariesRoot.InnerXml = BinariesRoot;
                 root.AppendChild(binariesRoot);
             }
 
-            if(!string.IsNullOrEmpty(this.TargetDevice))
+            if(!string.IsNullOrEmpty(TargetDevice))
             {
                 XmlElement targetDevice = doc.CreateElement("TargetDevice");
-                targetDevice.InnerXml = this.TargetDevice;
+                targetDevice.InnerXml = TargetDevice;
                 root.AppendChild(targetDevice);
             }
 
-            if (!string.IsNullOrEmpty(this.TestCaseFilter))
+            if (!string.IsNullOrEmpty(TestCaseFilter))
             {
                 XmlElement testCaseFilter = doc.CreateElement(nameof(TestCaseFilter));
-                testCaseFilter.InnerXml = this.TestCaseFilter;
+                testCaseFilter.InnerXml = TestCaseFilter;
                 root.AppendChild(testCaseFilter);
             }
             
-            if (!string.IsNullOrEmpty(this.DotnetHostPath))
+            if (!string.IsNullOrEmpty(DotnetHostPath))
             {
                 XmlElement dotnetHostPath = doc.CreateElement(nameof(DotnetHostPath));
-                dotnetHostPath.InnerXml = this.DotnetHostPath;
+                dotnetHostPath.InnerXml = DotnetHostPath;
                 root.AppendChild(dotnetHostPath);
             }
 
-            if (this.TreatNoTestsAsError)
+            if (TreatNoTestsAsError)
             {
                 XmlElement treatAsError = doc.CreateElement(nameof(TreatNoTestsAsError));
-                treatAsError.InnerText = this.TreatNoTestsAsError.ToString();
+                treatAsError.InnerText = TreatNoTestsAsError.ToString();
                 root.AppendChild(treatAsError);
             }
 
@@ -621,7 +572,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns></returns>
         public static RunConfiguration FromXml(XmlReader reader)
         {
-            ValidateArg.NotNull<XmlReader>(reader, nameof(reader));
+            ValidateArg.NotNull(reader, nameof(reader));
             var runConfiguration = new RunConfiguration();
             var empty = reader.IsEmptyElement;
 

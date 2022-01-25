@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [DataRow("X86", "X64")]
         public void Use_EnvironmentVariables(string architectureFrom, string architectureTo)
         {
-            using Workspace workSpace = new Workspace(GetResultsDirectory());
+            using Workspace workSpace = new(GetResultsDirectory());
             string dotnetPath = GetDownloadedDotnetMuxerFromTools(architectureFrom);
             string dotnetPathTo = GetDownloadedDotnetMuxerFromTools(architectureTo);
             var vstestConsolePath = GetDotnetRunnerPath();
@@ -41,7 +41,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 [$"DOTNET_ROOT_{architectureTo}"] = Path.GetDirectoryName(dotnetPathTo),
                 ["ExpectedArchitecture"] = architectureTo
             };
-            this.ExecuteApplication(dotnetPath, "new mstest", out string stdOut, out string stdError, out int exitCode, environmentVariables, workSpace.Path);
+            ExecuteApplication(dotnetPath, "new mstest", out string stdOut, out string stdError, out int exitCode, environmentVariables, workSpace.Path);
 
             // Patch test file
             File.WriteAllText(Path.Combine(workSpace.Path, "UnitTest1.cs"),
@@ -61,7 +61,7 @@ public class UnitTest1
     }
 }");
 
-            this.ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower()} --diag:log.txt", out stdOut, out stdError, out exitCode, environmentVariables, workSpace.Path);
+            ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower()} --diag:log.txt", out stdOut, out stdError, out exitCode, environmentVariables, workSpace.Path);
             Assert.AreEqual(0, exitCode, stdOut);
 
             environmentVariables = new Dictionary<string, string>
@@ -70,7 +70,7 @@ public class UnitTest1
                 ["DOTNET_ROOT"] = Path.GetDirectoryName(dotnetPathTo),
                 ["ExpectedArchitecture"] = architectureTo
             };
-            this.ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower()} --diag:log.txt", out stdOut, out stdError, out exitCode, environmentVariables, workSpace.Path);
+            ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower()} --diag:log.txt", out stdOut, out stdError, out exitCode, environmentVariables, workSpace.Path);
             Assert.AreEqual(0, exitCode, stdOut);
 
             environmentVariables = new Dictionary<string, string>
@@ -80,7 +80,7 @@ public class UnitTest1
                 ["DOTNET_ROOT"] = "WE SHOULD PICK THE ABOVE ONE BEFORE FALLBACK TO DOTNET_ROOT",
                 ["ExpectedArchitecture"] = architectureTo
             };
-            this.ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower()} --diag:log.txt", out stdOut, out stdError, out exitCode, environmentVariables, workSpace.Path);
+            ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower()} --diag:log.txt", out stdOut, out stdError, out exitCode, environmentVariables, workSpace.Path);
             Assert.AreEqual(0, exitCode, stdOut);
         }
 

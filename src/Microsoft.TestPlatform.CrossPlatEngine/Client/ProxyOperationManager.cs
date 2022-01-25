@@ -35,10 +35,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         private readonly string versionCheckPropertyName = "IsVersionCheckRequired";
         private readonly string makeRunsettingsCompatiblePropertyName = "MakeRunsettingsCompatible";
-        private readonly ManualResetEventSlim testHostExited = new ManualResetEventSlim(false);
+        private readonly ManualResetEventSlim testHostExited = new(false);
         private readonly IProcessHelper processHelper;
 
-        private IBaseProxy baseProxy;
+        private readonly IBaseProxy baseProxy;
         private bool versionCheckRequired = true;
         private bool makeRunsettingsCompatible;
         private bool makeRunsettingsCompatibleSet;
@@ -80,16 +80,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             ITestRuntimeProvider testHostManager,
             IBaseProxy baseProxy)
         {
-            this.RequestData = requestData;
-            this.RequestSender = requestSender;
-            this.TestHostManager = testHostManager;
+            RequestData = requestData;
+            RequestSender = requestSender;
+            TestHostManager = testHostManager;
             this.baseProxy = baseProxy;
 
-            this.initialized = false;
-            this.testHostLaunched = false;
-            this.testHostProcessId = -1;
-            this.processHelper = new ProcessHelper();
-            this.CancellationTokenSource = new CancellationTokenSource();
+            initialized = false;
+            testHostLaunched = false;
+            testHostProcessId = -1;
+            processHelper = new ProcessHelper();
+            CancellationTokenSource = new CancellationTokenSource();
         }
 
         #endregion
@@ -152,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             ITestMessageEventHandler eventHandler)
         {
             // NOTE: Event handler is ignored here, but it is used in the overloaded method.
-            return this.SetupChannel(sources, runSettings);
+            return SetupChannel(sources, runSettings);
         }
 
         /// <summary>
@@ -168,66 +168,66 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </returns>
         public virtual bool SetupChannel(IEnumerable<string> sources, string runSettings)
         {
-            this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
+            CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
 
-            if (this.initialized)
+            if (initialized)
             {
                 return true;
             }
 
             var connTimeout = EnvironmentHelper.GetConnectionTimeout();
 
-            this.testHostProcessStdError = string.Empty;
-            TestHostConnectionInfo testHostConnectionInfo = this.TestHostManager.GetTestHostConnectionInfo();
+            testHostProcessStdError = string.Empty;
+            TestHostConnectionInfo testHostConnectionInfo = TestHostManager.GetTestHostConnectionInfo();
 
             var portNumber = 0;
             if (testHostConnectionInfo.Role == ConnectionRole.Client)
             {
-                portNumber = this.RequestSender.InitializeCommunication();
+                portNumber = RequestSender.InitializeCommunication();
                 testHostConnectionInfo.Endpoint += portNumber;
             }
 
-            var processId = this.processHelper.GetCurrentProcessId();
+            var processId = processHelper.GetCurrentProcessId();
             var connectionInfo = new TestRunnerConnectionInfo()
             {
                 Port = portNumber,
                 ConnectionInfo = testHostConnectionInfo,
                 RunnerProcessId = processId,
-                LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile),
+                LogFile = GetTimestampedLogFile(EqtTrace.LogFile),
                 TraceLevel = (int)EqtTrace.TraceLevel
             };
 
             // Subscribe to test host events.
-            this.TestHostManager.HostLaunched += this.TestHostManagerHostLaunched;
-            this.TestHostManager.HostExited += this.TestHostManagerHostExited;
+            TestHostManager.HostLaunched += TestHostManagerHostLaunched;
+            TestHostManager.HostExited += TestHostManagerHostExited;
 
             // Get environment variables from run settings.
             var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettings);
 
             // Get the test process start info.
-            var testHostStartInfo = this.UpdateTestProcessStartInfo(
-                this.TestHostManager.GetTestHostProcessStartInfo(
+            var testHostStartInfo = UpdateTestProcessStartInfo(
+                TestHostManager.GetTestHostProcessStartInfo(
                     sources,
                     envVars,
                     connectionInfo));
             try
             {
                 // Launch the test host.
-                this.testHostLaunched = this.TestHostManager.LaunchTestHostAsync(
+                testHostLaunched = TestHostManager.LaunchTestHostAsync(
                     testHostStartInfo,
-                    this.CancellationTokenSource.Token).Result;
+                    CancellationTokenSource.Token).Result;
 
-                if (this.testHostLaunched && testHostConnectionInfo.Role == ConnectionRole.Host)
+                if (testHostLaunched && testHostConnectionInfo.Role == ConnectionRole.Host)
                 {
                     // If test runtime is service host, try to poll for connection as client.
-                    this.RequestSender.InitializeCommunication();
+                    RequestSender.InitializeCommunication();
                 }
             }
             catch (Exception ex)
             {
                 EqtTrace.Error("ProxyOperationManager: Failed to launch testhost :{0}", ex);
 
-                this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
+                CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
                 throw new TestPlatformException(string.Format(
                     CultureInfo.CurrentUICulture,
                     CrossPlatEngineResources.FailedToLaunchTestHost,
@@ -251,8 +251,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 ConsoleOutput.Instance.WriteLine(
                     string.Format(
                         "Process Id: {0}, Name: {1}",
-                        this.testHostProcessId,
-                        this.processHelper.GetProcessName(this.testHostProcessId)),
+                        testHostProcessId,
+                        processHelper.GetProcessName(testHostProcessId)),
                     OutputLevel.Information);
 
                 // Increase connection timeout when debugging is enabled.
@@ -260,34 +260,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             // If test host does not launch then throw exception, otherwise wait for connection.
-            if (!this.testHostLaunched
-                || !this.RequestSender.WaitForRequestHandlerConnection(
+            if (!testHostLaunched
+                || !RequestSender.WaitForRequestHandlerConnection(
                     connTimeout * 1000,
-                    this.CancellationTokenSource.Token))
+                    CancellationTokenSource.Token))
             {
                 EqtTrace.Verbose($"Test host failed to start Test host launched:{testHostLaunched} test host exited: {testHostExited.IsSet}");
                 // Throw a test platform exception with the appropriate message if user requested cancellation.
-                this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
+                CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
 
                 // Throw a test platform exception along with the error messages from the test if the test host exited unexpectedly
                 // before communication was established.
-                this.ThrowOnTestHostExited(this.testHostExited.IsSet);
+                ThrowOnTestHostExited(testHostExited.IsSet);
 
                 // Throw a test platform exception stating the connection to test could not be established even after waiting
                 // for the configure timeout period.
-                this.ThrowExceptionOnConnectionFailure(connTimeout);
+                ThrowExceptionOnConnectionFailure(connTimeout);
             }
 
             // Handling special case for dotnet core projects with older test hosts.
             // Older test hosts are not aware of protocol version check, hence we should not be
             // sending VersionCheck message to these test hosts.
-            this.CompatIssueWithVersionCheckAndRunsettings();
-            if (this.versionCheckRequired)
+            CompatIssueWithVersionCheckAndRunsettings();
+            if (versionCheckRequired)
             {
-                this.RequestSender.CheckVersionWithTestHost();
+                RequestSender.CheckVersionWithTestHost();
             }
 
-            this.initialized = true;
+            initialized = true;
 
             return true;
         }
@@ -300,21 +300,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             try
             {
                 // Do not send message if the host did not launch.
-                if (this.testHostLaunched)
+                if (testHostLaunched)
                 {
-                    this.RequestSender.EndSession();
+                    RequestSender.EndSession();
 
                     // We want to give test host a chance to safely close.
                     // The upper bound for wait should be 100ms.
                     var timeout = 100;
                     EqtTrace.Verbose("ProxyOperationManager.Close: waiting for test host to exit for {0} ms", timeout);
-                    if (!this.testHostExited.Wait(timeout))
+                    if (!testHostExited.Wait(timeout))
                     {
                         EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
                     }
 
                     // Closing the communication channel.
-                    this.RequestSender.Close();
+                    RequestSender.Close();
                 }
             }
             catch (Exception ex)
@@ -325,13 +325,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
             finally
             {
-                this.initialized = false;
+                initialized = false;
 
                 // Please clean up test host.
-                this.TestHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
+                TestHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
 
-                this.TestHostManager.HostExited -= this.TestHostManagerHostExited;
-                this.TestHostManager.HostLaunched -= this.TestHostManagerHostLaunched;
+                TestHostManager.HostExited -= TestHostManagerHostExited;
+                TestHostManager.HostLaunched -= TestHostManagerHostLaunched;
             }
         }
 
@@ -351,15 +351,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
         {
             // TODO (copoiena): If called and testhost is already running, we should restart.
-            if (this.baseProxy == null)
+            if (baseProxy == null)
             {
                 // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
-                var telemetryOptedIn = this.RequestData.IsTelemetryOptedIn ? "true" : "false";
+                var telemetryOptedIn = RequestData.IsTelemetryOptedIn ? "true" : "false";
                 testProcessStartInfo.Arguments += " --telemetryoptedin " + telemetryOptedIn;
                 return testProcessStartInfo;
             }
 
-            return this.baseProxy.UpdateTestProcessStartInfo(testProcessStartInfo);
+            return baseProxy.UpdateTestProcessStartInfo(testProcessStartInfo);
         }
 
         /// <summary>
@@ -374,12 +374,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public string RemoveNodesFromRunsettingsIfRequired(string runsettingsXml, Action<TestMessageLevel, string> logMessage)
         {
             var updatedRunSettingsXml = runsettingsXml;
-            if (!this.makeRunsettingsCompatibleSet)
+            if (!makeRunsettingsCompatibleSet)
             {
-                this.CompatIssueWithVersionCheckAndRunsettings();
+                CompatIssueWithVersionCheckAndRunsettings();
             }
 
-            if (this.makeRunsettingsCompatible)
+            if (makeRunsettingsCompatible)
             {
                 logMessage.Invoke(TestMessageLevel.Warning, CrossPlatEngineResources.OldTestHostIsGettingUsed);
                 updatedRunSettingsXml = InferRunSettingsHelper.MakeRunsettingsCompatible(runsettingsXml);
@@ -395,12 +395,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private string GetTimestampedLogFile(string logFile)
         {
-            if (string.IsNullOrWhiteSpace(logFile))
-            {
-                return null;
-            }
-
-            return Path.ChangeExtension(
+            return string.IsNullOrWhiteSpace(logFile)
+                ? null
+                : Path.ChangeExtension(
                 logFile,
                 string.Format(
                     "host.{0}_{1}{2}",
@@ -411,40 +408,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void CompatIssueWithVersionCheckAndRunsettings()
         {
-            var properties = this.TestHostManager.GetType().GetRuntimeProperties();
+            var properties = TestHostManager.GetType().GetRuntimeProperties();
 
             var versionCheckProperty = properties.FirstOrDefault(p => string.Equals(p.Name, versionCheckPropertyName, StringComparison.OrdinalIgnoreCase));
             if (versionCheckProperty != null)
             {
-                this.versionCheckRequired = (bool)versionCheckProperty.GetValue(this.TestHostManager);
+                versionCheckRequired = (bool)versionCheckProperty.GetValue(TestHostManager);
             }
 
             var makeRunsettingsCompatibleProperty = properties.FirstOrDefault(p => string.Equals(p.Name, makeRunsettingsCompatiblePropertyName, StringComparison.OrdinalIgnoreCase));
             if (makeRunsettingsCompatibleProperty != null)
             {
-                this.makeRunsettingsCompatible = (bool)makeRunsettingsCompatibleProperty.GetValue(this.TestHostManager);
-                this.makeRunsettingsCompatibleSet = true;
+                makeRunsettingsCompatible = (bool)makeRunsettingsCompatibleProperty.GetValue(TestHostManager);
+                makeRunsettingsCompatibleSet = true;
             }
         }
 
         private void TestHostManagerHostLaunched(object sender, HostProviderEventArgs e)
         {
             EqtTrace.Verbose(e.Data);
-            this.testHostProcessId = e.ProcessId;
+            testHostProcessId = e.ProcessId;
         }
 
         private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)
         {
             EqtTrace.Verbose("CrossPlatEngine.TestHostManagerHostExited: calling on client process exit callback.");
-            this.testHostProcessStdError = e.Data;
+            testHostProcessStdError = e.Data;
 
             // This needs to be set before we call the OnClientProcess exit because the
             // OnClientProcess will short-circuit WaitForRequestHandlerConnection in SetupChannel
             // that then continues to throw an exception and checks if the test host process exited.
             // If not it reports timeout, if we don't set this before OnClientProcessExit we will
             // report timeout even though we exited the test host before even attempting the connect.
-            this.testHostExited.Set();
-            this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
+            testHostExited.Set();
+            RequestSender.OnClientProcessExit(testHostProcessStdError);
         }
 
         private void ThrowOnTestHostExited(bool testHostExited)
@@ -453,7 +450,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 // We might consider passing standard output here in case standard error is not
                 // available because some errors don't end up in the standard error output.
-                throw new TestPlatformException(string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError));
+                throw new TestPlatformException(string.Format(CrossPlatEngineResources.TestHostExitedWithError, testHostProcessStdError));
             }
         }
 
@@ -463,7 +460,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             var errorMsg = CrossPlatEngineResources.InitializationFailed;
 
             // Testhost launched but timeout occurred due to machine slowness.
-            if (this.testHostLaunched)
+            if (testHostLaunched)
             {
                 errorMsg = string.Format(
                     CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
@@ -474,10 +471,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             // After testhost process launched failed with error.
-            if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError))
+            if (!string.IsNullOrWhiteSpace(testHostProcessStdError))
             {
                 // Testhost failed with error.
-                errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError);
+                errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, testHostProcessStdError);
             }
 
             throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));

@@ -59,7 +59,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
 
                 EqtTrace.Info($"HangDumperFactory: This is Windows, returning the default WindowsHangDumper that P/Invokes MiniDumpWriteDump.");
-                return new WindowsHangDumper(this.LogWarning);
+                return new WindowsHangDumper(LogWarning);
             }
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))

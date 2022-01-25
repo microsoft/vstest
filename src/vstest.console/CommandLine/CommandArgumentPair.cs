@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System;
     using System.Diagnostics.Contracts;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     /// Breaks a string down into command and argument based on the following format:
@@ -51,7 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
             Contract.Ensures(!String.IsNullOrWhiteSpace(Command));
 
-            this.Parse(input);
+            Parse(input);
         }
 
         /// <summary>
@@ -69,8 +69,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             Contract.Ensures(Command == command);
             Contract.Ensures(Argument == argument);
 
-            this.Command = command;
-            this.Argument = argument;
+            Command = command;
+            Argument = argument;
         }
 
         #endregion
@@ -88,19 +88,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             Contract.Ensures(Argument != null);
 
             // Find the index of the separator (":")
-            int index = input.IndexOf(CommandArgumentPair.Separator, StringComparison.OrdinalIgnoreCase);
+            int index = input.IndexOf(Separator, StringComparison.OrdinalIgnoreCase);
 
             if (index == -1)
             {
                 // No separator was found, so use the input as the command.
-                this.Command = input;
-                this.Argument = String.Empty;
+                Command = input;
+                Argument = String.Empty;
             }
             else
             {
                 // Separator was found, so separate the command and the input.
-                this.Command = input.Substring(0, index);
-                this.Argument = input.Substring(index + 1);
+                Command = input.Substring(0, index);
+                Argument = input.Substring(index + 1);
             }
         }
 

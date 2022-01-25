@@ -32,16 +32,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             foreach (var fmw in targetFrameworks.Split(';'))
             {
-                this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw, AcceptanceTestBase.InIsolation) });
+                dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw, AcceptanceTestBase.InIsolation) });
             }
 
         }
 
-        private List<object[]> dataRows = new List<object[]>();
+        private readonly List<object[]> dataRows = new();
 
         public IEnumerable<object[]> GetData(MethodInfo methodInfo)
         {
-            return this.dataRows;
+            return dataRows;
         }
 
         public string GetDisplayName(MethodInfo methodInfo, object[] data)

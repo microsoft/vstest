@@ -1,7 +1,7 @@
+
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#pragma warning disable SA1649 // SA1649FileNameMustMatchTypeName. This is a generic type.
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 {
@@ -28,8 +28,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// </param>
         public Job(TPayload job, int size)
         {
-            this.Payload = job;
-            this.Size = size;
+            Payload = job;
+            Size = size;
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// </summary>
         private Job()
         {
-            this.Size = 0;
+            Size = 0;
         }
 
         #endregion
@@ -89,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// <returns> The wait job. </returns>
         public static Job<TPayload> CreateWaitJob(ManualResetEvent waitEvent)
         {
-            ValidateArg.NotNull<ManualResetEvent>(waitEvent, nameof(waitEvent));
+            ValidateArg.NotNull(waitEvent, nameof(waitEvent));
             var waitJob = new Job<TPayload>();
             waitJob.WaitManualResetEvent = waitEvent;
 

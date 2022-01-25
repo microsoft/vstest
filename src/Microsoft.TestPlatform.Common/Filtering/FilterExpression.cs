@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+    using CommonResources = Resources.Resources;
 
     /// <summary>
     /// Represents an expression tree.
@@ -135,18 +135,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             }
 
             bool valid = false;
-            if (this.condition != null)
+            if (condition != null)
             {
-                valid = this.condition.ValidForProperties(properties, propertyProvider);
+                valid = condition.ValidForProperties(properties, propertyProvider);
                 if (!valid)
                 {
-                    invalidProperties = new string[1] { this.condition.Name };
+                    invalidProperties = new string[1] { condition.Name };
                 }
             }
             else
             {
-                invalidProperties = this.left.ValidForProperties(properties, propertyProvider);
-                var invalidRight = this.right.ValidForProperties(properties, propertyProvider);
+                invalidProperties = left.ValidForProperties(properties, propertyProvider);
+                var invalidRight = right.ValidForProperties(properties, propertyProvider);
                 if (null == invalidProperties)
                 {
                     invalidProperties = invalidRight;
@@ -249,7 +249,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     default:
                         // push the operand to the operand stack.
                         Condition condition = Condition.Parse(token);
-                        FilterExpression filter = new FilterExpression(condition);
+                        FilterExpression filter = new(condition);
                         filterStack.Push(filter);
 
                         fastFilterBuilder.AddCondition(condition);
@@ -282,39 +282,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
 
             bool filterResult = false;
-            if (null != this.condition)
+            if (null != condition)
             {
-                filterResult = this.condition.Evaluate(propertyValueProvider);
+                filterResult = condition.Evaluate(propertyValueProvider);
             }
             else
             {
                 // & or | operator
-                bool leftResult = this.left.Evaluate(propertyValueProvider);
-                bool rightResult = this.right.Evaluate(propertyValueProvider);
-                if (this.areJoinedByAnd)
-                {
-                    filterResult = leftResult && rightResult;
-                }
-                else
-                {
-                    filterResult = leftResult || rightResult;
-                }
+                bool leftResult = left.Evaluate(propertyValueProvider);
+                bool rightResult = right.Evaluate(propertyValueProvider);
+                filterResult = areJoinedByAnd ? leftResult && rightResult : leftResult || rightResult;
             }
             return filterResult;
         }
 
         internal static IEnumerable<string> TokenizeFilterExpressionString(string str)
         {
-            if (str == null)
-            {
-                throw new ArgumentNullException(nameof(str));
-            }
-
-            return TokenizeFilterExpressionStringHelper(str);
-
+            return str == null ? throw new ArgumentNullException(nameof(str)) : TokenizeFilterExpressionStringHelper(str);
             IEnumerable<string> TokenizeFilterExpressionStringHelper(string s)
             {
-                StringBuilder tokenBuilder = new StringBuilder();
+                StringBuilder tokenBuilder = new();
 
                 var last = '\0';
                 for (int i = 0; i < s.Length; ++i)

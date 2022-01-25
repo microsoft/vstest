@@ -14,8 +14,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
-    using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
+    using CommonResources = Resources.Resources;
+    using ObjectModelConstants = TestPlatform.ObjectModel.Constants;
 
     /// <summary>
     /// Test request sender implementation.
@@ -54,11 +54,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         // Must be in sync with the highest supported version in
         // src/Microsoft.TestPlatform.CrossPlatEngine/EventHandlers/TestRequestHandler.cs file.
-        private int highestSupportedVersion = 5;
+        private readonly int highestSupportedVersion = 5;
 
         private TestHostConnectionInfo connectionInfo;
 
-        private ITestRuntimeProvider runtimeProvider;
+        private readonly ITestRuntimeProvider runtimeProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRequestSender"/> class.
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                   protocolConfig,
                   ClientProcessExitWaitTimeout)
         {
-            this.SetCommunicationEndPoint();
+            SetCommunicationEndPoint();
         }
 
         internal TestRequestSender(
@@ -85,17 +85,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             ProtocolConfig protocolConfig,
             int clientExitedWaitTime)
         {
-            this.dataSerializer = serializer;
-            this.connected = new ManualResetEventSlim(false);
-            this.clientExited = new ManualResetEventSlim(false);
+            dataSerializer = serializer;
+            connected = new ManualResetEventSlim(false);
+            clientExited = new ManualResetEventSlim(false);
             this.clientExitedWaitTime = clientExitedWaitTime;
-            this.operationCompleted = 0;
+            operationCompleted = 0;
 
-            this.highestSupportedVersion = protocolConfig.Version;
+            highestSupportedVersion = protocolConfig.Version;
 
             // The connectionInfo here is that of RuntimeProvider, so reverse the role of runner.
             this.runtimeProvider = runtimeProvider;
-            this.communicationEndpoint = communicationEndPoint;
+            communicationEndpoint = communicationEndPoint;
             this.connectionInfo.Endpoint = connectionInfo.Endpoint;
             this.connectionInfo.Role = connectionInfo.Role == ConnectionRole.Host
                 ? ConnectionRole.Client
@@ -138,25 +138,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
 
             // this.clientExitCancellationSource = new CancellationTokenSource();
-            this.clientExitErrorMessage = string.Empty;
-            this.communicationEndpoint.Connected += (sender, args) =>
+            clientExitErrorMessage = string.Empty;
+            communicationEndpoint.Connected += (sender, args) =>
             {
-                this.channel = args.Channel;
-                if (args.Connected && this.channel != null)
+                channel = args.Channel;
+                if (args.Connected && channel != null)
                 {
-                    this.connected.Set();
+                    connected.Set();
                 }
             };
 
-            this.communicationEndpoint.Disconnected += (sender, args) =>
-            {
+            communicationEndpoint.Disconnected += (sender, args) =>
                 // If there's an disconnected event handler, call it
-                this.onDisconnected?.Invoke(args);
-            };
+                onDisconnected?.Invoke(args);
 
             // Server start returns the listener port
             // return int.Parse(this.communicationServer.Start());
-            var endpoint = this.communicationEndpoint.Start(this.connectionInfo.Endpoint);
+            var endpoint = communicationEndpoint.Start(connectionInfo.Endpoint);
             return endpoint.GetIPEndPoint().Port;
         }
 
@@ -171,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // Wait until either connection is successful, handled by connected.WaitHandle
             // or operation is canceled, handled by cancellationToken.WaitHandle
             // or testhost exits unexpectedly, handled by clientExited.WaitHandle
-            var waitIndex = WaitHandle.WaitAny(new WaitHandle[] { this.connected.WaitHandle, cancellationToken.WaitHandle, this.clientExited.WaitHandle }, connectionTimeout);
+            var waitIndex = WaitHandle.WaitAny(new WaitHandle[] { connected.WaitHandle, cancellationToken.WaitHandle, clientExited.WaitHandle }, connectionTimeout);
 
             // Return true if connection was successful.
             return waitIndex == 0;
@@ -185,9 +183,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // Test host sends the version it can support (must be less than highest) to runner
             // Error case: test host can send a protocol error if it cannot find a supported version
             var protocolNegotiated = new ManualResetEvent(false);
-            this.onMessageReceived = (sender, args) =>
+            onMessageReceived = (sender, args) =>
             {
-                var message = this.dataSerializer.DeserializeMessage(args.Data);
+                var message = dataSerializer.DeserializeMessage(args.Data);
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
@@ -196,7 +194,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 if (message.MessageType == MessageType.VersionCheck)
                 {
-                    this.protocolVersion = this.dataSerializer.DeserializePayload<int>(message);
+                    protocolVersion = dataSerializer.DeserializePayload<int>(message);
                 }
 
                 // TRH can also send TestMessage if tracing is enabled, so log it at runner end
@@ -220,20 +218,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 protocolNegotiated.Set();
             };
-            this.channel.MessageReceived += this.onMessageReceived;
+            channel.MessageReceived += onMessageReceived;
 
             try
             {
                 // Send the protocol negotiation request. Note that we always serialize this data
                 // without any versioning in the message itself.
-                var data = this.dataSerializer.SerializePayload(MessageType.VersionCheck, this.highestSupportedVersion);
+                var data = dataSerializer.SerializePayload(MessageType.VersionCheck, highestSupportedVersion);
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
                     EqtTrace.Verbose("TestRequestSender.CheckVersionWithTestHost: Sending check version message: {0}", data);
                 }
 
-                this.channel.Send(data);
+                channel.Send(data);
 
                 // Wait for negotiation response
                 var timeout = EnvironmentHelper.GetConnectionTimeout();
@@ -244,8 +242,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
             finally
             {
-                this.channel.MessageReceived -= this.onMessageReceived;
-                this.onMessageReceived = null;
+                channel.MessageReceived -= onMessageReceived;
+                onMessageReceived = null;
             }
         }
 
@@ -254,41 +252,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions)
         {
-            var message = this.dataSerializer.SerializePayload(
+            var message = dataSerializer.SerializePayload(
                 MessageType.DiscoveryInitialize,
                 pathToAdditionalExtensions,
-                this.protocolVersion);
+                protocolVersion);
 
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TestRequestSender.InitializeDiscovery: Sending initialize discovery with message: {0}", message);
             }
 
-            this.channel.Send(message);
+            channel.Send(message);
         }
 
         /// <inheritdoc/>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 discoveryEventsHandler)
         {
-            this.messageEventHandler = discoveryEventsHandler;
-            this.onDisconnected = (disconnectedEventArgs) =>
-                {
-                    this.OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, true);
-                };
-            this.onMessageReceived = (sender, args) => this.OnDiscoveryMessageReceived(discoveryEventsHandler, args);
+            messageEventHandler = discoveryEventsHandler;
+            onDisconnected = (disconnectedEventArgs) => OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, true);
+            onMessageReceived = (sender, args) => OnDiscoveryMessageReceived(discoveryEventsHandler, args);
 
-            this.channel.MessageReceived += this.onMessageReceived;
-            var message = this.dataSerializer.SerializePayload(
+            channel.MessageReceived += onMessageReceived;
+            var message = dataSerializer.SerializePayload(
                 MessageType.StartDiscovery,
                 discoveryCriteria,
-                this.protocolVersion);
+                protocolVersion);
 
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TestRequestSender.DiscoverTests: Sending discover tests with message: {0}", message);
             }
 
-            this.channel.Send(message);
+            channel.Send(message);
         }
         #endregion
 
@@ -297,29 +292,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions)
         {
-            var message = this.dataSerializer.SerializePayload(
+            var message = dataSerializer.SerializePayload(
                 MessageType.ExecutionInitialize,
                 pathToAdditionalExtensions,
-                this.protocolVersion);
+                protocolVersion);
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TestRequestSender.InitializeExecution: Sending initialize execution with message: {0}", message);
             }
 
-            this.channel.Send(message);
+            channel.Send(message);
         }
 
         /// <inheritdoc />
         public void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler)
         {
-            this.messageEventHandler = eventHandler;
-            this.onDisconnected = (disconnectedEventArgs) =>
-            {
-                this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
-            };
+            messageEventHandler = eventHandler;
+            onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
 
-            this.onMessageReceived = (sender, args) => this.OnExecutionMessageReceived(sender, args, eventHandler);
-            this.channel.MessageReceived += this.onMessageReceived;
+            onMessageReceived = (sender, args) => OnExecutionMessageReceived(sender, args, eventHandler);
+            channel.MessageReceived += onMessageReceived;
 
             // This code section is needed because we altered the old testhost launch process for
             // the debugging workflow. Now we don't ask VS to launch and attach to the testhost
@@ -332,8 +324,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // to the testhost here before starting the test run.
             if (runCriteria.TestExecutionContext != null
                 && runCriteria.TestExecutionContext.IsDebug
-                && this.runtimeProvider is ITestRuntimeProvider2 convertedRuntimeProvider
-                && this.protocolVersion < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
+                && runtimeProvider is ITestRuntimeProvider2 convertedRuntimeProvider
+                && protocolVersion < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
             {
                 var handler = (ITestRunEventsHandler2)eventHandler;
                 if (!convertedRuntimeProvider.AttachDebuggerToTestHost())
@@ -345,30 +337,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 }
             }
 
-            var message = this.dataSerializer.SerializePayload(
+            var message = dataSerializer.SerializePayload(
                 MessageType.StartTestExecutionWithSources,
                 runCriteria,
-                this.protocolVersion);
+                protocolVersion);
 
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TestRequestSender.StartTestRun: Sending test run with message: {0}", message);
             }
 
-            this.channel.Send(message);
+            channel.Send(message);
         }
 
         /// <inheritdoc />
         public void StartTestRun(TestRunCriteriaWithTests runCriteria, ITestRunEventsHandler eventHandler)
         {
-            this.messageEventHandler = eventHandler;
-            this.onDisconnected = (disconnectedEventArgs) =>
-            {
-                this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
-            };
+            messageEventHandler = eventHandler;
+            onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
 
-            this.onMessageReceived = (sender, args) => this.OnExecutionMessageReceived(sender, args, eventHandler);
-            this.channel.MessageReceived += this.onMessageReceived;
+            onMessageReceived = (sender, args) => OnExecutionMessageReceived(sender, args, eventHandler);
+            channel.MessageReceived += onMessageReceived;
 
             // This code section is needed because we altered the old testhost launch process for
             // the debugging workflow. Now we don't ask VS to launch and attach to the testhost
@@ -381,8 +370,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // to the testhost here before starting the test run.
             if (runCriteria.TestExecutionContext != null
                 && runCriteria.TestExecutionContext.IsDebug
-                && this.runtimeProvider is ITestRuntimeProvider2 convertedRuntimeProvider
-                && this.protocolVersion < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
+                && runtimeProvider is ITestRuntimeProvider2 convertedRuntimeProvider
+                && protocolVersion < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
             {
                 var handler = (ITestRunEventsHandler2)eventHandler;
                 if (!convertedRuntimeProvider.AttachDebuggerToTestHost())
@@ -394,23 +383,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 }
             }
 
-            var message = this.dataSerializer.SerializePayload(
+            var message = dataSerializer.SerializePayload(
                 MessageType.StartTestExecutionWithTests,
                 runCriteria,
-                this.protocolVersion);
+                protocolVersion);
 
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TestRequestSender.StartTestRun: Sending test run with message: {0}", message);
             }
 
-            this.channel.Send(message);
+            channel.Send(message);
         }
 
         /// <inheritdoc />
         public void SendTestRunCancel()
         {
-            if (this.IsOperationComplete())
+            if (IsOperationComplete())
             {
                 EqtTrace.Verbose("TestRequestSender: SendTestRunCancel: Operation is already complete. Skip error message.");
                 return;
@@ -421,13 +410,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 EqtTrace.Verbose("TestRequestSender.SendTestRunCancel: Sending test run cancel.");
             }
 
-            this.channel?.Send(this.dataSerializer.SerializeMessage(MessageType.CancelTestRun));
+            channel?.Send(dataSerializer.SerializeMessage(MessageType.CancelTestRun));
         }
 
         /// <inheritdoc />
         public void SendTestRunAbort()
         {
-            if (this.IsOperationComplete())
+            if (IsOperationComplete())
             {
                 EqtTrace.Verbose("TestRequestSender: SendTestRunAbort: Operation is already complete. Skip error message.");
                 return;
@@ -438,7 +427,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 EqtTrace.Verbose("TestRequestSender.SendTestRunAbort: Sending test run abort.");
             }
 
-            this.channel?.Send(this.dataSerializer.SerializeMessage(MessageType.AbortTestRun));
+            channel?.Send(dataSerializer.SerializeMessage(MessageType.AbortTestRun));
         }
 
         #endregion
@@ -446,14 +435,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void EndSession()
         {
-            if (!this.IsOperationComplete())
+            if (!IsOperationComplete())
             {
                 if (EqtTrace.IsVerboseEnabled)
                 {
                     EqtTrace.Verbose("TestRequestSender.EndSession: Sending end session.");
                 }
 
-                this.channel?.Send(this.dataSerializer.SerializeMessage(MessageType.SessionEnd));
+                channel?.Send(dataSerializer.SerializeMessage(MessageType.SessionEnd));
             }
         }
 
@@ -467,29 +456,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 EqtTrace.Info($"TestRequestSender.OnClientProcessExit: Test host process exited. Standard error: {stdError}");
             }
 
-            this.clientExitErrorMessage = stdError;
-            this.clientExited.Set();
+            clientExitErrorMessage = stdError;
+            clientExited.Set();
 
             // Break communication loop. In some cases (E.g: When tests creates child processes to testhost) communication channel won't break if testhost exits.
-            this.communicationEndpoint.Stop();
+            communicationEndpoint.Stop();
         }
 
         /// <inheritdoc />
         public void Close()
         {
-            this.Dispose();
+            Dispose();
             EqtTrace.Info("Closing the connection");
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            if (this.channel != null)
+            if (channel != null)
             {
-                this.channel.MessageReceived -= this.onMessageReceived;
+                channel.MessageReceived -= onMessageReceived;
             }
 
-            this.communicationEndpoint.Stop();
+            communicationEndpoint.Stop();
             GC.SuppressFinalize(this);
         }
 
@@ -506,15 +495,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 // Send raw message first to unblock handlers waiting to send message to IDEs
                 testRunEventsHandler.HandleRawMessage(rawMessage);
 
-                var message = this.dataSerializer.DeserializeMessage(rawMessage);
+                var message = dataSerializer.DeserializeMessage(rawMessage);
                 switch (message.MessageType)
                 {
                     case MessageType.TestRunStatsChange:
-                        var testRunChangedArgs = this.dataSerializer.DeserializePayload<TestRunChangedEventArgs>(message);
+                        var testRunChangedArgs = dataSerializer.DeserializePayload<TestRunChangedEventArgs>(message);
                         testRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
                         break;
                     case MessageType.ExecutionComplete:
-                        var testRunCompletePayload = this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
+                        var testRunCompletePayload = dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
 
                         testRunEventsHandler.HandleTestRunComplete(
                             testRunCompletePayload.TestRunCompleteArgs,
@@ -522,51 +511,51 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             testRunCompletePayload.RunAttachments,
                             testRunCompletePayload.ExecutorUris);
 
-                        this.SetOperationComplete();
+                        SetOperationComplete();
                         break;
                     case MessageType.TestMessage:
-                        var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                        var testMessagePayload = dataSerializer.DeserializePayload<TestMessagePayload>(message);
                         testRunEventsHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
                         break;
                     case MessageType.LaunchAdapterProcessWithDebuggerAttached:
-                        var testProcessStartInfo = this.dataSerializer.DeserializePayload<TestProcessStartInfo>(message);
+                        var testProcessStartInfo = dataSerializer.DeserializePayload<TestProcessStartInfo>(message);
                         int processId = testRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
 
                         var data =
-                            this.dataSerializer.SerializePayload(
+                            dataSerializer.SerializePayload(
                                 MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback,
                                 processId,
-                                this.protocolVersion);
+                                protocolVersion);
                         if (EqtTrace.IsVerboseEnabled)
                         {
                             EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Sending LaunchAdapterProcessWithDebuggerAttachedCallback message: {0}", data);
                         }
 
-                        this.channel.Send(data);
+                        channel.Send(data);
                         break;
 
                     case MessageType.AttachDebugger:
-                        var testProcessPid = this.dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
+                        var testProcessPid = dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
                         bool result = ((ITestRunEventsHandler2)testRunEventsHandler).AttachDebuggerToProcess(testProcessPid.ProcessID);
 
-                        var resultMessage = this.dataSerializer.SerializePayload(
+                        var resultMessage = dataSerializer.SerializePayload(
                             MessageType.AttachDebuggerCallback,
                             result,
-                            this.protocolVersion);
+                            protocolVersion);
 
                         if (EqtTrace.IsVerboseEnabled)
                         {
                             EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Sending AttachDebugger with message: {0}", message);
                         }
 
-                        this.channel.Send(resultMessage);
+                        channel.Send(resultMessage);
 
                         break;
                 }
             }
             catch (Exception exception)
             {
-                this.OnTestRunAbort(testRunEventsHandler, exception, false);
+                OnTestRunAbort(testRunEventsHandler, exception, false);
             }
         }
 
@@ -585,25 +574,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 // Send raw message first to unblock handlers waiting to send message to IDEs
                 discoveryEventsHandler.HandleRawMessage(rawMessage);
 
-                var data = this.dataSerializer.DeserializeMessage(rawMessage);
+                var data = dataSerializer.DeserializeMessage(rawMessage);
                 switch (data.MessageType)
                 {
                     case MessageType.TestCasesFound:
-                        var testCases = this.dataSerializer.DeserializePayload<IEnumerable<TestCase>>(data);
+                        var testCases = dataSerializer.DeserializePayload<IEnumerable<TestCase>>(data);
                         discoveryEventsHandler.HandleDiscoveredTests(testCases);
                         break;
                     case MessageType.DiscoveryComplete:
                         var discoveryCompletePayload =
-                            this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(data);
+                            dataSerializer.DeserializePayload<DiscoveryCompletePayload>(data);
                         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
                         discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
                         discoveryEventsHandler.HandleDiscoveryComplete(
                             discoveryCompleteEventArgs,
                             discoveryCompletePayload.LastDiscoveredTests);
-                        this.SetOperationComplete();
+                        SetOperationComplete();
                         break;
                     case MessageType.TestMessage:
-                        var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(
+                        var testMessagePayload = dataSerializer.DeserializePayload<TestMessagePayload>(
                             data);
                         discoveryEventsHandler.HandleLogMessage(
                             testMessagePayload.MessageLevel,
@@ -613,29 +602,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
             catch (Exception ex)
             {
-                this.OnDiscoveryAbort(discoveryEventsHandler, ex, false);
+                OnDiscoveryAbort(discoveryEventsHandler, ex, false);
             }
         }
 
         private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception, bool getClientError)
         {
-            if (this.IsOperationComplete())
+            if (IsOperationComplete())
             {
                 EqtTrace.Verbose("TestRequestSender: OnTestRunAbort: Operation is already complete. Skip error message.");
                 return;
             }
 
             EqtTrace.Verbose("TestRequestSender: OnTestRunAbort: Set operation complete.");
-            this.SetOperationComplete();
+            SetOperationComplete();
 
-            var reason = this.GetAbortErrorMessage(exception, getClientError);
+            var reason = GetAbortErrorMessage(exception, getClientError);
             EqtTrace.Error("TestRequestSender: Aborting test run because {0}", reason);
-            this.LogErrorMessage(string.Format(CommonResources.AbortedTestRun, reason));
+            LogErrorMessage(string.Format(CommonResources.AbortedTestRun, reason));
 
             // notify test run abort to vstest console wrapper.
             var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, null, TimeSpan.Zero);
             var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
-            var rawMessage = this.dataSerializer.SerializePayload(MessageType.ExecutionComplete, payload);
+            var rawMessage = dataSerializer.SerializePayload(MessageType.ExecutionComplete, payload);
             testRunEventsHandler.HandleRawMessage(rawMessage);
 
             // notify of a test run complete and bail out.
@@ -644,19 +633,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void OnDiscoveryAbort(ITestDiscoveryEventsHandler2 eventHandler, Exception exception, bool getClientError)
         {
-            if (this.IsOperationComplete())
+            if (IsOperationComplete())
             {
                 EqtTrace.Verbose("TestRequestSender: OnDiscoveryAbort: Operation is already complete. Skip error message.");
                 return;
             }
 
             EqtTrace.Verbose("TestRequestSender: OnDiscoveryAbort: Set operation complete.");
-            this.SetOperationComplete();
+            SetOperationComplete();
 
             var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
-            var reason = this.GetAbortErrorMessage(exception, getClientError);
+            var reason = GetAbortErrorMessage(exception, getClientError);
             EqtTrace.Error("TestRequestSender: Aborting test discovery because {0}", reason);
-            this.LogErrorMessage(string.Format(CommonResources.AbortedTestDiscovery, reason));
+            LogErrorMessage(string.Format(CommonResources.AbortedTestDiscovery, reason));
 
             // Notify discovery abort to IDE test output
             var payload = new DiscoveryCompletePayload()
@@ -665,7 +654,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 LastDiscoveredTests = null,
                 TotalTests = -1
             };
-            var rawMessage = this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, payload);
+            var rawMessage = dataSerializer.SerializePayload(MessageType.DiscoveryComplete, payload);
             eventHandler.HandleRawMessage(rawMessage);
 
             // Complete discovery
@@ -685,14 +674,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Client has disconnected. Wait for standard error.");
 
                 // Wait for test host to exit for a moment
-                if (this.clientExited.Wait(this.clientExitedWaitTime))
+                if (clientExited.Wait(clientExitedWaitTime))
                 {
                     // Set a default message of test host process exited and additionally specify the error if present
                     EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Received test host error message.");
                     reason = CommonResources.TestHostProcessCrashed;
-                    if (!string.IsNullOrWhiteSpace(this.clientExitErrorMessage))
+                    if (!string.IsNullOrWhiteSpace(clientExitErrorMessage))
                     {
-                        reason = $"{reason} : {this.clientExitErrorMessage}";
+                        reason = $"{reason} : {clientExitErrorMessage}";
                     }
                 }
                 else
@@ -707,24 +696,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void LogErrorMessage(string message)
         {
-            if (this.messageEventHandler == null)
+            if (messageEventHandler == null)
             {
                 EqtTrace.Error("TestRequestSender.LogErrorMessage: Message event handler not set. Error: " + message);
                 return;
             }
 
             // Log to vstest console
-            this.messageEventHandler.HandleLogMessage(TestMessageLevel.Error, message);
+            messageEventHandler.HandleLogMessage(TestMessageLevel.Error, message);
 
             // Log to vs ide test output
             var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = message };
-            var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
-            this.messageEventHandler.HandleRawMessage(rawMessage);
+            var rawMessage = dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
+            messageEventHandler.HandleRawMessage(rawMessage);
         }
 
         private bool IsOperationComplete()
         {
-            return this.operationCompleted == 1;
+            return operationCompleted == 1;
         }
 
         private void SetOperationComplete()
@@ -734,7 +723,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // suppress the test request sender channel close taking place here. This channel
             // will be closed when the test session owner decides to dispose of the test session
             // object.
-            if (!this.CloseConnectionOnOperationComplete)
+            if (!CloseConnectionOnOperationComplete)
             {
                 return;
             }
@@ -745,16 +734,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 EqtTrace.Verbose("TestRequestSender.SetOperationComplete: Setting operation complete.");
             }
 
-            this.communicationEndpoint.Stop();
-            Interlocked.CompareExchange(ref this.operationCompleted, 1, 0);
+            communicationEndpoint.Stop();
+            Interlocked.CompareExchange(ref operationCompleted, 1, 0);
         }
 
         private void SetCommunicationEndPoint()
         {
             // TODO: Use factory to get the communication endpoint. It will abstract out the type of communication endpoint like socket, shared memory or named pipe etc.,
-            if (this.connectionInfo.Role == ConnectionRole.Client)
+            if (connectionInfo.Role == ConnectionRole.Client)
             {
-                this.communicationEndpoint = new SocketClient();
+                communicationEndpoint = new SocketClient();
                 if (EqtTrace.IsVerboseEnabled)
                 {
                     EqtTrace.Verbose("TestRequestSender is acting as client");
@@ -762,7 +751,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
             else
             {
-                this.communicationEndpoint = new SocketServer();
+                communicationEndpoint = new SocketServer();
                 if (EqtTrace.IsVerboseEnabled)
                 {
                     EqtTrace.Verbose("TestRequestSender is acting as server");

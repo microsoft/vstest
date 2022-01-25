@@ -24,32 +24,32 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <typeparam name="TemplateType"></typeparam>
         private sealed class EqtBaseCollectionEnumerator<TemplateType> : IEnumerator<TemplateType>
         {
-            private IEnumerator enumerator;
+            private readonly IEnumerator _enumerator;
 
             internal EqtBaseCollectionEnumerator(IEnumerator e)
             {
                 Debug.Assert(e != null, "e is null");
-                this.enumerator = e;
+                _enumerator = e;
             }
 
             public TemplateType Current
             {
-                get { return (TemplateType)this.enumerator.Current; }
+                get { return (TemplateType)_enumerator.Current; }
             }
 
             object IEnumerator.Current
             {
-                get { return this.enumerator.Current; }
+                get { return _enumerator.Current; }
             }
 
             public bool MoveNext()
             {
-                return this.enumerator.MoveNext();
+                return _enumerator.MoveNext();
             }
 
             public void Reset()
             {
-                this.enumerator.Reset();
+                _enumerator.Reset();
             }
 
             public void Dispose()
@@ -59,15 +59,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         #endregion
 
         #region Fields
-        protected Hashtable container;
+        protected Hashtable _container;
 
-        private string childElementName;
+        private string _childElementName;
         #endregion
 
         #region Constructors
         protected EqtBaseCollection()
         {
-            this.container = new Hashtable();
+            _container = new Hashtable();
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <param name="comparer">For case insensitive comparison use StringComparer.InvariantCultureIgnoreCase.</param>
         protected EqtBaseCollection(IEqualityComparer comparer)
         {
-            this.container = new Hashtable(0, comparer);   // Ad default Hashtable() constructor creates table with 0 items.
+            _container = new Hashtable(0, comparer);   // Ad default Hashtable() constructor creates table with 0 items.
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         protected EqtBaseCollection(EqtBaseCollection<T> other)
         {
             EqtAssert.ParameterNotNull(other, nameof(other));
-            this.container = new Hashtable(other.container);
+            _container = new Hashtable(other._container);
         }
         #endregion
 
@@ -96,20 +96,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         {
             EqtAssert.ParameterNotNull(item, nameof(item));
 
-            if (!this.container.Contains(item))
+            if (!_container.Contains(item))
             {
-                this.container.Add(item, null);    // Do not want to xml-persist the value.
+                _container.Add(item, null);    // Do not want to xml-persist the value.
             }
         }
 
         public virtual bool Contains(T item)
         {
-            if (item == null)
-            {
-                return false;
-            }
-
-            return this.container.Contains(item);
+            return item != null && _container.Contains(item);
         }
 
         /// <summary>
@@ -120,9 +115,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         public virtual bool Remove(T item)
         {
             EqtAssert.ParameterNotNull(item, nameof(item));   // This is to be consistent with Add...
-            if (this.container.Contains(item))
+            if (_container.Contains(item))
             {
-                this.container.Remove(item);
+                _container.Remove(item);
                 return true;
             }
 
@@ -131,7 +126,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
         public virtual void Clear()
         {
-            this.container.Clear();
+            _container.Clear();
         }
 
         /// <summary>
@@ -144,7 +139,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
         public virtual int Count
         {
-            get { return this.container.Count; }
+            get { return _container.Count; }
         }
 
         /// <summary>
@@ -154,7 +149,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         public virtual void CopyTo(T[] array, int index)
         {
             EqtAssert.ParameterNotNull(array, nameof(array));
-            this.container.Keys.CopyTo(array, index);
+            _container.Keys.CopyTo(array, index);
         }
 
         public bool IsReadOnly
@@ -166,12 +161,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         #region IEnumerable
         public virtual IEnumerator GetEnumerator()
         {
-            return this.container.Keys.GetEnumerator();
+            return _container.Keys.GetEnumerator();
         }
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
-            return new EqtBaseCollectionEnumerator<T>(this.GetEnumerator());
+            return new EqtBaseCollectionEnumerator<T>(GetEnumerator());
         }
         #endregion
 
@@ -183,8 +178,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         public virtual void Save(XmlElement element, XmlTestStoreParameters parameters)
         {
-            XmlPersistence xmlPersistence = new XmlPersistence();
-            xmlPersistence.SaveHashtable(this.container, element, ".", ".", null, ChildElementName, parameters);
+            XmlPersistence xmlPersistence = new();
+            xmlPersistence.SaveHashtable(_container, element, ".", ".", null, ChildElementName, parameters);
         }
 
         #endregion
@@ -194,12 +189,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         {
             get
             {
-                if (this.childElementName == null)
+                if (_childElementName == null)
                 {
                     // All we can do here is to delegate to T. Cannot cast T to IXmlTestStoreCustom as T is a type, not an instance.
-                    this.childElementName = typeof(T).Name;
+                    _childElementName = typeof(T).Name;
                 }
-                return this.childElementName;
+                return _childElementName;
             }
         }
         #endregion

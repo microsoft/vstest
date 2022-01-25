@@ -15,9 +15,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void TrxFileShouldBeCreatedInResultsDirectory(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
             var trxFileName = "TestResults.trx";
             var resultsDir = GetResultsDirectory();
             var trxFilePath = Path.Combine(resultsDir, trxFileName);
@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             // Delete if already exists
             TryRemoveDirectory(resultsDir);
 
-            this.InvokeVsTest(arguments);
+            InvokeVsTest(arguments);
 
             Assert.IsTrue(File.Exists(trxFilePath), $"Expected Trx file: {trxFilePath} not created in results directory");
             TryRemoveDirectory(resultsDir);
@@ -38,9 +38,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void ResultsDirectoryRelativePathShouldWork(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
             var trxFileName = "TestResults.trx";
             var relativeDirectory = @"relative\directory";
             var resultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), relativeDirectory);
@@ -54,7 +54,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 Directory.Delete(resultsDirectory, true);
             }
 
-            this.InvokeVsTest(arguments);
+            InvokeVsTest(arguments);
 
             Assert.IsTrue(File.Exists(trxFilePath), $"Expected Trx file: {trxFilePath} not created in results directory");
             TryRemoveDirectory(resultsDirectory);

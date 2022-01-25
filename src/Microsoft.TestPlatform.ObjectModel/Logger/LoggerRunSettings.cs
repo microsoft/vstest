@@ -15,19 +15,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public class LoggerRunSettings : TestRunSettings
     {
-        private string loggerRunSettingsName = string.Empty;
-        private string loggersSettingName = string.Empty;
-        private string loggerSettingName = string.Empty;
+        private readonly string loggerRunSettingsName = string.Empty;
+        private readonly string loggersSettingName = string.Empty;
+        private readonly string loggerSettingName = string.Empty;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoggerRunSettings"/> class.
         /// </summary>
         public LoggerRunSettings() : base(Constants.LoggerRunSettingsName)
         {
-            this.LoggerSettingsList = new Collection<LoggerSettings>();
-            this.loggerRunSettingsName = Constants.LoggerRunSettingsName;
-            this.loggersSettingName = Constants.LoggersSettingName;
-            this.loggerSettingName = Constants.LoggerSettingName;
+            LoggerSettingsList = new Collection<LoggerSettings>();
+            loggerRunSettingsName = Constants.LoggerRunSettingsName;
+            loggersSettingName = Constants.LoggersSettingName;
+            loggerSettingName = Constants.LoggerSettingName;
         }
 
         /// <summary>
@@ -43,13 +43,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public override XmlElement ToXml()
         {
             var doc = new XmlDocument();
-            var root = doc.CreateElement(this.loggerRunSettingsName);
-            var subRoot = doc.CreateElement(this.loggersSettingName);
+            var root = doc.CreateElement(loggerRunSettingsName);
+            var subRoot = doc.CreateElement(loggersSettingName);
             root.AppendChild(subRoot);
 
-            foreach (var loggerSettings in this.LoggerSettingsList)
+            foreach (var loggerSettings in LoggerSettingsList)
             {
-                XmlNode child = doc.ImportNode(loggerSettings.ToXml(this.loggerSettingName), true);
+                XmlNode child = doc.ImportNode(loggerSettings.ToXml(loggerSettingName), true);
                 subRoot.AppendChild(child);
             }
 

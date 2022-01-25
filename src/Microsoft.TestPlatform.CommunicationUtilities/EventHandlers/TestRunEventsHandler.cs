@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
     /// </summary>
     public class TestRunEventsHandler : ITestRunEventsHandler2
     {
-        private ITestRequestHandler requestHandler;
+        private readonly ITestRequestHandler requestHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunEventsHandler"/> class.
@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
         public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
         {
             EqtTrace.Info("Sending test run statistics");
-            this.requestHandler.SendTestRunStatistics(testRunChangedArgs);
+            requestHandler.SendTestRunStatistics(testRunChangedArgs);
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
         public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
         {
             EqtTrace.Info("Sending test run complete");
-            this.requestHandler.SendExecutionComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
+            requestHandler.SendExecutionComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
                     break;
             }
 
-            this.requestHandler.SendLog(level, message);
+            requestHandler.SendLog(level, message);
         }
 
         public void HandleRawMessage(string rawMessage)
@@ -93,14 +93,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
             EqtTrace.Info("Sending LaunchProcessWithDebuggerAttached on additional test process: {0}", testProcessStartInfo?.FileName);
-            return this.requestHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+            return requestHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
         }
 
         /// <inheritdoc/>
         public bool AttachDebuggerToProcess(int pid)
         {
             EqtTrace.Info("Sending AttachDebuggerToProcess on additional test process with pid: {0}", pid);
-            return this.requestHandler.AttachDebuggerToProcess(pid);
+            return requestHandler.AttachDebuggerToProcess(pid);
         }
     }
 }

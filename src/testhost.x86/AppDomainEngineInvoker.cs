@@ -33,8 +33,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         {
             TestPlatformEventSource.Instance.TestHostAppDomainCreationStart();
 
-            this.appDomain = CreateNewAppDomain(testSourcePath);
-            this.actualInvoker = CreateInvokerInAppDomain(appDomain);
+            appDomain = CreateNewAppDomain(testSourcePath);
+            actualInvoker = CreateInvokerInAppDomain(appDomain);
 
             TestPlatformEventSource.Instance.TestHostAppDomainCreationStop();
         }
@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         {
             try
             {
-                this.actualInvoker.Invoke(argsDictionary);
+                actualInvoker.Invoke(argsDictionary);
             }
             finally
             {
@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     // AppDomain.Unload(appDomain);
                     //}
 
-                    if (!string.IsNullOrWhiteSpace(this.mergedTempConfigFile) && File.Exists(mergedTempConfigFile))
+                    if (!string.IsNullOrWhiteSpace(mergedTempConfigFile) && File.Exists(mergedTempConfigFile))
                     {
                         File.Delete(mergedTempConfigFile);
                     }
@@ -137,11 +137,11 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 var mergedConfigDocument = MergeApplicationConfigFiles(userConfigDoc, testHostConfigDoc);
 
                 // Create a temp file with config
-                this.mergedTempConfigFile = Path.GetTempFileName();
-                mergedConfigDocument.Save(this.mergedTempConfigFile);
+                mergedTempConfigFile = Path.GetTempFileName();
+                mergedConfigDocument.Save(mergedTempConfigFile);
 
                 // Set config file to merged one
-                appDomainSetup.ConfigurationFile = this.mergedTempConfigFile;
+                appDomainSetup.ConfigurationFile = mergedTempConfigFile;
             }
             else
             {
@@ -247,8 +247,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.CreateSpecificCulture(uiCulture);
             }
 
-            this.resolverPaths = new string[] { testPlatformPath, Path.Combine(testPlatformPath, "Extensions") };
-            this.resolvedAssemblies = new Dictionary<string, Assembly>();
+            resolverPaths = new string[] { testPlatformPath, Path.Combine(testPlatformPath, "Extensions") };
+            resolvedAssemblies = new Dictionary<string, Assembly>();
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
         }
 

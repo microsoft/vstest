@@ -27,27 +27,27 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
         [TestInitialize]
         public void TestInit()
         {
-            this.migrator = new Migrator();
-            this.newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
-            this.oldTestsettingsPath = Path.GetFullPath(Path.Combine(".", "oldTestsettings.testsettings"));
-            this.oldRunsettingsPath = Path.Combine(Path.GetTempPath(), "oldRunsettings.runsettings");
+            migrator = new Migrator();
+            newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
+            oldTestsettingsPath = Path.GetFullPath(Path.Combine(".", "oldTestsettings.testsettings"));
+            oldRunsettingsPath = Path.Combine(Path.GetTempPath(), "oldRunsettings.runsettings");
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            if (File.Exists(this.newRunsettingsPath))
+            if (File.Exists(newRunsettingsPath))
             {
-                File.Delete(this.newRunsettingsPath);
+                File.Delete(newRunsettingsPath);
             }
         }
 
         [TestMethod]
         public void NonRootedPathIsNotMigrated()
         {
-            this.migrator.Migrate("asda", this.newRunsettingsPath);
+            migrator.Migrate("asda", newRunsettingsPath);
 
-            Assert.IsFalse(File.Exists(this.newRunsettingsPath), "Run settings should not be generated.");
+            Assert.IsFalse(File.Exists(newRunsettingsPath), "Run settings should not be generated.");
         }
 
         [TestMethod]
@@ -56,33 +56,33 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
             var doc = new XmlDocument();
             doc.LoadXml(OldRunSettings);
             var settingsnode = doc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
-                settingsnode.InnerText = this.oldTestsettingsPath;
-            File.WriteAllText(this.oldRunsettingsPath, doc.InnerXml);
+                settingsnode.InnerText = oldTestsettingsPath;
+            File.WriteAllText(oldRunsettingsPath, doc.InnerXml);
 
-            this.migrator.Migrate(this.oldRunsettingsPath, this.newRunsettingsPath);
+            migrator.Migrate(oldRunsettingsPath, newRunsettingsPath);
 
-            Validate(this.newRunsettingsPath);
+            Validate(newRunsettingsPath);
 
-            File.Delete(this.oldRunsettingsPath);
+            File.Delete(oldRunsettingsPath);
         }
 
         [TestMethod]
         public void MigratorGeneratesCorrectRunsettingsForEmbeddedTestSettingsOfRelativePath()
         {
-            this.oldRunsettingsPath = Path.GetFullPath(Path.Combine(".", "oldRunSettingsWithEmbeddedSettings.runSEttings"));
+            oldRunsettingsPath = Path.GetFullPath(Path.Combine(".", "oldRunSettingsWithEmbeddedSettings.runSEttings"));
 
-            this.migrator.Migrate(this.oldRunsettingsPath, this.newRunsettingsPath);
-            Validate(this.newRunsettingsPath);
+            migrator.Migrate(oldRunsettingsPath, newRunsettingsPath);
+            Validate(newRunsettingsPath);
         }
 
         [TestMethod]
         public void MigratorGeneratesCorrectRunsettingsWithDC()
         {
-            this.oldRunsettingsPath = Path.GetFullPath(Path.Combine(".", "oldRunSettingsWithDataCollector.runsettings"));
+            oldRunsettingsPath = Path.GetFullPath(Path.Combine(".", "oldRunSettingsWithDataCollector.runsettings"));
 
-            this.migrator.Migrate(this.oldRunsettingsPath, this.newRunsettingsPath);
+            migrator.Migrate(oldRunsettingsPath, newRunsettingsPath);
 
-            using XmlTextReader reader = new XmlTextReader(this.newRunsettingsPath);
+            using XmlTextReader reader = new(newRunsettingsPath);
             reader.Namespaces = false;
             var document = new XmlDocument();
             document.Load(reader);
@@ -94,23 +94,23 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
         [TestMethod]
         public void MigratorGeneratesCorrectRunsettingsForTestSettings()
         {
-            this.migrator.Migrate(this.oldTestsettingsPath, this.newRunsettingsPath);
+            migrator.Migrate(oldTestsettingsPath, newRunsettingsPath);
 
-            Validate(this.newRunsettingsPath);
+            Validate(newRunsettingsPath);
         }
 
         [TestMethod]
         [ExpectedException(typeof(XmlException))]
         public void InvalidSettingsThrowsException()
         {
-            this.oldTestsettingsPath = Path.Combine(Path.GetTempPath(), "oldTestsettings.testsettings");
+            oldTestsettingsPath = Path.Combine(Path.GetTempPath(), "oldTestsettings.testsettings");
 
-            File.WriteAllText(this.oldTestsettingsPath, InvalidSettings);
-            File.WriteAllText(this.newRunsettingsPath, string.Empty);
+            File.WriteAllText(oldTestsettingsPath, InvalidSettings);
+            File.WriteAllText(newRunsettingsPath, string.Empty);
 
-            this.migrator.Migrate(this.oldTestsettingsPath, this.newRunsettingsPath);
+            migrator.Migrate(oldTestsettingsPath, newRunsettingsPath);
 
-            File.Delete(this.oldTestsettingsPath);
+            File.Delete(oldTestsettingsPath);
         }
 
         [TestMethod]
@@ -119,14 +119,14 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
         {
             string oldTestsettingsPath = @"X:\generatedRun,settings.runsettings";
 
-            this.migrator.Migrate(oldTestsettingsPath, this.newRunsettingsPath);
+            migrator.Migrate(oldTestsettingsPath, newRunsettingsPath);
         }
 
         private static void Validate(string newRunsettingsPath)
         {
             Assert.IsTrue(File.Exists(newRunsettingsPath), "Run settings should be generated.");
 
-            using XmlTextReader reader = new XmlTextReader(newRunsettingsPath);
+            using XmlTextReader reader = new(newRunsettingsPath);
             reader.Namespaces = false;
 
             var document = new XmlDocument();

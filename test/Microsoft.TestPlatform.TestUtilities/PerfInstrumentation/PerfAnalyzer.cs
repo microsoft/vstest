@@ -24,9 +24,9 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         private const string ETWSessionProviderName = "TestPlatform";
 
 #if NETFRAMEWORK
-        private string perfDataFileName;
-        private TraceEventSession traceEventSession;
-        private Dictionary<string, List<TestPlatformTask>> testPlatformTaskMap;
+        private readonly string perfDataFileName;
+        private readonly TraceEventSession traceEventSession;
+        private readonly Dictionary<string, List<TestPlatformTask>> testPlatformTaskMap;
 #endif
 
         /// <summary>
@@ -35,9 +35,9 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public PerfAnalyzer()
         {
 #if NETFRAMEWORK
-            this.perfDataFileName = "TestPlatformEventsData.etl";
-            this.testPlatformTaskMap = new Dictionary<string, List<TestPlatformTask>>();
-            this.traceEventSession = new TraceEventSession("TestPlatformSession", this.perfDataFileName);
+            perfDataFileName = "TestPlatformEventsData.etl";
+            testPlatformTaskMap = new Dictionary<string, List<TestPlatformTask>>();
+            traceEventSession = new TraceEventSession("TestPlatformSession", perfDataFileName);
 #endif
         }
 
@@ -47,8 +47,8 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public void EnableProvider()
         {
 #if NETFRAMEWORK
-            this.traceEventSession.StopOnDispose = true;
-            this.traceEventSession.EnableProvider(ETWSessionProviderName);
+            traceEventSession.StopOnDispose = true;
+            traceEventSession.EnableProvider(ETWSessionProviderName);
 #endif
         }
 
@@ -58,7 +58,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public void DisableProvider()
         {
 #if NETFRAMEWORK
-            this.traceEventSession.Dispose();
+            traceEventSession.Dispose();
 #endif
         }
 
@@ -68,7 +68,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public void AnalyzeEventsData()
         {
 #if NETFRAMEWORK
-            using var source = new ETWTraceEventSource(this.perfDataFileName);
+            using var source = new ETWTraceEventSource(perfDataFileName);
             // Open the file
             var parser = new DynamicTraceEventParser(source);
             parser.All += delegate (TraceEvent data) {

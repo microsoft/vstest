@@ -163,15 +163,10 @@ namespace TestPlatform.Common.UnitTests.Logging
             {
                 var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
                 var framework = config.TargetFramework;
-                this.Shared = !config.DisableAppDomain;
+                Shared = !config.DisableAppDomain;
 
                 // This is expected to be called once every run so returning a new instance every time.
-                if (framework.Name.IndexOf("netframework", StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    return true;
-                }
-
-                return false;
+                return framework.Name.IndexOf("netframework", StringComparison.OrdinalIgnoreCase) >= 0;
             }
 
             public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
@@ -192,7 +187,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             public void Initialize(IMessageLogger logger, string runsettingsXml)
             {
                 var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
-                this.Shared = !config.DisableAppDomain;
+                Shared = !config.DisableAppDomain;
             }
 
             public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
@@ -202,12 +197,12 @@ namespace TestPlatform.Common.UnitTests.Logging
 
             public void OnHostExited(HostProviderEventArgs e)
             {
-                this.HostExited.Invoke(this, new HostProviderEventArgs("Error"));
+                HostExited.Invoke(this, new HostProviderEventArgs("Error"));
             }
 
             public void OnHostLaunched(HostProviderEventArgs e)
             {
-                this.HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
+                HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
             }
 
             public void SetCustomLauncher(ITestHostLauncher customLauncher)
@@ -240,16 +235,11 @@ namespace TestPlatform.Common.UnitTests.Logging
             {
                 var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
                 var framework = config.TargetFramework;
-                this.Shared = !config.DisableAppDomain;
+                Shared = !config.DisableAppDomain;
 
                 // This is expected to be called once every run so returning a new instance every time.
-                if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                    || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    return true;
-                }
-
-                return false;
+                return framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+                    || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0;
             }
 
             public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
@@ -265,7 +255,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             public void Initialize(IMessageLogger logger, string runsettingsXml)
             {
                 var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
-                this.Shared = !config.DisableAppDomain;
+                Shared = !config.DisableAppDomain;
             }
 
             public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
@@ -275,12 +265,12 @@ namespace TestPlatform.Common.UnitTests.Logging
 
             public void OnHostExited(HostProviderEventArgs e)
             {
-                this.HostExited.Invoke(this, new HostProviderEventArgs("Error"));
+                HostExited.Invoke(this, new HostProviderEventArgs("Error"));
             }
 
             public void OnHostLaunched(HostProviderEventArgs e)
             {
-                this.HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
+                HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
             }
 
             public void SetCustomLauncher(ITestHostLauncher customLauncher)

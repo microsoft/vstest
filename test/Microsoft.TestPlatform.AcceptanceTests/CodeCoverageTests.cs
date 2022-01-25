@@ -47,7 +47,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         public CodeCoverageTests()
         {
-            this.resultsDirectory = GetResultsDirectory();
+            resultsDirectory = GetResultsDirectory();
         }
 
         [TestMethod]
@@ -66,7 +66,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 ExpectedFailedTests = 1
             };
 
-            this.CollectCodeCoverage(runnerInfo, parameters);
+            CollectCodeCoverage(runnerInfo, parameters);
         }
 
         [TestMethod]
@@ -85,7 +85,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 ExpectedFailedTests = 1
             };
 
-            this.CollectCodeCoverage(runnerInfo, parameters);
+            CollectCodeCoverage(runnerInfo, parameters);
         }
 
         [TestMethod]
@@ -104,7 +104,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 ExpectedFailedTests = 1
             };
 
-            this.CollectCodeCoverage(runnerInfo, parameters);
+            CollectCodeCoverage(runnerInfo, parameters);
         }
 
         [TestMethod]
@@ -123,7 +123,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 ExpectedFailedTests = 1
             };
 
-            this.CollectCodeCoverage(runnerInfo, parameters);
+            CollectCodeCoverage(runnerInfo, parameters);
         }
 
         [TestMethod]
@@ -145,7 +145,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 CheckSkipped = true
             };
 
-            this.CollectCodeCoverage(runnerInfo, parameters);
+            CollectCodeCoverage(runnerInfo, parameters);
         }
 
         [TestMethod]
@@ -167,7 +167,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 CheckSkipped = true
             };
 
-            this.CollectCodeCoverage(runnerInfo, parameters);
+            CollectCodeCoverage(runnerInfo, parameters);
         }
 
         [TestMethod]
@@ -186,7 +186,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 ExpectedFailedTests = 1
             };
 
-            this.CollectCodeCoverage(runnerInfo, parameters);
+            CollectCodeCoverage(runnerInfo, parameters);
         }
 
         [TestMethod]
@@ -207,23 +207,23 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 ExpectedFailedTests = 1
             };
 
-            this.CollectCodeCoverage(runnerInfo, parameters);
+            CollectCodeCoverage(runnerInfo, parameters);
         }
 
         private void CollectCodeCoverage(RunnerInfo runnerInfo, TestParameters testParameters)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            var arguments = this.CreateArguments(runnerInfo, testParameters, out var trxFilePath);
+            var arguments = CreateArguments(runnerInfo, testParameters, out var trxFilePath);
 
-            this.InvokeVsTest(arguments);
+            InvokeVsTest(arguments);
 
-            this.ValidateSummaryStatus(
+            ValidateSummaryStatus(
                 testParameters.ExpectedPassedTests,
                 testParameters.ExpectedSkippedTests,
                 testParameters.ExpectedFailedTests);
 
-            var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory);
+            var actualCoverageFile = GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory);
             Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
             Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
 
@@ -240,15 +240,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 Assert.IsTrue(actualCoverageFile.EndsWith(".coverage", StringComparison.InvariantCultureIgnoreCase));
             }
 
-            var coverageDocument = this.GetXmlCoverage(actualCoverageFile);
+            var coverageDocument = GetXmlCoverage(actualCoverageFile);
             if (testParameters.CheckSkipped)
             {
-                this.AssertSkippedMethod(coverageDocument);
+                AssertSkippedMethod(coverageDocument);
             }
 
-            this.ValidateCoverageData(coverageDocument, testParameters.AssemblyName, testParameters.RunSettingsType != TestParameters.SettingsType.CoberturaOutput);
+            ValidateCoverageData(coverageDocument, testParameters.AssemblyName, testParameters.RunSettingsType != TestParameters.SettingsType.CoberturaOutput);
 
-            Directory.Delete(this.resultsDirectory, true);
+            Directory.Delete(resultsDirectory, true);
         }
 
         private string CreateArguments(
@@ -256,19 +256,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             TestParameters testParameters,
             out string trxFilePath)
         {
-            var assemblyPaths = this.GetAssetFullPath(testParameters.AssemblyName);
+            var assemblyPaths = GetAssetFullPath(testParameters.AssemblyName);
 
             string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
                 "artifacts", IntegrationTestEnvironment.BuildConfiguration, "Microsoft.CodeCoverage");
 
-            string diagFileName = Path.Combine(this.resultsDirectory, "diaglog.txt");
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty,
-                this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory);
+            string diagFileName = Path.Combine(resultsDirectory, "diaglog.txt");
+            var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty,
+                FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory);
             arguments = string.Concat(arguments, $" /Diag:{diagFileName}",
                 $" /TestAdapterPath:{traceDataCollectorDir}");
             arguments = string.Concat(arguments, $" /Platform:{testParameters.TargetPlatform}");
 
-            trxFilePath = Path.Combine(this.resultsDirectory, Guid.NewGuid() + ".trx");
+            trxFilePath = Path.Combine(resultsDirectory, Guid.NewGuid() + ".trx");
             arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
 
             var defaultRunSettingsPath = Path.Combine(
@@ -310,40 +310,40 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         private void AssertSkippedMethod(XmlDocument document)
         {
-            var module = this.GetModuleNode(document.DocumentElement, "codecoveragetest.dll");
+            var module = GetModuleNode(document.DocumentElement, "codecoveragetest.dll");
             Assert.IsNotNull(module);
 
             var coverage = double.Parse(module.Attributes["block_coverage"].Value);
-            Assert.IsTrue(coverage > CodeCoverageAcceptanceTestBase.ExpectedMinimalModuleCoverage);
+            Assert.IsTrue(coverage > ExpectedMinimalModuleCoverage);
 
-            var testSignFunction = this.GetNode(module, "skipped_function", "TestSign()");
+            var testSignFunction = GetNode(module, "skipped_function", "TestSign()");
             Assert.IsNotNull(testSignFunction);
             Assert.AreEqual("name_excluded", testSignFunction.Attributes["reason"].Value);
 
-            var skippedTestMethod = this.GetNode(module, "skipped_function", "__CxxPureMSILEntry_Test()");
+            var skippedTestMethod = GetNode(module, "skipped_function", "__CxxPureMSILEntry_Test()");
             Assert.IsNotNull(skippedTestMethod);
             Assert.AreEqual("name_excluded", skippedTestMethod.Attributes["reason"].Value);
 
-            var testAbsFunction = this.GetNode(module, "function", "TestAbs()");
+            var testAbsFunction = GetNode(module, "function", "TestAbs()");
             Assert.IsNotNull(testAbsFunction);
         }
 
         private void ValidateCoverageData(XmlDocument document, string moduleName, bool validateSourceFileNames)
         {
-            var module = this.GetModuleNode(document.DocumentElement, moduleName.ToLower());
+            var module = GetModuleNode(document.DocumentElement, moduleName.ToLower());
 
             if (module == null)
             {
-                module = this.GetModuleNode(document.DocumentElement, moduleName);
+                module = GetModuleNode(document.DocumentElement, moduleName);
             }
             Assert.IsNotNull(module);
 
-            this.AssertCoverage(module, CodeCoverageAcceptanceTestBase.ExpectedMinimalModuleCoverage);
+            AssertCoverage(module, ExpectedMinimalModuleCoverage);
 
             // In case of cobertura report. Cobertura report has different format.
             if (validateSourceFileNames)
             {
-                this.AssertSourceFileName(module);
+                AssertSourceFileName(module);
             }
         }
 

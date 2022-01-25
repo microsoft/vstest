@@ -85,12 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
         private static Guid GetProfilerGuid(string profilerGuid)
         {
-            if (Guid.TryParse(profilerGuid, out var guid))
-            {
-                return guid;
-            }
-
-            return Guid.Empty;
+            return Guid.TryParse(profilerGuid, out var guid) ? guid : Guid.Empty;
         }
 
         private static string GetTelemetryKey(string telemetryPrefix, DataCollectorInformation dataCollectorInformation)

@@ -17,7 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
     /// </summary>
     internal static class Sha1Helper
     {
-        [SuppressMessage("Microsoft.Cryptographic.Standard", "CA5354:SHA1CannotBeUsed", Justification = "Hash Algorithm is used only to generate unique testcase id.")]
         public static byte[] ComputeSha1(byte[] message)
         {
 #if NETSTANDARD1_0
@@ -77,13 +76,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 {
                     return B ^ C ^ D;
                 }
-                else if (t >= 40 && t <= 59)
-                {
-                    return (B & C) | (B & D) | (C & D);
-                }
                 else
                 {
-                    throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t));
+                    return t >= 40 && t <= 59
+                        ? (B & C) | (B & D) | (C & D)
+                        : throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t));
                 }
             }
 
@@ -112,13 +109,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 {
                     return 0x8F1BBCDCu;
                 }
-                else if (t >= 60 && t <= 79)
-                {
-                    return 0xCA62C1D6u;
-                }
                 else
                 {
-                    throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t));
+                    return t >= 60 && t <= 79 ? 0xCA62C1D6u : throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t));
                 }
             }
 
@@ -130,12 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             /// <returns>S^n(X)  =  (X << n) OR (X >> 32-n)</returns>
             private static uint S(uint X, byte n)
             {
-                if (n > 32)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(n));
-                }
-
-                return (X << n) | (X >> (32 - n));
+                return n > 32 ? throw new ArgumentOutOfRangeException(nameof(n)) : (X << n) | (X >> (32 - n));
             }
 
             /// <summary>

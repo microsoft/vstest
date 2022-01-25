@@ -33,7 +33,7 @@ namespace AttachmentProcessorDataCollector
     {
         private DataCollectionSink dataCollectionSink;
         private DataCollectionEnvironmentContext context;
-        private string tempDirectoryPath = Path.GetTempPath();
+        private readonly string tempDirectoryPath = Path.GetTempPath();
 
         public override void Initialize(
             XmlElement configurationElement,
@@ -42,9 +42,9 @@ namespace AttachmentProcessorDataCollector
             DataCollectionLogger logger,
             DataCollectionEnvironmentContext environmentContext)
         {
-            events.SessionEnd += this.SessionEnded_Handler;
-            this.dataCollectionSink = dataSink;
-            this.context = environmentContext;
+            events.SessionEnd += SessionEnded_Handler;
+            dataCollectionSink = dataSink;
+            context = environmentContext;
         }
 
         private void SessionEnded_Handler(object sender, SessionEndEventArgs e)
@@ -52,7 +52,7 @@ namespace AttachmentProcessorDataCollector
             string tmpAttachment = Path.Combine(tempDirectoryPath, Guid.NewGuid().ToString("N"), "DataCollectorAttachmentProcessor_1.txt");
             Directory.CreateDirectory(Path.GetDirectoryName(tmpAttachment));
             File.WriteAllText(tmpAttachment, $"SessionEnded_Handler_{Guid.NewGuid().ToString("N")}");
-            this.dataCollectionSink.SendFileAsync(this.context.SessionDataCollectionContext, tmpAttachment, true);
+            dataCollectionSink.SendFileAsync(context.SessionDataCollectionContext, tmpAttachment, true);
         }
     }
 

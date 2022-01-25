@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Globalization;
 
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     // <summary>
     //     Argument Executor for the "-?|--Help|/?|/Help" Help command line argument.
@@ -41,12 +41,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new HelpArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new HelpArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -57,17 +57,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new HelpArgumentExecutor());
+                    executor = new Lazy<IArgumentExecutor>(() => new HelpArgumentExecutor());
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -102,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         public HelpArgumentExecutor()
         {
-            this.Output = ConsoleOutput.Instance;
+            Output = ConsoleOutput.Instance;
         }
 
         #endregion
@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             OutputSection(CommandLineResources.HelpArgumentsText);
 
             var argumentProcessorFactory = ArgumentProcessorFactory.Create();
-            List<IArgumentProcessor> processors = new List<IArgumentProcessor>();
+            List<IArgumentProcessor> processors = new();
             processors.AddRange(argumentProcessorFactory.AllArgumentProcessors);
             processors.Sort((p1, p2) => Comparer<HelpContentPriority>.Default.Compare(p1.Metadata.Value.HelpPriority, p2.Metadata.Value.HelpPriority));
 

@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
     /// </summary>
     public class FileHelper : IFileHelper
     {
-        private static readonly Version DefaultFileVersion = new Version(0, 0);
+        private static readonly Version DefaultFileVersion = new(0, 0);
 
         /// <inheritdoc/>
         public DirectoryInfo CreateDirectory(string path)
@@ -45,9 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         }
 
         /// <inheritdoc/>
-#pragma warning disable RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
         public Stream GetStream(string filePath, FileMode mode, FileAccess access = FileAccess.ReadWrite)
-#pragma warning restore RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
         {
             return new FileStream(filePath, mode, access);
         }

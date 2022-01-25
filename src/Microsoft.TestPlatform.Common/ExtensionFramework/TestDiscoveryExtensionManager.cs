@@ -33,11 +33,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> discoverers,
             IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredDiscoverers)
         {
-            ValidateArg.NotNull<IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>>>(discoverers, nameof(discoverers));
-            ValidateArg.NotNull<IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>>>(unfilteredDiscoverers, nameof(unfilteredDiscoverers));
+            ValidateArg.NotNull(discoverers, nameof(discoverers));
+            ValidateArg.NotNull(unfilteredDiscoverers, nameof(unfilteredDiscoverers));
 
-            this.Discoverers = discoverers;
-            this.UnfilteredDiscoverers = unfilteredDiscoverers;
+            Discoverers = discoverers;
+            UnfilteredDiscoverers = unfilteredDiscoverers;
         }
 
         #endregion
@@ -117,7 +117,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Loads and Initializes all the extensions.
         /// </summary>
         /// <param name="throwOnError"> The throw On Error. </param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         internal static void LoadAndInitializeAllExtensions(bool throwOnError)
         {
             try
@@ -170,15 +169,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             if (fileExtensions != null && fileExtensions.Count > 0)
             {
-                this.FileExtension = new List<string>(fileExtensions);
+                FileExtension = new List<string>(fileExtensions);
             }
 
             if (!string.IsNullOrWhiteSpace(defaultExecutorUri))
             {
-                this.DefaultExecutorUri = new Uri(defaultExecutorUri);
+                DefaultExecutorUri = new Uri(defaultExecutorUri);
             }
 
-            this.AssemblyType = assemblyType;
+            AssemblyType = assemblyType;
         }
 
         /// <summary>

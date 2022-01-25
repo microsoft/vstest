@@ -28,7 +28,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     [TestClass]
     public class DiscovererEnumeratorTests
     {
-        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource cancellationTokenSource = new();
         private readonly DiscovererEnumerator discovererEnumerator;
         private readonly Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
         private readonly DiscoveryResultCache discoveryResultCache;
@@ -40,15 +40,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
         public DiscovererEnumeratorTests()
         {
-            this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
-            this.discoveryResultCache = new DiscoveryResultCache(1000, TimeSpan.FromHours(1), (tests) => { });
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockMetricsCollection = new Mock<IMetricsCollection>();
-            this.mockAssemblyProperties = new Mock<IAssemblyProperties>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
-            this.discovererEnumerator = new DiscovererEnumerator(this.mockRequestData.Object, this.discoveryResultCache, this.mockTestPlatformEventSource.Object, this.mockAssemblyProperties.Object, this.cancellationTokenSource.Token);
-            this.runSettingsMock = new Mock<IRunSettings>();
-            this.messageLoggerMock = new Mock<IMessageLogger>();
+            mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
+            discoveryResultCache = new DiscoveryResultCache(1000, TimeSpan.FromHours(1), (tests) => { });
+            mockRequestData = new Mock<IRequestData>();
+            mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockAssemblyProperties = new Mock<IAssemblyProperties>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+            discovererEnumerator = new DiscovererEnumerator(mockRequestData.Object, discoveryResultCache, mockTestPlatformEventSource.Object, mockAssemblyProperties.Object, cancellationTokenSource.Token);
+            runSettingsMock = new Mock<IRunSettings>();
+            messageLoggerMock = new Mock<IMessageLogger>();
             TestPluginCacheHelper.SetupMockExtensions( new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
             TestDiscoveryExtensionManager.Destroy();
@@ -76,13 +76,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 { "_none_", sources }
             };
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, null, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettingsMock.Object, null, messageLoggerMock.Object);
 
             var messageFormat =
                 "No test is available in {0}. Make sure that test discoverer & executors are registered and platform & framework version settings are appropriate and try again.";
             var message = string.Format(messageFormat, string.Join(" ", sources));
 
-            this.messageLoggerMock.Verify(
+            messageLoggerMock.Verify(
                 l =>
                 l.SendMessage(TestMessageLevel.Warning, message), Times.Once);
         }
@@ -100,7 +100,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 { "_none_", sources }
             };
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, null, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettingsMock.Object, null, messageLoggerMock.Object);
 
             Assert.IsFalse(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
             Assert.IsFalse(NativeDllTestDiscoverer.IsNativeDiscoverTestCalled);
@@ -113,7 +113,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
-            this.mockAssemblyProperties.Setup(pe => pe.GetAssemblyType("native.dll")).Returns(AssemblyType.Native);
+            mockAssemblyProperties.Setup(pe => pe.GetAssemblyType("native.dll")).Returns(AssemblyType.Native);
 
             var sources = new List<string>
                               {
@@ -127,7 +127,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             string testCaseFilter = "TestFilter";
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, testCaseFilter, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettingsMock.Object, testCaseFilter, messageLoggerMock.Object);
 
             Assert.IsTrue(NativeDllTestDiscoverer.IsNativeDiscoverTestCalled);
             CollectionAssert.AreEqual(sources, NativeDllTestDiscoverer.Sources.ToList());
@@ -143,7 +143,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
-            this.mockAssemblyProperties.Setup(pe => pe.GetAssemblyType("managed.dll")).Returns(AssemblyType.Managed);
+            mockAssemblyProperties.Setup(pe => pe.GetAssemblyType("managed.dll")).Returns(AssemblyType.Managed);
 
             var sources = new List<string>
                               {
@@ -157,7 +157,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             string testCaseFilter = "TestFilter";
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, testCaseFilter, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettingsMock.Object, testCaseFilter, messageLoggerMock.Object);
 
             Assert.IsTrue(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
             CollectionAssert.AreEqual(sources, ManagedDllTestDiscoverer.Sources.ToList());
@@ -173,8 +173,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
-            this.mockAssemblyProperties.Setup(pe => pe.GetAssemblyType("native.dll")).Returns(AssemblyType.Native);
-            this.mockAssemblyProperties.Setup(pe => pe.GetAssemblyType("managed.dll")).Returns(AssemblyType.Managed);
+            mockAssemblyProperties.Setup(pe => pe.GetAssemblyType("native.dll")).Returns(AssemblyType.Native);
+            mockAssemblyProperties.Setup(pe => pe.GetAssemblyType("managed.dll")).Returns(AssemblyType.Managed);
 
             var nativeSources = new List<string>
                               {
@@ -192,7 +192,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             string testCaseFilter = "TestFilter";
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, testCaseFilter, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettingsMock.Object, testCaseFilter, messageLoggerMock.Object);
 
             Assert.IsTrue(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
             CollectionAssert.AreEqual(managedSources, ManagedDllTestDiscoverer.Sources.ToList());
@@ -222,17 +222,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             };
             string testCaseFilter = "TestFilter";
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, testCaseFilter, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettingsMock.Object, testCaseFilter, messageLoggerMock.Object);
 
             Assert.IsTrue(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
             Assert.IsFalse(JsonTestDiscoverer.IsDiscoverTestCalled);
 
             // Also validate that the right set of arguments were passed on to the discoverer.
             CollectionAssert.AreEqual(sources, ManagedDllTestDiscoverer.Sources.ToList());
-            Assert.AreEqual(this.runSettingsMock.Object, ManagedDllTestDiscoverer.DiscoveryContext.RunSettings);
-            Assert.AreEqual(testCaseFilter, (ManagedDllTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
-            Assert.AreEqual(this.messageLoggerMock.Object, ManagedDllTestDiscoverer.MessageLogger);
-            Assert.IsNotNull(ManagedDllTestDiscoverer.DiscoverySink);
+            Assert.AreEqual(runSettingsMock.Object, DllTestDiscoverer.DiscoveryContext.RunSettings);
+            Assert.AreEqual(testCaseFilter, (DllTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
+            Assert.AreEqual(messageLoggerMock.Object, DllTestDiscoverer.MessageLogger);
+            Assert.IsNotNull(DllTestDiscoverer.DiscoverySink);
         }
 
         [TestMethod]
@@ -260,26 +260,26 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 { "_none_", sources }
             };
 
-            var runSettings = this.runSettingsMock.Object;
+            var runSettings = runSettingsMock.Object;
 
             string testCaseFilter = "TestFilter";
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, runSettings, testCaseFilter, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettings, testCaseFilter, messageLoggerMock.Object);
 
             Assert.IsTrue(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
             Assert.IsTrue(JsonTestDiscoverer.IsDiscoverTestCalled);
 
             // Also validate that the right set of arguments were passed on to the discoverer.
             CollectionAssert.AreEqual(dllsources, ManagedDllTestDiscoverer.Sources.ToList());
-            Assert.AreEqual(runSettings, ManagedDllTestDiscoverer.DiscoveryContext.RunSettings);
-            Assert.AreEqual(testCaseFilter, (ManagedDllTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
-            Assert.AreEqual(this.messageLoggerMock.Object, ManagedDllTestDiscoverer.MessageLogger);
-            Assert.IsNotNull(ManagedDllTestDiscoverer.DiscoverySink);
+            Assert.AreEqual(runSettings, DllTestDiscoverer.DiscoveryContext.RunSettings);
+            Assert.AreEqual(testCaseFilter, (DllTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
+            Assert.AreEqual(messageLoggerMock.Object, DllTestDiscoverer.MessageLogger);
+            Assert.IsNotNull(DllTestDiscoverer.DiscoverySink);
 
             CollectionAssert.AreEqual(jsonsources, JsonTestDiscoverer.Sources.ToList());
             Assert.AreEqual(runSettings, JsonTestDiscoverer.DiscoveryContext.RunSettings);
             Assert.AreEqual(testCaseFilter, (JsonTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
-            Assert.AreEqual(this.messageLoggerMock.Object, JsonTestDiscoverer.MessageLogger);
+            Assert.AreEqual(messageLoggerMock.Object, JsonTestDiscoverer.MessageLogger);
             Assert.IsNotNull(JsonTestDiscoverer.DiscoverySink);
         }
 
@@ -301,21 +301,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 { "_none_", sources }
             };
 
-            var runSettings = this.runSettingsMock.Object;
+            var runSettings = runSettingsMock.Object;
 
             string testCaseFilter = "TestFilter";
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, runSettings, testCaseFilter, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettings, testCaseFilter, messageLoggerMock.Object);
 
             Assert.IsTrue(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
             Assert.IsFalse(SingletonTestDiscoverer.IsDiscoverTestCalled);
 
             // Also validate that the right set of arguments were passed on to the discoverer.
             CollectionAssert.AreEqual(new List<string> { sources[1] }, ManagedDllTestDiscoverer.Sources.ToList());
-            Assert.AreEqual(runSettings, ManagedDllTestDiscoverer.DiscoveryContext.RunSettings);
-            Assert.AreEqual(testCaseFilter, (ManagedDllTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
-            Assert.AreEqual(this.messageLoggerMock.Object, ManagedDllTestDiscoverer.MessageLogger);
-            Assert.IsNotNull(ManagedDllTestDiscoverer.DiscoverySink);
+            Assert.AreEqual(runSettings, DllTestDiscoverer.DiscoveryContext.RunSettings);
+            Assert.AreEqual(testCaseFilter, (DllTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
+            Assert.AreEqual(messageLoggerMock.Object, DllTestDiscoverer.MessageLogger);
+            Assert.IsNotNull(DllTestDiscoverer.DiscoverySink);
         }
 
         [TestMethod]
@@ -336,21 +336,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 { "_none_", sources }
             };
 
-            var runSettings = this.runSettingsMock.Object;
+            var runSettings = runSettingsMock.Object;
 
             string testCaseFilter = "TestFilter";
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, runSettings, testCaseFilter, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettings, testCaseFilter, messageLoggerMock.Object);
 
             Assert.IsTrue(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
             Assert.IsTrue(NotImplementedTestDiscoverer.IsDiscoverTestCalled);
 
             // Also validate that the right set of arguments were passed on to the discoverer.
             CollectionAssert.AreEqual(new List<string> { sources[1] }, ManagedDllTestDiscoverer.Sources.ToList());
-            Assert.AreEqual(runSettings, ManagedDllTestDiscoverer.DiscoveryContext.RunSettings);
-            Assert.AreEqual(testCaseFilter, (ManagedDllTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
-            Assert.AreEqual(this.messageLoggerMock.Object, ManagedDllTestDiscoverer.MessageLogger);
-            Assert.IsNotNull(ManagedDllTestDiscoverer.DiscoverySink);
+            Assert.AreEqual(runSettings, DllTestDiscoverer.DiscoveryContext.RunSettings);
+            Assert.AreEqual(testCaseFilter, (DllTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
+            Assert.AreEqual(messageLoggerMock.Object, DllTestDiscoverer.MessageLogger);
+            Assert.IsNotNull(DllTestDiscoverer.DiscoverySink);
 
             // Check if we log the failure.
             var message = string.Format(
@@ -359,7 +359,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                     typeof(NotImplementedTestDiscoverer).Name,
                     "The method or operation is not implemented.");
 
-            this.messageLoggerMock.Verify(l => l.SendMessage(TestMessageLevel.Error, message), Times.Once);
+            messageLoggerMock.Verify(l => l.SendMessage(TestMessageLevel.Error, message), Times.Once);
         }
 
         [TestMethod]
@@ -387,10 +387,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             };
 
             mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
             string testCaseFilter = "TestFilter";
-            this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, testCaseFilter, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettingsMock.Object, testCaseFilter, messageLoggerMock.Object);
 
             // Verify.
             mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecByAllAdapters, It.IsAny<object>()), Times.Once);
@@ -429,62 +429,62 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             };
 
             // Act
-            this.cancellationTokenSource.Cancel();
-            var runSettings = this.runSettingsMock.Object;
+            cancellationTokenSource.Cancel();
+            var runSettings = runSettingsMock.Object;
             string testCaseFilter = "TestFilter";
-            this.discovererEnumerator.LoadTests(extensionSourceMap, runSettings, testCaseFilter, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettings, testCaseFilter, messageLoggerMock.Object);
 
             // Validate
             Assert.IsFalse(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
             Assert.IsFalse(JsonTestDiscoverer.IsDiscoverTestCalled);
-            this.messageLoggerMock.Verify(logger => logger.SendMessage(TestMessageLevel.Warning, "Discovery of tests cancelled."), Times.Once);
+            messageLoggerMock.Verify(logger => logger.SendMessage(TestMessageLevel.Warning, "Discovery of tests cancelled."), Times.Once);
         }
 
         [TestMethod]
         public void LoadTestsShouldCallIntoTheAdapterWithTheRightTestCaseSink()
         {
-            this.InvokeLoadTestWithMockSetup();
+            InvokeLoadTestWithMockSetup();
 
             Assert.IsTrue(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
-            Assert.AreEqual(2, this.discoveryResultCache.Tests.Count);
+            Assert.AreEqual(2, discoveryResultCache.Tests.Count);
         }
 
         [TestMethod]
         public void LoadTestsShouldNotShowAnyWarningOnTestsDiscovered()
         {
-            this.InvokeLoadTestWithMockSetup();
+            InvokeLoadTestWithMockSetup();
 
-            Assert.AreEqual(2, this.discoveryResultCache.Tests.Count);
+            Assert.AreEqual(2, discoveryResultCache.Tests.Count);
 
-            this.messageLoggerMock.Verify(m => m.SendMessage(TestMessageLevel.Warning, It.IsAny<string>()), Times.Never);
+            messageLoggerMock.Verify(m => m.SendMessage(TestMessageLevel.Warning, It.IsAny<string>()), Times.Never);
         }
 
         [TestMethod]
         public void LoadTestShouldInstrumentDiscoveryStart()
         {
-            this.InvokeLoadTestWithMockSetup();
-            this.mockTestPlatformEventSource.Verify(x => x.DiscoveryStart(), Times.Once);
+            InvokeLoadTestWithMockSetup();
+            mockTestPlatformEventSource.Verify(x => x.DiscoveryStart(), Times.Once);
         }
 
         [TestMethod]
         public void LoadTestShouldInstrumentDiscoveryStop()
         {
-            this.InvokeLoadTestWithMockSetup();
-            this.mockTestPlatformEventSource.Verify(x => x.DiscoveryStop(It.IsAny<long>()), Times.Once);
+            InvokeLoadTestWithMockSetup();
+            mockTestPlatformEventSource.Verify(x => x.DiscoveryStop(It.IsAny<long>()), Times.Once);
         }
 
         [TestMethod]
         public void LoadTestShouldInstrumentAdapterDiscoveryStart()
         {
-            this.InvokeLoadTestWithMockSetup();
-            this.mockTestPlatformEventSource.Verify(x => x.AdapterDiscoveryStart(It.IsAny<string>()), Times.AtLeastOnce);
+            InvokeLoadTestWithMockSetup();
+            mockTestPlatformEventSource.Verify(x => x.AdapterDiscoveryStart(It.IsAny<string>()), Times.AtLeastOnce);
         }
 
         [TestMethod]
         public void LoadTestShouldInstrumentAdapterDiscoveryStop()
         {
-            this.InvokeLoadTestWithMockSetup();
-            this.mockTestPlatformEventSource.Verify(x => x.AdapterDiscoveryStop(It.IsAny<long>()), Times.AtLeastOnce);
+            InvokeLoadTestWithMockSetup();
+            mockTestPlatformEventSource.Verify(x => x.AdapterDiscoveryStop(It.IsAny<long>()), Times.AtLeastOnce);
         }
 
         [TestMethod]
@@ -511,74 +511,74 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 { "_none_", dllsources }
             };
 
-            var runSettings = this.runSettingsMock.Object;
+            var runSettings = runSettingsMock.Object;
 
             string testCaseFilter = "TestFilter";
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, runSettings, testCaseFilter, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettings, testCaseFilter, messageLoggerMock.Object);
 
             Assert.IsTrue(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
             Assert.IsTrue(JsonTestDiscoverer.IsDiscoverTestCalled);
 
             // Also validate that the right set of arguments were passed on to the discoverer.
             CollectionAssert.AreEqual(dllsources, ManagedDllTestDiscoverer.Sources.ToList());
-            Assert.AreEqual(runSettings, ManagedDllTestDiscoverer.DiscoveryContext.RunSettings);
-            Assert.AreEqual(testCaseFilter, (ManagedDllTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
-            Assert.AreEqual(this.messageLoggerMock.Object, ManagedDllTestDiscoverer.MessageLogger);
-            Assert.IsNotNull(ManagedDllTestDiscoverer.DiscoverySink);
+            Assert.AreEqual(runSettings, DllTestDiscoverer.DiscoveryContext.RunSettings);
+            Assert.AreEqual(testCaseFilter, (DllTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
+            Assert.AreEqual(messageLoggerMock.Object, DllTestDiscoverer.MessageLogger);
+            Assert.IsNotNull(DllTestDiscoverer.DiscoverySink);
 
             CollectionAssert.AreEqual(jsonsources, JsonTestDiscoverer.Sources.ToList());
             Assert.AreEqual(runSettings, JsonTestDiscoverer.DiscoveryContext.RunSettings);
             Assert.AreEqual(testCaseFilter, (JsonTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
-            Assert.AreEqual(this.messageLoggerMock.Object, JsonTestDiscoverer.MessageLogger);
+            Assert.AreEqual(messageLoggerMock.Object, JsonTestDiscoverer.MessageLogger);
             Assert.IsNotNull(JsonTestDiscoverer.DiscoverySink);
         }
 
         [TestMethod]
         public void LoadTestsShouldLogWarningMessageOnNoTestsInAssemblies()
         {
-            DiscovererEnumeratorTests.SetupForNoTestsAvailableInGivenAssemblies(out var extensionSourceMap, out var sourcesString);
+            SetupForNoTestsAvailableInGivenAssemblies(out var extensionSourceMap, out var sourcesString);
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, null, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettingsMock.Object, null, messageLoggerMock.Object);
 
             var expectedMessage =
                 $"No test is available in {sourcesString}. Make sure that test discoverer & executors are registered and platform & framework version settings are appropriate and try again.";
 
-            this.messageLoggerMock.Verify(l => l.SendMessage(TestMessageLevel.Warning, expectedMessage));
+            messageLoggerMock.Verify(l => l.SendMessage(TestMessageLevel.Warning, expectedMessage));
         }
 
         [TestMethod]
         public void LoadTestsShouldLogWarningMessageOnNoTestsInAssembliesWithTestCaseFilter()
         {
-            DiscovererEnumeratorTests.SetupForNoTestsAvailableInGivenAssemblies(out var extensionSourceMap, out var sourcesString);
+            SetupForNoTestsAvailableInGivenAssemblies(out var extensionSourceMap, out var sourcesString);
 
             var testCaseFilter = "Name~TestMethod1";
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, testCaseFilter, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettingsMock.Object, testCaseFilter, messageLoggerMock.Object);
 
             var expectedMessage =
                 $"No test matches the given testcase filter `{testCaseFilter}` in {sourcesString}";
 
-            this.messageLoggerMock.Verify(l => l.SendMessage(TestMessageLevel.Warning, expectedMessage));
+            messageLoggerMock.Verify(l => l.SendMessage(TestMessageLevel.Warning, expectedMessage));
         }
 
         [TestMethod]
         public void LoadTestsShouldShortenTheLongTestCaseFilterWhenNoTestsDiscovered()
         {
-            DiscovererEnumeratorTests.SetupForNoTestsAvailableInGivenAssemblies(out var extensionSourceMap, out var sourcesString);
+            SetupForNoTestsAvailableInGivenAssemblies(out var extensionSourceMap, out var sourcesString);
 
             var veryLengthyTestCaseFilter = "FullyQualifiedName=TestPlatform.CrossPlatEngine" +
                                             ".UnitTests.Discovery.DiscovererEnumeratorTests." +
                                             "LoadTestsShouldShortenTheLongTestCaseFilterWhenNoTestsDiscovered" +
                                             "TestCaseFilterWithVeryLengthTestCaseNameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, veryLengthyTestCaseFilter, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettingsMock.Object, veryLengthyTestCaseFilter, messageLoggerMock.Object);
 
             var expectedTestCaseFilter = veryLengthyTestCaseFilter.Substring(0, 256) + "...";
             var expectedMessage =
                 $"No test matches the given testcase filter `{expectedTestCaseFilter}` in {sourcesString}";
 
-            this.messageLoggerMock.Verify(l => l.SendMessage(TestMessageLevel.Warning, expectedMessage));
+            messageLoggerMock.Verify(l => l.SendMessage(TestMessageLevel.Warning, expectedMessage));
         }
 
         private static void SetupForNoTestsAvailableInGivenAssemblies(
@@ -612,7 +612,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 { "_none_", sources }
             };
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, null, this.messageLoggerMock.Object);
+            discovererEnumerator.LoadTests(extensionSourceMap, runSettingsMock.Object, null, messageLoggerMock.Object);
         }
 
         #region Implementation
@@ -715,7 +715,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             public virtual void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
             {
-                if (DllTestDiscoverer.ShouldTestDiscovered(sources) == false)
+                if (ShouldTestDiscovered(sources) == false)
                 {
                     return;
                 }

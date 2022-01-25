@@ -23,13 +23,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             "ACCESS_VIOLATION"
         };
 
-        private IProcessHelper processHelper;
-        private IFileHelper fileHelper;
-        private IEnvironment environment;
+        private readonly IProcessHelper processHelper;
+        private readonly IFileHelper fileHelper;
+        private readonly IEnvironment environment;
         private Process procDumpProcess;
         private string tempDirectory;
         private string dumpFileName;
-        private INativeMethodsHelper nativeMethodsHelper;
+        private readonly INativeMethodsHelper nativeMethodsHelper;
         private bool collectAlways;
         private string outputDirectory;
         private Process process;
@@ -65,12 +65,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <inheritdoc/>
         public void WaitForDumpToFinish()
         {
-            if (this.processHelper == null)
+            if (processHelper == null)
             {
                 EqtTrace.Info($"ProcDumpDumper.WaitForDumpToFinish: ProcDump was not previously attached, this might indicate error during setup, look for ProcDumpDumper.AttachToTargetProcess.");
             }
 
-            this.processHelper?.WaitForProcessExit(this.procDumpProcess);
+            processHelper?.WaitForProcessExit(procDumpProcess);
         }
 
         /// <inheritdoc/>
@@ -78,9 +78,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         {
             this.collectAlways = collectAlways;
             this.outputDirectory = outputDirectory;
-            this.process = Process.GetProcessById(processId);
-            this.outputFilePrefix = $"{this.process.ProcessName}_{this.process.Id}_{DateTime.Now:yyyyMMddTHHmmss}_crashdump";
-            var outputFile = Path.Combine(outputDirectory, $"{this.outputFilePrefix}.dmp");
+            process = Process.GetProcessById(processId);
+            outputFilePrefix = $"{process.ProcessName}_{process.Id}_{DateTime.Now:yyyyMMddTHHmmss}_crashdump";
+            var outputFile = Path.Combine(outputDirectory, $"{outputFilePrefix}.dmp");
             EqtTrace.Info($"ProcDumpDumper.AttachToTargetProcess: Attaching to process '{processId}' to dump into '{outputFile}'.");
 
             // Procdump will append .dmp at the end of the dump file. We generate this internally so it is rather a safety check.
@@ -89,7 +89,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 throw new InvalidOperationException("Procdump crash dump file must end with .dmp extension.");
             }
 
-            if (!this.TryGetProcDumpExecutable(processId, out var procDumpPath))
+            if (!TryGetProcDumpExecutable(processId, out var procDumpPath))
             {
                 var err = $"{procDumpPath} could not be found, please set PROCDUMP_PATH environment variable to a directory that contains {procDumpPath} executable, or make sure that the executable is available on PATH.";
                 ConsoleOutput.Instance.Warning(false, err);
@@ -97,32 +97,32 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 return;
             }
 
-            this.tempDirectory = Path.GetDirectoryName(outputFile);
-            this.dumpFileName = Path.GetFileNameWithoutExtension(outputFile);
+            tempDirectory = Path.GetDirectoryName(outputFile);
+            dumpFileName = Path.GetFileNameWithoutExtension(outputFile);
 
             string procDumpArgs = new ProcDumpArgsBuilder().BuildTriggerBasedProcDumpArgs(
                 processId,
-                this.dumpFileName,
+                dumpFileName,
                 ProcDumpExceptionsList,
                 isFullDump: dumpType == DumpTypeOption.Full);
 
             EqtTrace.Info($"ProcDumpDumper.AttachToTargetProcess: Running ProcDump with arguments: '{procDumpArgs}'.");
-            this.procDumpProcess = this.processHelper.LaunchProcess(
+            procDumpProcess = processHelper.LaunchProcess(
                                             procDumpPath,
                                             procDumpArgs,
-                                            this.tempDirectory,
+                                            tempDirectory,
                                             null,
                                             null,
                                             null,
-                                            this.OutputReceivedCallback) as Process;
+                                            OutputReceivedCallback) as Process;
 
-            EqtTrace.Info($"ProcDumpDumper.AttachToTargetProcess: ProcDump started as process with id '{this.procDumpProcess.Id}'.");
+            EqtTrace.Info($"ProcDumpDumper.AttachToTargetProcess: ProcDump started as process with id '{procDumpProcess.Id}'.");
         }
 
         /// <inheritdoc/>
         public void DetachFromTargetProcess(int targetProcessId)
         {
-            if (this.procDumpProcess == null)
+            if (procDumpProcess == null)
             {
                 EqtTrace.Info($"ProcDumpDumper.DetachFromTargetProcess: ProcDump was not previously attached, this might indicate error during setup, look for ProcDumpDumper.AttachToTargetProcess.");
                 return;
@@ -138,7 +138,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 try
                 {
                     EqtTrace.Info("ProcDumpDumper.DetachFromTargetProcess: Attempting to kill proc dump process.");
-                    this.processHelper.TerminateProcess(this.procDumpProcess);
+                    processHelper.TerminateProcess(procDumpProcess);
                 }
                 catch (Exception e)
                 {
@@ -149,8 +149,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
         public IEnumerable<string> GetDumpFiles(bool processCrashed)
         {
-            var allDumps = this.fileHelper.DirectoryExists(this.outputDirectory)
-                ? this.fileHelper.GetFiles(this.outputDirectory, "*_crashdump*.dmp", SearchOption.AllDirectories)
+            var allDumps = fileHelper.DirectoryExists(outputDirectory)
+                ? fileHelper.GetFiles(outputDirectory, "*_crashdump*.dmp", SearchOption.AllDirectories)
                 : Array.Empty<string>();
 
             // We are always collecting dump on exit even when collectAlways option is false, to make sure we collect
@@ -158,7 +158,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // this was just a normal process exit that was not caused by an exception and user is not interested in getting that
             // dump because it only pollutes their CI.
             // The hangdumps and crash dumps actually end up in the same folder, but we can distinguish them based on the _crashdump suffix.
-            if (this.collectAlways)
+            if (collectAlways)
             {
                 return allDumps;
             }
@@ -172,7 +172,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // get only the ones that match the path we provide to procdump. And get the last one created.
             var allTargetProcessDumps = allDumps
                 .Where(dump => Path.GetFileNameWithoutExtension(dump)
-                .StartsWith(this.outputFilePrefix))
+                .StartsWith(outputFilePrefix))
                 .Select(dump => new FileInfo(dump))
                 .OrderBy(dump => dump.LastWriteTime).ThenBy(dump => dump.Name)
                 .ToList();
@@ -209,7 +209,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 throw new InvalidOperationException("Procdump crash dump file must end with .dmp extension.");
             }
 
-            if (!this.TryGetProcDumpExecutable(processId, out var procDumpPath))
+            if (!TryGetProcDumpExecutable(processId, out var procDumpPath))
             {
                 var err = $"{procDumpPath} could not be found, please set PROCDUMP_PATH environment variable to a directory that contains {procDumpPath} executable, or make sure that the executable is available on PATH.";
                 ConsoleOutput.Instance.Warning(false, err);
@@ -226,18 +226,18 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 isFullDump: dumpType == DumpTypeOption.Full);
 
             EqtTrace.Info($"ProcDumpDumper.Dump: Running ProcDump with arguments: '{procDumpArgs}'.");
-            var procDumpProcess = this.processHelper.LaunchProcess(
+            var procDumpProcess = processHelper.LaunchProcess(
                                             procDumpPath,
                                             procDumpArgs,
                                             tempDirectory,
                                             null,
                                             null,
                                             null,
-                                            this.OutputReceivedCallback) as Process;
+                                            OutputReceivedCallback) as Process;
 
             EqtTrace.Info($"ProcDumpDumper.Dump: ProcDump started as process with id '{procDumpProcess.Id}'.");
 
-            this.processHelper?.WaitForProcessExit(procDumpProcess);
+            processHelper?.WaitForProcessExit(procDumpProcess);
 
             EqtTrace.Info($"ProcDumpDumper.Dump: ProcDump finished hang dumping process with id '{processId}'.");
         }
@@ -268,26 +268,19 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
 
             string filename;
-            if (this.environment.OperatingSystem == PlatformOperatingSystem.Windows)
+            if (environment.OperatingSystem == PlatformOperatingSystem.Windows)
             {
                 // Launch proc dump according to process architecture
-                if (this.environment.Architecture == PlatformArchitecture.X86)
-                {
-                    filename = Constants.ProcdumpProcess;
-                }
-                else
-                {
-                    filename = this.nativeMethodsHelper.Is64Bit(this.processHelper.GetProcessHandle(processId)) ?
+                filename = environment.Architecture == PlatformArchitecture.X86
+                    ? Constants.ProcdumpProcess
+                    : nativeMethodsHelper.Is64Bit(processHelper.GetProcessHandle(processId)) ?
                     Constants.Procdump64Process : Constants.ProcdumpProcess;
-                }
-            }
-            else if (this.environment.OperatingSystem == PlatformOperatingSystem.Unix || this.environment.OperatingSystem == PlatformOperatingSystem.OSX)
-            {
-                filename = Constants.ProcdumpUnixProcess;
             }
             else
             {
-                throw new NotSupportedException($"Not supported platform {this.environment.OperatingSystem}");
+                filename = environment.OperatingSystem == PlatformOperatingSystem.Unix || environment.OperatingSystem == PlatformOperatingSystem.OSX
+                    ? Constants.ProcdumpUnixProcess
+                    : throw new NotSupportedException($"Not supported platform {environment.OperatingSystem}");
             }
 
             if (!searchPath)
@@ -303,7 +296,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 EqtTrace.Verbose($"ProcDumpDumper.GetProcDumpExecutable: Path '{candidatePath}' does not exist will try to run {filename} from PATH.");
             }
 
-            if (this.TryGetExecutablePath(filename, out var p))
+            if (TryGetExecutablePath(filename, out var p))
             {
                 EqtTrace.Verbose($"ProcDumpDumper.GetProcDumpExecutable: Resolved {filename} to {p} from PATH.");
                 path = p;
@@ -322,7 +315,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             foreach (string path in pathString.Split(Path.PathSeparator))
             {
                 string exeFullPath = Path.Combine(path.Trim(), executable);
-                if (this.fileHelper.Exists(exeFullPath))
+                if (fileHelper.Exists(exeFullPath))
                 {
                     executablePath = exeFullPath;
                     return true;

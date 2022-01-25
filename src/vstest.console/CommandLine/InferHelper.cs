@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
 
     internal class InferHelper
     {
-        private IAssemblyMetadataProvider assemblyMetadataProvider;
+        private readonly IAssemblyMetadataProvider assemblyMetadataProvider;
 
         internal InferHelper(IAssemblyMetadataProvider assemblyMetadataProvider)
         {
@@ -139,15 +139,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                         // possible for js files. So using default .NET Full framework version.
                         fx = new FrameworkName(Constants.DotNetFramework40);
                     }
-                    else if (extension.Equals(".appx", StringComparison.OrdinalIgnoreCase)
-                        || extension.Equals(".msix", StringComparison.OrdinalIgnoreCase)
-                        || extension.Equals(".appxrecipe", StringComparison.OrdinalIgnoreCase))
-                    {
-                        fx = new FrameworkName(Constants.DotNetFrameworkUap10);
-                    }
                     else
                     {
-                        fx = new FrameworkName(Framework.DefaultFramework.Name);
+                        fx = extension.Equals(".appx", StringComparison.OrdinalIgnoreCase)
+                                                || extension.Equals(".msix", StringComparison.OrdinalIgnoreCase)
+                                                || extension.Equals(".appxrecipe", StringComparison.OrdinalIgnoreCase)
+                            ? new FrameworkName(Constants.DotNetFrameworkUap10)
+                            : new FrameworkName(Framework.DefaultFramework.Name);
                     }
                 }
                 sourceFrameworkVersions[source] = Framework.FromString(fx.FullName);

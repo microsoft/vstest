@@ -321,14 +321,14 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         [TestMethod]
         public void IsDataCollectionEnabledShouldReturnFalseIfDataCollectionIsDisabled()
         {
-            Assert.IsFalse(XmlRunSettingsUtilities.IsDataCollectionEnabled(this.runSettingsXmlWithDataCollectorsDisabled));
+            Assert.IsFalse(XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettingsXmlWithDataCollectorsDisabled));
         }
 
 
         [TestMethod]
         public void IsDataCollectionEnabledShouldReturnTrueIfDataCollectionIsEnabled()
         {
-            Assert.IsTrue(XmlRunSettingsUtilities.IsDataCollectionEnabled(this.runSettingsXmlWithDataCollectors));
+            Assert.IsTrue(XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettingsXmlWithDataCollectors));
         }
 
         #endregion
@@ -350,13 +350,13 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         [TestMethod]
         public void IsInProcDataCollectionEnabledShouldReturnFalseIfDataCollectionIsDisabled()
         {
-            Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(this.ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(this.runSettingsXmlWithDataCollectorsDisabled)));
+            Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(runSettingsXmlWithDataCollectorsDisabled)));
         }
 
         [TestMethod]
         public void IsInProcDataCollectionEnabledShouldReturnTrueIfDataCollectionIsEnabled()
         {
-            Assert.IsTrue(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(this.ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(this.runSettingsXmlWithDataCollectors)));
+            Assert.IsTrue(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(runSettingsXmlWithDataCollectors)));
         }
 
         #endregion
@@ -1156,19 +1156,19 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         [TestMethod]
         public void GetDataCollectionRunSettingsShouldReturnDataCollectorRunSettings()
         {
-            Assert.IsNotNull(XmlRunSettingsUtilities.GetDataCollectionRunSettings(this.runSettingsXmlWithDataCollectors));
+            Assert.IsNotNull(XmlRunSettingsUtilities.GetDataCollectionRunSettings(runSettingsXmlWithDataCollectors));
         }
 
         [TestMethod]
         public void GetDataCollectionRunSettingsShouldReturnDataCollectorRunSettingsEvenIfDisabled()
         {
-            Assert.IsNotNull(XmlRunSettingsUtilities.GetDataCollectionRunSettings(this.runSettingsXmlWithDataCollectorsDisabled));
+            Assert.IsNotNull(XmlRunSettingsUtilities.GetDataCollectionRunSettings(runSettingsXmlWithDataCollectorsDisabled));
         }
 
         [TestMethod]
         public void GetDataCollectionRunSettingsShouldThrowOnMalformedDataCollectorSettings()
         {
-            Assert.ThrowsException<SettingsException>(() => XmlRunSettingsUtilities.GetDataCollectionRunSettings(this.runSettingsXmlWithIncorrectDataCollectorSettings));
+            Assert.ThrowsException<SettingsException>(() => XmlRunSettingsUtilities.GetDataCollectionRunSettings(runSettingsXmlWithIncorrectDataCollectorSettings));
         }
 
         #endregion
@@ -1187,7 +1187,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
                                     </DataCollectionRunSettings>
                                 </RunSettings>";
 
-            var friendlyNameList = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(settingsXml).ToList<string>();
+            var friendlyNameList = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(settingsXml).ToList();
 
             Assert.AreEqual(2, friendlyNameList.Count, "There should be two friendly name");
             CollectionAssert.AreEqual(friendlyNameList, new List<string> { "DummyDataCollector1", "DummyDataCollector2" });

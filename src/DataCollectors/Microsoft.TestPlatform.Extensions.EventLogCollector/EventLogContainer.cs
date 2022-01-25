@@ -11,30 +11,21 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
-    using Resource = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
+    using Resource = Resources.Resources;
 
     /// <summary>
     /// The event log container.
     /// </summary>
     internal class EventLogContainer : IEventLogContainer
     {
-        private ISet<string> eventSources;
+        private readonly ISet<string> eventSources;
 
-        private ISet<EventLogEntryType> entryTypes;
+        private readonly ISet<EventLogEntryType> entryTypes;
+        private readonly int maxLogEntries;
 
-        private EventLog eventLog;
+        private readonly DataCollectionLogger dataCollectionLogger;
 
-        private int nextEntryIndexToCollect;
-
-        private int maxLogEntries;
-
-        private DataCollectionLogger dataCollectionLogger;
-
-        private DataCollectionContext dataCollectionContext;
-
-        private bool limitReached;
-
-        private List<EventLogEntry> eventLogEntries;
+        private readonly DataCollectionContext dataCollectionContext;
 
         /// <summary>
         /// Keeps track of if we are disposed.
@@ -64,42 +55,32 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// </param>
         public EventLogContainer(string eventLogName, ISet<string> eventSources, ISet<EventLogEntryType> entryTypes, int maxLogEntries, DataCollectionLogger dataCollectionLogger, DataCollectionContext dataCollectionContext)
         {
-            this.CreateEventLog(eventLogName);
+            CreateEventLog(eventLogName);
             this.eventSources = eventSources;
             this.entryTypes = entryTypes;
             this.maxLogEntries = maxLogEntries;
             this.dataCollectionLogger = dataCollectionLogger;
             this.dataCollectionContext = dataCollectionContext;
 
-            this.eventLogEntries = new List<EventLogEntry>();
+            EventLogEntries = new List<EventLogEntry>();
         }
 
         /// <inheritdoc />
-        public List<EventLogEntry> EventLogEntries => this.eventLogEntries;
+        public List<EventLogEntry> EventLogEntries { get; }
 
         /// <inheritdoc />
-        public EventLog EventLog => this.eventLog;
+        public EventLog EventLog { get; private set; }
 
-        internal int NextEntryIndexToCollect
-        {
-            get => this.nextEntryIndexToCollect;
-
-            set => this.nextEntryIndexToCollect = value;
-        }
+        internal int NextEntryIndexToCollect { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether limit reached.
         /// </summary>
-        internal bool LimitReached
-        {
-            get => this.limitReached;
-
-            set => this.limitReached = value;
-        }
+        internal bool LimitReached { get; set; }
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
 
             // Use SupressFinalize in case a subclass
             // of this type implements a finalizer.
@@ -134,28 +115,28 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <param name="e">The System.Diagnostics.EntryWrittenEventArgs object describing the entry that was written.</param>
         public void OnEventLogEntryWritten(object source, EntryWrittenEventArgs e)
         {
-            while (!this.limitReached)
+            while (!LimitReached)
             {
                 try
                 {
-                    lock (this.eventLogEntries)
+                    lock (EventLogEntries)
                     {
-                        int currentCount = this.eventLog.Entries.Count;
+                        int currentCount = EventLog.Entries.Count;
                         if (currentCount == 0)
                         {
                             break;
                         }
 
-                        int firstIndexInLog = this.eventLog.Entries[0].Index;
-                        int mostRecentIndexInLog = this.eventLog.Entries[currentCount - 1].Index;
+                        int firstIndexInLog = EventLog.Entries[0].Index;
+                        int mostRecentIndexInLog = EventLog.Entries[currentCount - 1].Index;
 
-                        if (mostRecentIndexInLog == this.nextEntryIndexToCollect - 1)
+                        if (mostRecentIndexInLog == NextEntryIndexToCollect - 1)
                         {
                             // We've already collected the most recent entry in the log
                             break;
                         }
 
-                        if (mostRecentIndexInLog < this.nextEntryIndexToCollect - 1)
+                        if (mostRecentIndexInLog < NextEntryIndexToCollect - 1)
                         {
                             if (EqtTrace.IsWarningEnabled)
                             {
@@ -165,45 +146,45 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                                         "EventLogDataContainer: OnEventLogEntryWritten: Handling clearing of log (mostRecentIndexInLog < eventLogContainer.NextEntryIndex): firstIndexInLog: {0}:, mostRecentIndexInLog: {1}, NextEntryIndex: {2}",
                                         firstIndexInLog,
                                         mostRecentIndexInLog,
-                                        this.nextEntryIndexToCollect));
+                                        NextEntryIndexToCollect));
                             }
 
                             // Send warning; event log must have been cleared.
-                            this.dataCollectionLogger.LogWarning(
-                                this.dataCollectionContext,
+                            dataCollectionLogger.LogWarning(
+                                dataCollectionContext,
                                 string.Format(
                                     CultureInfo.InvariantCulture,
                                     Resource.EventsLostWarning,
-                                    this.eventLog.Log));
+                                    EventLog.Log));
 
-                            this.nextEntryIndexToCollect = 0;
+                            NextEntryIndexToCollect = 0;
                             firstIndexInLog = 0;
                         }
 
                         for (;
-                            this.nextEntryIndexToCollect <= mostRecentIndexInLog;
-                            this.nextEntryIndexToCollect++)
+                            NextEntryIndexToCollect <= mostRecentIndexInLog;
+                            NextEntryIndexToCollect++)
                         {
-                            int nextEntryIndexInCurrentLog = this.nextEntryIndexToCollect - firstIndexInLog;
-                            EventLogEntry nextEntry = this.eventLog.Entries[nextEntryIndexInCurrentLog];
+                            int nextEntryIndexInCurrentLog = NextEntryIndexToCollect - firstIndexInLog;
+                            EventLogEntry nextEntry = EventLog.Entries[nextEntryIndexInCurrentLog];
 
                             // If an explicit list of event sources was provided, only report log entries from those sources
-                            if (this.eventSources != null && this.eventSources.Count > 0)
+                            if (eventSources != null && eventSources.Count > 0)
                             {
-                                if (!this.eventSources.Contains(nextEntry.Source))
+                                if (!eventSources.Contains(nextEntry.Source))
                                 {
                                     continue;
                                 }
                             }
 
-                            if (!this.entryTypes.Contains(nextEntry.EntryType))
+                            if (!entryTypes.Contains(nextEntry.EntryType))
                             {
                                 continue;
                             }
 
-                            if (this.eventLogEntries.Count < this.maxLogEntries)
+                            if (EventLogEntries.Count < maxLogEntries)
                             {
-                                this.eventLogEntries.Add(nextEntry);
+                                EventLogEntries.Add(nextEntry);
 
                                 if (EqtTrace.IsVerboseEnabled)
                                 {
@@ -213,12 +194,12 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                                             "EventLogDataContainer.OnEventLogEntryWritten() add event with Id {0} from position {1} in the current {2} log",
                                             nextEntry.Index,
                                             nextEntryIndexInCurrentLog,
-                                            this.eventLog.Log));
+                                            EventLog.Log));
                                 }
                             }
                             else
                             {
-                                this.LimitReached = true;
+                                LimitReached = true;
                                 break;
                             }
                         }
@@ -226,12 +207,12 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 }
                 catch (Exception exception)
                 {
-                    this.dataCollectionLogger.LogError(
-                        this.dataCollectionContext,
+                    dataCollectionLogger.LogError(
+                        dataCollectionContext,
                         string.Format(
                             CultureInfo.InvariantCulture,
                             Resource.EventsLostError,
-                            this.eventLog.Log,
+                            EventLog.Log,
                             exception), exception);
                 }
             }
@@ -245,27 +226,27 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// </param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!this.isDisposed)
+            if (!isDisposed)
             {
                 if (disposing)
                 {
-                    this.eventLog.EnableRaisingEvents = false;
-                    this.eventLog.EntryWritten -= this.OnEventLogEntryWritten;
-                    this.eventLog.Dispose();
+                    EventLog.EnableRaisingEvents = false;
+                    EventLog.EntryWritten -= OnEventLogEntryWritten;
+                    EventLog.Dispose();
                 }
 
-                this.isDisposed = true;
+                isDisposed = true;
             }
         }
 
         private void CreateEventLog(string eventLogName)
         {
-            this.eventLog = new EventLog(eventLogName);
-            this.eventLog.EnableRaisingEvents = true;
-            this.eventLog.EntryWritten += this.OnEventLogEntryWritten;
-            int currentCount = this.eventLog.Entries.Count;
-            this.nextEntryIndexToCollect =
-                (currentCount == 0) ? 0 : this.eventLog.Entries[currentCount - 1].Index + 1;
+            EventLog = new EventLog(eventLogName);
+            EventLog.EnableRaisingEvents = true;
+            EventLog.EntryWritten += OnEventLogEntryWritten;
+            int currentCount = EventLog.Entries.Count;
+            NextEntryIndexToCollect =
+                (currentCount == 0) ? 0 : EventLog.Entries[currentCount - 1].Index + 1;
         }
     }
 }

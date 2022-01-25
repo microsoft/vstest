@@ -34,17 +34,17 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// </param>
         public static void WriteEventLogEntriesToXmlFile(string xmlFilePath, List<EventLogEntry> eventLogEntries, IFileHelper fileHelper)
         {
-            using DataTable dataTable = new DataTable();
+            using DataTable dataTable = new();
             dataTable.Locale = CultureInfo.InvariantCulture;
 
             // The MaxLength of the Type and Source columns must be set to allow indices to be created on them
-            DataColumn typeColumn = new DataColumn("Type", typeof(string));
+            DataColumn typeColumn = new("Type", typeof(string));
             typeColumn.MaxLength = EventLogConstants.TypeColumnMaxLength;
             dataTable.Columns.Add(typeColumn);
 
             dataTable.Columns.Add(new DataColumn("DateTime", typeof(DateTime)));
 
-            DataColumn sourceColumn = new DataColumn("Source", typeof(string));
+            DataColumn sourceColumn = new("Source", typeof(string));
             sourceColumn.MaxLength = EventLogConstants.SourceColumnMaxLength;
             dataTable.Columns.Add(sourceColumn);
 
@@ -70,13 +70,13 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 dataTable.Rows.Add(row);
             }
 
-            DataSet dataSet = new DataSet();
+            DataSet dataSet = new();
             dataSet.Locale = CultureInfo.InvariantCulture;
             dataSet.Tables.Add(dataTable);
 
             // Use UTF-16 encoding
-            StringBuilder stringBuilder = new StringBuilder();
-            using StringWriter stringWriter = new StringWriter(stringBuilder);
+            StringBuilder stringBuilder = new();
+            using StringWriter stringWriter = new(stringBuilder);
             dataSet.WriteXml(stringWriter, XmlWriteMode.WriteSchema);
             fileHelper.WriteAllTextToFile(xmlFilePath, stringBuilder.ToString());
         }

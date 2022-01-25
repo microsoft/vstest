@@ -12,11 +12,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 
     internal sealed class FileHelper
     {
-        private static Dictionary<char, object> invalidFileNameChars;
-        private static Regex ReservedFileNamesRegex = new Regex(@"(?i:^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]|CLOCK\$)(\..*)?)$");
+        private static readonly Dictionary<char, object> invalidFileNameChars;
+        private static readonly Regex ReservedFileNamesRegex = new(@"(?i:^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]|CLOCK\$)(\..*)?)$");
 
         #region Constructors
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]  // Have to init invalidFileNameChars dynamically.
         static FileHelper()
         {
             // Create a hash table of invalid chars.

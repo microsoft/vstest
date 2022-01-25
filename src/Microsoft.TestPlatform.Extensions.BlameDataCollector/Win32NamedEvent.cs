@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     {
         private const uint EventModifyState = 0x0002;
 
-        private string eventName;
+        private readonly string eventName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Win32NamedEvent"/> class.
@@ -29,7 +29,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// </summary>
         public void Set()
         {
-            IntPtr handle = OpenEvent(Win32NamedEvent.EventModifyState, false, this.eventName);
+            IntPtr handle = OpenEvent(EventModifyState, false, eventName);
             SetEvent(handle);
             CloseHandle(handle);
         }

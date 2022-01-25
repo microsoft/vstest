@@ -28,8 +28,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// </summary>
         public RequestData()
         {
-            this.MetricsCollection = new NoOpMetricsCollection();
-            this.IsTelemetryOptedIn = false;
+            MetricsCollection = new NoOpMetricsCollection();
+            IsTelemetryOptedIn = false;
         }
 
         /// <summary>
@@ -37,8 +37,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// </summary>
         public IMetricsCollection MetricsCollection
         {
-            get => this.metricsCollection;
-            set => this.metricsCollection = value ?? throw new ArgumentNullException(nameof(value));
+            get => metricsCollection;
+            set => metricsCollection = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         /// <summary>
@@ -46,8 +46,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// </summary>
         public ProtocolConfig ProtocolConfig
         {
-            get => this.protocolConfig;
-            set => this.protocolConfig = value ?? throw new ArgumentNullException(nameof(value));
+            get => protocolConfig;
+            set => protocolConfig = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         /// <summary>

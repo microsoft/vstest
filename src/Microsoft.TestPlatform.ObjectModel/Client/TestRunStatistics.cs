@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="stats"> The stats. </param>
         public TestRunStatistics(IDictionary<TestOutcome, long> stats)
         {
-            this.Stats = stats;
+            Stats = stats;
         }
 
         /// <summary>
@@ -38,8 +38,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <remarks> This constructor is only needed to reconstruct the object during deserialization.</remarks>
         public TestRunStatistics(long executedTests, IDictionary<TestOutcome, long> stats)
         {
-            this.ExecutedTests = executedTests;
-            this.Stats = stats;
+            ExecutedTests = executedTests;
+            Stats = stats;
         }
 
         /// <summary>
@@ -63,12 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         {
             get
             {
-                if (this.Stats.TryGetValue(testOutcome, out var count))
-                {
-                    return count;
-                }
-
-                return 0;
+                return Stats.TryGetValue(testOutcome, out var count) ? count : 0;
             }
         }
     }

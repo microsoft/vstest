@@ -16,7 +16,7 @@ namespace vstest.console.UnitTests.Processors
 
         public void SetActiveRunSettings(RunSettings runSettings)
         {
-            this.ActiveRunSettings = runSettings;
+            ActiveRunSettings = runSettings;
         }
     }
 }

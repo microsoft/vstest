@@ -25,8 +25,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         protected BasicTransferInformation(DataCollectionContext context)
         {
             //EqtAssert.ParameterNotNull(context, "context");
-            this.Context = context;
-            this.Description = string.Empty;
+            Context = context;
+            Description = string.Empty;
         }
 
         #endregion
@@ -49,20 +49,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         {
             get
             {
-                return this.description;
+                return description;
             }
 
             set
             {
                 // If we don't have a description, use an empty string.
-                if (value == null)
-                {
-                    this.description = string.Empty;
-                }
-                else
-                {
-                    this.description = value;
-                }
+                description = value ?? string.Empty;
             }
         }
 

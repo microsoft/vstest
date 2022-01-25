@@ -29,10 +29,9 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting
             Action<HostProviderEventArgs> onHostExited)
         {
             EqtTrace.Verbose("TestHostProvider.ExitCallBack: Host exited starting callback.");
-            var exitCode = 0;
             var testHostProcessStdErrorStr = testHostProcessStdError.ToString();
 
-            processHelper.TryGetExitCode(process, out exitCode);
+            processHelper.TryGetExitCode(process, out int exitCode);
 
             int procId = -1;
             try

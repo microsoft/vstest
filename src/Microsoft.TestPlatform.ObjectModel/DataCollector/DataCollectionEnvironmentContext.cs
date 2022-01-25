@@ -19,7 +19,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// DataCollectionContext for the session.
         /// </summary>
-        private DataCollectionContext sessionDataCollectionContext;
 
         #endregion
 
@@ -71,17 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// DataCollectionContext for the session.
         /// </summary>
-        public DataCollectionContext SessionDataCollectionContext
-        {
-            get
-            {
-                return sessionDataCollectionContext;
-            }
-            internal set
-            {
-                sessionDataCollectionContext = value;
-            }
-        }
+        public DataCollectionContext SessionDataCollectionContext { get; internal set; }
 
         #endregion
     }

@@ -18,92 +18,92 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
     [TestClass]
     public class TestRunResultAggregatorTests
     {
-        TestRunResultAggregator resultAggregator = TestRunResultAggregator.Instance;
-        Mock<ITestRunRequest> mockTestRunRequest;
+        readonly TestRunResultAggregator _resultAggregator = TestRunResultAggregator.Instance;
+        Mock<ITestRunRequest> _mockTestRunRequest;
 
         [TestInitialize]
         public void TestInit()
         {
-            resultAggregator.Reset();
-            mockTestRunRequest = new Mock<ITestRunRequest>();
-            resultAggregator.RegisterTestRunEvents(mockTestRunRequest.Object);
+            _resultAggregator.Reset();
+            _mockTestRunRequest = new Mock<ITestRunRequest>();
+            _resultAggregator.RegisterTestRunEvents(_mockTestRunRequest.Object);
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            resultAggregator.UnregisterTestRunEvents(mockTestRunRequest.Object);
+            _resultAggregator.UnregisterTestRunEvents(_mockTestRunRequest.Object);
         }
 
         [TestMethod]
         public void DefaultOutcomeIsPassed()
         {
-            Assert.AreEqual(TestOutcome.Passed, resultAggregator.Outcome);
+            Assert.AreEqual(TestOutcome.Passed, _resultAggregator.Outcome);
         }
 
         [TestMethod]
         public void MarkTestRunFailedSetsOutcomeToFailed()
         {
-            resultAggregator.MarkTestRunFailed();
-            Assert.AreEqual(TestOutcome.Failed, resultAggregator.Outcome);
+            _resultAggregator.MarkTestRunFailed();
+            Assert.AreEqual(TestOutcome.Failed, _resultAggregator.Outcome);
         }
 
         [TestMethod]
         public void TestRunMessageHandlerForMessageLevelErrorSetsOutcomeToFailed()
         {
             var messageArgs = new TestRunMessageEventArgs(TestMessageLevel.Error, "bad stuff");
-            mockTestRunRequest.Raise(tr => tr.TestRunMessage += null, messageArgs);
-            Assert.AreEqual(TestOutcome.Failed, resultAggregator.Outcome);
+            _mockTestRunRequest.Raise(tr => tr.TestRunMessage += null, messageArgs);
+            Assert.AreEqual(TestOutcome.Failed, _resultAggregator.Outcome);
         }
 
         [TestMethod]
         public void TestRunCompletionHandlerForTestRunStatisticsNullSetsOutcomeToFailed()
         {
             var messageArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, new TimeSpan());
-            mockTestRunRequest.Raise(tr => tr.OnRunCompletion += null, messageArgs);
-            Assert.AreEqual(TestOutcome.Failed, resultAggregator.Outcome);
+            _mockTestRunRequest.Raise(tr => tr.OnRunCompletion += null, messageArgs);
+            Assert.AreEqual(TestOutcome.Failed, _resultAggregator.Outcome);
         }
 
         [TestMethod]
         public void TestRunCompletionHandlerForTestRunStatsWithOneOrMoreFailingTestsSetsOutcomeToFailed()
         {
-            var testOutcomeDict = new System.Collections.Generic.Dictionary<TestOutcome, long>
+            var testOutcomeDict = new Dictionary<TestOutcome, long>
             {
                 { TestOutcome.Failed, 1 }
             };
             var stats = new TestableTestRunStats(testOutcomeDict);
 
             var messageArgs = new TestRunCompleteEventArgs(stats, false, false, null, null, null, new TimeSpan());
-            this.mockTestRunRequest.Raise(tr => tr.OnRunCompletion += null, messageArgs);
-            Assert.AreEqual(TestOutcome.Failed, resultAggregator.Outcome);
+            _mockTestRunRequest.Raise(tr => tr.OnRunCompletion += null, messageArgs);
+            Assert.AreEqual(TestOutcome.Failed, _resultAggregator.Outcome);
         }
 
         [TestMethod]
         public void TestRunCompletionHandlerForCanceledRunShouldSetsOutcomeToFailed()
         {
-            var testOutcomeDict = new System.Collections.Generic.Dictionary<TestOutcome, long>
+            var testOutcomeDict = new Dictionary<TestOutcome, long>
             {
                 { TestOutcome.Passed, 1 }
             };
             var stats = new TestableTestRunStats(testOutcomeDict);
 
             var messageArgs = new TestRunCompleteEventArgs(stats, true, false, null, null, null, new TimeSpan());
-            this.mockTestRunRequest.Raise(tr => tr.OnRunCompletion += null, messageArgs);
-            Assert.AreEqual(TestOutcome.Failed, resultAggregator.Outcome);
+            _mockTestRunRequest.Raise(tr => tr.OnRunCompletion += null, messageArgs);
+            Assert.AreEqual(TestOutcome.Failed, _resultAggregator.Outcome);
         }
 
         [TestMethod]
         public void TestRunCompletionHandlerForAbortedRunShouldSetsOutcomeToFailed()
         {
-            var testOutcomeDict = new System.Collections.Generic.Dictionary<TestOutcome, long>
+            var testOutcomeDict = new Dictionary<TestOutcome, long>
             {
                 { TestOutcome.Passed, 1 }
             };
             var stats = new TestableTestRunStats(testOutcomeDict);
 
             var messageArgs = new TestRunCompleteEventArgs(stats, false, true, null, null, null, new TimeSpan());
-            this.mockTestRunRequest.Raise(tr => tr.OnRunCompletion += null, messageArgs);
-            Assert.AreEqual(TestOutcome.Failed, resultAggregator.Outcome);
+            _mockTestRunRequest.Raise(tr => tr.OnRunCompletion += null, messageArgs);
+            Assert.AreEqual(TestOutcome.Failed, _resultAggregator.Outcome);
         }
 
         #region Implementation
@@ -112,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         {
             public TestableTestRunStats(Dictionary<TestOutcome, long> stats)
             {
-                this.Stats = stats;
+                Stats = stats;
             }
 
             public long ExecutedTests { get; set; }
@@ -132,12 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             {
                 get
                 {
-                    if (this.Stats.TryGetValue(testOutcome, out var count))
-                    {
-                        return count;
-                    }
-
-                    return 0;
+                    return Stats.TryGetValue(testOutcome, out var count) ? count : 0;
                 }
             }
         }

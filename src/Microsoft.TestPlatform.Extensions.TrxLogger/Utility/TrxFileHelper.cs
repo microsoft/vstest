@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     using System.IO;
     using System.Text;
     using System.Text.RegularExpressions;
-    using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+    using TrxLoggerResources = VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
     /// <summary>
     /// Helper function to deal with file name.
@@ -22,11 +22,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         private const string RelativeDirectorySeparator = "..";
 
         private static readonly HashSet<char> InvalidFileNameChars;
-        private static readonly Regex ReservedFileNamesRegex = new Regex(@"(?i:^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]|CLOCK\$)(\..*)?)$");
-        private readonly Func<DateTime> TimeProvider;
+        private static readonly Regex ReservedFileNamesRegex = new(@"(?i:^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]|CLOCK\$)(\..*)?)$");
+        private readonly Func<DateTime> _timeProvider;
 
         #region Constructors
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Reviewed. Suppression is OK here.")]
 
         // Have to init InvalidFileNameChars dynamically.
         static TrxFileHelper()
@@ -60,7 +59,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
         public TrxFileHelper(Func<DateTime> timeProvider)
         {
-            TimeProvider = timeProvider ?? (() => DateTime.Now);
+            _timeProvider = timeProvider ?? (() => DateTime.Now);
         }
 
         #endregion
@@ -76,20 +75,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
             // Replace bad chars by this.
             char replacementChar = '_';
-            StringBuilder result = new StringBuilder(fileName.Length);
+            StringBuilder result = new(fileName.Length);
             result.Length = fileName.Length;
 
             // Replace each invalid char with replacement char.
             for (int i = 0; i < fileName.Length; ++i)
             {
-                if (InvalidFileNameChars.Contains(fileName[i]))
-                {
-                    result[i] = replacementChar;
-                }
-                else
-                {
-                    result[i] = fileName[i];
-                }
+                result[i] = InvalidFileNameChars.Contains(fileName[i]) ? replacementChar : fileName[i];
             }
 
             // We trim spaces in the end because CreateFile/Dir trim those.
@@ -150,7 +142,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             EqtAssert.StringNotNullOrEmpty(timestampFormat, nameof(timestampFormat));
 
             ushort iteration = 0;
-            var iterationStamp = TimeProvider();
+            var iterationStamp = _timeProvider();
             var fileNamePrefix = Path.GetFileNameWithoutExtension(fileName);
             var extension = Path.GetExtension(fileName);
             do
@@ -207,7 +199,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             // Skip all of the empty tokens that result from things like "\dir1"
             // and "\\dir1". We need to compare the first non-null token
             // to know if we've got differences.
-            int i = 0;
+            int i;
             for (i = 0; i < max && pathTokens[i].Length == 0 && basePathTokens[i].Length == 0; i++)
             {
             }
@@ -235,7 +227,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
             // i should point to first non-matching token.
 
-            StringBuilder newPath = new StringBuilder();
+            StringBuilder newPath = new();
 
             // ok, for each remaining token in the base path,
             // add ..\ to the string.
@@ -309,7 +301,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <returns>
         /// Next valid iteration name.
         /// </returns>
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         private static string GetNextIterationNameHelper(
             string baseDirectoryName,
             string originalName,
@@ -370,7 +361,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
         private class FileIterationHelper : IterationHelper
         {
-            private readonly bool checkMatchingDirectory;
+            private readonly bool _checkMatchingDirectory;
 
             /// <summary>
             /// Constructor for class checkMatchingDirectory.
@@ -378,7 +369,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             /// <param name="checkMatchingDirectory">If true, and directory with filename without extension exists, try next iteration.</param>
             internal FileIterationHelper(bool checkMatchingDirectory)
             {
-                this.checkMatchingDirectory = checkMatchingDirectory;
+                this._checkMatchingDirectory = checkMatchingDirectory;
             }
 
             internal override string NextIteration(string baseName, uint iteration)
@@ -405,12 +396,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 }
 
                 // Path.ChangeExtension for "" returns trailing dot but Directory.Exists works the same for dir with and without trailing dot.
-                if (this.checkMatchingDirectory && Path.HasExtension(path) && Directory.Exists(Path.ChangeExtension(path, string.Empty)))
-                {
-                    return false;
-                }
-
-                return true;
+                return !_checkMatchingDirectory || !Path.HasExtension(path) || !Directory.Exists(Path.ChangeExtension(path, string.Empty));
             }
         }
     }

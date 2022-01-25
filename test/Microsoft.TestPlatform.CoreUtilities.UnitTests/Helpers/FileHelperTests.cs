@@ -15,23 +15,23 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
 
         public FileHelperTests()
         {
-            this.tempFile = Path.GetTempFileName();
-            File.AppendAllText(this.tempFile, "Some content..");
-            this.fileHelper = new FileHelper();
+            tempFile = Path.GetTempFileName();
+            File.AppendAllText(tempFile, "Some content..");
+            fileHelper = new FileHelper();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            File.Delete(this.tempFile);
+            File.Delete(tempFile);
         }
 
         [TestMethod]
         public void GetStreamShouldAbleToGetTwoStreamSimultanouslyIfFileAccessIsRead()
         {
-            using var stream1 = this.fileHelper.GetStream(this.tempFile, FileMode.Open, FileAccess.Read);
+            using var stream1 = fileHelper.GetStream(tempFile, FileMode.Open, FileAccess.Read);
             using var stream2 =
-                this.fileHelper.GetStream(this.tempFile, FileMode.Open, FileAccess.Read);
+                fileHelper.GetStream(tempFile, FileMode.Open, FileAccess.Read);
         }
     }
 }

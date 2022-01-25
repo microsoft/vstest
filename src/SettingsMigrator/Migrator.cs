@@ -69,11 +69,11 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
 
             if (string.Equals(Path.GetExtension(oldFilePath), TestSettingsExtension, StringComparison.OrdinalIgnoreCase))
             {
-                this.MigrateTestSettings(oldFilePath, newFilePath);
+                MigrateTestSettings(oldFilePath, newFilePath);
             }
             else if (string.Equals(Path.GetExtension(oldFilePath), RunSettingsExtension, StringComparison.OrdinalIgnoreCase))
             {
-                this.MigrateRunSettings(oldFilePath, newFilePath);
+                MigrateRunSettings(oldFilePath, newFilePath);
             }
             else
             {
@@ -89,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
         private void MigrateRunSettings(string oldRunSettingsPath, string newRunSettingsPath)
         {
             string testSettingsPath = null;
-            using XmlTextReader reader = new XmlTextReader(oldRunSettingsPath);
+            using XmlTextReader reader = new(oldRunSettingsPath);
             reader.Namespaces = false;
 
             var runSettingsXmlDoc = new XmlDocument();
@@ -112,9 +112,9 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
                 }
 
                 // Remove the embedded testSettings node if it exists.
-                this.RemoveEmbeddedTestSettings(runSettingsXmlDoc);
+                RemoveEmbeddedTestSettings(runSettingsXmlDoc);
 
-                this.MigrateTestSettingsNodesToRunSettings(testSettingsPath, runSettingsXmlDoc);
+                MigrateTestSettingsNodesToRunSettings(testSettingsPath, runSettingsXmlDoc);
 
                 runSettingsXmlDoc.Save(newRunSettingsPath);
                 Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.RunSettingsCreated, newRunSettingsPath));
@@ -135,7 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
             var runSettingsXmlDoc = new XmlDocument();
             runSettingsXmlDoc.LoadXml(SampleRunSettingsContent);
 
-            this.MigrateTestSettingsNodesToRunSettings(oldTestSettingsPath, runSettingsXmlDoc);
+            MigrateTestSettingsNodesToRunSettings(oldTestSettingsPath, runSettingsXmlDoc);
 
             runSettingsXmlDoc.Save(newRunSettingsPath);
             Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.RunSettingsCreated, newRunSettingsPath));
@@ -148,7 +148,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
         /// <param name="runSettingsXmlDoc">Runsettings Xml</param>
         private void MigrateTestSettingsNodesToRunSettings(string testSettingsPath, XmlDocument runSettingsXmlDoc)
         {
-            var testSettingsNodes = this.ReadTestSettingsNodes(testSettingsPath);
+            var testSettingsNodes = ReadTestSettingsNodes(testSettingsPath);
 
             string testTimeout = null;
             if (testSettingsNodes.Timeout != null && testSettingsNodes.Timeout.Attributes[TestTimeoutAttributeName] != null)
@@ -181,18 +181,18 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
             }
 
             // LegacySettings node.
-            this.AddLegacyNodes(testSettingsNodes, testTimeout, parallelTestCount, hostProcessPlatform, runSettingsXmlDoc);
+            AddLegacyNodes(testSettingsNodes, testTimeout, parallelTestCount, hostProcessPlatform, runSettingsXmlDoc);
 
             // TestSessionTimeout node.
             if (!string.IsNullOrEmpty(runTimeout))
             {
-                this.AddRunTimeoutNode(runTimeout, runSettingsXmlDoc);
+                AddRunTimeoutNode(runTimeout, runSettingsXmlDoc);
             }
 
             // DataCollectors node.
             if (testSettingsNodes.Datacollectors != null && testSettingsNodes.Datacollectors.Count > 0)
             {
-                this.AddDataCollectorNodes(testSettingsNodes.Datacollectors, runSettingsXmlDoc);
+                AddDataCollectorNodes(testSettingsNodes.Datacollectors, runSettingsXmlDoc);
             }
         }
 
@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
         {
             var testSettingsNodes = new TestSettingsNodes();
 
-            using (XmlTextReader reader = new XmlTextReader(testSettingsPath))
+            using (XmlTextReader reader = new(testSettingsPath))
             {
                 reader.Namespaces = false;
 

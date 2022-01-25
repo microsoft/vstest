@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using CrossPlatEngineResources = Resources.Resources;
 
     /// <summary>
     /// The base run tests.
@@ -43,13 +43,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     {
         #region private fields
 
-        private string runSettings;
-        private TestExecutionContext testExecutionContext;
-        private ITestRunEventsHandler testRunEventsHandler;
-        private ITestEventsPublisher testEventsPublisher;
-        private ITestRunCache testRunCache;
+        private readonly ITestEventsPublisher testEventsPublisher;
         private protected string package;
-        private IRequestData requestData;
+        private readonly IRequestData requestData;
 
         /// <summary>
         /// Specifies that the test run cancellation is requested
@@ -60,17 +56,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// Active executor which is executing the tests currently
         /// </summary>
         private ITestExecutor activeExecutor;
-        private ITestCaseEventsHandler testCaseEventsHandler;
-        private RunContext runContext;
-        private FrameworkHandle frameworkHandle;
-
-        private ICollection<string> executorUrisThatRanTests;
-        private ITestPlatformEventSource testPlatformEventSource;
+        private readonly ITestCaseEventsHandler testCaseEventsHandler;
+        private readonly ITestPlatformEventSource testPlatformEventSource;
 
         /// <summary>
         /// To create thread in given apartment state.
         /// </summary>
-        private IThread platformThread;
+        private readonly IThread platformThread;
 
         /// <summary>
         /// The Run configuration. To determine framework and execution thread apartment state.
@@ -80,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <summary>
         /// The Serializer to clone testcase object in case of user input test source is package. E.g UWP scenario(appx/build.appxrecipe).
         /// </summary>
-        private IDataSerializer dataSerializer;
+        private readonly IDataSerializer dataSerializer;
 
         #endregion
 
@@ -144,18 +136,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             IDataSerializer dataSerializer)
         {
             this.package = package;
-            this.runSettings = runSettings;
-            this.testExecutionContext = testExecutionContext;
+            RunSettings = runSettings;
+            TestExecutionContext = testExecutionContext;
             this.testCaseEventsHandler = testCaseEventsHandler;
-            this.testRunEventsHandler = testRunEventsHandler;
+            TestRunEventsHandler = testRunEventsHandler;
             this.requestData = requestData;
 
-            this.isCancellationRequested = false;
+            isCancellationRequested = false;
             this.testPlatformEventSource = testPlatformEventSource;
             this.testEventsPublisher = testEventsPublisher;
             this.platformThread = platformThread;
             this.dataSerializer = dataSerializer;
-            this.SetContext();
+            SetContext();
         }
 
         #endregion
@@ -165,30 +157,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <summary>
         /// Gets the run settings.
         /// </summary>
-        protected string RunSettings => this.runSettings;
+        protected string RunSettings { get; private set; }
 
         /// <summary>
         /// Gets the test execution context.
         /// </summary>
-        protected TestExecutionContext TestExecutionContext => this.testExecutionContext;
+        protected TestExecutionContext TestExecutionContext { get; private set; }
 
         /// <summary>
         /// Gets the test run events handler.
         /// </summary>
-        protected ITestRunEventsHandler TestRunEventsHandler => this.testRunEventsHandler;
+        protected ITestRunEventsHandler TestRunEventsHandler { get; private set; }
 
         /// <summary>
         /// Gets the test run cache.
         /// </summary>
-        protected ITestRunCache TestRunCache => this.testRunCache;
+        protected ITestRunCache TestRunCache { get; private set; }
 
-        protected bool IsCancellationRequested => this.isCancellationRequested;
+        protected bool IsCancellationRequested => isCancellationRequested;
 
-        protected RunContext RunContext => this.runContext;
+        protected RunContext RunContext { get; private set; }
 
-        protected FrameworkHandle FrameworkHandle => this.frameworkHandle;
+        protected FrameworkHandle FrameworkHandle { get; private set; }
 
-        protected ICollection<string> ExecutorUrisThatRanTests => this.executorUrisThatRanTests;
+        protected ICollection<string> ExecutorUrisThatRanTests { get; private set; }
 
         #endregion
 
@@ -196,7 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         public void RunTests()
         {
-            using (this.testRunCache)
+            using (TestRunCache)
             {
                 TimeSpan elapsedTime = TimeSpan.Zero;
 
@@ -207,12 +199,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 try
                 {
                     // Call Session-Start event on in-proc datacollectors
-                    this.SendSessionStart();
+                    SendSessionStart();
 
-                    elapsedTime = this.RunTestsInternal();
+                    elapsedTime = RunTestsInternal();
 
                     // Check the adapter setting for shutting down this process after run
-                    shutdownAfterRun = this.frameworkHandle.EnableShutdownAfterTestRun;
+                    shutdownAfterRun = FrameworkHandle.EnableShutdownAfterTestRun;
                 }
                 catch (Exception ex)
                 {
@@ -228,12 +220,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 finally
                 {
                     // Trigger Session End on in-proc datacollectors
-                    this.SendSessionEnd();
+                    SendSessionEnd();
 
                     try
                     {
                         // Send the test run complete event.
-                        this.RaiseTestRunComplete(exception, this.isCancellationRequested, isAborted, shutdownAfterRun, elapsedTime);
+                        RaiseTestRunComplete(exception, isCancellationRequested, isAborted, shutdownAfterRun, elapsedTime);
                     }
                     catch (Exception ex2)
                     {
@@ -255,7 +247,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         internal void Abort()
         {
             EqtTrace.Verbose("BaseRunTests.Abort: Calling RaiseTestRunComplete");
-            this.RaiseTestRunComplete(exception: null, canceled: this.isCancellationRequested, aborted: true, adapterHintToShutdownAfterRun: false, elapsedTime: TimeSpan.Zero);
+            RaiseTestRunComplete(exception: null, canceled: isCancellationRequested, aborted: true, adapterHintToShutdownAfterRun: false, elapsedTime: TimeSpan.Zero);
         }
 
         /// <summary>
@@ -265,16 +257,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             // Note: Test host delegates the cancellation to active executor and doesn't call HandleTestRunComplete in cancel request.
             // Its expected from active executor to respect the cancel request and thus return from RunTests quickly (canceling the tests).
-            this.isCancellationRequested = true;
+            isCancellationRequested = true;
 
-            if (this.activeExecutor == null)
+            if (activeExecutor == null)
             {
                 return;
             }
 
-            if (this.NotRequiredSTAThread() || !this.TryToRunInSTAThread(() => this.CancelTestRunInternal(this.activeExecutor), false))
+            if (NotRequiredSTAThread() || !TryToRunInSTAThread(() => CancelTestRunInternal(activeExecutor), false))
             {
-                Task.Run(() => this.CancelTestRunInternal(this.activeExecutor));
+                Task.Run(() => CancelTestRunInternal(activeExecutor));
             }
         }
 
@@ -330,62 +322,61 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private void SetContext()
         {
-            this.testRunCache = new TestRunCache(this.testExecutionContext.FrequencyOfRunStatsChangeEvent, this.testExecutionContext.RunStatsChangeEventTimeout, this.OnCacheHit);
+            TestRunCache = new TestRunCache(TestExecutionContext.FrequencyOfRunStatsChangeEvent, TestExecutionContext.RunStatsChangeEventTimeout, OnCacheHit);
 
-            this.runContext = new RunContext();
-            this.runContext.RunSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(this.runSettings);
-            this.runContext.KeepAlive = this.testExecutionContext.KeepAlive;
-            this.runContext.InIsolation = this.testExecutionContext.InIsolation;
-            this.runContext.IsDataCollectionEnabled = this.testExecutionContext.IsDataCollectionEnabled;
-            this.runContext.IsBeingDebugged = this.testExecutionContext.IsDebug;
+            RunContext = new RunContext();
+            RunContext.RunSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(RunSettings);
+            RunContext.KeepAlive = TestExecutionContext.KeepAlive;
+            RunContext.InIsolation = TestExecutionContext.InIsolation;
+            RunContext.IsDataCollectionEnabled = TestExecutionContext.IsDataCollectionEnabled;
+            RunContext.IsBeingDebugged = TestExecutionContext.IsDebug;
 
-            var runConfig = XmlRunSettingsUtilities.GetRunConfigurationNode(this.runSettings);
-            this.runContext.TestRunDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfig);
-            this.runContext.SolutionDirectory = RunSettingsUtilities.GetSolutionDirectory(runConfig);
-            this.runConfiguration = runConfig;
+            var runConfig = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettings);
+            RunContext.TestRunDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfig);
+            RunContext.SolutionDirectory = RunSettingsUtilities.GetSolutionDirectory(runConfig);
+            runConfiguration = runConfig;
 
-            this.frameworkHandle = new FrameworkHandle(
-                this.testCaseEventsHandler,
-                this.testRunCache,
-                this.testExecutionContext,
-                this.testRunEventsHandler);
-            this.frameworkHandle.TestRunMessage += this.OnTestRunMessage;
+            FrameworkHandle = new FrameworkHandle(
+                testCaseEventsHandler,
+                TestRunCache,
+                TestExecutionContext,
+                TestRunEventsHandler);
+            FrameworkHandle.TestRunMessage += OnTestRunMessage;
 
-            this.executorUrisThatRanTests = new List<string>();
+            ExecutorUrisThatRanTests = new List<string>();
         }
 
         private void OnTestRunMessage(object sender, TestRunMessageEventArgs e)
         {
-            this.testRunEventsHandler.HandleLogMessage(e.Level, e.Message);
+            TestRunEventsHandler.HandleLogMessage(e.Level, e.Message);
         }
 
         private TimeSpan RunTestsInternal()
         {
             long totalTests = 0;
 
-            var executorUriExtensionMap = this.GetExecutorUriExtensionMap(this.frameworkHandle, this.runContext);
+            var executorUriExtensionMap = GetExecutorUriExtensionMap(FrameworkHandle, RunContext);
 
             // Set on the logger the TreatAdapterErrorAsWarning setting from runsettings.
-            this.SetAdapterLoggingSettings();
+            SetAdapterLoggingSettings();
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            this.testPlatformEventSource.ExecutionStart();
-            var exceptionsHitDuringRunTests = this.RunTestInternalWithExecutors(
+            testPlatformEventSource.ExecutionStart();
+            var exceptionsHitDuringRunTests = RunTestInternalWithExecutors(
                 executorUriExtensionMap,
                 totalTests);
 
             stopwatch.Stop();
-            this.testPlatformEventSource.ExecutionStop(this.testRunCache.TotalExecutedTests);
-            this.BeforeRaisingTestRunComplete(exceptionsHitDuringRunTests);
+            testPlatformEventSource.ExecutionStop(TestRunCache.TotalExecutedTests);
+            BeforeRaisingTestRunComplete(exceptionsHitDuringRunTests);
             return stopwatch.Elapsed;
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "This methods must call all possible executors and not fail on crash in any executor.")]
         private bool RunTestInternalWithExecutors(IEnumerable<Tuple<Uri, string>> executorUriExtensionMap, long totalTests)
         {
             // Collecting Total Number of Adapters Discovered in Machine.
-            this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, executorUriExtensionMap.Count());
+            requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, executorUriExtensionMap.Count());
 
             var attachedToTestHost = false;
             var executorCache = new Dictionary<string, LazyExtension<ITestExecutor, ITestExecutorCapabilities>>();
@@ -398,7 +389,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
 
                 // Get the extension manager.
-                var extensionManager = this.GetExecutorExtensionManager(executorUriExtensionTuple.Item2);
+                var extensionManager = GetExecutorExtensionManager(executorUriExtensionTuple.Item2);
 
                 // Look up the executor.
                 var executor = extensionManager.TryGetTestExtension(executorUriExtensionTuple.Item1);
@@ -409,7 +400,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     // var runtimeVersion = string.Concat(PlatformServices.Default.Runtime.RuntimeType, " ",	
                     // PlatformServices.Default.Runtime.RuntimeVersion);
                     var runtimeVersion = " ";
-                    this.TestRunEventsHandler?.HandleLogMessage(
+                    TestRunEventsHandler?.HandleLogMessage(
                         TestMessageLevel.Warning,
                         string.Format(
                             CultureInfo.CurrentUICulture,
@@ -424,7 +415,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 executorCache.Add(executorUriExtensionTuple.Item1.AbsoluteUri, executor);
 
                 // Check if we actually have to attach to the default test host.
-                if (!this.runContext.IsBeingDebugged || attachedToTestHost)
+                if (!RunContext.IsBeingDebugged || attachedToTestHost)
                 {
                     // We already know we should attach to the default test host, simply continue.
                     continue;
@@ -436,13 +427,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 // Same goes if all adapters implement the new test executor interface but at
                 // least one of them needs the test platform to attach to the default test host.
                 if (!(executor.Value is ITestExecutor2)
-                    || this.ShouldAttachDebuggerToTestHost(executor, executorUriExtensionTuple, this.runContext))
+                    || ShouldAttachDebuggerToTestHost(executor, executorUriExtensionTuple, RunContext))
                 {
                     EqtTrace.Verbose("Attaching to default test host.");
 
                     attachedToTestHost = true;
                     var pid = Process.GetCurrentProcess().Id;
-                    if (!this.frameworkHandle.AttachDebuggerToProcess(pid))
+                    if (!FrameworkHandle.AttachDebuggerToProcess(pid))
                     {
                         EqtTrace.Warning(
                             string.Format(
@@ -478,46 +469,46 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     }
 
                     // set the active executor
-                    this.activeExecutor = executor.Value;
+                    activeExecutor = executor.Value;
 
                     // If test run cancellation is requested, skip the next executor
-                    if (this.isCancellationRequested)
+                    if (isCancellationRequested)
                     {
                         break;
                     }
 
                     var timeStartNow = DateTime.UtcNow;
 
-                    var currentTotalTests = this.testRunCache.TotalExecutedTests;
-                    this.testPlatformEventSource.AdapterExecutionStart(executorUri);
+                    var currentTotalTests = TestRunCache.TotalExecutedTests;
+                    testPlatformEventSource.AdapterExecutionStart(executorUri);
 
                     // Run the tests.
-                    if (this.NotRequiredSTAThread() || !this.TryToRunInSTAThread(() => this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle), true))
+                    if (NotRequiredSTAThread() || !TryToRunInSTAThread(() => InvokeExecutor(executor, executorUriExtensionTuple, RunContext, FrameworkHandle), true))
                     {
-                        this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle);
+                        InvokeExecutor(executor, executorUriExtensionTuple, RunContext, FrameworkHandle);
                     }
 
-                    this.testPlatformEventSource.AdapterExecutionStop(this.testRunCache.TotalExecutedTests - currentTotalTests);
+                    testPlatformEventSource.AdapterExecutionStop(TestRunCache.TotalExecutedTests - currentTotalTests);
 
                     var totalTimeTaken = DateTime.UtcNow - timeStartNow;
 
                     // Identify whether the executor did run any tests at all
-                    if (this.testRunCache.TotalExecutedTests > totalTests)
+                    if (TestRunCache.TotalExecutedTests > totalTests)
                     {
-                        this.executorUrisThatRanTests.Add(executorUri);
+                        ExecutorUrisThatRanTests.Add(executorUri);
 
                         // Collecting Total Tests Ran by each Adapter
-                        var totalTestRun = this.testRunCache.TotalExecutedTests - totalTests;
-                        this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsRanByAdapter, executorUri), totalTestRun);
+                        var totalTestRun = TestRunCache.TotalExecutedTests - totalTests;
+                        requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsRanByAdapter, executorUri), totalTestRun);
 
                         // Only enable this for MSTestV1 telemetry for now, this might become more generic later.
                         if (MSTestV1TelemetryHelper.IsMSTestV1Adapter(executorUri))
                         {
-                            foreach (var adapterMetrics in this.testRunCache.AdapterTelemetry.Keys.Where(k => k.StartsWith(executorUri)))
+                            foreach (var adapterMetrics in TestRunCache.AdapterTelemetry.Keys.Where(k => k.StartsWith(executorUri)))
                             {
-                                var value = this.testRunCache.AdapterTelemetry[adapterMetrics];
+                                var value = TestRunCache.AdapterTelemetry[adapterMetrics];
 
-                                this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsRunByMSTestv1, adapterMetrics), value);
+                                requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsRunByMSTestv1, adapterMetrics), value);
                             }
                         }
 
@@ -528,7 +519,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                             executorsFromDeprecatedLocations |= Path.GetDirectoryName(executorLocation).Equals(CrossPlatEngine.Constants.DefaultAdapterLocation);
                         }
 
-                        totalTests = this.testRunCache.TotalExecutedTests;
+                        totalTests = TestRunCache.TotalExecutedTests;
                     }
 
                     if (EqtTrace.IsVerboseEnabled)
@@ -539,7 +530,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     }
 
                     // Collecting Time Taken by each executor Uri
-                    this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, executorUri), totalTimeTaken.TotalSeconds);
+                    requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, executorUri), totalTimeTaken.TotalSeconds);
                     totalTimeTakenByAdapters += totalTimeTaken.TotalSeconds;
                 }
                 catch (Exception e)
@@ -558,7 +549,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                             e);
                     }
 
-                    this.TestRunEventsHandler?.HandleLogMessage(
+                    TestRunEventsHandler?.HandleLogMessage(
                         TestMessageLevel.Error,
                         string.Format(
                             CultureInfo.CurrentCulture,
@@ -568,16 +559,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
                 finally
                 {
-                    this.activeExecutor = null;
+                    activeExecutor = null;
                 }
             }
 
             // Collecting Total Time Taken by Adapters
-            this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenByAllAdaptersInSec, totalTimeTakenByAdapters);
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenByAllAdaptersInSec, totalTimeTakenByAdapters);
 
             if (executorsFromDeprecatedLocations)
             {
-                this.TestRunEventsHandler?.HandleLogMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DeprecatedAdapterPath));
+                TestRunEventsHandler?.HandleLogMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DeprecatedAdapterPath));
             }
 
             return exceptionsHitDuringRunTests;
@@ -585,7 +576,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private bool NotRequiredSTAThread()
         {
-            return this.runConfiguration.ExecutionThreadApartmentState != PlatformApartmentState.STA;
+            return runConfiguration.ExecutionThreadApartmentState != PlatformApartmentState.STA;
         }
 
         private TestExecutorExtensionManager GetExecutorExtensionManager(string extensionAssembly)
@@ -633,29 +624,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             bool adapterHintToShutdownAfterRun,
             TimeSpan elapsedTime)
         {
-            var runStats = this.testRunCache?.TestRunStatistics ?? new TestRunStatistics(new Dictionary<TestOutcome, long>());
-            var lastChunkTestResults = this.testRunCache?.GetLastChunk() ?? new List<TestResult>();
+            var runStats = TestRunCache?.TestRunStatistics ?? new TestRunStatistics(new Dictionary<TestOutcome, long>());
+            var lastChunkTestResults = TestRunCache?.GetLastChunk() ?? new List<TestResult>();
 
-            if (this.testRunEventsHandler != null)
+            if (TestRunEventsHandler != null)
             {
                 // Collecting Total Tests Run
-                this.requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsRun, runStats.ExecutedTests);
+                requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsRun, runStats.ExecutedTests);
 
                 // Collecting Test Run State
-                this.requestData.MetricsCollection.Add(TelemetryDataConstants.RunState, canceled ? "Canceled" : (aborted ? "Aborted" : "Completed"));
+                requestData.MetricsCollection.Add(TelemetryDataConstants.RunState, canceled ? "Canceled" : (aborted ? "Aborted" : "Completed"));
 
                 // Collecting Number of Adapters Used to run tests.
-                this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, this.ExecutorUrisThatRanTests.Count);
+                requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, ExecutorUrisThatRanTests.Count);
 
-                if (lastChunkTestResults.Any() && this.IsTestSourceIsPackage())
+                if (lastChunkTestResults.Any() && IsTestSourceIsPackage())
                 {
-                    this.UpdateTestCaseSourceToPackage(lastChunkTestResults, null, out lastChunkTestResults, out var updatedTestCases);
+                    UpdateTestCaseSourceToPackage(lastChunkTestResults, null, out lastChunkTestResults, out _);
                 }
 
                 var testRunChangedEventArgs = new TestRunChangedEventArgs(runStats, lastChunkTestResults, Enumerable.Empty<TestCase>());
 
                 // Adding Metrics along with Test Run Complete Event Args
-                Collection<AttachmentSet> attachments = this.frameworkHandle?.Attachments;
+                Collection<AttachmentSet> attachments = FrameworkHandle?.Attachments;
                 var testRunCompleteEventArgs = new TestRunCompleteEventArgs(
                     runStats,
                     canceled,
@@ -665,13 +656,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     // Today we don't offer an extension to run collectors for test adapters.
                     new Collection<InvokedDataCollector>(),
                     elapsedTime);
-                testRunCompleteEventArgs.Metrics = this.requestData.MetricsCollection.Metrics;
+                testRunCompleteEventArgs.Metrics = requestData.MetricsCollection.Metrics;
 
-                this.testRunEventsHandler.HandleTestRunComplete(
+                TestRunEventsHandler.HandleTestRunComplete(
                     testRunCompleteEventArgs,
                     testRunChangedEventArgs,
                     attachments,
-                    this.executorUrisThatRanTests);
+                    ExecutorUrisThatRanTests);
             }
             else
             {
@@ -681,20 +672,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private bool IsTestSourceIsPackage()
         {
-            return !string.IsNullOrEmpty(this.package);
+            return !string.IsNullOrEmpty(package);
         }
 
         private void OnCacheHit(TestRunStatistics testRunStats, ICollection<TestResult> results, ICollection<TestCase> inProgressTestCases)
         {
-            if (this.testRunEventsHandler != null)
+            if (TestRunEventsHandler != null)
             {
-                if (this.IsTestSourceIsPackage())
+                if (IsTestSourceIsPackage())
                 {
-                    this.UpdateTestCaseSourceToPackage(results, inProgressTestCases, out results, out inProgressTestCases);
+                    UpdateTestCaseSourceToPackage(results, inProgressTestCases, out results, out inProgressTestCases);
                 }
 
                 var testRunChangedEventArgs = new TestRunChangedEventArgs(testRunStats, results, inProgressTestCases);
-                this.testRunEventsHandler.HandleTestRunStatsChange(testRunChangedEventArgs);
+                TestRunEventsHandler.HandleTestRunStatsChange(testRunChangedEventArgs);
             }
             else
             {
@@ -711,15 +702,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             try
             {
                 EqtTrace.Verbose("BaseRunTests.TryToRunInSTAThread: Using STA thread to call adapter API.");
-                this.platformThread.Run(action, PlatformApartmentState.STA, waitForCompletion);
+                platformThread.Run(action, PlatformApartmentState.STA, waitForCompletion);
             }
             catch (ThreadApartmentStateNotSupportedException ex)
             {
                 success = false;
                 EqtTrace.Warning("BaseRunTests.TryToRunInSTAThread: Failed to run in STA thread: {0}", ex);
-                this.TestRunEventsHandler.HandleLogMessage(
+                TestRunEventsHandler.HandleLogMessage(
                     TestMessageLevel.Warning,
-                    string.Format(CultureInfo.CurrentUICulture, Resources.ExecutionThreadApartmentStateNotSupportedForFramework, this.runConfiguration.TargetFramework.ToString()));
+                    string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.ExecutionThreadApartmentStateNotSupportedForFramework, runConfiguration.TargetFramework.ToString()));
             }
 
             return success;
@@ -733,8 +724,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             EqtTrace.Verbose("BaseRunTests.UpdateTestCaseSourceToPackage: Update source details for testResults and testCases.");
 
-            updatedTestResults = this.UpdateTestResults(testResults, this.package);
-            updatedInProgressTestCases = this.UpdateInProgressTests(inProgressTestCases, this.package);
+            updatedTestResults = UpdateTestResults(testResults, package);
+            updatedInProgressTestCases = UpdateInProgressTests(inProgressTestCases, package);
         }
 
         private ICollection<TestResult> UpdateTestResults(ICollection<TestResult> testResults, string package)
@@ -743,7 +734,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             foreach (var testResult in testResults)
             {
-                var updatedTestResult = this.dataSerializer.Clone(testResult);
+                var updatedTestResult = dataSerializer.Clone(testResult);
                 updatedTestResult.TestCase.Source = package;
                 updatedTestResults.Add(updatedTestResult);
             }
@@ -761,7 +752,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             ICollection<TestCase> updatedTestCases = new List<TestCase>();
             foreach (var inProgressTestCase in inProgressTestCases)
             {
-                var updatedTestCase = this.dataSerializer.Clone(inProgressTestCase);
+                var updatedTestCase = dataSerializer.Clone(inProgressTestCase);
                 updatedTestCase.Source = package;
                 updatedTestCases.Add(updatedTestCase);
             }

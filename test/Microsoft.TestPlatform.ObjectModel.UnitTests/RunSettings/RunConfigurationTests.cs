@@ -88,7 +88,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(Architecture.X64, runConfiguration.TargetPlatform);
 
             var expectedFramework = Framework.FromString("FrameworkCore10");
-            var actualFramework = runConfiguration.TargetFramework;
+            _ = runConfiguration.TargetFramework;
             Assert.AreEqual(expectedFramework.Name, runConfiguration.TargetFramework.Name);
             Assert.AreEqual(expectedFramework.Version, runConfiguration.TargetFramework.Version);
 
@@ -112,41 +112,36 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         }
 
         [TestMethod]
+        [Obsolete]
         public void SetTargetFrameworkVersionShouldSetTargetFramework()
         {
-#pragma warning disable 612, 618
-
             var runConfiguration = new RunConfiguration();
             runConfiguration.TargetFrameworkVersion = FrameworkVersion.Framework35;
-            StringAssert.Equals(Framework.FromString("Framework35").Name, runConfiguration.TargetFramework.Name);
+            Equals(Framework.FromString("Framework35").Name, runConfiguration.TargetFramework.Name);
             Assert.AreEqual(FrameworkVersion.Framework35, runConfiguration.TargetFrameworkVersion);
 
             runConfiguration.TargetFrameworkVersion = FrameworkVersion.Framework40;
-            StringAssert.Equals(Framework.FromString("Framework40").Name, runConfiguration.TargetFramework.Name);
+            Equals(Framework.FromString("Framework40").Name, runConfiguration.TargetFramework.Name);
             Assert.AreEqual(FrameworkVersion.Framework40, runConfiguration.TargetFrameworkVersion);
 
             runConfiguration.TargetFrameworkVersion = FrameworkVersion.Framework45;
-            StringAssert.Equals(Framework.FromString("Framework45").Name, runConfiguration.TargetFramework.Name);
+            Equals(Framework.FromString("Framework45").Name, runConfiguration.TargetFramework.Name);
             Assert.AreEqual(FrameworkVersion.Framework45, runConfiguration.TargetFrameworkVersion);
 
             runConfiguration.TargetFrameworkVersion = FrameworkVersion.FrameworkCore10;
-            StringAssert.Equals(Framework.FromString("FrameworkCore10").Name, runConfiguration.TargetFramework.Name);
+            Equals(Framework.FromString("FrameworkCore10").Name, runConfiguration.TargetFramework.Name);
             Assert.AreEqual(FrameworkVersion.FrameworkCore10, runConfiguration.TargetFrameworkVersion);
 
             runConfiguration.TargetFrameworkVersion = FrameworkVersion.FrameworkUap10;
-            StringAssert.Equals(Framework.FromString("FrameworkUap10").Name, runConfiguration.TargetFramework.Name);
+            Equals(Framework.FromString("FrameworkUap10").Name, runConfiguration.TargetFramework.Name);
             Assert.AreEqual(FrameworkVersion.FrameworkUap10, runConfiguration.TargetFrameworkVersion);
-
-#pragma warning restore 612, 618
         }
 
         [TestMethod]
+        [Obsolete]
         public void SetTargetFrameworkShouldSetTargetFrameworkVersion()
         {
             var runConfiguration = new RunConfiguration();
-
-#pragma warning disable 612, 618
-
             runConfiguration.TargetFramework = Framework.FromString("Framework35");
             Assert.AreEqual(FrameworkVersion.Framework35, runConfiguration.TargetFrameworkVersion);
 
@@ -161,8 +156,6 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 
             runConfiguration.TargetFramework = Framework.FromString("FrameworkUap10");
             Assert.AreEqual(FrameworkVersion.FrameworkUap10, runConfiguration.TargetFrameworkVersion);
-
-#pragma warning restore 612, 618
         }
 
         [TestMethod]

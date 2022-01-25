@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         public TestSessionInfo()
         {
-            this.Id = Guid.NewGuid();
+            Id = Guid.NewGuid();
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <returns>An integer representing the computed hashcode value.</returns>
         public override int GetHashCode()
         {
-            return this.Id.GetHashCode();
+            return Id.GetHashCode();
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <returns>True if the two objects are equal, false otherwise.</returns>
         public override bool Equals(object obj)
         {
-            return this.Equals(obj as TestSessionInfo);
+            return Equals(obj as TestSessionInfo);
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <returns>True if the two sessions are equal, false otherwise.</returns>
         public bool Equals(TestSessionInfo other)
         {
-            return other != null && this.Id == other.Id;
+            return other != null && Id == other.Id;
         }
     }
 }

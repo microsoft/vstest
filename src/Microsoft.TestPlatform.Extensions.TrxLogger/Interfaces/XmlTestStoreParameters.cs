@@ -14,7 +14,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// Example: a class has a summary and details fields. Details are large, so they're only 
     /// saved when 'MyClass.SaveDetails' parameter is set to 'true'.
     /// </example>
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is ok here.")]
     internal sealed class XmlTestStoreParameters : Dictionary<string, object>
     {
         private XmlTestStoreParameters()
@@ -43,7 +42,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public bool Contains(string parameter)
         {
-            return this.ContainsKey(parameter);
+            return ContainsKey(parameter);
         }
     }
 }

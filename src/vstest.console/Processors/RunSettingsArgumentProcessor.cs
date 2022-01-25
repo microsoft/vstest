@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     internal class RunSettingsArgumentProcessor : IArgumentProcessor
     {
@@ -45,12 +45,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new RunSettingsArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new RunSettingsArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -61,17 +61,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new RunSettingsArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
+                    executor = new Lazy<IArgumentExecutor>(() => new RunSettingsArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -93,8 +93,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     internal class RunSettingsArgumentExecutor : IArgumentExecutor
     {
-        private CommandLineOptions commandLineOptions;
-        private IRunSettingsProvider runSettingsManager;
+        private readonly CommandLineOptions commandLineOptions;
+        private readonly IRunSettingsProvider runSettingsManager;
 
         internal IFileHelper FileHelper { get; set; }
 
@@ -102,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             this.commandLineOptions = commandLineOptions;
             this.runSettingsManager = runSettingsManager;
-            this.FileHelper = new FileHelper();
+            FileHelper = new FileHelper();
         }
 
         public void Initialize(string argument)
@@ -112,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(CommandLineResources.RunSettingsRequired);
             }
 
-            if (!this.FileHelper.Exists(argument))
+            if (!FileHelper.Exists(argument))
             {
                 throw new CommandLineException(
                     string.Format(
@@ -126,28 +126,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Load up the run settings and set it as the active run settings.
             try
             {
-                XmlDocument document = this.GetRunSettingsDocument(argument);
+                XmlDocument document = GetRunSettingsDocument(argument);
 
-                this.runSettingsManager.UpdateRunSettings(document.OuterXml);
+                runSettingsManager.UpdateRunSettings(document.OuterXml);
 
                 // To determine whether to infer framework and platform.
                 ExtractFrameworkAndPlatform();
 
                 //Add default runsettings values if not exists in given runsettings file.
-                this.runSettingsManager.AddDefaultRunSettings();
+                runSettingsManager.AddDefaultRunSettings();
 
-                this.commandLineOptions.SettingsFile = argument;
+                commandLineOptions.SettingsFile = argument;
 
-                if (this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.EnvironmentVariables") != null)
+                if (runSettingsManager.QueryRunSettingsNode("RunConfiguration.EnvironmentVariables") != null)
                 {
-                    this.commandLineOptions.InIsolation = true;
-                    this.runSettingsManager.UpdateRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath, "true");
+                    commandLineOptions.InIsolation = true;
+                    runSettingsManager.UpdateRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath, "true");
                 }
 
-                var testCaseFilter = this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestCaseFilter");
+                var testCaseFilter = runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestCaseFilter");
                 if (testCaseFilter != null)
                 {
-                    this.commandLineOptions.TestCaseFilterValue = testCaseFilter;
+                    commandLineOptions.TestCaseFilterValue = testCaseFilter;
                 }
             }
             catch (XmlException exception)
@@ -160,37 +160,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         private void ExtractFrameworkAndPlatform()
         {
-            var framworkStr = this.runSettingsManager.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath);
+            var framworkStr = runSettingsManager.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath);
             Framework framework = Framework.FromString(framworkStr);
             if (framework != null)
             {
-                this.commandLineOptions.TargetFrameworkVersion = framework;
+                commandLineOptions.TargetFrameworkVersion = framework;
             }
 
-            var platformStr = this.runSettingsManager.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath);
+            var platformStr = runSettingsManager.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath);
             if (Enum.TryParse<Architecture>(platformStr, true, out var architecture))
             {
                 RunSettingsHelper.Instance.IsDefaultTargetArchitecture = false;
-                this.commandLineOptions.TargetArchitecture = architecture;
+                commandLineOptions.TargetArchitecture = architecture;
             }
         }
 
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         protected virtual XmlReader GetReaderForFile(string runSettingsFile)
         {
             return XmlReader.Create(new StringReader(File.ReadAllText(runSettingsFile, Encoding.UTF8)), XmlRunSettingsUtilities.ReaderSettings);
         }
 
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         private XmlDocument GetRunSettingsDocument(string runSettingsFile)
         {
             XmlDocument runSettingsDocument;
 
             if (!MSTestSettingsUtilities.IsLegacyTestSettingsFile(runSettingsFile))
             {
-                using XmlReader reader = this.GetReaderForFile(runSettingsFile);
+                using XmlReader reader = GetReaderForFile(runSettingsFile);
                 var settingsDocument = new XmlDocument();
                 settingsDocument.Load(reader);
                 ClientUtilities.FixRelativePathsInRunSettings(settingsDocument, runSettingsFile);

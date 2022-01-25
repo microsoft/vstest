@@ -14,16 +14,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     [TestClass]
     public class TestHostManagerFactoryTests
     {
-        private TestHostManagerFactory testHostManagerFactory;
-        private Mock<IRequestData> mockRequestData;
-        private Mock<IMetricsCollection> mockMetricsCollection;
+        private readonly TestHostManagerFactory testHostManagerFactory;
+        private readonly Mock<IRequestData> mockRequestData;
+        private readonly Mock<IMetricsCollection> mockMetricsCollection;
 
         public TestHostManagerFactoryTests()
         {
-            this.mockMetricsCollection = new Mock<IMetricsCollection>();
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
-            this.testHostManagerFactory = new TestHostManagerFactory(this.mockRequestData.Object);
+            mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockRequestData = new Mock<IRequestData>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+            testHostManagerFactory = new TestHostManagerFactory(mockRequestData.Object);
         }
 
         [TestMethod]
@@ -35,25 +35,25 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDiscoveryManagerShouldReturnADiscoveryManagerInstance()
         {
-            Assert.IsNotNull(this.testHostManagerFactory.GetDiscoveryManager());
+            Assert.IsNotNull(testHostManagerFactory.GetDiscoveryManager());
         }
 
         [TestMethod]
         public void GetDiscoveryManagerShouldCacheTheDiscoveryManagerInstance()
         {
-            Assert.AreEqual(this.testHostManagerFactory.GetDiscoveryManager(), this.testHostManagerFactory.GetDiscoveryManager());
+            Assert.AreEqual(testHostManagerFactory.GetDiscoveryManager(), testHostManagerFactory.GetDiscoveryManager());
         }
 
         [TestMethod]
         public void GetDiscoveryManagerShouldReturnAnExecutionManagerInstance()
         {
-            Assert.IsNotNull(this.testHostManagerFactory.GetExecutionManager());
+            Assert.IsNotNull(testHostManagerFactory.GetExecutionManager());
         }
 
         [TestMethod]
         public void GetDiscoveryManagerShouldCacheTheExecutionManagerInstance()
         {
-            Assert.AreEqual(this.testHostManagerFactory.GetExecutionManager(), this.testHostManagerFactory.GetExecutionManager());
+            Assert.AreEqual(testHostManagerFactory.GetExecutionManager(), testHostManagerFactory.GetExecutionManager());
         }
     }
 }

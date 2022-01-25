@@ -134,8 +134,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
         {
             var args = new List<string>() { "--hello", "--world" };
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args.ToArray());
-
-            bool found = CommandLineArgumentsHelper.TryGetIntArgFromDict(argsDictionary, "--port", out var data);
+            bool found = CommandLineArgumentsHelper.TryGetIntArgFromDict(argsDictionary, "--port", out _);
 
             Assert.IsFalse(found);
         }

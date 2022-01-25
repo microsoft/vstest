@@ -53,7 +53,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             var projectName = "ArchitectureSwitch.csproj";
-            var projectPath = this.GetProjectFullPath(projectName);
+            var projectPath = GetProjectFullPath(projectName);
             var projectDirectory = Path.GetDirectoryName(projectPath);
 
             var env = new Dictionary<string, string>
@@ -63,7 +63,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             };
 
             // Verify native architecture
-            ExecuteApplication(GetDefaultDotnetMuxerLocation, $"test {projectPath} --framework net6.0", out string stdOut, out string stdError, out int exitCode, env, projectDirectory);
+            ExecuteApplication(GetDefaultDotnetMuxerLocation, $"test {projectPath} --framework net6.0", out string stdOut, out _, out _, env, projectDirectory);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 Assert.IsTrue(stdOut.Contains("Runtime location: /usr/local/share/dotnet/shared/Microsoft.NETCore.App"));
@@ -77,15 +77,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
 
             // Verify switch using csproj
-            ExecuteApplication(GetDefaultDotnetMuxerLocation, $"test {projectPath} --framework net6.0 --arch x64", out stdOut, out stdError, out exitCode, env, projectDirectory);
+            ExecuteApplication(GetDefaultDotnetMuxerLocation, $"test {projectPath} --framework net6.0 --arch x64", out stdOut, out _, out _, env, projectDirectory);
             AssertSwitch(stdOut);
 
             // Verify switch using test container
             var buildAssemblyPath = GetAssetFullPath("ArchitectureSwitch.dll", "net6.0");
-            ExecuteApplication(GetDefaultDotnetMuxerLocation, $"test {buildAssemblyPath} --arch x64", out stdOut, out stdError, out exitCode, env, projectDirectory);
+            ExecuteApplication(GetDefaultDotnetMuxerLocation, $"test {buildAssemblyPath} --arch x64", out stdOut, out _, out _, env, projectDirectory);
             AssertSwitch(stdOut);
 
-            void AssertSwitch(string output)
+            static void AssertSwitch(string output)
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
@@ -117,11 +117,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             };
 
             var projectName = "ArchitectureSwitch.csproj";
-            var projectPath = this.GetProjectFullPath(projectName);
+            var projectPath = GetProjectFullPath(projectName);
             var projectDirectory = Path.GetDirectoryName(projectPath);
 
             // Verify native architecture
-            ExecuteApplication(GetDefaultDotnetMuxerLocation, $"test {projectPath} --framework net6.0", out string stdOut, out string stdError, out int exitCode, env, projectDirectory);
+            ExecuteApplication(GetDefaultDotnetMuxerLocation, $"test {projectPath} --framework net6.0", out string stdOut, out _, out _, env, projectDirectory);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 Assert.IsTrue(stdOut.Contains("Runtime location: /usr/local/share/dotnet/shared/Microsoft.NETCore.App"), "Unexpected runtime location");
@@ -147,12 +147,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             // Verify switch using csproj
-            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {projectPath} --framework net6.0 --arch x64", out stdOut, out stdError, out exitCode, env, projectDirectory);
+            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {projectPath} --framework net6.0 --arch x64", out stdOut, out _, out _, env, projectDirectory);
             AssertSwitch(stdOut);
 
             // Verify switch using test container
             var buildAssemblyPath = GetAssetFullPath("ArchitectureSwitch.dll", "net6.0");
-            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {buildAssemblyPath} --framework net6.0 --arch x64", out stdOut, out stdError, out exitCode, env, projectDirectory);
+            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {buildAssemblyPath} --framework net6.0 --arch x64", out stdOut, out _, out _, env, projectDirectory);
             AssertSwitch(stdOut);
 
             void AssertSwitch(string output)
@@ -160,8 +160,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 Assert.IsTrue(Regex.IsMatch(output.Replace(@"\", "/"), $"Runtime location: .*{privateX64Installation.Replace(@"\", "/")}.*shared.*Microsoft.NETCore.App"), "Unexpected runtime location");
                 Assert.IsTrue(output.Contains("OSArchitecture: X64"), "Unexpected OSArchitecture");
                 Assert.IsTrue(output.Contains("ProcessArchitecture: X64"), "Unexpected ProcessArchitecture");
-                Assert.IsTrue(dotnetRoot ? output.Contains($"DOTNET_ROOT: {privateX64Installation}") : true, "Unexpected DOTNET_ROOT var");
-                Assert.IsTrue(dotnetRootX64 ? output.Contains($"DOTNET_ROOT_X64: {privateX64Installation}") : true, "Unexpected DOTNET_ROOT_X64 var");
+                Assert.IsTrue(!dotnetRoot || output.Contains($"DOTNET_ROOT: {privateX64Installation}"), "Unexpected DOTNET_ROOT var");
+                Assert.IsTrue(!dotnetRootX64 || output.Contains($"DOTNET_ROOT_X64: {privateX64Installation}"), "Unexpected DOTNET_ROOT_X64 var");
             }
         }
 
@@ -181,25 +181,25 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             string privateInstallationMuxer = Path.Combine(privateX64Installation, GetMuxerName);
 
             var projectName = "ArchitectureSwitch.csproj";
-            var projectPath = this.GetProjectFullPath(projectName);
+            var projectPath = GetProjectFullPath(projectName);
             var projectDirectory = Path.GetDirectoryName(projectPath);
 
             // Verify native architecture
-            ExecuteApplication(privateInstallationMuxer, $"test {projectPath} --framework net6.0", out string stdOut, out string stdError, out int exitCode, env, projectDirectory);
+            ExecuteApplication(privateInstallationMuxer, $"test {projectPath} --framework net6.0", out string stdOut, out _, out _, env, projectDirectory);
             Assert.IsTrue(Regex.IsMatch(stdOut.Replace(@"\", "/"), $"Runtime location: .*{privateX64Installation.Replace(@"\", "/")}.*shared.*Microsoft.NETCore.App"), "Unexpected runtime location");
             Assert.IsTrue(stdOut.Contains("OSArchitecture: X64"), "Unexpected OSArchitecture");
             Assert.IsTrue(stdOut.Contains("ProcessArchitecture: X64"), "Unexpected ProcessArchitecture");
 
             // Verify switch using csproj
-            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {projectPath} --framework net6.0 --arch arm64", out stdOut, out stdError, out exitCode, env, projectDirectory);
+            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {projectPath} --framework net6.0 --arch arm64", out stdOut, out _, out _, env, projectDirectory);
             AssertSwitch(stdOut);
 
             // Verify switch using test container
             var buildAssemblyPath = GetAssetFullPath("ArchitectureSwitch.dll", "net6.0");
-            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {buildAssemblyPath} --framework net6.0 --arch arm64", out stdOut, out stdError, out exitCode, env, projectDirectory);
+            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {buildAssemblyPath} --framework net6.0 --arch arm64", out stdOut, out _, out _, env, projectDirectory);
             AssertSwitch(stdOut);
 
-            void AssertSwitch(string output)
+            static void AssertSwitch(string output)
             {
                 Assert.IsTrue(Regex.IsMatch(output.Replace(@"\", "/"), $"Runtime location: .*{GetDefaultLocation.Replace(@"\", "/")}.*shared.*Microsoft.NETCore.App"), "Unexpected runtime location");
                 Assert.IsTrue(output.Contains("OSArchitecture: Arm64"), "Unexpected OSArchitecture");
@@ -225,11 +225,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             string privateInstallationMuxer = Path.Combine(privateX64Installation, GetMuxerName);
 
             var projectName = "ArchitectureSwitch.csproj";
-            var projectPath = this.GetProjectFullPath(projectName);
+            var projectPath = GetProjectFullPath(projectName);
             var projectDirectory = Path.GetDirectoryName(projectPath);
 
             // Verify native architecture
-            ExecuteApplication(privateInstallationMuxer, $"test {projectPath} --framework net6.0", out string stdOut, out string stdError, out int exitCode, env, projectDirectory);
+            ExecuteApplication(privateInstallationMuxer, $"test {projectPath} --framework net6.0", out string stdOut, out _, out _, env, projectDirectory);
             Assert.IsTrue(Regex.IsMatch(stdOut.Replace(@"\", "/"), $"Runtime location: .*{privateX64Installation.Replace(@"\", "/")}.*shared.*Microsoft.NETCore.App"), "Unexpected runtime location");
             Assert.IsTrue(stdOut.Contains("OSArchitecture: X64"), "Unexpected OSArchitecture");
             Assert.IsTrue(stdOut.Contains("ProcessArchitecture: X64"), "Unexpected ProcessArchitecture");
@@ -248,12 +248,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             // Verify switch using csproj
-            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {projectPath} --framework net6.0 --arch arm64", out stdOut, out stdError, out exitCode, env, projectDirectory);
+            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {projectPath} --framework net6.0 --arch arm64", out stdOut, out _, out _, env, projectDirectory);
             AssertSwitch(stdOut);
 
             // Verify switch using test container
             var buildAssemblyPath = GetAssetFullPath("ArchitectureSwitch.dll", "net6.0");
-            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {buildAssemblyPath} --framework net6.0 --arch arm64", out stdOut, out stdError, out exitCode, env, projectDirectory);
+            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {buildAssemblyPath} --framework net6.0 --arch arm64", out stdOut, out _, out _, env, projectDirectory);
             AssertSwitch(stdOut);
 
             void AssertSwitch(string output)
@@ -261,8 +261,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 Assert.IsTrue(Regex.IsMatch(output.Replace(@"\", "/"), $"Runtime location: .*{GetDefaultLocation.Replace(@"\", "/")}.*shared.*Microsoft.NETCore.App"), "Unexpected runtime location");
                 Assert.IsTrue(output.Contains("OSArchitecture: Arm64"), "Unexpected OSArchitecture");
                 Assert.IsTrue(output.Contains("ProcessArchitecture: Arm64"), "Unexpected ProcessArchitecture");
-                Assert.IsTrue(dotnetRoot ? output.Contains($"DOTNET_ROOT: {GetDefaultLocation}") : true, "Unexpected DOTNET_ROOT var");
-                Assert.IsTrue(dotnetRootARM64 ? output.Contains($"DOTNET_ROOT_ARM64: {GetDefaultLocation}") : true, "Unexpected DOTNET_ROOT_ARM64 var");
+                Assert.IsTrue(!dotnetRoot || output.Contains($"DOTNET_ROOT: {GetDefaultLocation}"), "Unexpected DOTNET_ROOT var");
+                Assert.IsTrue(!dotnetRootARM64 || output.Contains($"DOTNET_ROOT_ARM64: {GetDefaultLocation}"), "Unexpected DOTNET_ROOT_ARM64 var");
             }
         }
 
@@ -275,7 +275,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             var projectName = "ArchitectureSwitch.csproj";
-            var projectPath = this.GetProjectFullPath(projectName);
+            var projectPath = GetProjectFullPath(projectName);
             var projectDirectory = Path.GetDirectoryName(projectPath);
 
             var env = new Dictionary<string, string>
@@ -283,8 +283,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 ["DOTNET_ROOT"] = null,
                 ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
             };
-
-            ExecuteApplication(GetDefaultDotnetMuxerLocation, $"test {projectPath} --framework {GetFrameworkVersionToForceToX64}", out string stdOut, out string stdError, out int exitCode, env, projectDirectory);
+            ExecuteApplication(GetDefaultDotnetMuxerLocation, $"test {projectPath} --framework {GetFrameworkVersionToForceToX64}", out string stdOut, out _, out _, env, projectDirectory);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 Assert.IsTrue(stdOut.Contains("Runtime location: /usr/local/share/dotnet/x64/shared/Microsoft.NETCore.App"));

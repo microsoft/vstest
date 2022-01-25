@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             if (!string.IsNullOrEmpty(vsInstallPath))
             {
                 var pathToDevenv = Path.Combine(vsInstallPath, DevenvExe);
-                if (!string.IsNullOrEmpty(pathToDevenv) && this.fileHelper.Exists(pathToDevenv))
+                if (!string.IsNullOrEmpty(pathToDevenv) && fileHelper.Exists(pathToDevenv))
                 {
                     visualStudioDirectory = vsInstallPath;
                     return true;

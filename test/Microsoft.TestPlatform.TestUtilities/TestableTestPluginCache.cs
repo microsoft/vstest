@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             TestDiscoveryExtensionManager.Destroy();
             TestExecutorExtensionManager.Destroy();
             SettingsProviderExtensionManager.Destroy();
-            this.UpdateExtensions(extensionsPath, skipExtensionFilters: false);
+            UpdateExtensions(extensionsPath, skipExtensionFilters: false);
         }
 
         public TestableTestPluginCache() : this(new List<string>())
@@ -25,7 +25,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         protected override IEnumerable<string> GetFilteredExtensions(List<string> extensions, string searchPattern)
         {
-            this.Action?.Invoke();
+            Action?.Invoke();
             return extensions;
         }
 

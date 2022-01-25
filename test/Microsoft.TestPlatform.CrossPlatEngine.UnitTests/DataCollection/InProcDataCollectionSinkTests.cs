@@ -22,39 +22,39 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestInitialize]
         public void InitializeTest()
         {
-            this.dataCollectionSink = new InProcDataCollectionSink();
-            this.testCase = new TestCase("DummyNS.DummyC.DummyM", new Uri("executor://mstest/v1"), "Dummy.dll");
-            this.dataCollectionContext = new DataCollectionContext(this.testCase);
+            dataCollectionSink = new InProcDataCollectionSink();
+            testCase = new TestCase("DummyNS.DummyC.DummyM", new Uri("executor://mstest/v1"), "Dummy.dll");
+            dataCollectionContext = new DataCollectionContext(testCase);
         }
 
         [TestMethod]
         public void SendDataShouldAddKeyValueToDictionaryInSink()
         {
-            this.testCase.SetPropertyValue(TestCaseProperties.Id, Guid.NewGuid());
-            this.dataCollectionSink.SendData(this.dataCollectionContext, "DummyKey", "DummyValue");
+            testCase.SetPropertyValue(TestCaseProperties.Id, Guid.NewGuid());
+            dataCollectionSink.SendData(dataCollectionContext, "DummyKey", "DummyValue");
 
-            var dict = ((InProcDataCollectionSink)this.dataCollectionSink).GetDataCollectionDataSetForTestCase(this.testCase.Id);
+            var dict = ((InProcDataCollectionSink)dataCollectionSink).GetDataCollectionDataSetForTestCase(testCase.Id);
 
-            Assert.AreEqual<string>("DummyValue", dict["DummyKey"]);
+            Assert.AreEqual("DummyValue", dict["DummyKey"]);
         }
 
         [TestMethod]
 
         public void SendDataShouldThrowArgumentExceptionIfKeyIsNull()
         {
-            this.testCase.SetPropertyValue(TestCaseProperties.Id, Guid.NewGuid());
+            testCase.SetPropertyValue(TestCaseProperties.Id, Guid.NewGuid());
 
             Assert.ThrowsException<ArgumentNullException>(
-                () => this.dataCollectionSink.SendData(this.dataCollectionContext, null, "DummyValue"));
+                () => dataCollectionSink.SendData(dataCollectionContext, null, "DummyValue"));
         }
 
         [TestMethod]
         public void SendDataShouldThrowArgumentExceptionIfValueIsNull()
         {
-            this.testCase.SetPropertyValue(TestCaseProperties.Id, Guid.NewGuid());
+            testCase.SetPropertyValue(TestCaseProperties.Id, Guid.NewGuid());
 
             Assert.ThrowsException<ArgumentNullException>(
-                () => this.dataCollectionSink.SendData(this.dataCollectionContext, "DummyKey", null));
+                () => dataCollectionSink.SendData(dataCollectionContext, "DummyKey", null));
         }
 
         //[TestMethod]
@@ -62,7 +62,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void SendDataShouldThrowArgumentExceptionIfTestCaseIdIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(
-                () => this.dataCollectionSink.SendData(this.dataCollectionContext, "DummyKey", "DummyValue"));
+                () => dataCollectionSink.SendData(dataCollectionContext, "DummyKey", "DummyValue"));
         }
     }
 }

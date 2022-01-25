@@ -20,8 +20,8 @@ namespace Microsoft.TestPlatform.Client.UnitTests.TestRunAttachmentsProcessing
 
         public TestRunAttachmentsProcessingEventsHandlerTests()
         {
-            this.mockCommunicationManager = new Mock<ICommunicationManager>();
-            this.handler = new TestRunAttachmentsProcessingEventsHandler(mockCommunicationManager.Object);
+            mockCommunicationManager = new Mock<ICommunicationManager>();
+            handler = new TestRunAttachmentsProcessingEventsHandler(mockCommunicationManager.Object);
         }
 
         [TestMethod]

@@ -16,9 +16,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     [TestClass]
     public class TestPlatformDataCollectionSinkTests
     {
-        private Mock<IDataCollectionAttachmentManager> attachmentManager;
+        private readonly Mock<IDataCollectionAttachmentManager> attachmentManager;
 
-        private DataCollectorConfig dataCollectorConfig;
+        private readonly DataCollectorConfig dataCollectorConfig;
 
         private TestPlatformDataCollectionSink dataCollectionSink;
 
@@ -27,10 +27,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
         public TestPlatformDataCollectionSinkTests()
         {
-            this.attachmentManager = new Mock<IDataCollectionAttachmentManager>();
-            this.dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollector));
-            this.dataCollectionSink = new TestPlatformDataCollectionSink(this.attachmentManager.Object, this.dataCollectorConfig);
-            this.isEventHandlerInvoked = false;
+            attachmentManager = new Mock<IDataCollectionAttachmentManager>();
+            dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollector));
+            dataCollectionSink = new TestPlatformDataCollectionSink(attachmentManager.Object, dataCollectorConfig);
+            isEventHandlerInvoked = false;
         }
 
         [TestCleanup]
@@ -42,10 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void SendFileAsyncShouldThrowExceptionIfFileTransferInformationIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.dataCollectionSink.SendFileAsync(default);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => dataCollectionSink.SendFileAsync(default));
         }
 
         [TestMethod]
@@ -60,9 +57,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             var fileTransferInfo = new FileTransferInformation(context, filename, false);
 
-            this.dataCollectionSink.SendFileAsync(fileTransferInfo);
+            dataCollectionSink.SendFileAsync(fileTransferInfo);
 
-            this.attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
+            attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
         }
 
         [TestMethod]
@@ -80,14 +77,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var attachmentManager = new DataCollectionAttachmentManager();
             attachmentManager.Initialize(sessionId, TempDirectoryPath, new Mock<IMessageSink>().Object);
 
-            this.dataCollectionSink = new TestPlatformDataCollectionSink(attachmentManager, this.dataCollectorConfig);
-            this.dataCollectionSink.SendFileCompleted += SendFileCompleted_Handler;
-            this.dataCollectionSink.SendFileAsync(fileTransferInfo);
+            dataCollectionSink = new TestPlatformDataCollectionSink(attachmentManager, dataCollectorConfig);
+            dataCollectionSink.SendFileCompleted += SendFileCompleted_Handler;
+            dataCollectionSink.SendFileAsync(fileTransferInfo);
 
             var result = attachmentManager.GetAttachments(context);
 
             Assert.IsNotNull(result);
-            Assert.IsTrue(this.isEventHandlerInvoked);
+            Assert.IsTrue(isEventHandlerInvoked);
         }
 
         [TestMethod]
@@ -100,9 +97,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var sessionId = new SessionId(guid);
             var context = new DataCollectionContext(sessionId);
 
-            this.dataCollectionSink.SendFileAsync(context, filename, false);
+            dataCollectionSink.SendFileAsync(context, filename, false);
 
-            this.attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
+            attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
         }
 
         [TestMethod]
@@ -115,14 +112,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var sessionId = new SessionId(guid);
             var context = new DataCollectionContext(sessionId);
 
-            this.dataCollectionSink.SendFileAsync(context, filename, string.Empty, false);
+            dataCollectionSink.SendFileAsync(context, filename, string.Empty, false);
 
-            this.attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
+            attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
         }
 
         void SendFileCompleted_Handler(object sender, AsyncCompletedEventArgs e)
         {
-            this.isEventHandlerInvoked = true;
+            isEventHandlerInvoked = true;
         }
     }
 }

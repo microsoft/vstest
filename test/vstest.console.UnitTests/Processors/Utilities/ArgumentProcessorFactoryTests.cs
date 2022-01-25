@@ -88,7 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         }
 
         [TestMethod]
-        public void CreateArgumentProcessorShouldReturnCLIRunSettingsArgumentProcessorIfCommandIsGiven()
+        public void CreateArgumentProcessorShouldReturnCliRunSettingsArgumentProcessorIfCommandIsGiven()
         {
             var command = "--";
 
@@ -104,8 +104,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         {
             var specialCommands = GetArgumentProcessors(specialCommandFilter: true);
 
-            List<string> xplatspecialCommandNames = new List<string>();
-            List<string> specialCommandNames = new List<string>();
+            List<string> xplatspecialCommandNames = new();
+            List<string> specialCommandNames = new();
 
             // for each command add there xplat version
             foreach (var specialCommand in specialCommands)
@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         {
             var commandProcessors = GetArgumentProcessors(specialCommandFilter: false);
             var commands = commandProcessors.Select(a => a.Metadata.Value.CommandName);
-            List<string> xplatCommandName = new List<string>();
+            List<string> xplatCommandName = new();
 
             // for each command add there xplat version
             foreach (string name in commands)
@@ -139,7 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
             var shortCommands = commandProcessors.Where(a => !string.IsNullOrEmpty(a.Metadata.Value.ShortCommandName))
                                     .Select(a => a.Metadata.Value.ShortCommandName);
 
-            List<string> xplatShortCommandName = new List<string>();
+            List<string> xplatShortCommandName = new();
 
             // for each short command add there xplat version
             foreach (string name in shortCommands)

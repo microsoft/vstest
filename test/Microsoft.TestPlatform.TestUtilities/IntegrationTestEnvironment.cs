@@ -27,14 +27,14 @@ namespace Microsoft.TestPlatform.TestUtilities
         public IntegrationTestEnvironment()
         {
             // These environment variables are set in scripts/test.ps1 or scripts/test.sh.
-            this.TargetFramework = Environment.GetEnvironmentVariable("TPT_TargetFramework");
-            this.TargetRuntime = Environment.GetEnvironmentVariable("TPT_TargetRuntime");
+            TargetFramework = Environment.GetEnvironmentVariable("TPT_TargetFramework");
+            TargetRuntime = Environment.GetEnvironmentVariable("TPT_TargetRuntime");
 
             // If the variables are not set, valid defaults are assumed.
-            if (string.IsNullOrEmpty(this.TargetFramework))
+            if (string.IsNullOrEmpty(TargetFramework))
             {
                 // Run integration tests for net451 by default.
-                this.TargetFramework = "net451";
+                TargetFramework = "net451";
             }
 
             if (string.IsNullOrEmpty(TestPlatformRootDirectory))
@@ -44,14 +44,14 @@ namespace Microsoft.TestPlatform.TestUtilities
                 TestPlatformRootDirectory = Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
             }
 
-            this.TestAssetsPath = Path.Combine(TestPlatformRootDirectory, $@"test{Path.DirectorySeparatorChar}TestAssets");
+            TestAssetsPath = Path.Combine(TestPlatformRootDirectory, $@"test{Path.DirectorySeparatorChar}TestAssets");
 
             // There is an assumption that integration tests will always run from a source enlistment.
             // Need to remove this assumption when we move to a CDP.
-            this.PackageDirectory = Path.Combine(TestPlatformRootDirectory, @"packages");
-            this.ToolsDirectory = Path.Combine(TestPlatformRootDirectory, @"tools");
-            this.TestArtifactsDirectory = Path.Combine(TestPlatformRootDirectory, "artifacts", "testArtifacts");
-            this.RunnerFramework = "net451";
+            PackageDirectory = Path.Combine(TestPlatformRootDirectory, @"packages");
+            ToolsDirectory = Path.Combine(TestPlatformRootDirectory, @"tools");
+            TestArtifactsDirectory = Path.Combine(TestPlatformRootDirectory, "artifacts", "testArtifacts");
+            RunnerFramework = "net451";
         }
 
         /// <summary>
@@ -105,15 +105,12 @@ namespace Microsoft.TestPlatform.TestUtilities
                     TestPlatformRootDirectory,
                     "artifacts",
                     BuildConfiguration,
-                    this.RunnerFramework,
-                    this.TargetRuntime);
+                    RunnerFramework,
+                    TargetRuntime);
 
-                if (!Directory.Exists(publishDirectory))
-                {
-                    throw new InvalidOperationException($"Path '{publishDirectory}' does not exist, did you build the solution via build.cmd?");
-                }
-
-                return publishDirectory;
+                return !Directory.Exists(publishDirectory)
+                    ? throw new InvalidOperationException($"Path '{publishDirectory}' does not exist, did you build the solution via build.cmd?")
+                    : publishDirectory;
             }
         }
 
@@ -140,23 +137,23 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             get
             {
-                if (this.RunnerFramework == IntegrationTestBase.DesktopRunnerFramework)
+                if (RunnerFramework == IntegrationTestBase.DesktopRunnerFramework)
                 {
-                    if (string.IsNullOrEmpty(this.targetRuntime))
+                    if (string.IsNullOrEmpty(targetRuntime))
                     {
-                        this.targetRuntime = "win7-x64";
+                        targetRuntime = "win7-x64";
                     }
                 }
                 else
                 {
-                    this.targetRuntime = "";
+                    targetRuntime = "";
                 }
 
-                return this.targetRuntime;
+                return targetRuntime;
             }
             set
             {
-                this.targetRuntime = value;
+                targetRuntime = value;
             }
         }
 
@@ -219,7 +216,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// </remarks>
         public string GetTestAsset(string assetName)
         {
-            return GetTestAsset(assetName, this.TargetFramework);
+            return GetTestAsset(assetName, TargetFramework);
         }
 
         /// <summary>
@@ -239,7 +236,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             var simpleAssetName = Path.GetFileNameWithoutExtension(assetName);
             var assetPath = Path.Combine(
-                this.TestAssetsPath,
+                TestAssetsPath,
                 simpleAssetName,
                 "bin",
                 BuildConfiguration,
@@ -259,7 +256,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <remarks>GetNugetPackage("foobar") will return a path to packages\foobar.</remarks>
         public string GetNugetPackage(string packageSuffix)
         {
-            var packagePath = Path.Combine(this.PackageDirectory, packageSuffix);
+            var packagePath = Path.Combine(PackageDirectory, packageSuffix);
 
             Assert.IsTrue(Directory.Exists(packagePath), "GetNugetPackage: Directory not found: {0}.", packagePath);
 
@@ -317,7 +314,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             var simpleAssetName = Path.GetFileNameWithoutExtension(assetName);
             var assetPath = Path.Combine(
-                this.TestAssetsPath,
+                TestAssetsPath,
                 simpleAssetName,
                 assetName);
 

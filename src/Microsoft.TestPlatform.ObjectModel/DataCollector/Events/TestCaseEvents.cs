@@ -44,9 +44,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             bool isChildTestCase)
             : base(context)
         {
-            this.TestCaseId = testCaseId;
-            this.TestCaseName = testCaseName ?? string.Empty;
-            this.IsChildTestCase = isChildTestCase;
+            TestCaseId = testCaseId;
+            TestCaseName = testCaseName ?? string.Empty;
+            IsChildTestCase = isChildTestCase;
         }
 
         /// <summary>
@@ -73,9 +73,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             // TODO
             // EqtAssert.ParameterNotNull(testElement, "testElement");
 
-            this.TestElement = testElement;
-            this.TestCaseId = testElement.Id;
-            this.TestCaseName = testElement.DisplayName;
+            TestElement = testElement;
+            TestCaseId = testElement.Id;
+            TestCaseName = testElement.DisplayName;
             // IsChildTestCase = testElement != null &&
             // !testElement.ParentExecId.Equals(TestExecId.Empty);
         }
@@ -260,7 +260,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             //  around in the events as this is extra information that needs to be serialized
             //  and the Execution Plugin Manager will fill this in for us before the event
             //  is sent to the data collector when running in a production environment.
-            this.TestOutcome = testOutcome;
+            TestOutcome = testOutcome;
         }
 
         /// <summary>
@@ -315,7 +315,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             : base(context, testCaseId, testCaseName, isChildTestCase)
         {
             Debug.Assert(context.HasTestCase, "Context is not for a test case");
-            this.TestOutcome = testOutcome;
+            TestOutcome = testOutcome;
         }
 
         #endregion
@@ -385,7 +385,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             //  around in the events as this is extra information that needs to be serialized
             //  and the Execution Plugin Manager will fill this in for us before the event
             //  is sent to the data collector when running in a production environment.
-            this.TestResult = testResult;
+            TestResult = testResult;
         }
 
         /// <summary>
@@ -416,7 +416,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             : base(context, testCaseId, testCaseName, isChildTestCase)
         {
             Debug.Assert(context.HasTestCase, "Context is not for a test case");
-            this.TestResult = testResult;
+            TestResult = testResult;
         }
 
         #endregion

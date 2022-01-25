@@ -185,10 +185,10 @@ namespace Microsoft.TestPlatform.Build.Tasks
             var allowfailureWithoutError = BuildEngine.GetType().GetProperty("AllowFailureWithoutError");
             allowfailureWithoutError?.SetValue(BuildEngine, true);
 
-            vsTestForwardingApp = new VSTestForwardingApp(this.VSTestConsolePath, this.CreateArgument());
-            if (!string.IsNullOrEmpty(this.VSTestFramework))
+            vsTestForwardingApp = new VSTestForwardingApp(VSTestConsolePath, CreateArgument());
+            if (!string.IsNullOrEmpty(VSTestFramework))
             {
-                Console.WriteLine(Resources.TestRunningSummary, this.TestFileFullPath, this.VSTestFramework);
+                Console.WriteLine(Resources.TestRunningSummary, TestFileFullPath, VSTestFramework);
             }
 
             return vsTestForwardingApp.Execute() == 0;
@@ -202,20 +202,20 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
         internal IEnumerable<string> CreateArgument()
         {
-            var allArgs = this.AddArgs();
+            var allArgs = AddArgs();
 
             // VSTestCLIRunSettings should be last argument in allArgs as vstest.console ignore options after "--"(CLIRunSettings option).
-            this.AddCLIRunSettingsArgs(allArgs);
+            AddCLIRunSettingsArgs(allArgs);
 
             return allArgs;
         }
 
         private void AddCLIRunSettingsArgs(List<string> allArgs)
         {
-            if (this.VSTestCLIRunSettings != null && this.VSTestCLIRunSettings.Length > 0)
+            if (VSTestCLIRunSettings != null && VSTestCLIRunSettings.Length > 0)
             {
                 allArgs.Add("--");
-                foreach (var arg in this.VSTestCLIRunSettings)
+                foreach (var arg in VSTestCLIRunSettings)
                 {
                     allArgs.Add(ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
                 }
@@ -230,40 +230,40 @@ namespace Microsoft.TestPlatform.Build.Tasks
             var allArgs = new List<string>();
 
             // TODO log arguments in task
-            if (!string.IsNullOrEmpty(this.VSTestSetting))
+            if (!string.IsNullOrEmpty(VSTestSetting))
             {
                 isRunSettingsEnabled = true;
-                allArgs.Add("--settings:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestSetting));
+                allArgs.Add("--settings:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VSTestSetting));
             }
 
-            if (this.VSTestTestAdapterPath != null && this.VSTestTestAdapterPath.Length > 0)
+            if (VSTestTestAdapterPath != null && VSTestTestAdapterPath.Length > 0)
             {
-                foreach (var arg in this.VSTestTestAdapterPath)
+                foreach (var arg in VSTestTestAdapterPath)
                 {
                     allArgs.Add("--testAdapterPath:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
                 }
             }
 
-            if (!string.IsNullOrEmpty(this.VSTestFramework))
+            if (!string.IsNullOrEmpty(VSTestFramework))
             {
-                allArgs.Add("--framework:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestFramework));
+                allArgs.Add("--framework:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VSTestFramework));
             }
 
             // vstest.console only support x86 and x64 for argument platform
-            if (!string.IsNullOrEmpty(this.VSTestPlatform) && !this.VSTestPlatform.Contains("AnyCPU"))
+            if (!string.IsNullOrEmpty(VSTestPlatform) && !VSTestPlatform.Contains("AnyCPU"))
             {
-                allArgs.Add("--platform:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestPlatform));
+                allArgs.Add("--platform:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VSTestPlatform));
             }
 
-            if (!string.IsNullOrEmpty(this.VSTestTestCaseFilter))
+            if (!string.IsNullOrEmpty(VSTestTestCaseFilter))
             {
                 allArgs.Add("--testCaseFilter:" +
-                            ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestTestCaseFilter));
+                            ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VSTestTestCaseFilter));
             }
 
-            if (this.VSTestLogger != null && this.VSTestLogger.Length > 0)
+            if (VSTestLogger != null && VSTestLogger.Length > 0)
             {
-                foreach (var arg in this.VSTestLogger)
+                foreach (var arg in VSTestLogger)
                 {
                     allArgs.Add("--logger:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
 
@@ -274,43 +274,43 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 }
             }
 
-            if (!string.IsNullOrEmpty(this.VSTestResultsDirectory))
+            if (!string.IsNullOrEmpty(VSTestResultsDirectory))
             {
                 allArgs.Add("--resultsDirectory:" +
-                            ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestResultsDirectory));
+                            ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VSTestResultsDirectory));
             }
 
-            if (!string.IsNullOrEmpty(this.VSTestListTests))
+            if (!string.IsNullOrEmpty(VSTestListTests))
             {
                 allArgs.Add("--listTests");
             }
 
-            if (!string.IsNullOrEmpty(this.VSTestDiag))
+            if (!string.IsNullOrEmpty(VSTestDiag))
             {
-                allArgs.Add("--Diag:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestDiag));
+                allArgs.Add("--Diag:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VSTestDiag));
             }
 
-            if (string.IsNullOrEmpty(this.TestFileFullPath))
+            if (string.IsNullOrEmpty(TestFileFullPath))
             {
-                this.Log.LogError("Test file path cannot be empty or null.");
+                Log.LogError("Test file path cannot be empty or null.");
             }
             else
             {
-                allArgs.Add(ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.TestFileFullPath));
+                allArgs.Add(ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(TestFileFullPath));
             }
 
             // Console logger was not specified by user, but verbosity was, hence add default console logger with verbosity as specified
-            if (!string.IsNullOrWhiteSpace(this.VSTestVerbosity) && !isConsoleLoggerSpecifiedByUser)
+            if (!string.IsNullOrWhiteSpace(VSTestVerbosity) && !isConsoleLoggerSpecifiedByUser)
             {
                 var normalTestLogging = new List<string>() { "n", "normal", "d", "detailed", "diag", "diagnostic" };
                 var quietTestLogging = new List<string>() { "q", "quiet" };
 
                 string vsTestVerbosity = "minimal";
-                if (normalTestLogging.Contains(this.VSTestVerbosity.ToLowerInvariant()))
+                if (normalTestLogging.Contains(VSTestVerbosity.ToLowerInvariant()))
                 {
                     vsTestVerbosity = "normal";
                 }
-                else if (quietTestLogging.Contains(this.VSTestVerbosity.ToLowerInvariant()))
+                else if (quietTestLogging.Contains(VSTestVerbosity.ToLowerInvariant()))
                 {
                     vsTestVerbosity = "quiet";
                 }
@@ -318,9 +318,9 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 allArgs.Add("--logger:Console;Verbosity=" + vsTestVerbosity);
             }
 
-            var blameCrash = !string.IsNullOrEmpty(this.VSTestBlameCrash);
-            var blameHang = !string.IsNullOrEmpty(this.VSTestBlameHang);
-            if (!string.IsNullOrEmpty(this.VSTestBlame) || blameCrash || blameHang)
+            var blameCrash = !string.IsNullOrEmpty(VSTestBlameCrash);
+            var blameHang = !string.IsNullOrEmpty(VSTestBlameHang);
+            if (!string.IsNullOrEmpty(VSTestBlame) || blameCrash || blameHang)
             {
                 var blameArgs = "--Blame";
 
@@ -330,14 +330,14 @@ namespace Microsoft.TestPlatform.Build.Tasks
                     if (blameCrash)
                     {
                         dumpArgs.Add("CollectDump");
-                        if (!string.IsNullOrEmpty(this.VSTestBlameCrashCollectAlways))
+                        if (!string.IsNullOrEmpty(VSTestBlameCrashCollectAlways))
                         {
-                            dumpArgs.Add($"CollectAlways={this.VSTestBlameCrashCollectAlways}");
+                            dumpArgs.Add($"CollectAlways={VSTestBlameCrashCollectAlways}");
                         }
 
-                        if (!string.IsNullOrEmpty(this.VSTestBlameCrashDumpType))
+                        if (!string.IsNullOrEmpty(VSTestBlameCrashDumpType))
                         {
-                            dumpArgs.Add($"DumpType={this.VSTestBlameCrashDumpType}");
+                            dumpArgs.Add($"DumpType={VSTestBlameCrashDumpType}");
                         }
                     }
 
@@ -345,14 +345,14 @@ namespace Microsoft.TestPlatform.Build.Tasks
                     {
                         dumpArgs.Add("CollectHangDump");
 
-                        if (!string.IsNullOrEmpty(this.VSTestBlameHangDumpType))
+                        if (!string.IsNullOrEmpty(VSTestBlameHangDumpType))
                         {
-                            dumpArgs.Add($"HangDumpType={this.VSTestBlameHangDumpType}");
+                            dumpArgs.Add($"HangDumpType={VSTestBlameHangDumpType}");
                         }
 
-                        if (!string.IsNullOrEmpty(this.VSTestBlameHangTimeout))
+                        if (!string.IsNullOrEmpty(VSTestBlameHangTimeout))
                         {
-                            dumpArgs.Add($"TestTimeout={this.VSTestBlameHangTimeout}");
+                            dumpArgs.Add($"TestTimeout={VSTestBlameHangTimeout}");
                         }
                     }
 
@@ -365,9 +365,9 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 allArgs.Add(blameArgs);
             }
 
-            if (this.VSTestCollect != null && this.VSTestCollect.Length > 0)
+            if (VSTestCollect != null && VSTestCollect.Length > 0)
             {
-                foreach (var arg in this.VSTestCollect)
+                foreach (var arg in VSTestCollect)
                 {
                     // For collecting code coverage, argument value can be either "Code Coverage" or "Code Coverage;a=b;c=d".
                     // Split the argument with ';' and compare first token value.
@@ -392,11 +392,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 //    2. Impact of adding adapter path always is minimal. (worst case: loads additional data collector assembly in datacollector process.)
                 // This is required due to currently trace datacollector not ships with dotnet sdk, can be remove once we have
                 // go code coverage x-plat.
-                if (!string.IsNullOrEmpty(this.VSTestTraceDataCollectorDirectoryPath))
+                if (!string.IsNullOrEmpty(VSTestTraceDataCollectorDirectoryPath))
                 {
                     allArgs.Add("--testAdapterPath:" +
-                                ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this
-                                    .VSTestTraceDataCollectorDirectoryPath));
+                                ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(
+                                    VSTestTraceDataCollectorDirectoryPath));
                 }
                 else
                 {
@@ -409,7 +409,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(this.VSTestNoLogo))
+            if (!string.IsNullOrWhiteSpace(VSTestNoLogo))
             {
                 allArgs.Add("--nologo");
             }

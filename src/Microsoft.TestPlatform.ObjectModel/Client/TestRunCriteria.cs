@@ -230,16 +230,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             var testSources = sources as IList<string> ?? sources.ToList();
             ValidateArg.NotNullOrEmpty(testSources, nameof(sources));
 
-            this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            AdapterSourceMap = new Dictionary<string, IEnumerable<string>>
             {
                 { Constants.UnspecifiedAdapterPath, testSources }
             };
 
-            this.TestCaseFilter = testCaseFilter;
-            this.FilterOptions = filterOptions;
+            TestCaseFilter = testCaseFilter;
+            FilterOptions = filterOptions;
 
-            this.TestSessionInfo = testSessionInfo;
-            this.DebugEnabledForTestSession = debugEnabledForTestSession;
+            TestSessionInfo = testSessionInfo;
+            DebugEnabledForTestSession = debugEnabledForTestSession;
         }
 
         /// <summary>
@@ -257,13 +257,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             var testSources = sources as IList<string> ?? sources.ToArray();
             ValidateArg.NotNullOrEmpty(testSources, nameof(sources));
 
-            this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            AdapterSourceMap = new Dictionary<string, IEnumerable<string>>
             {
                 { Constants.UnspecifiedAdapterPath, testSources }
             };
 
-            this.TestCaseFilter = testRunCriteria.testCaseFilter;
-            this.FilterOptions = testRunCriteria.filterOptions;
+            TestCaseFilter = testRunCriteria.testCaseFilter;
+            FilterOptions = testRunCriteria.filterOptions;
         }
 
         /// <summary>
@@ -300,7 +300,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         {
             ValidateArg.NotNullOrEmpty(adapterSourceMap, nameof(adapterSourceMap));
 
-            this.AdapterSourceMap = adapterSourceMap;
+            AdapterSourceMap = adapterSourceMap;
         }
 
         /// <summary>
@@ -405,7 +405,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             var testCases = tests as IList<TestCase> ?? tests.ToList();
             ValidateArg.NotNullOrEmpty(testCases, nameof(tests));
 
-            this.Tests = testCases;
+            Tests = testCases;
         }
 
         /// <summary>
@@ -482,9 +482,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             var testCases = tests as IList<TestCase> ?? tests.ToList();
             ValidateArg.NotNullOrEmpty(testCases, nameof(tests));
 
-            this.Tests = testCases;
-            this.TestSessionInfo = testSessionInfo;
-            this.DebugEnabledForTestSession = debugEnabledForTestSession;
+            Tests = testCases;
+            TestSessionInfo = testSessionInfo;
+            DebugEnabledForTestSession = debugEnabledForTestSession;
         }
 
         /// <summary>
@@ -496,7 +496,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             get
             {
                 IEnumerable<string> sources = new List<string>();
-                return this.AdapterSourceMap?.Values?.Aggregate(
+                return AdapterSourceMap?.Values?.Aggregate(
                     sources,
                     (current, enumerable) => current.Concat(enumerable));
             }
@@ -527,17 +527,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         {
             get
             {
-                return this.testCaseFilter;
+                return testCaseFilter;
             }
 
             private set
             {
-                if (value != null && !this.HasSpecificSources)
+                if (value != null && !HasSpecificSources)
                 {
                     throw new InvalidOperationException(Resources.NoTestCaseFilterForSpecificTests);
                 }
 
-                this.testCaseFilter = value;
+                testCaseFilter = value;
             }
         }
 
@@ -550,17 +550,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         {
             get
             {
-                return this.filterOptions;
+                return filterOptions;
             }
 
             private set
             {
-                if (value != null && !this.HasSpecificSources)
+                if (value != null && !HasSpecificSources)
                 {
                     throw new InvalidOperationException(Resources.NoTestCaseFilterForSpecificTests);
                 }
 
-                this.filterOptions = value;
+                filterOptions = value;
             }
         }
 
@@ -580,7 +580,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         public bool HasSpecificTests
         {
-            get { return this.Tests != null; }
+            get { return Tests != null; }
         }
 
         /// <summary>
@@ -589,23 +589,23 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         [DataMember]
         public bool HasSpecificSources
         {
-            get { return this.Sources != null; }
+            get { return Sources != null; }
         }
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             sb.AppendLine(string.Format(CultureInfo.CurrentCulture, "TestRunCriteria:"));
             sb.AppendLine(string.Format(
                     CultureInfo.CurrentCulture,
                     "   KeepAlive={0},FrequencyOfRunStatsChangeEvent={1},RunStatsChangeEventTimeout={2},TestCaseFilter={3},TestExecutorLauncher={4}",
-                    this.KeepAlive,
-                    this.FrequencyOfRunStatsChangeEvent,
-                    this.RunStatsChangeEventTimeout,
-                    this.TestCaseFilter,
-                    this.TestHostLauncher));
-            sb.AppendLine(string.Format(CultureInfo.CurrentCulture, "   Settingsxml={0}", this.TestRunSettings));
+                    KeepAlive,
+                    FrequencyOfRunStatsChangeEvent,
+                    RunStatsChangeEventTimeout,
+                    TestCaseFilter,
+                    TestHostLauncher));
+            sb.AppendLine(string.Format(CultureInfo.CurrentCulture, "   Settingsxml={0}", TestRunSettings));
 
             return sb.ToString();
         }
@@ -613,29 +613,24 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         protected bool Equals(TestRunCriteria other)
         {
             return base.Equals(other)
-                && string.Equals(this.TestCaseFilter, other.TestCaseFilter)
-                && string.Equals(this.FilterOptions, other.FilterOptions);
+                && string.Equals(TestCaseFilter, other.TestCaseFilter)
+                && Equals(FilterOptions, other.FilterOptions);
         }
 
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            if (object.ReferenceEquals(null, obj))
+            if (obj is null)
             {
                 return false;
             }
 
-            if (object.ReferenceEquals(this, obj))
+            if (ReferenceEquals(this, obj))
             {
                 return true;
             }
 
-            if (obj.GetType() != this.GetType())
-            {
-                return false;
-            }
-
-            return this.Equals((TestRunCriteria)obj);
+            return obj.GetType() == GetType() && Equals((TestRunCriteria)obj);
         }
 
         /// <inheritdoc/>
@@ -644,9 +639,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             unchecked
             {
                 int hashCode = base.GetHashCode();
-                hashCode = (hashCode * 397) ^ (this.testCaseFilter != null ? this.testCaseFilter.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (this.AdapterSourceMap != null ? this.AdapterSourceMap.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (this.Tests != null ? this.Tests.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (testCaseFilter != null ? testCaseFilter.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (AdapterSourceMap != null ? AdapterSourceMap.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Tests != null ? Tests.GetHashCode() : 0);
                 return hashCode;
             }
         }
@@ -666,11 +661,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         {
             ValidateArg.NotNull(runCriteria, nameof(runCriteria));
 
-            this.FrequencyOfRunStatsChangeEvent = runCriteria.FrequencyOfRunStatsChangeEvent;
-            this.KeepAlive = runCriteria.KeepAlive;
-            this.TestRunSettings = runCriteria.TestRunSettings;
-            this.RunStatsChangeEventTimeout = runCriteria.RunStatsChangeEventTimeout;
-            this.TestHostLauncher = runCriteria.TestHostLauncher;
+            FrequencyOfRunStatsChangeEvent = runCriteria.FrequencyOfRunStatsChangeEvent;
+            KeepAlive = runCriteria.KeepAlive;
+            TestRunSettings = runCriteria.TestRunSettings;
+            RunStatsChangeEventTimeout = runCriteria.RunStatsChangeEventTimeout;
+            TestHostLauncher = runCriteria.TestHostLauncher;
         }
 
         /// <summary>
@@ -787,11 +782,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                     Resources.NotificationTimeoutIsZero);
             }
 
-            this.FrequencyOfRunStatsChangeEvent = frequencyOfRunStatsChangeEvent;
-            this.KeepAlive = keepAlive;
-            this.TestRunSettings = testSettings;
-            this.RunStatsChangeEventTimeout = runStatsChangeEventTimeout;
-            this.TestHostLauncher = testHostLauncher;
+            FrequencyOfRunStatsChangeEvent = frequencyOfRunStatsChangeEvent;
+            KeepAlive = keepAlive;
+            TestRunSettings = testSettings;
+            RunStatsChangeEventTimeout = runStatsChangeEventTimeout;
+            TestHostLauncher = testHostLauncher;
         }
 
         /// <summary>
@@ -834,31 +829,26 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 
         protected bool Equals(BaseTestRunCriteria other)
         {
-            return this.KeepAlive == other.KeepAlive
-                && string.Equals(this.TestRunSettings, other.TestRunSettings)
-                && this.FrequencyOfRunStatsChangeEvent == other.FrequencyOfRunStatsChangeEvent
-                && this.RunStatsChangeEventTimeout.Equals(other.RunStatsChangeEventTimeout);
+            return KeepAlive == other.KeepAlive
+                && string.Equals(TestRunSettings, other.TestRunSettings)
+                && FrequencyOfRunStatsChangeEvent == other.FrequencyOfRunStatsChangeEvent
+                && RunStatsChangeEventTimeout.Equals(other.RunStatsChangeEventTimeout);
         }
 
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            if (object.ReferenceEquals(null, obj))
+            if (obj is null)
             {
                 return false;
             }
 
-            if (object.ReferenceEquals(this, obj))
+            if (ReferenceEquals(this, obj))
             {
                 return true;
             }
 
-            if (obj.GetType() != this.GetType())
-            {
-                return false;
-            }
-
-            return this.Equals((BaseTestRunCriteria)obj);
+            return obj.GetType() == GetType() && Equals((BaseTestRunCriteria)obj);
         }
 
         /// <inheritdoc/>
@@ -866,10 +856,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         {
             unchecked
             {
-                var hashCode = this.KeepAlive.GetHashCode();
-                hashCode = (hashCode * 397) ^ (this.TestRunSettings != null ? this.TestRunSettings.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ this.FrequencyOfRunStatsChangeEvent.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.RunStatsChangeEventTimeout.GetHashCode();
+                var hashCode = KeepAlive.GetHashCode();
+                hashCode = (hashCode * 397) ^ (TestRunSettings != null ? TestRunSettings.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ FrequencyOfRunStatsChangeEvent.GetHashCode();
+                hashCode = (hashCode * 397) ^ RunStatsChangeEventTimeout.GetHashCode();
                 return hashCode;
             }
         }

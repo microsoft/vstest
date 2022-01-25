@@ -95,13 +95,7 @@ namespace TestPlatform.Playground
 
             private string WriteTests(IEnumerable<TestCase> testCases)
             {
-                if (testCases == null)
-                {
-                    return null;
-                }
-
-                return "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName));
-
+                return testCases == null ? null : "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName));
             }
         }
 

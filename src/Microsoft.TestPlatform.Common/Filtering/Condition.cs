@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     using System.Text;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+    using CommonResources = Resources.Resources;
 
     internal enum Operation
     {
@@ -83,9 +83,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         #region Constructors
         internal Condition(string name, Operation operation, string value)
         {
-            this.Name = name;
-            this.Operation = operation;
-            this.Value = value;
+            Name = name;
+            Operation = operation;
+            Value = value;
         }
         #endregion
 
@@ -97,8 +97,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         {
             ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
             var result = false;
-            var multiValue = this.GetPropertyValue(propertyValueProvider);
-            switch (this.Operation)
+            var multiValue = GetPropertyValue(propertyValueProvider);
+            switch (Operation)
             {
                 case Operation.Equal:
                     // if any value in multi-valued property matches 'this.Value', for Equal to evaluate true.
@@ -186,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             {
                 // If only parameter values is passed, create condition with default property name,
                 // default operation and given condition string as parameter value.
-                return new Condition(Condition.DefaultPropertyName, Condition.DefaultOperation, FilterHelper.Unescape(conditionString.Trim()));
+                return new Condition(DefaultPropertyName, DefaultOperation, FilterHelper.Unescape(conditionString.Trim()));
             }
 
             if (parts.Length != 3)
@@ -204,7 +204,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             }
 
             Operation operation = GetOperator(parts[1]);
-            Condition condition = new Condition(parts[0], operation, FilterHelper.Unescape(parts[2]));
+            Condition condition = new(parts[0], operation, FilterHelper.Unescape(parts[2]));
             return condition;
         }
 
@@ -221,14 +221,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         {
             bool valid = false;
 
-            if (properties.Contains(this.Name, StringComparer.OrdinalIgnoreCase))
+            if (properties.Contains(Name, StringComparer.OrdinalIgnoreCase))
             {
                 valid = true;
 
                 // Check if operation ~ (Contains) is on property of type string.
-                if (this.Operation == Operation.Contains)
+                if (Operation == Operation.Contains)
                 {
-                    valid = this.ValidForContainsOperation(propertyProvider);
+                    valid = ValidForContainsOperation(propertyProvider);
                 }
             }
             return valid;
@@ -282,11 +282,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         private string[] GetPropertyValue(Func<string, Object> propertyValueProvider)
         {
-            var propertyValue = propertyValueProvider(this.Name);
+            var propertyValue = propertyValueProvider(Name);
             if (null != propertyValue)
             {
-                var multiValue = propertyValue as string[];
-                if (null == multiValue)
+                if (propertyValue is not string[] multiValue)
                 {
                     multiValue = new string[1];
                     multiValue[0] = propertyValue.ToString();
@@ -299,16 +298,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
         internal static IEnumerable<string> TokenizeFilterConditionString(string str)
         {
-            if (str == null)
-            {
-                throw new ArgumentNullException(nameof(str));
-            }
-
-            return TokenizeFilterConditionStringWorker(str);
-
+            return str == null ? throw new ArgumentNullException(nameof(str)) : TokenizeFilterConditionStringWorker(str);
             IEnumerable<string> TokenizeFilterConditionStringWorker(string s)
             {
-                StringBuilder tokenBuilder = new StringBuilder();
+                StringBuilder tokenBuilder = new();
 
                 var last = '\0';
                 for (int i = 0; i < s.Length; ++i)

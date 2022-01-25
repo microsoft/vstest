@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
@@ -39,12 +39,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new UseVsixExtensionsArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new UseVsixExtensionsArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -55,17 +55,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new UseVsixExtensionsArgumentExecutor(CommandLineOptions.Instance, TestRequestManager.Instance, new VSExtensionManager(), ConsoleOutput.Instance));
+                    executor = new Lazy<IArgumentExecutor>(() => new UseVsixExtensionsArgumentExecutor(CommandLineOptions.Instance, TestRequestManager.Instance, new VSExtensionManager(), ConsoleOutput.Instance));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -91,10 +91,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     /// </summary>
     internal class UseVsixExtensionsArgumentExecutor : IArgumentExecutor
     {
-        private CommandLineOptions commandLineOptions;
-        private ITestRequestManager testRequestManager;
-        private IVSExtensionManager extensionManager;
-        private IOutput output;
+        private readonly CommandLineOptions commandLineOptions;
+        private readonly ITestRequestManager testRequestManager;
+        private readonly IVSExtensionManager extensionManager;
+        private readonly IOutput output;
 
         internal UseVsixExtensionsArgumentExecutor(CommandLineOptions commandLineOptions, ITestRequestManager testRequestManager, IVSExtensionManager extensionManager, IOutput output)
         {
@@ -112,14 +112,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(string.Format(CultureInfo.CurrentCulture, CommandLineResources.UseVsixExtensionsValueRequired));
             }
 
-            bool value;
-            if (!bool.TryParse(argument, out value))
+            if (!bool.TryParse(argument, out bool value))
             {
                 throw new CommandLineException(
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidUseVsixExtensionsCommand, argument));
             }
 
-            this.output.Warning(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.UseVsixExtensionsDeprecation));
+            output.Warning(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.UseVsixExtensionsDeprecation));
             commandLineOptions.UseVsixExtensions = value;
 
             if (commandLineOptions.UseVsixExtensions)

@@ -365,8 +365,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.AggregateRunDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
-
-            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.RunState, out var value));
+            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.RunState, out _));
         }
 
         [TestMethod]
@@ -386,8 +385,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         public void GetAggregatedRunDataMetricsShouldReturnEmptyIfMetricsIsNull()
         {
             var aggregator = new ParallelRunDataAggregator(Constants.EmptyRunSettings);
-
-            var dict = new Dictionary<string, string>();
+            _ = new Dictionary<string, string>();
 
             aggregator.AggregateRunDataMetrics(null);
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
@@ -442,8 +440,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.AggregateRunDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
-
-            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, out var value));
+            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, out _));
         }
 
         [TestMethod]
@@ -455,8 +452,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.AggregateRunDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
-
-            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, out var value));
+            object value;
+            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, out _));
         }
     }
 }

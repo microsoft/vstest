@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System;
     using System.Diagnostics.Contracts;
     using System.Globalization;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     //  An argument processor to provide path to the file for listing fully qualified tests.
@@ -31,12 +31,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ListTestsTargetPathArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ListTestsTargetPathArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -47,17 +47,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new ListTestsTargetPathArgumentExecutor(CommandLineOptions.Instance));
+                    executor = new Lazy<IArgumentExecutor>(() => new ListTestsTargetPathArgumentExecutor(CommandLineOptions.Instance));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Used for getting sources.
         /// </summary>
-        private CommandLineOptions commandLineOptions;
+        private readonly CommandLineOptions commandLineOptions;
 
         #endregion
 
@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public ListTestsTargetPathArgumentExecutor(CommandLineOptions options)
         {
             Contract.Requires(options != null);
-            this.commandLineOptions = options;
+            commandLineOptions = options;
         }
         #endregion
 
@@ -113,7 +113,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, "ListTestsTargetPath is required with ListFullyQualifiedTests!"));
             }
 
-            this.commandLineOptions.ListTestsTargetPath = argument;
+            commandLineOptions.ListTestsTargetPath = argument;
         }
 
         /// <summary>

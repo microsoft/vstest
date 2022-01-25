@@ -34,30 +34,30 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private ProxyDiscoveryManager testDiscoveryManager;
 
-        private Mock<ITestRequestSender> mockRequestSender;
+        private readonly Mock<ITestRequestSender> mockRequestSender;
 
         //private Mock<IDataSerializer> mockDataSerializer;
 
-        private Mock<IRequestData> mockRequestData;
+        private readonly Mock<IRequestData> mockRequestData;
 
-        private Mock<IMetricsCollection> mockMetricsCollection;
-        private Mock<IFileHelper> mockFileHelper;
+        private readonly Mock<IMetricsCollection> mockMetricsCollection;
+        private readonly Mock<IFileHelper> mockFileHelper;
 
 
         public ProxyDiscoveryManagerTests()
         {
-            this.mockRequestSender = new Mock<ITestRequestSender>();
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockMetricsCollection = new Mock<IMetricsCollection>();
-            this.mockFileHelper = new Mock<IFileHelper>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
-            this.testDiscoveryManager = new ProxyDiscoveryManager(
-                                            this.mockRequestData.Object,
-                                            this.mockRequestSender.Object,
-                                            this.mockTestHostManager.Object,
-                                            this.mockDataSerializer.Object,
-                                            this.mockFileHelper.Object);
-            this.discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
+            mockRequestSender = new Mock<ITestRequestSender>();
+            mockRequestData = new Mock<IRequestData>();
+            mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockFileHelper = new Mock<IFileHelper>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+            testDiscoveryManager = new ProxyDiscoveryManager(
+                                            mockRequestData.Object,
+                                            mockRequestSender.Object,
+                                            mockTestHostManager.Object,
+                                            mockDataSerializer.Object,
+                                            mockFileHelper.Object);
+            discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
         }
 
         [TestMethod]
@@ -66,11 +66,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             // Make sure TestPlugincache is refreshed.
             TestPluginCache.Instance = null;
 
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+            mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, null);
 
-            this.mockRequestSender.Verify(s => s.InitializeDiscovery(It.IsAny<IEnumerable<string>>()), Times.Never);
+            mockRequestSender.Verify(s => s.InitializeDiscovery(It.IsAny<IEnumerable<string>>()), Times.Never);
         }
 
         [TestMethod]
@@ -79,13 +79,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             // Make sure TestPlugincache is refreshed.
             TestPluginCache.Instance = null;
 
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
+            mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
 
-            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventHandler = new();
 
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventHandler.Object);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventHandler.Object);
 
-            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>()), Times.Never);
+            mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>()), Times.Never);
         }
 
         [TestMethod]
@@ -94,14 +94,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             // Make sure TestPlugincache is refreshed.
             TestPluginCache.Instance = null;
 
-            this.mockTestHostManager.Setup(hm => hm.GetTestSources(this.discoveryCriteria.Sources)).Returns(this.discoveryCriteria.Sources);
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+            mockTestHostManager.Setup(hm => hm.GetTestSources(discoveryCriteria.Sources)).Returns(discoveryCriteria.Sources);
+            mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
-            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventHandler = new();
 
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventHandler.Object);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventHandler.Object);
 
-            this.mockTestHostManager.Verify(hm => hm.GetTestSources(this.discoveryCriteria.Sources), Times.Once);
+            mockTestHostManager.Verify(hm => hm.GetTestSources(discoveryCriteria.Sources), Times.Once);
         }
 
         [TestMethod]
@@ -112,14 +112,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             var localDiscoveryCriteria = new DiscoveryCriteria(inputSource, 1, string.Empty);
 
-            this.mockTestHostManager.Setup(hm => hm.GetTestSources(localDiscoveryCriteria.Sources)).Returns(actualSources);
-            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
-            this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string>());
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+            mockTestHostManager.Setup(hm => hm.GetTestSources(localDiscoveryCriteria.Sources)).Returns(actualSources);
+            mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+            mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string>());
+            mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
-            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventHandler = new();
 
-            this.testDiscoveryManager.DiscoverTests(localDiscoveryCriteria, mockTestDiscoveryEventHandler.Object);
+            testDiscoveryManager.DiscoverTests(localDiscoveryCriteria, mockTestDiscoveryEventHandler.Object);
 
             Assert.IsNotNull(localDiscoveryCriteria.Package);
             // AdapterSourceMap should contain updated testSources.
@@ -135,14 +135,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             var localDiscoveryCriteria = new DiscoveryCriteria(inputSource, 1, string.Empty);
 
-            this.mockTestHostManager.Setup(hm => hm.GetTestSources(localDiscoveryCriteria.Sources)).Returns(actualSources);
-            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
-            this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string>());
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+            mockTestHostManager.Setup(hm => hm.GetTestSources(localDiscoveryCriteria.Sources)).Returns(actualSources);
+            mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+            mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string>());
+            mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
-            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventHandler = new();
 
-            this.testDiscoveryManager.DiscoverTests(localDiscoveryCriteria, mockTestDiscoveryEventHandler.Object);
+            testDiscoveryManager.DiscoverTests(localDiscoveryCriteria, mockTestDiscoveryEventHandler.Object);
 
             Assert.IsNull(localDiscoveryCriteria.Package);
             // AdapterSourceMap should contain updated testSources.
@@ -152,24 +152,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void DiscoverTestsShouldNotSendDiscoveryRequestIfCommunicationFails()
         {
-            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
+            mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
                 .Callback(
-                    () =>
-                        {
-                            this.mockTestHostManager.Raise(thm => thm.HostLaunched += null, new HostProviderEventArgs(string.Empty));
-                        })
+                    () => mockTestHostManager.Raise(thm => thm.HostLaunched += null, new HostProviderEventArgs(string.Empty)))
                 .Returns(Task.FromResult(false));
 
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+            mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
             // Make sure TestPlugincache is refreshed.
             TestPluginCache.Instance = null;
 
-            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventHandler = new();
 
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventHandler.Object);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventHandler.Object);
 
-            this.mockRequestSender.Verify(s => s.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Never);
+            mockRequestSender.Verify(s => s.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Never);
         }
 
         [TestMethod]
@@ -184,14 +181,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                 // Setup Mocks.
                 TestPluginCacheHelper.SetupMockAdditionalPathExtensions(extensions);
-                this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
-                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
-                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "c:\\e1.dll", "c:\\e2.dll" });
+                mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+                mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+                mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "c:\\e1.dll", "c:\\e2.dll" });
 
-                this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
+                testDiscoveryManager.DiscoverTests(discoveryCriteria, null);
 
                 // Also verify that we have waited for client connection.
-                this.mockRequestSender.Verify(s => s.InitializeDiscovery(extensions), Times.Once);
+                mockRequestSender.Verify(s => s.InitializeDiscovery(extensions), Times.Once);
             }
             finally
             {
@@ -206,24 +203,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var expectedOutputPaths = new[] { "abc.TestAdapter.dll", "xyz.TestAdapter.dll" };
 
             TestPluginCacheHelper.SetupMockAdditionalPathExtensions(inputExtensions);
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
-            this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) =>
-            {
-                return extensions.Select(extension => { return Path.GetFileName(extension); });
-            });
+            mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+            mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) => extensions.Select(extension => Path.GetFileName(extension)));
 
-            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns((string extensionPath) =>
-            {
-                return !extensionPath.Contains("def.TestAdapter.dll");
-            });
+            mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns((string extensionPath) => !extensionPath.Contains("def.TestAdapter.dll"));
 
-            this.mockFileHelper.Setup(fh => fh.Exists("def.TestAdapter.dll")).Returns(false);
-            this.mockFileHelper.Setup(fh => fh.Exists("xyz.TestAdapter.dll")).Returns(true);
+            mockFileHelper.Setup(fh => fh.Exists("def.TestAdapter.dll")).Returns(false);
+            mockFileHelper.Setup(fh => fh.Exists("xyz.TestAdapter.dll")).Returns(true);
 
             var mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler2>();
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventHandler.Object);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventHandler.Object);
 
-            this.mockRequestSender.Verify(s => s.InitializeDiscovery(expectedOutputPaths), Times.Once);
+            mockRequestSender.Verify(s => s.InitializeDiscovery(expectedOutputPaths), Times.Once);
         }
 
         [TestMethod]
@@ -233,13 +224,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             try
             {
                 TestPluginCacheHelper.SetupMockAdditionalPathExtensions(new[] { "c:\\e1.dll" });
-                this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
-                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
-                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll", "c:\\e1.dll" });
+                mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+                mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+                mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll", "c:\\e1.dll" });
 
-                this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
+                testDiscoveryManager.DiscoverTests(discoveryCriteria, null);
 
-                this.mockRequestSender.Verify(s => s.InitializeDiscovery(new[] { "he1.dll", "c:\\e1.dll" }), Times.Once);
+                mockRequestSender.Verify(s => s.InitializeDiscovery(new[] { "he1.dll", "c:\\e1.dll" }), Times.Once);
             }
             finally
             {
@@ -255,13 +246,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             TestPluginCache.Instance.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "xyz.TestAdapter.dll" }, false);
             try
             {
-                this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
-                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+                mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+                mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
                 var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
 
-                this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
+                testDiscoveryManager.DiscoverTests(discoveryCriteria, null);
 
-                this.mockTestHostManager.Verify(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), expectedResult), Times.Once);
+                mockTestHostManager.Verify(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), expectedResult), Times.Once);
             }
             finally
             {
@@ -285,24 +276,24 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void DiscoverTestsShouldNotIntializeTestHost()
         {
             // Setup mocks.
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+            mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
             // Act.
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, null);
 
-            this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Once);
+            mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
+            mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [TestMethod]
         public void DiscoverTestsShouldCatchExceptionAndCallHandleDiscoveryComplete()
         {
             // Setup mocks.
-            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
-            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new();
+            mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
             // Act.
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
             // Verify
             mockTestDiscoveryEventsHandler.Verify(s => s.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()));
@@ -314,13 +305,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void DiscoverTestsShouldCatchExceptionAndCallHandleRawMessageOfDiscoveryComplete()
         {
             // Setup mocks.
-            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
-            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new();
+            mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
-            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns(MessageType.TestMessage);
-            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>())).Returns(MessageType.DiscoveryComplete);
+            mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns(MessageType.TestMessage);
+            mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>())).Returns(MessageType.DiscoveryComplete);
 
-            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns((string rawMessage) =>
+            mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns((string rawMessage) =>
             {
                 var messageType = rawMessage.Contains(MessageType.DiscoveryComplete) ? MessageType.DiscoveryComplete : MessageType.TestMessage;
                 var message = new Message
@@ -332,7 +323,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             });
 
             // Act.
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
             // Verify
             mockTestDiscoveryEventsHandler.Verify(s => s.HandleRawMessage(It.Is<string>(str => str.Contains(MessageType.DiscoveryComplete))), Times.Once);
@@ -342,13 +333,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void DiscoverTestsShouldCatchExceptionAndCallHandleRawMessageOfTestMessage()
         {
             // Setup mocks.
-            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
-            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new();
+            mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
-            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns(MessageType.TestMessage);
-            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>())).Returns(MessageType.DiscoveryComplete);
+            mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns(MessageType.TestMessage);
+            mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>())).Returns(MessageType.DiscoveryComplete);
 
-            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns((string rawMessage) =>
+            mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns((string rawMessage) =>
             {
                 var messageType = rawMessage.Contains(MessageType.DiscoveryComplete) ? MessageType.DiscoveryComplete : MessageType.TestMessage;
                 var message = new Message
@@ -360,7 +351,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             });
 
             // Act.
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
             // Verify
             mockTestDiscoveryEventsHandler.Verify(s => s.HandleRawMessage(It.Is<string>(str => str.Contains(MessageType.TestMessage))), Times.Once);
@@ -370,11 +361,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void DiscoverTestsShouldCatchExceptionAndCallHandleLogMessageOfError()
         {
             // Setup mocks.
-            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
-            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new();
+            mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
             // Act.
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
             // Verify
             mockTestDiscoveryEventsHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
@@ -384,24 +375,24 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void DiscoverTestsShouldInitiateServerDiscoveryLoop()
         {
             // Setup mocks.
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+            mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
             // Act.
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, null);
 
             // Assert.
-            this.mockRequestSender.Verify(s => s.DiscoverTests(It.IsAny<DiscoveryCriteria>(), this.testDiscoveryManager), Times.Once);
+            mockRequestSender.Verify(s => s.DiscoverTests(It.IsAny<DiscoveryCriteria>(), testDiscoveryManager), Times.Once);
         }
 
         [TestMethod]
         public void DiscoverTestsCloseTestHostIfRawMessageIsOfTypeDiscoveryComplete()
         {
-            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new();
 
-            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns(MessageType.TestMessage);
-            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>())).Returns(MessageType.DiscoveryComplete);
+            mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns(MessageType.TestMessage);
+            mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>())).Returns(MessageType.DiscoveryComplete);
 
-            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns((string rawMessage) =>
+            mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns((string rawMessage) =>
             {
                 var messageType = rawMessage.Contains(MessageType.DiscoveryComplete) ? MessageType.DiscoveryComplete : MessageType.TestMessage;
                 var message = new Message
@@ -413,18 +404,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             });
 
             // Act.
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
             // Verify
-            this.mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Once);
+            mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [TestMethod]
         public void DiscoverTestsShouldNotCloseTestHostIfRawMessageIsNotOfTypeDiscoveryComplete()
         {
-            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new();
 
-            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns(() =>
+            mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns(() =>
             {
                 var message = new Message
                 {
@@ -435,20 +426,20 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             });
 
             // Act.
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
             // Verify
-            this.mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Never);
+            mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [TestMethod]
         public void DiscoveryManagerShouldPassOnHandleDiscoveredTests()
         {
-            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new();
             var testCases = new List<TestCase>() { new TestCase("x.y.z", new Uri("x://y"), "x.dll") };
 
-            this.testDiscoveryManager = this.GetProxyDiscoveryManager();
-            this.SetupChannelMessage(MessageType.StartDiscovery, MessageType.TestCasesFound, testCases);
+            testDiscoveryManager = GetProxyDiscoveryManager();
+            SetupChannelMessage(MessageType.StartDiscovery, MessageType.TestCasesFound, testCases);
 
             var completePayload = new DiscoveryCompletePayload()
             {
@@ -460,12 +451,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             mockTestDiscoveryEventsHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback(
                 () =>
                 {
-                    this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(It.IsAny<string>())).Returns(completeMessage);
-                    this.mockDataSerializer.Setup(ds => ds.DeserializePayload<DiscoveryCompletePayload>(completeMessage)).Returns(completePayload);
+                    mockDataSerializer.Setup(ds => ds.DeserializeMessage(It.IsAny<string>())).Returns(completeMessage);
+                    mockDataSerializer.Setup(ds => ds.DeserializePayload<DiscoveryCompletePayload>(completeMessage)).Returns(completePayload);
                 });
 
             // Act.
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
             // Verify
             mockTestDiscoveryEventsHandler.Verify(mtdeh => mtdeh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()), Times.AtLeastOnce);
@@ -474,9 +465,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void DiscoveryManagerShouldPassOnHandleLogMessage()
         {
-            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new();
 
-            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns(() =>
+            mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns(() =>
             {
                 var message = new Message
                 {
@@ -487,7 +478,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             });
 
             // Act.
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
             // Verify
             mockTestDiscoveryEventsHandler.Verify(mtdeh => mtdeh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Once);
@@ -497,15 +488,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void AbortShouldSendTestDiscoveryCancelIfCommunicationSuccessful()
         {
             var mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+            mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
-            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
 
-            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+            testDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
-            this.testDiscoveryManager.Abort();
+            testDiscoveryManager.Abort();
 
-            this.mockRequestSender.Verify(s => s.EndSession(), Times.Once);
+            mockRequestSender.Verify(s => s.EndSession(), Times.Once);
         }
 
         [TestMethod]
@@ -536,9 +527,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             try
             {
                 var mockProxyOperationManager = new Mock<ProxyOperationManager>(
-                    this.mockRequestData.Object,
-                    this.mockRequestSender.Object,
-                    this.mockTestHostManager.Object);
+                    mockRequestData.Object,
+                    mockRequestSender.Object,
+                    mockTestHostManager.Object);
                 mockTestSessionPool.Setup(
                     tsp => tsp.TryTakeProxy(
                         testSessionInfo,
@@ -573,15 +564,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             try
             {
-                this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
-                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) => extensions);
-                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+                mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+                mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) => extensions);
+                mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
                 var expectedResult = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, skipDefaultAdapters);
 
-                this.testDiscoveryManager.Initialize(skipDefaultAdapters);
-                this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
+                testDiscoveryManager.Initialize(skipDefaultAdapters);
+                testDiscoveryManager.DiscoverTests(discoveryCriteria, null);
 
-                this.mockRequestSender.Verify(s => s.InitializeDiscovery(expectedResult), Times.Once);
+                mockRequestSender.Verify(s => s.InitializeDiscovery(expectedResult), Times.Once);
             }
             finally
             {

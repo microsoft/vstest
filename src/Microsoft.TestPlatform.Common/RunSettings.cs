@@ -19,8 +19,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
-    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
-    using ObjectModelCommonResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
+    using CommonResources = Resources.Resources;
+    using ObjectModelCommonResources = ObjectModel.Resources.CommonResources;
 
     /// <summary>
     /// Used for loading settings for a run.
@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// <summary>
         /// Map of the settings names in the file to their associated settings provider.
         /// </summary>
-        private Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> settings;
+        private readonly Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> settings;
 
         /// <summary>
         /// Used to keep track if settings have been loaded.
@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// </summary>
         public RunSettings()
         {
-            this.settings = new Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>();
+            settings = new Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>();
         }
 
         #region Properties
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
 
             // Try and lookup the settings provider.
             ISettingsProvider result = null;
-            this.settings.TryGetValue(settingsName, out var provider);
+            settings.TryGetValue(settingsName, out var provider);
 
             // If a provider was found, return it.
             if (provider != null)
@@ -89,8 +89,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// Load the settings from the provided xml string.
         /// </summary>
         /// <param name="settings">xml string</param>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public void LoadSettingsXml(string settings)
         {
             if (StringUtilities.IsNullOrWhiteSpace(settings))
@@ -100,20 +98,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
 
             using var stringReader = new StringReader(settings);
             var reader = XmlReader.Create(stringReader, XmlRunSettingsUtilities.ReaderSettings);
-            this.ValidateAndSaveSettings(reader);
+            ValidateAndSaveSettings(reader);
         }
 
         /// <summary>
         /// Initialize settings providers with the settings xml.
         /// </summary>
         /// <param name="settings"> The settings xml string. </param>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public void InitializeSettingsProviders(string settings)
         {
             using var stringReader = new StringReader(settings);
             var reader = XmlReader.Create(stringReader, XmlRunSettingsUtilities.ReaderSettings);
-            this.ReadRunSettings(reader);
+            ReadRunSettings(reader);
         }
 
         #endregion
@@ -125,8 +121,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// This would throw XML exception on failure.
         /// </summary>
         /// <param name="reader">A xml reader instance.</param>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         private void ValidateAndSaveSettings(XmlReader reader)
         {
             try
@@ -135,7 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
                 dom.Load(reader);
                 using var writer = new StringWriter(CultureInfo.InvariantCulture);
                 dom.Save(writer);
-                this.SettingsXml = writer.ToString();
+                SettingsXml = writer.ToString();
             }
             catch (Exception e)
             {
@@ -155,12 +149,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         private void ReadRunSettings(XmlReader reader)
         {
             // If settings have already been loaded, throw.
-            if (this.isSettingsLoaded)
+            if (isSettingsLoaded)
             {
                 throw new InvalidOperationException(CommonResources.RunSettingsAlreadyLoaded);
             }
 
-            this.isSettingsLoaded = true;
+            isSettingsLoaded = true;
 
             try
             {
@@ -174,7 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
                 var settingsExtensionManager = SettingsProviderExtensionManager.Create();
                 while (!reader.EOF)
                 {
-                    this.LoadSection(reader, settingsExtensionManager);
+                    LoadSection(reader, settingsExtensionManager);
                     reader.SkipToNextElement();
                 }
             }
@@ -198,14 +192,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// </summary>
         /// <param name="reader">Reader to load the section from.</param>
         /// <param name="settingsExtensionManager">Settings extension manager to get the provider from.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "This methods must not fail on crash in loading settings.")]
         private void LoadSection(XmlReader reader, SettingsProviderExtensionManager settingsExtensionManager)
         {
             ValidateArg.NotNull(reader, nameof(reader));
             ValidateArg.NotNull(settingsExtensionManager, nameof(settingsExtensionManager));
 
             // Check for duplicate settings
-            if (this.settings.ContainsKey(reader.Name))
+            if (settings.ContainsKey(reader.Name))
             {
                 TestSessionMessageLogger.Instance.SendMessage(
                     TestMessageLevel.Error,
@@ -251,7 +244,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
             }
 
             // Cache the provider instance so it can be looked up later when the section is requested.
-            this.settings.Add(provider.Metadata.SettingsName, provider);
+            settings.Add(provider.Metadata.SettingsName, provider);
         }
 
         /// <summary>
@@ -267,10 +260,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
             Exception innerException = null)
         {
             return new LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>(
-                () =>
-                {
-                    throw new SettingsException(message, innerException);
-                },
+                () => throw new SettingsException(message, innerException),
                 metadata);
         }
 

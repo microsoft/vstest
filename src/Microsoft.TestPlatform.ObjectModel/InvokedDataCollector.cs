@@ -17,11 +17,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="hasAttachmentProcessor">True if data collector registers an attachment processor</param>
         public InvokedDataCollector(Uri uri, string friendlyName, string assemblyQualifiedName, string filePath, bool hasAttachmentProcessor)
         {
-            this.Uri = uri ?? throw new ArgumentException(nameof(uri));
-            this.FriendlyName = friendlyName ?? throw new ArgumentException(nameof(friendlyName));
-            this.AssemblyQualifiedName = assemblyQualifiedName ?? throw new ArgumentException(nameof(assemblyQualifiedName)); ;
-            this.FilePath = filePath ?? throw new ArgumentException(nameof(filePath)); ;
-            this.HasAttachmentProcessor = hasAttachmentProcessor;
+            Uri = uri ?? throw new ArgumentException(nameof(uri));
+            FriendlyName = friendlyName ?? throw new ArgumentException(nameof(friendlyName));
+            AssemblyQualifiedName = assemblyQualifiedName ?? throw new ArgumentException(nameof(assemblyQualifiedName)); ;
+            FilePath = filePath ?? throw new ArgumentException(nameof(filePath)); ;
+            HasAttachmentProcessor = hasAttachmentProcessor;
         }
 
         /// <summary>
@@ -61,16 +61,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>True if objects are equal</returns>
         public bool Equals(InvokedDataCollector other)
         {
-            if (other is null)
-            {
-                return false;
-            }
-
-            return this.HasAttachmentProcessor == other.HasAttachmentProcessor &&
-                this.Uri.AbsoluteUri == other.Uri.AbsoluteUri &&
-                this.FriendlyName == other.FriendlyName &&
-                this.AssemblyQualifiedName == other.AssemblyQualifiedName &&
-                this.FilePath == other.FilePath;
+            return other is not null
+&& HasAttachmentProcessor == other.HasAttachmentProcessor &&
+                Uri.AbsoluteUri == other.Uri.AbsoluteUri &&
+                FriendlyName == other.FriendlyName &&
+                AssemblyQualifiedName == other.AssemblyQualifiedName &&
+                FilePath == other.FilePath;
         }
 
         /// <summary>
@@ -79,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="obj">InvokedDataCollector instance</param>
         /// <returns>True if objects are equal</returns>
         public override bool Equals(object obj)
-            => this.Equals(obj as InvokedDataCollector);
+            => Equals(obj as InvokedDataCollector);
 
         /// <summary>
         /// Returns the object hashcode
@@ -89,11 +85,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             unchecked
             {
-                var hashCode = this.Uri.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.FriendlyName.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.AssemblyQualifiedName.GetHashCode();
-                hashCode = (hashCode * 397) ^ (this.FilePath != null ? this.FilePath.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ this.HasAttachmentProcessor.GetHashCode();
+                var hashCode = Uri.GetHashCode();
+                hashCode = (hashCode * 397) ^ FriendlyName.GetHashCode();
+                hashCode = (hashCode * 397) ^ AssemblyQualifiedName.GetHashCode();
+                hashCode = (hashCode * 397) ^ (FilePath != null ? FilePath.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ HasAttachmentProcessor.GetHashCode();
                 return hashCode;
             }
         }

@@ -23,9 +23,9 @@ namespace Microsoft.TestPlatform.PerformanceTests
             var client = new SocketClient();
             ICommunicationChannel serverChannel = null;
             ICommunicationChannel clientChannel = null;
-            ManualResetEventSlim dataTransferred = new ManualResetEventSlim(false);
-            ManualResetEventSlim clientConnected = new ManualResetEventSlim(false);
-            ManualResetEventSlim serverConnected = new ManualResetEventSlim(false);
+            ManualResetEventSlim dataTransferred = new(false);
+            ManualResetEventSlim clientConnected = new(false);
+            ManualResetEventSlim serverConnected = new(false);
             int dataReceived = 0;
             var watch = new Stopwatch();
             var thread = new Thread(() => SendData(clientChannel, watch));

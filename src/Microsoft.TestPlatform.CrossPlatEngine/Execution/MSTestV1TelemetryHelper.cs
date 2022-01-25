@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 // Get addional data from test result passed by MSTestv1
                 // Only legacy tests have testtype.
 
-                var testType = testResult.GetPropertyValue<Guid>(testTypeProperty, Guid.Empty);
+                var testType = testResult.GetPropertyValue(testTypeProperty, Guid.Empty);
                 var hasTestType = testType != Guid.Empty;
 
                 string key;
@@ -62,14 +62,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         testExtension = testExtension.Remove(0, 4);
                     }
 
-                    if (hasExtension)
-                    {
-                        key = $"{testResult.TestCase.ExecutorUri.AbsoluteUri}.legacy.extension.{testExtension}.count";
-                    }
-                    else
-                    {
-                        key = $"{testResult.TestCase.ExecutorUri.AbsoluteUri}.legacy.count";
-                    }
+                    key = hasExtension
+                        ? $"{testResult.TestCase.ExecutorUri.AbsoluteUri}.legacy.extension.{testExtension}.count"
+                        : $"{testResult.TestCase.ExecutorUri.AbsoluteUri}.legacy.count";
                 }
                 else
                 {

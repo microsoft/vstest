@@ -16,83 +16,48 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     {
         #region Fields
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
         [StoreXmlSimpleField("Counters/@total")]
-        private int totalTests;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _totalTests;
         [StoreXmlSimpleField("Counters/@executed")]
-        private int executedTests;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _executedTests;
         [StoreXmlSimpleField("Counters/@passed")]
-        private int passedTests;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _passedTests;
         [StoreXmlSimpleField("Counters/@failed")]
-        private int failedTests;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _failedTests;
         [StoreXmlSimpleField("Counters/@error")]
-        private int errorTests;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _errorTests;
         [StoreXmlSimpleField("Counters/@timeout")]
-        private int timeoutTests;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _timeoutTests;
         [StoreXmlSimpleField("Counters/@aborted")]
-        private int abortedTests;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _abortedTests;
         [StoreXmlSimpleField("Counters/@inconclusive")]
-        private int inconclusiveTests;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _inconclusiveTests;
         [StoreXmlSimpleField("Counters/@passedButRunAborted")]
-        private int passedButRunAborted;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _passedButRunAborted;
         [StoreXmlSimpleField("Counters/@notRunnable")]
-        private int notRunnable;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _notRunnable;
         [StoreXmlSimpleField("Counters/@notExecuted")]
-        private int notExecuted;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _notExecuted;
         [StoreXmlSimpleField("Counters/@disconnected")]
-        private int disconnected;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _disconnected;
         [StoreXmlSimpleField("Counters/@warning")]
-        private int warning;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _warning;
         [StoreXmlSimpleField("Counters/@completed")]
-        private int completed;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _completed;
         [StoreXmlSimpleField("Counters/@inProgress")]
-        private int inProgress;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _inProgress;
         [StoreXmlSimpleField("Counters/@pending")]
-        private int pending;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly int _pending;
         [StoreXmlSimpleField]
-        private TestOutcome outcome = TestOutcome.Pending;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
+        private readonly TestOutcome _outcome = TestOutcome.Pending;
         [StoreXmlSimpleField("Output/StdOut", "")]
-        private string stdOut = string.Empty;
+        private readonly string _stdOut = string.Empty;
 
-        private List<RunInfo> runLevelErrorsAndWarnings;
+        private readonly List<RunInfo> _runLevelErrorsAndWarnings;
 
-        private List<CollectorDataEntry> collectorDataEntries;
+        private readonly List<CollectorDataEntry> _collectorDataEntries;
 
-        private IList<String> resultFiles;
+        private readonly IList<String> _resultFiles;
 
         #endregion
 
@@ -139,30 +104,30 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             IList<String> resultFiles,
             List<CollectorDataEntry> dataCollectors)
         {
-            this.totalTests = total;
-            this.executedTests = executed;
-            this.passedTests = pass;
-            this.failedTests = fail;
+            _totalTests = total;
+            _executedTests = executed;
+            _passedTests = pass;
+            _failedTests = fail;
             int countForNonExistingResults = 0; // if below values are assigned constants 0, compiler gives warning CS0414
-            this.abortedTests = countForNonExistingResults;
-            this.errorTests = countForNonExistingResults;
-            this.timeoutTests = countForNonExistingResults;
-            this.inconclusiveTests = countForNonExistingResults;
-            this.passedButRunAborted = countForNonExistingResults;
-            this.notRunnable = countForNonExistingResults;
-            this.notExecuted = countForNonExistingResults;
-            this.disconnected = countForNonExistingResults;
-            this.warning = countForNonExistingResults;
-            this.completed = countForNonExistingResults;
-            this.inProgress = countForNonExistingResults;
-            this.pending = countForNonExistingResults;
+            _abortedTests = countForNonExistingResults;
+            _errorTests = countForNonExistingResults;
+            _timeoutTests = countForNonExistingResults;
+            _inconclusiveTests = countForNonExistingResults;
+            _passedButRunAborted = countForNonExistingResults;
+            _notRunnable = countForNonExistingResults;
+            _notExecuted = countForNonExistingResults;
+            _disconnected = countForNonExistingResults;
+            _warning = countForNonExistingResults;
+            _completed = countForNonExistingResults;
+            _inProgress = countForNonExistingResults;
+            _pending = countForNonExistingResults;
 
-            this.outcome = outcome;
-            this.stdOut = stdOut;
+            this._outcome = outcome;
+            this._stdOut = stdOut;
 
-            this.runLevelErrorsAndWarnings = runMessages;
-            this.resultFiles = resultFiles;
-            this.collectorDataEntries = dataCollectors;
+            _runLevelErrorsAndWarnings = runMessages;
+            this._resultFiles = resultFiles;
+            _collectorDataEntries = dataCollectors;
         }
 
         #endregion
@@ -180,11 +145,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </param>
         public void Save(XmlElement element, XmlTestStoreParameters parameters)
         {
-            XmlPersistence helper = new XmlPersistence();
+            XmlPersistence helper = new();
             helper.SaveSingleFields(element, this, parameters);
-            helper.SaveIEnumerable(this.runLevelErrorsAndWarnings, element, "RunInfos", ".", "RunInfo", parameters);
-            helper.SaveIEnumerable(this.resultFiles, element, "ResultFiles", "@path", "ResultFile", parameters);
-            helper.SaveIEnumerable(this.collectorDataEntries, element, "CollectorDataEntries", ".", "Collector", parameters);
+            helper.SaveIEnumerable(_runLevelErrorsAndWarnings, element, "RunInfos", ".", "RunInfo", parameters);
+            helper.SaveIEnumerable(_resultFiles, element, "ResultFiles", "@path", "ResultFile", parameters);
+            helper.SaveIEnumerable(_collectorDataEntries, element, "CollectorDataEntries", ".", "Collector", parameters);
         }
 
         #endregion

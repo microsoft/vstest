@@ -23,14 +23,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <param name="channel">Communication channel for this connection.</param>
         public ConnectedEventArgs(ICommunicationChannel channel)
         {
-            this.Channel = channel;
-            this.Connected = true;
+            Channel = channel;
+            Connected = true;
         }
 
         public ConnectedEventArgs(Exception faultException)
         {
-            this.Connected = false;
-            this.Fault = faultException;
+            Connected = false;
+            Fault = faultException;
         }
 
         /// <summary>

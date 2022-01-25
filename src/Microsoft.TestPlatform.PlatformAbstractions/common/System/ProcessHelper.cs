@@ -129,10 +129,9 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public bool TryGetExitCode(object process, out int exitCode)
         {
-            var proc = process as Process;
             try
             {
-                if (proc != null && proc.HasExited)
+                if (process is Process proc && proc.HasExited)
                 {
                     exitCode = proc.ExitCode;
                     return true;
@@ -166,10 +165,9 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public void TerminateProcess(object process)
         {
-            var proc = process as Process;
             try
             {
-                if (proc != null && !proc.HasExited)
+                if (process is Process proc && !proc.HasExited)
                 {
                     proc.Kill();
                 }
@@ -190,19 +188,15 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         public string GetNativeDllDirectory()
         {
             var osArchitecture = new PlatformEnvironment().Architecture;
-            if (osArchitecture == PlatformArchitecture.ARM || osArchitecture == PlatformArchitecture.ARM64)
-            {
-                return Path.Combine(this.GetCurrentProcessLocation(), this.GetCurrentProcessArchitecture().ToString().ToLower(), ARM);
-            }
-
-            return Path.Combine(this.GetCurrentProcessLocation(), this.GetCurrentProcessArchitecture().ToString().ToLower());
+            return osArchitecture == PlatformArchitecture.ARM || osArchitecture == PlatformArchitecture.ARM64
+                ? Path.Combine(GetCurrentProcessLocation(), GetCurrentProcessArchitecture().ToString().ToLower(), ARM)
+                : Path.Combine(GetCurrentProcessLocation(), GetCurrentProcessArchitecture().ToString().ToLower());
         }
 
         /// <inheritdoc/>
         public void WaitForProcessExit(object process)
         {
-            var proc = process as Process;
-            if (proc != null && !proc.HasExited)
+            if (process is Process proc && !proc.HasExited)
             {
                 proc.WaitForExit();
             }

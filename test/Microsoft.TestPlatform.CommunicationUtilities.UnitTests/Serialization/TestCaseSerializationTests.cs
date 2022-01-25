@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
     [TestClass]
     public class TestCaseSerializationTests
     {
-        private static TestCase testCase = new TestCase(
+        private static readonly TestCase testCase = new(
                                                "sampleTestClass.sampleTestCase",
                                                new Uri("executor://sampleTestExecutor"),
                                                "sampleTest.dll")
@@ -126,16 +126,15 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
         [TestMethod]
         public void TestCasePropertiesShouldGetRegisteredAsPartOfDeserialization()
         {
-            TestProperty.TryUnregister("DummyProperty", out var property);
+            TestProperty.TryUnregister("DummyProperty", out var _);
             var json = "{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"a.b\"},"
                 + "{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"uri://x\"},"
                 + "{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"/tmp/a.b.dll\"},"
                 + "{\"Key\":{\"Id\":\"DummyProperty\",\"Label\":\"DummyPropertyLabel\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.String\"},\"Value\":\"dummyString\"},"
                 + "{\"Key\":{\"Id\":\"TestObject.Traits\",\"Label\":\"Traits\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]\"},\"Value\":[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]}]}";
+            _ = Deserialize<TestCase>(json);
 
-            var test = Deserialize<TestCase>(json);
-
-            this.VerifyDummyPropertyIsRegistered();
+            VerifyDummyPropertyIsRegistered();
         }
 
         #endregion
@@ -222,14 +221,13 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
         [TestMethod]
         public void TestCasePropertiesShouldGetRegisteredAsPartOfDeserializationV2()
         {
-            TestProperty.TryUnregister("DummyProperty", out var property);
+            TestProperty.TryUnregister("DummyProperty", out var _);
             var json = "{\"Id\": \"be78d6fc-61b0-4882-9d07-40d796fd96ce\",\"FullyQualifiedName\": \"sampleTestClass.sampleTestCase\",\"DisplayName\": \"sampleTestCase\",\"ExecutorUri\": \"executor://sampleTestExecutor\",\"Source\": \"sampleTest.dll\",\"CodeFilePath\": \"/user/src/testFile.cs\", \"LineNumber\": 999,"
                 + "\"Properties\": [{\"Key\":{\"Id\":\"DummyProperty\",\"Label\":\"DummyPropertyLabel\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.String\"},\"Value\":\"dummyString\"},"
                 + "{ \"Key\": { \"Id\": \"TestObject.Traits\", \"Label\": \"Traits\", \"Category\": \"\", \"Description\": \"\", \"Attributes\": 5, \"ValueType\": \"System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]\"}, \"Value\": [{\"Key\": \"Priority\",\"Value\": \"0\"}, {\"Key\": \"Category\",\"Value\": \"unit\"}]}]}";
+            _ = Deserialize<TestCase>(json, 2);
 
-            var test = Deserialize<TestCase>(json, 2);
-
-            this.VerifyDummyPropertyIsRegistered();
+            VerifyDummyPropertyIsRegistered();
         }
 
         #endregion

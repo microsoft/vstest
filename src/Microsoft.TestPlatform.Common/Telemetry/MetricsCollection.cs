@@ -13,14 +13,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
     /// </summary>
     public class MetricsCollection : IMetricsCollection
     {
-        private Dictionary<string, object> metricDictionary;
+        private readonly Dictionary<string, object> metricDictionary;
 
         /// <summary>
         /// The Metrics Collection
         /// </summary>
         public MetricsCollection()
         {
-            this.metricDictionary = new Dictionary<string, object>();
+            metricDictionary = new Dictionary<string, object>();
         }
 
         /// <summary>
@@ -30,20 +30,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         /// <param name="value"></param>
         public void Add(string metric, object value)
         {
-            this.metricDictionary[metric] = value;
+            metricDictionary[metric] = value;
         }
 
         /// <summary>
         /// Returns the Metrics
         /// </summary>
-        public IDictionary<string, object> Metrics => this.metricDictionary;
+        public IDictionary<string, object> Metrics => metricDictionary;
 
         /// <summary>
         /// Clears the Metrics
         /// </summary>
         public void Clear()
         {
-            this.metricDictionary?.Clear();
+            metricDictionary?.Clear();
         }
     }
 }

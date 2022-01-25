@@ -23,7 +23,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
 
         public DiscoveryEventHandler2()
         {
-            this.DiscoveredTestCases = new List<TestCase>();
+            DiscoveredTestCases = new List<TestCase>();
         }
 
         public void HandleRawMessage(string rawMessage)
@@ -40,17 +40,17 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         {
             if (lastChunk != null)
             {
-                this.DiscoveredTestCases.AddRange(lastChunk);
+                DiscoveredTestCases.AddRange(lastChunk);
             }
 
-            this.Metrics = discoveryCompleteEventArgs.Metrics;
+            Metrics = discoveryCompleteEventArgs.Metrics;
         }
 
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
             if (discoveredTestCases != null)
             {
-                this.DiscoveredTestCases.AddRange(discoveredTestCases);
+                DiscoveredTestCases.AddRange(discoveredTestCases);
             }
         }
     }

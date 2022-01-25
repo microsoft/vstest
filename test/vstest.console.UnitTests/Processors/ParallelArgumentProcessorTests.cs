@@ -8,20 +8,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using vstest.console.UnitTests.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
-    using ExceptionUtilities = Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.ExceptionUtilities;
+    using ExceptionUtilities = ExceptionUtilities;
     using System;
 
     [TestClass]
     public class ParallelArgumentProcessorTests
     {
-        private ParallelArgumentExecutor executor;
-        private TestableRunSettingsProvider runSettingsProvider;
+        private ParallelArgumentExecutor _executor;
+        private TestableRunSettingsProvider _runSettingsProvider;
 
         [TestInitialize]
         public void Init()
         {
-            this.runSettingsProvider = new TestableRunSettingsProvider();
-            this.executor = new ParallelArgumentExecutor(CommandLineOptions.Instance, this.runSettingsProvider);
+            _runSettingsProvider = new TestableRunSettingsProvider();
+            _executor = new ParallelArgumentExecutor(CommandLineOptions.Instance, _runSettingsProvider);
         }
         [TestCleanup]
         public void TestCleanup()
@@ -72,16 +72,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             // Parallel should not have any values or arguments
             ExceptionUtilities.ThrowsException<CommandLineException>(
-                () => this.executor.Initialize("123"),
+                () => _executor.Initialize("123"),
                 "Argument " + 123 + " is not expected in the 'Parallel' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /Parallel) and try again.");
         }
 
         [TestMethod]
         public void InitializeShouldSetParallelValue()
         {
-            this.executor.Initialize(null);
+            _executor.Initialize(null);
             Assert.IsTrue(CommandLineOptions.Instance.Parallel, "Parallel option must be set to true.");
-            Assert.AreEqual("0", this.runSettingsProvider.QueryRunSettingsNode(ParallelArgumentExecutor.RunSettingsPath));
+            Assert.AreEqual("0", _runSettingsProvider.QueryRunSettingsNode(ParallelArgumentExecutor.RunSettingsPath));
         }
 
         #endregion
@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecuteShouldReturnSuccess()
         {
-            Assert.AreEqual(ArgumentProcessorResult.Success, this.executor.Execute());
+            Assert.AreEqual(ArgumentProcessorResult.Success, _executor.Execute());
         }
 
         #endregion

@@ -13,9 +13,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// </summary>
     internal sealed class TestLink : IXmlTestStore
     {
-        private Guid id;
-        private string name = string.Empty;
-        private string storage = string.Empty;
+        private Guid _id;
 
         public TestLink(Guid id, string name, string storage)
         {
@@ -27,9 +25,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             EqtAssert.StringNotNullOrEmpty(name, nameof(name));
             EqtAssert.ParameterNotNull(storage, nameof(storage));
 
-            this.id = id;
-            this.name = name;
-            this.storage = storage;
+            this._id = id;
+            Name = name;
+            this.Storage = storage;
         }
 
         /// <summary>
@@ -37,34 +35,25 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public Guid Id
         {
-            get { return this.id; }
+            get { return _id; }
         }
 
         /// <summary>
         /// Gets the name.
         /// </summary>
-        public string Name
-        {
-            get { return this.name; }
-        }
+        public string Name { get; private set; } = string.Empty;
 
         /// <summary>
         /// Gets the storage.
         /// </summary>
-        public string Storage
-        {
-            get { return this.storage; }
-        }
+        public string Storage { get; private set; } = string.Empty;
 
         /// <summary>
         /// Whether this Link is equal to other Link. Compares by Id.
         /// </summary>
         public override bool Equals(object other)
         {
-            TestLink link = other as TestLink;
-            return (link == null) ?
-                false :
-                this.id.Equals(link.id);
+            return other is TestLink link && _id.Equals(link._id);
         }
 
         /// <summary>
@@ -72,12 +61,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public bool IsSame(TestLink other)
         {
-            if (other == null)
-                return false;
-
-            return this.id.Equals(other.id) &&
-                this.name.Equals(other.name) &&
-                this.storage.Equals(other.storage);
+            return other != null
+&& _id.Equals(other._id) &&
+                Name.Equals(other.Name) &&
+                Storage.Equals(other.Storage);
         }
 
         /// <summary>
@@ -86,7 +73,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return this.id.GetHashCode();
+            return _id.GetHashCode();
         }
 
         /// <summary>
@@ -98,17 +85,17 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             return string.Format(
                 CultureInfo.InvariantCulture,
                 "Link to '{0}' {1} '{2}'.",
-                this.name ?? "(null)",
-                this.id.ToString("B"),
-                this.storage ?? "(null)");
+                Name ?? "(null)",
+                _id.ToString("B"),
+                Storage ?? "(null)");
         }
 
         public void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
         {
-            XmlPersistence h = new XmlPersistence();
-            h.SaveGuid(element, "@id", this.Id);
-            h.SaveSimpleField(element, "@name", this.name, null);
-            h.SaveSimpleField(element, "@storage", this.storage, string.Empty);
+            XmlPersistence h = new();
+            h.SaveGuid(element, "@id", Id);
+            h.SaveSimpleField(element, "@name", Name, null);
+            h.SaveSimpleField(element, "@storage", Storage, string.Empty);
         }
     }
 }

@@ -117,9 +117,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </param>
         public DataCollectorMetadata(string extension, string friendlyName, bool hasAttachmentProcessor)
         {
-            this.ExtensionUri = extension;
-            this.FriendlyName = friendlyName;
-            this.HasAttachmentProcessor = hasAttachmentProcessor;
+            ExtensionUri = extension;
+            FriendlyName = friendlyName;
+            HasAttachmentProcessor = hasAttachmentProcessor;
         }
 
         /// <summary>

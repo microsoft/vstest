@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
     internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachmentsProcessorsFactory
     {
         private const string CoverageFriendlyName = "Code Coverage";
-        private static readonly ConcurrentDictionary<string, DataCollectorExtensionManager> dataCollectorExtensionManagerCache = new ConcurrentDictionary<string, DataCollectorExtensionManager>();
+        private static readonly ConcurrentDictionary<string, DataCollectorExtensionManager> dataCollectorExtensionManagerCache = new();
 
         public DataCollectorAttachmentProcessor[] Create(InvokedDataCollector[] invokedDataCollectors, IMessageLogger logger)
         {

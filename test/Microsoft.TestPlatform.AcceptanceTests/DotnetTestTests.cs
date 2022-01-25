@@ -14,17 +14,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void RunDotnetTestWithCsproj(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
             var projectName = "SimpleTestProject.csproj";
-            var projectPath = this.GetProjectFullPath(projectName);
+            var projectPath = GetProjectFullPath(projectName);
 
-            this.InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal""");
+            InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal""");
             
             // ensure our dev version is used
-            this.StdOutputContains("-dev");
-            this.ValidateSummaryStatus(1, 1, 1);
-            this.ExitCodeEquals(1);
+            StdOutputContains("-dev");
+            ValidateSummaryStatus(1, 1, 1);
+            ExitCodeEquals(1);
         }
 
 
@@ -34,15 +34,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void RunDotnetTestWithDll(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            var assemblyPath = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
-            this.InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal""");
+            var assemblyPath = BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
+            InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal""");
 
             // ensure our dev version is used
-            this.StdOutputContains("-dev");
-            this.ValidateSummaryStatus(1, 1, 1);
-            this.ExitCodeEquals(1);
+            StdOutputContains("-dev");
+            ValidateSummaryStatus(1, 1, 1);
+            ExitCodeEquals(1);
         }
 
         [TestMethod]
@@ -51,13 +51,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void PassInlineSettings(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
             var projectName = "ParametrizedTestProject.csproj";
-            var projectPath = this.GetProjectFullPath(projectName);
-            this.InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name =\""weburl\"", value=\""http://localhost//def\"")");
-            this.ValidateSummaryStatus(1, 0, 0);
-            this.ExitCodeEquals(0);
+            var projectPath = GetProjectFullPath(projectName);
+            InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name =\""weburl\"", value=\""http://localhost//def\"")");
+            ValidateSummaryStatus(1, 0, 0);
+            ExitCodeEquals(0);
         }
 
         [TestMethod]
@@ -67,13 +67,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void PassInlineSettingsToDll(RunnerInfo runnerInfo)
         {
 
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            var assemblyPath = this.BuildMultipleAssemblyPath("ParametrizedTestProject.dll").Trim('\"');
-            this.InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name=\""weburl\"", value=\""http://localhost//def\"")");
+            var assemblyPath = BuildMultipleAssemblyPath("ParametrizedTestProject.dll").Trim('\"');
+            InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name=\""weburl\"", value=\""http://localhost//def\"")");
 
-            this.ValidateSummaryStatus(1, 0, 0);
-            this.ExitCodeEquals(0);
+            ValidateSummaryStatus(1, 0, 0);
+            ExitCodeEquals(0);
         }
     }
 }

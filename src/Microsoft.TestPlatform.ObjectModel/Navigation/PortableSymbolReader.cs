@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         ///     Key in second dict is method name
         /// </summary>
         private Dictionary<string, Dictionary<string, DiaNavigationData>> methodsNavigationDataForType =
-            new Dictionary<string, Dictionary<string, DiaNavigationData>>();
+            new();
 
         /// <summary>
         /// The cache symbols.
@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         /// </param>
         public void CacheSymbols(string binaryPath, string searchPath)
         {
-            this.PopulateCacheForTypeAndMethodSymbols(binaryPath);
+            PopulateCacheForTypeAndMethodSymbols(binaryPath);
         }
 
         /// <summary>
@@ -42,13 +42,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         /// </summary>
         public void Dispose()
         {
-            foreach (var methodsNavigationData in this.methodsNavigationDataForType.Values)
+            foreach (var methodsNavigationData in methodsNavigationDataForType.Values)
             {
                 methodsNavigationData.Clear();
             }
 
-            this.methodsNavigationDataForType.Clear();
-            this.methodsNavigationDataForType = null;
+            methodsNavigationDataForType.Clear();
+            methodsNavigationDataForType = null;
         }
 
         /// <summary>
@@ -66,9 +66,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         public INavigationData GetNavigationData(string declaringTypeName, string methodName)
         {
             INavigationData navigationData = null;
-            if (this.methodsNavigationDataForType.ContainsKey(declaringTypeName))
+            if (methodsNavigationDataForType.ContainsKey(declaringTypeName))
             {
-                var methodDict = this.methodsNavigationDataForType[declaringTypeName];
+                var methodDict = methodsNavigationDataForType[declaringTypeName];
                 if (methodDict.ContainsKey(methodName))
                 {
                     navigationData = methodDict[methodName];
@@ -134,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
                     if (methodsNavigationData.Count != 0)
                     {
-                        this.methodsNavigationDataForType[type.FullName] = methodsNavigationData;
+                        methodsNavigationDataForType[type.FullName] = methodsNavigationData;
                     }
                 }
             }
@@ -142,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             {
                 EqtTrace.Error("PortableSymbolReader: Failed to load symbols for binary: {0}", binaryPath);
                 EqtTrace.Error(ex);
-                this.Dispose();
+                Dispose();
                 throw;
             }
         }

@@ -16,20 +16,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class DiscoveryTests : AcceptanceTestBase
     {
-        private readonly string dummyFilePath = Path.Combine(Path.GetTempPath(), $"{System.Guid.NewGuid()}.txt");
+        private readonly string dummyFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.txt");
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         [NetCoreTargetFrameworkDataSource]
         public void DiscoverAllTests(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            this.InvokeVsTestForDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            InvokeVsTestForDiscovery(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue);
 
             var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
-            this.ValidateDiscoveredTests(listOfTests);
-            this.ExitCodeEquals(0);
+            ValidateDiscoveredTests(listOfTests);
+            ExitCodeEquals(0);
         }
 
         [TestMethod]
@@ -37,8 +37,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void MultipleSourcesDiscoverAllTests(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
             var listOfTests = new[] {
                 "SampleUnitTestProject.UnitTest1.PassingTest",
                 "SampleUnitTestProject.UnitTest1.FailingTest",
@@ -48,10 +48,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 "SampleUnitTestProject.UnitTest1.SkippingTest2"
             };
 
-            this.InvokeVsTestForDiscovery(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            InvokeVsTestForDiscovery(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue);
 
-            this.ValidateDiscoveredTests(listOfTests);
-            this.ExitCodeEquals(0);
+            ValidateDiscoveredTests(listOfTests);
+            ExitCodeEquals(0);
         }
 
         [TestMethod]
@@ -63,20 +63,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             try
             {
-                AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+                SetTestEnvironment(testEnvironment, runnerInfo);
 
                 var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
 
-                var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
+                var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
                 arguments = string.Concat(arguments, " /ListFullyQualifiedTests", " /ListTestsTargetPath:\"" + dummyFilePath + "\"");
-                this.InvokeVsTest(arguments);
+                InvokeVsTest(arguments);
 
-                this.ValidateFullyQualifiedDiscoveredTests(this.dummyFilePath, listOfTests);
-                this.ExitCodeEquals(0);
+                ValidateFullyQualifiedDiscoveredTests(dummyFilePath, listOfTests);
+                ExitCodeEquals(0);
             }
             finally
             {
-                File.Delete(this.dummyFilePath);
+                File.Delete(dummyFilePath);
                 TryRemoveDirectory(resultsDir);
             }
         }
@@ -86,19 +86,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void DiscoverTestsShouldShowProperWarningIfNoTestsOnTestCaseFilter(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
             var resultsDir = GetResultsDirectory();
 
-            var assetFullPath = this.GetAssetFullPath("SimpleTestProject2.dll");
-            var arguments = PrepareArguments(assetFullPath, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
+            var assetFullPath = GetAssetFullPath("SimpleTestProject2.dll");
+            var arguments = PrepareArguments(assetFullPath, GetTestAdapterPath(), string.Empty, FrameworkArgValue, testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /listtests");
             arguments = string.Concat(arguments, " /testcasefilter:NonExistTestCaseName");
             arguments = string.Concat(arguments, " /logger:\"console;prefix=true\"");
-            this.InvokeVsTest(arguments);
+            InvokeVsTest(arguments);
 
-            StringAssert.Contains(this.StdOut, "Warning: No test matches the given testcase filter `NonExistTestCaseName` in");
-            StringAssert.Contains(this.StdOut, "SimpleTestProject2.dll");
-            this.ExitCodeEquals(0);
+            StringAssert.Contains(StdOut, "Warning: No test matches the given testcase filter `NonExistTestCaseName` in");
+            StringAssert.Contains(StdOut, "SimpleTestProject2.dll");
+            ExitCodeEquals(0);
 
             TryRemoveDirectory(resultsDir);
         }

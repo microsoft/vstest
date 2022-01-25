@@ -16,17 +16,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
         public static ITestHostLauncher GetCustomHostLauncherForTestRun(IDesignModeClient designModeClient, bool debuggingEnabled)
         {
-            ITestHostLauncher testHostLauncher = null;
-
-            if (!debuggingEnabled)
-            {
-                testHostLauncher = defaultLauncher = defaultLauncher ?? new DesignModeTestHostLauncher(designModeClient);
-            }
-            else
-            {
-                testHostLauncher = debugLauncher = debugLauncher ?? new DesignModeDebugTestHostLauncher(designModeClient);
-            }
-
+            ITestHostLauncher testHostLauncher = !debuggingEnabled
+                ? (defaultLauncher ??= new DesignModeTestHostLauncher(designModeClient))
+                : (debugLauncher ??= new DesignModeDebugTestHostLauncher(designModeClient));
             return testHostLauncher;
         }
     }

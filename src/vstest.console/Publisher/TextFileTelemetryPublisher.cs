@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
         public void PublishMetrics(string eventName, IDictionary<string, object> metrics)
         {
             // Log to Text File
-            this.LogToFile(eventName, metrics, new FileHelper());
+            LogToFile(eventName, metrics, new FileHelper());
         }
 
         /// <summary>

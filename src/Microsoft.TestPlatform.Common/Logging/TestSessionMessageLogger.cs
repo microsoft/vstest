@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-    using ObjectModelCommonResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
+    using ObjectModelCommonResources = ObjectModel.Resources.CommonResources;
 
     /// <summary>
     /// The test session message logger.
@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// </summary>
         protected TestSessionMessageLogger()
         {
-            this.TreatTestAdapterErrorsAsWarnings = Constants.DefaultTreatTestAdapterErrorsAsWarnings;
+            TreatTestAdapterErrorsAsWarnings = Constants.DefaultTreatTestAdapterErrorsAsWarnings;
         }
 
         /// <summary>
@@ -67,17 +67,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                 throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(message));
             }
 
-            if (this.TreatTestAdapterErrorsAsWarnings
+            if (TreatTestAdapterErrorsAsWarnings
                     && testMessageLevel == TestMessageLevel.Error)
             {
                 // Downgrade the message severity to Warning...
                 testMessageLevel = TestMessageLevel.Warning;
             }
 
-            if (this.TestRunMessage != null)
+            if (TestRunMessage != null)
             {
                 var args = new TestRunMessageEventArgs(testMessageLevel, message);
-                this.TestRunMessage.SafeInvoke(this, args, "TestRunMessageLoggerProxy.SendMessage");
+                TestRunMessage.SafeInvoke(this, args, "TestRunMessageLoggerProxy.SendMessage");
             }
         }
     }

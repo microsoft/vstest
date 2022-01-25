@@ -7,7 +7,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#pragma warning disable SA1600
     [TestClass]
     public class TestRunnerConnectionInfoExtensionsTests
     {
@@ -71,5 +70,4 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             StringAssert.EndsWith(options, "--diag log.txt --tracelevel 3");
         }
     }
-#pragma warning restore SA1600
 }

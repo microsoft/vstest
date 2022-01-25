@@ -19,15 +19,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         [TestInitialize]
         public void TestInit()
         {
-            this.runContext = new RunContext();
+            runContext = new RunContext();
         }
 
         [TestMethod]
         public void GetTestCaseFilterShouldReturnNullIfFilterExpressionIsNull()
         {
-            this.runContext.FilterExpressionWrapper = null;
+            runContext.FilterExpressionWrapper = null;
 
-            Assert.IsNull(this.runContext.GetTestCaseFilter(null, (s) => { return null; }));
+            Assert.IsNull(runContext.GetTestCaseFilter(null, (s) => null));
         }
 
         /// <summary>
@@ -36,9 +36,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         [TestMethod]
         public void GetTestCaseFilterShouldNotThrowIfPropertyValueOnlyPassed()
         {
-            this.runContext.FilterExpressionWrapper = new FilterExpressionWrapper("Infinity");
+            runContext.FilterExpressionWrapper = new FilterExpressionWrapper("Infinity");
 
-            var filter = this.runContext.GetTestCaseFilter(new List<string>{ "FullyQualifiedName" }, (s) => { return null; });
+            var filter = runContext.GetTestCaseFilter(new List<string>{ "FullyQualifiedName" }, (s) => null);
 
             Assert.IsNotNull(filter);
         }
@@ -46,9 +46,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         [TestMethod]
         public void GetTestCaseFilterShouldNotThrowOnInvalidProperties()
         {
-            this.runContext.FilterExpressionWrapper = new FilterExpressionWrapper("highlyunlikelyproperty=unused");
+            runContext.FilterExpressionWrapper = new FilterExpressionWrapper("highlyunlikelyproperty=unused");
 
-            var filter = this.runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => { return null; });
+            var filter = runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => null);
 
             Assert.IsNotNull(filter);
         }
@@ -56,8 +56,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         [TestMethod]
         public void GetTestCaseFilterShouldReturnTestCaseFilter()
         {
-            this.runContext.FilterExpressionWrapper = new FilterExpressionWrapper("TestCategory=Important");
-            var filter = this.runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => { return null; });
+            runContext.FilterExpressionWrapper = new FilterExpressionWrapper("TestCategory=Important");
+            var filter = runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => null);
 
             Assert.IsNotNull(filter);
             Assert.AreEqual("TestCategory=Important", filter.TestCaseFilterValue);

@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="pid">The process id the debugger should attach to.</param>
         public TestProcessAttachDebuggerPayload(int pid)
         {
-            this.ProcessID = pid;
+            ProcessID = pid;
         }
 
         /// <summary>

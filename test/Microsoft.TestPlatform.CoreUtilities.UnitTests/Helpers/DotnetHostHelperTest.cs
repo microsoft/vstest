@@ -18,12 +18,12 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
     [TestClass]
     public class DotnetHostHelperTest : IDisposable
     {
-        private readonly Mock<IFileHelper> fileHelper = new Mock<IFileHelper>();
-        private readonly Mock<IProcessHelper> processHelper = new Mock<IProcessHelper>();
-        private readonly Mock<IEnvironment> environmentHelper = new Mock<IEnvironment>();
-        private readonly Mock<IWindowsRegistryHelper> windowsRegistrytHelper = new Mock<IWindowsRegistryHelper>();
-        private readonly Mock<IEnvironmentVariableHelper> environmentVariableHelper = new Mock<IEnvironmentVariableHelper>();
-        private readonly MockMuxerHelper muxerHelper = new MockMuxerHelper();
+        private readonly Mock<IFileHelper> fileHelper = new();
+        private readonly Mock<IProcessHelper> processHelper = new();
+        private readonly Mock<IEnvironment> environmentHelper = new();
+        private readonly Mock<IWindowsRegistryHelper> windowsRegistrytHelper = new();
+        private readonly Mock<IEnvironmentVariableHelper> environmentVariableHelper = new();
+        private readonly MockMuxerHelper muxerHelper = new();
 
         [TestMethod]
         public void GetDotnetPathByArchitecture_SameArchitecture()
@@ -73,7 +73,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
                 DOTNET_ROOT_X86 = muxerHelper.RenameMuxerAndReturnPath(platformSystem, PlatformArchitecture.X86);
             }
             string DOTNET_ROOT = muxerHelper.RenameMuxerAndReturnPath(platformSystem, targetArchitecture);
-            Dictionary<string, string> envVars = new Dictionary<string, string>()
+            Dictionary<string, string> envVars = new()
             {
                 { "DOTNET_ROOT_X64" , DOTNET_ROOT_X64},
                 { "DOTNET_ROOT_ARM64" , DOTNET_ROOT_ARM64},
@@ -108,7 +108,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
             string DOTNET_ROOT_ARM64 = muxerHelper.RenameMuxerAndReturnPath(PlatformOperatingSystem.Windows, PlatformArchitecture.ARM64);
             string DOTNET_ROOT_X86 = muxerHelper.RenameMuxerAndReturnPath(PlatformOperatingSystem.Windows, PlatformArchitecture.X86);
             string DOTNET_ROOT = muxerHelper.RenameMuxerAndReturnPath(PlatformOperatingSystem.Windows, targetAchitecture);
-            Dictionary<string, string> envVars = new Dictionary<string, string>()
+            Dictionary<string, string> envVars = new()
             {
                 { "DOTNET_ROOT_X64" , DOTNET_ROOT_X64},
                 { "DOTNET_ROOT_ARM64" , DOTNET_ROOT_ARM64},
@@ -137,15 +137,15 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
         {
             // Arrange
             string dotnetMuxer = muxerHelper.RenameMuxerAndReturnPath(PlatformOperatingSystem.Windows, muxerArchitecture);
-            Mock<IRegistryKey> installedVersionKey = new Mock<IRegistryKey>();
-            Mock<IRegistryKey> architectureSubKey = new Mock<IRegistryKey>();
-            Mock<IRegistryKey> nativeArchSubKey = new Mock<IRegistryKey>();
+            Mock<IRegistryKey> installedVersionKey = new();
+            Mock<IRegistryKey> architectureSubKey = new();
+            Mock<IRegistryKey> nativeArchSubKey = new();
             installedVersionKey.Setup(x => x.OpenSubKey(It.IsAny<string>())).Returns(architectureSubKey.Object);
             architectureSubKey.Setup(x => x.OpenSubKey(It.IsAny<string>())).Returns(nativeArchSubKey.Object);
             nativeArchSubKey.Setup(x => x.GetValue(It.IsAny<string>())).Returns(Path.GetDirectoryName(dotnetMuxer));
-            this.windowsRegistrytHelper.Setup(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)).Returns(installedVersionKey.Object);
-            this.fileHelper.Setup(x => x.Exists(dotnetMuxer)).Returns(true);
-            this.fileHelper.Setup(x => x.GetStream(dotnetMuxer, FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(dotnetMuxer));
+            windowsRegistrytHelper.Setup(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)).Returns(installedVersionKey.Object);
+            fileHelper.Setup(x => x.Exists(dotnetMuxer)).Returns(true);
+            fileHelper.Setup(x => x.GetStream(dotnetMuxer, FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(dotnetMuxer));
 
             //Act & Assert
             var dotnetHostHelper = new DotnetHostHelper(fileHelper.Object, environmentHelper.Object, windowsRegistrytHelper.Object, environmentVariableHelper.Object, processHelper.Object);
@@ -161,14 +161,14 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
         public void GetDotnetPathByArchitecture_GlobalInstallation_NullSubkeys(bool nullInstalledVersion, bool nullArchitecture, bool nullNative, bool nullInstallLocation)
         {
             // Arrange
-            Mock<IRegistryKey> installedVersionKey = new Mock<IRegistryKey>();
-            Mock<IRegistryKey> architectureSubKey = new Mock<IRegistryKey>();
-            Mock<IRegistryKey> nativeArchSubKey = new Mock<IRegistryKey>();
+            Mock<IRegistryKey> installedVersionKey = new();
+            Mock<IRegistryKey> architectureSubKey = new();
+            Mock<IRegistryKey> nativeArchSubKey = new();
             installedVersionKey.Setup(x => x.OpenSubKey(It.IsAny<string>())).Returns(nullArchitecture ? null : architectureSubKey.Object);
             architectureSubKey.Setup(x => x.OpenSubKey(It.IsAny<string>())).Returns(nullNative ? null : nativeArchSubKey.Object);
             nativeArchSubKey.Setup(x => x.GetValue(It.IsAny<string>())).Returns(nullInstallLocation ? null : "");
-            this.windowsRegistrytHelper.Setup(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)).Returns(nullInstalledVersion ? null : installedVersionKey.Object);
-            this.environmentVariableHelper.Setup(x => x.GetEnvironmentVariable("ProgramFiles")).Returns("notfound");
+            windowsRegistrytHelper.Setup(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)).Returns(nullInstalledVersion ? null : installedVersionKey.Object);
+            environmentVariableHelper.Setup(x => x.GetEnvironmentVariable("ProgramFiles")).Returns("notfound");
 
             //Act & Assert
             var dotnetHostHelper = new DotnetHostHelper(fileHelper.Object, environmentHelper.Object, windowsRegistrytHelper.Object, environmentVariableHelper.Object, processHelper.Object);
@@ -191,13 +191,13 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
         {
             // Arrange
             string dotnetMuxer = muxerHelper.RenameMuxerAndReturnPath(os, targetArchitecture);
-            this.environmentHelper.SetupGet(x => x.OperatingSystem).Returns(os);
-            this.fileHelper.Setup(x => x.Exists(install_location)).Returns(true);
-            this.fileHelper.Setup(x => x.Exists(dotnetMuxer)).Returns(true);
-            this.fileHelper.Setup(x => x.GetStream(install_location, FileMode.Open, FileAccess.Read)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(Path.GetDirectoryName(dotnetMuxer))));
+            environmentHelper.SetupGet(x => x.OperatingSystem).Returns(os);
+            fileHelper.Setup(x => x.Exists(install_location)).Returns(true);
+            fileHelper.Setup(x => x.Exists(dotnetMuxer)).Returns(true);
+            fileHelper.Setup(x => x.GetStream(install_location, FileMode.Open, FileAccess.Read)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(Path.GetDirectoryName(dotnetMuxer))));
             if (found)
             {
-                this.fileHelper.Setup(x => x.GetStream(dotnetMuxer, FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(dotnetMuxer));
+                fileHelper.Setup(x => x.GetStream(dotnetMuxer, FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(dotnetMuxer));
             }
 
             //Act & Assert
@@ -217,13 +217,13 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
         {
             // Arrange
             string dotnetMuxer = muxerHelper.RenameMuxerAndReturnPath(PlatformOperatingSystem.Windows, targetArchitecture, subfolder);
-            this.environmentVariableHelper.Setup(x => x.GetEnvironmentVariable(envVar)).Returns(dotnetMuxer.Replace(Path.Combine(subfolder, "dotnet.exe"), string.Empty));
-            this.environmentHelper.Setup(x => x.Architecture).Returns(platformArchitecture);
+            environmentVariableHelper.Setup(x => x.GetEnvironmentVariable(envVar)).Returns(dotnetMuxer.Replace(Path.Combine(subfolder, "dotnet.exe"), string.Empty));
+            environmentHelper.Setup(x => x.Architecture).Returns(platformArchitecture);
             if (found)
             {
-                this.fileHelper.Setup(x => x.Exists(dotnetMuxer)).Returns(true);
-                this.fileHelper.Setup(x => x.GetStream(dotnetMuxer, FileMode.Open, FileAccess.Read)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(Path.GetDirectoryName(dotnetMuxer))));
-                this.fileHelper.Setup(x => x.GetStream(dotnetMuxer, FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(dotnetMuxer));
+                fileHelper.Setup(x => x.Exists(dotnetMuxer)).Returns(true);
+                fileHelper.Setup(x => x.GetStream(dotnetMuxer, FileMode.Open, FileAccess.Read)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(Path.GetDirectoryName(dotnetMuxer))));
+                fileHelper.Setup(x => x.GetStream(dotnetMuxer, FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(dotnetMuxer));
             }
 
             //Act & Assert
@@ -246,14 +246,14 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
         {
             // Arrange
             string dotnetMuxer = muxerHelper.RenameMuxerAndReturnPath(os, targetArchitecture, subfolder);
-            this.environmentHelper.SetupGet(x => x.OperatingSystem).Returns(os);
-            this.environmentHelper.Setup(x => x.Architecture).Returns(platformArchitecture);
+            environmentHelper.SetupGet(x => x.OperatingSystem).Returns(os);
+            environmentHelper.Setup(x => x.Architecture).Returns(platformArchitecture);
             string expectedMuxerPath = Path.Combine(expectedFolder, "dotnet");
-            this.fileHelper.Setup(x => x.Exists(expectedMuxerPath)).Returns(true);
-            this.fileHelper.Setup(x => x.GetStream(expectedMuxerPath, FileMode.Open, FileAccess.Read)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(Path.GetDirectoryName(dotnetMuxer))));
+            fileHelper.Setup(x => x.Exists(expectedMuxerPath)).Returns(true);
+            fileHelper.Setup(x => x.GetStream(expectedMuxerPath, FileMode.Open, FileAccess.Read)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(Path.GetDirectoryName(dotnetMuxer))));
             if (found)
             {
-                this.fileHelper.Setup(x => x.GetStream(expectedMuxerPath, FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(dotnetMuxer));
+                fileHelper.Setup(x => x.GetStream(expectedMuxerPath, FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(dotnetMuxer));
             }
 
             //Act & Assert
@@ -262,17 +262,17 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
             Assert.AreEqual(found ? expectedMuxerPath : null, muxerPath);
         }
 
-        public void Dispose() => this.muxerHelper.Dispose();
+        public void Dispose() => muxerHelper.Dispose();
 
 
         class MockMuxerHelper : IDisposable
         {
-            private static string DotnetMuxerWinX86 = "TestAssets/dotnetWinX86.exe";
-            private static string DotnetMuxerWinX64 = "TestAssets/dotnetWinX64.exe";
-            private static string DotnetMuxerWinArm64 = "TestAssets/dotnetWinArm64.exe";
-            private static string DotnetMuxerMacArm64 = "TestAssets/dotnetMacArm64";
-            private static string DotnetMuxerMacX64 = "TestAssets/dotnetMacX64";
-            private readonly List<string> muxers = new List<string>();
+            private static readonly string DotnetMuxerWinX86 = "TestAssets/dotnetWinX86.exe";
+            private static readonly string DotnetMuxerWinX64 = "TestAssets/dotnetWinX64.exe";
+            private static readonly string DotnetMuxerWinArm64 = "TestAssets/dotnetWinArm64.exe";
+            private static readonly string DotnetMuxerMacArm64 = "TestAssets/dotnetMacArm64";
+            private static readonly string DotnetMuxerMacX64 = "TestAssets/dotnetMacX64";
+            private readonly List<string> muxers = new();
 
             public MockMuxerHelper()
             {

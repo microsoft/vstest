@@ -19,30 +19,30 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.ObjectModel
         [TestInitialize]
         public void InitializeTests()
         {
-            this.mockClient = new Mock<ITestRequestHandler>();
-            this.testRunEventHandler = new TestRunEventsHandler(this.mockClient.Object);
+            mockClient = new Mock<ITestRequestHandler>();
+            testRunEventHandler = new TestRunEventsHandler(mockClient.Object);
         }
 
         [TestMethod]
         public void HandleTestRunStatsChangeShouldSendTestRunStatisticsToClient()
         {
-            this.testRunEventHandler.HandleTestRunStatsChange(null);
-            this.mockClient.Verify(th => th.SendTestRunStatistics(null), Times.Once);
+            testRunEventHandler.HandleTestRunStatsChange(null);
+            mockClient.Verify(th => th.SendTestRunStatistics(null), Times.Once);
         }
 
         [TestMethod]
         public void HandleTestRunCompleteShouldInformClient()
         {
-            this.testRunEventHandler.HandleTestRunComplete(null, null, null, null);
-            this.mockClient.Verify(th => th.SendExecutionComplete(null, null, null, null), Times.Once);
+            testRunEventHandler.HandleTestRunComplete(null, null, null, null);
+            mockClient.Verify(th => th.SendExecutionComplete(null, null, null, null), Times.Once);
         }
 
         [TestMethod]
         public void HandleTestRunMessageShouldSendMessageToClient()
         {
-            this.testRunEventHandler.HandleLogMessage(TestMessageLevel.Informational, string.Empty);
+            testRunEventHandler.HandleLogMessage(TestMessageLevel.Informational, string.Empty);
 
-            this.mockClient.Verify(th => th.SendLog(TestMessageLevel.Informational, string.Empty), Times.AtLeast(1));
+            mockClient.Verify(th => th.SendLog(TestMessageLevel.Informational, string.Empty), Times.AtLeast(1));
         }
     }
 }

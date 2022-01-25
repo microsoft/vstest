@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     [DataContract]
     public sealed class SessionStartEventArgs : DataCollectionEventArgs
     {
-        private IDictionary<string, object> Properties;
+        private readonly IDictionary<string, object> Properties;
 
         #region Constructor
 
@@ -51,7 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         public SessionStartEventArgs(DataCollectionContext context, IDictionary<string, object> properties)
             : base(context)
         {
-            this.Properties = properties;
+            Properties = properties;
             Debug.Assert(!context.HasTestCase, "Session event has test a case context");
         }
 
@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </summary>
         public IEnumerator<KeyValuePair<string, object>> GetProperties()
         {
-            return this.Properties.GetEnumerator();
+            return Properties.GetEnumerator();
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         {
             ValidateArg.NotNullOrEmpty(property, nameof(property));
 
-            return this.Properties.ContainsKey(property) ? (T)this.Properties[property] : default(T);
+            return Properties.ContainsKey(property) ? (T)Properties[property] : default;
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         {
             ValidateArg.NotNullOrEmpty(property, nameof(property));
 
-            this.Properties.TryGetValue(property, out var propertyValue);
+            Properties.TryGetValue(property, out var propertyValue);
 
             return propertyValue;
         }

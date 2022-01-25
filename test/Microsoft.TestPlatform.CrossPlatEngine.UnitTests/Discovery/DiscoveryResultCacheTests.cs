@@ -60,7 +60,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         public void AddTestShouldReportTestCasesIfMaxCacheSizeIsMet()
         {
             ICollection<TestCase> reportedTestCases = null;
-            var cache = new DiscoveryResultCache(2, TimeSpan.FromHours(1), (tests) => { reportedTestCases = tests; });
+            var cache = new DiscoveryResultCache(2, TimeSpan.FromHours(1), (tests) => reportedTestCases = tests);
 
             var testCase1 = new TestCase("A.C.M", new Uri("executor://unittest"), "A");
             var testCase2 = new TestCase("A.C.M2", new Uri("executor://unittest"), "A");
@@ -93,7 +93,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         public void AddTestShouldReportTestCasesIfCacheTimeoutIsMet()
         {
             ICollection<TestCase> reportedTestCases = null;
-            var cache = new DiscoveryResultCache(100, TimeSpan.FromMilliseconds(10), (tests) => { reportedTestCases = tests; });
+            var cache = new DiscoveryResultCache(100, TimeSpan.FromMilliseconds(10), (tests) => reportedTestCases = tests);
 
             var testCase = new TestCase("A.C.M", new Uri("executor://unittest"), "A");
             Task.Delay(20).Wait();
@@ -108,7 +108,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         public void AddTestShouldResetTestListIfCacheTimeoutIsMet()
         {
             ICollection<TestCase> reportedTestCases = null;
-            var cache = new DiscoveryResultCache(100, TimeSpan.FromMilliseconds(10), (tests) => { reportedTestCases = tests; });
+            var cache = new DiscoveryResultCache(100, TimeSpan.FromMilliseconds(10), (tests) => reportedTestCases = tests);
 
             var testCase = new TestCase("A.C.M", new Uri("executor://unittest"), "A");
             Task.Delay(20).Wait();

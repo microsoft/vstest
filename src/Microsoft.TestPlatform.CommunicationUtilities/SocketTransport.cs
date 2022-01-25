@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private TestHostConnectionInfo connectionInfo;
 
-        private ICommunicationManager communicationManager;
+        private readonly ICommunicationManager communicationManager;
 
         public SocketTransport(ICommunicationManager communicationManager, TestHostConnectionInfo connectionInfo)
         {
@@ -30,21 +30,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc/>
         public IPEndPoint Initialize()
         {
-            var endpoint = this.GetIPEndPoint(this.connectionInfo.Endpoint);
-            switch (this.connectionInfo.Role)
+            var endpoint = GetIPEndPoint(connectionInfo.Endpoint);
+            switch (connectionInfo.Role)
             {
                 case ConnectionRole.Host:
                     {
                         // In case users passes endpoint Port as 0 HostServer will allocate endpoint at appropriate port,
                         // So reassign endpoint to point to correct endpoint.
-                        endpoint = this.communicationManager.HostServer(endpoint);
-                        this.communicationManager.AcceptClientAsync();
+                        endpoint = communicationManager.HostServer(endpoint);
+                        communicationManager.AcceptClientAsync();
                         return endpoint;
                     }
 
                 case ConnectionRole.Client:
                     {
-                        this.communicationManager.SetupClientAsync(this.GetIPEndPoint(this.connectionInfo.Endpoint));
+                        communicationManager.SetupClientAsync(GetIPEndPoint(connectionInfo.Endpoint));
                         return endpoint;
                     }
 
@@ -56,31 +56,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc/>
         public bool WaitForConnection(int connectionTimeout)
         {
-            return this.connectionInfo.Role == ConnectionRole.Client ? this.communicationManager.WaitForServerConnection(connectionTimeout) : this.communicationManager.WaitForClientConnection(connectionTimeout);
+            return connectionInfo.Role == ConnectionRole.Client ? communicationManager.WaitForServerConnection(connectionTimeout) : communicationManager.WaitForClientConnection(connectionTimeout);
         }
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
         }
 
         private void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            if (!disposed)
             {
                 if (disposing)
                 {
-                    if (this.connectionInfo.Role == ConnectionRole.Client)
+                    if (connectionInfo.Role == ConnectionRole.Client)
                     {
-                        this.communicationManager?.StopClient();
+                        communicationManager?.StopClient();
                     }
                     else
                     {
-                        this.communicationManager?.StopServer();
+                        communicationManager?.StopServer();
                     }
                 }
 
-                this.disposed = true;
+                disposed = true;
             }
         }
 
@@ -91,12 +91,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>IPEndpoint from give string</returns>
         private IPEndPoint GetIPEndPoint(string endpointAddress)
         {
-            if (Uri.TryCreate(string.Concat("tcp://", endpointAddress), UriKind.Absolute, out Uri uri))
-            {
-                return new IPEndPoint(IPAddress.Parse(uri.Host), uri.Port < 0 ? 0 : uri.Port);
-            }
-
-            return null;
+            return Uri.TryCreate(string.Concat("tcp://", endpointAddress), UriKind.Absolute, out Uri uri)
+                ? new IPEndPoint(IPAddress.Parse(uri.Host), uri.Port < 0 ? 0 : uri.Port)
+                : null;
         }
     }
 }

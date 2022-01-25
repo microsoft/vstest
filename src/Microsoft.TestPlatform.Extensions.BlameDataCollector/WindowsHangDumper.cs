@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
     internal class WindowsHangDumper : IHangDumper
     {
-        private Action<string> logWarning;
+        private readonly Action<string> logWarning;
 
         public WindowsHangDumper(Action<string> logWarning)
         {
@@ -52,17 +52,17 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
 
                 // logging warning separately to avoid interleving the messages in the log which make this tree unreadable
-                this.logWarning(Resources.Resources.DumpingTree);
+                logWarning(Resources.Resources.DumpingTree);
                 foreach (var p in tree)
                 {
-                    this.logWarning($"{new string(' ', p.Level)}{(p.Level != 0 ? "+-" : ">")} {p.Process.Id} - {p.Process.ProcessName}");
+                    logWarning($"{new string(' ', p.Level)}{(p.Level != 0 ? "+-" : ">")} {p.Process.Id} - {p.Process.ProcessName}");
                 }
             }
             else
             {
                 EqtTrace.Verbose($"NetClientHangDumper.Dump: Dumping {process.Id} - {process.ProcessName}.");
                 var message = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.Dumping, process.Id, process.ProcessName);
-                this.logWarning(message);
+                logWarning(message);
             }
 
             var bottomUpTree = processTree.OrderByDescending(t => t.Level).Select(t => t.Process);
@@ -245,9 +245,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
 
             [Flags]
-#pragma warning disable SA1201 // Elements must appear in the correct order
             public enum MINIDUMP_TYPE : uint
-#pragma warning restore SA1201 // Elements must appear in the correct order
             {
                 MiniDumpNormal = 0,
                 MiniDumpWithDataSegs = 1 << 0,

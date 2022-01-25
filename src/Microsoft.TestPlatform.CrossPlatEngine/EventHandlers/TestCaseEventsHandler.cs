@@ -36,31 +36,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
         /// <inheritdoc />
         public void SendTestCaseStart(TestCase testCase)
         {
-            this.TestCaseStart.SafeInvoke(this, new TestCaseStartEventArgs(testCase), "TestCaseEventsHandler.RaiseTestCaseStart");
+            TestCaseStart.SafeInvoke(this, new TestCaseStartEventArgs(testCase), "TestCaseEventsHandler.RaiseTestCaseStart");
         }
 
         /// <inheritdoc />
         public void SendTestCaseEnd(TestCase testCase, TestOutcome outcome)
         {
-            this.TestCaseEnd.SafeInvoke(this, new TestCaseEndEventArgs(testCase, outcome), "TestCaseEventsHandler.RaiseTestCaseEnd");
+            TestCaseEnd.SafeInvoke(this, new TestCaseEndEventArgs(testCase, outcome), "TestCaseEventsHandler.RaiseTestCaseEnd");
         }
 
         /// <inheritdoc />
         public void SendTestResult(TestResult result)
         {
-            this.TestResult.SafeInvoke(this, new TestResultEventArgs(result), "TestCaseEventsHandler.RaiseTestCaseEnd");
+            TestResult.SafeInvoke(this, new TestResultEventArgs(result), "TestCaseEventsHandler.RaiseTestCaseEnd");
         }
 
         /// <inheritdoc />
         public void SendSessionStart(IDictionary<string, object> properties)
         {
-            this.SessionStart.SafeInvoke(this, new SessionStartEventArgs(properties), "TestCaseEventsHandler.RaiseSessionStart");
+            SessionStart.SafeInvoke(this, new SessionStartEventArgs(properties), "TestCaseEventsHandler.RaiseSessionStart");
         }
 
         /// <inheritdoc />
         public void SendSessionEnd()
         {
-            this.SessionEnd.SafeInvoke(this, new SessionEndEventArgs(), "TestCaseEventsHandler.RaiseSessionEnd");
+            SessionEnd.SafeInvoke(this, new SessionEndEventArgs(), "TestCaseEventsHandler.RaiseSessionEnd");
         }
     }
 }

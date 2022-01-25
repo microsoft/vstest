@@ -13,9 +13,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations
     {
         public TestableTestRunCache()
         {
-            this.TestStartedList = new List<TestCase>();
-            this.TestCompletedList = new List<TestCase>();
-            this.TestResultList = new List<TestResult>();
+            TestStartedList = new List<TestCase>();
+            TestCompletedList = new List<TestCase>();
+            TestResultList = new List<TestResult>();
         }
 
         // use the below three to fill in data to the testable cache.
@@ -39,24 +39,24 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations
 
         public ICollection<TestResult> GetLastChunk()
         {
-            return this.TestResultList;
+            return TestResultList;
         }
 
         public void OnNewTestResult(TestResult testResult)
         {
-            this.TestResultList.Add(testResult);
+            TestResultList.Add(testResult);
         }
 
         public bool OnTestCompletion(TestCase testCase)
         {
-            this.TestCompletedList.Add(testCase);
+            TestCompletedList.Add(testCase);
 
             return false;
         }
 
         public void OnTestStarted(TestCase testCase)
         {
-            this.TestStartedList.Add(testCase);
+            TestStartedList.Add(testCase);
         }
 
         public void Dispose()

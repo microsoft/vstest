@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     internal class ArgumentProcessorUtilities
     {
@@ -26,12 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             var argumentList = rawArgument?.Split(argumentSeparator, StringSplitOptions.RemoveEmptyEntries);
 
             // Throw error in case of invalid argument.
-            if (argumentList == null || argumentList.Length <= 0)
-            {
-                throw new CommandLineException(exceptionMessage);
-            }
-
-            return argumentList;
+            return argumentList == null || argumentList.Length <= 0 ? throw new CommandLineException(exceptionMessage) : argumentList;
         }
 
         /// <summary>

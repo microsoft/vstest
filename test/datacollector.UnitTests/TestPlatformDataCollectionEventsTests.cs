@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     [TestClass]
     public class TestPlatformDataCollectionEventsTests
     {
-        private TestPlatformDataCollectionEvents events;
+        private readonly TestPlatformDataCollectionEvents events;
 
         private DataCollectionContext context;
 
@@ -20,142 +20,139 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
         public TestPlatformDataCollectionEventsTests()
         {
-            this.events = new TestPlatformDataCollectionEvents();
+            events = new TestPlatformDataCollectionEvents();
         }
 
         [TestMethod]
         public void RaiseEventsShouldThrowExceptionIfEventArgsIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.events.RaiseEvent(null);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => events.RaiseEvent(null));
         }
 
         [TestMethod]
         public void RaiseEventsShouldRaiseEventsIfSessionStartEventArgsIsPassed()
         {
-            this.isEventRaised = false;
+            isEventRaised = false;
             var testCase = new TestCase();
-            this.context = new DataCollectionContext(testCase);
+            context = new DataCollectionContext(testCase);
 
-            this.events.SessionStart += this.SessionStartMessageHandler;
-            var eventArgs = new SessionStartEventArgs(this.context, new Dictionary<string, object>());
-            this.events.RaiseEvent(eventArgs);
+            events.SessionStart += SessionStartMessageHandler;
+            var eventArgs = new SessionStartEventArgs(context, new Dictionary<string, object>());
+            events.RaiseEvent(eventArgs);
 
-            Assert.IsTrue(this.isEventRaised);
+            Assert.IsTrue(isEventRaised);
         }
 
         [TestMethod]
         public void RaiseEventsShouldNotRaiseEventsIfEventIsNotRegisterd()
         {
-            this.isEventRaised = false;
+            isEventRaised = false;
             var testCase = new TestCase();
-            this.context = new DataCollectionContext(testCase);
+            context = new DataCollectionContext(testCase);
 
-            var eventArgs = new SessionStartEventArgs(this.context, new Dictionary<string, object>());
-            this.events.RaiseEvent(eventArgs);
+            var eventArgs = new SessionStartEventArgs(context, new Dictionary<string, object>());
+            events.RaiseEvent(eventArgs);
 
-            Assert.IsFalse(this.isEventRaised);
+            Assert.IsFalse(isEventRaised);
         }
 
         [TestMethod]
         public void RaiseEventsShouldNotRaiseEventsIfEventIsUnRegisterd()
         {
-            this.isEventRaised = false;
+            isEventRaised = false;
             var testCase = new TestCase();
-            this.context = new DataCollectionContext(testCase);
+            context = new DataCollectionContext(testCase);
 
-            this.events.SessionStart += this.SessionStartMessageHandler;
-            this.events.SessionStart -= this.SessionStartMessageHandler;
-            var eventArgs = new SessionStartEventArgs(this.context, new Dictionary<string, object>());
-            this.events.RaiseEvent(eventArgs);
+            events.SessionStart += SessionStartMessageHandler;
+            events.SessionStart -= SessionStartMessageHandler;
+            var eventArgs = new SessionStartEventArgs(context, new Dictionary<string, object>());
+            events.RaiseEvent(eventArgs);
 
-            Assert.IsFalse(this.isEventRaised);
+            Assert.IsFalse(isEventRaised);
         }
 
         [TestMethod]
         public void RaiseEventsShouldRaiseEventsIfSessionEndEventArgsIsPassed()
         {
-            this.isEventRaised = false;
+            isEventRaised = false;
             var testCase = new TestCase();
-            this.context = new DataCollectionContext(testCase);
+            context = new DataCollectionContext(testCase);
 
-            this.events.SessionEnd += this.SessionEndMessageHandler;
-            var eventArgs = new SessionEndEventArgs(this.context);
-            this.events.RaiseEvent(eventArgs);
+            events.SessionEnd += SessionEndMessageHandler;
+            var eventArgs = new SessionEndEventArgs(context);
+            events.RaiseEvent(eventArgs);
 
-            Assert.IsTrue(this.isEventRaised);
+            Assert.IsTrue(isEventRaised);
         }
 
         [TestMethod]
         public void RaiseEventsShouldRaiseEventsIfTestCaseStartEventArgsIsPassed()
         {
-            this.isEventRaised = false;
+            isEventRaised = false;
             var testCase = new TestCase();
-            this.context = new DataCollectionContext(testCase);
+            context = new DataCollectionContext(testCase);
 
-            this.events.TestCaseStart += this.TestCaseStartMessageHandler;
-            var eventArgs = new TestCaseStartEventArgs(this.context, testCase);
-            this.events.RaiseEvent(eventArgs);
+            events.TestCaseStart += TestCaseStartMessageHandler;
+            var eventArgs = new TestCaseStartEventArgs(context, testCase);
+            events.RaiseEvent(eventArgs);
 
-            Assert.IsTrue(this.isEventRaised);
+            Assert.IsTrue(isEventRaised);
         }
 
         [TestMethod]
         public void RaiseEventsShouldRaiseEventsIfTestCaseEndEventArgsIsPassed()
         {
-            this.isEventRaised = false;
+            isEventRaised = false;
             var testCase = new TestCase();
-            this.context = new DataCollectionContext(testCase);
+            context = new DataCollectionContext(testCase);
 
-            this.events.TestCaseEnd += this.TestCaseEndMessageHandler;
-            var eventArgs = new TestCaseEndEventArgs(this.context, testCase, TestOutcome.Passed);
-            this.events.RaiseEvent(eventArgs);
+            events.TestCaseEnd += TestCaseEndMessageHandler;
+            var eventArgs = new TestCaseEndEventArgs(context, testCase, TestOutcome.Passed);
+            events.RaiseEvent(eventArgs);
 
-            Assert.IsTrue(this.isEventRaised);
+            Assert.IsTrue(isEventRaised);
         }
 
         [TestMethod]
         public void AreTestCaseEventsSubscribedShouldReturnTrueIfTestCaseStartIsSubscribed()
         {
-            this.events.TestCaseStart += this.TestCaseStartMessageHandler;
+            events.TestCaseStart += TestCaseStartMessageHandler;
 
-            Assert.IsTrue(this.events.AreTestCaseEventsSubscribed());
+            Assert.IsTrue(events.AreTestCaseEventsSubscribed());
         }
 
         [TestMethod]
         public void AreTestCaseEventsSubscribedShouldReturnTrueIfTestCaseEndIsSubscribed()
         {
-            this.events.TestCaseEnd += this.TestCaseEndMessageHandler;
+            events.TestCaseEnd += TestCaseEndMessageHandler;
 
-            Assert.IsTrue(this.events.AreTestCaseEventsSubscribed());
+            Assert.IsTrue(events.AreTestCaseEventsSubscribed());
         }
 
         [TestMethod]
         public void AreTestCaseEventsSubscribedShouldFalseIfTestCaseEventsAreNotSubscribed()
         {
-            Assert.IsFalse(this.events.AreTestCaseEventsSubscribed());
+            Assert.IsFalse(events.AreTestCaseEventsSubscribed());
         }
 
         private void SessionStartMessageHandler(object sender, SessionStartEventArgs e)
         {
-            this.isEventRaised = true;
+            isEventRaised = true;
         }
 
         private void SessionEndMessageHandler(object sender, SessionEndEventArgs e)
         {
-            this.isEventRaised = true;
+            isEventRaised = true;
         }
 
         private void TestCaseStartMessageHandler(object sender, TestCaseStartEventArgs e)
         {
-            this.isEventRaised = true;
+            isEventRaised = true;
         }
 
         private void TestCaseEndMessageHandler(object sender, TestCaseEndEventArgs e)
         {
-            this.isEventRaised = true;
+            isEventRaised = true;
         }
     }
 }

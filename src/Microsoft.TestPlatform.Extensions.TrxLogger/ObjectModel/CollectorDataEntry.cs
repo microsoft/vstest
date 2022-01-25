@@ -24,32 +24,32 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// List of data attachments. These attachments can be things such as files that the
         /// collector wants to make available to the publishers.
         /// </summary>
-        private readonly List<IDataAttachment> attachments;
+        private readonly List<IDataAttachment> _attachments;
 
         /// <summary>
         /// Name of the agent from which we received the data
         /// </summary>
-        private string agentName;
+        private string _agentName;
 
         /// <summary>
         /// Display name of the agent from which we received the data
         /// </summary>
-        private string agentDisplayName;
+        private string _agentDisplayName;
 
         /// <summary>
         /// Flag indicating whether this data is coming from a remote (not hosted) agent
         /// </summary>
-        private bool isFromRemoteAgent;
+        private bool _isFromRemoteAgent;
 
         /// <summary>
         /// URI of the collector.
         /// </summary>
-        private Uri uri;
+        private Uri _uri;
 
         /// <summary>
         /// Name of the collector that should be displayed to the user.
         /// </summary>
-        private string collectorDisplayName;
+        private string _collectorDisplayName;
 
         #endregion
 
@@ -80,7 +80,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         public CollectorDataEntry(Uri uri, string collectorDisplayName, string agentName, string agentDisplayName, bool isFromRemoteAgent, IList<IDataAttachment> attachments)
             : this()
         {
-            this.Initialize(uri, collectorDisplayName, agentName, agentDisplayName, isFromRemoteAgent, attachments);
+            Initialize(uri, collectorDisplayName, agentName, agentDisplayName, isFromRemoteAgent, attachments);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </remarks>
         internal CollectorDataEntry()
         {
-            this.attachments = new List<IDataAttachment>();
+            _attachments = new List<IDataAttachment>();
         }
 
         /// <summary>
@@ -104,25 +104,24 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         private CollectorDataEntry(CollectorDataEntry other, string resultsDirectory, bool useAbsolutePaths)
         {
             Debug.Assert(other != null, "'other' is null");
-            Debug.Assert(other.attachments != null, "'other.m_attachments' is null");
+            Debug.Assert(other._attachments != null, "'other.m_attachments' is null");
             Debug.Assert(!string.IsNullOrEmpty(resultsDirectory), "'resultsDirectory' is null or empty");
 
-            this.attachments = new List<IDataAttachment>(other.attachments.Count);
-            this.Initialize(other.uri, other.collectorDisplayName, other.agentName, other.agentDisplayName, other.isFromRemoteAgent, null);
+            _attachments = new List<IDataAttachment>(other._attachments.Count);
+            Initialize(other._uri, other._collectorDisplayName, other._agentName, other._agentDisplayName, other._isFromRemoteAgent, null);
 
             // Clone the attachments
-            foreach (IDataAttachment attachment in other.attachments)
+            foreach (IDataAttachment attachment in other._attachments)
             {
                 Debug.Assert(attachment != null, "'attachment' is null");
 
-                UriDataAttachment uriDataAttachment = attachment as UriDataAttachment;
-                if (uriDataAttachment != null)
+                if (attachment is UriDataAttachment uriDataAttachment)
                 {
-                    this.attachments.Add(uriDataAttachment.Clone(resultsDirectory, useAbsolutePaths));
+                    _attachments.Add(uriDataAttachment.Clone(resultsDirectory, useAbsolutePaths));
                 }
                 else
                 {
-                    this.attachments.Add(attachment);
+                    _attachments.Add(attachment);
                 }
             }
         }
@@ -138,7 +137,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             get
             {
-                return this.attachments.AsReadOnly();
+                return _attachments.AsReadOnly();
             }
         }
 
@@ -155,18 +154,17 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             EqtAssert.ParameterNotNull(element, nameof(element));
 
-            XmlPersistence helper = new XmlPersistence();
-            helper.SaveSimpleField(element, "@agentName", this.agentName, null);
-            helper.SaveSimpleField(element, "@agentDisplayName", this.agentDisplayName, this.agentName);
-            helper.SaveSimpleField(element, "@isFromRemoteAgent", this.isFromRemoteAgent, false);
-            helper.SaveSimpleField(element, "@uri", this.uri.AbsoluteUri, null);
-            helper.SaveSimpleField(element, "@collectorDisplayName", this.collectorDisplayName, string.Empty);
+            XmlPersistence helper = new();
+            helper.SaveSimpleField(element, "@agentName", _agentName, null);
+            helper.SaveSimpleField(element, "@agentDisplayName", _agentDisplayName, _agentName);
+            helper.SaveSimpleField(element, "@isFromRemoteAgent", _isFromRemoteAgent, false);
+            helper.SaveSimpleField(element, "@uri", _uri.AbsoluteUri, null);
+            helper.SaveSimpleField(element, "@collectorDisplayName", _collectorDisplayName, string.Empty);
 
             IList<UriDataAttachment> uriAttachments = new List<UriDataAttachment>();
-            foreach (IDataAttachment attachment in this.Attachments)
+            foreach (IDataAttachment attachment in Attachments)
             {
-                UriDataAttachment uriAtt = attachment as UriDataAttachment;
-                if (uriAtt != null)
+                if (attachment is UriDataAttachment uriAtt)
                 {
                     uriAttachments.Add(uriAtt);
                 }
@@ -190,7 +188,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 throw new ArgumentNullException(nameof(attachment));
             }
 
-            this.attachments.Add(attachment);
+            _attachments.Add(attachment);
         }
 
         /// <summary>
@@ -223,16 +221,16 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 // Copy the attachments
                 foreach (IDataAttachment attachment in attachments)
                 {
-                    this.AddAttachment(attachment);
+                    AddAttachment(attachment);
                 }
             }
 
             // Note that the data can be null.
-            this.uri = uri;
-            this.collectorDisplayName = collectorDisplayName;
-            this.agentName = agentName.Trim();
-            this.agentDisplayName = agentDisplayName.Trim();
-            this.isFromRemoteAgent = isFromRemoteAgent;
+            this._uri = uri;
+            this._collectorDisplayName = collectorDisplayName;
+            this._agentName = agentName.Trim();
+            this._agentDisplayName = agentDisplayName.Trim();
+            this._isFromRemoteAgent = isFromRemoteAgent;
         }
 
         #endregion

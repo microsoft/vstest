@@ -93,14 +93,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <summary>
         /// The min value of this enum
         /// </summary>
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         Min = Error,
 
         /// <summary>
         /// The max value of this enum
         /// </summary>
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly",
-            Justification = "Reviewed. Suppression is OK here.")]
         Max = Pending
     }
 }

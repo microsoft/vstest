@@ -18,7 +18,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource]
         public void DisableAppdomainTest(RunnerInfo runnerInfo)
         {
-            SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
             var diableAppdomainTest1 = testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", "net451");
             var diableAppdomainTest2 = testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", "net451");
@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource]
         public void NewtonSoftDependencyWithDisableAppdomainTest(RunnerInfo runnerInfo)
         {
-            SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
             var newtonSoftDependnecyTest = testEnvironment.GetTestAsset("NewtonSoftDependency.dll", "net451");
 
@@ -52,16 +52,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                  };
 
             var resultsDir = GetResultsDirectory();
-            var diableAppdomainTest1 = testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", "net451");
-            var diableAppdomainTest2 = testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", "net451");
+            string diableAppdomainTest1;
+            _ = testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", "net451");
+            _ = testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", "net451");
             var arguments = PrepareArguments(
                 testAssembly,
                 string.Empty,
                 GetRunsettingsFilePath(runConfigurationDictionary),
-                this.FrameworkArgValue, resultsDirectory: resultsDir);
+                FrameworkArgValue, resultsDirectory: resultsDir);
 
-            this.InvokeVsTest(arguments);
-            this.ValidateSummaryStatus(passedTestCount, 0, 0);
+            InvokeVsTest(arguments);
+            ValidateSummaryStatus(passedTestCount, 0, 0);
 
             TryRemoveDirectory(resultsDir);
         }

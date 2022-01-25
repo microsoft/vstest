@@ -54,11 +54,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 EqtTrace.Error(
                     "Data collector '{0}' logged the following error: {1}",
-                    this.dataCollectorConfig.TypeUri,
+                    dataCollectorConfig.TypeUri,
                     text);
             }
 
-            this.SendTextMessage(context, text, TestMessageLevel.Error);
+            SendTextMessage(context, text, TestMessageLevel.Error);
         }
 
         /// <inheritdoc/>
@@ -82,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         "Description:            {1}" + Environment.NewLine +
                         "Exception type:         {2}" + Environment.NewLine + "Exception message:      {3}"
                     + Environment.NewLine + "Exception stack trace:  {4}",
-                    this.dataCollectorConfig.TypeUri,
+                    dataCollectorConfig.TypeUri,
                     text,
                     exception.GetType(),
                     exception.Message,
@@ -97,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 exception.GetType(),
                 exception.Message,
                 text);
-            this.SendTextMessage(context, message, TestMessageLevel.Error);
+            SendTextMessage(context, message, TestMessageLevel.Error);
         }
 
         /// <inheritdoc/>
@@ -107,10 +107,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             ValidateArg.NotNull(text, nameof(text));
             EqtTrace.Warning(
                     "Data collector '{0}' logged the following warning: {1}",
-                    this.dataCollectorConfig.TypeUri,
+                    dataCollectorConfig.TypeUri,
                 text);
 
-            this.SendTextMessage(context, text, TestMessageLevel.Warning);
+            SendTextMessage(context, text, TestMessageLevel.Warning);
         }
 
         /// <summary>
@@ -144,14 +144,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             }
 
             var args = new DataCollectionMessageEventArgs(level, text);
-            args.Uri = this.dataCollectorConfig.TypeUri;
-            args.FriendlyName = this.dataCollectorConfig.FriendlyName;
+            args.Uri = dataCollectorConfig.TypeUri;
+            args.FriendlyName = dataCollectorConfig.FriendlyName;
             if (context.HasTestCase)
             {
                 args.TestCaseId = context.TestExecId.Id;
             }
 
-            this.sink.SendMessage(args);
+            sink.SendMessage(args);
         }
     }
 }

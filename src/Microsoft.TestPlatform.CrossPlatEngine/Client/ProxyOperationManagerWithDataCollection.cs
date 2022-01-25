@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     public class ProxyOperationManagerWithDataCollection : ProxyOperationManager
     {
         private IDictionary<string, string> dataCollectionEnvironmentVariables;
-        private IRequestData requestData;
+        private readonly IRequestData requestData;
         private int dataCollectionPort;
 
         /// <summary>
@@ -40,39 +40,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                   requestSender,
                   testHostManager)
         {
-            this.ProxyDataCollectionManager = proxyDataCollectionManager;
-            this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
+            ProxyDataCollectionManager = proxyDataCollectionManager;
+            DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
             this.requestData = requestData;
-            this.dataCollectionEnvironmentVariables = new Dictionary<string, string>();
+            dataCollectionEnvironmentVariables = new Dictionary<string, string>();
 
-            testHostManager.HostLaunched += this.TestHostLaunchedHandler;
+            testHostManager.HostLaunched += TestHostLaunchedHandler;
         }
 
         /// <inheritdoc />
         public override void Initialize(bool skipDefaultAdapters)
         {
-            this.ProxyDataCollectionManager.Initialize();
+            ProxyDataCollectionManager.Initialize();
 
             try
             {
-                var dataCollectionParameters = this.ProxyDataCollectionManager.BeforeTestRunStart(
+                var dataCollectionParameters = ProxyDataCollectionManager.BeforeTestRunStart(
                     resetDataCollectors: true,
                     isRunStartingNow: true,
-                    runEventsHandler: this.DataCollectionRunEventsHandler);
+                    runEventsHandler: DataCollectionRunEventsHandler);
 
                 if (dataCollectionParameters != null)
                 {
-                    this.dataCollectionEnvironmentVariables = dataCollectionParameters.EnvironmentVariables;
-                    this.dataCollectionPort = dataCollectionParameters.DataCollectionEventsPort;
+                    dataCollectionEnvironmentVariables = dataCollectionParameters.EnvironmentVariables;
+                    dataCollectionPort = dataCollectionParameters.DataCollectionEventsPort;
                 }
             }
             catch (Exception)
             {
                 // On failure in calling BeforeTestRunStart, call AfterTestRunEnd to end the data
                 // collection process.
-                this.ProxyDataCollectionManager.AfterTestRunEnd(
+                ProxyDataCollectionManager.AfterTestRunEnd(
                     isCanceled: true,
-                    runEventsHandler: this.DataCollectionRunEventsHandler);
+                    runEventsHandler: DataCollectionRunEventsHandler);
                 throw;
             }
 
@@ -84,19 +84,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             if (testProcessStartInfo.EnvironmentVariables == null)
             {
-                testProcessStartInfo.EnvironmentVariables = this.dataCollectionEnvironmentVariables;
+                testProcessStartInfo.EnvironmentVariables = dataCollectionEnvironmentVariables;
             }
             else
             {
-                foreach (var kvp in this.dataCollectionEnvironmentVariables)
+                foreach (var kvp in dataCollectionEnvironmentVariables)
                 {
                     testProcessStartInfo.EnvironmentVariables[kvp.Key] = kvp.Value;
                 }
             }
 
             // Update telemetry opt in status because by default test host telemetry is opted out.
-            var telemetryOptedIn = this.requestData.IsTelemetryOptedIn ? "true" : "false";
-            testProcessStartInfo.Arguments += " --datacollectionport " + this.dataCollectionPort
+            var telemetryOptedIn = requestData.IsTelemetryOptedIn ? "true" : "false";
+            testProcessStartInfo.Arguments += " --datacollectionport " + dataCollectionPort
                                               + " --telemetryoptedin " + telemetryOptedIn;
 
             return testProcessStartInfo;
@@ -109,14 +109,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             ITestMessageEventHandler eventHandler)
         {
             // Log all the messages that are reported while initializing the DataCollectionClient.
-            if (this.DataCollectionRunEventsHandler.Messages.Count > 0)
+            if (DataCollectionRunEventsHandler.Messages.Count > 0)
             {
-                foreach (var message in this.DataCollectionRunEventsHandler.Messages)
+                foreach (var message in DataCollectionRunEventsHandler.Messages)
                 {
                     eventHandler.HandleLogMessage(message.Item1, message.Item2);
                 }
 
-                this.DataCollectionRunEventsHandler.Messages.Clear();
+                DataCollectionRunEventsHandler.Messages.Clear();
             }
 
             return base.SetupChannel(sources, runSettings);
@@ -140,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void TestHostLaunchedHandler(object sender, HostProviderEventArgs e)
         {
-            this.ProxyDataCollectionManager.TestHostLaunched(e.ProcessId);
+            ProxyDataCollectionManager.TestHostLaunched(e.ProcessId);
         }
     }
 }

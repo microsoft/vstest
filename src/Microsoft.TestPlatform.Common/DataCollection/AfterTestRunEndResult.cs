@@ -50,9 +50,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
             Collection<InvokedDataCollector> invokedDataCollectors,
             IDictionary<string, object> metrics)
         {
-            this.AttachmentSets = attachmentSets;
-            this.InvokedDataCollectors = invokedDataCollectors;
-            this.Metrics = metrics;
+            AttachmentSets = attachmentSets;
+            InvokedDataCollectors = invokedDataCollectors;
+            Metrics = metrics;
         }
 
         [DataMember]

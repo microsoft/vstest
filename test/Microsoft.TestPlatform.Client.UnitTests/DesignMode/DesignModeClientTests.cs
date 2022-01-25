@@ -49,11 +49,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
 
         public DesignModeClientTests()
         {
-            this.mockTestRequestManager = new Mock<ITestRequestManager>();
-            this.mockCommunicationManager = new Mock<ICommunicationManager>();
-            this.mockPlatformEnvrironment = new Mock<IEnvironment>();
-            this.designModeClient = new DesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance, this.mockPlatformEnvrironment.Object);
-            this.completeEvent = new AutoResetEvent(false);
+            mockTestRequestManager = new Mock<ITestRequestManager>();
+            mockCommunicationManager = new Mock<ICommunicationManager>();
+            mockPlatformEnvrironment = new Mock<IEnvironment>();
+            designModeClient = new DesignModeClient(mockCommunicationManager.Object, JsonDataSerializer.Instance, mockPlatformEnvrironment.Object);
+            completeEvent = new AutoResetEvent(false);
         }
 
         [TestMethod]
@@ -72,63 +72,63 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         [TestMethod]
         public void TestRunMessageHandlerShouldCallCommmunicationManagerIfMessageisError()
         {
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>()));
+            mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>()));
 
-            this.designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Error, "message"));
+            designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Error, "message"));
 
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(),It.IsAny<TestMessagePayload>()), Times.Once());
+            mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(),It.IsAny<TestMessagePayload>()), Times.Once());
         }
 
         [TestMethod]
         public void TestRunMessageHandlerShouldCallCommmunicationManagerIfMessageisWarning()
         {
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>()));
+            mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>()));
 
-            this.designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Warning, "message"));
+            designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Warning, "message"));
 
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<TestMessagePayload>()), Times.Once());
+            mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<TestMessagePayload>()), Times.Once());
         }
 
         [TestMethod]
         public void TestRunMessageHandlerShouldNotCallCommmunicationManagerIfMessageisInformational()
         {
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>()));
+            mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>()));
 
-            this.designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Informational, "message"));
+            designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Informational, "message"));
 
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<TestMessagePayload>()), Times.Never());
+            mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<TestMessagePayload>()), Times.Never());
         }
 
         [TestMethod]
         public void DesignModeClientConnectShouldSetupChannel()
         {
-            var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = this.protocolVersion };
+            var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = protocolVersion };
             var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
 
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object);
 
-            this.mockCommunicationManager.Verify(cm => cm.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, PortNumber)), Times.Once);
-            this.mockCommunicationManager.Verify(cm => cm.WaitForServerConnection(It.IsAny<int>()), Times.Once);
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.SessionConnected), Times.Once());
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, this.protocolVersion), Times.Once());
+            mockCommunicationManager.Verify(cm => cm.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, PortNumber)), Times.Once);
+            mockCommunicationManager.Verify(cm => cm.WaitForServerConnection(It.IsAny<int>()), Times.Once);
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.SessionConnected), Times.Once());
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, protocolVersion), Times.Once());
         }
 
         [TestMethod]
         public void DesignModeClientConnectShouldNotSendConnectedIfServerConnectionTimesOut()
         {
-            var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = this.protocolVersion };
+            var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = protocolVersion };
             var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(false);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(false);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
 
-            Assert.ThrowsException<TimeoutException>(() => this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object));
+            Assert.ThrowsException<TimeoutException>(() => designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object));
 
-            this.mockCommunicationManager.Verify(cm => cm.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, PortNumber)), Times.Once);
-            this.mockCommunicationManager.Verify(cm => cm.WaitForServerConnection(It.IsAny<int>()), Times.Once);
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.SessionConnected), Times.Never);
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, It.IsAny<int>()), Times.Never);
+            mockCommunicationManager.Verify(cm => cm.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, PortNumber)), Times.Once);
+            mockCommunicationManager.Verify(cm => cm.WaitForServerConnection(It.IsAny<int>()), Times.Once);
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.SessionConnected), Times.Never);
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, It.IsAny<int>()), Times.Never);
         }
 
         [TestMethod]
@@ -136,12 +136,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         {
             var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = 5 };
             var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
 
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object);
 
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, this.protocolVersion), Times.Once());
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, protocolVersion), Times.Once());
         }
 
         [TestMethod]
@@ -149,12 +149,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         {
             var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = 1 };
             var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
 
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object);
 
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, 1), Times.Once());
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, 1), Times.Once());
         }
 
         [TestMethod]
@@ -178,11 +178,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             var allTasksComplete = new ManualResetEvent(false);
 
             // Setup mocks.
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.Setup(cm => cm.DeserializePayload<TestRunRequestPayload>(getProcessStartInfoMessage))
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.Setup(cm => cm.DeserializePayload<TestRunRequestPayload>(getProcessStartInfoMessage))
                 .Returns(testRunPayload);
 
-            this.mockTestRequestManager.Setup(
+            mockTestRequestManager.Setup(
                     trm =>
                         trm.RunTests(
                             It.IsAny<TestRunRequestPayload>(),
@@ -199,12 +199,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                             allTasksComplete.Set();
                         });
 
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage())
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage())
                 .Returns(getProcessStartInfoMessage)
                 .Returns(sessionEnd);
 
             // Act.
-            this.designModeClient.ConnectToClientAndProcessRequests(0, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(0, mockTestRequestManager.Object);
 
             // wait for the internal spawned of tasks to complete.
             Assert.IsTrue(allTasksComplete.WaitOne(1000), "Timed out waiting for mock request manager.");
@@ -241,10 +241,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             var allTasksComplete = new ManualResetEvent(false);
 
             // Setup mocks.
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.Setup(cm => cm.DeserializePayload<TestRunRequestPayload>(getProcessStartInfoMessage))
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.Setup(cm => cm.DeserializePayload<TestRunRequestPayload>(getProcessStartInfoMessage))
                 .Returns(testRunPayload);
-            this.mockTestRequestManager.Setup(
+            mockTestRequestManager.Setup(
                 trm =>
                 trm.RunTests(
                     It.IsAny<TestRunRequestPayload>(),
@@ -260,12 +260,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                         receivedTestRunPayload = trp;
                         allTasksComplete.Set();
                     });
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage())
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage())
                 .Returns(getProcessStartInfoMessage)
                 .Returns(sessionEnd);
 
             // Act.
-            this.designModeClient.ConnectToClientAndProcessRequests(0, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(0, mockTestRequestManager.Object);
 
             // wait for the internal spawned of tasks to complete.
             allTasksComplete.WaitOne(1000);
@@ -284,39 +284,36 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         [TestMethod]
         public void DesignModeClientOnBadConnectionShouldStopServerAndThrowTimeoutException()
         {
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(false);
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(false);
 
-            var ex = Assert.ThrowsException<TimeoutException>(() => this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object));
+            var ex = Assert.ThrowsException<TimeoutException>(() => designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object));
             Assert.AreEqual("vstest.console process failed to connect to translation layer process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.", ex.Message);
 
-            this.mockCommunicationManager.Verify(cm => cm.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, PortNumber)), Times.Once);
-            this.mockCommunicationManager.Verify(cm => cm.WaitForServerConnection(It.IsAny<int>()), Times.Once);
-            this.mockCommunicationManager.Verify(cm => cm.StopClient(), Times.Once);
+            mockCommunicationManager.Verify(cm => cm.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, PortNumber)), Times.Once);
+            mockCommunicationManager.Verify(cm => cm.WaitForServerConnection(It.IsAny<int>()), Times.Once);
+            mockCommunicationManager.Verify(cm => cm.StopClient(), Times.Once);
         }
 
         [TestMethod]
         public void DesignModeClientShouldStopCommunicationOnParentProcessExit()
         {
-            this.mockPlatformEnvrironment.Setup(pe => pe.Exit(It.IsAny<int>()));
-            this.designModeClient.HandleParentProcessExit();
+            mockPlatformEnvrironment.Setup(pe => pe.Exit(It.IsAny<int>()));
+            designModeClient.HandleParentProcessExit();
 
-            this.mockCommunicationManager.Verify(cm => cm.StopClient(), Times.Once);
+            mockCommunicationManager.Verify(cm => cm.StopClient(), Times.Once);
         }
 
         [TestMethod]
         public void DesignModeClientLaunchCustomHostMustReturnIfAckComes()
         {
-            var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance, this.mockPlatformEnvrironment.Object);
+            var testableDesignModeClient = new TestableDesignModeClient(mockCommunicationManager.Object, JsonDataSerializer.Instance, mockPlatformEnvrironment.Object);
 
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
 
             var expectedProcessId = 1234;
-            Action sendMessageAction = () =>
-            {
-                testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId, null);
-            };
+            Action sendMessageAction = () => testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId, null);
 
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.CustomTestHostLaunch, It.IsAny<object>())).
+            mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.CustomTestHostLaunch, It.IsAny<object>())).
                 Callback(() => Task.Run(sendMessageAction));
 
             var info = new TestProcessStartInfo();
@@ -329,17 +326,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         [ExpectedException(typeof(TestPlatformException))]
         public void DesignModeClientLaunchCustomHostMustThrowIfInvalidAckComes()
         {
-            var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance, this.mockPlatformEnvrironment.Object);
+            var testableDesignModeClient = new TestableDesignModeClient(mockCommunicationManager.Object, JsonDataSerializer.Instance, mockPlatformEnvrironment.Object);
 
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
 
             var expectedProcessId = -1;
-            Action sendMessageAction = () =>
-            {
-                testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId, "Dummy");
-            };
+            Action sendMessageAction = () => testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId, "Dummy");
 
-            this.mockCommunicationManager
+            mockCommunicationManager
                 .Setup(cm => cm.SendMessage(MessageType.CustomTestHostLaunch, It.IsAny<object>()))
                 .Callback(() => Task.Run(sendMessageAction));
 
@@ -351,7 +345,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         [ExpectedException(typeof(TestPlatformException))]
         public void DesignModeClientLaunchCustomHostMustThrowIfCancellationOccursBeforeHostLaunch()
         {
-            var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance, this.mockPlatformEnvrironment.Object);
+            var testableDesignModeClient = new TestableDesignModeClient(mockCommunicationManager.Object, JsonDataSerializer.Instance, mockPlatformEnvrironment.Object);
 
             var info = new TestProcessStartInfo();
             var cancellationTokenSource = new CancellationTokenSource();
@@ -365,23 +359,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         {
             var payload = new DiscoveryRequestPayload();
             var startDiscovery = new Message { MessageType = MessageType.StartDiscovery, Payload = JToken.FromObject(payload) };
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startDiscovery);
-            this.mockCommunicationManager
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startDiscovery);
+            mockCommunicationManager
                 .Setup(cm => cm.SendMessage(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>()))
                 .Callback(() => completeEvent.Set());
-            this.mockTestRequestManager.Setup(
+            mockTestRequestManager.Setup(
                     rm => rm.DiscoverTests(
                         It.IsAny<DiscoveryRequestPayload>(),
                         It.IsAny<ITestDiscoveryEventsRegistrar>(),
                         It.IsAny<ProtocolConfig>()))
                 .Throws(new Exception());
 
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object);
 
-            Assert.IsTrue(this.completeEvent.WaitOne(Timeout), "Discovery not completed.");
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>()), Times.Once());
+            Assert.IsTrue(completeEvent.WaitOne(Timeout), "Discovery not completed.");
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>()), Times.Once());
         }
 
         [TestMethod]
@@ -389,23 +383,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         {
             var payload = new DiscoveryRequestPayload();
             var startDiscovery = new Message { MessageType = MessageType.StartDiscovery, Payload = JToken.FromObject(payload) };
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startDiscovery);
-            this.mockCommunicationManager
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startDiscovery);
+            mockCommunicationManager
                 .Setup(cm => cm.SendMessage(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>()))
                 .Callback(() => completeEvent.Set());
-            this.mockTestRequestManager.Setup(
+            mockTestRequestManager.Setup(
                     rm => rm.DiscoverTests(
                         It.IsAny<DiscoveryRequestPayload>(),
                         It.IsAny<ITestDiscoveryEventsRegistrar>(),
                         It.IsAny<ProtocolConfig>()))
                 .Throws(new TestPlatformException("Hello world"));
 
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object);
 
-            Assert.IsTrue(this.completeEvent.WaitOne(Timeout), "Discovery not completed.");
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>()), Times.Once());
+            Assert.IsTrue(completeEvent.WaitOne(Timeout), "Discovery not completed.");
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>()), Times.Once());
         }
 
         [TestMethod]
@@ -413,23 +407,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         {
             var payload = new TestRunAttachmentsProcessingPayload();
             var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Payload = JToken.FromObject(payload) };
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startAttachmentsProcessing);
-            this.mockCommunicationManager
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startAttachmentsProcessing);
+            mockCommunicationManager
                 .Setup(cm => cm.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, It.IsAny<TestRunAttachmentsProcessingCompletePayload>()))
                 .Callback(() => completeEvent.Set());
-            this.mockTestRequestManager.Setup(
+            mockTestRequestManager.Setup(
                     rm => rm.ProcessTestRunAttachments(
                         It.IsAny<TestRunAttachmentsProcessingPayload>(),
                         It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(),
                         It.IsAny<ProtocolConfig>()))
                 .Throws(new Exception());
 
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object);
 
-            Assert.IsTrue(this.completeEvent.WaitOne(Timeout), "AttachmentsProcessing not completed.");
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, It.Is<TestRunAttachmentsProcessingCompletePayload>(p => p.Attachments == null)), Times.Once());
+            Assert.IsTrue(completeEvent.WaitOne(Timeout), "AttachmentsProcessing not completed.");
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, It.Is<TestRunAttachmentsProcessingCompletePayload>(p => p.Attachments == null)), Times.Once());
         }
 
         [TestMethod]
@@ -437,23 +431,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         {
             var payload = new TestRunAttachmentsProcessingPayload();
             var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Payload = JToken.FromObject(payload) };
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startAttachmentsProcessing);
-            this.mockCommunicationManager
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startAttachmentsProcessing);
+            mockCommunicationManager
                 .Setup(cm => cm.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, It.IsAny<TestRunAttachmentsProcessingCompletePayload>()))
                 .Callback(() => completeEvent.Set());
-            this.mockTestRequestManager.Setup(
+            mockTestRequestManager.Setup(
                     rm => rm.ProcessTestRunAttachments(
                         It.IsAny<TestRunAttachmentsProcessingPayload>(),
                         It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(),
                         It.IsAny<ProtocolConfig>()))
                 .Throws(new TestPlatformException("Hello world"));
 
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object);
 
-            Assert.IsTrue(this.completeEvent.WaitOne(Timeout), "AttachmentsProcessing not completed.");
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, It.Is<TestRunAttachmentsProcessingCompletePayload>(p => p.Attachments == null)), Times.Once());
+            Assert.IsTrue(completeEvent.WaitOne(Timeout), "AttachmentsProcessing not completed.");
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, It.Is<TestRunAttachmentsProcessingCompletePayload>(p => p.Attachments == null)), Times.Once());
         }
 
         [TestMethod]
@@ -461,10 +455,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         {
             var payload = new TestRunAttachmentsProcessingPayload();
             var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Payload = JToken.FromObject(payload) };
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startAttachmentsProcessing);
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startAttachmentsProcessing);
 
-            this.mockTestRequestManager
+            mockTestRequestManager
                 .Setup(
                     rm => rm.ProcessTestRunAttachments(
                         It.IsAny<TestRunAttachmentsProcessingPayload>(),
@@ -472,26 +466,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                         It.IsAny<ProtocolConfig>()))
                 .Callback(() => completeEvent.Set());
 
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object);
 
-            Assert.IsTrue(this.completeEvent.WaitOne(Timeout), "AttachmentsProcessing not completed.");
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Never);
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, It.IsAny<TestRunAttachmentsProcessingCompletePayload>()), Times.Never);
-            this.mockTestRequestManager.Verify(rm => rm.ProcessTestRunAttachments(It.IsAny<TestRunAttachmentsProcessingPayload>(), It.IsAny<TestRunAttachmentsProcessingEventsHandler>(), It.IsAny<ProtocolConfig>()));
+            Assert.IsTrue(completeEvent.WaitOne(Timeout), "AttachmentsProcessing not completed.");
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Never);
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, It.IsAny<TestRunAttachmentsProcessingCompletePayload>()), Times.Never);
+            mockTestRequestManager.Verify(rm => rm.ProcessTestRunAttachments(It.IsAny<TestRunAttachmentsProcessingPayload>(), It.IsAny<TestRunAttachmentsProcessingEventsHandler>(), It.IsAny<ProtocolConfig>()));
         }
 
         [TestMethod]
         public void DesignModeClientConnectShouldCallRequestManagerForAttachmentsProcessingCancel()
         {
             var cancelAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingCancel };
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(cancelAttachmentsProcessing);
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(cancelAttachmentsProcessing);
 
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object);
 
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Never);
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, It.IsAny<TestRunAttachmentsProcessingCompletePayload>()), Times.Never);
-            this.mockTestRequestManager.Verify(rm => rm.CancelTestRunAttachmentsProcessing());
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Never);
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, It.IsAny<TestRunAttachmentsProcessingCompletePayload>()), Times.Never);
+            mockTestRequestManager.Verify(rm => rm.CancelTestRunAttachmentsProcessing());
         }
 
         [TestMethod]
@@ -499,23 +493,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         {
             var payload = new TestRunRequestPayload();
             var testRunAll = new Message { MessageType = MessageType.TestRunAllSourcesWithDefaultHost, Payload = JToken.FromObject(payload) };
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(testRunAll);
-            this.mockCommunicationManager
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(testRunAll);
+            mockCommunicationManager
                 .Setup(cm => cm.SendMessage(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>()))
-                .Callback(() => this.completeEvent.Set());
-            this.mockTestRequestManager.Setup(
+                .Callback(() => completeEvent.Set());
+            mockTestRequestManager.Setup(
                 rm => rm.RunTests(
                     It.IsAny<TestRunRequestPayload>(),
                     null,
                     It.IsAny<DesignModeTestEventsRegistrar>(),
                 It.IsAny<ProtocolConfig>())).Throws(new Exception());
 
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object);
 
-            Assert.IsTrue(this.completeEvent.WaitOne(Timeout), "Execution not completed.");
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>()), Times.Once());
+            Assert.IsTrue(completeEvent.WaitOne(Timeout), "Execution not completed.");
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>()), Times.Once());
         }
 
         [TestMethod]
@@ -523,23 +517,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         {
             var payload = new TestRunRequestPayload();
             var testRunAll = new Message { MessageType = MessageType.TestRunAllSourcesWithDefaultHost, Payload = JToken.FromObject(payload) };
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(testRunAll);
-            this.mockCommunicationManager
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(testRunAll);
+            mockCommunicationManager
                 .Setup(cm => cm.SendMessage(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>()))
-                .Callback(() => this.completeEvent.Set());
-            this.mockTestRequestManager.Setup(
+                .Callback(() => completeEvent.Set());
+            mockTestRequestManager.Setup(
                 rm => rm.RunTests(
                     It.IsAny<TestRunRequestPayload>(),
                     null,
                     It.IsAny<DesignModeTestEventsRegistrar>(),
                 It.IsAny<ProtocolConfig>())).Throws(new TestPlatformException("Hello world"));
 
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object);
 
-            Assert.IsTrue(this.completeEvent.WaitOne(Timeout), "Execution not completed.");
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>()), Times.Once());
+            Assert.IsTrue(completeEvent.WaitOne(Timeout), "Execution not completed.");
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>()), Times.Once());
         }
 
         [TestMethod]
@@ -552,32 +546,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                 Payload = JToken.FromObject(payload)
             };
 
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startTestSessionMessage);
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startTestSessionMessage);
+            mockCommunicationManager.Setup(cm => cm.SendMessage(
                     MessageType.StartTestSessionCallback,
                     It.IsAny<StartTestSessionAckPayload>()))
                 .Callback((string _, object actualPayload) =>
                 {
-                    this.completeEvent.Set();
+                    completeEvent.Set();
                     Assert.IsNull(((StartTestSessionAckPayload)actualPayload).TestSessionInfo);
                 });
-            this.mockCommunicationManager.Setup(
+            mockCommunicationManager.Setup(
                 cm => cm.DeserializePayload<StartTestSessionPayload>(
                     startTestSessionMessage))
                 .Returns(payload);
 
-            this.mockTestRequestManager.Setup(
+            mockTestRequestManager.Setup(
                 rm => rm.StartTestSession(
                     It.IsAny<StartTestSessionPayload>(),
                     It.IsAny<ITestHostLauncher>(),
                     It.IsAny<ITestSessionEventsHandler>(),
                     It.IsAny<ProtocolConfig>())).Throws(new SettingsException("DummyException"));
 
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object);
 
-            Assert.IsTrue(this.completeEvent.WaitOne(Timeout), "Start test session not completed.");
-            this.mockCommunicationManager.Verify(
+            Assert.IsTrue(completeEvent.WaitOne(Timeout), "Start test session not completed.");
+            mockCommunicationManager.Verify(
                 cm => cm.SendMessage(
                     MessageType.StartTestSessionCallback,
                     It.IsAny<StartTestSessionAckPayload>()),
@@ -597,30 +591,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                 Payload = JToken.FromObject(testSessionInfo)
             };
 
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(stopTestSessionMessage);
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(stopTestSessionMessage);
+            mockCommunicationManager.Setup(cm => cm.SendMessage(
                     MessageType.StopTestSessionCallback,
                     It.IsAny<StopTestSessionAckPayload>()))
                 .Callback((string _, object actualPayload) =>
                 {
-                    this.completeEvent.Set();
+                    completeEvent.Set();
 
                     Assert.AreEqual(((StopTestSessionAckPayload)actualPayload).TestSessionInfo, testSessionInfo);
                     Assert.IsFalse(((StopTestSessionAckPayload)actualPayload).IsStopped);
                 });
 
-            this.mockCommunicationManager.Setup(
+            mockCommunicationManager.Setup(
                 cm => cm.DeserializePayload<TestSessionInfo>(
                     stopTestSessionMessage))
                 .Returns(testSessionInfo);
 
             mockTestPool.Setup(tp => tp.KillSession(testSessionInfo)).Throws(new Exception("DummyException"));
 
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object);
 
-            Assert.IsTrue(this.completeEvent.WaitOne(Timeout), "Start test session not completed.");
-            this.mockCommunicationManager.Verify(
+            Assert.IsTrue(completeEvent.WaitOne(Timeout), "Start test session not completed.");
+            mockCommunicationManager.Verify(
                 cm => cm.SendMessage(
                     MessageType.StopTestSessionCallback,
                     It.IsAny<StopTestSessionAckPayload>()),
@@ -640,30 +634,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                 Payload = JToken.FromObject(testSessionInfo)
             };
 
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(stopTestSessionMessage);
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(stopTestSessionMessage);
+            mockCommunicationManager.Setup(cm => cm.SendMessage(
                     MessageType.StopTestSessionCallback,
                     It.IsAny<StopTestSessionAckPayload>()))
                 .Callback((string _, object actualPayload) =>
                 {
-                    this.completeEvent.Set();
+                    completeEvent.Set();
 
                     Assert.AreEqual(((StopTestSessionAckPayload)actualPayload).TestSessionInfo, testSessionInfo);
                     Assert.IsFalse(((StopTestSessionAckPayload)actualPayload).IsStopped);
                 });
 
-            this.mockCommunicationManager.Setup(
+            mockCommunicationManager.Setup(
                 cm => cm.DeserializePayload<TestSessionInfo>(
                     stopTestSessionMessage))
                 .Returns(testSessionInfo);
 
             mockTestPool.Setup(tp => tp.KillSession(testSessionInfo)).Returns(false);
 
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object);
 
-            Assert.IsTrue(this.completeEvent.WaitOne(Timeout), "Start test session not completed.");
-            this.mockCommunicationManager.Verify(
+            Assert.IsTrue(completeEvent.WaitOne(Timeout), "Start test session not completed.");
+            mockCommunicationManager.Verify(
                 cm => cm.SendMessage(
                     MessageType.StopTestSessionCallback,
                     It.IsAny<StopTestSessionAckPayload>()),
@@ -683,30 +677,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                 Payload = JToken.FromObject(testSessionInfo)
             };
 
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(stopTestSessionMessage);
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(
+            mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(stopTestSessionMessage);
+            mockCommunicationManager.Setup(cm => cm.SendMessage(
                     MessageType.StopTestSessionCallback,
                     It.IsAny<StopTestSessionAckPayload>()))
                 .Callback((string _, object actualPayload) =>
                 {
-                    this.completeEvent.Set();
+                    completeEvent.Set();
 
                     Assert.AreEqual(((StopTestSessionAckPayload)actualPayload).TestSessionInfo, testSessionInfo);
                     Assert.IsTrue(((StopTestSessionAckPayload)actualPayload).IsStopped);
                 });
 
-            this.mockCommunicationManager.Setup(
+            mockCommunicationManager.Setup(
                 cm => cm.DeserializePayload<TestSessionInfo>(
                     stopTestSessionMessage))
                 .Returns(testSessionInfo);
 
             mockTestPool.Setup(tp => tp.KillSession(testSessionInfo)).Returns(true);
 
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            designModeClient.ConnectToClientAndProcessRequests(PortNumber, mockTestRequestManager.Object);
 
-            Assert.IsTrue(this.completeEvent.WaitOne(Timeout), "Start test session not completed.");
-            this.mockCommunicationManager.Verify(
+            Assert.IsTrue(completeEvent.WaitOne(Timeout), "Start test session not completed.");
+            mockCommunicationManager.Verify(
                 cm => cm.SendMessage(
                     MessageType.StopTestSessionCallback,
                     It.IsAny<StopTestSessionAckPayload>()),
@@ -716,11 +710,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         [TestMethod]
         public void DesignModeClientSendTestMessageShouldSendTestMessage()
         {
-            var testPayload = new TestMessagePayload { MessageLevel = ObjectModel.Logging.TestMessageLevel.Error, Message = "DummyMessage" };
+            var testPayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = "DummyMessage" };
 
-            this.designModeClient.SendTestMessage(testPayload.MessageLevel, testPayload.Message);
+            designModeClient.SendTestMessage(testPayload.MessageLevel, testPayload.Message);
 
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
         }
 
         private class TestableDesignModeClient : DesignModeClient
@@ -740,7 +734,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                     HostProcessId = processId,
                     ErrorMessage = errorMessage
                 };
-                this.onCustomTestHostLaunchAckReceived?.Invoke(
+                onCustomTestHostLaunchAckReceived?.Invoke(
                     new Message() { MessageType = MessageType.CustomTestHostLaunchCallback, Payload = JToken.FromObject(payload) });
             }
         }

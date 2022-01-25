@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces
     /// <summary>
     /// Metadata that is available from Settings Providers.
     /// </summary>
-    [SuppressMessage("Microsoft.MSInternal", "CA903:InternalNamespaceShouldNotContainPublicTypes", Justification = "This interface is only public due to limitations in MEF which require metadata interfaces to be public.")]
     public interface ISettingsProviderCapabilities
     {
         /// <summary>

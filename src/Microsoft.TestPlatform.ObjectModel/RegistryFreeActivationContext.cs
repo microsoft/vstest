@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         private bool disposed = false;
 
-        private string manifestFilePath = string.Empty;
+        private readonly string manifestFilePath = string.Empty;
 
         /// <summary>
         /// Initializes a new instance of RegistryFreeActivationContext class.
@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         ///<param name="manifest">Manifest file path.</param>
         public RegistryFreeActivationContext(string manifest)
         {
-            this.manifestFilePath = manifest;
+            manifestFilePath = manifest;
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         ~RegistryFreeActivationContext()
         {
-            this.Dispose(false);
+            Dispose(false);
         }
 
         /// <summary>
@@ -49,10 +49,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 return;
             }
 
-            ActivationContextNativeMethods.ACTCTX context = new ActivationContextNativeMethods.ACTCTX();
+            ActivationContextNativeMethods.ACTCTX context = new();
             context.cbSize = Marshal.SizeOf(typeof(ActivationContextNativeMethods.ACTCTX));
 
-            context.lpSource = this.manifestFilePath;
+            context.lpSource = manifestFilePath;
 
             hActCtx = ActivationContextNativeMethods.CreateActCtx(ref context);
             if (hActCtx == (IntPtr)(-1))
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     // No managed resources to release
                 }
 
-                this.DeactivateContext();
+                DeactivateContext();
                 disposed = true;
             }
         }

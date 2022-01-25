@@ -27,8 +27,8 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         {
             var mockExtension = new Mock<ITestDiscoverer>();
             LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> extension =
-                new LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>(
-                    () => { return mockExtension.Object; },
+                new(
+                    () => mockExtension.Object,
                     new Mock<ITestDiscovererCapabilities>().Object);
 
             Assert.AreEqual(mockExtension.Object, extension.Value);
@@ -39,7 +39,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         {
             var testDiscovererPluginInfo = new TestDiscovererPluginInformation(typeof(DummyExtension));
             LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> extension =
-                new LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>(
+                new(
                     testDiscovererPluginInfo,
                     new Mock<ITestDiscovererCapabilities>().Object);
 
@@ -53,7 +53,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
             var numberOfTimesExtensionCreated = 0;
             var mockExtension = new Mock<ITestDiscoverer>();
             LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> extension =
-                new LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>(
+                new(
                     () =>
                         {
                             numberOfTimesExtensionCreated++;
@@ -77,7 +77,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
             var testDiscovererPluginInfo = new TestDiscovererPluginInformation(typeof(DummyExtension));
             var mockMetadata = new Mock<ITestDiscovererCapabilities>();
             LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> extension =
-                new LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>(
+                new(
                     testDiscovererPluginInfo,
                     mockMetadata.Object);
 
@@ -89,7 +89,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         {
             var testDiscovererPluginInfo = new TestDiscovererPluginInformation(typeof(DummyExtension));
             LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> extension =
-                new LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>(
+                new(
                     testDiscovererPluginInfo,
                     typeof(DummyDiscovererCapability));
 
@@ -127,9 +127,9 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
 
             public DummyDiscovererCapability(List<string> fileExtensions, string executorURI, AssemblyType assemblyType)
             {
-                this.FileExtension = fileExtensions;
-                this.DefaultExecutorUri = new Uri(executorURI);
-                this.AssemblyType = assemblyType;
+                FileExtension = fileExtensions;
+                DefaultExecutorUri = new Uri(executorURI);
+                AssemblyType = assemblyType;
             }
         }
 

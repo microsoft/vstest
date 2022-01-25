@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         /// <param name="name">The Full name of an assembly to resolve.</param>
         public AssemblyResolveEventArgs(string name)
         {
-            this.Name = name;
+            Name = name;
         }
 
         /// <summary>

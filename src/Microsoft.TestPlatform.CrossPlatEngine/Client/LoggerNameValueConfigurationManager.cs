@@ -12,10 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     internal class LoggerNameValueConfigurationManager
     {
-        /// <summary>
-        /// The name/value pairs loaded from the configuration XML element
-        /// </summary>
-        private Dictionary<string, string> nameValuePairs = new Dictionary<string, string>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoggerNameValueConfigurationManager"/> class.
@@ -29,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             Initialize(configurationElement);
         }
 
-        public Dictionary<string, string> NameValuePairs => this.nameValuePairs;
+        public Dictionary<string, string> NameValuePairs { get; } = new Dictionary<string, string>();
 
         private void Initialize(XmlElement configurationElement)
         {
@@ -44,8 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             foreach (XmlNode settingNode in configurationElement.ChildNodes)
             {
                 // Skip all non-elements
-                var settingElement = settingNode as XmlElement;
-                if (settingElement == null)
+                if (settingNode is not XmlElement settingElement)
                 {
                     continue;
                 }
@@ -64,14 +59,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 // Save the name/value pair in the dictionary. Note that duplicate settings are
                 // overwritten with the last occurrence's value.
-                if (this.nameValuePairs.ContainsKey(settingName))
+                if (NameValuePairs.ContainsKey(settingName))
                 {
                     EqtTrace.Verbose(
                         "Duplicate configuration setting found for '{0}'. Using the last setting.",
                         settingName);
                 }
 
-                this.NameValuePairs[settingName] = settingValue;
+                NameValuePairs[settingName] = settingValue;
             }
         }
     }

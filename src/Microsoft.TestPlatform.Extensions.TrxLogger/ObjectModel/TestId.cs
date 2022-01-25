@@ -28,11 +28,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         private const string DefaultIdLocation = "@testId";
 
-        /// <summary>
-        /// Represents an empty test ID
-        /// </summary>
-        private static readonly TestId EmptyId = new TestId(Guid.Empty);
-
         #endregion
 
         #region Fields
@@ -40,7 +35,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <summary>
         /// The test ID
         /// </summary>
-        private Guid id;
+        private Guid _id;
 
         #endregion
 
@@ -60,7 +55,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="id">GUID of the test</param>
         public TestId(Guid id)
         {
-            this.id = id;
+            this._id = id;
         }
 
         #endregion
@@ -70,17 +65,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <summary>
         /// Gets an empty test ID
         /// </summary>
-        public static TestId Empty
-        {
-            get { return EmptyId; }
-        }
+        public static TestId Empty { get; } = new TestId(Guid.Empty);
 
         /// <summary>
         /// Gets test ID
         /// </summary>
         public Guid Id
         {
-            get { return this.id; }
+            get { return _id; }
         }
 
         #endregion
@@ -96,11 +88,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             Debug.Assert(element != null, "element is null");
 
-            string idLocation;
-            this.GetIdLocation(parameters, out idLocation);
+            GetIdLocation(parameters, out string idLocation);
 
-            XmlPersistence helper = new XmlPersistence();
-            helper.SaveGuid(element, idLocation, this.id);
+            XmlPersistence helper = new();
+            helper.SaveGuid(element, idLocation, _id);
         }
 
         /// <summary>
@@ -120,8 +111,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             // If any parameters are specified, see if we need to override the defaults
             if (parameters != null)
             {
-                object idLocationObj;
-                if (parameters.TryGetValue(IdLocationKey, out idLocationObj))
+                if (parameters.TryGetValue(IdLocationKey, out object idLocationObj))
                 {
                     idLocation = idLocationObj as string ?? idLocation;
                 }
@@ -142,7 +132,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         public bool Equals(TestId other)
         {
             // Check reference equality first, as it is faster than comparing value equality when the references are equal
-            return object.ReferenceEquals(this, other) || this.ValueEquals(other);
+            return ReferenceEquals(this, other) || ValueEquals(other);
         }
 
         /// <summary>
@@ -153,7 +143,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         private bool ValueEquals(TestId other)
         {
             // Avoid calling of "!= null", as the != operator has been overloaded.
-            return !object.ReferenceEquals(other, null) && this.id == other.id;
+            return other is not null && _id == other._id;
         }
 
         #endregion
@@ -167,7 +157,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>True if the test IDs are equal in value, false otherwise</returns>
         public override bool Equals(object other)
         {
-            return this.Equals(other as TestId);
+            return Equals(other as TestId);
         }
 
         /// <summary>
@@ -176,7 +166,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>The hash code</returns>
         public override int GetHashCode()
         {
-            return this.id.GetHashCode();
+            return _id.GetHashCode();
         }
 
         #endregion
@@ -192,8 +182,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         public static bool operator ==(TestId left, TestId right)
         {
             return
-                object.ReferenceEquals(left, right) ||
-                (!object.ReferenceEquals(left, null) && left.ValueEquals(right));
+                ReferenceEquals(left, right) ||
+                (left is not null && left.ValueEquals(right));
         }
 
         /// <summary>
@@ -225,12 +215,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public int CompareTo(TestId other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
-
-            return this.id.CompareTo(other.id);
+            return other == null ? throw new ArgumentNullException(nameof(other)) : _id.CompareTo(other._id);
         }
 
         #endregion
@@ -265,7 +250,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         public override string ToString()
         {
             // "B" adds curly braces around guid
-            string s = this.id.ToString("B");
+            string s = _id.ToString("B");
             return string.Format(CultureInfo.InvariantCulture, s);
         }
 

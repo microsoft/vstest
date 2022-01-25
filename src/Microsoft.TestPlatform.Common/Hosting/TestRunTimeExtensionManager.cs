@@ -52,13 +52,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
         /// </returns>
         public static TestRuntimeExtensionManager Create(IMessageLogger messageLogger)
         {
-            IEnumerable<LazyExtension<ITestRuntimeProvider, ITestRuntimeCapabilities>> filteredTestExtensions;
-            IEnumerable<LazyExtension<ITestRuntimeProvider, Dictionary<string, object>>> unfilteredTestExtensions;
 
             TestPluginManager.Instance.GetSpecificTestExtensions<TestRuntimePluginInformation, ITestRuntimeProvider, ITestRuntimeCapabilities, TestRuntimeMetadata>(
                 TestPlatformConstants.RunTimeEndsWithPattern,
-                out unfilteredTestExtensions,
-                out filteredTestExtensions);
+                out IEnumerable<LazyExtension<ITestRuntimeProvider, Dictionary<string, object>>> unfilteredTestExtensions,
+                out IEnumerable<LazyExtension<ITestRuntimeProvider, ITestRuntimeCapabilities>> filteredTestExtensions);
 
             return new TestRuntimeExtensionManager(unfilteredTestExtensions, filteredTestExtensions, messageLogger);
         }

@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     {
         private const string DataCollectorProcessName = "datacollector.dll";
 
-        private IFileHelper fileHelper;
+        private readonly IFileHelper fileHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetDataCollectionLauncher"/> class.
@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
-            this.DataCollectorProcessId = -1;
+            DataCollectorProcessId = -1;
         }
 
         /// <summary>
@@ -61,9 +61,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
         public override int LaunchDataCollector(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
         {
-            string dataCollectorFileName = null;
             var dataCollectorDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation());
-            var currentProcessFileName = this.processHelper.GetCurrentProcessFileName();
+            var currentProcessFileName = processHelper.GetCurrentProcessFileName();
 
             if (EqtTrace.IsVerboseEnabled)
             {
@@ -72,14 +71,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             var dataCollectorAssemblyPath = Path.Combine(dataCollectorDirectory, DataCollectorProcessName);
 
-            dataCollectorFileName = Path.GetFileNameWithoutExtension(dataCollectorAssemblyPath);
+            string dataCollectorFileName = Path.GetFileNameWithoutExtension(dataCollectorAssemblyPath);
 
             var args = "exec";
 
             // Probe for runtime config and deps file for the test source
             var runtimeConfigPath = Path.Combine(dataCollectorDirectory, string.Concat(dataCollectorFileName, ".runtimeconfig.json"));
 
-            if (this.fileHelper.Exists(runtimeConfigPath))
+            if (fileHelper.Exists(runtimeConfigPath))
             {
                 var argsToAdd = " --runtimeconfig " + runtimeConfigPath.AddDoubleQuote();
                 args += argsToAdd;
@@ -98,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             // Use the deps.json for test source
             var depsFilePath = Path.Combine(dataCollectorDirectory, string.Concat(dataCollectorFileName, ".deps.json"));
-            if (this.fileHelper.Exists(depsFilePath))
+            if (fileHelper.Exists(depsFilePath))
             {
                 var argsToAdd = " --depsfile " + depsFilePath.AddDoubleQuote();
                 args += argsToAdd;
@@ -117,9 +116,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             var cliArgs = string.Join(" ", commandLineArguments);
             var argumentsString = string.Format("{0} \"{1}\" {2} ", args, dataCollectorAssemblyPath, cliArgs);
-            var dataCollectorProcess = this.processHelper.LaunchProcess(currentProcessFileName, argumentsString, Directory.GetCurrentDirectory(), environmentVariables, this.ErrorReceivedCallback, this.ExitCallBack, null);
-            this.DataCollectorProcessId = this.processHelper.GetProcessId(dataCollectorProcess);
-            return this.DataCollectorProcessId;
+            var dataCollectorProcess = processHelper.LaunchProcess(currentProcessFileName, argumentsString, Directory.GetCurrentDirectory(), environmentVariables, ErrorReceivedCallback, ExitCallBack, null);
+            DataCollectorProcessId = processHelper.GetProcessId(dataCollectorProcess);
+            return DataCollectorProcessId;
         }
     }
 }

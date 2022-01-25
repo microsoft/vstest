@@ -11,17 +11,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
     [TestClass]
     public class GenerateFakesUtilitiesTests
     {
-        private readonly Mock<IFileHelper> fileHelper;
-        private readonly string currentDirectory = @"C:\\Temp";
-        private string runSettings = string.Empty;
+        private readonly Mock<IFileHelper> _fileHelper;
+        private readonly string _currentDirectory = @"C:\\Temp";
+        private readonly string _runSettings = string.Empty;
 
         public GenerateFakesUtilitiesTests()
         {
-            this.fileHelper = new Mock<IFileHelper>();
+            _fileHelper = new Mock<IFileHelper>();
             CommandLineOptions.Instance.Reset();
-            CommandLineOptions.Instance.FileHelper = this.fileHelper.Object;
-            this.fileHelper.Setup(fh => fh.GetCurrentDirectory()).Returns(currentDirectory);
-            this.runSettings = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>.netstandard,Version=5.0</TargetFrameworkVersion></RunConfiguration ></RunSettings>";
+            CommandLineOptions.Instance.FileHelper = _fileHelper.Object;
+            _fileHelper.Setup(fh => fh.GetCurrentDirectory()).Returns(_currentDirectory);
+            _runSettings = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>.netstandard,Version=5.0</TargetFrameworkVersion></RunConfiguration ></RunSettings>";
         }
 
         [TestMethod]
@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             string runSettingsXml = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>.netstandard,Version=5.0</TargetFrameworkVersion></RunConfiguration ></RunSettings>";
 
             GenerateFakesUtilities.GenerateFakesSettings(CommandLineOptions.Instance, new string[] { }, ref runSettingsXml);
-            Assert.AreEqual(runSettingsXml, this.runSettings);
+            Assert.AreEqual(runSettingsXml, _runSettings);
         }
 
     }

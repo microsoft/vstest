@@ -19,16 +19,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         public void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
-            this.discoveryEventHandler = new DiscoveryEventHandler();
-            this.discoveryEventHandler2 = new DiscoveryEventHandler2();
-            this.runEventHandler = new RunEventHandler();
+            vstestConsoleWrapper = GetVsTestConsoleWrapper();
+            discoveryEventHandler = new DiscoveryEventHandler();
+            discoveryEventHandler2 = new DiscoveryEventHandler2();
+            runEventHandler = new RunEventHandler();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            this.vstestConsoleWrapper?.EndSession();
+            vstestConsoleWrapper?.EndSession();
         }
 
 
@@ -37,8 +37,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void DiscoverTestsUsingLiveUnitTesting(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
             string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
@@ -48,13 +48,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                         </RunConfiguration>
                                     </RunSettings>";
 
-            this.vstestConsoleWrapper.DiscoverTests(
-               this.GetTestAssemblies(),
+            vstestConsoleWrapper.DiscoverTests(
+               GetTestAssemblies(),
                 runSettingsXml,
-                this.discoveryEventHandler);
+                discoveryEventHandler);
 
             // Assert
-            Assert.AreEqual(6, this.discoveryEventHandler.DiscoveredTestCases.Count);
+            Assert.AreEqual(6, discoveryEventHandler.DiscoveredTestCases.Count);
         }
 
         [TestMethod]
@@ -62,8 +62,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithLiveUnitTesting(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
             string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
@@ -73,24 +73,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                         </RunConfiguration>
                                     </RunSettings>";
 
-            this.vstestConsoleWrapper.RunTests(
-                this.GetTestAssemblies(),
+            vstestConsoleWrapper.RunTests(
+                GetTestAssemblies(),
                 runSettingsXml,
-                this.runEventHandler);
+                runEventHandler);
 
             // Assert
-            Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+            Assert.AreEqual(6, runEventHandler.TestResults.Count);
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
         }
 
         private IList<string> GetTestAssemblies()
         {
             var testAssemblies = new List<string>
                                      {
-                                         this.GetAssetFullPath("SimpleTestProject.dll"),
-                                         this.GetAssetFullPath("SimpleTestProject2.dll")
+                                         GetAssetFullPath("SimpleTestProject.dll"),
+                                         GetAssetFullPath("SimpleTestProject2.dll")
                                      };
 
             return testAssemblies;

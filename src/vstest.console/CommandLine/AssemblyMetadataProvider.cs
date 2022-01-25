@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
     internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
     {
         private static AssemblyMetadataProvider instance;
-        private IFileHelper fileHelper;
+        private readonly IFileHelper fileHelper;
 
         /// <summary>
         /// Gets the instance.
@@ -32,11 +32,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
         /// <inheritdoc />
         public FrameworkName GetFrameWork(string filePath)
         {
-            FrameworkName frameworkName = new FrameworkName(Framework.DefaultFramework.Name);
+            FrameworkName frameworkName = new(Framework.DefaultFramework.Name);
             try
             {
-                using var assemblyStream = this.fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read);
-                frameworkName = AssemblyMetadataProvider.GetFrameworkNameFromAssemblyMetadata(assemblyStream);
+                using var assemblyStream = fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read);
+                frameworkName = GetFrameworkNameFromAssemblyMetadata(assemblyStream);
             }
             catch (Exception ex)
             {
@@ -95,8 +95,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
         private Architecture GetArchitectureFromAssemblyMetadata(string path)
         {
             Architecture arch = Architecture.AnyCPU;
-            using (Stream stream = this.fileHelper.GetStream(path, FileMode.Open, FileAccess.Read))
-            using (PEReader peReader = new PEReader(stream))
+            using (Stream stream = fileHelper.GetStream(path, FileMode.Open, FileAccess.Read))
+            using (PEReader peReader = new(stream))
             {
                 switch (peReader.PEHeaders.CoffHeader.Machine)
                 {
@@ -120,7 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 
         private static FrameworkName GetFrameworkNameFromAssemblyMetadata(Stream assemblyStream)
         {
-            FrameworkName frameworkName = new FrameworkName(Framework.DefaultFramework.Name);
+            FrameworkName frameworkName = new(Framework.DefaultFramework.Name);
             using (var peReader = new PEReader(assemblyStream))
             {
                 var metadataReader = peReader.GetMetadataReader();
@@ -206,7 +206,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             try
             {
                 //get the input stream
-                using Stream fs = this.fileHelper.GetStream(imagePath, FileMode.Open, FileAccess.Read);
+                using Stream fs = fileHelper.GetStream(imagePath, FileMode.Open, FileAccess.Read);
                 using var reader = new BinaryReader(fs);
                 var validImage = true;
 

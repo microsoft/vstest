@@ -38,13 +38,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             // Target Framework of DataCollection process and Runner should be same.
             var currentProcessPath = processHelper.GetCurrentProcessFileName();
 
-            if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
-                 || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
-            {
-                return new DotnetDataCollectionLauncher();
-            }
-
-            return new DefaultDataCollectionLauncher();
+            return currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
+                 || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase)
+                ? new DotnetDataCollectionLauncher()
+                : new DefaultDataCollectionLauncher();
         }
     }
 }

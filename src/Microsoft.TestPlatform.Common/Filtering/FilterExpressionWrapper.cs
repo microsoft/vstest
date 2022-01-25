@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </remarks>
         internal readonly FastFilter fastFilter;
 
-        private bool UseFastFilter => this.fastFilter != null;
+        private bool UseFastFilter => fastFilter != null;
 
         /// <summary>
         /// Initializes FilterExpressionWrapper with given filterString and options.
@@ -35,17 +35,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         {
             ValidateArg.NotNullOrEmpty(filterString, nameof(filterString));
 
-            this.FilterString = filterString;
-            this.FilterOptions = options;
+            FilterString = filterString;
+            FilterOptions = options;
 
             try
             {
                 // We prefer fast filter when it's available.
-                this.filterExpression = FilterExpression.Parse(filterString, out this.fastFilter);
+                filterExpression = FilterExpression.Parse(filterString, out fastFilter);
 
                 if (UseFastFilter)
                 {
-                    this.filterExpression = null;
+                    filterExpression = null;
 
                     // Property value regex is only supported for fast filter,
                     // so we ignore it if no fast filter is constructed.
@@ -54,21 +54,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     var regexString = options?.FilterRegEx;
                     if (!string.IsNullOrEmpty(regexString))
                     {
-                        Debug.Assert(options.FilterRegExReplacement != null ? options.FilterRegEx != null : true);
-                        this.fastFilter.PropertyValueRegex = new Regex(regexString, RegexOptions.Compiled);
-                        this.fastFilter.PropertyValueRegexReplacement = options.FilterRegExReplacement;
+                        Debug.Assert(options.FilterRegExReplacement == null || options.FilterRegEx != null);
+                        fastFilter.PropertyValueRegex = new Regex(regexString, RegexOptions.Compiled);
+                        fastFilter.PropertyValueRegexReplacement = options.FilterRegExReplacement;
                     }
                 }
 
             }
             catch (FormatException ex)
             {
-                this.ParseError = ex.Message;
+                ParseError = ex.Message;
             }
             catch (ArgumentException ex)
             {
-                this.fastFilter = null;
-                this.ParseError = ex.Message;
+                fastFilter = null;
+                ParseError = ex.Message;
             }
         }
 
@@ -112,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         public string[] ValidForProperties(IEnumerable<String> supportedProperties, Func<string, TestProperty> propertyProvider)
         {
-            return UseFastFilter ? this.fastFilter.ValidForProperties(supportedProperties) : this.filterExpression?.ValidForProperties(supportedProperties, propertyProvider);
+            return UseFastFilter ? fastFilter.ValidForProperties(supportedProperties) : filterExpression?.ValidForProperties(supportedProperties, propertyProvider);
         }
 
         /// <summary>
@@ -122,12 +122,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         {
             ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
 
-            if (UseFastFilter)
-            {
-                return this.fastFilter.Evaluate(propertyValueProvider);
-            }
-
-            return this.filterExpression == null ? false : this.filterExpression.Evaluate(propertyValueProvider);
+            return UseFastFilter
+                ? fastFilter.Evaluate(propertyValueProvider)
+                : filterExpression != null && filterExpression.Evaluate(propertyValueProvider);
         }
     }
 }

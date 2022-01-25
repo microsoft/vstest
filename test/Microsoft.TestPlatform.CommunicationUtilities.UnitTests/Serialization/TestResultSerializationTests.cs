@@ -11,18 +11,18 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
 
     using Newtonsoft.Json.Linq;
 
-    using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
+    using TestResult = VisualStudio.TestPlatform.ObjectModel.TestResult;
 
     [TestClass]
     public class TestResultSerializationTests
     {
-        private static TestCase testCase = new TestCase(
+        private static readonly TestCase testCase = new(
             "sampleTestClass.sampleTestCase",
             new Uri("executor://sampleTestExecutor"),
             "sampleTest.dll");
 
-        private static DateTimeOffset startTime = new DateTimeOffset(new DateTime(2007, 3, 10, 0, 0, 0, DateTimeKind.Utc));
-        private static TestResult testResult = new TestResult(testCase)
+        private static DateTimeOffset startTime = new(new DateTime(2007, 3, 10, 0, 0, 0, DateTimeKind.Utc));
+        private static readonly TestResult testResult = new(testCase)
         {
             // Attachments = ?
             // Messages = ?
@@ -160,7 +160,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
         [DataRow(3)]
         public void TestResultPropertiesShouldGetRegisteredAsPartOfDeserialization(int version)
         {
-            TestProperty.TryUnregister("DummyProperty", out var property);
+            TestProperty.TryUnregister("DummyProperty", out var _);
             var json = "{\"TestCase\":{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestClass.sampleTestCase\"}," +
                 "{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"executor://sampleTestExecutor\"}," +
                 "{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTest.dll\"}," +
@@ -175,9 +175,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
                 "{\"Key\":{\"Id\":\"TestResult.Duration\",\"Label\":\"Duration\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.TimeSpan\"},\"Value\":\"00:00:00\"},{\"Key\":{\"Id\":\"TestResult.StartTime\",\"Label\":\"Start Time\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.DateTimeOffset\"},\"Value\":\"0001-01-01T00:00:00+00:00\"}," +
                 "{\"Key\":{\"Id\":\"DummyProperty\",\"Label\":\"DummyPropertyLabel\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.String\"},\"Value\":\"dummyString\"}," +
                 "{\"Key\":{\"Id\":\"TestResult.EndTime\",\"Label\":\"End Time\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.DateTimeOffset\"},\"Value\":\"0001-01-01T00:00:00+00:00\"}]}";
-            var test = Deserialize<TestResult>(json, version);
+            _ = Deserialize<TestResult>(json, version);
 
-            this.VerifyDummyPropertyIsRegistered();
+            VerifyDummyPropertyIsRegistered();
         }
 
         #endregion
@@ -264,13 +264,12 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
         [DataRow(4)]
         public void TestResultPropertiesShouldGetRegisteredAsPartOfDeserializationV2(int version)
         {
-            TestProperty.TryUnregister("DummyProperty", out var property);
+            TestProperty.TryUnregister("DummyProperty", out var _);
             var json = "{\"TestCase\":{\"Id\":\"28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b\",\"FullyQualifiedName\":\"sampleTestClass.sampleTestCase\",\"DisplayName\":\"sampleTestClass.sampleTestCase\",\"ExecutorUri\":\"executor://sampleTestExecutor\",\"Source\":\"sampleTest.dll\",\"CodeFilePath\":null,\"LineNumber\":-1,\"Properties\":[]},\"Attachments\":[],\"Outcome\":1,\"ErrorMessage\":\"sampleError\",\"ErrorStackTrace\":\"sampleStackTrace\",\"DisplayName\":\"sampleTestResult\",\"Messages\":[],\"ComputerName\":\"sampleComputerName\",\"Duration\":\"10675199.02:48:05.4775807\",\"StartTime\":\"2007-03-10T00:00:00+00:00\",\"EndTime\":\"9999-12-31T23:59:59.9999999+00:00\"," +
                 "\"Properties\":[{\"Key\":{\"Id\":\"DummyProperty\",\"Label\":\"DummyPropertyLabel\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.String\"},\"Value\":\"dummyString\"},]}";
+            _ = Deserialize<TestResult>(json, version);
 
-            var test = Deserialize<TestResult>(json, version);
-
-            this.VerifyDummyPropertyIsRegistered();
+            VerifyDummyPropertyIsRegistered();
         }
 
         #endregion

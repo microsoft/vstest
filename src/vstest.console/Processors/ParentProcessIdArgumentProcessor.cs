@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System;
     using System.Diagnostics.Contracts;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     /// Argument Processor for the "--ParentProcessId|/ParentProcessId" command line argument.
@@ -33,12 +33,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ParentProcessIdArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ParentProcessIdArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -49,18 +49,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() =>
+                    executor = new Lazy<IArgumentExecutor>(() =>
                     new ParentProcessIdArgumentExecutor(CommandLineOptions.Instance));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Used for getting sources.
         /// </summary>
-        private CommandLineOptions commandLineOptions;
+        private readonly CommandLineOptions commandLineOptions;
 
         #endregion
 
@@ -105,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public ParentProcessIdArgumentExecutor(CommandLineOptions options)
         {
             Contract.Requires(options != null);
-            this.commandLineOptions = options;
+            commandLineOptions = options;
         }
 
         #endregion
@@ -116,13 +116,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            int parentProcessId;
-            if (string.IsNullOrWhiteSpace(argument) || !int.TryParse(argument, out parentProcessId))
+            if (string.IsNullOrWhiteSpace(argument) || !int.TryParse(argument, out int parentProcessId))
             {
                 throw new CommandLineException(CommandLineResources.InvalidParentProcessIdArgument);
             }
 
-            this.commandLineOptions.ParentProcessId = parentProcessId;
+            commandLineOptions.ParentProcessId = parentProcessId;
         }
 
         /// <summary>

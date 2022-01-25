@@ -17,7 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     public class TraitCollection : IEnumerable<Trait>
     {
         internal const string TraitPropertyId = "TestObject.Traits";
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         private static readonly TestProperty TraitsProperty = TestProperty.Register(
             TraitPropertyId,
 #if !NET451
@@ -49,43 +48,43 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             ValidateArg.NotNull(trait, nameof(trait));
 
-            this.AddRange(new[] { trait });
+            AddRange(new[] { trait });
         }
 
         public void Add(string name, string value)
         {
             ValidateArg.NotNull(name, nameof(name));
 
-            this.Add(new Trait(name, value));
+            Add(new Trait(name, value));
         }
 
         public void AddRange(IEnumerable<Trait> traits)
         {
             ValidateArg.NotNull(traits, nameof(traits));
 
-            var existingTraits = this.GetTraits();
-            this.Add(existingTraits, traits);
+            var existingTraits = GetTraits();
+            Add(existingTraits, traits);
         }
 
         public IEnumerator<Trait> GetEnumerator()
         {
-            var enumerable = this.GetTraits();
+            var enumerable = GetTraits();
             return enumerable.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
 
         private IEnumerable<Trait> GetTraits()
         {
-            if (!this.testObject.Properties.Contains(TraitsProperty))
+            if (!testObject.Properties.Contains(TraitsProperty))
             {
                 yield break;
             }
 
-            var traits = this.testObject.GetPropertyValue(TraitsProperty, Enumerable.Empty<KeyValuePair<string, string>>().ToArray());
+            var traits = testObject.GetPropertyValue(TraitsProperty, Enumerable.Empty<KeyValuePair<string, string>>().ToArray());
 
             foreach (var trait in traits)
             {
@@ -97,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             var newValue = traits.Union(newTraits);
             var newPairs = newValue.Select(t => new KeyValuePair<string, string>(t.Name, t.Value)).ToArray();
-            this.testObject.SetPropertyValue<KeyValuePair<string, string>[]>(TraitsProperty, newPairs);
+            testObject.SetPropertyValue(TraitsProperty, newPairs);
         }
     }
 }

@@ -55,12 +55,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
 
             var frameworkVersion = GetFramework(runSettingsXml);
-            if (frameworkVersion == null)
-            {
-                return runSettingsXml;
-            }
-
-            return TryAddFakesDataCollectorSettings(doc, sources, (FrameworkVersion)frameworkVersion) 
+            return frameworkVersion == null
+                ? runSettingsXml
+                : TryAddFakesDataCollectorSettings(doc, sources, (FrameworkVersion)frameworkVersion)
                 ? doc.OuterXml
                 : runSettingsXml;
         }

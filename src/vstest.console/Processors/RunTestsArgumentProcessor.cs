@@ -32,11 +32,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new RunTestsArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new RunTestsArgumentProcessorCapabilities());
                 }
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -44,9 +44,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() =>
+                    executor = new Lazy<IArgumentExecutor>(() =>
                     new RunTestsArgumentExecutor(
                         CommandLineOptions.Instance,
                         RunSettingsManager.Instance,
@@ -54,11 +54,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                         ConsoleOutput.Instance));
                 }
 
-                return this.executor;
+                return executor;
             }
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -89,12 +89,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Used for getting tests to run.
         /// </summary>
-        private CommandLineOptions commandLineOptions;
+        private readonly CommandLineOptions commandLineOptions;
 
         /// <summary>
         /// The instance of testPlatforms
         /// </summary>
-        private ITestRequestManager testRequestManager;
+        private readonly ITestRequestManager testRequestManager;
 
         /// <summary>
         /// Used for sending discovery messages.
@@ -104,12 +104,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Settings manager to get currently active settings.
         /// </summary>
-        private IRunSettingsProvider runSettingsManager;
+        private readonly IRunSettingsProvider runSettingsManager;
 
         /// <summary>
         /// Registers and Unregisters for test run events before and after test run
         /// </summary>
-        private ITestRunEventsRegistrar testRunEventsRegistrar;
+        private readonly ITestRunEventsRegistrar testRunEventsRegistrar;
         
         /// <summary>
         /// Shows the number of tests which were executed
@@ -132,10 +132,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             Contract.Requires(commandLineOptions != null);
 
             this.commandLineOptions = commandLineOptions;
-            this.runSettingsManager = runSettingsProvider;
+            runSettingsManager = runSettingsProvider;
             this.testRequestManager = testRequestManager;
             this.output = output;
-            this.testRunEventsRegistrar = new TestRunRequestEventsRegistrar(this.output, this.commandLineOptions);
+            testRunEventsRegistrar = new TestRunRequestEventsRegistrar(this.output, this.commandLineOptions);
         }
 
         #endregion
@@ -150,10 +150,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         public ArgumentProcessorResult Execute()
         {
-            Contract.Assert(this.commandLineOptions != null);
-            Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager?.ActiveRunSettings?.SettingsXml));
+            Contract.Assert(commandLineOptions != null);
+            Contract.Assert(!string.IsNullOrWhiteSpace(runSettingsManager?.ActiveRunSettings?.SettingsXml));
 
-            if (this.commandLineOptions.IsDesignMode)
+            if (commandLineOptions.IsDesignMode)
             {
                 // Do not attempt execution in case of design mode. Expect execution to happen
                 // via the design mode client.
@@ -161,33 +161,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             // Ensure a test source file was provided
-            var anySource = this.commandLineOptions.Sources.FirstOrDefault();
+            var anySource = commandLineOptions.Sources.FirstOrDefault();
             if (anySource == null)
             {
                 throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
             }
 
-            this.output.WriteLine(CommandLineResources.StartingExecution, OutputLevel.Information);
+            output.WriteLine(CommandLineResources.StartingExecution, OutputLevel.Information);
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))
             {
-                this.output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
+                output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
             }
 
-            var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
+            var runSettings = runSettingsManager.ActiveRunSettings.SettingsXml;
 
-            if (this.commandLineOptions.Sources.Any())
+            if (commandLineOptions.Sources.Any())
             {
-                this.RunTests(runSettings);
+                RunTests(runSettings);
             }
 
             bool treatNoTestsAsError = RunSettingsUtilities.GetTreatNoTestsAsError(runSettings);
 
-            if (treatNoTestsAsError && numberOfExecutedTests == 0)
-            {
-                return ArgumentProcessorResult.Fail;
-            }
-
-            return ArgumentProcessorResult.Success;
+            return treatNoTestsAsError && numberOfExecutedTests == 0 ? ArgumentProcessorResult.Fail : ArgumentProcessorResult.Success;
         }
 
         private void RunTests(string runSettings)
@@ -207,8 +202,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // for Windows Store apps it should be false, as Windows Store apps executor should terminate after finishing the test execution.
             var keepAlive = false;
 
-            var runRequestPayload = new TestRunRequestPayload() { Sources = this.commandLineOptions.Sources.ToList(), RunSettings = runSettings, KeepAlive = keepAlive, TestPlatformOptions= new TestPlatformOptions() { TestCaseFilter = this.commandLineOptions.TestCaseFilterValue } };
-            this.testRequestManager.RunTests(runRequestPayload, null, this.testRunEventsRegistrar, Constants.DefaultProtocolConfig);
+            var runRequestPayload = new TestRunRequestPayload() { Sources = commandLineOptions.Sources.ToList(), RunSettings = runSettings, KeepAlive = keepAlive, TestPlatformOptions= new TestPlatformOptions() { TestCaseFilter = commandLineOptions.TestCaseFilterValue } };
+            testRequestManager.RunTests(runRequestPayload, null, testRunEventsRegistrar, Constants.DefaultProtocolConfig);
 
             if (EqtTrace.IsInfoEnabled)
             {
@@ -218,8 +213,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         private class TestRunRequestEventsRegistrar : ITestRunEventsRegistrar
         {
-            private IOutput output;
-            private CommandLineOptions commandLineOptions;
+            private readonly IOutput output;
+            private readonly CommandLineOptions commandLineOptions;
 
             public TestRunRequestEventsRegistrar(IOutput output, CommandLineOptions commandLineOptions)
             {
@@ -254,12 +249,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 if (!e.IsAborted && !e.IsCanceled)
                 {
                     numberOfExecutedTests = e.TestRunStatistics.ExecutedTests;
-                    var testsFoundInAnySource = (e.TestRunStatistics == null) ? false : (e.TestRunStatistics.ExecutedTests > 0);
+                    var testsFoundInAnySource = e.TestRunStatistics != null && (e.TestRunStatistics.ExecutedTests > 0);
 
                     // Indicate the user to use test adapter path command if there are no tests found
-                    if (!testsFoundInAnySource && string.IsNullOrEmpty(CommandLineOptions.Instance.TestAdapterPath) && this.commandLineOptions.TestCaseFilterValue == null)
+                    if (!testsFoundInAnySource && string.IsNullOrEmpty(CommandLineOptions.Instance.TestAdapterPath) && commandLineOptions.TestCaseFilterValue == null)
                     {
-                        this.output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
+                        output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
                     }
                 }
             }

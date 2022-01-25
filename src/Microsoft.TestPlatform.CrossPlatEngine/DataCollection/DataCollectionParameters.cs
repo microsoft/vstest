@@ -27,9 +27,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             IDictionary<string, string> environmentVariables,
             int dataCollectionEventsPort)
         {
-            this.AreTestCaseLevelEventsRequired = areTestCaseLevelEventsRequired;
-            this.EnvironmentVariables = environmentVariables;
-            this.DataCollectionEventsPort = dataCollectionEventsPort;
+            AreTestCaseLevelEventsRequired = areTestCaseLevelEventsRequired;
+            EnvironmentVariables = environmentVariables;
+            DataCollectionEventsPort = dataCollectionEventsPort;
         }
 
         /// <summary>

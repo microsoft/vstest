@@ -19,16 +19,16 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
         private DataCollectionLogger logger;
 
         public override void Initialize(
-            System.Xml.XmlElement configurationElement,
+            XmlElement configurationElement,
             DataCollectionEvents events,
             DataCollectionSink dataSink,
             DataCollectionLogger logger,
             DataCollectionEnvironmentContext environmentContext)
         {
-            events.SessionStart += new EventHandler<SessionStartEventArgs>(this.SessionStarted_Handler);
-            events.SessionEnd += new EventHandler<SessionEndEventArgs>(this.SessionEnded_Handler);
-            this.dataCollectionSink = dataSink;
-            this.context = environmentContext;
+            events.SessionStart += new EventHandler<SessionStartEventArgs>(SessionStarted_Handler);
+            events.SessionEnd += new EventHandler<SessionEndEventArgs>(SessionEnded_Handler);
+            dataCollectionSink = dataSink;
+            context = environmentContext;
             this.logger = logger;
         }
 
@@ -36,8 +36,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
         {
             var filename = Path.Combine(Path.GetTempPath(), "filename.txt");
             File.WriteAllText(filename, string.Empty);
-            this.dataCollectionSink.SendFileAsync(context.SessionDataCollectionContext, filename, true);
-            this.logger.LogWarning(this.context.SessionDataCollectionContext, "SessionEnded");
+            dataCollectionSink.SendFileAsync(context.SessionDataCollectionContext, filename, true);
+            logger.LogWarning(context.SessionDataCollectionContext, "SessionEnded");
         }
 
         private void SessionEnded_Handler(object sender, SessionEndEventArgs args)
@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
             //logger.LogWarning(this.context.SessionDataCollectionContext, "my arning");
             //logger.LogException(context.SessionDataCollectionContext, new Exception("abc"), DataCollectorMessageLevel.Error);
 
-            this.logger.LogWarning(this.context.SessionDataCollectionContext, "SessionEnded");
+            logger.LogWarning(context.SessionDataCollectionContext, "SessionEnded");
         }
 
         public IEnumerable<KeyValuePair<string, string>> GetTestExecutionEnvironmentVariables()

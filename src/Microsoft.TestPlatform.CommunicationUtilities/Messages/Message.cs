@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns> The <see cref="string"/>. </returns>
         public override string ToString()
         {
-            return "(" + this.MessageType + ") -> " + (this.Payload == null ? "null" : this.Payload.ToString(Formatting.Indented));
+            return "(" + MessageType + ") -> " + (Payload == null ? "null" : Payload.ToString(Formatting.Indented));
         }
     }
 }

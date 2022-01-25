@@ -102,12 +102,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>IPEndpoint from give string, if its not a valid string. It will create endpoint with loop back address with port 0</returns>
         internal static IPEndPoint GetIPEndPoint(this string value)
         {
-            if (Uri.TryCreate(string.Concat("tcp://", value), UriKind.Absolute, out Uri uri))
-            {
-                return new IPEndPoint(IPAddress.Parse(uri.Host), uri.Port < 0 ? 0 : uri.Port);
-            }
-
-            return new IPEndPoint(IPAddress.Loopback, 0);
+            return Uri.TryCreate(string.Concat("tcp://", value), UriKind.Absolute, out Uri uri)
+                ? new IPEndPoint(IPAddress.Parse(uri.Host), uri.Port < 0 ? 0 : uri.Port)
+                : new IPEndPoint(IPAddress.Loopback, 0);
         }
     }
 }

@@ -18,9 +18,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
     internal class InProcessProxyDiscoveryManager : IProxyDiscoveryManager
     {
-        private ITestHostManagerFactory testHostManagerFactory;
-        private IDiscoveryManager discoveryManager;
-        private ITestRuntimeProvider testHostManager;
+        private readonly ITestHostManagerFactory testHostManagerFactory;
+        private readonly IDiscoveryManager discoveryManager;
+        private readonly ITestRuntimeProvider testHostManager;
 
         public bool IsInitialized { get; private set; } = false;
 
@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             this.testHostManager = testHostManager;
             this.testHostManagerFactory = testHostManagerFactory;
-            this.discoveryManager = this.testHostManagerFactory.GetDiscoveryManager();
+            discoveryManager = this.testHostManagerFactory.GetDiscoveryManager();
         }
 
         /// <summary>
@@ -60,10 +60,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 try
                 {
                     // Initialize extension before discovery
-                    this.InitializeExtensions(discoveryCriteria.Sources);
+                    InitializeExtensions(discoveryCriteria.Sources);
                     discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
 
-                    this.discoveryManager.DiscoverTests(discoveryCriteria, eventHandler);
+                    discoveryManager.DiscoverTests(discoveryCriteria, eventHandler);
                 }
                 catch (Exception exception)
                 {
@@ -92,12 +92,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Abort()
         {
-            Task.Run(() => this.testHostManagerFactory.GetDiscoveryManager().Abort());
+            Task.Run(() => testHostManagerFactory.GetDiscoveryManager().Abort());
         }
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {
-            var extensionsFromSource = this.testHostManager.GetTestPlatformExtensions(sources, Enumerable.Empty<string>());
+            var extensionsFromSource = testHostManager.GetTestPlatformExtensions(sources, Enumerable.Empty<string>());
             if (extensionsFromSource.Any())
             {
                 TestPluginCache.Instance.UpdateExtensions(extensionsFromSource, false);

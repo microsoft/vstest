@@ -21,32 +21,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         private const int ExpectedTimeForFindingArchForDotNetAssembly = 15; // In milliseconds.
         private const string PerfAssertMessageFormat = "Expected Elapsed Time: {0} ms, Actual Elapsed Time: {1} ms";
 
-        private IAssemblyMetadataProvider assemblyMetadataProvider;
+        private readonly IAssemblyMetadataProvider assemblyMetadataProvider;
 
-        private Mock<IFileHelper> fileHelperMock;
+        private readonly Mock<IFileHelper> fileHelperMock;
 
-        private FileHelper fileHelper;
+        private readonly FileHelper fileHelper;
 
         private bool isManagedAssemblyArchitectureTest;
 
         public AssemblyMetadataProviderTests()
         {
-            this.fileHelper = new FileHelper();
-            this.fileHelperMock = new Mock<IFileHelper>();
-            this.isManagedAssemblyArchitectureTest = false;
-            this.assemblyMetadataProvider = new AssemblyMetadataProvider(this.fileHelperMock.Object);
+            fileHelper = new FileHelper();
+            fileHelperMock = new Mock<IFileHelper>();
+            isManagedAssemblyArchitectureTest = false;
+            assemblyMetadataProvider = new AssemblyMetadataProvider(fileHelperMock.Object);
 
-            this.fileHelperMock.Setup(f =>
+            fileHelperMock.Setup(f =>
                     f.GetStream(It.IsAny<string>(), FileMode.Open, FileAccess.Read))
-                .Returns<string, FileMode, FileAccess>((filePath, mode, access) => this.fileHelper.GetStream(filePath, mode, access));
+                .Returns<string, FileMode, FileAccess>((filePath, mode, access) => fileHelper.GetStream(filePath, mode, access));
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            if (!this.isManagedAssemblyArchitectureTest)
+            if (!isManagedAssemblyArchitectureTest)
             {
-                this.fileHelperMock.Verify(
+                fileHelperMock.Verify(
                     f => f.GetStream(It.IsAny<string>(), FileMode.Open, FileAccess.Read), Times.Once);
             }
         }
@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         [DataRow("netcoreapp2.1")]
         public void GetArchitectureShouldReturnCorrentArchForx64Assembly(string framework)
         {
-            this.TestDotnetAssemblyArch("SimpleTestProject3", framework, Architecture.X64, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
+            TestDotnetAssemblyArch("SimpleTestProject3", framework, Architecture.X64, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
         }
 
         [TestMethod]
@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         [DataRow("netcoreapp2.1")]
         public void GetArchitectureShouldReturnCorrentArchForx86Assembly(string framework)
         {
-            this.TestDotnetAssemblyArch("SimpleTestProjectx86", framework, Architecture.X86, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
+            TestDotnetAssemblyArch("SimpleTestProjectx86", framework, Architecture.X86, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
         }
 
         [TestMethod]
@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         [DataRow("netcoreapp2.1")]
         public void GetArchitectureShouldReturnCorrentArchForAnyCPUAssembly(string framework)
         {
-            this.TestDotnetAssemblyArch("SimpleTestProject", framework, Architecture.AnyCPU, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
+            TestDotnetAssemblyArch("SimpleTestProject", framework, Architecture.AnyCPU, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
         }
 
         [TestMethod]
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         [DataRow("netcoreapp2.1")]
         public void GetArchitectureShouldReturnCorrentArchForARMAssembly(string framework)
         {
-            this.TestDotnetAssemblyArch("SimpleTestProjectARM", framework, Architecture.ARM, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
+            TestDotnetAssemblyArch("SimpleTestProjectARM", framework, Architecture.ARM, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
         }
 
         [TestMethod]
@@ -90,11 +90,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         {
             var expectedElapsedTime = 5;
             var platformPath = platform.Equals("x64") ? platform : string.Empty;
-            var assemblyPath = $@"{this.testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\"
+            var assemblyPath = $@"{testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\"
                 + $@"contentFiles\any\any\{platformPath}\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-            this.LoadAssemblyIntoMemory(assemblyPath);
+            LoadAssemblyIntoMemory(assemblyPath);
             var stopWatch = Stopwatch.StartNew();
-            var arch = this.assemblyMetadataProvider.GetArchitecture(assemblyPath);
+            var arch = assemblyMetadataProvider.GetArchitecture(assemblyPath);
             stopWatch.Stop();
 
             Console.WriteLine("Platform:{0}, {1}", platform, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
@@ -110,10 +110,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         public void GetFrameWorkForDotNetAssembly(string framework)
         {
             var expectedElapsedTime = 5;
-            var assemblyPath = this.testEnvironment.GetTestAsset("SimpleTestProject3.dll", framework);
-            this.LoadAssemblyIntoMemory(assemblyPath);
+            var assemblyPath = testEnvironment.GetTestAsset("SimpleTestProject3.dll", framework);
+            LoadAssemblyIntoMemory(assemblyPath);
             var stopWatch = Stopwatch.StartNew();
-            var actualFx = this.assemblyMetadataProvider.GetFrameWork(assemblyPath);
+            var actualFx = assemblyMetadataProvider.GetFrameWork(assemblyPath);
             stopWatch.Stop();
 
             if (framework.Equals("net451"))
@@ -137,10 +137,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         public void GetFrameWorkForNativeDll()
         {
             var expectedElapsedTime = 5;
-            var assemblyPath = $@"{this.testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-            this.LoadAssemblyIntoMemory(assemblyPath);
+            var assemblyPath = $@"{testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
+            LoadAssemblyIntoMemory(assemblyPath);
             var stopWatch = Stopwatch.StartNew();
-            var fx = this.assemblyMetadataProvider.GetFrameWork(assemblyPath);
+            var fx = assemblyMetadataProvider.GetFrameWork(assemblyPath);
             stopWatch.Stop();
 
             Console.WriteLine(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds);
@@ -152,11 +152,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
 
         private void TestDotnetAssemblyArch(string projectName, string framework, Architecture expectedArch, long expectedElapsedTime)
         {
-            this.isManagedAssemblyArchitectureTest = true;
-            var assemblyPath = this.testEnvironment.GetTestAsset(projectName + ".dll", framework);
-            this.LoadAssemblyIntoMemory(assemblyPath);
+            isManagedAssemblyArchitectureTest = true;
+            var assemblyPath = testEnvironment.GetTestAsset(projectName + ".dll", framework);
+            LoadAssemblyIntoMemory(assemblyPath);
             var stopWatch = Stopwatch.StartNew();
-            var arch = this.assemblyMetadataProvider.GetArchitecture(assemblyPath);
+            var arch = assemblyMetadataProvider.GetArchitecture(assemblyPath);
             stopWatch.Stop();
 
             Console.WriteLine("Framework:{0}, {1}", framework, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));

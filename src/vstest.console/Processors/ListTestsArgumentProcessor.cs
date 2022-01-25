@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     /// Argument Executor for the "-lt|--ListTests|/lt|/ListTests" command line argument.
@@ -49,12 +49,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ListTestsArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ListTestsArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -65,9 +65,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor =
+                    executor =
                         new Lazy<IArgumentExecutor>(
                             () =>
                             new ListTestsArgumentExecutor(
@@ -76,12 +76,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                                 TestRequestManager.Instance));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -113,12 +113,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Used for getting sources.
         /// </summary>
-        private CommandLineOptions commandLineOptions;
+        private readonly CommandLineOptions commandLineOptions;
 
         /// <summary>
         /// Used for getting tests.
         /// </summary>
-        private ITestRequestManager testRequestManager;
+        private readonly ITestRequestManager testRequestManager;
 
         /// <summary>
         /// Used for sending output.
@@ -128,12 +128,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// RunSettingsManager to get currently active run settings.
         /// </summary>
-        private IRunSettingsProvider runSettingsManager;
+        private readonly IRunSettingsProvider runSettingsManager;
 
         /// <summary>
         /// Registers for discovery events during discovery
         /// </summary>
-        private ITestDiscoveryEventsRegistrar discoveryEventsRegistrar;
+        private readonly ITestDiscoveryEventsRegistrar discoveryEventsRegistrar;
 
         #endregion
 
@@ -167,12 +167,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             Contract.Requires(options != null);
 
-            this.commandLineOptions = options;
+            commandLineOptions = options;
             this.output = output;
             this.testRequestManager = testRequestManager;
 
-            this.runSettingsManager = runSettingsProvider;
-            this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output);
+            runSettingsManager = runSettingsProvider;
+            discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output);
         }
 
         #endregion
@@ -187,36 +187,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (!string.IsNullOrWhiteSpace(argument))
             {
-                this.commandLineOptions.AddSource(argument);
+                commandLineOptions.AddSource(argument);
             }
         }
 
         /// <summary>
         /// Lists out the available discoverers.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public ArgumentProcessorResult Execute()
         {
-            Contract.Assert(this.output != null);
-            Contract.Assert(this.commandLineOptions != null);
-            Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager?.ActiveRunSettings?.SettingsXml));
+            Contract.Assert(output != null);
+            Contract.Assert(commandLineOptions != null);
+            Contract.Assert(!string.IsNullOrWhiteSpace(runSettingsManager?.ActiveRunSettings?.SettingsXml));
 
-            if (!this.commandLineOptions.Sources.Any())
+            if (!commandLineOptions.Sources.Any())
             {
                 throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
             }
 
-            this.output.WriteLine(CommandLineResources.ListTestsHeaderMessage, OutputLevel.Information);
+            output.WriteLine(CommandLineResources.ListTestsHeaderMessage, OutputLevel.Information);
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))
             {
-                this.output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
+                output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
             }
 
-            var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
+            var runSettings = runSettingsManager.ActiveRunSettings.SettingsXml;
 
-            this.testRequestManager.DiscoverTests(
-                new DiscoveryRequestPayload() { Sources = this.commandLineOptions.Sources, RunSettings = runSettings },
-                this.discoveryEventsRegistrar, Constants.DefaultProtocolConfig);
+            testRequestManager.DiscoverTests(
+                new DiscoveryRequestPayload() { Sources = commandLineOptions.Sources, RunSettings = runSettings },
+                discoveryEventsRegistrar, Constants.DefaultProtocolConfig);
 
             return ArgumentProcessorResult.Success;
         }
@@ -225,7 +224,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         private class DiscoveryEventsRegistrar : ITestDiscoveryEventsRegistrar
         {
-            private IOutput output;
+            private readonly IOutput output;
 
             public DiscoveryEventsRegistrar(IOutput output)
             {
@@ -239,12 +238,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
-                discoveryRequest.OnDiscoveredTests += this.DiscoveryRequest_OnDiscoveredTests;
+                discoveryRequest.OnDiscoveredTests += DiscoveryRequest_OnDiscoveredTests;
             }
 
             public void UnregisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
-                discoveryRequest.OnDiscoveredTests -= this.DiscoveryRequest_OnDiscoveredTests;
+                discoveryRequest.OnDiscoveredTests -= DiscoveryRequest_OnDiscoveredTests;
             }
 
             private void DiscoveryRequest_OnDiscoveredTests(Object sender, DiscoveredTestsEventArgs args)
@@ -252,7 +251,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 // List out each of the tests.
                 foreach (var test in args.DiscoveredTestCases)
                 {
-                    this.output.WriteLine(String.Format(CultureInfo.CurrentUICulture,
+                    output.WriteLine(String.Format(CultureInfo.CurrentUICulture,
                                                     CommandLineResources.AvailableTestsFormat,
                                                     test.DisplayName),
                                        OutputLevel.Information);

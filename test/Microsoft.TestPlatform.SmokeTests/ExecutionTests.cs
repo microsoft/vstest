@@ -13,22 +13,22 @@ namespace Microsoft.TestPlatform.SmokeTests
         [TestMethod]
         public void RunAllTestExecution()
         {
-            this.InvokeVsTestForExecution(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), ".NETFramework,Version=v4.5.1");
-            this.ValidateSummaryStatus(1, 1, 1);
-            this.ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
-            this.ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
-            this.ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
+            InvokeVsTestForExecution(GetSampleTestAssembly(), GetTestAdapterPath(), ".NETFramework,Version=v4.5.1");
+            ValidateSummaryStatus(1, 1, 1);
+            ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
+            ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
+            ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
         }
 
         [TestMethod]
         public void RunSelectedTests()
         {
             var resultsDir = GetResultsDirectory();
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, ".NETFramework,Version=v4.5.1", resultsDirectory: resultsDir);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, ".NETFramework,Version=v4.5.1", resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /Tests:PassingTest");
-            this.InvokeVsTest(arguments);
-            this.ValidateSummaryStatus(1, 0, 0);
-            this.ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
+            InvokeVsTest(arguments);
+            ValidateSummaryStatus(1, 0, 0);
+            ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
             TryRemoveDirectory(resultsDir);
         }
     }

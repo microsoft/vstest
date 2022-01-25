@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
         {
             ValidateArg.NotNull(info, nameof(info));
             // Save the basic properties.
-            this.FilterValue = info.GetString("FilterValue");
+            FilterValue = info.GetString("FilterValue");
         }
 
 #endif
@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
             }
 
             base.GetObjectData(info, context);
-            info.AddValue("FilterValue", this.FilterValue);
+            info.AddValue("FilterValue", FilterValue);
         }
 #endif
     }

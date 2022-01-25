@@ -16,11 +16,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     {
         #region Fields
 
-        private TestId testId;
-        private Guid executionId;
-        private Guid parentExecutionId;
-        private TestListCategoryId categoryId;
-        private List<TestEntry> testEntries;
+        private readonly TestId _testId;
+        private Guid _executionId;
+        private Guid _parentExecutionId;
+        private readonly TestListCategoryId _categoryId;
+        private List<TestEntry> _testEntries;
 
         #endregion
 
@@ -35,8 +35,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="catId">Category Id. This gets into .</param>
         public TestEntry(TestId testId, TestListCategoryId catId)
         {
-            this.testId = testId;
-            this.categoryId = catId;
+            this._testId = testId;
+            _categoryId = catId;
         }
 
         #endregion
@@ -48,11 +48,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public Guid ExecutionId
         {
-            get { return this.executionId; }
+            get { return _executionId; }
 
             set
             {
-                this.executionId = value;
+                _executionId = value;
             }
         }
 
@@ -61,11 +61,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public Guid ParentExecutionId
         {
-            get { return this.parentExecutionId; }
+            get { return _parentExecutionId; }
 
             set
             {
-                this.parentExecutionId = value;
+                _parentExecutionId = value;
             }
         }
 
@@ -73,12 +73,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             get
             {
-                if (this.testEntries == null)
+                if (_testEntries == null)
                 {
-                    this.testEntries = new List<TestEntry>();
+                    _testEntries = new List<TestEntry>();
                 }
 
-                return this.testEntries;
+                return _testEntries;
             }
         }
 
@@ -95,23 +95,20 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
-        [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1405:DebugAssertMustProvideMessageText", Justification = "Reviewed. Suppression is OK here.")]
         public override bool Equals(object obj)
         {
-            TestEntry e = obj as TestEntry;
-
-            if (e == null)
+            if (obj is not TestEntry e)
             {
                 return false;
             }
 
-            if (!this.executionId.Equals(e.executionId))
+            if (!_executionId.Equals(e._executionId))
             {
                 return false;
             }
 
-            Debug.Assert(object.Equals(this.testId, e.testId));
-            Debug.Assert(object.Equals(this.categoryId, e.categoryId));
+            Debug.Assert(Equals(_testId, e._testId));
+            Debug.Assert(Equals(_categoryId, e._categoryId));
             return true;
         }
 
@@ -123,7 +120,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public override int GetHashCode()
         {
-            return this.executionId.GetHashCode();
+            return _executionId.GetHashCode();
         }
 
         #endregion
@@ -141,15 +138,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </param>
         public void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
         {
-            XmlPersistence helper = new XmlPersistence();
+            XmlPersistence helper = new();
             helper.SaveSingleFields(element, this, parameters);
 
-            helper.SaveObject(this.testId, element, null);
-            helper.SaveGuid(element, "@executionId", this.executionId);
-            if (parentExecutionId != Guid.Empty)
-                helper.SaveGuid(element, "@parentExecutionId", this.parentExecutionId);
-            helper.SaveGuid(element, "@testListId", this.categoryId.Id);
-            if (this.TestEntries.Count > 0)
+            helper.SaveObject(_testId, element, null);
+            helper.SaveGuid(element, "@executionId", _executionId);
+            if (_parentExecutionId != Guid.Empty)
+                helper.SaveGuid(element, "@parentExecutionId", _parentExecutionId);
+            helper.SaveGuid(element, "@testListId", _categoryId.Id);
+            if (TestEntries.Count > 0)
                 helper.SaveIEnumerable(TestEntries, element, "TestEntries", ".", "TestEntry", parameters);
         }
 

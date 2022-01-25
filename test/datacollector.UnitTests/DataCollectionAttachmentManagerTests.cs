@@ -19,17 +19,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     public class DataCollectionAttachmentManagerTests
     {
         private const int Timeout = 10 * 60 * 1000;
-        private DataCollectionAttachmentManager attachmentManager;
-        private Mock<IMessageSink> messageSink;
-        private SessionId sessionId;
+        private readonly DataCollectionAttachmentManager attachmentManager;
+        private readonly Mock<IMessageSink> messageSink;
+        private readonly SessionId sessionId;
         private static readonly string TempDirectoryPath = Path.GetTempPath();
 
         public DataCollectionAttachmentManagerTests()
         {
-            this.attachmentManager = new DataCollectionAttachmentManager();
-            this.messageSink = new Mock<IMessageSink>();
+            attachmentManager = new DataCollectionAttachmentManager();
+            messageSink = new Mock<IMessageSink>();
             var guid = Guid.NewGuid();
-            this.sessionId = new SessionId(guid);
+            sessionId = new SessionId(guid);
         }
 
         [TestCleanup]
@@ -42,35 +42,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void InitializeShouldThrowExceptionIfSessionIdIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.attachmentManager.Initialize((SessionId)null, string.Empty, this.messageSink.Object);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => attachmentManager.Initialize((SessionId)null, string.Empty, messageSink.Object));
         }
 
         [TestMethod]
         public void InitializeShouldThrowExceptionIfMessageSinkIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.attachmentManager.Initialize(this.sessionId, string.Empty, null);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => attachmentManager.Initialize(sessionId, string.Empty, null));
         }
 
         [TestMethod]
         public void InitializeShouldSetDefaultPathIfOutputDirectoryPathIsNull()
         {
-            this.attachmentManager.Initialize(this.sessionId, string.Empty, this.messageSink.Object);
+            attachmentManager.Initialize(sessionId, string.Empty, messageSink.Object);
 
-            Assert.AreEqual(this.attachmentManager.SessionOutputDirectory, Path.Combine(Path.GetTempPath(), "TestResults", this.sessionId.Id.ToString()));
+            Assert.AreEqual(attachmentManager.SessionOutputDirectory, Path.Combine(Path.GetTempPath(), "TestResults", sessionId.Id.ToString()));
         }
 
         [TestMethod]
         public void InitializeShouldSetCorrectGuidAndOutputPath()
         {
-            this.attachmentManager.Initialize(this.sessionId, TempDirectoryPath, this.messageSink.Object);
+            attachmentManager.Initialize(sessionId, TempDirectoryPath, messageSink.Object);
 
-            Assert.AreEqual(Path.Combine(TempDirectoryPath, this.sessionId.Id.ToString()), this.attachmentManager.SessionOutputDirectory);
+            Assert.AreEqual(Path.Combine(TempDirectoryPath, sessionId.Id.ToString()), attachmentManager.SessionOutputDirectory);
         }
 
         [TestMethod]
@@ -79,15 +73,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var filename = "filename.txt";
             File.WriteAllText(Path.Combine(TempDirectoryPath, filename), string.Empty);
 
-            var datacollectioncontext = new DataCollectionContext(this.sessionId);
+            var datacollectioncontext = new DataCollectionContext(sessionId);
             var friendlyName = "TestDataCollector";
             var uri = new Uri("datacollector://Company/Product/Version");
 
             var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(TempDirectoryPath, filename), false);
 
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
+            attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
 
-            Assert.AreEqual(0, this.attachmentManager.AttachmentSets.Count);
+            Assert.AreEqual(0, attachmentManager.AttachmentSets.Count);
         }
 
         [TestMethod]
@@ -97,25 +91,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             File.WriteAllText(Path.Combine(TempDirectoryPath, filename), string.Empty);
 
 
-            this.attachmentManager.Initialize(this.sessionId, TempDirectoryPath, this.messageSink.Object);
+            attachmentManager.Initialize(sessionId, TempDirectoryPath, messageSink.Object);
 
-            var datacollectioncontext = new DataCollectionContext(this.sessionId);
+            var datacollectioncontext = new DataCollectionContext(sessionId);
             var friendlyName = "TestDataCollector";
             var uri = new Uri("datacollector://Company/Product/Version");
 
             EventWaitHandle waitHandle = new AutoResetEvent(false);
-            var handler = new AsyncCompletedEventHandler((a, e) => { waitHandle.Set(); });
+            var handler = new AsyncCompletedEventHandler((a, e) => waitHandle.Set());
             var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(TempDirectoryPath, filename), false);
 
 
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
+            attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
 
             // Wait for file operations to complete
             waitHandle.WaitOne(Timeout);
 
             Assert.IsTrue(File.Exists(Path.Combine(TempDirectoryPath, filename)));
-            Assert.IsTrue(File.Exists(Path.Combine(TempDirectoryPath, this.sessionId.Id.ToString(), filename)));
-            Assert.AreEqual(1, this.attachmentManager.AttachmentSets[datacollectioncontext][uri].Attachments.Count);
+            Assert.IsTrue(File.Exists(Path.Combine(TempDirectoryPath, sessionId.Id.ToString(), filename)));
+            Assert.AreEqual(1, attachmentManager.AttachmentSets[datacollectioncontext][uri].Attachments.Count);
         }
 
         [TestMethod]
@@ -126,31 +120,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             File.WriteAllText(Path.Combine(TempDirectoryPath, filename), string.Empty);
             File.WriteAllText(Path.Combine(TempDirectoryPath, filename1), string.Empty);
 
-            this.attachmentManager.Initialize(this.sessionId, TempDirectoryPath, this.messageSink.Object);
+            attachmentManager.Initialize(sessionId, TempDirectoryPath, messageSink.Object);
 
-            var datacollectioncontext = new DataCollectionContext(this.sessionId);
+            var datacollectioncontext = new DataCollectionContext(sessionId);
             var friendlyName = "TestDataCollector";
             var uri = new Uri("datacollector://Company/Product/Version");
             var uri1 = new Uri("datacollector://Company/Product/Version1");
 
             EventWaitHandle waitHandle = new AutoResetEvent(false);
-            var handler = new AsyncCompletedEventHandler((a, e) => { waitHandle.Set(); });
+            var handler = new AsyncCompletedEventHandler((a, e) => waitHandle.Set());
             var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(TempDirectoryPath, filename), false);
 
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
+            attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
 
             // Wait for file operations to complete
             waitHandle.WaitOne(Timeout);
 
             waitHandle.Reset();
             dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(TempDirectoryPath, filename1), false);
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri1, friendlyName);
+            attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri1, friendlyName);
 
             // Wait for file operations to complete
             waitHandle.WaitOne(Timeout);
 
-            Assert.AreEqual(1, this.attachmentManager.AttachmentSets[datacollectioncontext][uri].Attachments.Count);
-            Assert.AreEqual(1, this.attachmentManager.AttachmentSets[datacollectioncontext][uri1].Attachments.Count);
+            Assert.AreEqual(1, attachmentManager.AttachmentSets[datacollectioncontext][uri].Attachments.Count);
+            Assert.AreEqual(1, attachmentManager.AttachmentSets[datacollectioncontext][uri1].Attachments.Count);
         }
 
         [TestMethod]
@@ -160,23 +154,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             File.WriteAllText(Path.Combine(TempDirectoryPath, filename), string.Empty);
 
 
-            this.attachmentManager.Initialize(this.sessionId, TempDirectoryPath, this.messageSink.Object);
+            attachmentManager.Initialize(sessionId, TempDirectoryPath, messageSink.Object);
 
-            var datacollectioncontext = new DataCollectionContext(this.sessionId);
+            var datacollectioncontext = new DataCollectionContext(sessionId);
             var friendlyName = "TestDataCollector";
             var uri = new Uri("datacollector://Company/Product/Version");
 
             var waitHandle = new AutoResetEvent(false);
-            var handler = new AsyncCompletedEventHandler((a, e) => { waitHandle.Set(); });
+            var handler = new AsyncCompletedEventHandler((a, e) => waitHandle.Set());
             var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(TempDirectoryPath, filename), true);
 
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
+            attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
 
             // Wait for file operations to complete
             waitHandle.WaitOne(Timeout);
 
-            Assert.AreEqual(1, this.attachmentManager.AttachmentSets[datacollectioncontext][uri].Attachments.Count);
-            Assert.IsTrue(File.Exists(Path.Combine(TempDirectoryPath, this.sessionId.Id.ToString(), filename)));
+            Assert.AreEqual(1, attachmentManager.AttachmentSets[datacollectioncontext][uri].Attachments.Count);
+            Assert.IsTrue(File.Exists(Path.Combine(TempDirectoryPath, sessionId.Id.ToString(), filename)));
             Assert.IsFalse(File.Exists(Path.Combine(TempDirectoryPath, filename)));
         }
 
@@ -188,38 +182,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             File.WriteAllText(Path.Combine(TempDirectoryPath, filename), string.Empty);
             File.WriteAllText(Path.Combine(TempDirectoryPath, filename1), string.Empty);
 
-            this.attachmentManager.Initialize(this.sessionId, TempDirectoryPath, this.messageSink.Object);
+            attachmentManager.Initialize(sessionId, TempDirectoryPath, messageSink.Object);
 
-            var datacollectioncontext = new DataCollectionContext(this.sessionId);
+            var datacollectioncontext = new DataCollectionContext(sessionId);
             var friendlyName = "TestDataCollector";
             var uri = new Uri("datacollector://Company/Product/Version");
 
             EventWaitHandle waitHandle = new AutoResetEvent(false);
-            var handler = new AsyncCompletedEventHandler((a, e) => { waitHandle.Set(); });
+            var handler = new AsyncCompletedEventHandler((a, e) => waitHandle.Set());
             var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(TempDirectoryPath, filename), false);
 
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
+            attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
 
             // Wait for file operations to complete
             waitHandle.WaitOne(Timeout);
 
             waitHandle.Reset();
             dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(TempDirectoryPath, filename1), false);
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
+            attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
 
             // Wait for file operations to complete
             waitHandle.WaitOne(Timeout);
 
-            Assert.AreEqual(2, this.attachmentManager.AttachmentSets[datacollectioncontext][uri].Attachments.Count);
+            Assert.AreEqual(2, attachmentManager.AttachmentSets[datacollectioncontext][uri].Attachments.Count);
         }
 
         [TestMethod]
         public void AddAttachmentShouldNotAddNewFileTransferIfNullIsPassed()
         {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.attachmentManager.AddAttachment(null, null, null, null);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => attachmentManager.AddAttachment(null, null, null, null));
         }
 
         [TestMethod]
@@ -228,20 +219,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var filename = "filename1.txt";
             File.WriteAllText(Path.Combine(TempDirectoryPath, filename), string.Empty);
 
-            this.attachmentManager.Initialize(this.sessionId, TempDirectoryPath, this.messageSink.Object);
+            attachmentManager.Initialize(sessionId, TempDirectoryPath, messageSink.Object);
 
-            var datacollectioncontext = new DataCollectionContext(this.sessionId);
+            var datacollectioncontext = new DataCollectionContext(sessionId);
             var friendlyName = "TestDataCollector";
             var uri = new Uri("datacollector://Company/Product/Version");
 
             var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(TempDirectoryPath, filename), true);
 
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
+            attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
 
-            Assert.AreEqual(1, this.attachmentManager.AttachmentSets.Count);
-            var result = this.attachmentManager.GetAttachments(datacollectioncontext);
+            Assert.AreEqual(1, attachmentManager.AttachmentSets.Count);
+            var result = attachmentManager.GetAttachments(datacollectioncontext);
 
-            Assert.AreEqual(0, this.attachmentManager.AttachmentSets.Count);
+            Assert.AreEqual(0, attachmentManager.AttachmentSets.Count);
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual(friendlyName, result[0].DisplayName);
             Assert.AreEqual(uri, result[0].Uri);
@@ -251,11 +242,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void GetAttachmentsShouldNotReutrnAnyDataWhenActiveFileTransferAreNotPresent()
         {
-            this.attachmentManager.Initialize(this.sessionId, TempDirectoryPath, this.messageSink.Object);
+            attachmentManager.Initialize(sessionId, TempDirectoryPath, messageSink.Object);
 
-            var datacollectioncontext = new DataCollectionContext(this.sessionId);
+            var datacollectioncontext = new DataCollectionContext(sessionId);
 
-            var result = this.attachmentManager.GetAttachments(datacollectioncontext);
+            var result = attachmentManager.GetAttachments(datacollectioncontext);
             Assert.AreEqual(0, result.Count);
         }
 
@@ -266,18 +257,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var testableAttachmentManager = new TestableDataCollectionAttachmentManager(fileHelper.Object);
             var attachmentPath = Path.Combine(TempDirectoryPath, "filename.txt");
             File.WriteAllText(attachmentPath, string.Empty);
-            var datacollectioncontext = new DataCollectionContext(this.sessionId);
+            var datacollectioncontext = new DataCollectionContext(sessionId);
             var friendlyName = "TestDataCollector";
             var uri = new Uri("datacollector://Company/Product/Version");
             var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, attachmentPath, true);
             var waitHandle = new AutoResetEvent(false);
-            var handler = new AsyncCompletedEventHandler((a, e) => { Assert.Fail("Handler shouldn't be called since operation is canceled."); });
+            var handler = new AsyncCompletedEventHandler((a, e) => Assert.Fail("Handler shouldn't be called since operation is canceled."));
 
             // We cancel the operation in the actual operation. This ensures the follow up task to is never called, attachments
             // are not added.
             Action cancelAddAttachment = () => testableAttachmentManager.Cancel();
             fileHelper.Setup(fh => fh.MoveFile(It.IsAny<string>(), It.IsAny<string>())).Callback(cancelAddAttachment);
-            testableAttachmentManager.Initialize(this.sessionId, TempDirectoryPath, this.messageSink.Object);
+            testableAttachmentManager.Initialize(sessionId, TempDirectoryPath, messageSink.Object);
             testableAttachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
 
             // Wait for the attachment transfer tasks to complete

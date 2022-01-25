@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     {
         private readonly ITestPlatformEventSource testPlatformEventSource;
         private BaseRunTests activeTestRun;
-        private IRequestData requestData;
+        private readonly IRequestData requestData;
         private readonly TestSessionMessageLogger sessionMessageLogger;
         private ITestMessageEventHandler testMessageEventsHandler;
 
@@ -40,8 +40,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// </summary>
         public ExecutionManager(IRequestData requestData) : this(TestPlatformEventSource.Instance, requestData)
         {
-            this.sessionMessageLogger = TestSessionMessageLogger.Instance;
-            this.sessionMessageLogger.TestRunMessage += this.TestSessionMessageHandler;
+            sessionMessageLogger = TestSessionMessageLogger.Instance;
+            sessionMessageLogger.TestRunMessage += TestSessionMessageHandler;
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         public void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestMessageEventHandler testMessageEventsHandler)
         {
             this.testMessageEventsHandler = testMessageEventsHandler;
-            this.testPlatformEventSource.AdapterSearchStart();
+            testPlatformEventSource.AdapterSearchStart();
 
             if (pathToAdditionalExtensions != null && pathToAdditionalExtensions.Any())
             {
@@ -71,12 +71,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 TestPluginCache.Instance.DefaultExtensionPaths = pathToAdditionalExtensions;
             }
 
-            this.LoadExtensions();
+            LoadExtensions();
 
             //unsubscrive session logger
-            this.sessionMessageLogger.TestRunMessage -= this.TestSessionMessageHandler;
+            sessionMessageLogger.TestRunMessage -= TestSessionMessageHandler;
 
-            this.testPlatformEventSource.AdapterSearchStop();
+            testPlatformEventSource.AdapterSearchStop();
         }
 
         /// <summary>
@@ -98,20 +98,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             try
             {
-                this.InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap));
+                InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap));
 
-                this.activeTestRun = new RunTestsWithSources(this.requestData, adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
+                activeTestRun = new RunTestsWithSources(requestData, adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
-                this.activeTestRun.RunTests();
+                activeTestRun.RunTests();
             }
             catch (Exception e)
             {
                 runEventsHandler.HandleLogMessage(TestMessageLevel.Error, e.ToString());
-                this.Abort(runEventsHandler);
+                Abort(runEventsHandler);
             }
             finally
             {
-                this.activeTestRun = null;
+                activeTestRun = null;
             }
         }
 
@@ -134,20 +134,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             try
             {
-                this.InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(tests));
+                InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(tests));
 
-                this.activeTestRun = new RunTestsWithTests(this.requestData, tests, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
+                activeTestRun = new RunTestsWithTests(requestData, tests, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
-                this.activeTestRun.RunTests();
+                activeTestRun.RunTests();
             }
             catch (Exception e)
             {
                 runEventsHandler.HandleLogMessage(TestMessageLevel.Error, e.ToString());
-                this.Abort(runEventsHandler);
+                Abort(runEventsHandler);
             }
             finally
             {
-                this.activeTestRun = null;
+                activeTestRun = null;
             }
         }
 
@@ -156,14 +156,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// </summary>
         public void Cancel(ITestRunEventsHandler testRunEventsHandler)
         {
-            if (this.activeTestRun == null)
+            if (activeTestRun == null)
             {
                 var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, true, false, null, null, null, TimeSpan.Zero);
                 testRunEventsHandler.HandleTestRunComplete(testRunCompleteEventArgs, null, null, null);
             }
             else
             {
-                this.activeTestRun.Cancel();
+                activeTestRun.Cancel();
             }
         }
 
@@ -172,14 +172,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// </summary>
         public void Abort(ITestRunEventsHandler testRunEventsHandler)
         {
-            if (this.activeTestRun == null)
+            if (activeTestRun == null)
             {
                 var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero);
                 testRunEventsHandler.HandleTestRunComplete(testRunCompleteEventArgs, null, null, null);
             }
             else
             {
-                this.activeTestRun.Abort();
+                activeTestRun.Abort();
             }
         }
 
@@ -220,21 +220,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             // Initialize out-proc data collectors if declared in run settings.
             if (DataCollectionTestCaseEventSender.Instance != null && XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettings))
             {
-                var outOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, testEventsPublisher);
+                _ = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, testEventsPublisher);
             }
 
             // Initialize in-proc data collectors if declared in run settings.
             if (XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(runSettings))
             {
-                var inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testEventsPublisher, defaultCodeBase, TestPluginCache.Instance);
+                _ = new InProcDataCollectionExtensionManager(runSettings, testEventsPublisher, defaultCodeBase, TestPluginCache.Instance);
             }
         }
 
         private void TestSessionMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            if (this.testMessageEventsHandler != null)
+            if (testMessageEventsHandler != null)
             {
-                this.testMessageEventsHandler.HandleLogMessage(e.Level, e.Message);
+                testMessageEventsHandler.HandleLogMessage(e.Level, e.Message);
             }
             else
             {

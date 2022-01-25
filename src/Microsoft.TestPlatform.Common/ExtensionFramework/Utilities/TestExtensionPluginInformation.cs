@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             if (type != null)
             {
-                this.ExtensionUri = GetExtensionUri(type);
+                ExtensionUri = GetExtensionUri(type);
             }
         }
 
@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             get
             {
-                return this.ExtensionUri;
+                return ExtensionUri;
             }
         }
 
@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             get
             {
-                return new object[] { this.ExtensionUri };
+                return new object[] { ExtensionUri };
             }
         }
 

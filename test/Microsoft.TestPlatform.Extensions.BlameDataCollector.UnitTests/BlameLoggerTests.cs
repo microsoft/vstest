@@ -21,11 +21,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     [TestClass]
     public class BlameLoggerTests
     {
-        private Mock<ITestRunRequest> testRunRequest;
-        private Mock<TestLoggerEvents> events;
-        private Mock<IOutput> mockOutput;
-        private Mock<IBlameReaderWriter> mockBlameReaderWriter;
-        private BlameLogger blameLogger;
+        private readonly Mock<ITestRunRequest> testRunRequest;
+        private readonly Mock<TestLoggerEvents> events;
+        private readonly Mock<IOutput> mockOutput;
+        private readonly Mock<IBlameReaderWriter> mockBlameReaderWriter;
+        private readonly BlameLogger blameLogger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameLoggerTests"/> class.
@@ -33,11 +33,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public BlameLoggerTests()
         {
             // Mock for ITestRunRequest
-            this.testRunRequest = new Mock<ITestRunRequest>();
-            this.events = new Mock<TestLoggerEvents>();
-            this.mockOutput = new Mock<IOutput>();
-            this.mockBlameReaderWriter = new Mock<IBlameReaderWriter>();
-            this.blameLogger = new TestableBlameLogger(this.mockOutput.Object, this.mockBlameReaderWriter.Object);
+            testRunRequest = new Mock<ITestRunRequest>();
+            events = new Mock<TestLoggerEvents>();
+            mockOutput = new Mock<IOutput>();
+            mockBlameReaderWriter = new Mock<IBlameReaderWriter>();
+            blameLogger = new TestableBlameLogger(mockOutput.Object, mockBlameReaderWriter.Object);
         }
 
         /// <summary>
@@ -46,10 +46,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void InitializeShouldThrowExceptionIfEventsIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.blameLogger.Initialize(null, string.Empty);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => blameLogger.Initialize(null, string.Empty));
         }
 
         /// <summary>
@@ -58,7 +55,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void TestRunCompleteHandlerShouldGetFaultyTestRunIfTestRunAborted()
         {
-            this.InitializeAndVerify(1);
+            InitializeAndVerify(1);
         }
 
         /// <summary>
@@ -67,7 +64,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void TestRunCompleteHandlerShouldGetFaultyTestRunIfTestRunAbortedForMultipleProjects()
         {
-            this.InitializeAndVerify(2);
+            InitializeAndVerify(2);
         }
 
         /// <summary>
@@ -79,14 +76,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             // Initialize Blame Logger
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            this.blameLogger.Initialize(loggerEvents, (string)null);
+            blameLogger.Initialize(loggerEvents, (string)null);
 
             // Setup and Raise event
-            this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>()));
+            mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>()));
             loggerEvents.CompleteTestRun(null, false, false, null, null, null, new TimeSpan(1, 0, 0, 0));
 
             // Verify Call
-            this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Never);
+            mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Never);
         }
 
         /// <summary>
@@ -102,13 +99,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             // Initialize Blame Logger
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            this.blameLogger.Initialize(loggerEvents, (string)null);
+            blameLogger.Initialize(loggerEvents, (string)null);
 
             // Setup and Raise event
             loggerEvents.CompleteTestRun(null, false, true, null, new Collection<AttachmentSet>(attachmentSetList), new Collection<InvokedDataCollector>(), new TimeSpan(1, 0, 0, 0));
 
             // Verify Call
-            this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Never);
+            mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Never);
         }
 
         private AttachmentSet GetAttachmentSet()
@@ -127,13 +124,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             for (int i = 0; i < count; i++)
             {
-                attachmentSetList.Add(this.GetAttachmentSet());
+                attachmentSetList.Add(GetAttachmentSet());
             }
 
             // Initialize Blame Logger
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            this.blameLogger.Initialize(loggerEvents, (string)null);
+            blameLogger.Initialize(loggerEvents, (string)null);
 
             var testCaseList =
                     new List<BlameTestObject>
@@ -143,11 +140,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                         };
 
             // Setup and Raise event
-            this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>())).Returns(testCaseList);
+            mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>())).Returns(testCaseList);
             loggerEvents.CompleteTestRun(null, false, true, null, new Collection<AttachmentSet>(attachmentSetList), new Collection<InvokedDataCollector>(), new TimeSpan(1, 0, 0, 0));
 
             // Verify Call
-            this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.Is<string>(str => str.EndsWith(".xml"))), Times.Exactly(count));
+            mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.Is<string>(str => str.EndsWith(".xml"))), Times.Exactly(count));
         }
 
         /// <summary>

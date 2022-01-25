@@ -17,8 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>The localized outcome string.</returns>
         public static string GetOutcomeString(TestOutcome outcome)
         {
-            string result = null;
-
+            string result;
             switch (outcome)
             {
                 case TestOutcome.None:

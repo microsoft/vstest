@@ -29,7 +29,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// Used by the data collector to send warnings, errors, or other messages
         /// </param>
         /// <param name="environmentContext">Provides contextual information about the agent environment</param>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes", MessageId = "System.Xml.XmlNode")]
         public abstract void Initialize(
             XmlElement configurationElement,
             DataCollectionEvents events,

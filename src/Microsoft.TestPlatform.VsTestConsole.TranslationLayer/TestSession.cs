@@ -20,10 +20,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     public class TestSession : ITestSession
     {
-        private bool disposed = false;
+        private bool _disposed = false;
 
-        private readonly ITestSessionEventsHandler eventsHandler;
-        private readonly IVsTestConsoleWrapper consoleWrapper;
+        private readonly ITestSessionEventsHandler _eventsHandler;
+        private readonly IVsTestConsoleWrapper _consoleWrapper;
 
         #region Properties
         /// <inheritdoc/>
@@ -44,15 +44,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestSessionEventsHandler eventsHandler,
             IVsTestConsoleWrapper consoleWrapper)
         {
-            this.TestSessionInfo = testSessionInfo;
-            this.eventsHandler = eventsHandler;
-            this.consoleWrapper = consoleWrapper;
+            TestSessionInfo = testSessionInfo;
+            this._eventsHandler = eventsHandler;
+            this._consoleWrapper = consoleWrapper;
         }
 
         /// <summary>
         /// Destroys the current instance of the <see cref="TestSession"/> class.
         /// </summary>
-        ~TestSession() => this.Dispose(false);
+        ~TestSession() => Dispose(false);
 
         /// <summary>
         /// Disposes of the current instance of the <see cref="TestSession"/> class.
@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -71,13 +71,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="disposing">Indicates if managed resources should be disposed.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (this.disposed)
+            if (_disposed)
             {
                 return;
             }
 
-            this.StopTestSession();
-            this.disposed = true;
+            StopTestSession();
+            _disposed = true;
         }
         #endregion
 
@@ -86,21 +86,21 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void AbortTestRun()
         {
-            this.consoleWrapper.AbortTestRun();
+            _consoleWrapper.AbortTestRun();
         }
 
         /// <inheritdoc/>
         [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void CancelDiscovery()
         {
-            this.consoleWrapper.CancelDiscovery();
+            _consoleWrapper.CancelDiscovery();
         }
 
         /// <inheritdoc/>
         [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void CancelTestRun()
         {
-            this.consoleWrapper.CancelTestRun();
+            _consoleWrapper.CancelTestRun();
         }
 
         /// <inheritdoc/>
@@ -110,7 +110,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             string discoverySettings,
             ITestDiscoveryEventsHandler discoveryEventsHandler)
         {
-            this.DiscoverTests(
+            DiscoverTests(
                 sources,
                 discoverySettings,
                 options: null,
@@ -125,11 +125,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             TestPlatformOptions options,
             ITestDiscoveryEventsHandler2 discoveryEventsHandler)
         {
-            this.consoleWrapper.DiscoverTests(
+            _consoleWrapper.DiscoverTests(
                 sources,
                 discoverySettings,
                 options,
-                this.TestSessionInfo,
+                TestSessionInfo,
                 discoveryEventsHandler);
         }
 
@@ -140,7 +140,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             string runSettings,
             ITestRunEventsHandler testRunEventsHandler)
         {
-            this.RunTests(
+            RunTests(
                 sources,
                 runSettings,
                 options: null,
@@ -155,11 +155,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             TestPlatformOptions options,
             ITestRunEventsHandler testRunEventsHandler)
         {
-            this.consoleWrapper.RunTests(
+            _consoleWrapper.RunTests(
                 sources,
                 runSettings,
                 options,
-                this.TestSessionInfo,
+                TestSessionInfo,
                 testRunEventsHandler);
         }
 
@@ -170,7 +170,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             string runSettings,
             ITestRunEventsHandler testRunEventsHandler)
         {
-            this.RunTests(
+            RunTests(
                 testCases,
                 runSettings,
                 options: null,
@@ -185,11 +185,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             TestPlatformOptions options,
             ITestRunEventsHandler testRunEventsHandler)
         {
-            this.consoleWrapper.RunTests(
+            _consoleWrapper.RunTests(
                 testCases,
                 runSettings,
                 options,
-                this.TestSessionInfo,
+                TestSessionInfo,
                 testRunEventsHandler);
         }
 
@@ -201,7 +201,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestRunEventsHandler testRunEventsHandler,
             ITestHostLauncher customTestHostLauncher)
         {
-            this.RunTestsWithCustomTestHost(
+            RunTestsWithCustomTestHost(
                 sources,
                 runSettings,
                 options: null,
@@ -218,11 +218,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestRunEventsHandler testRunEventsHandler,
             ITestHostLauncher customTestHostLauncher)
         {
-            this.consoleWrapper.RunTestsWithCustomTestHost(
+            _consoleWrapper.RunTestsWithCustomTestHost(
                 sources,
                 runSettings,
                 options,
-                this.TestSessionInfo,
+                TestSessionInfo,
                 testRunEventsHandler,
                 customTestHostLauncher);
         }
@@ -235,7 +235,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestRunEventsHandler testRunEventsHandler,
             ITestHostLauncher customTestHostLauncher)
         {
-            this.RunTestsWithCustomTestHost(
+            RunTestsWithCustomTestHost(
                 testCases,
                 runSettings,
                 options: null,
@@ -252,11 +252,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestRunEventsHandler testRunEventsHandler,
             ITestHostLauncher customTestHostLauncher)
         {
-            this.consoleWrapper.RunTestsWithCustomTestHost(
+            _consoleWrapper.RunTestsWithCustomTestHost(
                 testCases,
                 runSettings,
                 options,
-                this.TestSessionInfo,
+                TestSessionInfo,
                 testRunEventsHandler,
                 customTestHostLauncher);
         }
@@ -265,27 +265,27 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         [Obsolete("This API is not final yet and is subject to changes.", false)]
         public bool StopTestSession()
         {
-            return this.StopTestSession(this.eventsHandler);
+            return StopTestSession(_eventsHandler);
         }
 
         /// <inheritdoc/>
         [Obsolete("This API is not final yet and is subject to changes.", false)]
         public bool StopTestSession(ITestSessionEventsHandler eventsHandler)
         {
-            if (this.TestSessionInfo == null)
+            if (TestSessionInfo == null)
             {
                 return true;
             }
 
             try
             {
-                return this.consoleWrapper.StopTestSession(
-                    this.TestSessionInfo,
+                return _consoleWrapper.StopTestSession(
+                    TestSessionInfo,
                     eventsHandler);
             }
             finally
             {
-                this.TestSessionInfo = null;
+                TestSessionInfo = null;
             }
         }
         #endregion
@@ -298,7 +298,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             string discoverySettings,
             ITestDiscoveryEventsHandler discoveryEventsHandler)
         {
-            await this.DiscoverTestsAsync(
+            await DiscoverTestsAsync(
                     sources,
                     discoverySettings,
                     options: null,
@@ -315,11 +315,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             TestPlatformOptions options,
             ITestDiscoveryEventsHandler2 discoveryEventsHandler)
         {
-            await this.consoleWrapper.DiscoverTestsAsync(
+            await _consoleWrapper.DiscoverTestsAsync(
                 sources,
                 discoverySettings,
                 options,
-                this.TestSessionInfo,
+                TestSessionInfo,
                 discoveryEventsHandler).ConfigureAwait(false);
         }
 
@@ -330,7 +330,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             string runSettings,
             ITestRunEventsHandler testRunEventsHandler)
         {
-            await this.RunTestsAsync(
+            await RunTestsAsync(
                 sources,
                 runSettings,
                 options: null,
@@ -345,11 +345,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             TestPlatformOptions options,
             ITestRunEventsHandler testRunEventsHandler)
         {
-            await this.consoleWrapper.RunTestsAsync(
+            await _consoleWrapper.RunTestsAsync(
                 sources,
                 runSettings,
                 options,
-                this.TestSessionInfo,
+                TestSessionInfo,
                 testRunEventsHandler).ConfigureAwait(false);
         }
 
@@ -360,7 +360,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             string runSettings,
             ITestRunEventsHandler testRunEventsHandler)
         {
-            await this.RunTestsAsync(
+            await RunTestsAsync(
                 testCases,
                 runSettings,
                 options: null,
@@ -375,11 +375,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             TestPlatformOptions options,
             ITestRunEventsHandler testRunEventsHandler)
         {
-            await this.consoleWrapper.RunTestsAsync(
+            await _consoleWrapper.RunTestsAsync(
                 testCases,
                 runSettings,
                 options,
-                this.TestSessionInfo,
+                TestSessionInfo,
                 testRunEventsHandler).ConfigureAwait(false);
         }
 
@@ -391,7 +391,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestRunEventsHandler testRunEventsHandler,
             ITestHostLauncher customTestHostLauncher)
         {
-            await this.RunTestsWithCustomTestHostAsync(
+            await RunTestsWithCustomTestHostAsync(
                 sources,
                 runSettings,
                 options: null,
@@ -408,11 +408,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestRunEventsHandler testRunEventsHandler,
             ITestHostLauncher customTestHostLauncher)
         {
-            await this.consoleWrapper.RunTestsWithCustomTestHostAsync(
+            await _consoleWrapper.RunTestsWithCustomTestHostAsync(
                 sources,
                 runSettings,
                 options,
-                this.TestSessionInfo,
+                TestSessionInfo,
                 testRunEventsHandler,
                 customTestHostLauncher).ConfigureAwait(false);
         }
@@ -425,7 +425,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestRunEventsHandler testRunEventsHandler,
             ITestHostLauncher customTestHostLauncher)
         {
-            await this.RunTestsWithCustomTestHostAsync(
+            await RunTestsWithCustomTestHostAsync(
                 testCases,
                 runSettings,
                 options: null,
@@ -442,11 +442,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestRunEventsHandler testRunEventsHandler,
             ITestHostLauncher customTestHostLauncher)
         {
-            await this.consoleWrapper.RunTestsWithCustomTestHostAsync(
+            await _consoleWrapper.RunTestsWithCustomTestHostAsync(
                 testCases,
                 runSettings,
                 options,
-                this.TestSessionInfo,
+                TestSessionInfo,
                 testRunEventsHandler,
                 customTestHostLauncher).ConfigureAwait(false);
         }
@@ -455,27 +455,27 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task<bool> StopTestSessionAsync()
         {
-            return await this.StopTestSessionAsync(this.eventsHandler).ConfigureAwait(false);
+            return await StopTestSessionAsync(_eventsHandler).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
         [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task<bool> StopTestSessionAsync(ITestSessionEventsHandler eventsHandler)
         {
-            if (this.TestSessionInfo == null)
+            if (TestSessionInfo == null)
             {
                 return true;
             }
 
             try
             {
-                return await this.consoleWrapper.StopTestSessionAsync(
-                    this.TestSessionInfo,
+                return await _consoleWrapper.StopTestSessionAsync(
+                    TestSessionInfo,
                     eventsHandler).ConfigureAwait(false);
             }
             finally
             {
-                this.TestSessionInfo = null;
+                TestSessionInfo = null;
             }
         }
         #endregion

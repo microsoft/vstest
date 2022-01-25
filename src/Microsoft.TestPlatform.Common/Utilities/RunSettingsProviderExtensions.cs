@@ -97,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         {
             var attrName = $"(?<{AttributeNameString}>[\\w.:-]+)";
             var attrValue = $"(?<{AttributeValueString}>.+)";
-            Regex regex = new Regex($"{Constants.TestRunParametersName}.{ParameterString}\\(name\\s*=\\s*\"{attrName}\"\\s*,\\s*value\\s*=\\s*\"{attrValue}\"\\)");
+            Regex regex = new($"{Constants.TestRunParametersName}.{ParameterString}\\(name\\s*=\\s*\"{attrName}\"\\s*,\\s*value\\s*=\\s*\"{attrValue}\"\\)");
             Match match = regex.Match(node);
             return match;
         }
@@ -181,8 +181,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// </summary>
         /// <param name="runSettings"> The run settings XML. </param>
         /// <returns> Effective run settings. </returns>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         private static string AddDefaultRunSettings(string runSettings)
         {
             var architecture = Constants.DefaultPlatform;

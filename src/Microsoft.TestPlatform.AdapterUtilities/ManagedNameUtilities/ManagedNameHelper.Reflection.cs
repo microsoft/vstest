@@ -494,15 +494,10 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             }
 
             var category = CharUnicodeInfo.GetUnicodeCategory(c);
-            if (category == UnicodeCategory.NonSpacingMark        // Mn
-             || category == UnicodeCategory.SpacingCombiningMark  // Mc
-             || category == UnicodeCategory.ConnectorPunctuation  // Pc
-             || category == UnicodeCategory.Format)               // Cf
-            {
-                return false;
-            }
-
-            return true;
+            return category != UnicodeCategory.NonSpacingMark        // Mn
+             && category != UnicodeCategory.SpacingCombiningMark  // Mc
+             && category != UnicodeCategory.ConnectorPunctuation  // Pc
+             && category != UnicodeCategory.Format;
         }
 
         private static string GetTypeString(Type type, bool closedType)

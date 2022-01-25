@@ -12,7 +12,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void SaveObjectShouldReplaceInvalidCharacter()
         {
-            XmlPersistence xmlPersistence = new XmlPersistence();
+            XmlPersistence xmlPersistence = new();
             var node = xmlPersistence.CreateRootElement("TestRun");
 
             // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
@@ -25,7 +25,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             invalidXmlCharacterArray[5] = (char)0xfffe;
             invalidXmlCharacterArray[6] = (char)0x0;
 
-            string strWithInvalidCharForXml = new string(invalidXmlCharacterArray);
+            string strWithInvalidCharForXml = new(invalidXmlCharacterArray);
             xmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
 
             string expectedResult = "\\u0005\\u000b\\u000f\\ud800\\udc00\\ufffe\\u0000";
@@ -35,7 +35,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void SaveObjectShouldNotReplaceValidCharacter()
         {
-            XmlPersistence xmlPersistence = new XmlPersistence();
+            XmlPersistence xmlPersistence = new();
             var node = xmlPersistence.CreateRootElement("TestRun");
 
             // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
@@ -49,7 +49,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             validXmlCharacterArray[6] = (char)0xea12;
             validXmlCharacterArray[7] = (char)0xfffd;
 
-            string strWithValidCharForXml = new string(validXmlCharacterArray);
+            string strWithValidCharForXml = new(validXmlCharacterArray);
 
             xmlPersistence.SaveObject(strWithValidCharForXml, node, null, "dummy");
 
@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void SaveObjectShouldReplaceOnlyInvalidCharacter()
         {
-            XmlPersistence xmlPersistence = new XmlPersistence();
+            XmlPersistence xmlPersistence = new();
             var node = xmlPersistence.CreateRootElement("TestRun");
             string strWithInvalidCharForXml = "This string has these \0 \v invalid characters";
             xmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");

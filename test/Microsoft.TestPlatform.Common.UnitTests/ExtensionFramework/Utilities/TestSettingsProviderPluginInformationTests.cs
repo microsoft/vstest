@@ -20,37 +20,37 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         [TestMethod]
         public void AssemblyQualifiedNameShouldReturnTestExtensionTypesName()
         {
-            this.testPluginInformation = new TestSettingsProviderPluginInformation(typeof(TestPluginInformationTests));
-            Assert.AreEqual(typeof(TestPluginInformationTests).AssemblyQualifiedName, this.testPluginInformation.AssemblyQualifiedName);
+            testPluginInformation = new TestSettingsProviderPluginInformation(typeof(TestPluginInformationTests));
+            Assert.AreEqual(typeof(TestPluginInformationTests).AssemblyQualifiedName, testPluginInformation.AssemblyQualifiedName);
         }
 
         [TestMethod]
         public void IdentifierDataShouldReturnSettingsName()
         {
-            this.testPluginInformation = new TestSettingsProviderPluginInformation(typeof(DummySettingProviderWithSettingsName));
-            Assert.AreEqual(DefaultSettingsName, this.testPluginInformation.IdentifierData);
+            testPluginInformation = new TestSettingsProviderPluginInformation(typeof(DummySettingProviderWithSettingsName));
+            Assert.AreEqual(DefaultSettingsName, testPluginInformation.IdentifierData);
         }
 
         [TestMethod]
         public void MetadataShouldReturnSettingsProviderName()
         {
-            this.testPluginInformation = new TestSettingsProviderPluginInformation(typeof(DummySettingProviderWithSettingsName));
-            CollectionAssert.AreEqual(new object[] { DefaultSettingsName }, this.testPluginInformation.Metadata.ToArray());
+            testPluginInformation = new TestSettingsProviderPluginInformation(typeof(DummySettingProviderWithSettingsName));
+            CollectionAssert.AreEqual(new object[] { DefaultSettingsName }, testPluginInformation.Metadata.ToArray());
         }
 
         [TestMethod]
         public void SettingsNameShouldReturnEmptyIfASettingsProviderDoesNotHaveOne()
         {
-            this.testPluginInformation = new TestSettingsProviderPluginInformation(typeof(DummySettingProviderWithoutSettingsName));
-            Assert.IsNotNull(this.testPluginInformation.SettingsName);
-            Assert.AreEqual(string.Empty, this.testPluginInformation.SettingsName);
+            testPluginInformation = new TestSettingsProviderPluginInformation(typeof(DummySettingProviderWithoutSettingsName));
+            Assert.IsNotNull(testPluginInformation.SettingsName);
+            Assert.AreEqual(string.Empty, testPluginInformation.SettingsName);
         }
 
         [TestMethod]
         public void SettingsNameShouldReturnExtensionUriOfAnExtension()
         {
-            this.testPluginInformation = new TestSettingsProviderPluginInformation(typeof(DummySettingProviderWithSettingsName));
-            Assert.AreEqual(DefaultSettingsName, this.testPluginInformation.SettingsName);
+            testPluginInformation = new TestSettingsProviderPluginInformation(typeof(DummySettingProviderWithSettingsName));
+            Assert.AreEqual(DefaultSettingsName, testPluginInformation.SettingsName);
         }
 
         #region Implementation

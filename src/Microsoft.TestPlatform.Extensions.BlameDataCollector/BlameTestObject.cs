@@ -9,9 +9,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     public class BlameTestObject
     {
         private Guid id;
-        private string fullyQualifiedName;
-        private string source;
-        private bool isCompleted;
         private string displayName;
 
         #region Constructor
@@ -42,11 +39,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             ValidateArg.NotNull(executorUri, nameof(executorUri));
             ValidateArg.NotNullOrEmpty(source, nameof(source));
 
-            this.Id = Guid.Empty;
-            this.FullyQualifiedName = fullyQualifiedName;
-            this.ExecutorUri = executorUri;
-            this.Source = source;
-            this.IsCompleted = false;
+            Id = Guid.Empty;
+            FullyQualifiedName = fullyQualifiedName;
+            ExecutorUri = executorUri;
+            Source = source;
+            IsCompleted = false;
         }
 
         /// <summary>
@@ -57,12 +54,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// </param>
         public BlameTestObject(TestCase testCase)
         {
-            this.Id = testCase.Id;
-            this.FullyQualifiedName = testCase.FullyQualifiedName;
-            this.ExecutorUri = testCase.ExecutorUri;
-            this.Source = testCase.Source;
-            this.DisplayName = testCase.DisplayName;
-            this.IsCompleted = false;
+            Id = testCase.Id;
+            FullyQualifiedName = testCase.FullyQualifiedName;
+            ExecutorUri = testCase.ExecutorUri;
+            Source = testCase.Source;
+            DisplayName = testCase.DisplayName;
+            IsCompleted = false;
         }
 
         #endregion
@@ -76,30 +73,19 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         {
             get
             {
-                return this.id;
+                return id;
             }
 
             set
             {
-                this.id = value;
+                id = value;
             }
         }
 
         /// <summary>
         /// Gets or sets the fully qualified name of the test case.
         /// </summary>
-        public string FullyQualifiedName
-        {
-            get
-            {
-                return this.fullyQualifiedName;
-            }
-
-            set
-            {
-                this.fullyQualifiedName = value;
-            }
-        }
+        public string FullyQualifiedName { get; set; }
 
         /// <summary>
         /// Gets or sets the Uri of the Executor to use for running this test.
@@ -112,34 +98,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <summary>
         /// Gets or sets the test container source from which the test is discovered.
         /// </summary>
-        public string Source
-        {
-            get
-            {
-                return this.source;
-            }
-
-            set
-            {
-                this.source = value;
-            }
-        }
+        public string Source { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether test case is completed or not.
         /// </summary>
-        public bool IsCompleted
-        {
-            get
-            {
-                return this.isCompleted;
-            }
-
-            set
-            {
-                this.isCompleted = value;
-            }
-        }
+        public bool IsCompleted { get; set; }
 
         /// <summary>
         /// Gets or sets the display name of the test case
@@ -148,12 +112,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         {
             get
             {
-                return this.displayName;
+                return displayName;
             }
 
             set
             {
-                this.displayName = value;
+                displayName = value;
             }
         }
 

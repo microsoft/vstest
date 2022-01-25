@@ -20,38 +20,38 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         [TestMethod]
         public void AssemblyQualifiedNameShouldReturnTestExtensionTypesName()
         {
-            this.testPluginInformation = new TestableTestExtensionPluginInformation(typeof(DummyTestExtensionWithNoExtensionUri));
-            Assert.AreEqual(typeof(DummyTestExtensionWithNoExtensionUri).AssemblyQualifiedName, this.testPluginInformation.AssemblyQualifiedName);
+            testPluginInformation = new TestableTestExtensionPluginInformation(typeof(DummyTestExtensionWithNoExtensionUri));
+            Assert.AreEqual(typeof(DummyTestExtensionWithNoExtensionUri).AssemblyQualifiedName, testPluginInformation.AssemblyQualifiedName);
         }
 
         [TestMethod]
         public void IdentifierDataShouldReturnExtensionUri()
         {
-            this.testPluginInformation = new TestableTestExtensionPluginInformation(typeof(DummyTestExtensionWithExtensionUri));
-            Assert.AreEqual(DefaultExtensionURI, this.testPluginInformation.IdentifierData);
+            testPluginInformation = new TestableTestExtensionPluginInformation(typeof(DummyTestExtensionWithExtensionUri));
+            Assert.AreEqual(DefaultExtensionURI, testPluginInformation.IdentifierData);
         }
 
         [TestMethod]
         public void ExtensionUriShouldReturnEmptyIfAnExtensionDoesNotHaveOne()
         {
-            this.testPluginInformation = new TestableTestExtensionPluginInformation(typeof(DummyTestExtensionWithNoExtensionUri));
-            Assert.IsNotNull(this.testPluginInformation.ExtensionUri);
-            Assert.AreEqual(string.Empty, this.testPluginInformation.ExtensionUri);
+            testPluginInformation = new TestableTestExtensionPluginInformation(typeof(DummyTestExtensionWithNoExtensionUri));
+            Assert.IsNotNull(testPluginInformation.ExtensionUri);
+            Assert.AreEqual(string.Empty, testPluginInformation.ExtensionUri);
         }
 
         [TestMethod]
         public void ExtensionUriShouldReturnExtensionUriOfAnExtension()
         {
-            this.testPluginInformation = new TestableTestExtensionPluginInformation(typeof(DummyTestExtensionWithExtensionUri));
-            Assert.AreEqual(DefaultExtensionURI, this.testPluginInformation.ExtensionUri);
+            testPluginInformation = new TestableTestExtensionPluginInformation(typeof(DummyTestExtensionWithExtensionUri));
+            Assert.AreEqual(DefaultExtensionURI, testPluginInformation.ExtensionUri);
         }
 
         [TestMethod]
         public void MetadataShouldReturnExtensionUri()
         {
-            this.testPluginInformation = new TestableTestExtensionPluginInformation(typeof(DummyTestExtensionWithExtensionUri));
+            testPluginInformation = new TestableTestExtensionPluginInformation(typeof(DummyTestExtensionWithExtensionUri));
 
-            CollectionAssert.AreEqual(new object[] { DefaultExtensionURI }, this.testPluginInformation.Metadata.ToArray());
+            CollectionAssert.AreEqual(new object[] { DefaultExtensionURI }, testPluginInformation.Metadata.ToArray());
         }
 
         #region Implementation
@@ -67,7 +67,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         {
         }
 
-        [ExtensionUri(TestExtensionPluginInformationTests.DefaultExtensionURI)]
+        [ExtensionUri(DefaultExtensionURI)]
         private class DummyTestExtensionWithExtensionUri
         {
         }

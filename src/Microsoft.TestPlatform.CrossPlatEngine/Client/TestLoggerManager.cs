@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Used to keep track of which loggers have been initialized.
         /// </summary>
-        private HashSet<Type> initializedLoggers = new HashSet<Type>();
+        private readonly HashSet<Type> initializedLoggers = new();
 
         /// <summary>
         /// Test run directory.
@@ -60,17 +60,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Test Logger Events instance which will be passed to loggers when they are initialized.
         /// </summary>
-        private InternalTestLoggerEvents loggerEvents;
+        private readonly InternalTestLoggerEvents loggerEvents;
 
         /// <summary>
         /// Message logger.
         /// </summary>
-        private IMessageLogger messageLogger;
+        private readonly IMessageLogger messageLogger;
 
         /// <summary>
         /// Request data.
         /// </summary>
-        private IRequestData requestData;
+        private readonly IRequestData requestData;
 
         /// <summary>
         /// Logger extension manager.
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// AssemblyLoadContext for current platform
         /// </summary>
-        private IAssemblyLoadContext assemblyLoadContext;
+        private readonly IAssemblyLoadContext assemblyLoadContext;
 
         #endregion
 
@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             this.requestData = requestData;
             this.messageLogger = messageLogger;
-            this.testLoggerExtensionManager = null;
+            testLoggerExtensionManager = null;
             this.loggerEvents = loggerEvents;
             this.assemblyLoadContext = assemblyLoadContext;
         }
@@ -120,18 +120,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Loggers initialized flag.
         /// </summary>
-        public bool LoggersInitialized => this.initializedLoggers.Any();
+        public bool LoggersInitialized => initializedLoggers.Any();
 
         private TestLoggerExtensionManager TestLoggerExtensionManager
         {
             get
             {
-                if (this.testLoggerExtensionManager == null)
+                if (testLoggerExtensionManager == null)
                 {
-                    this.testLoggerExtensionManager = TestLoggerExtensionManager.Create(messageLogger);
+                    testLoggerExtensionManager = TestLoggerExtensionManager.Create(messageLogger);
                 }
 
-                return this.testLoggerExtensionManager;
+                return testLoggerExtensionManager;
             }
         }
 
@@ -148,9 +148,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             EnableLogging();
 
             // Store test run directory. This runsettings is the final runsettings merging CLI args and runsettings.
-            this.testRunDirectory = GetResultsDirectory(runSettings);
-            this.targetFramework = GetTargetFramework(runSettings)?.Name;
-            this.treatNoTestsAsError = GetTreatNoTestsAsError(runSettings);
+            testRunDirectory = GetResultsDirectory(runSettings);
+            targetFramework = GetTargetFramework(runSettings)?.Name;
+            treatNoTestsAsError = GetTreatNoTestsAsError(runSettings);
 
             var loggers = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettings);
 
@@ -203,7 +203,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
             }
 
-            requestData.MetricsCollection.Add(TelemetryDataConstants.LoggerUsed, string.Join<Type>(",", this.initializedLoggers.ToArray()));
+            requestData.MetricsCollection.Add(TelemetryDataConstants.LoggerUsed, string.Join<Type>(",", initializedLoggers.ToArray()));
         }
 
         /// <summary>
@@ -212,13 +212,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="e">TestRunMessage event args.</param>
         public void HandleTestRunMessage(TestRunMessageEventArgs e)
         {
-            if (this.isDisposed)
+            if (isDisposed)
             {
                 EqtTrace.Warning("TestLoggerManager.HandleTestRunMessage: Ignoring as the object is disposed.");
                 return;
             }
 
-            this.loggerEvents.RaiseTestRunMessage(e);
+            loggerEvents.RaiseTestRunMessage(e);
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="e">TestRunChanged event args.</param>
         public void HandleTestRunStatsChange(TestRunChangedEventArgs e)
         {
-            if (this.isDisposed)
+            if (isDisposed)
             {
                 EqtTrace.Warning("TestLoggerManager.HandleTestRunStatsChange: Ignoring as the object is disposed.");
                 return;
@@ -235,7 +235,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             foreach (TestResult result in e.NewTestResults)
             {
-                this.loggerEvents.RaiseTestResult(new TestResultEventArgs(result));
+                loggerEvents.RaiseTestResult(new TestResultEventArgs(result));
             }
         }
 
@@ -245,13 +245,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="e">TestRunStart event args.</param>
         public void HandleTestRunStart(TestRunStartEventArgs e)
         {
-            if (this.isDisposed)
+            if (isDisposed)
             {
                 EqtTrace.Warning("TestLoggerManager.HandleTestRunStart: Ignoring as the object is disposed.");
                 return;
             }
 
-            this.loggerEvents.RaiseTestRunStart(e);
+            loggerEvents.RaiseTestRunStart(e);
         }
 
         /// <summary>
@@ -260,16 +260,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="e">TestRunComplete event args.</param>
         public void HandleTestRunComplete(TestRunCompleteEventArgs e)
         {
-            if (!this.isDisposed)
+            if (!isDisposed)
             {
                 try
                 {
-                    this.loggerEvents.CompleteTestRun(e.TestRunStatistics, e.IsCanceled, e.IsAborted, e.Error,
+                    loggerEvents.CompleteTestRun(e.TestRunStatistics, e.IsCanceled, e.IsAborted, e.Error,
                         e.AttachmentSets, e.InvokedDataCollectors, e.ElapsedTimeInRunningTests);
                 }
                 finally
                 {
-                    this.Dispose();
+                    Dispose();
                 }
             }
             else
@@ -285,13 +285,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="e">TestRunMessage event args.</param>
         public void HandleDiscoveryMessage(TestRunMessageEventArgs e)
         {
-            if (this.isDisposed)
+            if (isDisposed)
             {
                 EqtTrace.Warning("TestLoggerManager.HandleDiscoveryMessage: Ignoring as the object is disposed.");
                 return;
             }
 
-            this.loggerEvents.RaiseDiscoveryMessage(e);
+            loggerEvents.RaiseDiscoveryMessage(e);
         }
 
         /// <summary>
@@ -300,13 +300,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="e">DiscoveredTests event args.</param>
         public void HandleDiscoveredTests(DiscoveredTestsEventArgs e)
         {
-            if (this.isDisposed)
+            if (isDisposed)
             {
                 EqtTrace.Warning("TestLoggerManager.HandleDiscoveredTests: Ignoring as the object is disposed.");
                 return;
             }
 
-            this.loggerEvents.RaiseDiscoveredTests(e);
+            loggerEvents.RaiseDiscoveredTests(e);
         }
 
         /// <summary>
@@ -315,15 +315,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="e">DiscoveryComplete event args.</param>
         public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs e)
         {
-            if (!this.isDisposed)
+            if (!isDisposed)
             {
                 try
                 {
-                    this.loggerEvents.RaiseDiscoveryComplete(e);
+                    loggerEvents.RaiseDiscoveryComplete(e);
                 }
                 finally
                 {
-                    this.Dispose();
+                    Dispose();
                 }
             }
             else
@@ -339,13 +339,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="e">DiscoveryStart event args.</param>
         public void HandleDiscoveryStart(DiscoveryStartEventArgs e)
         {
-            if (this.isDisposed)
+            if (isDisposed)
             {
                 EqtTrace.Warning("TestLoggerManager.HandleDiscoveryStart: Ignoring as the object is disposed.");
                 return;
             }
 
-            this.loggerEvents.RaiseDiscoveryStart(e);
+            loggerEvents.RaiseDiscoveryStart(e);
         }
 
         /// <summary>
@@ -353,7 +353,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
 
             // Use SupressFinalize in case a subclass
             // of this type implements a finalizer.
@@ -369,14 +369,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="uri">URI of the logger to add.</param>
         /// <param name="parameters">Logger parameters.</param>
         /// <returns>Logger Initialized flag.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2234:PassSystemUriObjectsInsteadOfStrings", Justification = "Case insensitive needs to be supported "), SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Third party loggers could potentially throw all kinds of exceptions.")]
         internal bool InitializeLoggerByUri(Uri uri, Dictionary<string, string> parameters)
         {
-            ValidateArg.NotNull<Uri>(uri, nameof(uri));
-            this.CheckDisposed();
+            ValidateArg.NotNull(uri, nameof(uri));
+            CheckDisposed();
 
             // Look up the extension and initialize it if one is found.
-            var extensionManager = this.TestLoggerExtensionManager;
+            var extensionManager = TestLoggerExtensionManager;
             var logger = extensionManager.TryGetTestExtension(uri.AbsoluteUri);
 
             if (logger == null)
@@ -385,7 +384,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             // If the logger has already been initialized just return.
-            if (this.initializedLoggers.Contains(logger.Value.GetType()))
+            if (initializedLoggers.Contains(logger.Value.GetType()))
             {
                 EqtTrace.Verbose("TestLoggerManager: Skipping duplicate logger initialization: {0}", logger.Value.GetType());
                 return true;
@@ -397,7 +396,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Add logger in initializedLoggers list.
             if (initialized)
             {
-                this.initializedLoggers.Add(logger.Value.GetType());
+                initializedLoggers.Add(logger.Value.GetType());
             }
 
             return initialized;
@@ -411,7 +410,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <returns><see cref="bool"/></returns>
         internal bool TryGetUriFromFriendlyName(string friendlyName, out Uri loggerUri)
         {
-            var extensionManager = this.TestLoggerExtensionManager;
+            var extensionManager = TestLoggerExtensionManager;
             foreach (var extension in extensionManager.TestExtensions)
             {
                 if (string.Equals(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase))
@@ -514,8 +513,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </remarks>
         internal void EnableLogging()
         {
-            this.CheckDisposed();
-            this.loggerEvents.EnableEvents();
+            CheckDisposed();
+            loggerEvents.EnableEvents();
         }
 
         /// <summary>
@@ -526,14 +525,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </param>
         internal virtual void Dispose(bool disposing)
         {
-            if (!this.isDisposed)
+            if (!isDisposed)
             {
                 if (disposing)
                 {
-                    this.loggerEvents.Dispose();
+                    loggerEvents.Dispose();
                 }
 
-                this.isDisposed = true;
+                isDisposed = true;
             }
         }
 
@@ -557,11 +556,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <returns>Logger Initialized flag.</returns>
         private bool InitializeLoggerByType(string assemblyQualifiedName, string codeBase, Dictionary<string, string> parameters)
         {
-            this.CheckDisposed();
+            CheckDisposed();
             try
             {
                 // Load logger assembly.
-                Assembly assembly = this.assemblyLoadContext.LoadAssemblyFromPath(codeBase);
+                Assembly assembly = assemblyLoadContext.LoadAssemblyFromPath(codeBase);
                 var loggerType =
                     assembly?.GetTypes()
                         .FirstOrDefault(x => x.AssemblyQualifiedName.Equals(assemblyQualifiedName));
@@ -577,7 +576,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
 
                 // If the logger has already been initialized just return.
-                if (this.initializedLoggers.Contains(logger.GetType()))
+                if (initializedLoggers.Contains(logger.GetType()))
                 {
                     EqtTrace.Verbose("TestLoggerManager: Skipping duplicate logger initialization: {0}", logger.GetType());
                     return true;
@@ -589,7 +588,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // Add logger in initializedLoggers list.
                 if (initialized)
                 {
-                    this.initializedLoggers.Add(logger.GetType());
+                    initializedLoggers.Add(logger.GetType());
                 }
 
                 return initialized;
@@ -635,7 +634,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 EqtTrace.Error(
                     "TestLoggerManager: Error while initializing logger: {0}, Exception details: {1}", loggerUri, ex);
 
-                this.messageLogger.SendMessage(
+                messageLogger.SendMessage(
                     TestMessageLevel.Error,
                     string.Format(
                         CultureInfo.CurrentUICulture,
@@ -676,7 +675,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void CheckDisposed()
         {
-            if (this.isDisposed)
+            if (isDisposed)
             {
                 throw new ObjectDisposedException(typeof(TestLoggerManager).FullName);
             }

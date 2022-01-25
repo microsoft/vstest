@@ -20,15 +20,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     /// </summary>
     public class ProxyTestSessionManager : IProxyTestSessionManager
     {
-        private readonly object lockObject = new object();
-        private readonly object proxyOperationLockObject = new object();
+        private readonly object lockObject = new();
+        private readonly object proxyOperationLockObject = new();
         private volatile bool proxySetupFailed = false;
-        private StartTestSessionCriteria testSessionCriteria;
-        private int testhostCount;
+        private readonly StartTestSessionCriteria testSessionCriteria;
+        private readonly int testhostCount;
         private TestSessionInfo testSessionInfo;
-        private Func<ProxyOperationManager> proxyCreator;
-        private IList<ProxyOperationManagerContainer> proxyContainerList;
-        private IDictionary<string, int> proxyMap;
+        private readonly Func<ProxyOperationManager> proxyCreator;
+        private readonly IList<ProxyOperationManagerContainer> proxyContainerList;
+        private readonly IDictionary<string, int> proxyMap;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyTestSessionManager"/> class.
@@ -42,28 +42,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             int testhostCount,
             Func<ProxyOperationManager> proxyCreator)
         {
-            this.testSessionCriteria = criteria;
+            testSessionCriteria = criteria;
             this.testhostCount = testhostCount;
             this.proxyCreator = proxyCreator;
 
-            this.proxyContainerList = new List<ProxyOperationManagerContainer>();
-            this.proxyMap = new Dictionary<string, int>();
+            proxyContainerList = new List<ProxyOperationManagerContainer>();
+            proxyMap = new Dictionary<string, int>();
         }
 
         /// <inheritdoc/>
         public virtual bool StartSession(ITestSessionEventsHandler eventsHandler)
         {
-            lock (this.lockObject)
+            lock (lockObject)
             {
-                if (this.testSessionInfo != null)
+                if (testSessionInfo != null)
                 {
                     return false;
                 }
-                this.testSessionInfo = new TestSessionInfo();
+                testSessionInfo = new TestSessionInfo();
             }
 
             // Create all the proxies in parallel, one task per proxy.
-            var taskList = new Task[this.testhostCount];
+            var taskList = new Task[testhostCount];
             for (int i = 0; i < taskList.Length; ++i)
             {
                 // The testhost count is equal to 1 because one of the following conditions
@@ -79,17 +79,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 // testhost is not shared (e.g.: .NET Core testhost), in which case each test
                 // source must be processed by a dedicated testhost, which is the reason we
                 // create a list with a single element, i.e. the current source to be processed.
-                var sources = (this.testhostCount == 1)
-                    ? this.testSessionCriteria.Sources
-                    : new List<string>() { this.testSessionCriteria.Sources[i] };
+                var sources = (testhostCount == 1)
+                    ? testSessionCriteria.Sources
+                    : new List<string>() { testSessionCriteria.Sources[i] };
 
                 taskList[i] = Task.Factory.StartNew(() =>
                 {
-                    if (!this.SetupRawProxy(
+                    if (!SetupRawProxy(
                         sources,
-                        this.testSessionCriteria.RunSettings))
+                        testSessionCriteria.RunSettings))
                     {
-                        this.proxySetupFailed = true;
+                        proxySetupFailed = true;
                     }
                 });
             }
@@ -98,37 +98,37 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             Task.WaitAll(taskList);
 
             // Dispose of all proxies if even one of them failed during setup.
-            if (this.proxySetupFailed)
+            if (proxySetupFailed)
             {
-                this.DisposeProxies();
+                DisposeProxies();
                 return false;
             }
 
             // Make the session available.
-            if (!TestSessionPool.Instance.AddSession(this.testSessionInfo, this))
+            if (!TestSessionPool.Instance.AddSession(testSessionInfo, this))
             {
-                this.DisposeProxies();
+                DisposeProxies();
                 return false;
             }
 
             // Let the caller know the session has been created.
-            eventsHandler.HandleStartTestSessionComplete(this.testSessionInfo);
+            eventsHandler.HandleStartTestSessionComplete(testSessionInfo);
             return true;
         }
 
         /// <inheritdoc/>
         public virtual bool StopSession()
         {
-            lock (this.lockObject)
+            lock (lockObject)
             {
-                if (this.testSessionInfo == null)
+                if (testSessionInfo == null)
                 {
                     return false;
                 }
-                this.testSessionInfo = null;
+                testSessionInfo = null;
             }
 
-            this.DisposeProxies();
+            DisposeProxies();
             return true;
         }
 
@@ -144,11 +144,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
             ProxyOperationManagerContainer proxyContainer = null;
 
-            lock (this.proxyOperationLockObject)
+            lock (proxyOperationLockObject)
             {
                 // No proxy available means the caller will have to create its own proxy.
-                if (!this.proxyMap.ContainsKey(source)
-                    || !this.proxyContainerList[this.proxyMap[source]].IsAvailable)
+                if (!proxyMap.ContainsKey(source)
+                    || !proxyContainerList[proxyMap[source]].IsAvailable)
                 {
                     throw new InvalidOperationException(
                         string.Format(
@@ -162,7 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 //
                 // TODO (copoiena): This run settings match is rudimentary. We should refine the
                 // match criteria in the future.
-                if (!this.testSessionCriteria.RunSettings.Equals(runSettings))
+                if (!testSessionCriteria.RunSettings.Equals(runSettings))
                 {
                     throw new InvalidOperationException(
                         string.Format(
@@ -171,7 +171,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 }
 
                 // Get the actual proxy.
-                proxyContainer = this.proxyContainerList[this.proxyMap[source]];
+                proxyContainer = proxyContainerList[proxyMap[source]];
 
                 // Mark the proxy as unavailable.
                 proxyContainer.IsAvailable = false;
@@ -189,10 +189,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <returns>True if the operation succeeded, false otherwise.</returns>
         public virtual bool EnqueueProxy(int proxyId)
         {
-            lock (this.proxyOperationLockObject)
+            lock (proxyOperationLockObject)
             {
                 // Check if the proxy exists.
-                if (proxyId < 0 || proxyId >= this.proxyContainerList.Count)
+                if (proxyId < 0 || proxyId >= proxyContainerList.Count)
                 {
                     throw new ArgumentException(
                         string.Format(
@@ -202,7 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 }
 
                 // Get the actual proxy.
-                var proxyContainer = this.proxyContainerList[proxyId];
+                var proxyContainer = proxyContainerList[proxyId];
                 if (proxyContainer.IsAvailable)
                 {
                     throw new InvalidOperationException(
@@ -223,17 +223,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             IList<string> sources,
             ProxyOperationManagerContainer operationManagerContainer)
         {
-            lock (this.proxyOperationLockObject)
+            lock (proxyOperationLockObject)
             {
-                var index = this.proxyContainerList.Count;
+                var index = proxyContainerList.Count;
 
                 // Add the proxy container to the proxy container list.
-                this.proxyContainerList.Add(operationManagerContainer);
+                proxyContainerList.Add(operationManagerContainer);
 
                 foreach (var source in sources)
                 {
                     // Add the proxy index to the map.
-                    this.proxyMap.Add(
+                    proxyMap.Add(
                         source,
                         index);
                 }
@@ -249,7 +249,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             try
             {
                 // Create and cache the proxy.
-                var operationManagerProxy = this.proxyCreator();
+                var operationManagerProxy = proxyCreator();
                 if (operationManagerProxy == null)
                 {
                     return false;
@@ -270,7 +270,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                     operationManagerProxy,
                     available: true);
 
-                operationManagerContainer.Proxy.Id = this.EnqueueNewProxy(sources, operationManagerContainer);
+                operationManagerContainer.Proxy.Id = EnqueueNewProxy(sources, operationManagerContainer);
                 return true;
             }
             catch (Exception ex)
@@ -290,30 +290,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
         private void DisposeProxies()
         {
-            lock (this.proxyOperationLockObject)
+            lock (proxyOperationLockObject)
             {
-                if (this.proxyContainerList.Count == 0)
+                if (proxyContainerList.Count == 0)
                 {
                     return;
                 }
 
                 // Dispose of all the proxies in parallel, one task per proxy.
                 int i = 0;
-                var taskList = new Task[this.proxyContainerList.Count];
-                foreach (var proxyContainer in this.proxyContainerList)
+                var taskList = new Task[proxyContainerList.Count];
+                foreach (var proxyContainer in proxyContainerList)
                 {
                     taskList[i++] = Task.Factory.StartNew(() =>
-                    {
                         // Initiate the end session handshake with the underlying testhost.
-                        proxyContainer.Proxy.Close();
-                    });
+                        proxyContainer.Proxy.Close());
                 }
 
                 // Wait for proxy disposal to be over.
                 Task.WaitAll(taskList);
 
-                this.proxyContainerList.Clear();
-                this.proxyMap.Clear();
+                proxyContainerList.Clear();
+                proxyMap.Clear();
             }
         }
     }
@@ -331,8 +329,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <param name="available">A flag indicating if the proxy is available to do work.</param>
         public ProxyOperationManagerContainer(ProxyOperationManager proxy, bool available)
         {
-            this.Proxy = proxy;
-            this.IsAvailable = available;
+            Proxy = proxy;
+            IsAvailable = available;
         }
 
         /// <summary>

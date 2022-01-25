@@ -29,10 +29,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             ValidateArg.NotNull(type, nameof(type));
 
-            this.DataCollectorType = type;
-            this.TypeUri = GetTypeUri(type);
-            this.FriendlyName = GetFriendlyName(type);
-            this.AttachmentsProcessorType = GetAttachmentsProcessors(type);
+            DataCollectorType = type;
+            TypeUri = GetTypeUri(type);
+            FriendlyName = GetFriendlyName(type);
+            AttachmentsProcessorType = GetAttachmentsProcessors(type);
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             get
             {
-                return this.TypeUri?.ToString();
+                return TypeUri?.ToString();
             }
         }
 
@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             get
             {
-                return new object[] { this.TypeUri.ToString(), this.FriendlyName, this.AttachmentsProcessorType != null };
+                return new object[] { TypeUri.ToString(), FriendlyName, AttachmentsProcessorType != null };
             }
         }
 

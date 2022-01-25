@@ -37,8 +37,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// for backward compatibility with older versions of Object Model.
         /// </summary>
         private static readonly Dictionary<TraceLevel, SourceLevels> TraceSourceLevelsMap =
-            new Dictionary<TraceLevel, SourceLevels>
-                {
+            new()
+            {
                         { TraceLevel.Error, SourceLevels.Error },
                         { TraceLevel.Info, SourceLevels.Information },
                         { TraceLevel.Off, SourceLevels.Off },
@@ -51,8 +51,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// for backward compatibility with older versions of Object Model.
         /// </summary>
         private static readonly Dictionary<SourceLevels, TraceLevel> SourceTraceLevelsMap =
-            new Dictionary<SourceLevels, TraceLevel>
-                {
+            new()
+            {
                         { SourceLevels.Error, TraceLevel.Error },
                         { SourceLevels.Information, TraceLevel.Info },
                         { SourceLevels.Off, TraceLevel.Off },
@@ -66,8 +66,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// for backward compatibility with older versions of Object Model.
         /// </summary>
         private static readonly Dictionary<TraceLevel, TraceEventType> TraceLevelEventTypeMap =
-            new Dictionary<TraceLevel, TraceEventType>
-                {
+            new()
+            {
                         { TraceLevel.Error, TraceEventType.Error },
                         { TraceLevel.Info, TraceEventType.Information },
                         { TraceLevel.Verbose, TraceEventType.Verbose },
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         private static readonly int ProcessId = GetProcessId();
 
-        private static object lockObject = new object();
+        private static readonly object lockObject = new();
 
         private static TraceSource traceSource;
 
@@ -92,10 +92,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Lock over initialization
         /// </summary>
-        private static object isInitializationLock = new object();
+        private static readonly object isInitializationLock = new();
 
         private static int traceFileSize = 0;
-        private static int defaultTraceFileSize = 10240; // 10Mb.
+        private static readonly int defaultTraceFileSize = 10240; // 10Mb.
 
         public static string LogFile
         {
@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public bool InitializeVerboseTrace(string customLogFile)
         {
-            return this.InitializeTrace(customLogFile, PlatformTraceLevel.Verbose);
+            return InitializeTrace(customLogFile, PlatformTraceLevel.Verbose);
         }
 
         /// <inheritdoc/>
@@ -173,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             isInitialized = false;
 
             LogFile = customLogFile;
-            TraceLevel = this.MapPlatformTraceToTrace(platformTraceLevel);
+            TraceLevel = MapPlatformTraceToTrace(platformTraceLevel);
             Source.Switch.Level = TraceSourceLevelsMap[TraceLevel];
 
             // Ensure trace is initialized
@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public bool ShouldTrace(PlatformTraceLevel traceLevel)
         {
-            if (this.DoNotInitialize)
+            if (DoNotInitialize)
             {
                 return false;
             }
@@ -234,7 +234,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                 try
                 {
-                    Source.TraceEvent(TraceLevelEventTypeMap[this.MapPlatformTraceToTrace(level)], 0, log);
+                    Source.TraceEvent(TraceLevelEventTypeMap[MapPlatformTraceToTrace(level)], 0, log);
                     Source.Flush();
                 }
                 catch (Exception e)
@@ -249,7 +249,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public void SetTraceLevel(PlatformTraceLevel value)
         {
-            Source.Switch.Level = TraceSourceLevelsMap[this.MapPlatformTraceToTrace(value)];
+            Source.Switch.Level = TraceSourceLevelsMap[MapPlatformTraceToTrace(value)];
         }
 
         public PlatformTraceLevel GetTraceLevel()

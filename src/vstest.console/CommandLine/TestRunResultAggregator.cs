@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         protected TestRunResultAggregator()
         {
             // Outcome is passed until we see a failure.
-            this.Outcome = TestOutcome.Passed;
+            Outcome = TestOutcome.Passed;
         }
 
         #endregion
@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <param name="testRunRequest">The run request to register for events on.</param>
         public void RegisterTestRunEvents(ITestRunRequest testRunRequest)
         {
-            ValidateArg.NotNull<ITestRunRequest>(testRunRequest, nameof(testRunRequest));
+            ValidateArg.NotNull(testRunRequest, nameof(testRunRequest));
 
             // Register for the events.
             testRunRequest.TestRunMessage += TestRunMessageHandler;
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <param name="testRunRequest">The run request from which events should be unregistered.</param>
         public void UnregisterTestRunEvents(ITestRunRequest testRunRequest)
         {
-            ValidateArg.NotNull<ITestRunRequest>(testRunRequest, nameof(testRunRequest));
+            ValidateArg.NotNull(testRunRequest, nameof(testRunRequest));
 
             testRunRequest.TestRunMessage -= TestRunMessageHandler;
             testRunRequest.OnRunCompletion -= TestRunCompletionHandler;
@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </summary>
         public void MarkTestRunFailed()
         {
-            this.Outcome = TestOutcome.Failed;
+            Outcome = TestOutcome.Failed;
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </summary>
         public void Reset()
         {
-            this.Outcome = TestOutcome.Passed;
+            Outcome = TestOutcome.Passed;
         }
 
         /// <summary>
@@ -109,11 +109,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             if (e.TestRunStatistics == null || e.IsCanceled || e.IsAborted)
             {
-                this.Outcome = TestOutcome.Failed;
+                Outcome = TestOutcome.Failed;
             }
             else if (e.TestRunStatistics[TestOutcome.Failed] > 0)
             {
-                this.Outcome = TestOutcome.Failed;
+                Outcome = TestOutcome.Failed;
             }
         }
 
@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             if (e.Level == TestMessageLevel.Error)
             {
-                this.Outcome = TestOutcome.Failed;
+                Outcome = TestOutcome.Failed;
             }
         }
 

@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         public TestRuntimePluginInformation(Type testHostType)
             : base(testHostType)
         {
-            this.FriendlyName = GetFriendlyName(testHostType);
+            FriendlyName = GetFriendlyName(testHostType);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             get
             {
-                return new Object[] { this.ExtensionUri, this.FriendlyName };
+                return new Object[] { ExtensionUri, FriendlyName };
             }
         }
 

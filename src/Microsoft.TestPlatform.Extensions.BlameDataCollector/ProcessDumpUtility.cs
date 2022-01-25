@@ -53,25 +53,25 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <inheritdoc/>
         public IEnumerable<string> GetDumpFiles(bool warnOnNoDumpFiles, bool processCrashed)
         {
-            if (!this.wasHangDumped)
+            if (!wasHangDumped)
             {
-                this.crashDumper.WaitForDumpToFinish();
+                crashDumper.WaitForDumpToFinish();
             }
 
             // If the process was hang dumped we killed it ourselves, so it crashed when executing tests,
             // but we already have the hang dump, and should not also collect the exit dump that we got
             // from killing the process by the hang dumper.
-            IEnumerable<string> crashDumps = this.crashDumper?.GetDumpFiles(processCrashed) ?? new List<string>();
+            IEnumerable<string> crashDumps = crashDumper?.GetDumpFiles(processCrashed) ?? new List<string>();
 
-            IEnumerable<string> hangDumps = this.fileHelper.DirectoryExists(this.hangDumpDirectory)
-                ? this.fileHelper.GetFiles(this.hangDumpDirectory, "*_hangdump*.dmp", SearchOption.TopDirectoryOnly)
+            IEnumerable<string> hangDumps = fileHelper.DirectoryExists(hangDumpDirectory)
+                ? fileHelper.GetFiles(hangDumpDirectory, "*_hangdump*.dmp", SearchOption.TopDirectoryOnly)
                 : Array.Empty<string>();
 
             var foundDumps = new List<string>();
             foreach (var dumpPath in crashDumps.Concat(hangDumps))
             {
                 EqtTrace.Info($"ProcessDumpUtility.GetDumpFiles: Looking for dump file '{dumpPath}'.");
-                var found = this.fileHelper.Exists(dumpPath);
+                var found = fileHelper.Exists(dumpPath);
                 if (found)
                 {
                     EqtTrace.Info($"ProcessDumpUtility.GetDumpFile: Found dump file '{dumpPath}'.");
@@ -85,7 +85,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (warnOnNoDumpFiles && !foundDumps.Any())
             {
-                EqtTrace.Error($"ProcessDumpUtility.GetDumpFile: Could not find any dump file in {this.hangDumpDirectory}.");
+                EqtTrace.Error($"ProcessDumpUtility.GetDumpFile: Could not find any dump file in {hangDumpDirectory}.");
                 throw new FileNotFoundException(Resources.Resources.DumpFileNotGeneratedErrorMessage);
             }
 
@@ -95,45 +95,45 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <inheritdoc/>
         public void StartHangBasedProcessDump(int processId, string tempDirectory, bool isFullDump, string targetFramework, Action<string> logWarning = null)
         {
-            this.HangDump(processId, tempDirectory, isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini, targetFramework, logWarning);
+            HangDump(processId, tempDirectory, isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini, targetFramework, logWarning);
         }
 
         /// <inheritdoc/>
         public void StartTriggerBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework, bool collectAlways)
         {
-            this.CrashDump(processId, testResultsDirectory, isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini, targetFramework, collectAlways);
+            CrashDump(processId, testResultsDirectory, isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini, targetFramework, collectAlways);
         }
 
         /// <inheritdoc/>
         public void DetachFromTargetProcess(int targetProcessId)
         {
-            this.crashDumper?.DetachFromTargetProcess(targetProcessId);
+            crashDumper?.DetachFromTargetProcess(targetProcessId);
         }
 
         private void CrashDump(int processId, string tempDirectory, DumpTypeOption dumpType, string targetFramework, bool collectAlways)
         {
-            var processName = this.processHelper.GetProcessName(processId);
+            var processName = processHelper.GetProcessName(processId);
             EqtTrace.Info($"ProcessDumpUtility.CrashDump: Creating {dumpType.ToString().ToLowerInvariant()} dump of process {processName} ({processId}) into temporary path '{tempDirectory}'.");
-            this.crashDumpDirectory = tempDirectory;
+            crashDumpDirectory = tempDirectory;
 
-            this.crashDumper = this.crashDumperFactory.Create(targetFramework);
+            crashDumper = crashDumperFactory.Create(targetFramework);
             ConsoleOutput.Instance.Information(false, $"Blame: Attaching crash dump utility to process {processName} ({processId}).");
-            this.crashDumper.AttachToTargetProcess(processId, tempDirectory, dumpType, collectAlways);
+            crashDumper.AttachToTargetProcess(processId, tempDirectory, dumpType, collectAlways);
         }
 
         private void HangDump(int processId, string tempDirectory, DumpTypeOption dumpType, string targetFramework, Action<string> logWarning = null)
         {
-            this.wasHangDumped = true;
+            wasHangDumped = true;
 
-            var processName = this.processHelper.GetProcessName(processId);
+            var processName = processHelper.GetProcessName(processId);
             EqtTrace.Info($"ProcessDumpUtility.HangDump: Creating {dumpType.ToString().ToLowerInvariant()} dump of process {processName} ({processId}) into temporary path '{tempDirectory}'.");
 
-            this.hangDumpDirectory = tempDirectory;
+            hangDumpDirectory = tempDirectory;
 
             // oh how ugly this is, but the whole infra above this starts with initializing the logger in Initialize
             // the logger needs to pass around 2 parameters, so I am just passing it around as callback instead
-            this.hangDumperFactory.LogWarning = logWarning;
-            var dumper = this.hangDumperFactory.Create(targetFramework);
+            hangDumperFactory.LogWarning = logWarning;
+            var dumper = hangDumperFactory.Create(targetFramework);
 
             try
             {

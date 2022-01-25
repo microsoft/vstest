@@ -21,110 +21,110 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         [TestMethod]
         public void AssemblyQualifiedNameShouldReturnTestExtensionTypesName()
         {
-            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithNoFileExtensions));
-            Assert.AreEqual(typeof(DummyTestDiscovererWithNoFileExtensions).AssemblyQualifiedName, this.testPluginInformation.AssemblyQualifiedName);
+            testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithNoFileExtensions));
+            Assert.AreEqual(typeof(DummyTestDiscovererWithNoFileExtensions).AssemblyQualifiedName, testPluginInformation.AssemblyQualifiedName);
         }
 
         [TestMethod]
         public void IdentifierDataShouldReturnTestExtensionTypesName()
         {
-            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithNoFileExtensions));
-            Assert.AreEqual(typeof(DummyTestDiscovererWithNoFileExtensions).AssemblyQualifiedName, this.testPluginInformation.IdentifierData);
+            testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithNoFileExtensions));
+            Assert.AreEqual(typeof(DummyTestDiscovererWithNoFileExtensions).AssemblyQualifiedName, testPluginInformation.IdentifierData);
         }
 
         [TestMethod]
         public void FileExtensionsShouldReturnEmptyListIfADiscovererSupportsNoFileExtensions()
         {
-            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithNoFileExtensions));
-            Assert.IsNotNull(this.testPluginInformation.FileExtensions);
-            Assert.AreEqual(0, this.testPluginInformation.FileExtensions.Count);
+            testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithNoFileExtensions));
+            Assert.IsNotNull(testPluginInformation.FileExtensions);
+            Assert.AreEqual(0, testPluginInformation.FileExtensions.Count);
         }
 
         [TestMethod]
         public void FileExtensionsShouldReturnAFileExtensionForADiscoverer()
         {
-            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithOneFileExtensions));
-            CollectionAssert.AreEqual(new List<string> { "csv"}, this.testPluginInformation.FileExtensions);
+            testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithOneFileExtensions));
+            CollectionAssert.AreEqual(new List<string> { "csv"}, testPluginInformation.FileExtensions);
         }
 
         [TestMethod]
         public void FileExtensionsShouldReturnSupportedFileExtensionsForADiscoverer()
         {
-            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithTwoFileExtensions));
-            CollectionAssert.AreEqual(new List<string> {"csv", "docx"}, this.testPluginInformation.FileExtensions);
+            testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithTwoFileExtensions));
+            CollectionAssert.AreEqual(new List<string> {"csv", "docx"}, testPluginInformation.FileExtensions);
         }
 
         [TestMethod]
         public void AssemblyTypeShouldReturnNoneIfDiscovererHasNoCategory()
         {
-            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithNoCategory));
-            Assert.AreEqual(AssemblyType.None, this.testPluginInformation.AssemblyType);
+            testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithNoCategory));
+            Assert.AreEqual(AssemblyType.None, testPluginInformation.AssemblyType);
         }
 
         [TestMethod]
         public void AssemblyTypeShouldReturnNoneIfDiscovererHasCategoryWithNoValue()
         {
-            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithCategoryHavingNoValue));
-            Assert.AreEqual(AssemblyType.None, this.testPluginInformation.AssemblyType);
+            testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithCategoryHavingNoValue));
+            Assert.AreEqual(AssemblyType.None, testPluginInformation.AssemblyType);
         }
 
         [TestMethod]
         public void AssemblyTypeShouldReturnNoneIfDiscovererHasCategoryWithEmptyValue()
         {
-            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithCategoryHavingEmptyValue));
-            Assert.AreEqual(AssemblyType.None, this.testPluginInformation.AssemblyType);
+            testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithCategoryHavingEmptyValue));
+            Assert.AreEqual(AssemblyType.None, testPluginInformation.AssemblyType);
         }
 
         [TestMethod]
         public void AssemblyTypeShouldReturnNativeIfDiscovererHasNativeCategory()
         {
-            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithNativeCategory));
-            Assert.AreEqual(AssemblyType.Native, this.testPluginInformation.AssemblyType);
+            testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithNativeCategory));
+            Assert.AreEqual(AssemblyType.Native, testPluginInformation.AssemblyType);
         }
 
         [TestMethod]
         public void AssemblyTypeShouldReturnManagedIfDiscovererHasManagedCategory()
         {
-            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithManagedCategory));
-            Assert.AreEqual(AssemblyType.Managed, this.testPluginInformation.AssemblyType);
+            testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithManagedCategory));
+            Assert.AreEqual(AssemblyType.Managed, testPluginInformation.AssemblyType);
         }
 
         [TestMethod]
         public void AssemblyTypeShouldReturnNoneIfDiscovererHasUnknownCategory()
         {
-            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithUnknownCategory));
-            Assert.AreEqual(AssemblyType.None, this.testPluginInformation.AssemblyType);
+            testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithUnknownCategory));
+            Assert.AreEqual(AssemblyType.None, testPluginInformation.AssemblyType);
         }
 
         [TestMethod]
         public void AssemblyTypeShouldReturnAssemblyTypeIfDiscovererHasCategoryInArbitCasing()
         {
-            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithArbitCasedCategory));
-            Assert.AreEqual(AssemblyType.Native, this.testPluginInformation.AssemblyType);
+            testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithArbitCasedCategory));
+            Assert.AreEqual(AssemblyType.Native, testPluginInformation.AssemblyType);
         }
 
         [TestMethod]
         public void DefaultExecutorUriShouldReturnEmptyListIfADiscovererDoesNotHaveOne()
         {
-            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithNoFileExtensions));
-            Assert.IsNotNull(this.testPluginInformation.DefaultExecutorUri);
-            Assert.AreEqual(string.Empty, this.testPluginInformation.DefaultExecutorUri);
+            testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithNoFileExtensions));
+            Assert.IsNotNull(testPluginInformation.DefaultExecutorUri);
+            Assert.AreEqual(string.Empty, testPluginInformation.DefaultExecutorUri);
         }
 
         [TestMethod]
         public void DefaultExecutorUriShouldReturnDefaultExecutorUriOfADiscoverer()
         {
-            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithOneFileExtensions));
-            Assert.AreEqual("csvexecutor", this.testPluginInformation.DefaultExecutorUri);
+            testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithOneFileExtensions));
+            Assert.AreEqual("csvexecutor", testPluginInformation.DefaultExecutorUri);
         }
 
         [TestMethod]
         public void MetadataShouldReturnFileExtensionsAndDefaultExecutorUriAndAssemblyType()
         {
-            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithTwoFileExtensions));
+            testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithTwoFileExtensions));
 
             var expectedFileExtensions = new List<string> { "csv", "docx" };
-            var testPluginMetada = this.testPluginInformation.Metadata.ToArray();
+            var testPluginMetada = testPluginInformation.Metadata.ToArray();
 
             CollectionAssert.AreEqual(expectedFileExtensions, (testPluginMetada[0] as List<string>).ToArray());
             Assert.AreEqual("csvexecutor", testPluginMetada[1] as string);

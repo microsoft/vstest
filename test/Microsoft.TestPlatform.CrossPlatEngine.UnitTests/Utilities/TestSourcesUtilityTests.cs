@@ -14,7 +14,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
     [TestClass]
     public class TestSourcesUtilityTests
     {
-        private static string temp = Path.GetTempPath();
+        private static readonly string temp = Path.GetTempPath();
 
         [TestMethod]
         public void GetSourcesShouldAggregateSourcesIfMultiplePresentInAdapterSourceMap()

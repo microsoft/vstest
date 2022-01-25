@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>A <see cref="Message"/> instance.</returns>
         public Message DeserializeMessage(string rawMessage)
         {
-            return this.Deserialize<VersionedMessage>(serializer, rawMessage);
+            return Deserialize<VersionedMessage>(serializer, rawMessage);
         }
 
         /// <summary>
@@ -84,8 +84,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public T DeserializePayload<T>(Message message)
         {
             var versionedMessage = message as VersionedMessage;
-            var payloadSerializer = this.GetPayloadSerializer(versionedMessage?.Version);
-            return this.Deserialize<T>(payloadSerializer, message.Payload);
+            var payloadSerializer = GetPayloadSerializer(versionedMessage?.Version);
+            return Deserialize<T>(payloadSerializer, message.Payload);
         }
 
         /// <summary>
@@ -97,8 +97,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>An instance of <see cref="T"/>.</returns>
         public T Deserialize<T>(string json, int version = 1)
         {
-            var payloadSerializer = this.GetPayloadSerializer(version);
-            return this.Deserialize<T>(payloadSerializer, json);
+            var payloadSerializer = GetPayloadSerializer(version);
+            return Deserialize<T>(payloadSerializer, json);
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Serialized message.</returns>
         public string SerializeMessage(string messageType)
         {
-            return this.Serialize(serializer, new Message { MessageType = messageType });
+            return Serialize(serializer, new Message { MessageType = messageType });
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Serialized message.</returns>
         public string SerializePayload(string messageType, object payload)
         {
-            return this.SerializePayload(messageType, payload, 1);
+            return SerializePayload(messageType, payload, 1);
         }
 
         /// <summary>
@@ -131,12 +131,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Serialized message.</returns>
         public string SerializePayload(string messageType, object payload, int version)
         {
-            var payloadSerializer = this.GetPayloadSerializer(version);
+            var payloadSerializer = GetPayloadSerializer(version);
             var serializedPayload = JToken.FromObject(payload, payloadSerializer);
 
             return version > 1 ?
-                this.Serialize(serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
-                this.Serialize(serializer, new Message { MessageType = messageType, Payload = serializedPayload });
+                Serialize(serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
+                Serialize(serializer, new Message { MessageType = messageType, Payload = serializedPayload });
         }
 
         /// <summary>
@@ -148,8 +148,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>JSON string.</returns>
         public string Serialize<T>(T data, int version = 1)
         {
-            var payloadSerializer = this.GetPayloadSerializer(version);
-            return this.Serialize(payloadSerializer, data);
+            var payloadSerializer = GetPayloadSerializer(version);
+            return Serialize(payloadSerializer, data);
         }
 
         /// <inheritdoc/>
@@ -160,8 +160,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 return default;
             }
 
-            var stringObj = this.Serialize<T>(obj, 2);
-            return this.Deserialize<T>(stringObj, 2);
+            var stringObj = Serialize(obj, 2);
+            return Deserialize<T>(stringObj, 2);
         }
 
         /// <summary>

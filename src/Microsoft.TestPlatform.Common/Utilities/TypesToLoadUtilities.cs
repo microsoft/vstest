@@ -33,10 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
             var type = attribute.GetType();
             var typesProperty = type.GetProperty("Types");
-            if(typesProperty == null)
-                return Enumerable.Empty<Type>();
-
-            return typesProperty.GetValue(attribute) as Type[];
+            return typesProperty == null ? Enumerable.Empty<Type>() : typesProperty.GetValue(attribute) as Type[];
         }
     }
 }

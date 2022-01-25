@@ -34,13 +34,13 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
 
         public RunEventHandler()
         {
-            this.TestResults = new List<TestResult>();
+            TestResults = new List<TestResult>();
         }
 
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            this.LogMessage = message;
-            this.TestMessageLevel = level;
+            LogMessage = message;
+            TestMessageLevel = level;
         }
 
         public void HandleTestRunComplete(
@@ -51,17 +51,17 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         {
             if (lastChunkArgs != null && lastChunkArgs.NewTestResults != null)
             {
-                this.TestResults.AddRange(lastChunkArgs.NewTestResults);
+                TestResults.AddRange(lastChunkArgs.NewTestResults);
             }
 
-            this.Metrics = testRunCompleteArgs.Metrics;
+            Metrics = testRunCompleteArgs.Metrics;
         }
 
         public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
         {
             if (testRunChangedArgs != null && testRunChangedArgs.NewTestResults != null)
             {
-                this.TestResults.AddRange(testRunChangedArgs.NewTestResults);
+                TestResults.AddRange(testRunChangedArgs.NewTestResults);
             }
         }
 

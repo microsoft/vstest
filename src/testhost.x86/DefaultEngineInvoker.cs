@@ -22,8 +22,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using PlatformAbstractions.Interfaces;
     using CommunicationUtilitiesResources =
-        Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
-    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+        CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = CoreUtilities.Constants;
 
     internal class DefaultEngineInvoker :
 #if NETFRAMEWORK
@@ -51,11 +51,11 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private const string TelemetryOptedIn = "--telemetryoptedin";
 
-        private ITestRequestHandler requestHandler;
+        private readonly ITestRequestHandler requestHandler;
 
-        private IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender;
+        private readonly IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender;
 
-        private IProcessHelper processHelper;
+        private readonly IProcessHelper processHelper;
 
         public DefaultEngineInvoker() : this(new TestRequestHandler(), DataCollectionTestCaseEventSender.Create(), new ProcessHelper())
         {
@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         public void Invoke(IDictionary<string, string> argsDictionary)
         {
-            DefaultEngineInvoker.InitializeEqtTrace(argsDictionary);
+            InitializeEqtTrace(argsDictionary);
 
             if (EqtTrace.IsVerboseEnabled)
             {
@@ -97,39 +97,39 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             TestHostTraceListener.Setup();
 #endif
 
-            this.SetParentProcessExitCallback(argsDictionary);
+            SetParentProcessExitCallback(argsDictionary);
 
-            this.requestHandler.ConnectionInfo =
-                DefaultEngineInvoker.GetConnectionInfo(argsDictionary);
+            requestHandler.ConnectionInfo =
+                GetConnectionInfo(argsDictionary);
 
             // Initialize Communication with vstest.console
-            this.requestHandler.InitializeCommunication();
+            requestHandler.InitializeCommunication();
 
             // skipping because 0 is the default value, and also the value the the callers use when they
             // call with the parameter specified, but without providing an actual port
             var dcPort = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, DataCollectionPortArgument);
             if (dcPort > 0)
             {
-                this.ConnectToDatacollector(dcPort);
+                ConnectToDatacollector(dcPort);
             }
 
-            var requestData = DefaultEngineInvoker.GetRequestData(argsDictionary);
+            var requestData = GetRequestData(argsDictionary);
 
             // Start processing async in a different task
             EqtTrace.Info("DefaultEngineInvoker.Invoke: Start Request Processing.");
             try
             {
-                this.StartProcessingAsync(requestHandler, new TestHostManagerFactory(requestData)).Wait();
+                StartProcessingAsync(requestHandler, new TestHostManagerFactory(requestData)).Wait();
             }
             finally
             {
                 if (dcPort > 0)
                 {
                     // Close datacollector communication.
-                    this.dataCollectionTestCaseEventSender.Close();
+                    dataCollectionTestCaseEventSender.Close();
                 }
 
-                this.requestHandler.Dispose();
+                requestHandler.Dispose();
             }
         }
 
@@ -162,7 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         {
             EqtTrace.Info("DefaultEngineInvoker.ConnectToDatacollector: Connecting to datacollector, port: {0}",
                 dcPort);
-            this.dataCollectionTestCaseEventSender.InitializeCommunication(dcPort);
+            dataCollectionTestCaseEventSender.InitializeCommunication(dcPort);
 
             // It's possible that connection to vstest.console happens, but to datacollector fails, why?
             // DataCollector keeps the server alive for testhost only for 15secs(increased to 90 now),
@@ -170,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             // in such scenario dc.exe would have killed the server, but testhost will wait infinitely to connect to it,
             // hence do not wait to connect to datacollector process infinitely, as it will cause process hang.
             var timeout = EnvironmentHelper.GetConnectionTimeout();
-            if (!this.dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(timeout * 1000))
+            if (!dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(timeout * 1000))
             {
                 EqtTrace.Error(
                     "DefaultEngineInvoker.ConnectToDatacollector: Connection to DataCollector failed: '{0}', DataCollection will not happen in this session",
@@ -211,7 +211,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 // Trying to attach to 0 will cause access denied error on Windows
             }
 
-            this.processHelper.SetExitCallback(
+            processHelper.SetExitCallback(
                 parentProcessId,
                 (obj) =>
                 {

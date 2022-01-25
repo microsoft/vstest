@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 #endif 
 
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-    using ObjectModelResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.Resources;
+    using ObjectModelResources = Resources.Resources;
 
     /// <summary>
     /// Utilities for the run settings XML.
@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <summary>
         /// Gets the os architecture of the machine where this application is running
         /// </summary>
-        public static ObjectModel.Architecture OSArchitecture
+        public static Architecture OSArchitecture
         {
             get
             {
@@ -34,15 +34,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 switch (arch)
                 {
                     case PlatformArchitecture.X64:
-                        return ObjectModel.Architecture.X64;
+                        return Architecture.X64;
                     case PlatformArchitecture.X86:
-                        return ObjectModel.Architecture.X86;
+                        return Architecture.X86;
                     case PlatformArchitecture.ARM64:
-                        return ObjectModel.Architecture.ARM64;
+                        return Architecture.ARM64;
                     case PlatformArchitecture.ARM:
-                        return ObjectModel.Architecture.ARM;
+                        return Architecture.ARM;
                     default:
-                        return ObjectModel.Architecture.X64;
+                        return Architecture.X64;
                 }
             }
         }
@@ -66,7 +66,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <param name="runSettingDocument"> XPathNavigable representation of a runsettings file </param>
         /// <param name="dataCollectorUri"> The data Collector Uri. </param>
         /// <returns> True if there is a datacollector configured. </returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#")]
         public static bool ContainsDataCollector(IXPathNavigable runSettingDocument, string dataCollectorUri)
         {
             if (runSettingDocument == null)
@@ -105,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             if (!string.IsNullOrWhiteSpace(runsettingsXml))
             {
                 using var stream = new StringReader(runsettingsXml);
-                using var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings);
+                using var reader = XmlReader.Create(stream, ReaderSettings);
                 var document = new XmlDocument();
                 document.Load(reader);
 
@@ -157,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <returns> The RunConfiguration node as defined in the settings xml.</returns>
         public static RunConfiguration GetRunConfigurationNode(string settingsXml)
         {
-            var nodeValue = GetNodeValue<RunConfiguration>(settingsXml, Constants.RunConfigurationSettingsName, RunConfiguration.FromXml);
+            var nodeValue = GetNodeValue(settingsXml, Constants.RunConfigurationSettingsName, RunConfiguration.FromXml);
             if (nodeValue == default(RunConfiguration))
             {
                 // Return default one.
@@ -175,7 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <remarks>If there is no test run parameters section defined in the settings xml a blank dictionary is returned.</remarks>
         public static Dictionary<string, object> GetTestRunParameters(string settingsXml)
         {
-            var nodeValue = GetNodeValue<Dictionary<string, object>>(settingsXml, Constants.TestRunParametersName, TestRunParameters.FromXml);
+            var nodeValue = GetNodeValue(settingsXml, Constants.TestRunParametersName, TestRunParameters.FromXml);
             if (nodeValue == default(Dictionary<string, object>))
             {
                 // Return default.
@@ -192,8 +191,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <returns>
         /// The <see cref="IXPathNavigable"/>.
         /// </returns>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public static XmlDocument CreateDefaultRunSettings()
         {
             // Create a new default xml doc that looks like this:
@@ -229,12 +226,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         {
             var dataCollectionRunSettings = GetDataCollectionRunSettings(runSettingsXml);
 
-            if (dataCollectionRunSettings == null || !dataCollectionRunSettings.IsCollectionEnabled)
-            {
-                return false;
-            }
-
-            return true;
+            return dataCollectionRunSettings != null && dataCollectionRunSettings.IsCollectionEnabled;
         }
 
         /// <summary>
@@ -246,12 +238,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         {
             var dataCollectionRunSettings = GetInProcDataCollectionRunSettings(runSettingsXml);
 
-            if (dataCollectionRunSettings == null || !dataCollectionRunSettings.IsCollectionEnabled)
-            {
-                return false;
-            }
-
-            return true;
+            return dataCollectionRunSettings != null && dataCollectionRunSettings.IsCollectionEnabled;
         }
 
         /// <summary>
@@ -259,8 +246,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// </summary>
         /// <param name="runSettingsXml"> The run Settings Xml. </param>
         /// <returns> The <see cref="DataCollectionRunSettings"/>. </returns>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public static DataCollectionRunSettings GetDataCollectionRunSettings(string runSettingsXml)
         {
             // use XmlReader to avoid loading of the plugins in client code (mainly from VS).
@@ -306,8 +291,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// The run Settings Xml.
         /// </param>
         /// <returns>Data collection run settings.</returns>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public static DataCollectionRunSettings GetInProcDataCollectionRunSettings(string runSettingsXml)
         {
             // use XmlReader to avoid loading of the plugins in client code (mainly from VS).
@@ -317,7 +300,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             }
 
             runSettingsXml = runSettingsXml.Trim();
-            using StringReader stringReader1 = new StringReader(runSettingsXml);
+            using StringReader stringReader1 = new(runSettingsXml);
             XmlReader reader = XmlReader.Create(stringReader1, ReaderSettings);
 
             // read to the fist child
@@ -369,7 +352,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             throw new SettingsException(
                 string.Format(
                     CultureInfo.CurrentCulture,
-                    Resources.Resources.InvalidSettingsXmlAttribute,
+                    ObjectModelResources.InvalidSettingsXmlAttribute,
                     elementName,
                     reader.Name));
         }
@@ -385,12 +368,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             throw new SettingsException(
                 string.Format(
                     CultureInfo.CurrentCulture,
-                    Resources.Resources.InvalidSettingsXmlAttribute,
+                    ObjectModelResources.InvalidSettingsXmlAttribute,
                     reader.Name));
         }
 
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         private static T GetNodeValue<T>(string settingsXml, string nodeName, Func<XmlReader, T> nodeParser)
         {
             // use XmlReader to avoid loading of the plugins in client code (mainly from VS).
@@ -427,7 +408,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 }
             }
 
-            return default(T);
+            return default;
         }
 
 #if !NETSTANDARD1_0

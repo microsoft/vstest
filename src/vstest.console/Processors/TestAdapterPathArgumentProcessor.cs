@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     /// Allows the user to specify a path to load custom adapters from.
@@ -44,12 +44,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new TestAdapterPathArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new TestAdapterPathArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -60,17 +60,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, ConsoleOutput.Instance, new FileHelper()));
+                    executor = new Lazy<IArgumentExecutor>(() => new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, ConsoleOutput.Instance, new FileHelper()));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -103,22 +103,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Used for getting sources.
         /// </summary>
-        private CommandLineOptions commandLineOptions;
+        private readonly CommandLineOptions commandLineOptions;
 
         /// <summary>
         /// Run settings provider.
         /// </summary>
-        private IRunSettingsProvider runSettingsManager;
+        private readonly IRunSettingsProvider runSettingsManager;
 
         /// <summary>
         /// Used for sending output.
         /// </summary>
-        private IOutput output;
+        private readonly IOutput output;
 
         /// <summary>
         /// For file related operation
         /// </summary>
-        private IFileHelper fileHelper;
+        private readonly IFileHelper fileHelper;
 
         /// <summary>
         /// Separators for multiple paths in argument.
@@ -138,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             Contract.Requires(options != null);
 
-            this.commandLineOptions = options;
+            commandLineOptions = options;
             this.runSettingsManager = runSettingsManager;
             this.output = output;
             this.fileHelper = fileHelper;
@@ -175,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 argument = argument.Trim().Trim(new char[] { '\"' });
 
                 // Get test adapter paths from RunSettings.
-                var testAdapterPathsInRunSettings = this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestAdaptersPaths");
+                var testAdapterPathsInRunSettings = runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestAdaptersPaths");
 
                 if (!string.IsNullOrWhiteSpace(testAdapterPathsInRunSettings))
                 {
@@ -189,7 +189,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     // TestAdaptersPaths could contain environment variables
                     var testAdapterFullPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(testadapterPath));
 
-                    if (!this.fileHelper.DirectoryExists(testAdapterFullPath))
+                    if (!fileHelper.DirectoryExists(testAdapterFullPath))
                     {
                         invalidAdapterPathArgument = testadapterPath;
                         throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 customAdaptersPath = string.Join(";", testAdapterFullPaths.Distinct().ToArray());
 
-                this.runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdaptersPaths", customAdaptersPath);
+                runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdaptersPaths", customAdaptersPath);
             }
             catch (Exception e)
             {
@@ -208,7 +208,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestAdapterPathCommand, invalidAdapterPathArgument, e.Message));
             }
 
-            this.commandLineOptions.TestAdapterPath = customAdaptersPath;
+            commandLineOptions.TestAdapterPath = customAdaptersPath;
         }
 
         /// <summary>
@@ -218,12 +218,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns>Paths.</returns>
         private string[] SplitPaths(string paths)
         {
-            if (string.IsNullOrWhiteSpace(paths))
-            {
-                return new string[] { };
-            }
-
-            return paths.Split(argumentSeparators, StringSplitOptions.RemoveEmptyEntries);
+            return string.IsNullOrWhiteSpace(paths) ? (new string[] { }) : paths.Split(argumentSeparators, StringSplitOptions.RemoveEmptyEntries);
         }
 
         /// <summary>

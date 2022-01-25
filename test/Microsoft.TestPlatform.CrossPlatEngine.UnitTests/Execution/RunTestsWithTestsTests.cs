@@ -38,11 +38,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestInitialize]
         public void TestInit()
         {
-            this.testableTestRunCache = new TestableTestRunCache();
-            this.mockMetricsCollection = new Mock<IMetricsCollection>();
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
-            this.testExecutionContext = new TestExecutionContext(
+            testableTestRunCache = new TestableTestRunCache();
+            mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockRequestData = new Mock<IRequestData>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+            testExecutionContext = new TestExecutionContext(
                                 frequencyOfRunStatsChangeEvent: 100,
                                 runStatsChangeEventTimeout: TimeSpan.MaxValue,
                                 inIsolation: false,
@@ -53,7 +53,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                                 isDebug: false,
                                 testCaseFilter: null,
                                 filterOptions: null);
-            this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+            mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
         }
 
         [TestMethod]
@@ -65,20 +65,20 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 new TestCase("A.C.M2", new Uri("e://d"), "s.dll")
             };
 
-            this.runTestsInstance = new TestableRunTestsWithTests(
+            runTestsInstance = new TestableRunTestsWithTests(
                 tests,
                 null,
                 testExecutionContext,
                 null,
-                this.mockTestRunEventsHandler.Object,
-                this.mockRequestData.Object);
+                mockTestRunEventsHandler.Object,
+                mockRequestData.Object);
 
-            var map = this.runTestsInstance.CallGetExecutorUriExtensionMap(new Mock<IFrameworkHandle>().Object, new RunContext());
+            var map = runTestsInstance.CallGetExecutorUriExtensionMap(new Mock<IFrameworkHandle>().Object, new RunContext());
 
             var expectedMap = new List<Tuple<Uri, string>>
             {
                 new Tuple<Uri, string>(new Uri("e://d"),
-                    Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants.UnspecifiedAdapterPath)
+                    Constants.UnspecifiedAdapterPath)
             };
 
             CollectionAssert.AreEqual(expectedMap, map.ToList());
@@ -93,22 +93,22 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 new TestCase("A.C.M2", new Uri("e://d2"), "s.dll")
             };
 
-            this.runTestsInstance = new TestableRunTestsWithTests(
+            runTestsInstance = new TestableRunTestsWithTests(
                 tests,
                 null,
                 testExecutionContext,
                 null,
-                this.mockTestRunEventsHandler.Object,
-                this.mockRequestData.Object);
+                mockTestRunEventsHandler.Object,
+                mockRequestData.Object);
 
-            var map = this.runTestsInstance.CallGetExecutorUriExtensionMap(new Mock<IFrameworkHandle>().Object, new RunContext());
+            var map = runTestsInstance.CallGetExecutorUriExtensionMap(new Mock<IFrameworkHandle>().Object, new RunContext());
 
             var expectedMap = new List<Tuple<Uri, string>>
             {
                 new Tuple<Uri, string>(new Uri("e://d"),
-                    Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants.UnspecifiedAdapterPath),
+                    Constants.UnspecifiedAdapterPath),
                 new Tuple<Uri, string>(new Uri("e://d2"),
-                    Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants.UnspecifiedAdapterPath)
+                    Constants.UnspecifiedAdapterPath)
             };
 
             CollectionAssert.AreEqual(expectedMap, map.ToList());
@@ -126,21 +126,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var executorUriExtensionTuple = new Tuple<Uri, string>(new Uri("e://d/"), "A.dll");
             executorUriVsTestList.Add(executorUriExtensionTuple, tests);
 
-            this.runTestsInstance = new TestableRunTestsWithTests(
+            runTestsInstance = new TestableRunTestsWithTests(
                 tests,
                 null,
                 testExecutionContext,
                 null,
-                this.mockTestRunEventsHandler.Object,
+                mockTestRunEventsHandler.Object,
                 executorUriVsTestList,
-                this.mockRequestData.Object);
+                mockRequestData.Object);
 
             var testExecutor = new RunTestsWithSourcesTests.RunTestWithSourcesExecutor();
             var extension = new LazyExtension<ITestExecutor, ITestExecutorCapabilities>(testExecutor, new TestExecutorMetadata("e://d/"));
             IEnumerable<TestCase> receivedTests = null;
-            RunTestsWithSourcesTests.RunTestWithSourcesExecutor.RunTestsWithTestsCallback = (t, rc, fh) => { receivedTests = t; };
+            RunTestsWithSourcesTests.RunTestWithSourcesExecutor.RunTestsWithTestsCallback = (t, rc, fh) => receivedTests = t;
 
-            this.runTestsInstance.CallInvokeExecutor(extension, executorUriExtensionTuple, null, null);
+            runTestsInstance.CallInvokeExecutor(extension, executorUriExtensionTuple, null, null);
 
             Assert.IsNotNull(receivedTests);
             CollectionAssert.AreEqual(tests, receivedTests.ToList());
@@ -155,15 +155,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             };
             var mockTestCaseEventsHandler = new Mock<ITestCaseEventsHandler>();
 
-            this.runTestsInstance = new TestableRunTestsWithTests(
+            runTestsInstance = new TestableRunTestsWithTests(
                 tests,
                 null,
                 testExecutionContext,
                 mockTestCaseEventsHandler.Object,
-                this.mockTestRunEventsHandler.Object,
-                this.mockRequestData.Object);
+                mockTestRunEventsHandler.Object,
+                mockRequestData.Object);
 
-            this.runTestsInstance.CallSendSessionStart();
+            runTestsInstance.CallSendSessionStart();
 
             mockTestCaseEventsHandler.Verify(x => x.SendSessionStart(It.Is<IDictionary<String, object>>(
                 y => y.ContainsKey("TestSources")
@@ -180,15 +180,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             };
             var mockTestCaseEventsHandler = new Mock<ITestCaseEventsHandler>();
 
-            this.runTestsInstance = new TestableRunTestsWithTests(
+            runTestsInstance = new TestableRunTestsWithTests(
                 tests,
                 null,
                 testExecutionContext,
                 mockTestCaseEventsHandler.Object,
-                this.mockTestRunEventsHandler.Object,
-                this.mockRequestData.Object);
+                mockTestRunEventsHandler.Object,
+                mockRequestData.Object);
 
-            this.runTestsInstance.CallSendSessionEnd();
+            runTestsInstance.CallSendSessionEnd();
 
             mockTestCaseEventsHandler.Verify(x => x.SendSessionEnd());
         }
@@ -216,23 +216,23 @@ requestData, testCases, null, runSettings, testExecutionContext,
             public IEnumerable<Tuple<Uri, string>> CallGetExecutorUriExtensionMap(
                 IFrameworkHandle testExecutorFrameworkHandle, RunContext runContext)
             {
-                return this.GetExecutorUriExtensionMap(testExecutorFrameworkHandle, runContext);
+                return GetExecutorUriExtensionMap(testExecutorFrameworkHandle, runContext);
             }
 
             public void CallInvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
                 Tuple<Uri, string> executorUriExtensionTuple, RunContext runContext, IFrameworkHandle frameworkHandle)
             {
-                this.InvokeExecutor(executor, executorUriExtensionTuple, runContext, frameworkHandle);
+                InvokeExecutor(executor, executorUriExtensionTuple, runContext, frameworkHandle);
             }
 
             public void CallSendSessionStart()
             {
-                this.SendSessionStart();
+                SendSessionStart();
             }
 
             public void CallSendSessionEnd()
             {
-                this.SendSessionEnd();
+                SendSessionEnd();
             }
         }
 

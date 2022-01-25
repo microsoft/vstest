@@ -14,8 +14,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     /// <summary>
     /// The blame logger.
     /// </summary>
-    [FriendlyName(BlameLogger.FriendlyName)]
-    [ExtensionUri(BlameLogger.ExtensionUri)]
+    [FriendlyName(FriendlyName)]
+    [ExtensionUri(ExtensionUri)]
     public class BlameLogger : ITestLogger
     {
         #region Constants
@@ -80,7 +80,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 throw new ArgumentNullException(nameof(events));
             }
 
-            events.TestRunComplete += this.TestRunCompleteHandler;
+            events.TestRunComplete += TestRunCompleteHandler;
         }
 
         /// <summary>
@@ -95,30 +95,30 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 throw new ArgumentNullException(nameof(sender));
             }
 
-            ValidateArg.NotNull<object>(sender, nameof(sender));
-            ValidateArg.NotNull<TestRunCompleteEventArgs>(e, nameof(e));
+            ValidateArg.NotNull(sender, nameof(sender));
+            ValidateArg.NotNull(e, nameof(e));
 
             if (!e.IsAborted)
             {
                 return;
             }
 
-            this.output.WriteLine(string.Empty, OutputLevel.Information);
+            output.WriteLine(string.Empty, OutputLevel.Information);
 
             // Gets the faulty test cases if test aborted
-            var testCaseNames = this.GetFaultyTestCaseNames(e);
+            var testCaseNames = GetFaultyTestCaseNames(e);
             if (!testCaseNames.Any())
             {
                 return;
             }
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             foreach (var tcn in testCaseNames)
             {
                 sb.Append(tcn).Append(Environment.NewLine);
             }
 
-            this.output.Error(false, Resources.Resources.AbortedTestRun, sb.ToString());
+            output.Error(false, Resources.Resources.AbortedTestRun, sb.ToString());
         }
 
         #endregion
@@ -147,7 +147,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     if (uriDataAttachment != null)
                     {
                         var filepath = uriDataAttachment.Uri.LocalPath;
-                        var testCaseList = this.blameReaderWriter.ReadTestSequence(filepath);
+                        var testCaseList = blameReaderWriter.ReadTestSequence(filepath);
                         if (testCaseList.Count > 0)
                         {
                             var testcases = testCaseList.Where(t => !t.IsCompleted).Select(t => t.FullyQualifiedName).ToList();

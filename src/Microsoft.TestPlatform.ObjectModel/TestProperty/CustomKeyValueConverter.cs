@@ -25,21 +25,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            var keyValuePairs = value as KeyValuePair<string, string>[];
-            if (keyValuePairs != null)
-            {
-                return keyValuePairs;
-            }
-
-            return base.ConvertTo(context, culture, value, destinationType);
+            return value is KeyValuePair<string, string>[] keyValuePairs
+                ? keyValuePairs
+                : base.ConvertTo(context, culture, value, destinationType);
         }
 
         /// <inheritdoc/>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             // KeyValuePairs are used for traits. 
-            var data = value as string;
-            if (data != null)
+            if (value is string data)
             {
                 using var stream = new MemoryStream(Encoding.Unicode.GetBytes(data));
                 // Converting Json data to array of KeyValuePairs with duplicate keys.

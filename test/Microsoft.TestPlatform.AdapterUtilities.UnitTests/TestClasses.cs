@@ -3,6 +3,8 @@
 
 namespace TestClasses
 {
+#pragma warning disable IDE0060 // Remove unused parameter
+
     using System;
     using System.Collections.Generic;
 
@@ -99,4 +101,6 @@ namespace TestClasses
         public void Overload0(Tuple<Tuple<string>, Tuple<int>> t) { }
         public void Overload0<U>(Tuple<Tuple<Outer<U>.Inner<U>>> t) { }
     }
+#pragma warning restore IDE0060 // Remove unused parameter
+
 }

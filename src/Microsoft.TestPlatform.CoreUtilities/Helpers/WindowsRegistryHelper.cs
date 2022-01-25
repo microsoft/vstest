@@ -33,16 +33,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
 
         public IRegistryKey OpenSubKey(string name)
         {
-            var keyRegistry = this.registryKey.OpenSubKey(name);
+            var keyRegistry = registryKey.OpenSubKey(name);
             return keyRegistry is null ? null : new RegistryKeyWrapper(keyRegistry);
         }
 
         public string[] GetSubKeyNames()
-            => this.registryKey?.GetSubKeyNames();
+            => registryKey?.GetSubKeyNames();
 
         public void Dispose()
         {
-            this.registryKey?.Dispose();
+            registryKey?.Dispose();
         }
     }
 }

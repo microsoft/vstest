@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
     /// </summary>
     internal class RunSettingsHelper : IRunSettingsHelper
     {
-        private static IRunSettingsHelper runSettings = new RunSettingsHelper();
+        private static readonly IRunSettingsHelper runSettings = new RunSettingsHelper();
 
         public static IRunSettingsHelper Instance = runSettings;
 

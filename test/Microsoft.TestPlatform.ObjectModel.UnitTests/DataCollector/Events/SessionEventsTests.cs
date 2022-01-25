@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
     [TestClass]
     public class SessionEventsTests
     {
-        private SessionStartEventArgs sessionStartEventArgs;
+        private readonly SessionStartEventArgs sessionStartEventArgs;
 
         public SessionEventsTests()
         {
@@ -20,13 +20,13 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                 { "property2", 2 }
             };
 
-            this.sessionStartEventArgs = new SessionStartEventArgs(properties);
+            sessionStartEventArgs = new SessionStartEventArgs(properties);
         }
 
         [TestMethod]
         public void SessionStartEventArgsGetPropertiesShouldGetPropertiesEnumerator()
         {
-            var properties = this.sessionStartEventArgs.GetProperties();
+            var properties = sessionStartEventArgs.GetProperties();
             int propertiesCount = 0;
             while (properties.MoveNext())
             {
@@ -39,7 +39,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         [TestMethod]
         public void SessionStartEventArgsGetPropertyValueShouldGetPropertyValue()
         {
-            var value = this.sessionStartEventArgs.GetPropertyValue<int>("property1");
+            var value = sessionStartEventArgs.GetPropertyValue<int>("property1");
 
             Assert.AreEqual(1, value);
         }
@@ -47,7 +47,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         [TestMethod]
         public void SessionStartEventArgsGetPropertyValueShouldGetPropertyValueInObject()
         {
-            var value = this.sessionStartEventArgs.GetPropertyValue("property1");
+            var value = sessionStartEventArgs.GetPropertyValue("property1");
 
             Assert.AreEqual(1, value);
         }

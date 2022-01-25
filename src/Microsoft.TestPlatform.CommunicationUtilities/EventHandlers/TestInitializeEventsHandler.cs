@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
     /// </summary>
     public class TestInitializeEventsHandler : ITestMessageEventHandler
     {
-        private ITestRequestHandler requestHandler;
+        private readonly ITestRequestHandler requestHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestInitializeEventsHandler"/> class.
@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
                     break;
             }
 
-            this.requestHandler.SendLog(level, message);
+            requestHandler.SendLog(level, message);
         }
 
         public void HandleRawMessage(string rawMessage)

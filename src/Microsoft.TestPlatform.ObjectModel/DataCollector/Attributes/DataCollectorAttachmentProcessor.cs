@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </param>
         public DataCollectorAttachmentProcessorAttribute(Type type)
         {
-            this.Type = type;
+            Type = type;
         }
 
         /// <summary>

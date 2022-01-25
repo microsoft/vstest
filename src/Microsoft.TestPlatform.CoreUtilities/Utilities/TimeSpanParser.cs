@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
     public static class TimeSpanParser
     {
-        static readonly Regex pattern = new Regex(@"(?<value>^\d+(?:\.\d+)?)\s*(?<suffix>ms|mil|m|h|d|s?[a-z]*)$", RegexOptions.IgnoreCase);
+        static readonly Regex pattern = new(@"(?<value>^\d+(?:\.\d+)?)\s*(?<suffix>ms|mil|m|h|d|s?[a-z]*)$", RegexOptions.IgnoreCase);
 
         public static TimeSpan Parse(string time)
         {

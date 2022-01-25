@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     internal class EnableDiagArgumentProcessor : IArgumentProcessor
     {
@@ -50,12 +50,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new EnableDiagArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new EnableDiagArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -66,17 +66,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableDiagArgumentExecutor(this.fileHelper));
+                    executor = new Lazy<IArgumentExecutor>(() => new EnableDiagArgumentExecutor(fileHelper));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -241,9 +241,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Create the base directory of file path if doesn't exist.
             // Directory could be empty if just a filename is provided. E.g. log.txt
             var directory = Path.GetDirectoryName(filePath);
-            if (!string.IsNullOrEmpty(directory) && !this.fileHelper.DirectoryExists(directory))
+            if (!string.IsNullOrEmpty(directory) && !fileHelper.DirectoryExists(directory))
             {
-                this.fileHelper.CreateDirectory(directory);
+                fileHelper.CreateDirectory(directory);
             }
         }
 

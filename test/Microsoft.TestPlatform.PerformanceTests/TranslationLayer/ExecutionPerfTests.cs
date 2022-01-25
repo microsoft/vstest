@@ -8,13 +8,13 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
     [TestClass]
     public class ExecutionPerfTests : TelemetryPerfTestbase
     {
-        private IVsTestConsoleWrapper vstestConsoleWrapper;
-        private RunEventHandler runEventHandler;
+        private readonly IVsTestConsoleWrapper vstestConsoleWrapper;
+        private readonly RunEventHandler runEventHandler;
 
         public ExecutionPerfTests()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
-            this.runEventHandler = new RunEventHandler();
+            vstestConsoleWrapper = GetVsTestConsoleWrapper();
+            runEventHandler = new RunEventHandler();
         }
 
         [TestMethod]
@@ -26,9 +26,9 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
                                          GetPerfAssetFullPath("MSTestAdapterPerfTestProject", "MSTestAdapterPerfTestProject.dll"),
                                      };
 
-            this.vstestConsoleWrapper.RunTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.runEventHandler);
+            vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, runEventHandler);
 
-            this.PostTelemetry("RunMsTest10K", this.runEventHandler.Metrics);
+            PostTelemetry("RunMsTest10K", runEventHandler.Metrics);
         }
 
         [TestMethod]
@@ -40,9 +40,9 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
                                          GetPerfAssetFullPath("XunitAdapterPerfTestProject", "XunitAdapterPerfTestProject.dll"),
                                      };
 
-            this.vstestConsoleWrapper.RunTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.runEventHandler);
+            vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, runEventHandler);
 
-            this.PostTelemetry("RunXunit10K", this.runEventHandler.Metrics);
+            PostTelemetry("RunXunit10K", runEventHandler.Metrics);
         }
 
         [TestMethod]
@@ -54,9 +54,9 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
                                          GetPerfAssetFullPath("NunitAdapterPerfTestProject", "NunitAdapterPerfTestProject.dll"),
                                      };
 
-            this.vstestConsoleWrapper.RunTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.runEventHandler);
+            vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, runEventHandler);
 
-            this.PostTelemetry("RunNunit10K", this.runEventHandler.Metrics);
+            PostTelemetry("RunNunit10K", runEventHandler.Metrics);
         }
 
         [TestMethod]
@@ -68,9 +68,9 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
                                          GetPerfAssetFullPath("MSTestAdapterPerfTestProject", "MSTestAdapterPerfTestProject.dll"),
                                      };
 
-            this.vstestConsoleWrapper.RunTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, this.runEventHandler);
+            vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, runEventHandler);
 
-            this.PostTelemetry("RunMsTest10KWithDefaultAdaptersSkipped", this.runEventHandler.Metrics);
+            PostTelemetry("RunMsTest10KWithDefaultAdaptersSkipped", runEventHandler.Metrics);
         }
 
         [TestMethod]
@@ -82,9 +82,9 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
                                          GetPerfAssetFullPath("XunitAdapterPerfTestProject", "XunitAdapterPerfTestProject.dll"),
                                      };
 
-            this.vstestConsoleWrapper.RunTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, this.runEventHandler);
+            vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, runEventHandler);
 
-            this.PostTelemetry("RunXunit10KWithDefaultAdaptersSkipped", this.runEventHandler.Metrics);
+            PostTelemetry("RunXunit10KWithDefaultAdaptersSkipped", runEventHandler.Metrics);
         }
 
         [TestMethod]
@@ -96,9 +96,9 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
                                          GetPerfAssetFullPath("NunitAdapterPerfTestProject", "NunitAdapterPerfTestProject.dll"),
                                      };
 
-            this.vstestConsoleWrapper.RunTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, this.runEventHandler);
+            vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, runEventHandler);
 
-            this.PostTelemetry("RunNunit10KWithDefaultAdaptersSkipped", this.runEventHandler.Metrics);
+            PostTelemetry("RunNunit10KWithDefaultAdaptersSkipped", runEventHandler.Metrics);
         }
     }
 }

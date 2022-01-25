@@ -31,20 +31,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         protected string GetCodeCoverageExePath()
         {
-            return Path.Combine(this.GetNetStandardAdapterPath(), "CodeCoverage", "CodeCoverage.exe");
+            return Path.Combine(GetNetStandardAdapterPath(), "CodeCoverage", "CodeCoverage.exe");
         }
 
         protected XmlNode GetModuleNode(XmlNode node, string name)
         {
-            var moduleNode = this.GetNode(node, "module", name);
+            var moduleNode = GetNode(node, "module", name);
 
             if (moduleNode == null)
             {
-                moduleNode = this.GetNode(node, "package", name);
+                moduleNode = GetNode(node, "package", name);
 
                 if (moduleNode == null)
                 {
-                    moduleNode = this.GetNode(node, "package", Path.GetFileNameWithoutExtension(name));
+                    moduleNode = GetNode(node, "package", Path.GetFileNameWithoutExtension(name));
                 }
             }
 
@@ -58,7 +58,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         protected XmlDocument GetXmlCoverage(string coverageResult)
         {
-            XmlDocument coverage = new XmlDocument();
+            XmlDocument coverage = new();
 
             if (coverageResult.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
             {
@@ -66,7 +66,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return coverage;
             }
 
-            var codeCoverageExe = this.GetCodeCoverageExePath();
+            var codeCoverageExe = GetCodeCoverageExePath();
             var output = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".xml");
 
             var watch = new Stopwatch();
@@ -105,7 +105,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         protected static string GetCoverageFileNameFromTrx(string trxFilePath, string resultsDirectory)
         {
             Assert.IsTrue(File.Exists(trxFilePath), "Trx file not found: {0}", trxFilePath);
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             using var trxStream = new FileStream(trxFilePath, FileMode.Open, FileAccess.Read);
             doc.Load(trxStream);
             var deploymentElements = doc.GetElementsByTagName("Deployment");

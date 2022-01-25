@@ -11,14 +11,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
     /// </summary>
     public class TestSessionStartArgs : InProcDataCollectionArgs
     {
-        private IDictionary<string, object> Properties;
+        private readonly IDictionary<string, object> Properties;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestSessionStartArgs"/> class.
         /// </summary>
         public TestSessionStartArgs()
         {
-            this.Configuration = String.Empty;
+            Configuration = String.Empty;
         }
 
         /// <summary>
@@ -29,8 +29,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
         /// </param>
         public TestSessionStartArgs(IDictionary<string, object> properties)
         {
-            this.Configuration = String.Empty;
-            this.Properties = properties;
+            Configuration = String.Empty;
+            Properties = properties;
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
         /// </param>
         public TestSessionStartArgs(string configuration)
         {
-            this.Configuration = configuration;
+            Configuration = configuration;
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
         /// </summary>
         public IEnumerator<KeyValuePair<string, object>> GetProperties()
         {
-            return this.Properties.GetEnumerator();
+            return Properties.GetEnumerator();
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
         {
             ValidateArg.NotNullOrEmpty(property, nameof(property));
 
-            return this.Properties.ContainsKey(property) ? (T)this.Properties[property] : default(T);
+            return Properties.ContainsKey(property) ? (T)Properties[property] : default;
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
         {
             ValidateArg.NotNullOrEmpty(property, nameof(property));
 
-            this.Properties.TryGetValue(property, out var propertyValue);
+            Properties.TryGetValue(property, out var propertyValue);
 
             return propertyValue;
         }

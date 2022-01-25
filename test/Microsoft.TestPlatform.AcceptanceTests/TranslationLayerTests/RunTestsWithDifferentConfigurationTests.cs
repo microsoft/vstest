@@ -28,14 +28,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         private void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
-            this.runEventHandler = new RunEventHandler();
+            vstestConsoleWrapper = GetVsTestConsoleWrapper();
+            runEventHandler = new RunEventHandler();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            this.vstestConsoleWrapper?.EndSession();
+            vstestConsoleWrapper?.EndSession();
         }
 
         [TestMethod]
@@ -43,22 +43,22 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithTestAdapterPath(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
-            var testAdapterPath = Directory.EnumerateFiles(this.GetTestAdapterPath(), "*.TestAdapter.dll").ToList();
-            this.vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
+            var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(), "*.TestAdapter.dll").ToList();
+            vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
 
-            this.vstestConsoleWrapper.RunTests(
-                this.GetTestAssemblies(),
-                this.GetDefaultRunSettings(),
-                this.runEventHandler);
+            vstestConsoleWrapper.RunTests(
+                GetTestAssemblies(),
+                GetDefaultRunSettings(),
+                runEventHandler);
 
             // Assert
-            Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+            Assert.AreEqual(6, runEventHandler.TestResults.Count);
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
         }
 
         [TestMethod]
@@ -66,8 +66,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithRunSettingsWithParallel(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
             string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
@@ -85,19 +85,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 cts,
                 testHostNames);
 
-            this.vstestConsoleWrapper.RunTests(
-                this.GetTestAssemblies(),
+            vstestConsoleWrapper.RunTests(
+                GetTestAssemblies(),
                 runSettingsXml,
-                this.runEventHandler);
+                runEventHandler);
 
             cts.Cancel();
 
             // Assert
-            this.runEventHandler.EnsureSuccess();
-            Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+            runEventHandler.EnsureSuccess();
+            Assert.AreEqual(6, runEventHandler.TestResults.Count);
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
                 numOfProcessCreatedTask.Result.Count,
@@ -109,9 +109,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetFullTargetFrameworkDataSource]
         public void RunTestsWithTestSettings(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+            Setup();
 
             var testsettingsFile = Path.Combine(Path.GetTempPath(), "tempsettings.testsettings");
             string testSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?><TestSettings></TestSettings>";
@@ -120,19 +120,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             var runSettings = $"<RunSettings><RunConfiguration><TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion></RunConfiguration><MSTest><SettingsFile>" + testsettingsFile + "</SettingsFile></MSTest></RunSettings>";
             var sources = new List<string>
                               {
-                                  this.GetAssetFullPath("MstestV1UnitTestProject.dll")
+                                  GetAssetFullPath("MstestV1UnitTestProject.dll")
                               };
 
-            this.vstestConsoleWrapper.RunTests(
+            vstestConsoleWrapper.RunTests(
                 sources,
                 runSettings,
-                this.runEventHandler);
+                runEventHandler);
 
             // Assert
-            Assert.AreEqual(5, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-            Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+            Assert.AreEqual(5, runEventHandler.TestResults.Count);
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+            Assert.AreEqual(1, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
 
             File.Delete(testsettingsFile);
         }
@@ -142,12 +142,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithX64Source(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
             var sources = new List<string>
                               {
-                                  this.GetAssetFullPath("SimpleTestProject3.dll")
+                                  GetAssetFullPath("SimpleTestProject3.dll")
                               };
 
 
@@ -158,17 +158,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts, testhostProcessNames);
 
-            this.vstestConsoleWrapper.RunTests(
+            vstestConsoleWrapper.RunTests(
                 sources,
-                this.GetDefaultRunSettings(),
+                GetDefaultRunSettings(),
                 new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName = SampleUnitTestProject3.UnitTest1.WorkingDirectoryTest" },
-                this.runEventHandler);
+                runEventHandler);
 
             cts.Cancel();
 
             // Assert
-            Assert.AreEqual(1, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+            Assert.AreEqual(1, runEventHandler.TestResults.Count);
+            Assert.AreEqual(1, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
             var numberOfProcessCreated = numOfProcessCreatedTask.Result;
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
@@ -180,8 +180,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             var testAssemblies = new List<string>
                                      {
-                                         this.GetAssetFullPath("SimpleTestProject.dll"),
-                                         this.GetAssetFullPath("SimpleTestProject2.dll")
+                                         GetAssetFullPath("SimpleTestProject.dll"),
+                                         GetAssetFullPath("SimpleTestProject2.dll")
                                      };
 
             return testAssemblies;

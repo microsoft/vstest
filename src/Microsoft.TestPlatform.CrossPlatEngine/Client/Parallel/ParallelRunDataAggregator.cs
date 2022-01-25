@@ -20,21 +20,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     {
         #region PrivateFields
 
-        private readonly string runSettingsXml;
 
-        private List<string> executorUris;
+        private readonly List<string> executorUris;
 
-        private List<ITestRunStatistics> testRunStatsList;
+        private readonly List<ITestRunStatistics> testRunStatsList;
 
-        private ConcurrentDictionary<string, object> metricsAggregator;
+        private readonly ConcurrentDictionary<string, object> metricsAggregator;
 
-        private object dataUpdateSyncObject = new object();
+        private readonly object dataUpdateSyncObject = new();
 
         #endregion
 
         public ParallelRunDataAggregator(string runSettingsXml)
         {
-            this.runSettingsXml = runSettingsXml ?? throw new ArgumentNullException(nameof(runSettingsXml));
+            RunSettings = runSettingsXml ?? throw new ArgumentNullException(nameof(runSettingsXml));
             ElapsedTime = TimeSpan.Zero;
             RunContextAttachments = new Collection<AttachmentSet>();
             RunCompleteArgsAttachments = new List<AttachmentSet>();
@@ -61,13 +60,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         public List<Exception> Exceptions { get; }
 
-        public HashSet<string> ExecutorUris => new HashSet<string>(executorUris);
+        public HashSet<string> ExecutorUris => new(executorUris);
 
         public bool IsAborted { get; private set; }
 
         public bool IsCanceled { get; private set; }
 
-        public string RunSettings => this.runSettingsXml;
+        public string RunSettings { get; private set; }
 
         #endregion
 
@@ -104,33 +103,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <returns></returns>
         public IDictionary<string, object> GetAggregatedRunDataMetrics()
         {
-            if (this.metricsAggregator == null || this.metricsAggregator.Count == 0)
+            if (metricsAggregator == null || metricsAggregator.Count == 0)
             {
                 return new ConcurrentDictionary<string, object>();
             }
 
-            var adapterUsedCount = this.metricsAggregator.Count(metrics =>
+            var adapterUsedCount = metricsAggregator.Count(metrics =>
                 metrics.Key.Contains(TelemetryDataConstants.TotalTestsRanByAdapter));
 
-            var adaptersDiscoveredCount = this.metricsAggregator.Count(metrics =>
+            var adaptersDiscoveredCount = metricsAggregator.Count(metrics =>
                 metrics.Key.Contains(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter));
 
             // Aggregating Total Adapter Used Count
-            this.metricsAggregator.TryAdd(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, adapterUsedCount);
+            metricsAggregator.TryAdd(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, adapterUsedCount);
 
             // Aggregating Total Adapters Discovered Count
-            this.metricsAggregator.TryAdd(
+            metricsAggregator.TryAdd(
                 TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution,
                 adaptersDiscoveredCount);
 
-            return this.metricsAggregator;
+            return metricsAggregator;
         }
 
         public Exception GetAggregatedException()
         {
-            if (Exceptions == null || Exceptions.Count < 1) return null;
-
-            return new AggregateException(Exceptions);
+            return Exceptions == null || Exceptions.Count < 1 ? null : (Exception)new AggregateException(Exceptions);
         }
 
         /// <summary>
@@ -150,8 +147,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             lock (dataUpdateSyncObject)
             {
-                this.IsAborted = this.IsAborted || isAborted;
-                this.IsCanceled = this.IsCanceled || isCanceled;
+                IsAborted = IsAborted || isAborted;
+                IsCanceled = IsCanceled || isCanceled;
 
                 ElapsedTime = TimeSpan.FromMilliseconds(Math.Max(ElapsedTime.TotalMilliseconds, elapsedTime.TotalMilliseconds));
                 if (runContextAttachments != null)
@@ -171,9 +168,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 {
                     foreach (var invokedDataCollector in invokedDataCollectors)
                     {
-                        if (!this.InvokedDataCollectors.Contains(invokedDataCollector))
+                        if (!InvokedDataCollectors.Contains(invokedDataCollector))
                         {
-                            this.InvokedDataCollectors.Add(invokedDataCollector);
+                            InvokedDataCollectors.Add(invokedDataCollector);
                         }
                     }
                 }
@@ -186,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <param name="metrics"></param>
         public void AggregateRunDataMetrics(IDictionary<string, object> metrics)
         {
-            if (metrics == null || metrics.Count == 0 || this.metricsAggregator == null)
+            if (metrics == null || metrics.Count == 0 || metricsAggregator == null)
             {
                 return;
             }
@@ -197,14 +194,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 {
                     var newValue = Convert.ToDouble(metric.Value);
 
-                    if (this.metricsAggregator.TryGetValue(metric.Key, out var oldValue))
+                    if (metricsAggregator.TryGetValue(metric.Key, out var oldValue))
                     {
                         var oldDoubleValue = Convert.ToDouble(oldValue);
-                        this.metricsAggregator[metric.Key] = newValue + oldDoubleValue;
+                        metricsAggregator[metric.Key] = newValue + oldDoubleValue;
                     }
                     else
                     {
-                        this.metricsAggregator.TryAdd(metric.Key, newValue);
+                        metricsAggregator.TryAdd(metric.Key, newValue);
                     }
                 }
             }

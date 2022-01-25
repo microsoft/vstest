@@ -49,18 +49,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
             string testCaseFilter,
             FilterOptions filterOptions)
         {
-            this.FrequencyOfRunStatsChangeEvent = frequencyOfRunStatsChangeEvent;
-            this.RunStatsChangeEventTimeout = runStatsChangeEventTimeout;
-            this.InIsolation = inIsolation;
-            this.KeepAlive = keepAlive;
-            this.IsDataCollectionEnabled = isDataCollectionEnabled;
-            this.AreTestCaseLevelEventsRequired = areTestCaseLevelEventsRequired;
+            FrequencyOfRunStatsChangeEvent = frequencyOfRunStatsChangeEvent;
+            RunStatsChangeEventTimeout = runStatsChangeEventTimeout;
+            InIsolation = inIsolation;
+            KeepAlive = keepAlive;
+            IsDataCollectionEnabled = isDataCollectionEnabled;
+            AreTestCaseLevelEventsRequired = areTestCaseLevelEventsRequired;
 
-            this.IsDebug = isDebug;
+            IsDebug = isDebug;
 
-            this.HasTestRun = hasTestRun;
-            this.TestCaseFilter = testCaseFilter;
-            this.FilterOptions = filterOptions;
+            HasTestRun = hasTestRun;
+            TestCaseFilter = testCaseFilter;
+            FilterOptions = filterOptions;
         }
 
         #endregion

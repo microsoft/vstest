@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public void WriteLine(PlatformTraceLevel traceLevel, string message)
         {
-            if (!this.ShouldTrace(traceLevel))
+            if (!ShouldTrace(traceLevel))
             {
                 return;
             }
@@ -54,22 +54,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public bool ShouldTrace(PlatformTraceLevel traceLevel)
         {
-            if (this.DoNotInitialize)
-            {
-                return false;
-            }
-
-            return (int)this.traceLevel >= (int)traceLevel;
+            return !DoNotInitialize && (int)this.traceLevel >= (int)traceLevel;
         }
 
         public string GetLogFile() => string.Empty;
 
         public void SetTraceLevel(PlatformTraceLevel value)
         {
-            this.traceLevel = value;
+            traceLevel = value;
         }
 
-        public PlatformTraceLevel GetTraceLevel() => this.traceLevel;
+        public PlatformTraceLevel GetTraceLevel() => traceLevel;
     }
 }
 

@@ -68,7 +68,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldReturnInitialAttachmentsThroughEventsHandler_IfNoAttachmentsOnInput()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>();
+            List<AttachmentSet> inputAttachments = new();
 
             // act
             await manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], mockEventsHandler.Object, cancellationTokenSource.Token);
@@ -92,7 +92,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldReturnNoAttachments_IfNoAttachmentsOnInput()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>();
+            List<AttachmentSet> inputAttachments = new();
 
             // act
             var result = await manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], cancellationTokenSource.Token);
@@ -111,7 +111,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldReturn1NotProcessedAttachmentThroughEventsHandler_If1NotRelatedAttachmentOnInput()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri3), "uri3_input")
             };
@@ -135,7 +135,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldReturn1NotProcessedAttachment_If1NotRelatedAttachmentOnInput()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri3), "uri3_input")
             };
@@ -158,12 +158,12 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldReturn1ProcessedAttachmentThroughEventsHandler_IfRelatedAttachmentOnInput()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input")
             };
 
-            List<AttachmentSet> outputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> outputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_output")
             };
@@ -189,12 +189,12 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldReturn1ProcessedAttachment_IfRelatedAttachmentOnInput()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input")
             };
 
-            List<AttachmentSet> outputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> outputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_output")
             };
@@ -221,7 +221,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldReturnInitialAttachmentsThroughEventsHandler_IfRelatedAttachmentOnInputButHandlerThrowsException()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input")
             };
@@ -247,7 +247,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldReturnInitialAttachments_IfRelatedAttachmentOnInputButHandlerThrowsException()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input")
             };
@@ -273,7 +273,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         {
             // arrange
             cancellationTokenSource.Cancel();
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input")
             };
@@ -297,7 +297,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         {
             // arrange
             cancellationTokenSource.Cancel();
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input")
             };
@@ -320,7 +320,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldReturnProcessedAttachmentsThroughEventsHandler_IfRelatedAttachmentsOnInput()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input1"),
                 new AttachmentSet(new Uri(uri1), "uri1_input2"),
@@ -329,12 +329,12 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
                 new AttachmentSet(new Uri(uri3), "uri3_input1"),
             };
 
-            List<AttachmentSet> outputAttachmentsForHandler1 = new List<AttachmentSet>
+            List<AttachmentSet> outputAttachmentsForHandler1 = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_output")
             };
 
-            List<AttachmentSet> outputAttachmentsForHandler2 = new List<AttachmentSet>
+            List<AttachmentSet> outputAttachmentsForHandler2 = new()
             {
                 new AttachmentSet(new Uri(uri2), "uri2_output")
             };
@@ -361,7 +361,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldReturnProcessedAttachments_IfRelatedAttachmentsOnInput()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input1"),
                 new AttachmentSet(new Uri(uri1), "uri1_input2"),
@@ -370,12 +370,12 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
                 new AttachmentSet(new Uri(uri3), "uri3_input1"),
             };
 
-            List<AttachmentSet> outputAttachmentsForHandler1 = new List<AttachmentSet>
+            List<AttachmentSet> outputAttachmentsForHandler1 = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_output")
             };
 
-            List<AttachmentSet> outputAttachmentsForHandler2 = new List<AttachmentSet>
+            List<AttachmentSet> outputAttachmentsForHandler2 = new()
             {
                 new AttachmentSet(new Uri(uri2), "uri2_output")
             };
@@ -403,7 +403,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldReturnInitialAttachmentsThroughEventsHandler_IfOperationCancelled()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input")
             };
@@ -469,7 +469,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldReturnInitialAttachments_IfOperationCancelled()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input")
             };
@@ -530,7 +530,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldReturnProperlySendProgressEvents_IfHandlersPropagesEvents()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input"),
                 new AttachmentSet(new Uri(uri2), "uri2_input")
@@ -606,7 +606,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldNotFailIfRunsettingsIsNull()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input"),
                 new AttachmentSet(new Uri(uri2), "uri2_input")
@@ -636,13 +636,13 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldFlowCorrectDataCollectorConfiguration(bool withConfig)
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input"),
                 new AttachmentSet(new Uri(uri2), "uri2_input")
             };
 
-            List<InvokedDataCollector> invokedDataCollectors = new List<InvokedDataCollector>
+            List<InvokedDataCollector> invokedDataCollectors = new()
             {
                 new InvokedDataCollector(new Uri(uri1),withConfig ? "friendlyNameA" : "friendlyNameB", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false)
             };
@@ -694,7 +694,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldNotConsumeAttachmentsIfProcessorFails()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input_1")
             };
@@ -756,7 +756,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         public async Task ProcessTestRunAttachmentsAsync_ShouldNotConsumeAttachmentsIfAllProcessorsFail()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input_1")
             };

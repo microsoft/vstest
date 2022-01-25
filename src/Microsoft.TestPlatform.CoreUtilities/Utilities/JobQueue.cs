@@ -1,7 +1,7 @@
+
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#pragma warning disable SA1649 // SA1649FileNameMustMatchTypeName. This is a generic type.
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
@@ -28,32 +28,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Handler which processes the individual jobs.
         /// </summary>
-        private Action<T> processJob;
+        private readonly Action<T> processJob;
 
         /// <summary>
         /// Name used when displaying information or reporting errors about this queue.
         /// </summary>
-        private string displayName;
+        private readonly string displayName;
 
         /// <summary>
         /// The queue of jobs.
         /// </summary>
-        private Queue<Job<T>> jobsQueue;
+        private readonly Queue<Job<T>> jobsQueue;
 
         /// <summary>
         /// Signaled when a job is added to the queue.  Used to wakeup the background thread.
         /// </summary>
-        private ManualResetEvent jobAdded;
+        private readonly ManualResetEvent jobAdded;
 
         /// <summary>
         /// The maximum number of jobs the job queue may hold.
         /// </summary>
-        private int maxNumberOfJobsInQueue;
+        private readonly int maxNumberOfJobsInQueue;
 
         /// <summary>
         /// The maximum total size of jobs the job queue may hold.
         /// </summary>
-        private int maxBytesQueueCanHold;
+        private readonly int maxBytesQueueCanHold;
 
         /// <summary>
         /// Gives the approximate total size of objects in the queue.
@@ -69,13 +69,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// Used to pause and resume processing of the queue.  By default the manual reset event is
         /// set so the queue can continue processing.
         /// </summary>
-        private ManualResetEvent queueProcessing;
+        private readonly ManualResetEvent queueProcessing;
 
         /// <summary>
         /// The background thread which is processing the jobs.  Used when disposing to wait
         /// for the thread to complete.
         /// </summary>
-        private Task backgroundJobProcessor;
+        private readonly Task backgroundJobProcessor;
 
         /// <summary>
         /// Keeps track of if we are disposed.
@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Logs to this action any exception when processing jobs.
         /// </summary>
-        private Action<string> exceptionLogger;
+        private readonly Action<string> exceptionLogger;
 
         #endregion
 
@@ -119,24 +119,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 throw new ArgumentOutOfRangeException(nameof(maxQueueSize));
             }
 
-            this.maxNumberOfJobsInQueue = maxQueueLength;
-            this.maxBytesQueueCanHold = maxQueueSize;
-            this.enableBoundsOnQueue = enableBounds;
+            maxNumberOfJobsInQueue = maxQueueLength;
+            maxBytesQueueCanHold = maxQueueSize;
+            enableBoundsOnQueue = enableBounds;
 
             // Initialize defaults.
-            this.jobsQueue = new Queue<Job<T>>();
-            this.jobAdded = new ManualResetEvent(false);
-            this.queueProcessing = new ManualResetEvent(true);
-            this.currentNumberOfBytesQueueIsHolding = 0;
-            this.isDisposed = false;
+            jobsQueue = new Queue<Job<T>>();
+            jobAdded = new ManualResetEvent(false);
+            queueProcessing = new ManualResetEvent(true);
+            currentNumberOfBytesQueueIsHolding = 0;
+            isDisposed = false;
 
             // Save off the arguments.
             this.displayName = displayName;
             this.exceptionLogger = exceptionLogger;
 
             // Setup the background thread to process the jobs.
-            this.backgroundJobProcessor = new Task(() => this.BackgroundJobProcessor(), TaskCreationOptions.LongRunning);
-            this.backgroundJobProcessor.Start();
+            backgroundJobProcessor = new Task(() => BackgroundJobProcessor(), TaskCreationOptions.LongRunning);
+            backgroundJobProcessor.Start();
         }
 
         #endregion
@@ -150,12 +150,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="jobSize"> The job Size. </param>
         public void QueueJob(T job, int jobSize)
         {
-            this.CheckDisposed();
+            CheckDisposed();
 
             Debug.Assert(jobSize >= 0, "Job size should never be negative");
 
             // Add the job and signal that a new job is available.
-            this.InternalQueueJob(new Job<T>(job, jobSize));
+            InternalQueueJob(new Job<T>(job, jobSize));
         }
 
         /// <summary>
@@ -163,10 +163,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         public void Pause()
         {
-            this.CheckDisposed();
+            CheckDisposed();
 
             // Do not allow any jobs to be processed.
-            this.queueProcessing.Reset();
+            queueProcessing.Reset();
         }
 
         /// <summary>
@@ -174,10 +174,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         public void Resume()
         {
-            this.CheckDisposed();
+            CheckDisposed();
 
             // Resume processing of jobs.
-            this.queueProcessing.Set();
+            queueProcessing.Set();
         }
 
         /// <summary>
@@ -185,14 +185,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         public void Flush()
         {
-            this.CheckDisposed();
+            CheckDisposed();
 
             // Create the wait job.
             using var waitEvent = new ManualResetEvent(false);
             var waitJob = Job<T>.CreateWaitJob(waitEvent);
 
             // Queue the wait job and wait for it to be processed.
-            this.InternalQueueJob(waitJob);
+            InternalQueueJob(waitJob);
 
             waitEvent.WaitOne();
         }
@@ -202,36 +202,36 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         public void Dispose()
         {
-            if (this.isDisposed)
+            if (isDisposed)
             {
                 return;
             }
 
             // If the queue is paused, then throw.
-            if (!this.queueProcessing.WaitOne(0))
+            if (!queueProcessing.WaitOne(0))
             {
                 throw new InvalidOperationException(
-                    string.Format(CultureInfo.CurrentUICulture, Resources.QueuePausedDisposeError, this.displayName));
+                    string.Format(CultureInfo.CurrentUICulture, Resources.QueuePausedDisposeError, displayName));
             }
 
-            this.isDisposed = true;
+            isDisposed = true;
 
             // Disable bounds on the queue so that any waiting threads can proceed.
-            lock (this.jobsQueue)
+            lock (jobsQueue)
             {
-                this.enableBoundsOnQueue = false;
-                Monitor.PulseAll(this.jobsQueue);
+                enableBoundsOnQueue = false;
+                Monitor.PulseAll(jobsQueue);
             }
 
             // Flag the queue as being shutdown and wake up the background thread.
-            this.InternalQueueJob(Job<T>.ShutdownJob);
+            InternalQueueJob(Job<T>.ShutdownJob);
 
             // Wait for the background thread to shutdown.
-            this.backgroundJobProcessor.Wait();
+            backgroundJobProcessor.Wait();
 
             // Cleanup
-            this.jobAdded.Dispose();
-            this.queueProcessing.Dispose();
+            jobAdded.Dispose();
+            queueProcessing.Dispose();
         }
 
         #endregion
@@ -247,7 +247,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         protected virtual bool WaitForQueueToGetEmpty()
         {
             EqtTrace.Verbose("blocking on over filled queue.");
-            return Monitor.Wait(this.jobsQueue);
+            return Monitor.Wait(jobsQueue);
         }
 
         /// <summary>
@@ -257,21 +257,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private void InternalQueueJob(Job<T> job)
         {
             // Add the job and signal that a new job is available.
-            lock (this.jobsQueue)
+            lock (jobsQueue)
             {
                 // If the queue is getting over filled wait till the background processor releases the thread.
-                while (this.enableBoundsOnQueue
+                while (enableBoundsOnQueue
                         &&
-                      ((this.jobsQueue.Count >= this.maxNumberOfJobsInQueue)
+                      ((jobsQueue.Count >= maxNumberOfJobsInQueue)
                           ||
-                       (this.currentNumberOfBytesQueueIsHolding >= this.maxBytesQueueCanHold)))
+                       (currentNumberOfBytesQueueIsHolding >= maxBytesQueueCanHold)))
                 {
-                    this.WaitForQueueToGetEmpty();
+                    WaitForQueueToGetEmpty();
                 }
 
-                this.jobsQueue.Enqueue(job);
-                this.currentNumberOfBytesQueueIsHolding += job.Size;
-                this.jobAdded.Set();
+                jobsQueue.Enqueue(job);
+                currentNumberOfBytesQueueIsHolding += job.Size;
+                jobAdded.Set();
             }
         }
 
@@ -280,10 +280,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         private void CheckDisposed()
         {
-            if (this.isDisposed)
+            if (isDisposed)
             {
                 throw new ObjectDisposedException(
-                    string.Format(CultureInfo.CurrentUICulture, Resources.QueueAlreadyDisposed, this.displayName));
+                    string.Format(CultureInfo.CurrentUICulture, Resources.QueueAlreadyDisposed, displayName));
             }
         }
 
@@ -296,16 +296,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             do
             {
-                this.jobAdded.WaitOne();
+                jobAdded.WaitOne();
 
                 // Pull all of the current jobs out of the queue.
-                List<Job<T>> jobs = new List<Job<T>>();
-                lock (this.jobsQueue)
+                List<Job<T>> jobs = new();
+                lock (jobsQueue)
                 {
-                    while (this.jobsQueue.Count != 0)
+                    while (jobsQueue.Count != 0)
                     {
-                        var job = this.jobsQueue.Dequeue();
-                        this.currentNumberOfBytesQueueIsHolding -= job.Size;
+                        var job = jobsQueue.Dequeue();
+                        currentNumberOfBytesQueueIsHolding -= job.Size;
 
                         // If this is a shutdown job, signal shutdown and stop adding jobs.
                         if (job.Shutdown)
@@ -318,12 +318,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     }
 
                     // Reset the manual reset event so we get notified of new jobs that are added.
-                    this.jobAdded.Reset();
+                    jobAdded.Reset();
 
                     // Releases a thread waiting on the queue to get empty, to continue with the enqueuing process.
-                    if (this.enableBoundsOnQueue)
+                    if (enableBoundsOnQueue)
                     {
-                        Monitor.PulseAll(this.jobsQueue);
+                        Monitor.PulseAll(jobsQueue);
                     }
                 }
 
@@ -331,7 +331,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 foreach (var job in jobs)
                 {
                     // Wait for the queue to be open (not paused) and process the job.
-                    this.queueProcessing.WaitOne();
+                    queueProcessing.WaitOne();
 
                     // If this is a wait job, signal the manual reset event and continue.
                     if (job.WaitManualResetEvent != null)
@@ -340,7 +340,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     }
                     else
                     {
-                        this.SafeProcessJob(job.Payload);
+                        SafeProcessJob(job.Payload);
                     }
                 }
             }
@@ -351,20 +351,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// Executes the process job handler and logs any exceptions which occur.
         /// </summary>
         /// <param name="job">Job to be executed.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "unknown action could throw all kinds of exceptions.")]
         private void SafeProcessJob(T job)
         {
             try
             {
-                this.processJob(job);
+                processJob(job);
             }
             catch (Exception e)
             {
-                this.exceptionLogger(
+                exceptionLogger(
                     string.Format(
                         CultureInfo.CurrentUICulture,
                         Resources.ExceptionFromJobProcessor,
-                        this.displayName,
+                        displayName,
                         e));
             }
         }

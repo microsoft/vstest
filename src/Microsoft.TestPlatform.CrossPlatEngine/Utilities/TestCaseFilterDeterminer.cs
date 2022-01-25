@@ -9,17 +9,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities
 
         internal static string ShortenTestCaseFilterIfRequired(string testCaseFilter)
         {
-            string shortenTestCaseFilter;
-
-            if (testCaseFilter.Length > MaxLengthOfTestCaseFilterToShow)
-            {
-                shortenTestCaseFilter = testCaseFilter.Substring(0, MaxLengthOfTestCaseFilterToShow) + "...";
-            }
-            else
-            {
-                shortenTestCaseFilter = testCaseFilter;
-            }
-
+            string shortenTestCaseFilter = testCaseFilter.Length > MaxLengthOfTestCaseFilterToShow
+                ? testCaseFilter.Substring(0, MaxLengthOfTestCaseFilterToShow) + "..."
+                : testCaseFilter;
             return shortenTestCaseFilter;
         }
     }

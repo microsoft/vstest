@@ -22,38 +22,38 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         [TestMethod]
         public void AssemblyQualifiedNameShouldReturnTestExtensionTypesName()
         {
-            this.testPluginInformation = new TestLoggerPluginInformation(typeof(DummyTestExtensionWithNoFriendlyName));
-            Assert.AreEqual(typeof(DummyTestExtensionWithNoFriendlyName).AssemblyQualifiedName, this.testPluginInformation.AssemblyQualifiedName);
+            testPluginInformation = new TestLoggerPluginInformation(typeof(DummyTestExtensionWithNoFriendlyName));
+            Assert.AreEqual(typeof(DummyTestExtensionWithNoFriendlyName).AssemblyQualifiedName, testPluginInformation.AssemblyQualifiedName);
         }
 
         [TestMethod]
         public void IdentifierDataShouldReturnExtensionUri()
         {
-            this.testPluginInformation = new TestLoggerPluginInformation(typeof(DummyTestExtensionWithFriendlyName));
-            Assert.AreEqual(DefaultExtensionURI, this.testPluginInformation.IdentifierData);
+            testPluginInformation = new TestLoggerPluginInformation(typeof(DummyTestExtensionWithFriendlyName));
+            Assert.AreEqual(DefaultExtensionURI, testPluginInformation.IdentifierData);
         }
 
         [TestMethod]
         public void FriendlyNameShouldReturnEmptyIfALoggerDoesNotHaveOne()
         {
-            this.testPluginInformation = new TestLoggerPluginInformation(typeof(DummyTestExtensionWithNoFriendlyName));
-            Assert.IsNotNull(this.testPluginInformation.FriendlyName);
-            Assert.AreEqual(string.Empty, this.testPluginInformation.FriendlyName);
+            testPluginInformation = new TestLoggerPluginInformation(typeof(DummyTestExtensionWithNoFriendlyName));
+            Assert.IsNotNull(testPluginInformation.FriendlyName);
+            Assert.AreEqual(string.Empty, testPluginInformation.FriendlyName);
         }
 
         [TestMethod]
         public void FriendlyNameShouldReturnFriendlyNameOfALogger()
         {
-            this.testPluginInformation = new TestLoggerPluginInformation(typeof(DummyTestExtensionWithFriendlyName));
-            Assert.AreEqual(DefaultFriendlyName, this.testPluginInformation.FriendlyName);
+            testPluginInformation = new TestLoggerPluginInformation(typeof(DummyTestExtensionWithFriendlyName));
+            Assert.AreEqual(DefaultFriendlyName, testPluginInformation.FriendlyName);
         }
 
         [TestMethod]
         public void MetadataShouldReturnExtensionUriAndFriendlyName()
         {
-            this.testPluginInformation = new TestLoggerPluginInformation(typeof(DummyTestExtensionWithFriendlyName));
+            testPluginInformation = new TestLoggerPluginInformation(typeof(DummyTestExtensionWithFriendlyName));
 
-            CollectionAssert.AreEqual(new object[] { DefaultExtensionURI, DefaultFriendlyName }, this.testPluginInformation.Metadata.ToArray());
+            CollectionAssert.AreEqual(new object[] { DefaultExtensionURI, DefaultFriendlyName }, testPluginInformation.Metadata.ToArray());
         }
 
         #region Implementation
@@ -62,8 +62,8 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         {
         }
 
-        [FriendlyName(TestLoggerPluginInformationTests.DefaultFriendlyName)]
-        [ExtensionUri(TestLoggerPluginInformationTests.DefaultExtensionURI)]
+        [FriendlyName(DefaultFriendlyName)]
+        [ExtensionUri(DefaultExtensionURI)]
         private class DummyTestExtensionWithFriendlyName
         {
         }

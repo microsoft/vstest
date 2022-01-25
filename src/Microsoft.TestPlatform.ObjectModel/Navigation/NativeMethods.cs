@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
     /// </summary>
     internal static class Guids
     {
-        internal static Guid CLSID_DiaSource = new Guid("79F1BB5F-B66E-48E5-B6A9-1545C323CA3D");
+        internal static Guid CLSID_DiaSource = new("79F1BB5F-B66E-48E5-B6A9-1545C323CA3D");
     }
 
     /// <summary>
@@ -568,7 +568,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             var diaSourceClassGuid = new Guid("{E6756135-1E65-4D17-8576-610761398C3C}");
             var comClassFactory = (IClassFactory)DllGetClassObject(diaSourceClassGuid, new Guid("00000001-0000-0000-C000-000000000046"));
 
-            Guid iDataDataSourceGuid = new Guid("79F1BB5F-B66E-48E5-B6A9-1545C323CA3D");
+            Guid iDataDataSourceGuid = new("79F1BB5F-B66E-48E5-B6A9-1545C323CA3D");
             comClassFactory.CreateInstance(null, ref iDataDataSourceGuid, out object comObject);
             return (comObject as IDiaDataSource);
         }

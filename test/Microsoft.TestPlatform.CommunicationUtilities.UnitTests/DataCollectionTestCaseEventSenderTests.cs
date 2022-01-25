@@ -22,94 +22,82 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     [TestClass]
     public class DataCollectionTestCaseEventSenderTests
     {
-        private DataCollectionTestCaseEventSender dataCollectionTestCaseEventSender;
-        private Mock<ICommunicationManager> mockCommunicationManager;
-        private TestCase testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
+        private readonly DataCollectionTestCaseEventSender dataCollectionTestCaseEventSender;
+        private readonly Mock<ICommunicationManager> mockCommunicationManager;
+        private readonly TestCase testCase = new("hello", new Uri("world://how"), "1.dll");
 
         public DataCollectionTestCaseEventSenderTests()
         {
-            this.mockCommunicationManager = new Mock<ICommunicationManager>();
-            this.dataCollectionTestCaseEventSender = new TestableDataCollectionTestCaseEventSender(this.mockCommunicationManager.Object, JsonDataSerializer.Instance);
+            mockCommunicationManager = new Mock<ICommunicationManager>();
+            dataCollectionTestCaseEventSender = new TestableDataCollectionTestCaseEventSender(mockCommunicationManager.Object, JsonDataSerializer.Instance);
         }
 
         [TestMethod]
         public void InitializeShouldInitializeCommunicationManager()
         {
-            this.dataCollectionTestCaseEventSender.InitializeCommunication(123);
+            dataCollectionTestCaseEventSender.InitializeCommunication(123);
 
-            this.mockCommunicationManager.Verify(x => x.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, 123)), Times.Once);
+            mockCommunicationManager.Verify(x => x.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, 123)), Times.Once);
         }
 
         [TestMethod]
         public void InitializeShouldThrowExceptionIfThrownByCommunicationManager()
         {
-            this.mockCommunicationManager.Setup(x => x.SetupClientAsync(It.IsAny<IPEndPoint>())).Throws<Exception>();
+            mockCommunicationManager.Setup(x => x.SetupClientAsync(It.IsAny<IPEndPoint>())).Throws<Exception>();
 
-            Assert.ThrowsException<Exception>(() =>
-                {
-                    this.dataCollectionTestCaseEventSender.InitializeCommunication(123);
-                });
+            Assert.ThrowsException<Exception>(() => dataCollectionTestCaseEventSender.InitializeCommunication(123));
         }
 
         [TestMethod]
         public void WaitForRequestSenderConnectionShouldInvokeWaitForServerConnection()
         {
-            this.dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(123);
+            dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(123);
 
-            this.mockCommunicationManager.Verify(x => x.WaitForServerConnection(It.IsAny<int>()), Times.Once);
+            mockCommunicationManager.Verify(x => x.WaitForServerConnection(It.IsAny<int>()), Times.Once);
         }
 
         [TestMethod]
         public void WaitForRequestSenderConnectionShouldThrowExceptionIfThrownByCommunicationManager()
         {
-            this.mockCommunicationManager.Setup(x => x.WaitForServerConnection(It.IsAny<int>())).Throws<Exception>();
+            mockCommunicationManager.Setup(x => x.WaitForServerConnection(It.IsAny<int>())).Throws<Exception>();
 
-            Assert.ThrowsException<Exception>(() =>
-                {
-                    this.dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(123);
-                });
+            Assert.ThrowsException<Exception>(() => dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(123));
         }
 
         [TestMethod]
         public void CloseShouldDisposeCommunicationManager()
         {
-            this.dataCollectionTestCaseEventSender.Close();
+            dataCollectionTestCaseEventSender.Close();
 
-            this.mockCommunicationManager.Verify(x => x.StopClient(), Times.Once);
+            mockCommunicationManager.Verify(x => x.StopClient(), Times.Once);
         }
 
         [TestMethod]
         public void CloseShouldThrowExceptionIfThrownByCommunicationManager()
         {
-            this.mockCommunicationManager.Setup(x => x.StopClient()).Throws<Exception>();
+            mockCommunicationManager.Setup(x => x.StopClient()).Throws<Exception>();
 
-            Assert.ThrowsException<Exception>(() =>
-                {
-                    this.dataCollectionTestCaseEventSender.Close();
-                });
+            Assert.ThrowsException<Exception>(() => dataCollectionTestCaseEventSender.Close());
         }
 
         [TestMethod]
         public void SendTestCaseStartShouldSendMessageThroughCommunicationManager()
         {
-            this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.DataCollectionTestStartAck });
-            var testcaseStartEventArgs = new TestCaseStartEventArgs(this.testCase);
-            this.dataCollectionTestCaseEventSender.SendTestCaseStart(testcaseStartEventArgs);
+            mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.DataCollectionTestStartAck });
+            var testcaseStartEventArgs = new TestCaseStartEventArgs(testCase);
+            dataCollectionTestCaseEventSender.SendTestCaseStart(testcaseStartEventArgs);
 
-            this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs), Times.Once);
-            this.mockCommunicationManager.Verify(x => x.ReceiveMessage(), Times.Once);
+            mockCommunicationManager.Verify(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs), Times.Once);
+            mockCommunicationManager.Verify(x => x.ReceiveMessage(), Times.Once);
         }
 
         [TestMethod]
         public void SendTestCaseStartShouldThrowExceptionIfThrownByCommunicationManager()
         {
-            var testcaseStartEventArgs = new TestCaseStartEventArgs(this.testCase);
-            this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs)).Throws<Exception>();
+            var testcaseStartEventArgs = new TestCaseStartEventArgs(testCase);
+            mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs)).Throws<Exception>();
 
-            Assert.ThrowsException<Exception>(() =>
-                {
-                    this.dataCollectionTestCaseEventSender.SendTestCaseStart(testcaseStartEventArgs);
-                });
+            Assert.ThrowsException<Exception>(() => dataCollectionTestCaseEventSender.SendTestCaseStart(testcaseStartEventArgs));
         }
 
         [TestMethod]
@@ -118,8 +106,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             var testCaseEndEventArgs = new TestCaseEndEventArgs();
 
             var attachmentSet = new AttachmentSet(new Uri("my://attachment"), "displayname");
-            this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.DataCollectionTestEndResult, Payload = JToken.FromObject(new Collection<AttachmentSet>() { attachmentSet }) });
-            var attachments = this.dataCollectionTestCaseEventSender.SendTestCaseEnd(testCaseEndEventArgs);
+            mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.DataCollectionTestEndResult, Payload = JToken.FromObject(new Collection<AttachmentSet>() { attachmentSet }) });
+            var attachments = dataCollectionTestCaseEventSender.SendTestCaseEnd(testCaseEndEventArgs);
 
             Assert.AreEqual(attachments[0].Uri, attachmentSet.Uri);
             Assert.AreEqual(attachments[0].DisplayName, attachmentSet.DisplayName);
@@ -130,12 +118,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var testCaseEndEventArgs = new TestCaseEndEventArgs();
 
-            this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionTestEnd, It.IsAny<TestCaseEndEventArgs>())).Throws<Exception>();
+            mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionTestEnd, It.IsAny<TestCaseEndEventArgs>())).Throws<Exception>();
 
-            Assert.ThrowsException<Exception>(() =>
-                {
-                    this.dataCollectionTestCaseEventSender.SendTestCaseEnd(testCaseEndEventArgs);
-                });
+            Assert.ThrowsException<Exception>(() => dataCollectionTestCaseEventSender.SendTestCaseEnd(testCaseEndEventArgs));
         }
     }
 }

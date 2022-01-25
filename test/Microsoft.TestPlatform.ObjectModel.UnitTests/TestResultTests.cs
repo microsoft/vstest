@@ -5,7 +5,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 {
     using System;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
+    using TestResult = VisualStudio.TestPlatform.ObjectModel.TestResult;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -17,27 +17,27 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 
         public TestResultTests()
         {
-            this.testcase = new TestCase("FQN", new Uri("http://dummyUri"), "dummySource");
-            this.result = new TestResult(testcase);
+            testcase = new TestCase("FQN", new Uri("http://dummyUri"), "dummySource");
+            result = new TestResult(testcase);
         }
 
         [TestMethod]
         public void TestResultShouldInitializeEmptyAttachments()
         {
-            Assert.AreEqual(0, this.result.Attachments.Count);
+            Assert.AreEqual(0, result.Attachments.Count);
         }
 
         [TestMethod]
         public void TestResultShouldInitializeEmptyMessages()
         {
-            Assert.AreEqual(0, this.result.Messages.Count);
+            Assert.AreEqual(0, result.Messages.Count);
         }
 
         [TestMethod]
         public void TestResultShouldInitializeStartAndEndTimeToCurrent()
         {
-            Assert.IsTrue(this.result.StartTime.Subtract(DateTimeOffset.UtcNow) < new TimeSpan(0, 0, 0, 10));
-            Assert.IsTrue(this.result.EndTime.Subtract(DateTimeOffset.UtcNow) < new TimeSpan(0, 0, 0, 10));
+            Assert.IsTrue(result.StartTime.Subtract(DateTimeOffset.UtcNow) < new TimeSpan(0, 0, 0, 10));
+            Assert.IsTrue(result.EndTime.Subtract(DateTimeOffset.UtcNow) < new TimeSpan(0, 0, 0, 10));
         }
 
         #region GetSetPropertyValue Tests
@@ -46,144 +46,144 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         public void TestResultGetPropertyValueForComputerNameShouldReturnCorrectValue()
         {
             var testComputerName = "computerName";
-            this.result.ComputerName = testComputerName;
+            result.ComputerName = testComputerName;
 
-            Assert.AreEqual(testComputerName, this.result.GetPropertyValue(TestResultProperties.ComputerName));
+            Assert.AreEqual(testComputerName, result.GetPropertyValue(TestResultProperties.ComputerName));
         }
 
         [TestMethod]
         public void TestResultGetPropertyValueForDisplayNameShouldReturnCorrectValue()
         {
             var testDisplayName = "displayName";
-            this.result.DisplayName = testDisplayName;
+            result.DisplayName = testDisplayName;
 
-            Assert.AreEqual(testDisplayName, this.result.GetPropertyValue(TestResultProperties.DisplayName));
+            Assert.AreEqual(testDisplayName, result.GetPropertyValue(TestResultProperties.DisplayName));
         }
 
         [TestMethod]
         public void TestResultGetPropertyValueForDurationShouldReturnCorrectValue()
         {
             var testDuration = new TimeSpan(0, 0, 0, 10);
-            this.result.Duration = testDuration;
+            result.Duration = testDuration;
 
-            Assert.AreEqual(testDuration, this.result.GetPropertyValue(TestResultProperties.Duration));
+            Assert.AreEqual(testDuration, result.GetPropertyValue(TestResultProperties.Duration));
         }
 
         [TestMethod]
         public void TestResultGetPropertyValueForEndTimeShouldReturnCorrectValue()
         {
             var testEndTime = new DateTimeOffset(new DateTime(2007, 3, 10, 0, 0, 10, DateTimeKind.Utc));
-            this.result.EndTime = testEndTime;
+            result.EndTime = testEndTime;
 
-            Assert.AreEqual(testEndTime, this.result.GetPropertyValue(TestResultProperties.EndTime));
+            Assert.AreEqual(testEndTime, result.GetPropertyValue(TestResultProperties.EndTime));
         }
 
         [TestMethod]
         public void TestResultGetPropertyValueForErrorMessageShouldReturnCorrectValue()
         {
             var testErrorMessage = "error123";
-            this.result.ErrorMessage = testErrorMessage;
+            result.ErrorMessage = testErrorMessage;
 
-            Assert.AreEqual(testErrorMessage, this.result.GetPropertyValue(TestResultProperties.ErrorMessage));
+            Assert.AreEqual(testErrorMessage, result.GetPropertyValue(TestResultProperties.ErrorMessage));
         }
 
         [TestMethod]
         public void TestResultGetPropertyValueForErrorStackTraceShouldReturnCorrectValue()
         {
             var testErrorStackTrace = "errorStack";
-            this.result.ErrorStackTrace = testErrorStackTrace;
+            result.ErrorStackTrace = testErrorStackTrace;
 
-            Assert.AreEqual(testErrorStackTrace, this.result.GetPropertyValue(TestResultProperties.ErrorStackTrace));
+            Assert.AreEqual(testErrorStackTrace, result.GetPropertyValue(TestResultProperties.ErrorStackTrace));
         }
 
         [TestMethod]
         public void TestResultGetPropertyValueForTestOutcomeShouldReturnCorrectValue()
         {
             var testOutcome = TestOutcome.Passed;
-            this.result.Outcome = testOutcome;
+            result.Outcome = testOutcome;
 
-            Assert.AreEqual(testOutcome, this.result.GetPropertyValue(TestResultProperties.Outcome));
+            Assert.AreEqual(testOutcome, result.GetPropertyValue(TestResultProperties.Outcome));
         }
 
         [TestMethod]
         public void TestResultGetPropertyValueForStartTimeShouldReturnCorrectValue()
         {
             var testStartTime = new DateTimeOffset(new DateTime(2007, 3, 10, 0, 0, 0, DateTimeKind.Utc));
-            this.result.StartTime = testStartTime;
+            result.StartTime = testStartTime;
 
-            Assert.AreEqual(testStartTime, this.result.GetPropertyValue(TestResultProperties.StartTime));
+            Assert.AreEqual(testStartTime, result.GetPropertyValue(TestResultProperties.StartTime));
         }
 
         [TestMethod]
         public void TestResultSetPropertyValueForComputerNameShouldSetValue()
         {
             var testComputerName = "computerNameSet";
-            this.result.SetPropertyValue(TestResultProperties.ComputerName, testComputerName);
+            result.SetPropertyValue(TestResultProperties.ComputerName, testComputerName);
 
-            Assert.AreEqual(testComputerName, this.result.ComputerName);
+            Assert.AreEqual(testComputerName, result.ComputerName);
         }
 
         [TestMethod]
         public void TestResultSetPropertyValueForDisplayNameShouldSetValue()
         {
             var testDisplayName = "displayNameSet";
-            this.result.SetPropertyValue(TestResultProperties.DisplayName, testDisplayName);
+            result.SetPropertyValue(TestResultProperties.DisplayName, testDisplayName);
 
-            Assert.AreEqual(testDisplayName, this.result.DisplayName);
+            Assert.AreEqual(testDisplayName, result.DisplayName);
         }
 
         [TestMethod]
         public void TestResultSetPropertyValueForDurationShouldSetValue()
         {
             var testDuration = new TimeSpan(0, 0, 0, 20);
-            this.result.SetPropertyValue(TestResultProperties.Duration, testDuration);
+            result.SetPropertyValue(TestResultProperties.Duration, testDuration);
 
-            Assert.AreEqual(testDuration, this.result.Duration);
+            Assert.AreEqual(testDuration, result.Duration);
         }
 
         [TestMethod]
         public void TestResultSetPropertyValueForEndTimeShouldSetValue()
         {
             var testEndTime = new DateTimeOffset(new DateTime(2007, 5, 10, 0, 0, 10, DateTimeKind.Utc));
-            this.result.SetPropertyValue(TestResultProperties.EndTime, testEndTime);
+            result.SetPropertyValue(TestResultProperties.EndTime, testEndTime);
 
-            Assert.AreEqual(testEndTime, this.result.EndTime);
+            Assert.AreEqual(testEndTime, result.EndTime);
         }
 
         [TestMethod]
         public void TestResultSetPropertyValueForErrorMessageShouldSetValue()
         {
             var testErrorMessage = "error123Set";
-            this.result.SetPropertyValue(TestResultProperties.ErrorMessage, testErrorMessage);
+            result.SetPropertyValue(TestResultProperties.ErrorMessage, testErrorMessage);
 
-            Assert.AreEqual(testErrorMessage, this.result.ErrorMessage);
+            Assert.AreEqual(testErrorMessage, result.ErrorMessage);
         }
 
         [TestMethod]
         public void TestResultSetPropertyValueForErrorStackTraceShouldSetValue()
         {
             var testErrorStackTrace = "errorStackSet";
-            this.result.SetPropertyValue(TestResultProperties.ErrorStackTrace, testErrorStackTrace);
+            result.SetPropertyValue(TestResultProperties.ErrorStackTrace, testErrorStackTrace);
 
-            Assert.AreEqual(testErrorStackTrace, this.result.ErrorStackTrace);
+            Assert.AreEqual(testErrorStackTrace, result.ErrorStackTrace);
         }
 
         [TestMethod]
         public void TestResultSetPropertyValueForTestOutcomeShouldSetValue()
         {
             var testOutcome = TestOutcome.Failed;
-            this.result.SetPropertyValue(TestResultProperties.Outcome, testOutcome);
+            result.SetPropertyValue(TestResultProperties.Outcome, testOutcome);
 
-            Assert.AreEqual(testOutcome, this.result.Outcome);
+            Assert.AreEqual(testOutcome, result.Outcome);
         }
 
         [TestMethod]
         public void TestResultSetPropertyValueForStartTimeShouldSetValue()
         {
             var testStartTime = new DateTimeOffset(new DateTime(2007, 5, 10, 0, 0, 0, DateTimeKind.Utc));
-            this.result.SetPropertyValue(TestResultProperties.StartTime, testStartTime);
+            result.SetPropertyValue(TestResultProperties.StartTime, testStartTime);
 
-            Assert.AreEqual(testStartTime, this.result.StartTime);
+            Assert.AreEqual(testStartTime, result.StartTime);
         }
 
         #endregion

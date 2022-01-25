@@ -40,14 +40,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Microsoft.VisualStudio.TestPlatform.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
     /// </summary>
     internal class Executor
     {
-        private ITestPlatformEventSource testPlatformEventSource;
+        private readonly ITestPlatformEventSource testPlatformEventSource;
         private bool showHelp;
 
         #region Constructor
@@ -61,9 +61,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
         internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource)
         {
-            this.Output = output;
+            Output = output;
             this.testPlatformEventSource = testPlatformEventSource;
-            this.showHelp = true;
+            showHelp = true;
         }
 
         #endregion
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </returns>
         internal int Execute(params string[] args)
         {
-            this.testPlatformEventSource.VsTestConsoleStart();
+            testPlatformEventSource.VsTestConsoleStart();
 
             // If User specifies --nologo via dotnet, do not print splat screen
             if (args != null && args.Length !=0 && args.Contains("--nologo"))
@@ -101,7 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             else
             {
                 var isDiag = args != null && args.Any(arg => arg.StartsWith("--diag", StringComparison.OrdinalIgnoreCase));
-                this.PrintSplashScreen(isDiag);
+                PrintSplashScreen(isDiag);
             }
 
             int exitCode = 0;
@@ -109,35 +109,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             // If we have no arguments, set exit code to 1, add a message, and include the help processor in the args.
             if (args == null || args.Length == 0 || args.Any(string.IsNullOrWhiteSpace))
             {
-                this.Output.Error(true, CommandLineResources.NoArgumentsProvided);
+                Output.Error(true, CommandLineResources.NoArgumentsProvided);
                 args = new string[] { HelpArgumentProcessor.CommandName };
                 exitCode = 1;
             }
 
             // Flatten arguments and process response files.
-            string[] flattenedArguments;
-            exitCode |= this.FlattenArguments(args, out flattenedArguments);
+            exitCode |= FlattenArguments(args, out string[] flattenedArguments);
 
             // Get the argument processors for the arguments.
-            List<IArgumentProcessor> argumentProcessors;
-            exitCode |= this.GetArgumentProcessors(flattenedArguments, out argumentProcessors);
+            exitCode |= GetArgumentProcessors(flattenedArguments, out List<IArgumentProcessor> argumentProcessors);
 
             // Verify that the arguments are valid.
-            exitCode |= this.IdentifyDuplicateArguments(argumentProcessors);
+            exitCode |= IdentifyDuplicateArguments(argumentProcessors);
 
             // Quick exit for syntax error
             if (exitCode == 1
                 && argumentProcessors.All(
                     processor => processor.Metadata.Value.CommandName != HelpArgumentProcessor.CommandName))
             {
-                this.testPlatformEventSource.VsTestConsoleStop();
+                testPlatformEventSource.VsTestConsoleStop();
                 return exitCode;
             }
 
             // Execute all argument processors
             foreach (var processor in argumentProcessors)
             {
-                if (!this.ExecuteArgumentProcessor(processor, ref exitCode))
+                if (!ExecuteArgumentProcessor(processor, ref exitCode))
                 {
                     break;
                 }
@@ -148,14 +146,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             EqtTrace.Verbose("Executor.Execute: Exiting with exit code of {0}", exitCode);
 
-            this.testPlatformEventSource.VsTestConsoleStop();
+            testPlatformEventSource.VsTestConsoleStop();
 
-            this.testPlatformEventSource.MetricsDisposeStart();
+            testPlatformEventSource.MetricsDisposeStart();
 
             // Disposing Metrics Publisher when VsTestConsole ends
             TestRequestManager.Instance.Dispose();
 
-            this.testPlatformEventSource.MetricsDisposeStop();
+            testPlatformEventSource.MetricsDisposeStop();
             return exitCode;
         }
 
@@ -169,7 +167,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <param name="args">Arguments provided to perform execution with.</param>
         /// <param name="processors">List of argument processors for the arguments.</param>
         /// <returns>0 if all of the processors were created successfully and 1 otherwise.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "processorInstance", Justification = "Done on purpose to force the instances to be created")]
         private int GetArgumentProcessors(string[] args, out List<IArgumentProcessor> processors)
         {
             processors = new List<IArgumentProcessor>();
@@ -195,7 +192,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 else
                 {
                     // No known processor was found, report an error and continue
-                    this.Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoArgumentProcessorFound, arg));
+                    Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoArgumentProcessorFound, arg));
 
                     // Add the help processor
                     if (result == 0)
@@ -216,7 +213,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             RunSettingsManager.Instance.AddDefaultRunSettings();
 
             // Ensure we have an action argument.
-            this.EnsureActionArgumentIsPresent(processors, processorFactory);
+            EnsureActionArgumentIsPresent(processors, processorFactory);
 
             // Instantiate and initialize the processors in priority order.
             processors.Sort((p1, p2) => Comparer<ArgumentProcessorPriority>.Default.Compare(p1.Metadata.Value.Priority, p2.Metadata.Value.Priority));
@@ -233,15 +230,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 {
                     if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException)
                     {
-                        this.Output.Error(false, ex.Message);
+                        Output.Error(false, ex.Message);
                         result = 1;
-                        this.showHelp = false;
+                        showHelp = false;
                     }
                     else if(ex is TestSourceException)
                     {
-                        this.Output.Error(false, ex.Message);
+                        Output.Error(false, ex.Message);
                         result = 1;
-                        this.showHelp = false;
+                        showHelp = false;
                         break;
                     }
                     else
@@ -254,7 +251,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
 
             // If some argument was invalid, add help argument processor in beginning(i.e. at highest priority) 
-            if (result == 1 && this.showHelp && processors.First<IArgumentProcessor>().Metadata.Value.CommandName != HelpArgumentProcessor.CommandName)
+            if (result == 1 && showHelp && processors.First().Metadata.Value.CommandName != HelpArgumentProcessor.CommandName)
             {
                 processors.Insert(0, processorFactory.CreateArgumentProcessor(HelpArgumentProcessor.CommandName));
             }
@@ -282,8 +279,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 if (!processor.Metadata.Value.AllowMultiple)
                 {
-                    int count;
-                    if (!commandSeenCount.TryGetValue(processor.Metadata.Value.CommandName, out count))
+                    if (!commandSeenCount.TryGetValue(processor.Metadata.Value.CommandName, out int count))
                     {
                         commandSeenCount.Add(processor.Metadata.Value.CommandName, 1);
                     }
@@ -293,7 +289,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
                         // Update the count so we do not print the error out for this argument multiple times.
                         commandSeenCount[processor.Metadata.Value.CommandName] = ++count;
-                        this.Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateArgumentError, processor.Metadata.Value.CommandName));
+                        Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateArgumentError, processor.Metadata.Value.CommandName));
                     }
                 }
             }
@@ -339,7 +335,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException || ex is InvalidOperationException)
                 {
                     EqtTrace.Error("ExecuteArgumentProcessor: failed to execute argument process: {0}", ex);
-                    this.Output.Error(false, ex.Message);
+                    Output.Error(false, ex.Message);
                     result = ArgumentProcessorResult.Fail;
 
                     // Send inner exception only when its message is different to avoid duplicate.
@@ -347,7 +343,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                         ex.InnerException != null &&
                         !string.Equals(ex.InnerException.Message, ex.Message, StringComparison.CurrentCultureIgnoreCase))
                     {
-                        this.Output.Error(false, ex.InnerException.Message);
+                        Output.Error(false, ex.InnerException.Message);
                     }
                 }
                 else
@@ -391,9 +387,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
 
             string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersion);
-            this.Output.WriteLine(commandLineBanner, OutputLevel.Information);
-            this.Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
-            this.Output.WriteLine(string.Empty, OutputLevel.Information);
+            Output.WriteLine(commandLineBanner, OutputLevel.Information);
+            Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
+            Output.WriteLine(string.Empty, OutputLevel.Information);
         }
 
         /// <summary>
@@ -404,7 +400,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <returns>0 if successful and 1 otherwise.</returns>
         private int FlattenArguments(IEnumerable<string> arguments, out string[] flattenedArguments)
         {
-            List<string> outputArguments = new List<string>();
+            List<string> outputArguments = new();
             int result = 0;
 
             foreach (var arg in arguments)
@@ -413,7 +409,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 {
                     // response file:
                     string path = arg.Substring(1).TrimEnd(null);
-                    var hadError = this.ReadArgumentsAndSanitize(path, out var responseFileArgs, out var nestedArgs);
+                    var hadError = ReadArgumentsAndSanitize(path, out var responseFileArgs, out var nestedArgs);
 
                     if (hadError)
                     {
@@ -421,7 +417,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     }
                     else
                     {
-                        this.Output.WriteLine(string.Format("vstest.console.exe {0}", responseFileArgs), OutputLevel.Information);
+                        Output.WriteLine(string.Format("vstest.console.exe {0}", responseFileArgs), OutputLevel.Information);
                         outputArguments.AddRange(nestedArgs);
                     }
                 }
@@ -450,12 +446,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 return true;
             }
 
-            if (string.IsNullOrEmpty(args))
-            {
-                return false;
-            }
-
-            return CommandLineUtilities.SplitCommandLineIntoArguments(args, out arguments);
+            return !string.IsNullOrEmpty(args) && CommandLineUtilities.SplitCommandLineIntoArguments(args, out arguments);
         }
 
         private bool GetContentUsingFile(string fileName, out string contents)
@@ -469,7 +460,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 EqtTrace.Verbose("Executor.Execute: Exiting with exit code of {0}", 1);
                 EqtTrace.Error(string.Format(CultureInfo.InvariantCulture, "Error: Can't open command line argument file '{0}' : '{1}'", fileName, e.Message));
-                this.Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.OpenResponseFileError, fileName));
+                Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.OpenResponseFileError, fileName));
                 return true;
             }
 

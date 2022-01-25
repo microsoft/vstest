@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 
         public CustomStringArrayConverterTests()
         {
-            this.customStringArrayConverter = new CustomStringArrayConverter();
+            customStringArrayConverter = new CustomStringArrayConverter();
         }
 
         [TestMethod]
@@ -23,7 +23,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         {
             var json = "[ \"val2\", \"val1\" ]";
 
-            var data = this.customStringArrayConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as string[];
+            var data = customStringArrayConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as string[];
 
             Assert.IsNotNull(data);
             Assert.AreEqual(2, data.Length);
@@ -35,7 +35,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         {
             var json = "[]";
 
-            var data = this.customStringArrayConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as string[];
+            var data = customStringArrayConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as string[];
 
             Assert.IsNotNull(data);
             Assert.AreEqual(0, data.Length);
@@ -46,7 +46,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         {
             var json = "[null, \"val\"]";
 
-            var data = this.customStringArrayConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as string[];
+            var data = customStringArrayConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as string[];
 
             Assert.AreEqual(2, data.Length);
             Assert.IsNull(data[0]);
@@ -58,7 +58,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         {
             var json = "[\"\", \"\"]";
 
-            var data = this.customStringArrayConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as string[];
+            var data = customStringArrayConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as string[];
 
             Assert.AreEqual(2, data.Length);
             Assert.AreEqual(string.Empty, data[0]);
@@ -68,7 +68,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         [TestMethod]
         public void CustomStringArrayConverterShouldDeserializeNullValue()
         {
-            var data = this.customStringArrayConverter.ConvertFrom(null, CultureInfo.InvariantCulture, null) as string[];
+            var data = customStringArrayConverter.ConvertFrom(null, CultureInfo.InvariantCulture, null) as string[];
 
             Assert.IsNull(data);
         }

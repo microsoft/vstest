@@ -13,8 +13,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     {
         public DataCollectionResult(Collection<AttachmentSet> attachments, Collection<InvokedDataCollector> invokedDataCollectors)
         {
-            this.Attachments = attachments;
-            this.InvokedDataCollectors = invokedDataCollectors;
+            Attachments = attachments;
+            InvokedDataCollectors = invokedDataCollectors;
         }
 
         /// <summary>

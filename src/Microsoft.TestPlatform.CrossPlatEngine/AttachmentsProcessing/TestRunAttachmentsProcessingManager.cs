@@ -24,9 +24,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
     /// </summary>
     internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessingManager
     {
-        private static string AttachmentsProcessingCompleted = "Completed";
-        private static string AttachmentsProcessingCanceled = "Canceled";
-        private static string AttachmentsProcessingFailed = "Failed";
+        private static readonly string AttachmentsProcessingCompleted = "Completed";
+        private static readonly string AttachmentsProcessingCanceled = "Canceled";
+        private static readonly string AttachmentsProcessingFailed = "Failed";
 
         private readonly ITestPlatformEventSource testPlatformEventSource;
         private readonly IDataCollectorAttachmentsProcessorsFactory dataCollectorAttachmentsProcessorsFactory;
@@ -103,7 +103,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
             var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(runSettingsXml);
 
             var logger = CreateMessageLogger(eventsHandler);
-            var dataCollectorAttachmentsProcessors = this.dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollector?.ToArray(), logger);
+            var dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollector?.ToArray(), logger);
             for (int i = 0; i < dataCollectorAttachmentsProcessors.Length; i++)
             {
                 var dataCollectorAttachmentsProcessor = dataCollectorAttachmentsProcessors[i];

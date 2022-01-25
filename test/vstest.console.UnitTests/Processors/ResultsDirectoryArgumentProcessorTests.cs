@@ -15,14 +15,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     [TestClass]
     public class ResultsDirectoryArgumentProcessorTests
     {
-        private ResultsDirectoryArgumentExecutor executor;
-        private TestableRunSettingsProvider runSettingsProvider;
+        private ResultsDirectoryArgumentExecutor _executor;
+        private TestableRunSettingsProvider _runSettingsProvider;
 
         [TestInitialize]
         public void Init()
         {
-            this.runSettingsProvider = new TestableRunSettingsProvider();
-            this.executor = new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, this.runSettingsProvider);
+            _runSettingsProvider = new TestableRunSettingsProvider();
+            _executor = new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, _runSettingsProvider);
         }
 
         [TestCleanup]
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             string folder = null;
             var message =
                 @"The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory";
-            this.InitializeExceptionTestTemplate(folder, message);
+            InitializeExceptionTestTemplate(folder, message);
         }
 
         [TestMethod]
@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var folder = " ";
             var message =
                 @"The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory";
-            this.InitializeExceptionTestTemplate(folder, message);
+            InitializeExceptionTestTemplate(folder, message);
         }
 
         [TestMethod]
@@ -103,7 +103,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             
             var message = $"The path '{folder}' specified in the 'ResultsDirectory' is invalid. Error:";
             
-            this.InitializeExceptionTestTemplate(folder, message);
+            InitializeExceptionTestTemplate(folder, message);
         }
 
         private void InitializeExceptionTestTemplate(string folder, string message)
@@ -112,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             try
             {
-                this.executor.Initialize(folder);
+                _executor.Initialize(folder);
             }
             catch (Exception ex)
             {
@@ -129,18 +129,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var relativePath = TranslatePath(@".\relative\path");
             var absolutePath = Path.GetFullPath(relativePath);
-            this.executor.Initialize(relativePath);
+            _executor.Initialize(relativePath);
             Assert.AreEqual(absolutePath, CommandLineOptions.Instance.ResultsDirectory);
-            Assert.AreEqual(absolutePath, this.runSettingsProvider.QueryRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath));
+            Assert.AreEqual(absolutePath, _runSettingsProvider.QueryRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
         public void InitializeShouldSetCommandLineOptionsAndRunSettingsForAbsolutePathValue()
         {
             var absolutePath = TranslatePath(@"c:\random\someone\testresults");
-            this.executor.Initialize(absolutePath);
+            _executor.Initialize(absolutePath);
             Assert.AreEqual(absolutePath, CommandLineOptions.Instance.ResultsDirectory);
-            Assert.AreEqual(absolutePath, this.runSettingsProvider.QueryRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath));
+            Assert.AreEqual(absolutePath, _runSettingsProvider.QueryRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath));
         }
 
         #endregion
@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecuteShouldReturnSuccess()
         {
-            Assert.AreEqual(ArgumentProcessorResult.Success, executor.Execute());
+            Assert.AreEqual(ArgumentProcessorResult.Success, _executor.Execute());
         }
 
         #endregion

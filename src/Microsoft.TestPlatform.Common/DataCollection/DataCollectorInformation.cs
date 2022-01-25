@@ -45,14 +45,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <param name="settingsXml"></param>
         internal DataCollectorInformation(DataCollector dataCollector, XmlElement configurationElement, DataCollectorConfig dataCollectorConfig, DataCollectionEnvironmentContext environmentContext, IDataCollectionAttachmentManager attachmentManager, TestPlatformDataCollectionEvents events, IMessageSink messageSink, string settingsXml)
         {
-            this.DataCollector = dataCollector;
-            this.ConfigurationElement = configurationElement;
-            this.DataCollectorConfig = dataCollectorConfig;
-            this.Events = events;
-            this.EnvironmentContext = environmentContext;
-            this.DataCollectionSink = new TestPlatformDataCollectionSink(attachmentManager, dataCollectorConfig);
-            this.Logger = new TestPlatformDataCollectionLogger(messageSink, dataCollectorConfig);
-            this.SettingsXml = settingsXml;
+            DataCollector = dataCollector;
+            ConfigurationElement = configurationElement;
+            DataCollectorConfig = dataCollectorConfig;
+            Events = events;
+            EnvironmentContext = environmentContext;
+            DataCollectionSink = new TestPlatformDataCollectionSink(attachmentManager, dataCollectorConfig);
+            Logger = new TestPlatformDataCollectionLogger(messageSink, dataCollectorConfig);
+            SettingsXml = settingsXml;
         }
 
         /// <summary>
@@ -114,14 +114,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             UpdateConfigurationElement();
 
-            this.DataCollector.Initialize(this.ConfigurationElement, this.Events, this.DataCollectionSink, this.Logger, this.EnvironmentContext);
+            DataCollector.Initialize(ConfigurationElement, Events, DataCollectionSink, Logger, EnvironmentContext);
         }
 
         private void UpdateConfigurationElement()
         {
-            var frameWork = XmlRunSettingsUtilities.GetRunConfigurationNode(this.SettingsXml).TargetFramework;
+            var frameWork = XmlRunSettingsUtilities.GetRunConfigurationNode(SettingsXml).TargetFramework;
 
-            if (this.ConfigurationElement == null)
+            if (ConfigurationElement == null)
             {
                 var doc = new XmlDocument();
                 using (
@@ -132,13 +132,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     doc.Load(xmlReader);
                 }
 
-                this.ConfigurationElement = doc.DocumentElement;
+                ConfigurationElement = doc.DocumentElement;
             }
 
             // Add Framework config, since it could be required by DataCollector, to determine whether they support this Framework or not
             if (frameWork != null)
             {
-                AppendChildNodeOrInnerText(this.ConfigurationElement.OwnerDocument, this.ConfigurationElement, "Framework", string.Empty, frameWork.Name);
+                AppendChildNodeOrInnerText(ConfigurationElement.OwnerDocument, ConfigurationElement, "Framework", string.Empty, frameWork.Name);
             }
         }
 
@@ -158,16 +158,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    EqtTrace.Verbose("dataCollectorInfo.DisposeDataCollector: calling Dispose() on {0}", this.DataCollector.GetType());
+                    EqtTrace.Verbose("dataCollectorInfo.DisposeDataCollector: calling Dispose() on {0}", DataCollector.GetType());
                 }
 
-                this.DataCollector.Dispose();
+                DataCollector.Dispose();
             }
             catch (Exception ex)
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectorInfo.DisposeDataCollector: exception while calling Dispose() on {0}: " + ex, this.DataCollector.GetType());
+                    EqtTrace.Error("DataCollectorInfo.DisposeDataCollector: exception while calling Dispose() on {0}: " + ex, DataCollector.GetType());
                 }
             }
         }
@@ -177,11 +177,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </summary>
         public void SetTestExecutionEnvironmentVariables()
         {
-            var testExecutionEnvironmentSpecifier = this.DataCollector as ITestExecutionEnvironmentSpecifier;
-            if (testExecutionEnvironmentSpecifier != null)
+            if (DataCollector is ITestExecutionEnvironmentSpecifier testExecutionEnvironmentSpecifier)
             {
                 // Get the environment variables the data collector wants set in the test execution environment
-                this.TestExecutionEnvironmentVariables = testExecutionEnvironmentSpecifier.GetTestExecutionEnvironmentVariables();
+                TestExecutionEnvironmentVariables = testExecutionEnvironmentSpecifier.GetTestExecutionEnvironmentVariables();
             }
         }
     }

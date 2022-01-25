@@ -25,11 +25,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         [TestMethod]
         public void CreateRunSettingsShouldThrowExceptionWhenInvalidXmlStringIsPassed()
         {
-            Assert.ThrowsException<SettingsException>(() =>
-            {
-                RunSettingsUtilities.CreateAndInitializeRunSettings("abc");
-            }
-            );
+            Assert.ThrowsException<SettingsException>(() => RunSettingsUtilities.CreateAndInitializeRunSettings("abc"));
         }
 
         [TestMethod]
@@ -37,7 +33,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         {
             TestPluginCacheHelper.SetupMockExtensions(typeof(RunSettingsUtilitiesTests));
             string runsettings = @"<RunSettings><RunConfiguration><ResultsDirectory>.\TestResults</ResultsDirectory></RunConfiguration ><DummyMSTest><FORCEDLEGACYMODE>true</FORCEDLEGACYMODE></DummyMSTest></RunSettings>";
-            var result= RunSettingsUtilities.CreateAndInitializeRunSettings(runsettings);
+            _ = RunSettingsUtilities.CreateAndInitializeRunSettings(runsettings);
             Assert.AreEqual("<DummyMSTest><FORCEDLEGACYMODE>true</FORCEDLEGACYMODE></DummyMSTest>", DummyMsTestSetingsProvider.StringToVerify);
             TestPluginCacheHelper.ResetExtensionsCache();
         }
@@ -114,7 +110,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
     {
         public void Load(XmlReader reader)
         {
-            ValidateArg.NotNull<XmlReader>(reader, nameof(reader));
+            ValidateArg.NotNull(reader, nameof(reader));
             reader.Read();
             StringToVerify = reader.ReadOuterXml();
         }

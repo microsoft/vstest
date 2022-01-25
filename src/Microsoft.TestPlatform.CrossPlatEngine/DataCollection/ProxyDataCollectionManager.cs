@@ -26,9 +26,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
-    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
-    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+    using CrossPlatEngineResources = Resources.Resources;
+    using CommunicationUtilitiesResources = CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = CoreUtilities.Constants;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
 
     /// <summary>
@@ -42,10 +42,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private const string TraceLevelOption = "--tracelevel";
         public const string DebugEnvironmentVaribleName = "VSTEST_DATACOLLECTOR_DEBUG";
 
-        private IDataCollectionRequestSender dataCollectionRequestSender;
-        private IDataCollectionLauncher dataCollectionLauncher;
-        private IProcessHelper processHelper;
-        private IRequestData requestData;
+        private readonly IDataCollectionRequestSender dataCollectionRequestSender;
+        private readonly IDataCollectionLauncher dataCollectionLauncher;
+        private readonly IProcessHelper processHelper;
+        private readonly IRequestData requestData;
         private int dataCollectionPort;
         private int dataCollectionProcessId;
 
@@ -123,14 +123,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             // DataCollector process needs the information of the Extensions folder
             // Add the Extensions folder path to runsettings.
-            this.SettingsXml = UpdateExtensionsFolderInRunSettings(settingsXml);
-            this.Sources = sources;
+            SettingsXml = UpdateExtensionsFolderInRunSettings(settingsXml);
+            Sources = sources;
             this.requestData = requestData;
 
             this.dataCollectionRequestSender = dataCollectionRequestSender;
             this.dataCollectionLauncher = dataCollectionLauncher;
             this.processHelper = processHelper;
-            this.LogEnabledDataCollectors();
+            LogEnabledDataCollectors();
         }
 
         /// <summary>
@@ -148,11 +148,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         public DataCollectionResult AfterTestRunEnd(bool isCanceled, ITestMessageEventHandler runEventsHandler)
         {
             AfterTestRunEndResult afterTestRunEnd = null;
-            this.InvokeDataCollectionServiceAction(
+            InvokeDataCollectionServiceAction(
             () =>
             {
                 EqtTrace.Info("ProxyDataCollectionManager.AfterTestRunEnd: Get attachment set and invoked data collectors processId: {0} port: {1}", dataCollectionProcessId, dataCollectionPort);
-                afterTestRunEnd = this.dataCollectionRequestSender.SendAfterTestRunEndAndGetResult(runEventsHandler, isCanceled);
+                afterTestRunEnd = dataCollectionRequestSender.SendAfterTestRunEndAndGetResult(runEventsHandler, isCanceled);
             },
             runEventsHandler);
 
@@ -191,11 +191,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             IDictionary<string, string> environmentVariables = new Dictionary<string, string>();
 
             var dataCollectionEventsPort = 0;
-            this.InvokeDataCollectionServiceAction(
+            InvokeDataCollectionServiceAction(
             () =>
             {
-                EqtTrace.Info("ProxyDataCollectionManager.BeforeTestRunStart: Get environment variable and port for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
-                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.SettingsXml, this.Sources, this.requestData.IsTelemetryOptedIn, runEventsHandler);
+                EqtTrace.Info("ProxyDataCollectionManager.BeforeTestRunStart: Get environment variable and port for datacollector processId: {0} port: {1}", dataCollectionProcessId, dataCollectionPort);
+                var result = dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(SettingsXml, Sources, requestData.IsTelemetryOptedIn, runEventsHandler);
                 environmentVariables = result.EnvironmentVariables;
                 dataCollectionEventsPort = result.DataCollectionEventsPort;
 
@@ -217,7 +217,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             var payload = new TestHostLaunchedPayload();
             payload.ProcessId = processId;
 
-            this.dataCollectionRequestSender.SendTestHostLaunched(payload);
+            dataCollectionRequestSender.SendTestHostLaunched(payload);
         }
 
         /// <summary>
@@ -225,27 +225,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         public void Dispose()
         {
-            EqtTrace.Info("ProxyDataCollectionManager.Dispose: calling dispose for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
-            this.dataCollectionRequestSender.Close();
+            EqtTrace.Info("ProxyDataCollectionManager.Dispose: calling dispose for datacollector processId: {0} port: {1}", dataCollectionProcessId, dataCollectionPort);
+            dataCollectionRequestSender.Close();
         }
 
         /// <inheritdoc />
         public void Initialize()
         {
-            this.dataCollectionPort = this.dataCollectionRequestSender.InitializeCommunication();
+            dataCollectionPort = dataCollectionRequestSender.InitializeCommunication();
 
             // Warn the user that execution will wait for debugger attach.
-            this.dataCollectionProcessId = this.dataCollectionLauncher.LaunchDataCollector(null, this.GetCommandLineArguments(this.dataCollectionPort));
-            EqtTrace.Info("ProxyDataCollectionManager.Initialize: Launched datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
+            dataCollectionProcessId = dataCollectionLauncher.LaunchDataCollector(null, GetCommandLineArguments(dataCollectionPort));
+            EqtTrace.Info("ProxyDataCollectionManager.Initialize: Launched datacollector processId: {0} port: {1}", dataCollectionProcessId, dataCollectionPort);
 
-            var connectionTimeout = this.GetConnectionTimeout(dataCollectionProcessId);
+            var connectionTimeout = GetConnectionTimeout(dataCollectionProcessId);
 
             EqtTrace.Info("ProxyDataCollectionManager.Initialize: waiting for connection with timeout: {0} seconds", connectionTimeout);
 
-            var connected = this.dataCollectionRequestSender.WaitForRequestHandlerConnection(connectionTimeout * 1000);
+            var connected = dataCollectionRequestSender.WaitForRequestHandlerConnection(connectionTimeout * 1000);
             if (connected == false)
             {
-                EqtTrace.Error("ProxyDataCollectionManager.Initialize: failed to connect to datacollector process, processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
+                EqtTrace.Error("ProxyDataCollectionManager.Initialize: failed to connect to datacollector process, processId: {0} port: {1}", dataCollectionProcessId, dataCollectionPort);
                 throw new TestPlatformException(
                     string.Format(
                         CultureInfo.CurrentUICulture,
@@ -269,7 +269,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             {
                 ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.DataCollectorDebuggerWarning, OutputLevel.Warning);
                 ConsoleOutput.Instance.WriteLine(
-                    string.Format("Process Id: {0}, Name: {1}", processId, this.processHelper.GetProcessName(processId)),
+                    string.Format("Process Id: {0}, Name: {1}", processId, processHelper.GetProcessName(processId)),
                     OutputLevel.Information);
 
                 // Increase connection timeout when debugging is enabled.
@@ -301,7 +301,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     EqtTrace.Warning("ProxyDataCollectionManager.InvokeDataCollectionServiceAction: TestPlatformException = {0}.", ex);
                 }
 
-                this.HandleExceptionMessage(runEventsHandler, ex);
+                HandleExceptionMessage(runEventsHandler, ex);
             }
         }
 
@@ -323,13 +323,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 portNumber.ToString(),
 
                 ParentProcessIdOption,
-                this.processHelper.GetCurrentProcessId().ToString()
+                processHelper.GetCurrentProcessId().ToString()
             };
 
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))
             {
                 commandlineArguments.Add(DiagOption);
-                commandlineArguments.Add(this.GetTimestampedLogFile(EqtTrace.LogFile));
+                commandlineArguments.Add(GetTimestampedLogFile(EqtTrace.LogFile));
 
                 commandlineArguments.Add(TraceLevelOption);
                 commandlineArguments.Add(((int)EqtTrace.TraceLevel).ToString());
@@ -384,12 +384,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         private void LogEnabledDataCollectors()
         {
-            if (!this.requestData.IsTelemetryOptedIn)
+            if (!requestData.IsTelemetryOptedIn)
             {
                 return;
             }
 
-            var dataCollectionSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(this.SettingsXml);
+            var dataCollectionSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(SettingsXml);
 
             if (dataCollectionSettings == null || !dataCollectionSettings.IsCollectionEnabled)
             {
@@ -412,7 +412,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             }
 
             var dataCollectors = enabledDataCollectors.Select(x => new { x.FriendlyName, x.Uri }.ToString());
-            this.requestData.MetricsCollection.Add(TelemetryDataConstants.DataCollectorsEnabled, string.Join(",", dataCollectors.ToArray()));
+            requestData.MetricsCollection.Add(TelemetryDataConstants.DataCollectorsEnabled, string.Join(",", dataCollectors.ToArray()));
         }
     }
 }

@@ -22,14 +22,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         /// <inheritdoc />
         public bool IsDebug => true;
 
-        public bool AttachDebuggerToProcess(int pid) => this.AttachDebuggerToProcess(pid, CancellationToken.None);
+        public bool AttachDebuggerToProcess(int pid) => AttachDebuggerToProcess(pid, CancellationToken.None);
 
         public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken) => true;
 
         /// <inheritdoc />
         public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
         {
-            return this.LaunchTestHost(defaultTestHostStartInfo, CancellationToken.None);
+            return LaunchTestHost(defaultTestHostStartInfo, CancellationToken.None);
         }
 
         /// <inheritdoc />
@@ -46,12 +46,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             var process = new Process { StartInfo = processInfo };
             process.Start();
 
-            if (process != null)
-            {
-                return process.Id;
-            }
-
-            return -1;
+            return process != null ? process.Id : -1;
         }
     }
 }

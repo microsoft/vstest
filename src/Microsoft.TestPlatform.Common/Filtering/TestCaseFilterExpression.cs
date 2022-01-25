@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     /// </summary>
     public class TestCaseFilterExpression : ITestCaseFilterExpression
     {
-        private FilterExpressionWrapper filterWrapper;
+        private readonly FilterExpressionWrapper filterWrapper;
 
         /// <summary>
         /// If filter Expression is valid for performing TestCase matching
@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         {
             ValidateArg.NotNull(filterWrapper, nameof(filterWrapper));
             this.filterWrapper = filterWrapper;
-            this.validForMatch = string.IsNullOrEmpty(filterWrapper.ParseError);
+            validForMatch = string.IsNullOrEmpty(filterWrapper.ParseError);
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         {
             get
             {
-                return this.filterWrapper.FilterString;
+                return filterWrapper.FilterString;
             }
         }
 
@@ -50,9 +50,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         public string[] ValidForProperties(IEnumerable<String> supportedProperties, Func<string, TestProperty> propertyProvider)
         {
             string[] invalidProperties = null;
-            if (null != this.filterWrapper && this.validForMatch)
+            if (null != filterWrapper && validForMatch)
             {
-                invalidProperties = this.filterWrapper.ValidForProperties(supportedProperties, propertyProvider);
+                invalidProperties = filterWrapper.ValidForProperties(supportedProperties, propertyProvider);
             }
             return invalidProperties;
         }
@@ -64,17 +64,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         {
             ValidateArg.NotNull(testCase, nameof(testCase));
             ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
-            if (!this.validForMatch)
+            if (!validForMatch)
             {
                 return false;
             }
 
-            if (null == this.filterWrapper)
+            if (null == filterWrapper)
             {
                 // can be null when parsing error occurs. Invalid filter results in no match.
                 return false;
             }
-            return this.filterWrapper.Evaluate(propertyValueProvider);
+            return filterWrapper.Evaluate(propertyValueProvider);
         }
 
     }

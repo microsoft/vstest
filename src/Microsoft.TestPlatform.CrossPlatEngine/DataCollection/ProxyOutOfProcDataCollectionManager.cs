@@ -17,14 +17,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     /// </summary>
     internal class ProxyOutOfProcDataCollectionManager
     {
-        private IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender;
-        private ITestEventsPublisher testEventsPublisher;
-        private Dictionary<Guid, Collection<AttachmentSet>> attachmentsCache;
+        private readonly IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender;
+        private readonly ITestEventsPublisher testEventsPublisher;
+        private readonly Dictionary<Guid, Collection<AttachmentSet>> attachmentsCache;
 
         /// <summary>
         /// Sync object for ensuring that only run is active at a time
         /// </summary>
-        private object syncObject = new object();
+        private readonly object syncObject = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyOutOfProcDataCollectionManager"/> class.
@@ -37,35 +37,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </param>
         public ProxyOutOfProcDataCollectionManager(IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender, ITestEventsPublisher testEventsPublisher)
         {
-            this.attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
+            attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
             this.testEventsPublisher = testEventsPublisher;
             this.dataCollectionTestCaseEventSender = dataCollectionTestCaseEventSender;
 
-            this.testEventsPublisher.TestCaseStart += this.TriggerTestCaseStart;
-            this.testEventsPublisher.TestCaseEnd += this.TriggerTestCaseEnd;
+            this.testEventsPublisher.TestCaseStart += TriggerTestCaseStart;
+            this.testEventsPublisher.TestCaseEnd += TriggerTestCaseEnd;
             this.testEventsPublisher.TestResult += TriggerSendTestResult;
-            this.testEventsPublisher.SessionEnd += this.TriggerTestSessionEnd;
-            this.attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
+            this.testEventsPublisher.SessionEnd += TriggerTestSessionEnd;
+            attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
         }
 
         private void TriggerTestCaseStart(object sender, TestCaseStartEventArgs e)
         {
-            this.dataCollectionTestCaseEventSender.SendTestCaseStart(e);
+            dataCollectionTestCaseEventSender.SendTestCaseStart(e);
         }
 
         private void TriggerTestCaseEnd(object sender, TestCaseEndEventArgs e)
         {
-            var attachments = this.dataCollectionTestCaseEventSender.SendTestCaseEnd(e);
+            var attachments = dataCollectionTestCaseEventSender.SendTestCaseEnd(e);
 
             if (attachments != null)
             {
                 lock (syncObject)
                 {
-                    Collection<AttachmentSet> attachmentSets;
-                    if (!attachmentsCache.TryGetValue(e.TestCaseId, out attachmentSets))
+                    if (!attachmentsCache.TryGetValue(e.TestCaseId, out Collection<AttachmentSet> attachmentSets))
                     {
                         attachmentSets = new Collection<AttachmentSet>();
-                        this.attachmentsCache.Add(e.TestCaseId, attachmentSets);
+                        attachmentsCache.Add(e.TestCaseId, attachmentSets);
                     }
 
                     foreach (var attachment in attachments)
@@ -80,8 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             lock (syncObject)
             {
-                Collection<AttachmentSet> attachmentSets;
-                if (this.attachmentsCache.TryGetValue(e.TestCaseId, out attachmentSets))
+                if (attachmentsCache.TryGetValue(e.TestCaseId, out Collection<AttachmentSet> attachmentSets))
                 {
                     foreach (var attachment in attachmentSets)
                     {
@@ -89,13 +87,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     }
                 }
 
-                this.attachmentsCache.Remove(e.TestCaseId);
+                attachmentsCache.Remove(e.TestCaseId);
             }
         }
 
         private void TriggerTestSessionEnd(object sender, SessionEndEventArgs e)
         {
-            this.dataCollectionTestCaseEventSender.SendTestSessionEnd(e);
+            dataCollectionTestCaseEventSender.SendTestSessionEnd(e);
         }
     }
 }

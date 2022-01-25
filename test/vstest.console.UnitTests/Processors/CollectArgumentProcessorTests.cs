@@ -18,10 +18,10 @@ namespace vstest.console.UnitTests.Processors
     [TestClass]
     public class CollectArgumentProcessorTests
     {
-        private readonly TestableRunSettingsProvider settingsProvider;
-        private readonly CollectArgumentExecutor executor;
+        private readonly TestableRunSettingsProvider _settingsProvider;
+        private readonly CollectArgumentExecutor _executor;
 
-        private readonly string DefaultRunSettings = string.Join(Environment.NewLine,
+        private readonly string _defaultRunSettings = string.Join(Environment.NewLine,
             "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
             "<RunSettings>",
             " <RunConfiguration>",
@@ -34,9 +34,9 @@ namespace vstest.console.UnitTests.Processors
 
         public CollectArgumentProcessorTests()
         {
-            this.settingsProvider = new TestableRunSettingsProvider();
-            this.executor = new CollectArgumentExecutor(this.settingsProvider, new Mock<IFileHelper>().Object);
-            CollectArgumentExecutor.EnabledDataCollectors.Clear();
+            _settingsProvider = new TestableRunSettingsProvider();
+            _executor = new CollectArgumentExecutor(_settingsProvider, new Mock<IFileHelper>().Object);
+            EnabledDataCollectors.Clear();
         }
 
         [TestMethod]
@@ -82,19 +82,19 @@ namespace vstest.console.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldThrowIfArguemntIsNull()
         {
-            Assert.ThrowsException<CommandLineException>(() => { this.executor.Initialize(null); });
+            Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(null));
         }
 
         [TestMethod]
         public void InitializeShouldNotThrowIfArgumentIsEmpty()
         {
-            Assert.ThrowsException<CommandLineException>(() => { this.executor.Initialize(String.Empty); });
+            Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(String.Empty));
         }
 
         [TestMethod]
         public void InitializeShouldNotThrowIfArgumentIsWhiteSpace()
         {
-            Assert.ThrowsException<CommandLineException>(() => { this.executor.Initialize(" "); });
+            Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(" "));
         }
 
         [TestMethod]
@@ -108,13 +108,13 @@ namespace vstest.console.UnitTests.Processors
                                     </RunSettings>";
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
             bool exceptionThrown = false;
 
             try
             {
-                this.executor.Initialize("MyDataCollector");
+                _executor.Initialize("MyDataCollector");
             }
             catch (SettingsException ex)
             {
@@ -130,14 +130,14 @@ namespace vstest.console.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldCreateEntryForDataCollectorInRunSettingsIfNotAlreadyPresent()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettingsString = string.Format(_defaultRunSettings, "");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.executor.Initialize("MyDataCollector");
+            _executor.Initialize("MyDataCollector");
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<RunSettings>",
@@ -149,19 +149,19 @@ namespace vstest.console.UnitTests.Processors
                 "      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />",
                 "    </DataCollectors>",
                 "  </DataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldEnableDataCollectorIfDisabledInRunSettings()
         {
-            var runsettingsString = string.Format(DefaultRunSettings,
+            var runsettingsString = string.Format(_defaultRunSettings,
                 "<DataCollector friendlyName=\"MyDataCollector\" enabled=\"False\" />");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.executor.Initialize("MyDataCollector");
+            _executor.Initialize("MyDataCollector");
 
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -174,20 +174,20 @@ namespace vstest.console.UnitTests.Processors
                 "      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />",
                 "    </DataCollectors>",
                 "  </DataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldNotDisableOtherDataCollectorsIfEnabled()
         {
-            var runsettingsString = string.Format(DefaultRunSettings,
+            var runsettingsString = string.Format(_defaultRunSettings,
                 "<DataCollector friendlyName=\"MyDataCollector\" enabled=\"False\" /><DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.executor.Initialize("MyDataCollector");
-            this.executor.Initialize("MyDataCollector2");
+            _executor.Initialize("MyDataCollector");
+            _executor.Initialize("MyDataCollector2");
 
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -202,20 +202,20 @@ namespace vstest.console.UnitTests.Processors
                 "      <DataCollector friendlyName=\"MyDataCollector2\" enabled=\"True\" />",
                 "    </DataCollectors>",
                 "  </DataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldNotEnableOtherDataCollectorsIfDisabled()
         {
-            var runsettingsString = string.Format(DefaultRunSettings,
+            var runsettingsString = string.Format(_defaultRunSettings,
                 "<DataCollector friendlyName=\"MyDataCollector\" enabled=\"False\" /><DataCollector friendlyName=\"MyDataCollector1\" enabled=\"False\" />");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.executor.Initialize("MyDataCollector");
-            this.executor.Initialize("MyDataCollector2");
+            _executor.Initialize("MyDataCollector");
+            _executor.Initialize("MyDataCollector2");
 
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -230,18 +230,18 @@ namespace vstest.console.UnitTests.Processors
                 "      <DataCollector friendlyName=\"MyDataCollector2\" enabled=\"True\" />",
                 "    </DataCollectors>",
                 "  </DataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldEnableMultipleCollectorsWhenCalledMoreThanOnce()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, string.Empty);
+            var runsettingsString = string.Format(_defaultRunSettings, string.Empty);
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
-            this.executor.Initialize("MyDataCollector");
-            this.executor.Initialize("MyDataCollector1");
+            _settingsProvider.SetActiveRunSettings(runsettings);
+            _executor.Initialize("MyDataCollector");
+            _executor.Initialize("MyDataCollector1");
 
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -255,17 +255,17 @@ namespace vstest.console.UnitTests.Processors
                 "      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />",
                 "    </DataCollectors>",
                 "  </DataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldAddOutProcAndInprocCollectorWhenXPlatCodeCoverageIsEnabled()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, string.Empty);
+            var runsettingsString = string.Format(_defaultRunSettings, string.Empty);
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
-            this.executor.Initialize("XPlat Code Coverage");
+            _settingsProvider.SetActiveRunSettings(runsettings);
+            _executor.Initialize("XPlat Code Coverage");
 
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -283,19 +283,19 @@ namespace vstest.console.UnitTests.Processors
                 "      <InProcDataCollector assemblyQualifiedName=\"Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\" friendlyName=\"XPlat Code Coverage\" enabled=\"True\" codebase=\"coverlet.collector.dll\" />",
                 "    </InProcDataCollectors>",
                 "  </InProcDataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void UpdageXPlatCodeCoverageCodebaseWithFullPathFromTestAdaptersPaths_Found()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, string.Empty);
+            var runsettingsString = string.Format(_defaultRunSettings, string.Empty);
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
-            Mock<IFileHelper> fileHelper = new Mock<IFileHelper>();
+            _settingsProvider.SetActiveRunSettings(runsettings);
+            Mock<IFileHelper> fileHelper = new();
             fileHelper.Setup(f => f.Exists(It.IsAny<string>())).Returns(true);
-            CollectArgumentExecutor executor = new CollectArgumentExecutor(settingsProvider, fileHelper.Object);
+            CollectArgumentExecutor executor = new(_settingsProvider, fileHelper.Object);
             executor.Initialize("XPlat Code Coverage");
             executor.Execute();
 
@@ -315,19 +315,19 @@ namespace vstest.console.UnitTests.Processors
                 $"      <InProcDataCollector assemblyQualifiedName=\"Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\" friendlyName=\"XPlat Code Coverage\" enabled=\"True\" codebase=\"c:\\AdapterFolderPath{Path.DirectorySeparatorChar}coverlet.collector.dll\" />",
                 "    </InProcDataCollectors>",
                 "  </InProcDataCollectionRunSettings>",
-                "</RunSettings>").ShowWhiteSpace(), this.settingsProvider.ActiveRunSettings.SettingsXml.ShowWhiteSpace());
+                "</RunSettings>").ShowWhiteSpace(), _settingsProvider.ActiveRunSettings.SettingsXml.ShowWhiteSpace());
         }
 
         [TestMethod]
         public void UpdageXPlatCodeCoverageCodebaseWithFullPathFromTestAdaptersPaths_NotFound()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, string.Empty);
+            var runsettingsString = string.Format(_defaultRunSettings, string.Empty);
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
-            Mock<IFileHelper> fileHelper = new Mock<IFileHelper>();
+            _settingsProvider.SetActiveRunSettings(runsettings);
+            Mock<IFileHelper> fileHelper = new();
             fileHelper.Setup(f => f.Exists(It.IsAny<string>())).Returns(false);
-            CollectArgumentExecutor executor = new CollectArgumentExecutor(settingsProvider, fileHelper.Object);
+            CollectArgumentExecutor executor = new(_settingsProvider, fileHelper.Object);
             executor.Initialize("XPlat Code Coverage");
             executor.Execute();
 
@@ -347,7 +347,7 @@ namespace vstest.console.UnitTests.Processors
                 "      <InProcDataCollector assemblyQualifiedName=\"Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\" friendlyName=\"XPlat Code Coverage\" enabled=\"True\" codebase=\"coverlet.collector.dll\" />",
                 "    </InProcDataCollectors>",
                 "  </InProcDataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -367,8 +367,8 @@ namespace vstest.console.UnitTests.Processors
             runsettingsString = string.Format(runsettingsString, string.Empty);
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
-            this.executor.Initialize("XPlat Code Coverage");
+            _settingsProvider.SetActiveRunSettings(runsettings);
+            _executor.Initialize("XPlat Code Coverage");
 
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -386,7 +386,7 @@ namespace vstest.console.UnitTests.Processors
                 $"      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"{CoverletConstants.CoverletDataCollectorFriendlyName}\" enabled=\"True\" codebase=\"{CoverletConstants.CoverletDataCollectorCodebase}\" />",
                 "    </InProcDataCollectors>",
                 "  </InProcDataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -407,8 +407,8 @@ namespace vstest.console.UnitTests.Processors
             runsettingsString = string.Format(runsettingsString, string.Empty);
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
-            this.executor.Initialize("XPlat Code Coverage");
+            _settingsProvider.SetActiveRunSettings(runsettings);
+            _executor.Initialize("XPlat Code Coverage");
 
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -426,7 +426,7 @@ namespace vstest.console.UnitTests.Processors
                 $"      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"XPlat Code Coverage\" enabled=\"True\" codebase=\"{CoverletConstants.CoverletDataCollectorCodebase}\" />",
                 "    </InProcDataCollectors>",
                 "  </InProcDataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -452,8 +452,8 @@ namespace vstest.console.UnitTests.Processors
             runsettingsString = string.Format(runsettingsString, string.Empty);
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
-            this.executor.Initialize("XPlat Code Coverage");
+            _settingsProvider.SetActiveRunSettings(runsettings);
+            _executor.Initialize("XPlat Code Coverage");
 
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -471,7 +471,7 @@ namespace vstest.console.UnitTests.Processors
                 "      <InProcDataCollector assemblyQualifiedName=\"Microsoft.TestPlatform.Extensions.CoverletCoverageDataCollector.CoverletCoverageDataCollector, Microsoft.TestPlatform.Extensions.CoverletCoverageDataCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" friendlyName=\"XPlat Code Coverage\" enabled=\"True\" codebase=\"inprocdatacollector.dll\" />",
                 "    </InProcDataCollectors>",
                 "  </InProcDataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -496,8 +496,8 @@ namespace vstest.console.UnitTests.Processors
             runsettingsString = string.Format(runsettingsString, string.Empty);
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
-            this.executor.Initialize("XPlat Code Coverage");
+            _settingsProvider.SetActiveRunSettings(runsettings);
+            _executor.Initialize("XPlat Code Coverage");
 
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -515,7 +515,7 @@ namespace vstest.console.UnitTests.Processors
                $"      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"{CoverletConstants.CoverletDataCollectorFriendlyName}\" enabled=\"True\" codebase=\"inprocdatacollector.dll\" />",
                 "    </InProcDataCollectors>",
                 "  </InProcDataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -525,10 +525,10 @@ namespace vstest.console.UnitTests.Processors
             runsettingsString = string.Format(runsettingsString, string.Empty);
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
-            Mock<IFileHelper> fileHelper = new Mock<IFileHelper>();
+            _settingsProvider.SetActiveRunSettings(runsettings);
+            Mock<IFileHelper> fileHelper = new();
             fileHelper.Setup(f => f.Exists(It.IsAny<string>())).Returns(true);
-            CollectArgumentExecutor executor = new CollectArgumentExecutor(settingsProvider, fileHelper.Object);
+            CollectArgumentExecutor executor = new(_settingsProvider, fileHelper.Object);
             executor.Initialize("XPlat Code Coverage");
 
             Assert.AreEqual(string.Join(Environment.NewLine,
@@ -547,7 +547,7 @@ namespace vstest.console.UnitTests.Processors
                $"      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"{CoverletConstants.CoverletDataCollectorFriendlyName}\" enabled=\"True\" codebase=\"{CoverletConstants.CoverletDataCollectorCodebase}\" />",
                 "    </InProcDataCollectors>",
                 "  </InProcDataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -557,11 +557,11 @@ namespace vstest.console.UnitTests.Processors
             runsettingsString = string.Format(runsettingsString, string.Empty);
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
-            Mock<IFileHelper> fileHelper = new Mock<IFileHelper>();
+            _settingsProvider.SetActiveRunSettings(runsettings);
+            Mock<IFileHelper> fileHelper = new();
             // Suppose file exists to be sure that we won't find adapter path on runsettings config
             fileHelper.Setup(f => f.Exists(It.IsAny<string>())).Returns(true);
-            CollectArgumentExecutor executor = new CollectArgumentExecutor(settingsProvider, fileHelper.Object);
+            CollectArgumentExecutor executor = new(_settingsProvider, fileHelper.Object);
             executor.Initialize("XPlat Code Coverage");
 
             Assert.AreEqual(string.Join(Environment.NewLine,
@@ -582,42 +582,42 @@ namespace vstest.console.UnitTests.Processors
                $"      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"{CoverletConstants.CoverletDataCollectorFriendlyName}\" enabled=\"True\" codebase=\"{CoverletConstants.CoverletDataCollectorCodebase}\" />",
                 "    </InProcDataCollectors>",
                 "  </InProcDataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldThrowExceptionWhenInvalidCollectorNameProvided()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettingsString = string.Format(_defaultRunSettings, "");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            Assert.ThrowsException<CommandLineException>(() => this.executor.Initialize("MyDataCollector=SomeSetting"));
+            Assert.ThrowsException<CommandLineException>(() => _executor.Initialize("MyDataCollector=SomeSetting"));
         }
 
         [TestMethod]
         public void InitializeShouldThrowExceptionWhenInvalidConfigurationsProvided()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettingsString = string.Format(_defaultRunSettings, "");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            Assert.ThrowsException<CommandLineException>(() => this.executor.Initialize("MyDataCollector;SomeSetting"));
+            Assert.ThrowsException<CommandLineException>(() => _executor.Initialize("MyDataCollector;SomeSetting"));
         }
 
         [TestMethod]
         public void InitializeShouldCreateConfigurationsForNewDataCollectorInRunSettings()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettingsString = string.Format(_defaultRunSettings, "");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.executor.Initialize("MyDataCollector;SomeSetting=SomeValue;AnotherSetting=AnotherValue");
+            _executor.Initialize("MyDataCollector;SomeSetting=SomeValue;AnotherSetting=AnotherValue");
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<RunSettings>",
@@ -634,13 +634,13 @@ namespace vstest.console.UnitTests.Processors
                 "      </DataCollector>",
                 "    </DataCollectors>",
                 "  </DataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldCreateConfigurationsForExistingDataCollectorInRunSettings()
         {
-            var runsettingsString = string.Format(DefaultRunSettings,
+            var runsettingsString = string.Format(_defaultRunSettings,
                 "<DataCollector friendlyName=\"MyDataCollector\" enabled=\"False\">" +
                 "  <Configuration>" +
                 "    <SomeSetting>SomeValue</SomeSetting>" +
@@ -648,9 +648,9 @@ namespace vstest.console.UnitTests.Processors
                 "</DataCollector>");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.executor.Initialize("MyDataCollector;AnotherSetting=AnotherValue");
+            _executor.Initialize("MyDataCollector;AnotherSetting=AnotherValue");
 
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -668,13 +668,13 @@ namespace vstest.console.UnitTests.Processors
                 "      </DataCollector>",
                 "    </DataCollectors>",
                 "  </DataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldUpdateConfigurationsForExistingDataCollectorInRunSettings()
         {
-            var runsettingsString = string.Format(DefaultRunSettings,
+            var runsettingsString = string.Format(_defaultRunSettings,
                 "<DataCollector friendlyName=\"MyDataCollector\" enabled=\"False\">" +
                 "  <Configuration>" +
                 "    <SomeSetting>SomeValue</SomeSetting>" +
@@ -682,9 +682,9 @@ namespace vstest.console.UnitTests.Processors
                 "</DataCollector>");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.executor.Initialize("MyDataCollector;SomeSetting=AnotherValue");
+            _executor.Initialize("MyDataCollector;SomeSetting=AnotherValue");
 
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -701,7 +701,7 @@ namespace vstest.console.UnitTests.Processors
                 "      </DataCollector>",
                 "    </DataCollectors>",
                 "  </DataCollectionRunSettings>",
-                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
         #endregion
     }

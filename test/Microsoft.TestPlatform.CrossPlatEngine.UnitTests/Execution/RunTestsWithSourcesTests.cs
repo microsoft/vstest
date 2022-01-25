@@ -41,8 +41,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestInitialize]
         public void TestInit()
         {
-            this.testableTestRunCache = new TestableTestRunCache();
-            this.testExecutionContext = new TestExecutionContext(
+            testableTestRunCache = new TestableTestRunCache();
+            testExecutionContext = new TestExecutionContext(
                                             frequencyOfRunStatsChangeEvent: 100,
                                             runStatsChangeEventTimeout: TimeSpan.MaxValue,
                                             inIsolation: false,
@@ -53,10 +53,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                                             isDebug: false,
                                             testCaseFilter: null,
                                             filterOptions: null);
-            this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
-            this.mockMetricsCollection = new Mock<IMetricsCollection>();
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
+            mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+            mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockRequestData = new Mock<IRequestData>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
             TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(RunTestsWithSourcesTests).GetTypeInfo().Assembly.Location },
@@ -87,21 +87,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 { new Tuple<Uri, string>(new Uri("e://d/"), "A.dll"), new List<string> { "s1.dll " } }
             };
 
-            this.runTestsInstance = new TestableRunTestsWithSources(
+            runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
                 null,
                 testExecutionContext,
                 null,
-                this.mockTestRunEventsHandler.Object,
+                mockTestRunEventsHandler.Object,
                 executorUriVsSourceList,
-                this.mockRequestData.Object);
+                mockRequestData.Object);
 
-            this.runTestsInstance.CallBeforeRaisingTestRunComplete(false);
+            runTestsInstance.CallBeforeRaisingTestRunComplete(false);
 
             var messageFormat =
                 "No test is available in {0}. Make sure that test discoverer & executors are registered and platform & framework version settings are appropriate and try again.";
             var message = string.Format(messageFormat, "a aa b ab");
-            this.mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, message),
+            mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, message),
                 Times.Once);
         }
 
@@ -113,15 +113,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 { "a", new List<string> { "a", "aa" } }
             };
 
-            this.runTestsInstance = new TestableRunTestsWithSources(
+            runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
                 null,
                 testExecutionContext,
                 null,
-                this.mockTestRunEventsHandler.Object,
-                this.mockRequestData.Object);
+                mockTestRunEventsHandler.Object,
+                mockRequestData.Object);
 
-            var executorUris = this.runTestsInstance.CallGetExecutorUriExtensionMap(new Mock<IFrameworkHandle>().Object, new RunContext());
+            var executorUris = runTestsInstance.CallGetExecutorUriExtensionMap(new Mock<IFrameworkHandle>().Object, new RunContext());
 
             Assert.IsNotNull(executorUris);
             Assert.AreEqual(0, executorUris.Count());
@@ -138,15 +138,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 { assemblyLocation, new List<string> { assemblyLocation } }
             };
 
-            this.runTestsInstance = new TestableRunTestsWithSources(
+            runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
                 null,
                 testExecutionContext,
                 null,
-                this.mockTestRunEventsHandler.Object,
-                this.mockRequestData.Object);
+                mockTestRunEventsHandler.Object,
+                mockRequestData.Object);
 
-            var executorUris = this.runTestsInstance.CallGetExecutorUriExtensionMap(
+            var executorUris = runTestsInstance.CallGetExecutorUriExtensionMap(
                 new Mock<IFrameworkHandle>().Object, new RunContext());
 
             Assert.IsNotNull(executorUris);
@@ -167,21 +167,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var executorUriExtensionTuple = new Tuple<Uri, string>(new Uri("e://d/"), "A.dll");
             executorUriVsSourceList.Add(executorUriExtensionTuple, new List<string> { "s1.dll " });
 
-            this.runTestsInstance = new TestableRunTestsWithSources(
+            runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
                 null,
                 testExecutionContext,
                 null,
-                this.mockTestRunEventsHandler.Object,
+                mockTestRunEventsHandler.Object,
                 executorUriVsSourceList,
-                this.mockRequestData.Object);
+                mockRequestData.Object);
 
             var testExecutor = new RunTestWithSourcesExecutor();
             var extension = new LazyExtension<ITestExecutor, ITestExecutorCapabilities>(testExecutor, new TestExecutorMetadata("e://d/"));
             IEnumerable<string> receivedSources = null;
-            RunTestWithSourcesExecutor.RunTestsWithSourcesCallback = (sources, rc, fh) => { receivedSources = sources; };
+            RunTestWithSourcesExecutor.RunTestsWithSourcesCallback = (sources, rc, fh) => receivedSources = sources;
 
-            this.runTestsInstance.CallInvokeExecutor(extension, executorUriExtensionTuple, null, null);
+            runTestsInstance.CallInvokeExecutor(extension, executorUriExtensionTuple, null, null);
 
             Assert.IsNotNull(receivedSources);
             CollectionAssert.AreEqual(new List<string> {"s1.dll "}, receivedSources.ToList());
@@ -198,21 +198,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 { assemblyLocation, new List<string> { assemblyLocation } }
             };
 
-            this.runTestsInstance = new TestableRunTestsWithSources(
+            runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
                 null,
                 testExecutionContext,
                 null,
-                this.mockTestRunEventsHandler.Object,
-                this.mockRequestData.Object);
+                mockTestRunEventsHandler.Object,
+                mockRequestData.Object);
 
             bool isExecutorCalled = false;
-            RunTestWithSourcesExecutor.RunTestsWithSourcesCallback = (s, rc, fh) => { isExecutorCalled = true; };
+            RunTestWithSourcesExecutor.RunTestsWithSourcesCallback = (s, rc, fh) => isExecutorCalled = true;
 
-            this.runTestsInstance.RunTests();
+            runTestsInstance.RunTests();
 
             Assert.IsTrue(isExecutorCalled);
-            this.mockTestRunEventsHandler.Verify(
+            mockTestRunEventsHandler.Verify(
                 treh => treh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                     It.IsAny<TestRunChangedEventArgs>(),
                     It.IsAny<ICollection<AttachmentSet>>(),
@@ -223,26 +223,26 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void RunTestsShouldLogWarningOnNoTestsAvailableInAssembly()
         {
             string testCaseFilter = null;
-            this.SetupForNoTestsAvailable(testCaseFilter, out var sourcesString);
+            SetupForNoTestsAvailable(testCaseFilter, out var sourcesString);
 
-            this.runTestsInstance.RunTests();
+            runTestsInstance.RunTests();
 
             var expectedMessage =
                 $"No test is available in {sourcesString}. Make sure that test discoverer & executors are registered and platform & framework version settings are appropriate and try again.";
-            this.mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, expectedMessage), Times.Once);
+            mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, expectedMessage), Times.Once);
         }
 
         [TestMethod]
         public void RunTestsShouldLogWarningOnNoTestsAvailableInAssemblyWithTestCaseFilter()
         {
             var testCaseFilter = "Name~TestMethod1";
-            this.SetupForNoTestsAvailable(testCaseFilter, out var sourcesString);
+            SetupForNoTestsAvailable(testCaseFilter, out var sourcesString);
 
-            this.runTestsInstance.RunTests();
+            runTestsInstance.RunTests();
 
             var expectedMessage =
                 $"No test matches the given testcase filter `{testCaseFilter}` in {sourcesString}";
-            this.mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, expectedMessage), Times.Once);
+            mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, expectedMessage), Times.Once);
         }
 
         [TestMethod]
@@ -252,15 +252,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                                  ".UnitTests.Execution.RunTestsWithSourcesTests." +
                                  "RunTestsShouldLogWarningOnNoTestsAvailableInAssemblyWithLongTestCaseFilter" +
                                  "WithVeryLengthTestCaseNameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
-            this.SetupForNoTestsAvailable(veryLengthyTestCaseFilter, out var sourcesString);
+            SetupForNoTestsAvailable(veryLengthyTestCaseFilter, out var sourcesString);
 
-            this.runTestsInstance.RunTests();
+            runTestsInstance.RunTests();
 
             var expectedTestCaseFilter = veryLengthyTestCaseFilter.Substring(0, 256)+ "...";
 
             var expectedMessage =
                 $"No test matches the given testcase filter `{expectedTestCaseFilter}` in {sourcesString}";
-            this.mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, expectedMessage), Times.Once);
+            mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, expectedMessage), Times.Once);
         }
 
         [TestMethod]
@@ -272,15 +272,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             };
             var mockTestCaseEventsHandler = new Mock<ITestCaseEventsHandler>();
 
-            this.runTestsInstance = new TestableRunTestsWithSources(
+            runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
                 null,
                 testExecutionContext,
                 mockTestCaseEventsHandler.Object,
-                this.mockTestRunEventsHandler.Object,
-                this.mockRequestData.Object);
+                mockTestRunEventsHandler.Object,
+                mockRequestData.Object);
 
-            this.runTestsInstance.CallSendSessionStart();
+            runTestsInstance.CallSendSessionStart();
 
             mockTestCaseEventsHandler.Verify(x => x.SendSessionStart(It.Is<IDictionary<String, object>>(
                 y => y.ContainsKey("TestSources") 
@@ -298,15 +298,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             };
             var mockTestCaseEventsHandler = new Mock<ITestCaseEventsHandler>();
 
-            this.runTestsInstance = new TestableRunTestsWithSources(
+            runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
                 null,
                 testExecutionContext,
                 mockTestCaseEventsHandler.Object,
-                this.mockTestRunEventsHandler.Object,
-                this.mockRequestData.Object);
+                mockTestRunEventsHandler.Object,
+                mockRequestData.Object);
 
-            this.runTestsInstance.CallSendSessionEnd();
+            runTestsInstance.CallSendSessionEnd();
 
             mockTestCaseEventsHandler.Verify(x => x.SendSessionEnd());
         }
@@ -324,15 +324,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             adapterSourceMap.Add(adapterAssemblyLocation, sources);
 
-            this.testExecutionContext.TestCaseFilter = testCaseFilter;
+            testExecutionContext.TestCaseFilter = testCaseFilter;
 
-            this.runTestsInstance = new TestableRunTestsWithSources(
+            runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
                 null,
                 testExecutionContext,
                 null,
-                this.mockTestRunEventsHandler.Object,
-                this.mockRequestData.Object);
+                mockTestRunEventsHandler.Object,
+                mockRequestData.Object);
         }
 
         #region Testable Implementations
@@ -354,29 +354,29 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             public void CallBeforeRaisingTestRunComplete(bool exceptionsHitDuringRunTests)
             {
-                this.BeforeRaisingTestRunComplete(exceptionsHitDuringRunTests);
+                BeforeRaisingTestRunComplete(exceptionsHitDuringRunTests);
             }
 
             public IEnumerable<Tuple<Uri, string>> CallGetExecutorUriExtensionMap(
                 IFrameworkHandle testExecutorFrameworkHandle, RunContext runContext)
             {
-                return this.GetExecutorUriExtensionMap(testExecutorFrameworkHandle, runContext);
+                return GetExecutorUriExtensionMap(testExecutorFrameworkHandle, runContext);
             }
 
             public void CallSendSessionStart()
             {
-                this.SendSessionStart();
+                SendSessionStart();
             }
 
             public void CallSendSessionEnd()
             {
-                this.SendSessionEnd();
+                SendSessionEnd();
             }
 
             public void CallInvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
                 Tuple<Uri, string> executorUriExtensionTuple, RunContext runContext, IFrameworkHandle frameworkHandle)
             {
-                this.InvokeExecutor(executor, executorUriExtensionTuple, runContext, frameworkHandle);
+                InvokeExecutor(executor, executorUriExtensionTuple, runContext, frameworkHandle);
             }
         }
 

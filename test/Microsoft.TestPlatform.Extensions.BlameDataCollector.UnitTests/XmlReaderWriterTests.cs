@@ -19,30 +19,30 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     [TestClass]
     public class XmlReaderWriterTests
     {
-        private TestableXmlReaderWriter xmlReaderWriter;
-        private Mock<IFileHelper> mockFileHelper;
-        private Mock<Stream> mockStream;
-        private List<Guid> testCaseList;
-        private Dictionary<Guid, BlameTestObject> testObjectDictionary;
-        private BlameTestObject blameTestObject;
+        private readonly TestableXmlReaderWriter xmlReaderWriter;
+        private readonly Mock<IFileHelper> mockFileHelper;
+        private readonly Mock<Stream> mockStream;
+        private readonly List<Guid> testCaseList;
+        private readonly Dictionary<Guid, BlameTestObject> testObjectDictionary;
+        private readonly BlameTestObject blameTestObject;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="XmlReaderWriterTests"/> class.
         /// </summary>
         public XmlReaderWriterTests()
         {
-            this.mockFileHelper = new Mock<IFileHelper>();
-            this.xmlReaderWriter = new TestableXmlReaderWriter(this.mockFileHelper.Object);
-            this.mockStream = new Mock<Stream>();
-            this.testCaseList = new List<Guid>();
-            this.testObjectDictionary = new Dictionary<Guid, BlameTestObject>();
+            mockFileHelper = new Mock<IFileHelper>();
+            xmlReaderWriter = new TestableXmlReaderWriter(mockFileHelper.Object);
+            mockStream = new Mock<Stream>();
+            testCaseList = new List<Guid>();
+            testObjectDictionary = new Dictionary<Guid, BlameTestObject>();
             var testcase = new TestCase
             {
                 ExecutorUri = new Uri("test:/abc"),
                 FullyQualifiedName = "TestProject.UnitTest.TestMethod",
                 Source = "abc.dll"
             };
-            this.blameTestObject = new BlameTestObject(testcase);
+            blameTestObject = new BlameTestObject(testcase);
         }
 
         /// <summary>
@@ -51,13 +51,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void WriteTestSequenceShouldThrowExceptionIfFilePathIsNull()
         {
-            this.testCaseList.Add(this.blameTestObject.Id);
-            this.testObjectDictionary.Add(this.blameTestObject.Id, this.blameTestObject);
+            testCaseList.Add(blameTestObject.Id);
+            testObjectDictionary.Add(blameTestObject.Id, blameTestObject);
 
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.xmlReaderWriter.WriteTestSequence(this.testCaseList, this.testObjectDictionary, null);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => xmlReaderWriter.WriteTestSequence(testCaseList, testObjectDictionary, null));
         }
 
         /// <summary>
@@ -66,13 +63,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void WriteTestSequenceShouldThrowExceptionIfFilePathIsEmpty()
         {
-            this.testCaseList.Add(this.blameTestObject.Id);
-            this.testObjectDictionary.Add(this.blameTestObject.Id, this.blameTestObject);
+            testCaseList.Add(blameTestObject.Id);
+            testObjectDictionary.Add(blameTestObject.Id, blameTestObject);
 
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.xmlReaderWriter.WriteTestSequence(this.testCaseList, this.testObjectDictionary, string.Empty);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => xmlReaderWriter.WriteTestSequence(testCaseList, testObjectDictionary, string.Empty));
         }
 
         /// <summary>
@@ -81,10 +75,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void ReadTestSequenceShouldThrowExceptionIfFilePathIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.xmlReaderWriter.ReadTestSequence(null);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => xmlReaderWriter.ReadTestSequence(null));
         }
 
         /// <summary>
@@ -93,12 +84,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void ReadTestSequenceShouldThrowExceptionIfFileNotFound()
         {
-            this.mockFileHelper.Setup(m => m.Exists(It.IsAny<string>())).Returns(false);
+            mockFileHelper.Setup(m => m.Exists(It.IsAny<string>())).Returns(false);
 
-            Assert.ThrowsException<FileNotFoundException>(() =>
-            {
-                this.xmlReaderWriter.ReadTestSequence(string.Empty);
-            });
+            Assert.ThrowsException<FileNotFoundException>(() => xmlReaderWriter.ReadTestSequence(string.Empty));
         }
 
         /// <summary>
@@ -108,17 +96,17 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public void ReadTestSequenceShouldReadFileStream()
         {
             // Setup
-            this.mockFileHelper.Setup(m => m.Exists(It.IsAny<string>())).Returns(true);
-            this.mockFileHelper.Setup(m => m.GetStream("path.xml", FileMode.Open, FileAccess.ReadWrite)).Returns(this.mockStream.Object);
+            mockFileHelper.Setup(m => m.Exists(It.IsAny<string>())).Returns(true);
+            mockFileHelper.Setup(m => m.GetStream("path.xml", FileMode.Open, FileAccess.ReadWrite)).Returns(mockStream.Object);
 
             // Call to Read Test Sequence
-            this.xmlReaderWriter.ReadTestSequence("path.xml");
+            xmlReaderWriter.ReadTestSequence("path.xml");
 
             // Verify Call to fileHelper
-            this.mockFileHelper.Verify(x => x.GetStream("path.xml", FileMode.Open, FileAccess.ReadWrite));
+            mockFileHelper.Verify(x => x.GetStream("path.xml", FileMode.Open, FileAccess.ReadWrite));
 
             // Verify Call to stream read
-            this.mockStream.Verify(x => x.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()));
+            mockStream.Verify(x => x.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()));
         }
 
         /// <summary>
@@ -128,18 +116,18 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public void WriteTestSequenceShouldWriteFileStream()
         {
             // Setup
-            this.mockFileHelper.Setup(m => m.Exists(It.IsAny<string>())).Returns(true);
-            this.mockFileHelper.Setup(m => m.GetStream("path.xml", FileMode.Create, FileAccess.ReadWrite)).Returns(this.mockStream.Object);
-            this.mockStream.Setup(x => x.CanWrite).Returns(true);
-            this.mockStream.Setup(x => x.Write(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()));
+            mockFileHelper.Setup(m => m.Exists(It.IsAny<string>())).Returns(true);
+            mockFileHelper.Setup(m => m.GetStream("path.xml", FileMode.Create, FileAccess.ReadWrite)).Returns(mockStream.Object);
+            mockStream.Setup(x => x.CanWrite).Returns(true);
+            mockStream.Setup(x => x.Write(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()));
 
-            this.xmlReaderWriter.WriteTestSequence(this.testCaseList, this.testObjectDictionary, "path");
+            xmlReaderWriter.WriteTestSequence(testCaseList, testObjectDictionary, "path");
 
             // Verify Call to fileHelper
-            this.mockFileHelper.Verify(x => x.GetStream("path.xml", FileMode.Create, FileAccess.ReadWrite));
+            mockFileHelper.Verify(x => x.GetStream("path.xml", FileMode.Create, FileAccess.ReadWrite));
 
             // Verify Call to stream write
-            this.mockStream.Verify(x => x.Write(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()));
+            mockStream.Verify(x => x.Write(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()));
         }
 
         /// <summary>

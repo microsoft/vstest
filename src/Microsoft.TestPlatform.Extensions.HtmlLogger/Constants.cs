@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// <summary>
         /// Ordered test type guid
         /// </summary>
-        public static readonly Guid OrderedTestTypeGuid = new Guid("ec4800e8-40e5-4ab3-8510-b8bf29b1904d");
+        public static readonly Guid OrderedTestTypeGuid = new("ec4800e8-40e5-4ab3-8510-b8bf29b1904d");
 
         /// <summary>
         ///  Property Id storing the ParentExecutionId.

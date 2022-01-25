@@ -17,17 +17,17 @@ namespace vstest.console.UnitTests.Processors
     {
         private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
         private const string DeprecationMessage = @"/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.";
-        private Mock<ITestRequestManager> testRequestManager;
-        private Mock<IVSExtensionManager> extensionManager;
-        private Mock<IOutput> output;
-        private UseVsixExtensionsArgumentExecutor executor;
+        private readonly Mock<ITestRequestManager> _testRequestManager;
+        private readonly Mock<IVSExtensionManager> _extensionManager;
+        private readonly Mock<IOutput> _output;
+        private readonly UseVsixExtensionsArgumentExecutor _executor;
 
         public UseVsixExtensionsArgumentProcessorTests()
         {
-            this.testRequestManager = new Mock<ITestRequestManager>();
-            this.extensionManager = new Mock<IVSExtensionManager>();
-            this.output = new Mock<IOutput>();
-            this.executor = new UseVsixExtensionsArgumentExecutor(CommandLineOptions.Instance, this.testRequestManager.Object, this.extensionManager.Object, this.output.Object);
+            _testRequestManager = new Mock<ITestRequestManager>();
+            _extensionManager = new Mock<IVSExtensionManager>();
+            _output = new Mock<IOutput>();
+            _executor = new UseVsixExtensionsArgumentExecutor(CommandLineOptions.Instance, _testRequestManager.Object, _extensionManager.Object, _output.Object);
         }
 
         [TestMethod]
@@ -69,7 +69,7 @@ namespace vstest.console.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldThrowExceptionIfArgumentIsNull()
         {
-            var message = Assert.ThrowsException<CommandLineException>(() => this.executor.Initialize(null)).Message;
+            var message = Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(null)).Message;
             Assert.AreEqual(@"The /UseVsixExtensions parameter requires a value. If 'true', the installed VSIX extensions (if any) will be used in the test run. If false, they will be ignored.   Example:  /UseVsixExtensions:true", message);
         }
 
@@ -78,7 +78,7 @@ namespace vstest.console.UnitTests.Processors
         {
             var invalidArg = "Foo";
 
-            var message = Assert.ThrowsException<CommandLineException>(() => this.executor.Initialize(invalidArg)).Message;
+            var message = Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(invalidArg)).Message;
             Assert.AreEqual(@"Argument Foo is not expected in the 'UseVsixExtensions' command. Specify the command indicating whether the vsix extensions should be used or skipped (Example: vstest.console.exe myTests.dll /UseVsixExtensions:true) and try again.", message);
         }
 
@@ -86,23 +86,23 @@ namespace vstest.console.UnitTests.Processors
         public void InitializeForArgumentEqualTrueShouldCallTestRequestManagerInitializeExtensions()
         {
             var extensions = new List<string> { "T1.dll", "T2.dll" };
-            this.extensionManager.Setup(em => em.GetUnitTestExtensions()).Returns(extensions);
+            _extensionManager.Setup(em => em.GetUnitTestExtensions()).Returns(extensions);
 
-            this.executor.Initialize("true");
+            _executor.Initialize("true");
 
-            this.output.Verify(o => o.WriteLine(DeprecationMessage, OutputLevel.Warning), Times.Once);
-            this.extensionManager.Verify(em => em.GetUnitTestExtensions(), Times.Once);
-            this.testRequestManager.Verify(trm => trm.InitializeExtensions(extensions, true), Times.Once);
+            _output.Verify(o => o.WriteLine(DeprecationMessage, OutputLevel.Warning), Times.Once);
+            _extensionManager.Verify(em => em.GetUnitTestExtensions(), Times.Once);
+            _testRequestManager.Verify(trm => trm.InitializeExtensions(extensions, true), Times.Once);
         }
 
         [TestMethod]
         public void InitializeForArgumentEqualfalseShouldNotCallTestRequestManagerInitializeExtensions()
         {
-            this.executor.Initialize("false");
+            _executor.Initialize("false");
 
-            this.output.Verify(o => o.WriteLine(DeprecationMessage, OutputLevel.Warning), Times.Once);
-            this.extensionManager.Verify(em => em.GetUnitTestExtensions(), Times.Never);
-            this.testRequestManager.Verify(trm => trm.InitializeExtensions(It.IsAny<IEnumerable<string>>(), true), Times.Never);
+            _output.Verify(o => o.WriteLine(DeprecationMessage, OutputLevel.Warning), Times.Once);
+            _extensionManager.Verify(em => em.GetUnitTestExtensions(), Times.Never);
+            _testRequestManager.Verify(trm => trm.InitializeExtensions(It.IsAny<IEnumerable<string>>(), true), Times.Never);
         }
 
         #endregion

@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     /// Argument Executor for the "/TestCaseFilter" command line argument.
@@ -34,12 +34,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new TestCaseFilterArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new TestCaseFilterArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -50,17 +50,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new TestCaseFilterArgumentExecutor(CommandLineOptions.Instance));
+                    executor = new Lazy<IArgumentExecutor>(() => new TestCaseFilterArgumentExecutor(CommandLineOptions.Instance));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Used for getting sources.
         /// </summary>
-        private CommandLineOptions commandLineOptions;
+        private readonly CommandLineOptions commandLineOptions;
 
         #endregion
 
@@ -105,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public TestCaseFilterArgumentExecutor(CommandLineOptions options)
         {
             Contract.Requires(options != null);
-            this.commandLineOptions = options;
+            commandLineOptions = options;
         }
         #endregion
 
@@ -117,7 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            var defaultFilter = this.commandLineOptions.TestCaseFilterValue;
+            var defaultFilter = commandLineOptions.TestCaseFilterValue;
             var hasDefaultFilter = !string.IsNullOrWhiteSpace(defaultFilter);
             
             if (!hasDefaultFilter && string.IsNullOrWhiteSpace(argument))
@@ -127,12 +127,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             if (!hasDefaultFilter)
             {
-                this.commandLineOptions.TestCaseFilterValue = argument;
+                commandLineOptions.TestCaseFilterValue = argument;
             }
             else
             {
                 // Merge default filter an provided filter by AND operator to have both the default filter and custom filter applied.
-                this.commandLineOptions.TestCaseFilterValue = $"({defaultFilter})&({argument})";
+                commandLineOptions.TestCaseFilterValue = $"({defaultFilter})&({argument})";
             }
         }
 

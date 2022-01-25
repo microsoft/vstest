@@ -14,8 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// purposes
     /// </summary>
     [DataContract]
-    [SuppressMessage("Microsoft.Design", "CA1036:OverrideMethodsOnComparableTypes",
-            Justification = "Guid does not define < and > operators")]
     public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, IComparable
     {
         #region Constants
@@ -23,9 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// A request ID with an empty GUID
         /// </summary>
-        [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes",
-            Justification = "RequestId is immutable")]
-        public static readonly RequestId Empty = new RequestId(Guid.Empty);
+        public static readonly RequestId Empty = new(Guid.Empty);
 
         #endregion
 
@@ -64,18 +60,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
                 return false;
             }
 
-            if (object.ReferenceEquals(this, obj))
+            if (ReferenceEquals(this, obj))
             {
                 return true;
             }
 
             RequestId other = obj as RequestId;
-            if (other == null)
-            {
-                return false;
-            }
-
-            return Id == other.Id;
+            return other != null && Id == other.Id;
         }
 
         /// <summary>
@@ -111,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         {
             return
                 other != null && (
-                        object.ReferenceEquals(this, other) ||
+                        ReferenceEquals(this, other) ||
                         Id == other.Id
                     );
         }
@@ -150,12 +141,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             }
 
             RequestId other = obj as RequestId;
-            if (other == null)
-            {
-                throw new ArgumentException(string.Format(Resources.Common_ObjectMustBeOfType, new object[] { typeof(RequestId).Name }), nameof(obj));
-            }
-
-            return Id.CompareTo(other.Id);
+            return other == null
+                ? throw new ArgumentException(string.Format(Resources.Common_ObjectMustBeOfType, new object[] { typeof(RequestId).Name }), nameof(obj))
+                : Id.CompareTo(other.Id);
         }
 
         #endregion
@@ -173,9 +161,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         public static bool operator ==(RequestId left, RequestId right)
         {
             return
-                object.ReferenceEquals(left, right) ||
-                !object.ReferenceEquals(left, null) &&
-                    !object.ReferenceEquals(right, null) &&
+                ReferenceEquals(left, right) ||
+                left is not null &&
+                    right is not null &&
                     left.Id == right.Id;
         }
 

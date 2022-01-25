@@ -15,8 +15,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using PlatformAbstractions.Interfaces;
-    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
-    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+    using CommunicationUtilitiesResources = CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = CoreUtilities.Constants;
 
     public class DataCollectorMain
     {
@@ -40,10 +40,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// </summary>
         private const string TraceLevelArgument = "--tracelevel";
 
-        private IProcessHelper processHelper;
+        private readonly IProcessHelper processHelper;
 
-        private IEnvironment environment;
-        private IDataCollectionRequestHandler requestHandler;
+        private readonly IEnvironment environment;
+        private readonly IDataCollectionRequestHandler requestHandler;
 
         public DataCollectorMain():
             this(
@@ -109,12 +109,12 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessArgument);
             EqtTrace.Info("DataCollector: Monitoring parent process with id: '{0}'", parentProcessId);
 
-            this.processHelper.SetExitCallback(
+            processHelper.SetExitCallback(
                 parentProcessId,
                 (obj) =>
                 {
                     EqtTrace.Info("DataCollector: ParentProcess '{0}' Exited.", parentProcessId);
-                    this.environment.Exit(1);
+                    environment.Exit(1);
                 });
 
             // Get server port and initialize communication.
@@ -125,12 +125,12 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 throw new ArgumentException("Incorrect/No Port number");
             }
 
-            this.requestHandler.InitializeCommunication(port);
+            requestHandler.InitializeCommunication(port);
 
             // Can only do this after InitializeCommunication because datacollector cannot "Send Log" unless communications are initialized
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))
             {
-                (this.requestHandler as DataCollectionRequestHandler)?.SendDataCollectionMessage(new DataCollectionMessageEventArgs(TestMessageLevel.Informational, string.Format("Logging DataCollector Diagnostics in file: {0}", EqtTrace.LogFile)));
+                (requestHandler as DataCollectionRequestHandler)?.SendDataCollectionMessage(new DataCollectionMessageEventArgs(TestMessageLevel.Informational, string.Format("Logging DataCollector Diagnostics in file: {0}", EqtTrace.LogFile)));
             }
 
             // Start processing async in a different task
@@ -144,9 +144,9 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             var timeout = EnvironmentHelper.GetConnectionTimeout();
 
             // Wait for the connection to the sender and start processing requests from sender
-            if (this.requestHandler.WaitForRequestSenderConnection(timeout * 1000))
+            if (requestHandler.WaitForRequestSenderConnection(timeout * 1000))
             {
-                this.requestHandler.ProcessRequests();
+                requestHandler.ProcessRequests();
             }
             else
             {
@@ -154,7 +154,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                     "DataCollectorMain.StartProcessing: RequestHandler timed out while connecting to the Sender, timeout: {0} seconds.",
                     timeout);
 
-                this.requestHandler.Close();
+                requestHandler.Close();
 
                 throw new TestPlatformException(
                     string.Format(

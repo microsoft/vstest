@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </param>
         public DataCollectorFriendlyNameAttribute(string friendlyName)
         {
-            this.FriendlyName = friendlyName;
+            FriendlyName = friendlyName;
         }
 
         /// <summary>

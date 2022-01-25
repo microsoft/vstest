@@ -21,15 +21,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         private void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
-            this.runEventHandler = new RunEventHandler();
-            this.discoveryEventHandler = new DiscoveryEventHandler();
+            vstestConsoleWrapper = GetVsTestConsoleWrapper();
+            runEventHandler = new RunEventHandler();
+            discoveryEventHandler = new DiscoveryEventHandler();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            this.vstestConsoleWrapper?.EndSession();
+            vstestConsoleWrapper?.EndSession();
         }
 
         [TestMethod]
@@ -37,19 +37,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void RunSelectedTestsWithoutTestPlatformOptions(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
-            this.vstestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.discoveryEventHandler);
-            var testCases = this.discoveryEventHandler.DiscoveredTestCases;
+            vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), discoveryEventHandler);
+            var testCases = discoveryEventHandler.DiscoveredTestCases;
 
-            this.vstestConsoleWrapper.RunTests(testCases, this.GetDefaultRunSettings(), this.runEventHandler);
+            vstestConsoleWrapper.RunTests(testCases, GetDefaultRunSettings(), runEventHandler);
 
             // Assert
-            Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+            Assert.AreEqual(6, runEventHandler.TestResults.Count);
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
         }
 
         [TestMethod]
@@ -57,34 +57,34 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void RunSelectedTestsWithTestPlatformOptions(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            Setup();
 
-            this.vstestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.discoveryEventHandler);
-            var testCases = this.discoveryEventHandler.DiscoveredTestCases;
+            vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), discoveryEventHandler);
+            var testCases = discoveryEventHandler.DiscoveredTestCases;
 
-            this.vstestConsoleWrapper.RunTests(
+            vstestConsoleWrapper.RunTests(
                 testCases,
-                this.GetDefaultRunSettings(),
+                GetDefaultRunSettings(),
                 new TestPlatformOptions() { CollectMetrics = true },
-                this.runEventHandler);
+                runEventHandler);
 
             // Assert
-            Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
-            Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetDevice));
-            Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetFramework));
-            Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetOS));
-            Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForRun));
-            Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution));
-            Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.RunState));
+            Assert.AreEqual(6, runEventHandler.TestResults.Count);
+            Assert.IsTrue(runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetDevice));
+            Assert.IsTrue(runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetFramework));
+            Assert.IsTrue(runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetOS));
+            Assert.IsTrue(runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForRun));
+            Assert.IsTrue(runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution));
+            Assert.IsTrue(runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.RunState));
         }
 
         private IList<string> GetTestAssemblies()
         {
             var testAssemblies = new List<string>
                                      {
-                                         this.GetAssetFullPath("SimpleTestProject.dll"),
-                                         this.GetAssetFullPath("SimpleTestProject2.dll")
+                                         GetAssetFullPath("SimpleTestProject.dll"),
+                                         GetAssetFullPath("SimpleTestProject2.dll")
                                      };
 
             return testAssemblies;

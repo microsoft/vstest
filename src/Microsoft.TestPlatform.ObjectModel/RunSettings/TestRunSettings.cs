@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public abstract class TestRunSettings
     {
-        private string name;
 
         #region Constructor
 
@@ -22,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             ValidateArg.NotNullOrEmpty(name, nameof(name));
 
-            this.name = name;
+            Name = name;
         }
 
         #endregion
@@ -36,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// during RunSettings.LoadSection() call
         /// TODO: Communicate to Chutzpah and fix it
         /// </summary>
-        public string Name => name;
+        public string Name { get; private set; }
 
         #endregion
 
@@ -45,7 +44,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Converter the setting to be an XmlElement.
         /// </summary>
         /// <returns>The Xml element for the run settings provided.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes", Justification = "XmlElement is required in the data collector.")]
         public abstract XmlElement ToXml();
 #endif
     }

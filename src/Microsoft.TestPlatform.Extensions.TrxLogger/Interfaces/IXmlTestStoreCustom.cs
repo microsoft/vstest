@@ -18,7 +18,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// <summary>
         /// Gets the xml namespace to use when creating the element
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "Reviewed. Suppression is OK here.")]
         string NamespaceUri { get; }
     }
 }

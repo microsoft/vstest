@@ -27,19 +27,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
             // on non-windows we want to filter down only to netcoreapp runner, and net5.0 and newer.
-            Func<string, bool> filter = tfm => isWindows ? true : !tfm.StartsWith("net4");
+            Func<string, bool> filter = tfm => isWindows || !tfm.StartsWith("net4");
             foreach (var fmw in targetFrameworks.Split(';').Where(filter))
             {
-                this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, fmw) });
+                dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, fmw) });
             }
 
         }
 
-        private List<object[]> dataRows = new List<object[]>();
+        private readonly List<object[]> dataRows = new();
 
         public IEnumerable<object[]> GetData(MethodInfo methodInfo)
         {
-            return this.dataRows;
+            return dataRows;
         }
 
         public string GetDisplayName(MethodInfo methodInfo, object[] data)

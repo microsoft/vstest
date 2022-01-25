@@ -23,7 +23,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             var cache = new TestRunCache(int.MaxValue, TimeSpan.MaxValue, tester.CacheHitOnSize);
 
-            var tr = this.GetTestResult(0);
+            var tr = GetTestResult(0);
             cache.OnTestStarted(tr.TestCase);
 
             CollectionAssert.Contains(cache.InProgressTests.ToList(), tr.TestCase);
@@ -38,7 +38,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var cache = new TestRunCache(cacheSize, TimeSpan.MaxValue, tester.CacheHitOnSize);
             for (var i = 0; i < (cacheSize - 1); i++)
             {
-                var tr = this.GetTestResult(i);
+                var tr = GetTestResult(i);
                 cache.OnTestStarted(tr.TestCase);
 
                 Assert.AreEqual(i, cache.InProgressTests.Count - 1);
@@ -70,7 +70,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var cache = new TestRunCache(cacheSize, TimeSpan.MaxValue, tester.CacheHitOnSize);
             for (var i = 0; i < cacheSize; i++)
             {
-                var tr = this.GetTestResult(i);
+                var tr = GetTestResult(i);
                 cache.OnTestStarted(tr.TestCase);
             }
 
@@ -94,7 +94,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var cache = new TestRunCache(cacheSize, TimeSpan.MaxValue, tester.CacheHitOnSize);
             for (var i = 0; i < 2; i++)
             {
-                var tr = this.GetTestResult(i);
+                var tr = GetTestResult(i);
                 cache.OnNewTestResult(tr);
             }
 
@@ -110,7 +110,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var cache = new TestRunCache(cacheSize, TimeSpan.MaxValue, tester.CacheHitOnSize);
             for (var i = 0; i < 2; i++)
             {
-                var tr = this.GetTestResult(i);
+                var tr = GetTestResult(i);
                 cache.OnNewTestResult(tr);
                 CollectionAssert.Contains(cache.TestResults.ToList(), tr);
             }
@@ -125,7 +125,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var cache = new TestRunCache(cacheSize, TimeSpan.MaxValue, tester.CacheHitOnSize);
             for (var i = 0; i < 2; i++)
             {
-                var tr = this.GetTestResult(i);
+                var tr = GetTestResult(i);
                 tr.Outcome = TestOutcome.Passed;
                 cache.OnNewTestResult(tr);
             }
@@ -143,7 +143,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var cache = new TestRunCache(cacheSize, TimeSpan.MaxValue, tester.CacheHitOnSize);
             for (var i = 0; i < 2; i++)
             {
-                var tr = this.GetTestResult(i);
+                var tr = GetTestResult(i);
                 cache.OnTestStarted(tr.TestCase);
                 cache.OnNewTestResult(tr);
             }
@@ -160,7 +160,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var cache = new TestRunCache(cacheSize, TimeSpan.MaxValue, tester.CacheHitOnSize);
             for (var i = 0; i < cacheSize; i++)
             {
-                var tr = this.GetTestResult(i);
+                var tr = GetTestResult(i);
                 cache.OnNewTestResult(tr);
             }
 
@@ -179,7 +179,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var executedTests = cacheSize - 1;
             for (var i = 0; i < executedTests; i++)
             {
-                var tr = this.GetTestResult(i);
+                var tr = GetTestResult(i);
                 cache.OnNewTestResult(tr);
             }
 
@@ -199,7 +199,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             for (var i = 0; i < executedTests; i++)
             {
-                var tr = this.GetTestResult(i);
+                var tr = GetTestResult(i);
                 cache.OnNewTestResult(tr);
             }
 
@@ -231,7 +231,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             var cache = new TestRunCache(cacheSize, TimeSpan.MaxValue, tester.CacheHitOnSize);
 
-            Assert.IsFalse(cache.OnTestCompletion(this.GetTestResult(0).TestCase));
+            Assert.IsFalse(cache.OnTestCompletion(GetTestResult(0).TestCase));
         }
 
         [TestMethod]
@@ -243,7 +243,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var cache = new TestRunCache(cacheSize, TimeSpan.MaxValue, tester.CacheHitOnSize);
             for (int i = 0; i < cacheSize; i++)
             {
-                var tr = this.GetTestResult(i);
+                var tr = GetTestResult(i);
                 cache.OnTestStarted(tr.TestCase);
                 Assert.IsTrue(cache.OnTestCompletion(tr.TestCase));
 
@@ -260,7 +260,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var cache = new TestRunCache(cacheSize, TimeSpan.MaxValue, tester.CacheHitOnSize);
             for (var i = 0; i < cacheSize; i++)
             {
-                var tr = this.GetTestResult(i);
+                var tr = GetTestResult(i);
                 cache.OnTestStarted(tr.TestCase);
 
                 var clone = new TestCase(
@@ -283,10 +283,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             var cache = new TestRunCache(cacheSize, TimeSpan.MaxValue, tester.CacheHitOnSize);
 
-            var tr1 = this.GetTestResult(0);
+            var tr1 = GetTestResult(0);
             cache.OnTestStarted(tr1.TestCase);
 
-            var tr2 = this.GetTestResult(1);
+            var tr2 = GetTestResult(1);
             Assert.IsFalse(cache.OnTestCompletion(tr2.TestCase));
 
             Assert.AreEqual(1, cache.InProgressTests.Count);
@@ -303,11 +303,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var tester = new TestCacheTester { ExpectedCacheSize = cacheSize };
 
             var cache = new TestRunCache(cacheSize, TimeSpan.MaxValue, tester.CacheHitOnSize);
-            List<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult> pushedTestResults = new List<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult>();
+            List<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult> pushedTestResults = new();
 
             for (var i = 0; i < 2; i++)
             {
-                var tr = this.GetTestResult(i);
+                var tr = GetTestResult(i);
                 cache.OnNewTestResult(tr);
                 pushedTestResults.Add(tr);
             }
@@ -326,7 +326,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             for (var i = 0; i < 2; i++)
             {
-                var tr = this.GetTestResult(i);
+                var tr = GetTestResult(i);
                 cache.OnNewTestResult(tr);
             }
 
@@ -348,15 +348,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             for (var i = 0; i < cacheSize; i++)
             {
-                var tr = this.GetTestResult(i);
-                if (i < 5)
-                {
-                    tr.Outcome = TestOutcome.Passed;
-                }
-                else
-                {
-                    tr.Outcome = TestOutcome.Failed;
-                }
+                var tr = GetTestResult(i);
+                tr.Outcome = i < 5 ? TestOutcome.Passed : TestOutcome.Failed;
 
                 cache.OnNewTestResult(tr);
             }
@@ -391,15 +384,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             public void CacheHitOnSize(TestRunStatistics stats, ICollection<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult> results, ICollection<TestCase> tests)
             {
-                Assert.AreEqual(this.ExpectedCacheSize, results.Count + tests.Count);
-                this.CacheHitCount++;
-                this.TotalInProgressTestsReceived += tests.Count;
+                Assert.AreEqual(ExpectedCacheSize, results.Count + tests.Count);
+                CacheHitCount++;
+                TotalInProgressTestsReceived += tests.Count;
             }
 
             public void CacheHitOnTimerLimit(ICollection<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult> results, ICollection<TestCase> tests)
             {
-                this.CacheHitCount++;
-                this.TotalInProgressTestsReceived += tests.Count;
+                CacheHitCount++;
+                TotalInProgressTestsReceived += tests.Count;
             }
         }
 

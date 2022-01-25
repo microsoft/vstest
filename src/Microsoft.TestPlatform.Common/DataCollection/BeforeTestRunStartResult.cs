@@ -23,8 +23,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
         /// </param>
         public BeforeTestRunStartResult(IDictionary<string, string> environmentVariables, int dataCollectionEventsPort)
         {
-            this.EnvironmentVariables = environmentVariables;
-            this.DataCollectionEventsPort = dataCollectionEventsPort;
+            EnvironmentVariables = environmentVariables;
+            DataCollectionEventsPort = dataCollectionEventsPort;
         }
 
         /// <summary>

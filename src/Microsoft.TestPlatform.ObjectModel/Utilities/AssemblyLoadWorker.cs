@@ -81,7 +81,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// Returns null on failure and an empty array if there is no reference in the project.
         /// </summary>
         /// <param name="path">Path to the assembly file to load from.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Being created in a separate app-domain"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public string[] GetReferencedAssemblies(string path)
         {
             Debug.Assert(!string.IsNullOrEmpty(path));
@@ -101,29 +100,24 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             Debug.Assert(a != null);
 
             AssemblyName[] assemblies = a.GetReferencedAssemblies();
-            if (assemblies == null || assemblies.Length == 0)
-            {
-                return new string[0];
-            }
-
-            return (from assembly in assemblies
+            return assemblies == null || assemblies.Length == 0
+                ? (new string[0])
+                : (from assembly in assemblies
                     select assembly.FullName).ToArray();
         }
 
         /// <summary>
         /// Returns true if given assembly matched name and public key token.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Being created in a separate app-domain"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public bool? CheckAssemblyReference(string path, string referenceAssemblyName, byte[] publicKeyToken)
         {
-            Assembly a = null;
             try
             {
                 // ReflectionOnlyLoadFrom does not use the probing paths and loads from the
                 // specified path only and does not let code to be executed by the assembly
                 // in the loaded context.
                 //
-                a = Assembly.ReflectionOnlyLoadFrom(path);
+                Assembly a = Assembly.ReflectionOnlyLoadFrom(path);
 
                 Debug.Assert(a != null);
 
@@ -173,8 +167,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <param name="path"></param>
         /// <param name="procArchType"></param>
         /// <param name="frameworkVersion"></param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Being created in a separate app-domain")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public void GetPlatformAndFrameworkSettings(string path, out string procArchType, out string frameworkVersion)
         {
             procArchType = nameof(Architecture.Default);
@@ -274,7 +266,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private static string GetArchitectureForSource(string imagePath)
         {
             // For details refer to below code available on MSDN.
@@ -297,7 +288,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 using Stream fs = new FileStream(imagePath, FileMode.Open, FileAccess.Read);
                 bool validImage = true;
 
-                BinaryReader reader = new BinaryReader(fs);
+                BinaryReader reader = new(fs);
                 //PE Header starts @ 0x3C (60). Its a 4 byte header.
                 fs.Position = 0x3C;
                 peHeader = reader.ReadUInt32();

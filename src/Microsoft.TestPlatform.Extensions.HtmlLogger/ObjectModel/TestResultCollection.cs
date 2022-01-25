@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel
         /// </summary>
         [DataMember] public string Source
         {
-            get => this.source;
+            get => source;
             private set { }
         }
 
@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel
         /// </summary>
         [DataMember] public int Id
         {
-            get => this.source.GetHashCode();
+            get => source.GetHashCode();
             private set { }
         }
 

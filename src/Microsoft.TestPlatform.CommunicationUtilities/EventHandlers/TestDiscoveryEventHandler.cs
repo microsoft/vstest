@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     /// </summary>
     public class TestDiscoveryEventHandler : ITestDiscoveryEventsHandler2
     {
-        private ITestRequestHandler requestHandler;
+        private readonly ITestRequestHandler requestHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestDiscoveryEventHandler"/> class.
@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
             EqtTrace.Info("Test Cases found ");
-            this.requestHandler.SendTestCases(discoveredTestCases);
+            requestHandler.SendTestCases(discoveredTestCases);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 EqtTrace.Info(discoveryCompleteEventArgs.IsAborted ? "Discover Aborted." : "Discover Finished.");
             }
 
-            this.requestHandler.DiscoveryComplete(discoveryCompleteEventArgs, lastChunk);
+            requestHandler.DiscoveryComplete(discoveryCompleteEventArgs, lastChunk);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     break;
             }
 
-            this.requestHandler.SendLog(level, message);
+            requestHandler.SendLog(level, message);
         }
 
         public void HandleRawMessage(string rawMessage)

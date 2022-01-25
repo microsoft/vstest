@@ -24,8 +24,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     /// </summary>
     internal class TestPluginDiscoverer
     {
-        private static HashSet<string> UnloadableFiles = new HashSet<string>();
-        private readonly MetadataReaderExtensionsHelper extensionHelper = new MetadataReaderExtensionsHelper();
+        private static readonly HashSet<string> UnloadableFiles = new();
+        private readonly MetadataReaderExtensionsHelper extensionHelper = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class.
@@ -74,10 +74,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             // C++ UWP adapters do not follow TestAdapater naming convention, so making this exception
             if (!extensionPaths.Any())
             {
-                this.AddKnownExtensions(ref extensionPaths);
+                AddKnownExtensions(ref extensionPaths);
             }
 
-            this.GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), pluginInfos);
+            GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), pluginInfos);
 
             return pluginInfos;
         }
@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     assembly = Assembly.Load(new AssemblyName(assemblyName));
                     if (assembly != null)
                     {
-                        this.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos, file);
+                        GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos, file);
                     }
                 }
                 catch (FileLoadException e)
@@ -163,12 +163,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             Debug.Assert(assembly != null, "null assembly");
             Debug.Assert(pluginInfos != null, "null pluginInfos");
 
-            List<Type> types = new List<Type>();
+            List<Type> types = new();
             Type extension = typeof(TExtension);
 
             try
             {
-                var discoveredExtensions = this.extensionHelper.DiscoverTestExtensionTypesV2Attribute(assembly, filePath);
+                var discoveredExtensions = extensionHelper.DiscoverTestExtensionTypesV2Attribute(assembly, filePath);
                 if (discoveredExtensions?.Length > 0)
                 {
                     types.AddRange(discoveredExtensions);

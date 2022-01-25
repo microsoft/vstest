@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <param name="deleteFile">True to automatically have the file removed after sending it.</param>
         public void SendFileAsync(DataCollectionContext context, string path, bool deleteFile)
         {
-            this.SendFileAsync(context, path, string.Empty, deleteFile);
+            SendFileAsync(context, path, string.Empty, deleteFile);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             var fileInfo = new FileTransferInformation(context, path, deleteFile);
             fileInfo.Description = description;
 
-            this.SendFileAsync(fileInfo);
+            SendFileAsync(fileInfo);
         }
 
         /// <summary>

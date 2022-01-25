@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
-    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using CrossPlatEngineResources = Resources.Resources;
 
     /// <summary>
     /// Specifies the user specified RunSettings and framework provided context of the discovery.
@@ -34,14 +34,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         public ITestCaseFilterExpression GetTestCaseFilter(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider)
         {
             TestCaseFilterExpression adapterSpecificTestCaseFilter = null;
-            if (this.FilterExpressionWrapper != null)
+            if (FilterExpressionWrapper != null)
             {
-                if (!string.IsNullOrEmpty(this.FilterExpressionWrapper.ParseError))
+                if (!string.IsNullOrEmpty(FilterExpressionWrapper.ParseError))
                 {
-                    throw new TestPlatformFormatException(this.FilterExpressionWrapper.ParseError, this.FilterExpressionWrapper.FilterString);
+                    throw new TestPlatformFormatException(FilterExpressionWrapper.ParseError, FilterExpressionWrapper.FilterString);
                 }
 
-                adapterSpecificTestCaseFilter = new TestCaseFilterExpression(this.FilterExpressionWrapper);
+                adapterSpecificTestCaseFilter = new TestCaseFilterExpression(FilterExpressionWrapper);
                 var invalidProperties = adapterSpecificTestCaseFilter.ValidForProperties(supportedProperties, propertyProvider);
 
                 if (invalidProperties != null)

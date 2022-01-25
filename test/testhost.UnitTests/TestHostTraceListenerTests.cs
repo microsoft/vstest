@@ -20,8 +20,8 @@ namespace testhost.UnitTests
         [TestInitialize()]
         public void Initialize()
         {
-            this.listeners = new TraceListener[Trace.Listeners.Count];
-            Trace.Listeners.CopyTo(this.listeners, 0);
+            listeners = new TraceListener[Trace.Listeners.Count];
+            Trace.Listeners.CopyTo(listeners, 0);
             // not using the TestHostTraceListener.Setup method here
             // because that detects only default trace listeners and there won't
             // be any when this is in production, so this would end up testing against
@@ -33,7 +33,7 @@ namespace testhost.UnitTests
         [TestCleanup()]
         public void Cleanup() {
             Trace.Listeners.Clear();
-            foreach(var listener in this.listeners)
+            foreach(var listener in listeners)
             {
                 Trace.Listeners.Add(listener);
             }
@@ -100,15 +100,15 @@ namespace testhost.UnitTests
         [TestInitialize()]
         public void Initialize()
         {
-            this.listeners = new TraceListener[Trace.Listeners.Count];
-            Trace.Listeners.CopyTo(this.listeners, 0);
+            listeners = new TraceListener[Trace.Listeners.Count];
+            Trace.Listeners.CopyTo(listeners, 0);
         }
 
         [TestCleanup()]
         public void Cleanup()
         {
             Trace.Listeners.Clear();
-            foreach (var listener in this.listeners)
+            foreach (var listener in listeners)
             {
                 Trace.Listeners.Add(listener);
             }

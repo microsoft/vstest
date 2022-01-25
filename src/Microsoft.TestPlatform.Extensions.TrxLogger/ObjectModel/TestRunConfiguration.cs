@@ -19,13 +19,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         internal static readonly string DeploymentInDirectorySuffix = "In";
 
         #region  Fields
-        private TestRunConfigurationId id;
-        private readonly TrxFileHelper trxFileHelper;
+        private readonly TestRunConfigurationId _id;
+        private readonly TrxFileHelper _trxFileHelper;
 
         [StoreXmlSimpleField(DefaultValue = "")]
-        private string name;
+        private readonly string _name;
 
-        private string runDeploymentRoot;
+        private string _runDeploymentRoot;
 
         #endregion
 
@@ -42,10 +42,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             EqtAssert.ParameterNotNull(name, nameof(name));
 
-            this.name = name;
-            this.runDeploymentRoot = string.Empty;
-            this.id = new TestRunConfigurationId();
-            this.trxFileHelper = trxFileHelper;
+            this._name = name;
+            _runDeploymentRoot = string.Empty;
+            _id = new TestRunConfigurationId();
+            this._trxFileHelper = trxFileHelper;
         }
 
         #region IXmlTestStoreCustom Members
@@ -81,8 +81,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             get
             {
-                Debug.Assert(this.runDeploymentRoot != null, "runDeploymentRoot is null");
-                return Path.Combine(this.runDeploymentRoot, DeploymentInDirectorySuffix);
+                Debug.Assert(_runDeploymentRoot != null, "runDeploymentRoot is null");
+                return Path.Combine(_runDeploymentRoot, DeploymentInDirectorySuffix);
             }
         }
 
@@ -95,13 +95,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             get
             {
-                return this.runDeploymentRoot;
+                return _runDeploymentRoot;
             }
 
             set
             {
                 Debug.Assert(!string.IsNullOrEmpty(value), "RunDeploymentRootDirectory.value should not be null or empty.");
-                this.runDeploymentRoot = value;
+                _runDeploymentRoot = value;
             }
         }
 
@@ -118,17 +118,16 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </param>
         public void Save(XmlElement element, XmlTestStoreParameters parameters)
         {
-            XmlPersistence helper = new XmlPersistence();
+            XmlPersistence helper = new();
 
             // Save all fields marked as StoreXmlSimpleField.
             helper.SaveSingleFields(element, this, parameters);
 
-            helper.SaveGuid(element, "@id", this.id.Id);
+            helper.SaveGuid(element, "@id", _id.Id);
 
             // When saving and loading a TRX file, we want to use the run deployment root directory based on where the TRX file
             // is being saved to or loaded from
-            object filePersistenceRootObjectType;
-            if (parameters.TryGetValue(XmlFilePersistence.RootObjectType, out filePersistenceRootObjectType) &&
+            if (parameters.TryGetValue(XmlFilePersistence.RootObjectType, out object filePersistenceRootObjectType) &&
                 (Type)filePersistenceRootObjectType == typeof(TestRun))
             {
                 Debug.Assert(
@@ -136,7 +135,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                     "TestRun is the type of the root object being saved to a file, but the DirectoryPath was not specified in the XML test store parameters");
 
                 Debug.Assert(
-                        !string.IsNullOrEmpty(this.runDeploymentRoot),
+                        !string.IsNullOrEmpty(_runDeploymentRoot),
                     "TestRun is the type of the root object being saved to a file, but the run deployment root directory is null or empty");
 
                 // We are saving a TestRun object as the root element in a file (TRX file), so just save the test run directory
@@ -145,14 +144,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 helper.SaveSimpleField(
                         element,
                         "Deployment/@runDeploymentRoot",
-                        trxFileHelper.MakePathRelative(this.runDeploymentRoot, Path.GetDirectoryName(this.runDeploymentRoot)),
+                        _trxFileHelper.MakePathRelative(_runDeploymentRoot, Path.GetDirectoryName(_runDeploymentRoot)),
                     string.Empty);
             }
             else
             {
                 // We are not saving a TestRun object as the root element in a file (i.e., we're not saving a TRX file), so just
                 // save the run deployment root directory as is
-                helper.SaveSimpleField(element, "Deployment/@runDeploymentRoot", this.runDeploymentRoot, string.Empty);
+                helper.SaveSimpleField(element, "Deployment/@runDeploymentRoot", _runDeploymentRoot, string.Empty);
             }
         }
 

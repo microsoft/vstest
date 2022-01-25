@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     {
         private IDiscoveryManager discoveryManager;
         private IExecutionManager executionManager;
-        private IRequestData requestData;
+        private readonly IRequestData requestData;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestHostManagerFactory"/> class.
@@ -34,12 +34,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <returns>The discovery manager.</returns>
         public IDiscoveryManager GetDiscoveryManager()
         {
-            if (this.discoveryManager == null)
+            if (discoveryManager == null)
             {
-                this.discoveryManager = new DiscoveryManager(this.requestData);
+                discoveryManager = new DiscoveryManager(requestData);
             }
 
-            return this.discoveryManager;
+            return discoveryManager;
         }
 
         /// <summary>
@@ -48,12 +48,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <returns>The execution manager.</returns>
         public IExecutionManager GetExecutionManager()
         {
-            if (this.executionManager == null)
+            if (executionManager == null)
             {
-                this.executionManager = new ExecutionManager(this.requestData);
+                executionManager = new ExecutionManager(requestData);
             }
 
-            return this.executionManager;
+            return executionManager;
         }
     }
 }

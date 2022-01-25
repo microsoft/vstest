@@ -92,11 +92,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             var doc = new XmlDocument();
             var root = doc.CreateElement(loggerName);
 
-            AppendAttribute(doc, root, Constants.LoggerFriendlyName, this.FriendlyName);
-            AppendAttribute(doc, root, Constants.LoggerUriName, this.Uri?.ToString());
-            AppendAttribute(doc, root, Constants.LoggerAssemblyQualifiedName, this.AssemblyQualifiedName);
-            AppendAttribute(doc, root, Constants.LoggerCodeBase, this.CodeBase);
-            AppendAttribute(doc, root, Constants.LoggerEnabledName, this.IsEnabled.ToString());
+            AppendAttribute(doc, root, Constants.LoggerFriendlyName, FriendlyName);
+            AppendAttribute(doc, root, Constants.LoggerUriName, Uri?.ToString());
+            AppendAttribute(doc, root, Constants.LoggerAssemblyQualifiedName, AssemblyQualifiedName);
+            AppendAttribute(doc, root, Constants.LoggerCodeBase, CodeBase);
+            AppendAttribute(doc, root, Constants.LoggerEnabledName, IsEnabled.ToString());
 
             if (Configuration != null)
             {

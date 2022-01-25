@@ -14,16 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public ICommunicationEndPoint Create(ConnectionRole role)
         {
-            ICommunicationEndPoint endPoint;
-            if (role == ConnectionRole.Host)
-            {
-                endPoint = new SocketServer();
-            }
-            else
-            {
-                endPoint = new SocketClient();
-            }
-
+            ICommunicationEndPoint endPoint = role == ConnectionRole.Host ? new SocketServer() : new SocketClient();
             return endPoint;
         }
     }

@@ -15,21 +15,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public class DataCollectionRunSettings : TestRunSettings
     {
-        private string dataCollectionRootName = string.Empty;
+        private readonly string dataCollectionRootName = string.Empty;
 
-        private string dataCollectionsName = string.Empty;
+        private readonly string dataCollectionsName = string.Empty;
 
-        private string dataCollectorName = string.Empty;
+        private readonly string dataCollectorName = string.Empty;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionRunSettings"/> class.
         /// </summary>
         public DataCollectionRunSettings() : base(Constants.DataCollectionRunSettingsName)
         {
-            this.DataCollectorSettingsList = new Collection<DataCollectorSettings>();
-            this.dataCollectionRootName = Constants.DataCollectionRunSettingsName;
-            this.dataCollectionsName = Constants.DataCollectorsSettingName;
-            this.dataCollectorName = Constants.DataCollectorSettingName;
+            DataCollectorSettingsList = new Collection<DataCollectorSettings>();
+            dataCollectionRootName = Constants.DataCollectionRunSettingsName;
+            dataCollectionsName = Constants.DataCollectorsSettingName;
+            dataCollectorName = Constants.DataCollectorSettingName;
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.dataCollectionRootName = dataCollectionRootName;
             this.dataCollectionsName = dataCollectionsName;
             this.dataCollectorName = dataCollectorName;
-            this.DataCollectorSettingsList = new Collection<DataCollectorSettings>();
+            DataCollectorSettingsList = new Collection<DataCollectorSettings>();
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.DataCollectorSettingsList.Any<DataCollectorSettings>(setting => setting.IsEnabled);
+                return DataCollectorSettingsList.Any(setting => setting.IsEnabled);
             }
         }
 
@@ -82,18 +82,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>
         /// The <see cref="XmlElement"/>.
         /// </returns>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public override XmlElement ToXml()
         {
-            XmlDocument doc = new XmlDocument();
-            XmlElement root = doc.CreateElement(this.dataCollectionRootName);
-            XmlElement subRoot = doc.CreateElement(this.dataCollectionsName);
+            XmlDocument doc = new();
+            XmlElement root = doc.CreateElement(dataCollectionRootName);
+            XmlElement subRoot = doc.CreateElement(dataCollectionsName);
             root.AppendChild(subRoot);
 
-            foreach (var collectorSettings in this.DataCollectorSettingsList)
+            foreach (var collectorSettings in DataCollectorSettingsList)
             {
-                XmlNode child = doc.ImportNode(collectorSettings.ToXml(this.dataCollectorName), true);
+                XmlNode child = doc.ImportNode(collectorSettings.ToXml(dataCollectorName), true);
                 subRoot.AppendChild(child);
             }
 
@@ -130,11 +128,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             XmlReader reader, string dataCollectionName,
             string dataCollectorsName, string dataCollectorName)
         {
-            ValidateArg.NotNull<XmlReader>(reader, nameof(reader));
-            ValidateArg.NotNull<string>(dataCollectorsName, nameof(dataCollectorsName));
-            ValidateArg.NotNull<string>(dataCollectorName, nameof(dataCollectorName));
+            ValidateArg.NotNull(reader, nameof(reader));
+            ValidateArg.NotNull(dataCollectorsName, nameof(dataCollectorsName));
+            ValidateArg.NotNull(dataCollectorName, nameof(dataCollectorName));
 
-            DataCollectionRunSettings settings = new DataCollectionRunSettings(dataCollectionName, dataCollectorsName, dataCollectorName);
+            DataCollectionRunSettings settings = new(dataCollectionName, dataCollectorsName, dataCollectorName);
             bool empty = reader.IsEmptyElement;
             if (reader.HasAttributes)
             {
@@ -191,7 +189,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </exception>
         internal static List<DataCollectorSettings> ReadListElementFromXml(XmlReader reader, string dataCollectorsName)
         {
-            List<DataCollectorSettings> settings = new List<DataCollectorSettings>();
+            List<DataCollectorSettings> settings = new();
             bool empty = reader.IsEmptyElement;
             if (reader.HasAttributes)
             {

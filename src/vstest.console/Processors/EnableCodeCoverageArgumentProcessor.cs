@@ -41,12 +41,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new EnableCodeCoverageArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new EnableCodeCoverageArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -57,17 +57,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, new FileHelper()));
+                    executor = new Lazy<IArgumentExecutor>(() => new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, new FileHelper()));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -95,18 +95,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         #region private variables
 
-        private IRunSettingsProvider runSettingsManager;
-        private CommandLineOptions commandLineOptions;
-        private IFileHelper fileHelper;
+        private readonly IRunSettingsProvider runSettingsManager;
+        private readonly CommandLineOptions commandLineOptions;
+        private readonly IFileHelper fileHelper;
 
         internal const string FriendlyName = "Code Coverage";
 
-        private static string xPathSeperator = "/";
-        private static string[] nodeNames = new string[] { Constants.RunSettingsName, Constants.DataCollectionRunSettingsName, Constants.DataCollectorsSettingName, Constants.DataCollectorSettingName };
+        private static readonly string xPathSeperator = "/";
+        private static readonly string[] nodeNames = new string[] { Constants.RunSettingsName, Constants.DataCollectionRunSettingsName, Constants.DataCollectorsSettingName, Constants.DataCollectorSettingName };
 
         #region Default  CodeCoverage Settings String
 
-        private static string codeCoverageCollectorSettingsTemplate =
+        private static readonly string codeCoverageCollectorSettingsTemplate =
 @"      <DataCollector uri=""datacollector://microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=16.0.0.0 " + @", Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"" friendlyName=""Code Coverage"">" + Environment.NewLine +
 @"        <Configuration>" + Environment.NewLine +
 @"          <CodeCoverage>" + Environment.NewLine +
@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         internal EnableCodeCoverageArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager, IFileHelper fileHelper)
         {
-            this.commandLineOptions = options;
+            commandLineOptions = options;
             this.runSettingsManager = runSettingsManager;
             this.fileHelper = fileHelper;
         }
@@ -198,13 +198,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <inheritdoc />
         public void Initialize(string argument)
         {
-            this.commandLineOptions.EnableCodeCoverage = true;
+            commandLineOptions.EnableCodeCoverage = true;
 
             // Add this enabled data collectors list, this will ensure Code Coverage isn't disabled when other DCs are configured using /Collect.
             CollectArgumentExecutor.AddDataCollectorFriendlyName(FriendlyName);
             try
             {
-                this.UpdateWithCodeCoverageSettingsIfNotConfigured();
+                UpdateWithCodeCoverageSettingsIfNotConfigured();
             }
             catch (XPathException e)
             {
@@ -225,11 +225,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="runSettingsDocument"> The run settings document. </param>
         private void UpdateWithCodeCoverageSettingsIfNotConfigured()
         {
-            var runsettingsXml = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
+            var runsettingsXml = runSettingsManager.ActiveRunSettings?.SettingsXml;
             if (runsettingsXml == null)
             {
-                this.runSettingsManager.AddDefaultRunSettings();
-                runsettingsXml = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
+                runSettingsManager.AddDefaultRunSettings();
+                runsettingsXml = runSettingsManager.ActiveRunSettings?.SettingsXml;
             }
 
             IXPathNavigable runSettingsDocument;
@@ -246,7 +246,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (ContainsDataCollectorWithFriendlyName(runSettingsNavigator, FriendlyName))
             {
                 // runsettings already has Code coverage data collector, just enable it.
-                CollectArgumentExecutor.AddDataCollectorToRunSettings(FriendlyName, this.runSettingsManager, this.fileHelper);
+                CollectArgumentExecutor.AddDataCollectorToRunSettings(FriendlyName, runSettingsManager, fileHelper);
             }
             else
             {
@@ -282,7 +282,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 dataCollectorsNavigator = runSettingsNavigator.SelectSingleNode(xpaths[2]);
                 dataCollectorsNavigator.AppendChild(codeCoverageCollectorSettingsTemplate);
 
-                this.runSettingsManager.UpdateRunSettings(runSettingsDocument.CreateNavigator().OuterXml);
+                runSettingsManager.UpdateRunSettings(runSettingsDocument.CreateNavigator().OuterXml);
             }
         }
 
@@ -308,7 +308,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="runSettingDocument"> XPathNavigable representation of a runsettings file </param>
         /// <param name="dataCollectorFriendlyName"> The data Collector friendly name. </param>
         /// <returns> True if there is a datacollector configured. </returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#")]
         private static bool ContainsDataCollectorWithFriendlyName(IXPathNavigable runSettingDocument, string dataCollectorFriendlyName)
         {
             if (runSettingDocument == null)

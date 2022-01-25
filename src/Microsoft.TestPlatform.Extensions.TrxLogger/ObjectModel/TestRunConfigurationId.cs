@@ -10,14 +10,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// </summary>
     internal sealed class TestRunConfigurationId
     {
-        private Guid id;
+        private Guid _id;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunConfigurationId"/> class.
         /// </summary>
         public TestRunConfigurationId()
         {
-            this.id = Guid.NewGuid();
+            _id = Guid.NewGuid();
         }
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public Guid Id
         {
-            get { return this.id; }
+            get { return _id; }
         }
     }
 }

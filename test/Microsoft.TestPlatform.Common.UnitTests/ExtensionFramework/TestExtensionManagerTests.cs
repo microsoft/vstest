@@ -19,10 +19,10 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     [TestClass]
     public class TestExtensionManagerTests
     {
-        private IMessageLogger messageLogger;
+        private readonly IMessageLogger messageLogger;
         private TestExtensionManager<ITestLogger, ITestLoggerCapabilities> testExtensionManager;
-        private IEnumerable<LazyExtension<ITestLogger, ITestLoggerCapabilities>> filteredTestExtensions;
-        private IEnumerable<LazyExtension<ITestLogger, Dictionary<string, object>>> unfilteredTestExtensions;
+        private readonly IEnumerable<LazyExtension<ITestLogger, ITestLoggerCapabilities>> filteredTestExtensions;
+        private readonly IEnumerable<LazyExtension<ITestLogger, Dictionary<string, object>>> unfilteredTestExtensions;
 
         public TestExtensionManagerTests()
         {
@@ -41,11 +41,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void TestExtensionManagerConstructorShouldThrowExceptionIfMessageLoggerIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-                {
-                    testExtensionManager = new DummyTestExtensionManager(unfilteredTestExtensions, filteredTestExtensions, null);
-                }
-            );
+            Assert.ThrowsException<ArgumentNullException>(() => testExtensionManager = new DummyTestExtensionManager(unfilteredTestExtensions, filteredTestExtensions, null));
         }
 
         [TestMethod]

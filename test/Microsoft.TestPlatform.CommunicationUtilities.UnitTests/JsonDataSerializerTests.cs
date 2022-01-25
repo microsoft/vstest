@@ -15,11 +15,11 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     [TestClass]
     public class JsonDataSerializerTests
     {
-        private JsonDataSerializer jsonDataSerializer;
+        private readonly JsonDataSerializer jsonDataSerializer;
 
         public JsonDataSerializerTests()
         {
-            this.jsonDataSerializer = JsonDataSerializer.Instance;
+            jsonDataSerializer = JsonDataSerializer.Instance;
         }
 
         [TestMethod]
@@ -37,7 +37,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(classWithSelfReferencingLoop);
             classWithSelfReferencingLoop.InfiniteRefernce.InfiniteRefernce = classWithSelfReferencingLoop;
 
-            string serializedPayload = this.jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop);
+            string serializedPayload = jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop);
             Assert.AreEqual("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteRefernce\":{}}}", serializedPayload);
         }
 
@@ -52,7 +52,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
                 }
             };
 
-            Message message = this.jsonDataSerializer.DeserializeMessage("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteRefernce\":{}}}");
+            Message message = jsonDataSerializer.DeserializeMessage("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteRefernce\":{}}}");
             Assert.AreEqual("dummy", message?.MessageType);
         }
 
@@ -64,7 +64,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             classWithSelfReferencingLoop.InfiniteRefernce.InfiniteRefernce = classWithSelfReferencingLoop;
 
             // This line should not throw exception
-            this.jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop);
+            jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop);
         }
 
         [TestMethod]
@@ -74,10 +74,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(classWithSelfReferencingLoop);
             classWithSelfReferencingLoop.InfiniteRefernce.InfiniteRefernce = classWithSelfReferencingLoop;
 
-            var json = this.jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop);
+            var json = jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop);
 
             // This line should deserialize properly
-            var result = this.jsonDataSerializer.Deserialize<ClassWithSelfReferencingLoop>(json, 1);
+            var result = jsonDataSerializer.Deserialize<ClassWithSelfReferencingLoop>(json, 1);
 
             Assert.AreEqual(typeof(ClassWithSelfReferencingLoop), result.GetType());
             Assert.IsNull(result.InfiniteRefernce);
@@ -86,7 +86,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void CloneShouldReturnNullForNull()
         {
-            var clonedTestCase = this.jsonDataSerializer.Clone<TestCase>(null);
+            var clonedTestCase = jsonDataSerializer.Clone<TestCase>(null);
 
             Assert.IsNull(clonedTestCase);
         }
@@ -95,7 +95,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void CloneShouldWorkForValueType()
         {
             var i = 2;
-            var clonedI = this.jsonDataSerializer.Clone<int>(i);
+            var clonedI = jsonDataSerializer.Clone(i);
 
             Assert.AreEqual(clonedI, i);
         }
@@ -103,9 +103,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void CloneShouldCloneTestCaseObject()
         {
-            var testCase = JsonDataSerializerTests.GetSampleTestCase(out var expectedTrait);
+            var testCase = GetSampleTestCase(out var expectedTrait);
 
-            var clonedTestCase = this.jsonDataSerializer.Clone<TestCase>(testCase);
+            var clonedTestCase = jsonDataSerializer.Clone(testCase);
 
             VerifyTestCaseClone(clonedTestCase, testCase, expectedTrait);
         }
@@ -113,14 +113,14 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void CloneShouldCloneTestResultsObject()
         {
-            var testCase = JsonDataSerializerTests.GetSampleTestCase(out var expectedTrait);
+            var testCase = GetSampleTestCase(out var expectedTrait);
 
             var testResult = new TestResult(testCase);
 
             var startTime = DateTimeOffset.UtcNow;
             testResult.StartTime = startTime;
 
-            var clonedTestResult = this.jsonDataSerializer.Clone<TestResult>(testResult);
+            var clonedTestResult = jsonDataSerializer.Clone(testResult);
 
             Assert.IsFalse(ReferenceEquals(testResult, clonedTestResult));
 
@@ -166,7 +166,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             public ClassWithSelfReferencingLoop(ClassWithSelfReferencingLoop ir)
             {
-                this.InfiniteRefernce = ir;
+                InfiniteRefernce = ir;
             }
 
             public ClassWithSelfReferencingLoop InfiniteRefernce

@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
             try
             {
-                using var fileStream = this.fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var fileStream = fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using var peReader = new PEReader(fileStream);
                 // Resources for PEReader:
                 // 1. https://msdn.microsoft.com/library/windows/desktop/ms680547(v=vs.85).aspx?id=19509

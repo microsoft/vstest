@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     typeof(RemoteEqtTrace).Assembly.Location,
                     typeof(RemoteEqtTrace).FullName);
 
-                if (!Enum.Equals(TraceLevel, TraceLevel.Off))
+                if (!Equals(TraceLevel, TraceLevel.Off))
                 {
                     remoteEqtTrace.TraceLevel = TraceLevel;
 
@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 }
                 else
                 {
-                    this.DoNotInitialize = true;
+                    DoNotInitialize = true;
                 }
             }
         }

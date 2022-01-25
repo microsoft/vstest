@@ -112,15 +112,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                 throw new ArgumentOutOfRangeException(nameof(discoveredTestEventTimeout), Resources.NotificationTimeoutIsZero);
             }
 
-            this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            AdapterSourceMap = new Dictionary<string, IEnumerable<string>>
             {
                 { Constants.UnspecifiedAdapterPath, sources }
             };
-            this.FrequencyOfDiscoveredTestsEvent = frequencyOfDiscoveredTestsEvent;
-            this.DiscoveredTestEventTimeout = discoveredTestEventTimeout;
+            FrequencyOfDiscoveredTestsEvent = frequencyOfDiscoveredTestsEvent;
+            DiscoveredTestEventTimeout = discoveredTestEventTimeout;
 
-            this.RunSettings = runSettings;
-            this.TestSessionInfo = testSessionInfo;
+            RunSettings = runSettings;
+            TestSessionInfo = testSessionInfo;
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             get
             {
                 IEnumerable<string> sources = new List<string>();
-                return this.AdapterSourceMap.Values.Aggregate(sources, (current, enumerable) => current.Concat(enumerable));
+                return AdapterSourceMap.Values.Aggregate(sources, (current, enumerable) => current.Concat(enumerable));
             }
         }
 

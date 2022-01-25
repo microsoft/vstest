@@ -15,15 +15,15 @@ namespace Microsoft.TestPlatform.PerformanceTests
         [TestMethod]
         public void ExecutionPerformanceTest()
         {
-            this.RunExecutionPerformanceTests(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty);
+            RunExecutionPerformanceTests(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty);
 
-            this.ValidateSummaryStatus(1, 1, 1);
-            this.ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
-            this.ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
-            this.ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
+            ValidateSummaryStatus(1, 1, 1);
+            ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
+            ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
+            ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
 
-            this.AnalyzePerfData();
-            var actualExecutionTime = this.GetExecutionTime();
+            AnalyzePerfData();
+            var actualExecutionTime = GetExecutionTime();
 
             // Sample Assert statement to verify the performance. 500 will be replaced by the actual threshold value.
             Assert.IsTrue(actualExecutionTime < 500);
@@ -32,15 +32,15 @@ namespace Microsoft.TestPlatform.PerformanceTests
         [TestMethod]
         public void DiscoveryPerformanceTest()
         {
-            this.RunDiscoveryPerformanceTests(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty);
+            RunDiscoveryPerformanceTests(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty);
 
-            this.ValidateDiscoveredTests(
+            ValidateDiscoveredTests(
                 "SampleUnitTestProject.UnitTest1.PassingTest",
                 "SampleUnitTestProject.UnitTest1.FailingTest",
                 "SampleUnitTestProject.UnitTest1.SkippingTest");
 
-            this.AnalyzePerfData();
-            var actualDiscoveryTime = this.GetDiscoveryTime();
+            AnalyzePerfData();
+            var actualDiscoveryTime = GetDiscoveryTime();
 
             // Sample Assert statement to verify the performance. 500 will be replaced by the actual threshold value.
             Assert.IsTrue(actualDiscoveryTime < 500);
@@ -49,15 +49,15 @@ namespace Microsoft.TestPlatform.PerformanceTests
         [TestMethod]
         public void VsTestConsolePerformanceTest()
         {
-            this.RunExecutionPerformanceTests(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty);
+            RunExecutionPerformanceTests(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty);
 
-            this.ValidateSummaryStatus(1, 1, 1);
-            this.ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
-            this.ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
-            this.ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
+            ValidateSummaryStatus(1, 1, 1);
+            ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
+            ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
+            ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
 
-            this.AnalyzePerfData();
-            var actualVsTestTime = this.GetVsTestTime();
+            AnalyzePerfData();
+            var actualVsTestTime = GetVsTestTime();
 
             // Sample Assert statement to verify the performance. 1500 will be replaced by the actual threshold value.
             Assert.IsTrue(actualVsTestTime < 1500);
@@ -66,15 +66,15 @@ namespace Microsoft.TestPlatform.PerformanceTests
         [TestMethod]
         public void TestHostPerformanceTest()
         {
-            this.RunExecutionPerformanceTests(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty);
+            RunExecutionPerformanceTests(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty);
 
-            this.ValidateSummaryStatus(1, 1, 1);
-            this.ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
-            this.ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
-            this.ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
+            ValidateSummaryStatus(1, 1, 1);
+            ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
+            ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
+            ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
 
-            this.AnalyzePerfData();
-            var actualTestHostTime = this.GetTestHostTime();
+            AnalyzePerfData();
+            var actualTestHostTime = GetTestHostTime();
 
             // Sample Assert statement to verify the performance. 1000 will be replaced by the actual threshold value.
             Assert.IsTrue(actualTestHostTime < 1000);
@@ -83,16 +83,16 @@ namespace Microsoft.TestPlatform.PerformanceTests
         [TestMethod]
         public void MsTestV2AdapterPerformanceTest()
         {
-            this.RunExecutionPerformanceTests(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty);
+            RunExecutionPerformanceTests(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty);
 
-            this.ValidateSummaryStatus(1, 1, 1);
-            this.ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
-            this.ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
-            this.ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
+            ValidateSummaryStatus(1, 1, 1);
+            ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
+            ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
+            ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
 
-            this.AnalyzePerfData();
+            AnalyzePerfData();
 
-            var actualAdapterTimeTaken = this.GetAdapterExecutionTime("executor://mstestadapter/v2");
+            var actualAdapterTimeTaken = GetAdapterExecutionTime("executor://mstestadapter/v2");
 
             // Sample Assert statement to verify the performance. 300 will be replaced by the actual threshold value.
             Assert.IsTrue(actualAdapterTimeTaken < 300);

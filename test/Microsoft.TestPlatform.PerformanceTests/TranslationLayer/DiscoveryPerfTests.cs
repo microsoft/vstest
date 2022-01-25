@@ -11,13 +11,13 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
     [TestClass]
     public class DiscoveryPerfTests : TelemetryPerfTestbase
     {
-        private IVsTestConsoleWrapper vstestConsoleWrapper;
-        private DiscoveryEventHandler2 discoveryEventHandler2;
+        private readonly IVsTestConsoleWrapper vstestConsoleWrapper;
+        private readonly DiscoveryEventHandler2 discoveryEventHandler2;
 
         public DiscoveryPerfTests()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
-            this.discoveryEventHandler2 = new DiscoveryEventHandler2();
+            vstestConsoleWrapper = GetVsTestConsoleWrapper();
+            discoveryEventHandler2 = new DiscoveryEventHandler2();
         }
 
         [TestMethod]
@@ -29,9 +29,9 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
                                          GetPerfAssetFullPath("MSTestAdapterPerfTestProject", "MSTestAdapterPerfTestProject.dll"),
                                      };
 
-            this.vstestConsoleWrapper.DiscoverTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.discoveryEventHandler2);
+            vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, discoveryEventHandler2);
 
-            this.PostTelemetry("DiscoverMsTest10K", this.discoveryEventHandler2.Metrics);
+            PostTelemetry("DiscoverMsTest10K", discoveryEventHandler2.Metrics);
         }
 
         [TestMethod]
@@ -43,9 +43,9 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
                                          GetPerfAssetFullPath("XunitAdapterPerfTestProject", "XunitAdapterPerfTestProject.dll"),
                                      };
 
-            this.vstestConsoleWrapper.DiscoverTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.discoveryEventHandler2);
+            vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, discoveryEventHandler2);
 
-            this.PostTelemetry("DiscoverXunit10K", this.discoveryEventHandler2.Metrics);
+            PostTelemetry("DiscoverXunit10K", discoveryEventHandler2.Metrics);
         }
 
         [TestMethod]
@@ -57,9 +57,9 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
                                          GetPerfAssetFullPath("NunitAdapterPerfTestProject", "NunitAdapterPerfTestProject.dll"),
                                      };
 
-            this.vstestConsoleWrapper.DiscoverTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.discoveryEventHandler2);
+            vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, discoveryEventHandler2);
 
-            this.PostTelemetry("DiscoverNunit10K", this.discoveryEventHandler2.Metrics);
+            PostTelemetry("DiscoverNunit10K", discoveryEventHandler2.Metrics);
         }
 
         [TestMethod]
@@ -71,9 +71,9 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
                                          GetPerfAssetFullPath("MSTestAdapterPerfTestProject", "MSTestAdapterPerfTestProject.dll"),
                                      };
 
-            this.vstestConsoleWrapper.DiscoverTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, this.discoveryEventHandler2);
+            vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, discoveryEventHandler2);
 
-            this.PostTelemetry("DiscoverMsTest10KWithDefaultAdaptersSkipped", this.discoveryEventHandler2.Metrics);
+            PostTelemetry("DiscoverMsTest10KWithDefaultAdaptersSkipped", discoveryEventHandler2.Metrics);
         }
 
         [TestMethod]
@@ -85,9 +85,9 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
                                          GetPerfAssetFullPath("XunitAdapterPerfTestProject", "XunitAdapterPerfTestProject.dll"),
                                      };
 
-            this.vstestConsoleWrapper.DiscoverTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, this.discoveryEventHandler2);
+            vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, discoveryEventHandler2);
 
-            this.PostTelemetry("DiscoverXunit10KWithDefaultAdaptersSkipped", this.discoveryEventHandler2.Metrics);
+            PostTelemetry("DiscoverXunit10KWithDefaultAdaptersSkipped", discoveryEventHandler2.Metrics);
         }
 
         [TestMethod]
@@ -99,9 +99,9 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
                                          GetPerfAssetFullPath("NunitAdapterPerfTestProject", "NunitAdapterPerfTestProject.dll"),
                                      };
 
-            this.vstestConsoleWrapper.DiscoverTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, this.discoveryEventHandler2);
+            vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, discoveryEventHandler2);
 
-            this.PostTelemetry("DiscoverNunit10KWithDefaultAdaptersSkipped", this.discoveryEventHandler2.Metrics);
+            PostTelemetry("DiscoverNunit10KWithDefaultAdaptersSkipped", discoveryEventHandler2.Metrics);
         }
     }
 }

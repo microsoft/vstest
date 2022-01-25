@@ -17,18 +17,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
     [TestClass]
     public class CommandLineOptionsTests
     {
-        private readonly Mock<IFileHelper> fileHelper;
-        private FilePatternParser filePatternParser;
-        private readonly string currentDirectory = @"C:\\Temp";
+        private readonly Mock<IFileHelper> _fileHelper;
+        private readonly FilePatternParser _filePatternParser;
+        private readonly string _currentDirectory = @"C:\\Temp";
 
         public CommandLineOptionsTests()
         {
-            this.fileHelper = new Mock<IFileHelper>();
-            this.filePatternParser = new FilePatternParser(new Mock<Matcher>().Object, this.fileHelper.Object);
+            _fileHelper = new Mock<IFileHelper>();
+            _filePatternParser = new FilePatternParser(new Mock<Matcher>().Object, _fileHelper.Object);
             CommandLineOptions.Instance.Reset();
-            CommandLineOptions.Instance.FileHelper = this.fileHelper.Object;
-            CommandLineOptions.Instance.FilePatternParser = this.filePatternParser;
-            this.fileHelper.Setup(fh => fh.GetCurrentDirectory()).Returns(currentDirectory);
+            CommandLineOptions.Instance.FileHelper = _fileHelper.Object;
+            CommandLineOptions.Instance.FilePatternParser = _filePatternParser;
+            _fileHelper.Setup(fh => fh.GetCurrentDirectory()).Returns(_currentDirectory);
         }
 
         [TestMethod]
@@ -70,8 +70,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         public void CommandLineOptionsAddSourceShouldConvertRelativePathToAbsolutePath()
         {
             string relativeTestFilePath = "DummyTestFile.txt";
-            var absolutePath = Path.Combine(currentDirectory, relativeTestFilePath);
-            this.fileHelper.Setup(fh => fh.Exists(absolutePath)).Returns(true);
+            var absolutePath = Path.Combine(_currentDirectory, relativeTestFilePath);
+            _fileHelper.Setup(fh => fh.Exists(absolutePath)).Returns(true);
 
             // Pass relative path
             CommandLineOptions.Instance.AddSource(relativeTestFilePath);
@@ -88,7 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         public void CommandLineOptionsAddSourceShouldAddSourceForValidSource()
         {
             string testFilePath = Path.Combine(Path.GetTempPath(), "DummyTestFile.txt");
-            this.fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
+            _fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
 
             CommandLineOptions.Instance.AddSource(testFilePath);
 

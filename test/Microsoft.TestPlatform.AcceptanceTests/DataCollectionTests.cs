@@ -23,25 +23,25 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void ExecuteTestsWithDataCollection(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
             var resultsDir = GetResultsDirectory();
-            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-            string runSettings = this.GetRunsettingsFilePath(resultsDir);
+            var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+            string runSettings = GetRunsettingsFilePath(resultsDir);
             string diagFileName = Path.Combine(resultsDir, "diaglog.txt");
             var extensionsPath = Path.Combine(
-                this.testEnvironment.TestAssetsPath,
+                testEnvironment.TestAssetsPath,
                 Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
                 "bin",
                 IntegrationTestEnvironment.BuildConfiguration,
-                this.testEnvironment.RunnerFramework);
-            var arguments = PrepareArguments(assemblyPaths, null, runSettings, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+                testEnvironment.RunnerFramework);
+            var arguments = PrepareArguments(assemblyPaths, null, runSettings, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
 
-            this.InvokeVsTest(arguments);
+            InvokeVsTest(arguments);
 
-            this.ValidateSummaryStatus(1, 1, 1);
-            this.VaildateDataCollectorOutput(resultsDir);
+            ValidateSummaryStatus(1, 1, 1);
+            VaildateDataCollectorOutput(resultsDir);
 
             TryRemoveDirectory(resultsDir);
         }
@@ -51,25 +51,25 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void ExecuteTestsWithDataCollectionUsingCollectArgument(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
             var resultsDir = GetResultsDirectory();
-            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+            var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
             string diagFileName = Path.Combine(resultsDir, "diaglog.txt");
             var extensionsPath = Path.Combine(
-                this.testEnvironment.TestAssetsPath,
+                testEnvironment.TestAssetsPath,
                 Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
                 "bin",
                 IntegrationTestEnvironment.BuildConfiguration,
-                this.testEnvironment.RunnerFramework);
+                testEnvironment.RunnerFramework);
 
-            var arguments = PrepareArguments(assemblyPaths, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDir);
+            var arguments = PrepareArguments(assemblyPaths, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDir);
             arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /Collect:SampleDataCollector", $" /TestAdapterPath:{extensionsPath}");
 
-            this.InvokeVsTest(arguments);
+            InvokeVsTest(arguments);
 
-            this.ValidateSummaryStatus(1, 1, 1);
-            this.VaildateDataCollectorOutput(resultsDir);
+            ValidateSummaryStatus(1, 1, 1);
+            VaildateDataCollectorOutput(resultsDir);
 
             TryRemoveDirectory(resultsDir);
         }
@@ -78,13 +78,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void DataCollectorAssemblyLoadingShouldNotThrowErrorForNetCore(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
             var resultsDir = GetResultsDirectory();
-            var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.1"), string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: resultsDir);
+            var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.1"), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: resultsDir);
 
-            this.InvokeVsTest(arguments);
-            this.ValidateSummaryStatus(1, 0, 0);
+            InvokeVsTest(arguments);
+            ValidateSummaryStatus(1, 0, 0);
 
             TryRemoveDirectory(resultsDir);
         }
@@ -94,13 +94,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource]
         public void DataCollectorAssemblyLoadingShouldNotThrowErrorForFullFramework(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
             var resultsDir = GetResultsDirectory();
-            var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll"), string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: resultsDir);
+            var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll"), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: resultsDir);
 
-            this.InvokeVsTest(arguments);
-            this.ValidateSummaryStatus(1, 0, 0);
+            InvokeVsTest(arguments);
+            ValidateSummaryStatus(1, 0, 0);
 
             TryRemoveDirectory(resultsDir);
         }
@@ -110,20 +110,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void DataCollectorAttachmentProcessor(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
             var resultsDir = GetResultsDirectory();
-            var assemblyPath = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
-            var secondAssemblyPath = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-            string runSettings = this.GetRunsettingsFilePath(resultsDir);
+            var assemblyPath = BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
+            var secondAssemblyPath = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+            string runSettings = GetRunsettingsFilePath(resultsDir);
             string diagFileName = Path.Combine(resultsDir, "diaglog.txt");
             var extensionsPath = Path.Combine(
-                this.testEnvironment.TestAssetsPath,
+                testEnvironment.TestAssetsPath,
                 Path.GetFileNameWithoutExtension("AttachmentProcessorDataCollector"),
                 "bin",
                 IntegrationTestEnvironment.BuildConfiguration,
                 "netstandard2.0");
-            var arguments = PrepareArguments(new string[] { assemblyPath, secondAssemblyPath }, null, runSettings, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+            var arguments = PrepareArguments(new string[] { assemblyPath, secondAssemblyPath }, null, runSettings, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
 
             XElement runSettingsXml = XElement.Load(runSettings);
@@ -141,12 +141,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                          .Add(new XElement("Configuration", new XElement("MergeFile", "MergedFile.txt")));
             runSettingsXml.Save(runSettings);
 
-            this.InvokeVsTest(arguments);
-            this.ValidateSummaryStatus(2, 2, 2);
+            InvokeVsTest(arguments);
+            ValidateSummaryStatus(2, 2, 2);
 
             string mergedFile = Directory.GetFiles(resultsDir, "MergedFile.txt", SearchOption.AllDirectories).Single();
-            List<string> fileContent = new List<string>();
-            using (StreamReader streamReader = new StreamReader(mergedFile))
+            List<string> fileContent = new();
+            using (StreamReader streamReader = new(mergedFile))
             {
                 while (!streamReader.EndOfStream)
                 {
@@ -198,17 +198,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         private void VaildateDataCollectorOutput(string resultsDir)
         {
             // Output of datacollection attachment.
-            this.StdOutputContains("filename.txt");
-            this.StdOutputContains("TestCaseStarted");
-            this.StdOutputContains("TestCaseEnded");
-            this.StdOutputContains("SampleUnitTestProject2.UnitTest1.PassingTest2");
-            this.StdOutputContains("SampleUnitTestProject2.UnitTest1.FailingTest2");
-            this.StdOutputContains("Data collector 'SampleDataCollector' message: SessionStarted");
-            this.StdOutputContains("Data collector 'SampleDataCollector' message: TestHostLaunched");
-            this.StdOutputContains("Data collector 'SampleDataCollector' message: SessionEnded");
-            this.StdOutputContains("Data collector 'SampleDataCollector' message: my warning");
-            this.StdErrorContains("Data collector 'SampleDataCollector' message: Data collector caught an exception of type 'System.Exception': 'my exception'. More details:");
-            this.StdOutputContains("Data collector 'SampleDataCollector' message: Dispose called.");
+            StdOutputContains("filename.txt");
+            StdOutputContains("TestCaseStarted");
+            StdOutputContains("TestCaseEnded");
+            StdOutputContains("SampleUnitTestProject2.UnitTest1.PassingTest2");
+            StdOutputContains("SampleUnitTestProject2.UnitTest1.FailingTest2");
+            StdOutputContains("Data collector 'SampleDataCollector' message: SessionStarted");
+            StdOutputContains("Data collector 'SampleDataCollector' message: TestHostLaunched");
+            StdOutputContains("Data collector 'SampleDataCollector' message: SessionEnded");
+            StdOutputContains("Data collector 'SampleDataCollector' message: my warning");
+            StdErrorContains("Data collector 'SampleDataCollector' message: Data collector caught an exception of type 'System.Exception': 'my exception'. More details:");
+            StdOutputContains("Data collector 'SampleDataCollector' message: Dispose called.");
 
             // Verify attachments
             var isTestRunLevelAttachmentFound = false;
@@ -222,7 +222,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 // Test Run level attachments are logged in standard output.
                 if (file.Contains("filename.txt"))
                 {
-                    this.StdOutputContains(file);
+                    StdOutputContains(file);
                     isTestRunLevelAttachmentFound = true;
                 }
 

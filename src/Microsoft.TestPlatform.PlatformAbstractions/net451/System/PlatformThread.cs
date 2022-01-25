@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             }
 
             Exception exThrown = null;
-            var thread = new System.Threading.Thread(() =>
+            var thread = new Thread(() =>
             {
                 try
                 {

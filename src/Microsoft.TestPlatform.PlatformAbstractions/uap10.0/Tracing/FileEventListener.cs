@@ -28,44 +28,44 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Name of the current log file
         /// </summary>
-        private string fileName;
+        private readonly string fileName;
 
         /// <summary>
         /// The format to be used by logging.
         /// </summary>
-        private string format = "{0:yyyy-MM-dd HH\\:mm\\:ss\\:ffff}\tType: {1}\tId: {2}\tMessage: '{3}'";
+        private readonly string format = "{0:yyyy-MM-dd HH\\:mm\\:ss\\:ffff}\tType: {1}\tId: {2}\tMessage: '{3}'";
 
-        private SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim semaphoreSlim = new(1);
 
         public FileEventListener(string name)
         {
-            this.fileName = name;
+            fileName = name;
 
-            this.AssignLocalFile();
+            AssignLocalFile();
         }
 
         protected override void OnEventWritten(EventWrittenEventArgs eventData)
         {
-            if (this.streamWriter == null)
+            if (streamWriter == null)
             {
                 return;
             }
 
             var lines = new List<string>();
 
-            var newFormatedLine = string.Format(this.format, DateTime.Now, eventData.Level, eventData.EventId, eventData.Payload[0]);
+            var newFormatedLine = string.Format(format, DateTime.Now, eventData.Level, eventData.EventId, eventData.Payload[0]);
 
             Debug.WriteLine(newFormatedLine);
 
             lines.Add(newFormatedLine);
 
-            this.WriteToFile(lines);
+            WriteToFile(lines);
         }
 
         private void AssignLocalFile()
         {
-            this.fileStream = new FileStream(this.fileName, FileMode.Append | FileMode.OpenOrCreate);
-            this.streamWriter = new StreamWriter(this.fileStream)
+            fileStream = new FileStream(fileName, FileMode.Append | FileMode.OpenOrCreate);
+            streamWriter = new StreamWriter(fileStream)
             {
                 AutoFlush = true
             };
@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         private async void WriteToFile(IEnumerable<string> lines)
         {
-            await this.semaphoreSlim.WaitAsync();
+            await semaphoreSlim.WaitAsync();
 
             await Task.Run(async () =>
             {
@@ -81,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 {
                     foreach (var line in lines)
                     {
-                        await this.streamWriter.WriteLineAsync(line);
+                        await streamWriter.WriteLineAsync(line);
                     }
                 }
                 catch (Exception)
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 }
                 finally
                 {
-                    this.semaphoreSlim.Release();
+                    semaphoreSlim.Release();
                 }
             });
         }

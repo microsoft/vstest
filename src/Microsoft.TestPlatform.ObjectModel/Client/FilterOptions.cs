@@ -29,19 +29,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <inheritdoc/>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             sb.AppendLine(string.Format(CultureInfo.CurrentCulture, "FilterOptions:"));
             sb.AppendLine(string.Format(CultureInfo.CurrentCulture,
                 "   FilterRegEx={0}   FilterRegExReplacement={1}",
-                this.FilterRegEx ?? string.Empty,
-                this.FilterRegExReplacement ?? string.Empty));
+                FilterRegEx ?? string.Empty,
+                FilterRegExReplacement ?? string.Empty));
             return sb.ToString();
         }
 
         protected bool Equals(FilterOptions other) =>
             other != null &&
-            string.Equals(this.FilterRegEx, other.FilterRegEx) &&
-            string.Equals(this.FilterRegExReplacement, other.FilterRegExReplacement);
+            string.Equals(FilterRegEx, other.FilterRegEx) &&
+            string.Equals(FilterRegExReplacement, other.FilterRegExReplacement);
 
         /// <inheritdoc/>
         public override bool Equals(object obj) => Equals(obj as FilterOptions);
@@ -51,8 +51,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         {
             unchecked
             {
-                var hashCode = this.FilterRegEx.GetHashCode();
-                return (hashCode * 397) ^ (this.FilterRegExReplacement != null ? this.FilterRegExReplacement.GetHashCode() : 0);
+                var hashCode = FilterRegEx.GetHashCode();
+                return (hashCode * 397) ^ (FilterRegExReplacement != null ? FilterRegExReplacement.GetHashCode() : 0);
             }
         }
     }

@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     /// </summary>
     internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManager
     {
-        private static object attachmentTaskLock = new object();
+        private static readonly object attachmentTaskLock = new();
 
         #region Fields
 
@@ -42,17 +42,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <summary>
         /// Attachment transfer tasks associated with a given datacollection context.
         /// </summary>
-        private Dictionary<DataCollectionContext, List<Task>> attachmentTasks;
+        private readonly Dictionary<DataCollectionContext, List<Task>> attachmentTasks;
 
         /// <summary>
         /// Use to cancel attachment transfers if test run is canceled.
         /// </summary>
-        private CancellationTokenSource cancellationTokenSource;
+        private readonly CancellationTokenSource cancellationTokenSource;
 
         /// <summary>
         /// File helper instance.
         /// </summary>
-        private IFileHelper fileHelper;
+        private readonly IFileHelper fileHelper;
 
         #endregion
 
@@ -73,9 +73,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         protected DataCollectionAttachmentManager(IFileHelper fileHelper)
         {
             this.fileHelper = fileHelper;
-            this.cancellationTokenSource = new CancellationTokenSource();
-            this.attachmentTasks = new Dictionary<DataCollectionContext, List<Task>>();
-            this.AttachmentSets = new Dictionary<DataCollectionContext, Dictionary<Uri, AttachmentSet>>();
+            cancellationTokenSource = new CancellationTokenSource();
+            attachmentTasks = new Dictionary<DataCollectionContext, List<Task>>();
+            AttachmentSets = new Dictionary<DataCollectionContext, Dictionary<Uri, AttachmentSet>>();
         }
 
         #endregion
@@ -108,22 +108,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             if (string.IsNullOrEmpty(outputDirectory))
             {
-                this.SessionOutputDirectory = Path.Combine(Path.GetTempPath(), DefaultOutputDirectoryName, id.Id.ToString());
+                SessionOutputDirectory = Path.Combine(Path.GetTempPath(), DefaultOutputDirectoryName, id.Id.ToString());
             }
             else
             {
                 // Create a session specific directory under base output directory.
                 var expandedOutputDirectory = Environment.ExpandEnvironmentVariables(outputDirectory);
                 var absolutePath = Path.GetFullPath(expandedOutputDirectory);
-                this.SessionOutputDirectory = Path.Combine(absolutePath, id.Id.ToString());
+                SessionOutputDirectory = Path.Combine(absolutePath, id.Id.ToString());
             }
 
             try
             {
                 // Create the output directory if it doesn't exist.
-                if (!Directory.Exists(this.SessionOutputDirectory))
+                if (!Directory.Exists(SessionOutputDirectory))
                 {
-                    Directory.CreateDirectory(this.SessionOutputDirectory);
+                    Directory.CreateDirectory(SessionOutputDirectory);
                 }
             }
             catch (UnauthorizedAccessException accessException)
@@ -140,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             try
             {
-                if (this.attachmentTasks.TryGetValue(dataCollectionContext, out var tasks))
+                if (attachmentTasks.TryGetValue(dataCollectionContext, out var tasks))
                 {
                     Task.WhenAll(tasks.ToArray()).Wait();
                 }
@@ -150,13 +150,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 EqtTrace.Error("DataCollectionAttachmentManager.GetAttachments: Fail to get attachments: {0} ", ex);
             }
 
-            List<AttachmentSet> attachments = new List<AttachmentSet>();
+            List<AttachmentSet> attachments = new();
 
-            if (this.AttachmentSets.TryGetValue(dataCollectionContext, out var uriAttachmentSetMap))
+            if (AttachmentSets.TryGetValue(dataCollectionContext, out var uriAttachmentSetMap))
             {
                 attachments = uriAttachmentSetMap.Values.ToList();
-                this.attachmentTasks.Remove(dataCollectionContext);
-                this.AttachmentSets.Remove(dataCollectionContext);
+                attachmentTasks.Remove(dataCollectionContext);
+                AttachmentSets.Remove(dataCollectionContext);
             }
 
             return attachments;
@@ -167,7 +167,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             ValidateArg.NotNull(fileTransferInfo, nameof(fileTransferInfo));
 
-            if (string.IsNullOrEmpty(this.SessionOutputDirectory))
+            if (string.IsNullOrEmpty(SessionOutputDirectory))
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
@@ -178,25 +178,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return;
             }
 
-            if (!this.AttachmentSets.ContainsKey(fileTransferInfo.Context))
+            if (!AttachmentSets.ContainsKey(fileTransferInfo.Context))
             {
                 var uriAttachmentSetMap = new Dictionary<Uri, AttachmentSet>();
-                this.AttachmentSets.Add(fileTransferInfo.Context, uriAttachmentSetMap);
-                this.attachmentTasks.Add(fileTransferInfo.Context, new List<Task>());
+                AttachmentSets.Add(fileTransferInfo.Context, uriAttachmentSetMap);
+                attachmentTasks.Add(fileTransferInfo.Context, new List<Task>());
             }
 
-            if (!this.AttachmentSets[fileTransferInfo.Context].ContainsKey(uri))
+            if (!AttachmentSets[fileTransferInfo.Context].ContainsKey(uri))
             {
-                this.AttachmentSets[fileTransferInfo.Context].Add(uri, new AttachmentSet(uri, friendlyName));
+                AttachmentSets[fileTransferInfo.Context].Add(uri, new AttachmentSet(uri, friendlyName));
             }
 
-            this.AddNewFileTransfer(fileTransferInfo, sendFileCompletedCallback, uri, friendlyName);
+            AddNewFileTransfer(fileTransferInfo, sendFileCompletedCallback, uri, friendlyName);
         }
 
         /// <inheritdoc/>
         public void Cancel()
         {
-            this.cancellationTokenSource.Cancel();
+            cancellationTokenSource.Cancel();
         }
 
         #endregion
@@ -262,7 +262,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                                  : string.Empty;
 
             var directoryPath = Path.Combine(
-                this.SessionOutputDirectory,
+                SessionOutputDirectory,
                 testCaseId);
             var localFilePath = Path.Combine(directoryPath, Path.GetFileName(fileTransferInfo.FileName));
 
@@ -271,9 +271,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 {
                     Validate(fileTransferInfo, localFilePath);
 
-                    if (this.cancellationTokenSource.Token.IsCancellationRequested)
+                    if (cancellationTokenSource.Token.IsCancellationRequested)
                     {
-                        this.cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                        cancellationTokenSource.Token.ThrowIfCancellationRequested();
                     }
 
                     try
@@ -285,7 +285,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                                 EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Moving file {0} to {1}", fileTransferInfo.FileName, localFilePath);
                             }
 
-                            this.fileHelper.MoveFile(fileTransferInfo.FileName, localFilePath);
+                            fileHelper.MoveFile(fileTransferInfo.FileName, localFilePath);
 
                             if (EqtTrace.IsInfoEnabled)
                             {
@@ -299,7 +299,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                                 EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Copying file {0} to {1}", fileTransferInfo.FileName, localFilePath);
                             }
 
-                            this.fileHelper.CopyFile(fileTransferInfo.FileName, localFilePath);
+                            fileHelper.CopyFile(fileTransferInfo.FileName, localFilePath);
 
                             if (EqtTrace.IsInfoEnabled)
                             {
@@ -309,7 +309,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     }
                     catch (Exception ex)
                     {
-                        this.LogError(
+                        LogError(
                            ex.ToString(),
                            uri,
                            friendlyName,
@@ -318,7 +318,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         throw;
                     }
                 },
-                this.cancellationTokenSource.Token);
+                cancellationTokenSource.Token);
 
             var continuationTask = task.ContinueWith(
                 (t) =>
@@ -329,7 +329,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         {
                             lock (attachmentTaskLock)
                             {
-                                this.AttachmentSets[fileTransferInfo.Context][uri].Attachments.Add(UriDataAttachment.CreateFrom(localFilePath, fileTransferInfo.Description));
+                                AttachmentSets[fileTransferInfo.Context][uri].Attachments.Add(UriDataAttachment.CreateFrom(localFilePath, fileTransferInfo.Description));
                             }
                         }
 
@@ -346,9 +346,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         }
                     }
                 },
-                this.cancellationTokenSource.Token);
+                cancellationTokenSource.Token);
 
-            this.attachmentTasks[fileTransferInfo.Context].Add(continuationTask);
+            attachmentTasks[fileTransferInfo.Context].Add(continuationTask);
         }
 
         /// <summary>
@@ -379,7 +379,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 args.TestCaseId = testCaseId;
             }
 
-            this.messageSink.SendMessage(args);
+            messageSink.SendMessage(args);
         }
 
         #endregion

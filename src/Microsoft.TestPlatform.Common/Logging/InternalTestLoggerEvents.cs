@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         ///    because we queue up all events sent until raising of events to the
         ///    loggers is enabled
         /// </remarks>
-        private JobQueue<Action> loggerEventQueue;
+        private readonly JobQueue<Action> loggerEventQueue;
 
         /// <summary>
         /// Keeps track if we are disposed.
@@ -44,9 +44,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Specifies whether logger event queue is bounded or not
         /// </summary>
-        private bool isBoundsOnLoggerEventQueueEnabled;
+        private readonly bool isBoundsOnLoggerEventQueueEnabled;
 
-        private TestSessionMessageLogger testSessionMessageLogger;
+        private readonly TestSessionMessageLogger testSessionMessageLogger;
         #endregion
 
         #region Constructor
@@ -60,20 +60,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             // Initialize the queue and pause it.
             // Note: The queue will be resumed when events are enabled.  This is done so all
             //       loggers receive all messages.
-            this.isBoundsOnLoggerEventQueueEnabled = IsBoundsEnabledOnLoggerEventQueue();
-            this.loggerEventQueue = new JobQueue<Action>(
-                this.ProcessQueuedJob,
+            isBoundsOnLoggerEventQueueEnabled = IsBoundsEnabledOnLoggerEventQueue();
+            loggerEventQueue = new JobQueue<Action>(
+                ProcessQueuedJob,
                 "Test Logger",
                 GetMaxNumberOfJobsInQueue(),
                 GetMaxBytesQueueCanHold(),
-                this.isBoundsOnLoggerEventQueueEnabled,
+                isBoundsOnLoggerEventQueueEnabled,
                 (message) => EqtTrace.Error(message));
-            this.loggerEventQueue.Pause();
+            loggerEventQueue.Pause();
 
             // Register for events from the test run message logger so they
             // can be raised to the loggers.
             this.testSessionMessageLogger = testSessionMessageLogger;
-            this.testSessionMessageLogger.TestRunMessage += this.TestRunMessageHandler;
+            this.testSessionMessageLogger.TestRunMessage += TestRunMessageHandler;
         }
 
         #endregion
@@ -129,18 +129,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// </summary>
         public void Dispose()
         {
-            if (this.isDisposed)
+            if (isDisposed)
             {
                 return;
             }
-            this.isDisposed = true;
+            isDisposed = true;
 
             // Unregister for test run messages.
-            this.testSessionMessageLogger.TestRunMessage -= this.TestRunMessageHandler;
+            testSessionMessageLogger.TestRunMessage -= TestRunMessageHandler;
 
             // Ensure that the queue is processed before returning.
-            this.loggerEventQueue.Resume();
-            this.loggerEventQueue.Dispose();
+            loggerEventQueue.Resume();
+            loggerEventQueue.Dispose();
         }
 
         #endregion
@@ -158,15 +158,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// </remarks>
         internal void EnableEvents()
         {
-            this.CheckDisposed();
+            CheckDisposed();
 
-            this.loggerEventQueue.Resume();
+            loggerEventQueue.Resume();
 
             // Allow currently queued events to flush from the queue.  This is done so that information
             // logged during initialization completes processing before we begin other tasks.  This is
             // important for instance when errors are logged during initialization and need to be output
             // to the console before we begin outputting other information to the console.
-            this.loggerEventQueue.Flush();
+            loggerEventQueue.Flush();
         }
 
         /// <summary>
@@ -180,15 +180,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                 throw new ArgumentNullException(nameof(args));
             }
 
-            this.CheckDisposed();
+            CheckDisposed();
 
             // Sending 0 size as this event is not expected to contain any data.
-            this.SafeInvokeAsync(() => this.TestRunMessage, args, 0, "InternalTestLoggerEvents.SendTestRunMessage");
+            SafeInvokeAsync(() => TestRunMessage, args, 0, "InternalTestLoggerEvents.SendTestRunMessage");
         }
 
         internal void WaitForEventCompletion()
         {
-            this.loggerEventQueue.Flush();
+            loggerEventQueue.Flush();
         }
 
         /// <summary>
@@ -199,16 +199,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         {
             ValidateArg.NotNull(args, nameof(args));
 
-            this.CheckDisposed();
+            CheckDisposed();
 
             // find the approx size of test result
             int resultSize = 0;
-            if (this.isBoundsOnLoggerEventQueueEnabled)
+            if (isBoundsOnLoggerEventQueueEnabled)
             {
                 resultSize = FindTestResultSize(args) * sizeof(char);
             }
 
-            this.SafeInvokeAsync(() => this.TestResult, args, resultSize, "InternalTestLoggerEvents.SendTestResult");
+            SafeInvokeAsync(() => TestResult, args, resultSize, "InternalTestLoggerEvents.SendTestResult");
         }
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
             CheckDisposed();
 
-            this.SafeInvokeAsync(() => this.TestRunStart, args, 0, "InternalTestLoggerEvents.SendTestRunStart");
+            SafeInvokeAsync(() => TestRunStart, args, 0, "InternalTestLoggerEvents.SendTestRunStart");
         }
 
         /// <summary>
@@ -234,7 +234,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
             CheckDisposed();
 
-            SafeInvokeAsync(() => this.DiscoveryStart, args, 0, "InternalTestLoggerEvents.SendDiscoveryStart");
+            SafeInvokeAsync(() => DiscoveryStart, args, 0, "InternalTestLoggerEvents.SendDiscoveryStart");
         }
 
         /// <summary>
@@ -245,10 +245,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         {
             ValidateArg.NotNull(args, nameof(args));
 
-            this.CheckDisposed();
+            CheckDisposed();
 
             // Sending 0 size as this event is not expected to contain any data.
-            this.SafeInvokeAsync(() => this.DiscoveryMessage, args, 0, "InternalTestLoggerEvents.SendDiscoveryMessage");
+            SafeInvokeAsync(() => DiscoveryMessage, args, 0, "InternalTestLoggerEvents.SendDiscoveryMessage");
         }
 
         /// <summary>
@@ -261,7 +261,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
             CheckDisposed();
 
-            SafeInvokeAsync(() => this.DiscoveredTests, args, 0, "InternalTestLoggerEvents.SendDiscoveredTests");
+            SafeInvokeAsync(() => DiscoveredTests, args, 0, "InternalTestLoggerEvents.SendDiscoveredTests");
         }
 
         /// <summary>
@@ -275,10 +275,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             CheckDisposed();
 
             // Sending 0 size as this event is not expected to contain any data.
-            SafeInvokeAsync(() => this.DiscoveryComplete, args, 0, "InternalTestLoggerEvents.SendDiscoveryComplete");
+            SafeInvokeAsync(() => DiscoveryComplete, args, 0, "InternalTestLoggerEvents.SendDiscoveryComplete");
 
             // Wait for the loggers to finish processing the messages for the run.
-            this.loggerEventQueue.Flush();
+            loggerEventQueue.Flush();
         }
 
         /// <summary>
@@ -292,10 +292,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             CheckDisposed();
 
             // Size is being send as 0. (It is good to send the size as the job queue uses it)
-            SafeInvokeAsync(() => this.TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");
+            SafeInvokeAsync(() => TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");
 
             // Wait for the loggers to finish processing the messages for the run.
-            this.loggerEventQueue.Flush();
+            loggerEventQueue.Flush();
         }
 
         /// <summary>
@@ -311,15 +311,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <param name="elapsedTime">Time elapsed in just running the tests.</param>
         internal void CompleteTestRun(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSet, Collection<InvokedDataCollector> invokedDataCollectors, TimeSpan elapsedTime)
         {
-            this.CheckDisposed();
+            CheckDisposed();
 
             var args = new TestRunCompleteEventArgs(stats, isCanceled, isAborted, error, attachmentSet, invokedDataCollectors, elapsedTime);
 
             // Sending 0 size as this event is not expected to contain any data.
-            this.SafeInvokeAsync(() => this.TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");
+            SafeInvokeAsync(() => TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");
 
             // Wait for the loggers to finish processing the messages for the run.
-            this.loggerEventQueue.Flush();
+            loggerEventQueue.Flush();
         }
 
         #endregion
@@ -332,7 +332,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         private void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
         {
             // Broadcast the message to the loggers.
-            this.SafeInvokeAsync(() => this.TestRunMessage, e, 0, "InternalTestLoggerEvents.SendMessage");
+            SafeInvokeAsync(() => TestRunMessage, e, 0, "InternalTestLoggerEvents.SendMessage");
         }
 
         /// <summary>
@@ -346,7 +346,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             ValidateArg.NotNull(args, nameof(args));
 
             // Invoke the handlers on a background thread.
-            this.loggerEventQueue.QueueJob(
+            loggerEventQueue.QueueJob(
                 () =>
                     {
                         var eventHandlers = eventHandlersFactory();
@@ -367,7 +367,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// </summary>
         private void CheckDisposed()
         {
-            if (this.isDisposed)
+            if (isDisposed)
             {
                 throw new ObjectDisposedException(typeof(TestLoggerEvents).FullName);
             }

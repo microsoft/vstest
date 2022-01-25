@@ -26,10 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="args">Arguments to format into the format string.</param>
         public static void Error(this IOutput output, bool appendPrefix, string format, params object[] args)
         {
-            SetColorForAction(ConsoleColor.Red, () =>
-            {
-                Output(output, OutputLevel.Error, appendPrefix ? Resources.CommandLineError : DefaultFormat, format, args);
-            });
+            SetColorForAction(ConsoleColor.Red, () => Output(output, OutputLevel.Error, appendPrefix ? Resources.CommandLineError : DefaultFormat, format, args));
         }
 
         /// <summary>
@@ -41,10 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="args">Arguments to format into the format string.</param>
         public static void Warning(this IOutput output, bool appendPrefix, string format, params object[] args)
         {
-            SetColorForAction(ConsoleColor.Yellow, () =>
-            {
-                Output(output, OutputLevel.Warning, appendPrefix ? Resources.CommandLineWarning : DefaultFormat, format, args);
-            });
+            SetColorForAction(ConsoleColor.Yellow, () => Output(output, OutputLevel.Warning, appendPrefix ? Resources.CommandLineWarning : DefaultFormat, format, args));
         }
 
         /// <summary>
@@ -69,10 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="args">Arguments to format into the format string.</param>
         public static void Information(this IOutput output, bool appendPrefix, ConsoleColor foregroundColor, string format, params object[] args)
         {
-            SetColorForAction(foregroundColor, () =>
-            {
-                Output(output, OutputLevel.Information, appendPrefix ? Resources.CommandLineInformational : DefaultFormat, format, args);
-            });
+            SetColorForAction(foregroundColor, () => Output(output, OutputLevel.Information, appendPrefix ? Resources.CommandLineInformational : DefaultFormat, format, args));
         }
 
         /// <summary>
@@ -84,10 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="foregroundColor">Console color for the output message</param>
         public static void Write(this IOutput output, string message, OutputLevel level, ConsoleColor foregroundColor)
         {
-            SetColorForAction(foregroundColor, () =>
-            {
-                output.Write(message, level);
-            });
+            SetColorForAction(foregroundColor, () => output.Write(message, level));
         }
 
         /// <summary>
@@ -122,16 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 throw new ArgumentException(Resources.CannotBeNullOrEmpty, nameof(format));
             }
 
-            string message = null;
-            if (args != null && args.Length > 0)
-            {
-                message = string.Format(CultureInfo.CurrentCulture, format, args);
-            }
-            else
-            {
-                message = format;
-            }
-
+            string message = args != null && args.Length > 0 ? string.Format(CultureInfo.CurrentCulture, format, args) : format;
             return string.Format(CultureInfo.CurrentCulture, messageTypeFormat, message);
         }
 

@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-    using TranslationLayerResources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
+    using TranslationLayerResources = VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
 
     /// <summary>
     /// Vstest console request sender for sending requests to vstest.console.exe
@@ -34,21 +34,21 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         private const int MinimumProtocolVersionWithTestSessionSupport = 5;
 
-        private readonly ICommunicationManager communicationManager;
+        private readonly ICommunicationManager _communicationManager;
 
-        private readonly IDataSerializer dataSerializer;
-        private readonly ITestPlatformEventSource testPlatformEventSource;
+        private readonly IDataSerializer _dataSerializer;
+        private readonly ITestPlatformEventSource _testPlatformEventSource;
 
-        private readonly ManualResetEvent handShakeComplete = new ManualResetEvent(false);
+        private readonly ManualResetEvent _handShakeComplete = new(false);
 
-        private bool handShakeSuccessful = false;
+        private bool _handShakeSuccessful = false;
 
-        private int protocolVersion = 5;
+        private int _protocolVersion = 5;
 
         /// <summary>
         /// Used to cancel blocking tasks associated with the vstest.console process.
         /// </summary>
-        private CancellationTokenSource processExitCancellationTokenSource;
+        private CancellationTokenSource _processExitCancellationTokenSource;
 
         #region Constructor
 
@@ -75,9 +75,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             IDataSerializer dataSerializer,
             ITestPlatformEventSource testPlatformEventSource)
         {
-            this.communicationManager = communicationManager;
-            this.dataSerializer = dataSerializer;
-            this.testPlatformEventSource = testPlatformEventSource;
+            this._communicationManager = communicationManager;
+            this._dataSerializer = dataSerializer;
+            this._testPlatformEventSource = testPlatformEventSource;
         }
 
         #endregion
@@ -92,20 +92,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Started.");
             }
 
-            this.processExitCancellationTokenSource = new CancellationTokenSource();
-            this.handShakeSuccessful = false;
-            this.handShakeComplete.Reset();
+            _processExitCancellationTokenSource = new CancellationTokenSource();
+            _handShakeSuccessful = false;
+            _handShakeComplete.Reset();
             int port = -1;
             try
             {
-                port = this.communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
-                this.communicationManager.AcceptClientAsync();
+                port = _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
+                _communicationManager.AcceptClientAsync();
 
                 Task.Run(() =>
                 {
-                    this.communicationManager.WaitForClientConnection(Timeout.Infinite);
-                    this.handShakeSuccessful = this.HandShakeWithVsTestConsole();
-                    this.handShakeComplete.Set();
+                    _communicationManager.WaitForClientConnection(Timeout.Infinite);
+                    _handShakeSuccessful = HandShakeWithVsTestConsole();
+                    _handShakeComplete.Set();
                 });
             }
             catch (Exception ex)
@@ -113,7 +113,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Error(
                     "VsTestConsoleRequestSender.InitializeCommunication: Error initializing communication with VstestConsole: {0}",
                     ex);
-                this.handShakeComplete.Set();
+                _handShakeComplete.Set();
             }
 
             if (EqtTrace.IsInfoEnabled)
@@ -127,8 +127,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public bool WaitForRequestHandlerConnection(int clientConnectionTimeout)
         {
-            var waitSucess = this.handShakeComplete.WaitOne(clientConnectionTimeout);
-            return waitSucess && this.handShakeSuccessful;
+            var waitSucess = _handShakeComplete.WaitOne(clientConnectionTimeout);
+            return waitSucess && _handShakeSuccessful;
         }
 
         /// <inheritdoc/>
@@ -139,26 +139,26 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info($"VsTestConsoleRequestSender.InitializeCommunicationAsync: Started with client connection timeout {clientConnectionTimeout} milliseconds.");
             }
 
-            this.processExitCancellationTokenSource = new CancellationTokenSource();
-            this.handShakeSuccessful = false;
-            this.handShakeComplete.Reset();
+            _processExitCancellationTokenSource = new CancellationTokenSource();
+            _handShakeSuccessful = false;
+            _handShakeComplete.Reset();
             int port = -1;
             try
             {
-                port = this.communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
+                port = _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
                 var timeoutSource = new CancellationTokenSource(clientConnectionTimeout);
                 await Task.Run(() =>
-                    this.communicationManager.AcceptClientAsync(), timeoutSource.Token).ConfigureAwait(false);
+                    _communicationManager.AcceptClientAsync(), timeoutSource.Token).ConfigureAwait(false);
 
-                this.handShakeSuccessful = await this.HandShakeWithVsTestConsoleAsync().ConfigureAwait(false);
-                this.handShakeComplete.Set();
+                _handShakeSuccessful = await HandShakeWithVsTestConsoleAsync().ConfigureAwait(false);
+                _handShakeComplete.Set();
             }
             catch (Exception ex)
             {
                 EqtTrace.Error(
                     "VsTestConsoleRequestSender.InitializeCommunicationAsync: Error initializing communication with VstestConsole: {0}",
                     ex);
-                this.handShakeComplete.Set();
+                _handShakeComplete.Set();
             }
 
             if (EqtTrace.IsInfoEnabled)
@@ -166,7 +166,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunicationAsync: Ended.");
             }
 
-            return this.handShakeSuccessful ? port : -1;
+            return _handShakeSuccessful ? port : -1;
         }
 
         /// <inheritdoc/>
@@ -177,10 +177,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info($"VsTestConsoleRequestSender.InitializeExtensions: Initializing extensions with additional extensions path {string.Join(",", pathToAdditionalExtensions.ToList())}.");
             }
 
-            this.communicationManager.SendMessage(
+            _communicationManager.SendMessage(
                 MessageType.ExtensionsInitialize,
                 pathToAdditionalExtensions,
-                this.protocolVersion);
+                _protocolVersion);
         }
 
         /// <inheritdoc/>
@@ -196,7 +196,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleRequestSender.DiscoverTests: Starting test discovery.");
             }
 
-            this.SendMessageAndListenAndReportTestCases(
+            SendMessageAndListenAndReportTestCases(
                 sources,
                 runSettings,
                 options,
@@ -217,7 +217,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleRequestSender.DiscoverTestsAsync: Starting test discovery.");
             }
 
-            await this.SendMessageAndListenAndReportTestCasesAsync(
+            await SendMessageAndListenAndReportTestCasesAsync(
                 sources,
                 runSettings,
                 options,
@@ -238,7 +238,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
             }
 
-            this.SendMessageAndListenAndReportTestResults(
+            SendMessageAndListenAndReportTestResults(
                 MessageType.TestRunAllSourcesWithDefaultHost,
                 new TestRunRequestPayload()
                 {
@@ -264,7 +264,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
             }
 
-            await this.SendMessageAndListenAndReportTestResultsAsync(
+            await SendMessageAndListenAndReportTestResultsAsync(
                 MessageType.TestRunAllSourcesWithDefaultHost,
                 new TestRunRequestPayload()
                 {
@@ -290,7 +290,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
             }
 
-            this.SendMessageAndListenAndReportTestResults(
+            SendMessageAndListenAndReportTestResults(
                 MessageType.TestRunAllSourcesWithDefaultHost,
                 new TestRunRequestPayload()
                 {
@@ -316,7 +316,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
             }
 
-            await this.SendMessageAndListenAndReportTestResultsAsync(
+            await SendMessageAndListenAndReportTestResultsAsync(
                 MessageType.TestRunAllSourcesWithDefaultHost,
                 new TestRunRequestPayload()
                 {
@@ -343,7 +343,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHost: Starting test run.");
             }
 
-            this.SendMessageAndListenAndReportTestResults(
+            SendMessageAndListenAndReportTestResults(
                 MessageType.GetTestRunnerProcessStartInfoForRunAll,
                 new TestRunRequestPayload()
                 {
@@ -371,7 +371,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHostAsync: Starting test run.");
             }
 
-            await this.SendMessageAndListenAndReportTestResultsAsync(
+            await SendMessageAndListenAndReportTestResultsAsync(
                 MessageType.GetTestRunnerProcessStartInfoForRunAll,
                 new TestRunRequestPayload()
                 {
@@ -399,7 +399,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHost: Starting test run.");
             }
 
-            this.SendMessageAndListenAndReportTestResults(
+            SendMessageAndListenAndReportTestResults(
                 MessageType.GetTestRunnerProcessStartInfoForRunSelected,
                 new TestRunRequestPayload
                 {
@@ -427,7 +427,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHostAsync: Starting test run.");
             }
 
-            await this.SendMessageAndListenAndReportTestResultsAsync(
+            await SendMessageAndListenAndReportTestResultsAsync(
                 MessageType.GetTestRunnerProcessStartInfoForRunSelected,
                 new TestRunRequestPayload()
                 {
@@ -452,7 +452,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             // Make sure vstest.console knows how to handle start/stop test session messages.
             // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
             // that will never come.
-            if (this.protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
+            if (_protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
             {
                 eventsHandler?.HandleStartTestSessionComplete(null);
                 return null;
@@ -484,34 +484,34 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     TestPlatformOptions = options
                 };
 
-                this.communicationManager.SendMessage(
+                _communicationManager.SendMessage(
                     MessageType.StartTestSession,
                     payload,
-                    this.protocolVersion);
+                    _protocolVersion);
 
                 while (true)
                 {
-                    var message = this.TryReceiveMessage();
+                    var message = TryReceiveMessage();
 
                     switch (message.MessageType)
                     {
                         case MessageType.StartTestSessionCallback:
-                            var ackPayload = this.dataSerializer
+                            var ackPayload = _dataSerializer
                                 .DeserializePayload<StartTestSessionAckPayload>(message);
                             eventsHandler?.HandleStartTestSessionComplete(
                                 ackPayload.TestSessionInfo);
                             return ackPayload.TestSessionInfo;
 
                         case MessageType.CustomTestHostLaunch:
-                            this.HandleCustomHostLaunch(testHostLauncher, message);
+                            HandleCustomHostLaunch(testHostLauncher, message);
                             break;
 
                         case MessageType.EditorAttachDebugger:
-                            this.AttachDebuggerToProcess(testHostLauncher, message);
+                            AttachDebuggerToProcess(testHostLauncher, message);
                             break;
 
                         case MessageType.TestMessage:
-                            var testMessagePayload = this.dataSerializer
+                            var testMessagePayload = _dataSerializer
                                 .DeserializePayload<TestMessagePayload>(message);
                             eventsHandler?.HandleLogMessage(
                                 testMessagePayload.MessageLevel,
@@ -539,7 +539,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
             finally
             {
-                this.testPlatformEventSource.TranslationLayerStartTestSessionStop();
+                _testPlatformEventSource.TranslationLayerStartTestSessionStop();
             }
 
             return null;
@@ -556,7 +556,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             // Make sure vstest.console knows how to handle start/stop test session messages.
             // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
             // that will never come.
-            if (this.protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
+            if (_protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
             {
                 eventsHandler?.HandleStartTestSessionComplete(null);
                 return await Task.FromResult((TestSessionInfo)null);
@@ -587,34 +587,34 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     TestPlatformOptions = options
                 };
 
-                this.communicationManager.SendMessage(
+                _communicationManager.SendMessage(
                     MessageType.StartTestSession,
                     payload,
-                    this.protocolVersion);
+                    _protocolVersion);
 
                 while (true)
                 {
-                    var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
+                    var message = await TryReceiveMessageAsync().ConfigureAwait(false);
 
                     switch (message.MessageType)
                     {
                         case MessageType.StartTestSessionCallback:
-                            var ackPayload = this.dataSerializer
+                            var ackPayload = _dataSerializer
                                 .DeserializePayload<StartTestSessionAckPayload>(message);
                             eventsHandler?.HandleStartTestSessionComplete(
                                 ackPayload.TestSessionInfo);
                             return ackPayload.TestSessionInfo;
 
                         case MessageType.CustomTestHostLaunch:
-                            this.HandleCustomHostLaunch(testHostLauncher, message);
+                            HandleCustomHostLaunch(testHostLauncher, message);
                             break;
 
                         case MessageType.EditorAttachDebugger:
-                            this.AttachDebuggerToProcess(testHostLauncher, message);
+                            AttachDebuggerToProcess(testHostLauncher, message);
                             break;
 
                         case MessageType.TestMessage:
-                            var testMessagePayload = this.dataSerializer
+                            var testMessagePayload = _dataSerializer
                                 .DeserializePayload<TestMessagePayload>(message);
                             eventsHandler?.HandleLogMessage(
                                 testMessagePayload.MessageLevel,
@@ -640,7 +640,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
             finally
             {
-                this.testPlatformEventSource.TranslationLayerStartTestSessionStop();
+                _testPlatformEventSource.TranslationLayerStartTestSessionStop();
             }
 
             return null;
@@ -654,7 +654,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             // Make sure vstest.console knows how to handle start/stop test session messages.
             // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
             // that will never come.
-            if (this.protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
+            if (_protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
             {
                 eventsHandler?.HandleStopTestSessionComplete(testSessionInfo, false);
                 return false;
@@ -673,30 +673,30 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             // testplatform events being fired still.
             if (testSessionInfo == null)
             {
-                this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
+                _testPlatformEventSource.TranslationLayerStopTestSessionStop();
                 return true;
             }
 
             try
             {
-                this.communicationManager.SendMessage(
+                _communicationManager.SendMessage(
                     MessageType.StopTestSession,
                     testSessionInfo,
-                    this.protocolVersion);
+                    _protocolVersion);
 
                 while (true)
                 {
-                    var message = this.TryReceiveMessage();
+                    var message = TryReceiveMessage();
 
                     switch (message.MessageType)
                     {
                         case MessageType.StopTestSessionCallback:
-                            var payload = this.dataSerializer.DeserializePayload<StopTestSessionAckPayload>(message);
+                            var payload = _dataSerializer.DeserializePayload<StopTestSessionAckPayload>(message);
                             eventsHandler?.HandleStopTestSessionComplete(payload.TestSessionInfo, payload.IsStopped);
                             return payload.IsStopped;
 
                         case MessageType.TestMessage:
-                            var testMessagePayload = this.dataSerializer
+                            var testMessagePayload = _dataSerializer
                                 .DeserializePayload<TestMessagePayload>(message);
                             eventsHandler?.HandleLogMessage(
                                 testMessagePayload.MessageLevel,
@@ -725,7 +725,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
             finally
             {
-                this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
+                _testPlatformEventSource.TranslationLayerStopTestSessionStop();
             }
 
             return false;
@@ -739,7 +739,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             // Make sure vstest.console knows how to handle start/stop test session messages.
             // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
             // that will never come.
-            if (this.protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
+            if (_protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
             {
                 eventsHandler?.HandleStopTestSessionComplete(testSessionInfo, false);
                 return await Task.FromResult(false);
@@ -758,30 +758,30 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             // testplatform events being fired still.
             if (testSessionInfo == null)
             {
-                this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
+                _testPlatformEventSource.TranslationLayerStopTestSessionStop();
                 return true;
             }
 
             try
             {
-                this.communicationManager.SendMessage(
+                _communicationManager.SendMessage(
                     MessageType.StopTestSession,
                     testSessionInfo,
-                    this.protocolVersion);
+                    _protocolVersion);
 
                 while (true)
                 {
-                    var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
+                    var message = await TryReceiveMessageAsync().ConfigureAwait(false);
 
                     switch (message.MessageType)
                     {
                         case MessageType.StopTestSessionCallback:
-                            var payload = this.dataSerializer.DeserializePayload<StopTestSessionAckPayload>(message);
+                            var payload = _dataSerializer.DeserializePayload<StopTestSessionAckPayload>(message);
                             eventsHandler?.HandleStopTestSessionComplete(payload.TestSessionInfo, payload.IsStopped);
                             return payload.IsStopped;
 
                         case MessageType.TestMessage:
-                            var testMessagePayload = this.dataSerializer
+                            var testMessagePayload = _dataSerializer
                                 .DeserializePayload<TestMessagePayload>(message);
                             eventsHandler?.HandleLogMessage(
                                 testMessagePayload.MessageLevel,
@@ -810,7 +810,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
             finally
             {
-                this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
+                _testPlatformEventSource.TranslationLayerStopTestSessionStop();
             }
 
             return false;
@@ -824,7 +824,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleRequestSender.CancelTestRun: Canceling test run.");
             }
 
-            this.communicationManager.SendMessage(MessageType.CancelTestRun);
+            _communicationManager.SendMessage(MessageType.CancelTestRun);
         }
 
         /// <inheritdoc/>
@@ -835,7 +835,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleRequestSender.AbortTestRun: Aborting test run.");
             }
 
-            this.communicationManager.SendMessage(MessageType.AbortTestRun);
+            _communicationManager.SendMessage(MessageType.AbortTestRun);
         }
 
         /// <inheritdoc/>
@@ -846,25 +846,25 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleRequestSender.CancelDiscovery: Canceling test discovery.");
             }
 
-            this.communicationManager.SendMessage(MessageType.CancelDiscovery);
+            _communicationManager.SendMessage(MessageType.CancelDiscovery);
         }
 
         /// <inheritdoc/>
         public void OnProcessExited()
         {
-            this.processExitCancellationTokenSource.Cancel();
+            _processExitCancellationTokenSource.Cancel();
         }
 
         /// <inheritdoc/>
         public void Close()
         {
-            this.Dispose();
+            Dispose();
         }
 
         /// <inheritdoc/>
         public void EndSession()
         {
-            this.communicationManager.SendMessage(MessageType.SessionEnd);
+            _communicationManager.SendMessage(MessageType.SessionEnd);
         }
 
         /// <inheritdoc/>
@@ -876,7 +876,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler,
             CancellationToken cancellationToken)
         {
-            return this.SendMessageAndListenAndReportAttachmentsProcessingResultAsync(
+            return SendMessageAndListenAndReportAttachmentsProcessingResultAsync(
                 attachments,
                 invokedDataCollectors,
                 runSettings,
@@ -888,7 +888,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void Dispose()
         {
-            this.communicationManager?.StopServer();
+            _communicationManager?.StopServer();
         }
 
         #endregion
@@ -896,19 +896,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         private bool HandShakeWithVsTestConsole()
         {
             var success = false;
-            var message = this.communicationManager.ReceiveMessage();
+            var message = _communicationManager.ReceiveMessage();
 
             if (message.MessageType == MessageType.SessionConnected)
             {
-                this.communicationManager.SendMessage(
+                _communicationManager.SendMessage(
                     MessageType.VersionCheck,
-                    this.protocolVersion);
+                    _protocolVersion);
 
-                message = this.communicationManager.ReceiveMessage();
+                message = _communicationManager.ReceiveMessage();
 
                 if (message.MessageType == MessageType.VersionCheck)
                 {
-                    this.protocolVersion = this.dataSerializer
+                    _protocolVersion = _dataSerializer
                         .DeserializePayload<int>(message);
                     success = true;
                 }
@@ -938,21 +938,21 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         private async Task<bool> HandShakeWithVsTestConsoleAsync()
         {
             var success = false;
-            var message = await this.communicationManager.ReceiveMessageAsync(
-                this.processExitCancellationTokenSource.Token).ConfigureAwait(false);
+            var message = await _communicationManager.ReceiveMessageAsync(
+                _processExitCancellationTokenSource.Token).ConfigureAwait(false);
 
             if (message.MessageType == MessageType.SessionConnected)
             {
-                this.communicationManager.SendMessage(
+                _communicationManager.SendMessage(
                     MessageType.VersionCheck,
-                    this.protocolVersion);
+                    _protocolVersion);
 
-                message = await this.communicationManager.ReceiveMessageAsync(
-                    this.processExitCancellationTokenSource.Token).ConfigureAwait(false);
+                message = await _communicationManager.ReceiveMessageAsync(
+                    _processExitCancellationTokenSource.Token).ConfigureAwait(false);
 
                 if (message.MessageType == MessageType.VersionCheck)
                 {
-                    this.protocolVersion = this.dataSerializer.DeserializePayload<int>(message);
+                    _protocolVersion = _dataSerializer.DeserializePayload<int>(message);
                     success = true;
                 }
                 else if (message.MessageType == MessageType.ProtocolError)
@@ -987,7 +987,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             try
             {
-                this.communicationManager.SendMessage(
+                _communicationManager.SendMessage(
                     MessageType.StartDiscovery,
                     new DiscoveryRequestPayload()
                     {
@@ -996,7 +996,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                         TestPlatformOptions = options,
                         TestSessionInfo = testSessionInfo
                     },
-                    this.protocolVersion);
+                    _protocolVersion);
                 var isDiscoveryComplete = false;
 
                 // Cycle through the messages that vstest.console sends.
@@ -1006,11 +1006,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // This is just a notification.
                 while (!isDiscoveryComplete)
                 {
-                    var message = this.TryReceiveMessage();
+                    var message = TryReceiveMessage();
 
                     if (string.Equals(MessageType.TestCasesFound, message.MessageType))
                     {
-                        var testCases = this.dataSerializer
+                        var testCases = _dataSerializer
                             .DeserializePayload<IEnumerable<TestCase>>(message);
 
                         eventHandler.HandleDiscoveredTests(testCases);
@@ -1024,7 +1024,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                         }
 
                         var discoveryCompletePayload =
-                            this.dataSerializer
+                            _dataSerializer
                                 .DeserializePayload<DiscoveryCompletePayload>(message);
 
                         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
@@ -1041,7 +1041,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
                     {
-                        var testMessagePayload = this.dataSerializer
+                        var testMessagePayload = _dataSerializer
                             .DeserializePayload<TestMessagePayload>(message);
                         eventHandler.HandleLogMessage(
                             testMessagePayload.MessageLevel,
@@ -1066,7 +1066,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // files being locked by testhost.
             }
 
-            this.testPlatformEventSource.TranslationLayerDiscoveryStop();
+            _testPlatformEventSource.TranslationLayerDiscoveryStop();
         }
 
         private async Task SendMessageAndListenAndReportTestCasesAsync(
@@ -1078,7 +1078,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             try
             {
-                this.communicationManager.SendMessage(
+                _communicationManager.SendMessage(
                     MessageType.StartDiscovery,
                     new DiscoveryRequestPayload()
                     {
@@ -1087,7 +1087,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                         TestPlatformOptions = options,
                         TestSessionInfo = testSessionInfo
                     },
-                    this.protocolVersion);
+                    _protocolVersion);
                 var isDiscoveryComplete = false;
 
                 // Cycle through the messages that vstest.console sends.
@@ -1097,11 +1097,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // This is just a notification.
                 while (!isDiscoveryComplete)
                 {
-                    var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
+                    var message = await TryReceiveMessageAsync().ConfigureAwait(false);
 
                     if (string.Equals(MessageType.TestCasesFound, message.MessageType))
                     {
-                        var testCases = this.dataSerializer
+                        var testCases = _dataSerializer
                             .DeserializePayload<IEnumerable<TestCase>>(message);
 
                         eventHandler.HandleDiscoveredTests(testCases);
@@ -1115,7 +1115,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                         }
 
                         var discoveryCompletePayload =
-                            this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
+                            _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
 
                         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
                             discoveryCompletePayload.TotalTests,
@@ -1131,7 +1131,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
                     {
-                        var testMessagePayload = this.dataSerializer
+                        var testMessagePayload = _dataSerializer
                             .DeserializePayload<TestMessagePayload>(message);
                         eventHandler.HandleLogMessage(
                             testMessagePayload.MessageLevel,
@@ -1158,7 +1158,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // files being locked by testhost.
             }
 
-            this.testPlatformEventSource.TranslationLayerDiscoveryStop();
+            _testPlatformEventSource.TranslationLayerDiscoveryStop();
         }
 
         private void SendMessageAndListenAndReportTestResults(
@@ -1169,7 +1169,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             try
             {
-                this.communicationManager.SendMessage(messageType, payload, this.protocolVersion);
+                _communicationManager.SendMessage(messageType, payload, _protocolVersion);
                 var isTestRunComplete = false;
 
                 // Cycle through the messages that vstest.console sends.
@@ -1179,11 +1179,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // This is just a notification.
                 while (!isTestRunComplete)
                 {
-                    var message = this.TryReceiveMessage();
+                    var message = TryReceiveMessage();
 
                     if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                     {
-                        var testRunChangedArgs = this.dataSerializer
+                        var testRunChangedArgs = _dataSerializer
                             .DeserializePayload<TestRunChangedEventArgs>(
                             message);
                         eventHandler.HandleTestRunStatsChange(testRunChangedArgs);
@@ -1196,7 +1196,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                                 "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestResults: Execution complete.");
                         }
 
-                        var testRunCompletePayload = this.dataSerializer
+                        var testRunCompletePayload = _dataSerializer
                             .DeserializePayload<TestRunCompletePayload>(message);
 
                         eventHandler.HandleTestRunComplete(
@@ -1208,7 +1208,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
                     {
-                        var testMessagePayload = this.dataSerializer
+                        var testMessagePayload = _dataSerializer
                             .DeserializePayload<TestMessagePayload>(message);
                         eventHandler.HandleLogMessage(
                             testMessagePayload.MessageLevel,
@@ -1216,11 +1216,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
                     {
-                        this.HandleCustomHostLaunch(customHostLauncher, message);
+                        HandleCustomHostLaunch(customHostLauncher, message);
                     }
                     else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
                     {
-                        this.AttachDebuggerToProcess(customHostLauncher, message);
+                        AttachDebuggerToProcess(customHostLauncher, message);
                     }
                 }
             }
@@ -1242,7 +1242,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // files being locked by testhost.
             }
 
-            this.testPlatformEventSource.TranslationLayerExecutionStop();
+            _testPlatformEventSource.TranslationLayerExecutionStop();
         }
 
         private async Task SendMessageAndListenAndReportTestResultsAsync(
@@ -1253,7 +1253,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             try
             {
-                this.communicationManager.SendMessage(messageType, payload, this.protocolVersion);
+                _communicationManager.SendMessage(messageType, payload, _protocolVersion);
                 var isTestRunComplete = false;
 
                 // Cycle through the messages that vstest.console sends.
@@ -1263,11 +1263,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // This is just a notification.
                 while (!isTestRunComplete)
                 {
-                    var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
+                    var message = await TryReceiveMessageAsync().ConfigureAwait(false);
 
                     if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                     {
-                        var testRunChangedArgs = this.dataSerializer
+                        var testRunChangedArgs = _dataSerializer
                             .DeserializePayload<TestRunChangedEventArgs>(message);
                         eventHandler.HandleTestRunStatsChange(testRunChangedArgs);
                     }
@@ -1279,7 +1279,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                                 "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestResultsAsync: Execution complete.");
                         }
 
-                        var testRunCompletePayload = this.dataSerializer
+                        var testRunCompletePayload = _dataSerializer
                             .DeserializePayload<TestRunCompletePayload>(message);
 
                         eventHandler.HandleTestRunComplete(
@@ -1291,7 +1291,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
                     {
-                        var testMessagePayload = this.dataSerializer
+                        var testMessagePayload = _dataSerializer
                             .DeserializePayload<TestMessagePayload>(message);
                         eventHandler.HandleLogMessage(
                             testMessagePayload.MessageLevel,
@@ -1299,11 +1299,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
                     {
-                        this.HandleCustomHostLaunch(customHostLauncher, message);
+                        HandleCustomHostLaunch(customHostLauncher, message);
                     }
                     else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
                     {
-                        this.AttachDebuggerToProcess(customHostLauncher, message);
+                        AttachDebuggerToProcess(customHostLauncher, message);
                     }
                 }
             }
@@ -1325,7 +1325,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // files being locked by testhost.
             }
 
-            this.testPlatformEventSource.TranslationLayerExecutionStop();
+            _testPlatformEventSource.TranslationLayerExecutionStop();
         }
 
         private async Task SendMessageAndListenAndReportAttachmentsProcessingResultAsync(
@@ -1346,13 +1346,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     CollectMetrics = collectMetrics
                 };
 
-                this.communicationManager.SendMessage(
+                _communicationManager.SendMessage(
                     MessageType.TestRunAttachmentsProcessingStart,
                     payload);
                 var isTestRunAttachmentsProcessingComplete = false;
 
                 using (cancellationToken.Register(() =>
-                    this.communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingCancel)))
+                    _communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingCancel)))
                 {
                     // Cycle through the messages that vstest.console sends.
                     // Currently each operation is not a separate task since it should not take that
@@ -1361,7 +1361,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     // This is just a notification.
                     while (!isTestRunAttachmentsProcessingComplete)
                     {
-                        var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
+                        var message = await TryReceiveMessageAsync().ConfigureAwait(false);
 
                         if (string.Equals(
                             MessageType.TestRunAttachmentsProcessingComplete,
@@ -1373,7 +1373,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                                     "VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachments: Process complete.");
                             }
 
-                            var testRunAttachmentsProcessingCompletePayload = this.dataSerializer
+                            var testRunAttachmentsProcessingCompletePayload = _dataSerializer
                                 .DeserializePayload<TestRunAttachmentsProcessingCompletePayload>(message);
 
                             eventHandler.HandleTestRunAttachmentsProcessingComplete(
@@ -1385,14 +1385,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                             MessageType.TestRunAttachmentsProcessingProgress,
                             message.MessageType))
                         {
-                            var testRunAttachmentsProcessingProgressPayload = this.dataSerializer
+                            var testRunAttachmentsProcessingProgressPayload = _dataSerializer
                                 .DeserializePayload<TestRunAttachmentsProcessingProgressPayload>(message);
                             eventHandler.HandleTestRunAttachmentsProcessingProgress(
                                 testRunAttachmentsProcessingProgressPayload.AttachmentsProcessingProgressEventArgs);
                         }
                         else if (string.Equals(MessageType.TestMessage, message.MessageType))
                         {
-                            var testMessagePayload = this.dataSerializer
+                            var testMessagePayload = _dataSerializer
                                 .DeserializePayload<TestMessagePayload>(message);
                             eventHandler.HandleLogMessage(
                                 testMessagePayload.MessageLevel,
@@ -1425,39 +1425,28 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
             finally
             {
-                this.testPlatformEventSource.TranslationLayerTestRunAttachmentsProcessingStop();
+                _testPlatformEventSource.TranslationLayerTestRunAttachmentsProcessingStop();
             }
         }
 
         private Message TryReceiveMessage()
         {
-            Message message = null;
-            var receiverMessageTask = this.communicationManager.ReceiveMessageAsync(
-                this.processExitCancellationTokenSource.Token);
+            var receiverMessageTask = _communicationManager.ReceiveMessageAsync(
+                _processExitCancellationTokenSource.Token);
             receiverMessageTask.Wait();
-            message = receiverMessageTask.Result;
+            Message message = receiverMessageTask.Result;
 
-            if (message == null)
-            {
-                throw new TransationLayerException(
+            return message ?? throw new TransationLayerException(
                     TranslationLayerResources.FailedToReceiveMessage);
-            }
-
-            return message;
         }
 
         private async Task<Message> TryReceiveMessageAsync()
         {
-            Message message = await this.communicationManager.ReceiveMessageAsync(
-                this.processExitCancellationTokenSource.Token).ConfigureAwait(false);
+            Message message = await _communicationManager.ReceiveMessageAsync(
+                _processExitCancellationTokenSource.Token).ConfigureAwait(false);
 
-            if (message == null)
-            {
-                throw new TransationLayerException(
+            return message ?? throw new TransationLayerException(
                     TranslationLayerResources.FailedToReceiveMessage);
-            }
-
-            return message;
         }
 
         private void HandleCustomHostLaunch(ITestHostLauncher customHostLauncher, Message message)
@@ -1470,7 +1459,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             try
             {
-                var testProcessStartInfo = this.dataSerializer
+                var testProcessStartInfo = _dataSerializer
                     .DeserializePayload<TestProcessStartInfo>(message);
 
                 ackPayload.HostProcessId = customHostLauncher != null
@@ -1490,10 +1479,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 // Always unblock the vstest.console thread which is indefinitely waiting on this
                 // ACK.
-                this.communicationManager.SendMessage(
+                _communicationManager.SendMessage(
                     MessageType.CustomTestHostLaunchCallback,
                     ackPayload,
-                    this.protocolVersion);
+                    _protocolVersion);
             }
         }
 
@@ -1507,7 +1496,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             try
             {
-                var pid = this.dataSerializer.DeserializePayload<int>(message);
+                var pid = _dataSerializer.DeserializePayload<int>(message);
 
                 ackPayload.Attached = customHostLauncher is ITestHostLauncher2 launcher
                 && launcher.AttachDebuggerToProcess(pid);
@@ -1527,10 +1516,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 // Always unblock the vstest.console thread which is indefintitely waiting on this
                 // ACK.
-                this.communicationManager.SendMessage(
+                _communicationManager.SendMessage(
                     MessageType.EditorAttachDebuggerCallback,
                     ackPayload,
-                    this.protocolVersion);
+                    _protocolVersion);
             }
         }
     }

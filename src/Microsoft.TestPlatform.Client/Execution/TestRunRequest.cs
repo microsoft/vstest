@@ -22,8 +22,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-    using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
-    using CommunicationObjectModel = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using ClientResources = Resources.Resources;
+    using CommunicationObjectModel = CommunicationUtilities.ObjectModel;
 
     public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     {
@@ -40,24 +40,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// <summary>
         /// Sync object for various operations
         /// </summary>
-        private object syncObject = new object();
+        private readonly object syncObject = new();
 
         /// <summary>
         /// Sync object for cancel operation
         /// </summary>
-        private object cancelSyncObject = new object();
+        private readonly object cancelSyncObject = new();
 
         /// <summary>
         /// The run completion event which will be signaled on completion of test run.
         /// </summary>
-        private ManualResetEvent runCompletionEvent = new ManualResetEvent(true);
+        private ManualResetEvent runCompletionEvent = new(true);
 
         /// <summary>
         /// Tracks the time taken by each run request
         /// </summary>
         private Stopwatch runRequestTimeTracker;
 
-        private IDataSerializer dataSerializer;
+        private readonly IDataSerializer dataSerializer;
 
         /// <summary>
         /// Time out for run provided by client.
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// <summary>
         /// Request Data
         /// </summary>
-        private IRequestData requestData;
+        private readonly IRequestData requestData;
 
         internal TestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager, ITestLoggerManager loggerManager) :
             this(requestData, testRunCriteria, executionManager, loggerManager, JsonDataSerializer.Instance)
@@ -94,9 +94,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             }
 
             this.testRunCriteria = testRunCriteria;
-            this.ExecutionManager = executionManager;
-            this.LoggerManager = loggerManager;
-            this.State = TestRunState.Pending;
+            ExecutionManager = executionManager;
+            LoggerManager = loggerManager;
+            State = TestRunState.Pending;
             this.dataSerializer = dataSerializer;
             this.requestData = requestData;
         }
@@ -111,27 +111,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Starting.");
 
-            lock (this.syncObject)
+            lock (syncObject)
             {
-                if (this.disposed)
+                if (disposed)
                 {
                     throw new ObjectDisposedException("testRunRequest");
                 }
 
-                if (this.State != TestRunState.Pending)
+                if (State != TestRunState.Pending)
                 {
                     throw new InvalidOperationException(ClientResources.InvalidStateForExecution);
                 }
 
-                this.executionStartTime = DateTime.UtcNow;
+                executionStartTime = DateTime.UtcNow;
 
                 // Collecting Number of sources Sent For Execution
-                var numberOfSources = (uint)(testRunCriteria.Sources != null ? testRunCriteria.Sources.Count<string>() : 0);
-                this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForRun, numberOfSources);
+                var numberOfSources = (uint)(testRunCriteria.Sources != null ? testRunCriteria.Sources.Count() : 0);
+                requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForRun, numberOfSources);
 
                 if (EqtTrace.IsInfoEnabled)
                 {
-                    EqtTrace.Info("TestRunRequest.ExecuteAsync: Starting run with settings:{0}", this.testRunCriteria);
+                    EqtTrace.Info("TestRunRequest.ExecuteAsync: Starting run with settings:{0}", testRunCriteria);
                 }
 
                 if (EqtTrace.IsVerboseEnabled)
@@ -140,17 +140,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Wait for the first run request is over.");
                 }
 
-                this.State = TestRunState.InProgress;
+                State = TestRunState.InProgress;
 
                 // Reset the run completion event 
                 // (This needs to be done before queuing the test run because if the test run finishes fast then runCompletion event can 
                 // remain in non-signaled state even though run is actually complete.
-                this.runCompletionEvent.Reset();
+                runCompletionEvent.Reset();
 
                 try
                 {
-                    var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(this.TestRunCriteria.TestRunSettings);
-                    this.testSessionTimeout = runConfiguration.TestSessionTimeout;
+                    var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(TestRunCriteria.TestRunSettings);
+                    testSessionTimeout = runConfiguration.TestSessionTimeout;
 
                     if (testSessionTimeout > 0)
                     {
@@ -159,17 +159,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                             EqtTrace.Verbose(String.Format("TestRunRequest.ExecuteAsync: TestSessionTimeout is {0} milliseconds.", testSessionTimeout));
                         }
 
-                        this.timer = new Timer(this.OnTestSessionTimeout, null, TimeSpan.FromMilliseconds(testSessionTimeout), TimeSpan.FromMilliseconds(0));
+                        timer = new Timer(OnTestSessionTimeout, null, TimeSpan.FromMilliseconds(testSessionTimeout), TimeSpan.FromMilliseconds(0));
                     }
 
-                    this.runRequestTimeTracker = new Stopwatch();
+                    runRequestTimeTracker = new Stopwatch();
 
                     // Start the stop watch for calculating the test run time taken overall
-                    this.runRequestTimeTracker.Start();
-                    var testRunStartEvent = new TestRunStartEventArgs(this.testRunCriteria);
-                    this.LoggerManager.HandleTestRunStart(testRunStartEvent);
-                    this.OnRunStart.SafeInvoke(this, testRunStartEvent, "TestRun.TestRunStart");
-                    int processId = this.ExecutionManager.StartTestRun(this.testRunCriteria, this);
+                    runRequestTimeTracker.Start();
+                    var testRunStartEvent = new TestRunStartEventArgs(testRunCriteria);
+                    LoggerManager.HandleTestRunStart(testRunStartEvent);
+                    OnRunStart.SafeInvoke(this, testRunStartEvent, "TestRun.TestRunStart");
+                    int processId = ExecutionManager.StartTestRun(testRunCriteria, this);
 
                     if (EqtTrace.IsInfoEnabled)
                     {
@@ -180,7 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 }
                 catch
                 {
-                    this.State = TestRunState.Pending;
+                    State = TestRunState.Pending;
                     throw;
                 }
             }
@@ -193,13 +193,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 EqtTrace.Verbose(string.Format("TestRunRequest.OnTestSessionTimeout: calling cancellation as test run exceeded testSessionTimeout {0} milliseconds", testSessionTimeout));
             }
 
-            string message = string.Format(ClientResources.TestSessionTimeoutMessage, this.testSessionTimeout);
+            string message = string.Format(ClientResources.TestSessionTimeoutMessage, testSessionTimeout);
             var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = message };
-            var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
+            var rawMessage = dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
 
-            this.HandleLogMessage(TestMessageLevel.Error, message);
-            this.HandleRawMessage(rawMessage);
-            this.Abort();
+            HandleLogMessage(TestMessageLevel.Error, message);
+            HandleRawMessage(rawMessage);
+            Abort();
         }
 
         /// <summary>
@@ -209,15 +209,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             EqtTrace.Verbose("TestRunRequest.WaitForCompletion: Waiting with timeout {0}.", timeout);
 
-            if (this.disposed)
+            if (disposed)
             {
                 throw new ObjectDisposedException("testRunRequest");
             }
 
-            if (this.State != TestRunState.InProgress
-                        && !(this.State == TestRunState.Completed
-                        || this.State == TestRunState.Canceled
-                        || this.State == TestRunState.Aborted))
+            if (State != TestRunState.InProgress
+                        && !(State == TestRunState.Completed
+                        || State == TestRunState.Canceled
+                        || State == TestRunState.Aborted))
             {
                 // If run is already terminated, then we should not throw an exception.
                 throw new InvalidOperationException(ClientResources.WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive);
@@ -227,12 +227,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             // (the runCompletionEvent cannot be raised unless that lock is released)
 
             // Wait for run completion (In case m_runCompletionEvent is closed, then waitOne will throw nice error)
-            if (this.runCompletionEvent != null)
-            {
-                return this.runCompletionEvent.WaitOne(timeout);
-            }
-
-            return true;
+            return runCompletionEvent == null || runCompletionEvent.WaitOne(timeout);
         }
 
         /// <summary>
@@ -242,22 +237,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             EqtTrace.Verbose("TestRunRequest.CancelAsync: Canceling.");
 
-            lock (this.cancelSyncObject)
+            lock (cancelSyncObject)
             {
-                if (this.disposed)
+                if (disposed)
                 {
                     EqtTrace.Warning("Ignoring TestRunRequest.CancelAsync() as testRunRequest object has already been disposed.");
                     return;
                 }
 
-                if (this.State != TestRunState.InProgress)
+                if (State != TestRunState.InProgress)
                 {
                     EqtTrace.Info("Ignoring TestRunRequest.CancelAsync(). No test run in progress.");
                 }
                 else
                 {
                     // Inform the service about run cancellation
-                    this.ExecutionManager.Cancel(this);
+                    ExecutionManager.Cancel(this);
                 }
             }
 
@@ -271,21 +266,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             EqtTrace.Verbose("TestRunRequest.Abort: Aborting.");
 
-            lock (this.cancelSyncObject)
+            lock (cancelSyncObject)
             {
-                if (this.disposed)
+                if (disposed)
                 {
                     EqtTrace.Warning("Ignoring TestRunRequest.Abort() as testRunRequest object has already been disposed");
                     return;
                 }
 
-                if (this.State != TestRunState.InProgress)
+                if (State != TestRunState.InProgress)
                 {
                     EqtTrace.Info("Ignoring TestRunRequest.Abort(). No test run in progress.");
                 }
                 else
                 {
-                    this.ExecutionManager.Abort(this);
+                    ExecutionManager.Abort(this);
                 }
             }
 
@@ -298,7 +293,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// </summary>
         public ITestRunConfiguration TestRunConfiguration
         {
-            get { return this.testRunCriteria; }
+            get { return testRunCriteria; }
         }
 
         /// <summary>
@@ -367,7 +362,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         // resetting unmanaged resources.
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
 
             GC.SuppressFinalize(this);
         }
@@ -376,7 +371,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
         public TestRunCriteria TestRunCriteria
         {
-            get { return this.testRunCriteria; }
+            get { return testRunCriteria; }
         }
 
         /// <summary>
@@ -394,37 +389,37 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
             EqtTrace.Verbose("TestRunRequest:TestRunComplete: Starting. IsAborted:{0} IsCanceled:{1}.", isAborted, isCanceled);
 
-            lock (this.syncObject)
+            lock (syncObject)
             {
                 // If this object is disposed, don't do anything
-                if (this.disposed)
+                if (disposed)
                 {
                     EqtTrace.Warning("TestRunRequest.TestRunComplete: Ignoring as the object is disposed.");
                     return;
                 }
 
-                if (this.runCompletionEvent.WaitOne(0))
+                if (runCompletionEvent.WaitOne(0))
                 {
                     EqtTrace.Info("TestRunRequest:TestRunComplete:Ignoring duplicate event. IsAborted:{0} IsCanceled:{1}.", isAborted, isCanceled);
                     return;
                 }
 
                 // Disposing off the resources held by the execution manager so that the test host process can shut down.
-                this.ExecutionManager?.Close();
+                ExecutionManager?.Close();
 
                 try
                 {
-                    this.runRequestTimeTracker.Stop();
+                    runRequestTimeTracker.Stop();
 
                     if (lastChunkArgs != null)
                     {
                         // Raised the changed event also
-                        this.LoggerManager.HandleTestRunStatsChange(lastChunkArgs);
-                        this.OnRunStatsChange.SafeInvoke(this, lastChunkArgs, "TestRun.RunStatsChanged");
+                        LoggerManager.HandleTestRunStatsChange(lastChunkArgs);
+                        OnRunStatsChange.SafeInvoke(this, lastChunkArgs, "TestRun.RunStatsChanged");
                     }
 
                     TestRunCompleteEventArgs runCompletedEvent =
-                        new TestRunCompleteEventArgs(
+                        new(
                             runCompleteArgs.TestRunStatistics,
                             runCompleteArgs.IsCanceled,
                             runCompleteArgs.IsAborted,
@@ -432,37 +427,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                             // This is required as TMI adapter is sending attachments as List which cannot be type casted to Collection.
                             runContextAttachments != null ? new Collection<AttachmentSet>(runContextAttachments.ToList()) : null,
                             runCompleteArgs.InvokedDataCollectors,
-                            this.runRequestTimeTracker.Elapsed);
+                            runRequestTimeTracker.Elapsed);
 
                     // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests)
                     // by either engines - as both calculate at different points
                     // If we use them, it would be an incorrect comparison between TAEF and Rocksteady
-                    this.LoggerManager.HandleTestRunComplete(runCompletedEvent);
-                    this.OnRunCompletion.SafeInvoke(this, runCompletedEvent, "TestRun.TestRunComplete");
+                    LoggerManager.HandleTestRunComplete(runCompletedEvent);
+                    OnRunCompletion.SafeInvoke(this, runCompletedEvent, "TestRun.TestRunComplete");
                 }
                 finally
                 {
                     if (isCanceled)
                     {
-                        this.State = TestRunState.Canceled;
-                    }
-                    else if (isAborted)
-                    {
-                        this.State = TestRunState.Aborted;
+                        State = TestRunState.Canceled;
                     }
                     else
                     {
-                        this.State = TestRunState.Completed;
+                        State = isAborted ? TestRunState.Aborted : TestRunState.Completed;
                     }
 
                     // Notify the waiting handle that run is complete
-                    this.runCompletionEvent.Set();
+                    runCompletionEvent.Set();
 
 
-                    var executionTotalTimeTaken = DateTime.UtcNow - this.executionStartTime;
+                    var executionTotalTimeTaken = DateTime.UtcNow - executionStartTime;
 
                     // Fill in the time taken to complete the run
-                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecForRun, executionTotalTimeTaken.TotalSeconds);
+                    requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecForRun, executionTotalTimeTaken.TotalSeconds);
 
                     // Fill in the Metrics From Test Host Process
                     var metrics = runCompleteArgs.Metrics;
@@ -470,7 +461,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     {
                         foreach (var metric in metrics)
                         {
-                            this.requestData.MetricsCollection.Add(metric.Key, metric.Value);
+                            requestData.MetricsCollection.Add(metric.Key, metric.Value);
                         }
                     }
                 }
@@ -482,7 +473,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// <summary>
         /// Invoked when test run statistics change.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1", Justification = "This is not an external event")]
         public virtual void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
         {
             if (testRunChangedArgs != null)
@@ -500,10 +490,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     }
                 }
 
-                lock (this.syncObject)
+                lock (syncObject)
                 {
                     // If this object is disposed, don't do anything
-                    if (this.disposed)
+                    if (disposed)
                     {
                         EqtTrace.Warning("TestRunRequest.SendTestRunStatsChange: Ignoring as the object is disposed.");
                         return;
@@ -511,8 +501,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                     // TODO: Invoke this event in a separate thread.
                     // For now, I am setting the ConcurrencyMode on the callback attribute to Multiple
-                    this.LoggerManager.HandleTestRunStatsChange(testRunChangedArgs);
-                    this.OnRunStatsChange.SafeInvoke(this, testRunChangedArgs, "TestRun.RunStatsChanged");
+                    LoggerManager.HandleTestRunStatsChange(testRunChangedArgs);
+                    OnRunStatsChange.SafeInvoke(this, testRunChangedArgs, "TestRun.RunStatsChanged");
                 }
 
                 EqtTrace.Info("TestRunRequest:SendTestRunStatsChange: Completed.");
@@ -526,18 +516,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             EqtTrace.Verbose("TestRunRequest:SendTestRunMessage: Starting.");
 
-            lock (this.syncObject)
+            lock (syncObject)
             {
                 // If this object is disposed, don't do anything
-                if (this.disposed)
+                if (disposed)
                 {
                     EqtTrace.Warning("TestRunRequest.SendTestRunMessage: Ignoring as the object is disposed.");
                     return;
                 }
 
                 var testRunMessageEvent = new TestRunMessageEventArgs(level, message);
-                this.LoggerManager.HandleTestRunMessage(testRunMessageEvent);
-                this.TestRunMessage.SafeInvoke(this, testRunMessageEvent, "TestRun.LogMessages");
+                LoggerManager.HandleTestRunMessage(testRunMessageEvent);
+                TestRunMessage.SafeInvoke(this, testRunMessageEvent, "TestRun.LogMessages");
             }
 
             EqtTrace.Info("TestRunRequest:SendTestRunMessage: Completed.");
@@ -551,17 +541,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             // Note: Deserialize rawMessage only if required.
 
-            var message = this.LoggerManager.LoggersInitialized || this.requestData.IsTelemetryOptedIn ?
-                this.dataSerializer.DeserializeMessage(rawMessage) : null;
+            var message = LoggerManager.LoggersInitialized || requestData.IsTelemetryOptedIn ?
+                dataSerializer.DeserializeMessage(rawMessage) : null;
 
             if (string.Equals(message?.MessageType, MessageType.ExecutionComplete))
             {
-                var testRunCompletePayload = this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
+                var testRunCompletePayload = dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
                 rawMessage = UpdateRawMessageWithTelemetryInfo(testRunCompletePayload, message) ?? rawMessage;
                 HandleLoggerManagerTestRunComplete(testRunCompletePayload);
             }
 
-            this.OnRawMessageReceived?.Invoke(this, rawMessage);
+            OnRawMessageReceived?.Invoke(this, rawMessage);
         }
 
         /// <summary>
@@ -570,27 +560,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// <param name="testRunCompletePayload">TestRun complete payload.</param>
         private void HandleLoggerManagerTestRunComplete(TestRunCompletePayload testRunCompletePayload)
         {
-            if (this.LoggerManager.LoggersInitialized && testRunCompletePayload != null)
+            if (LoggerManager.LoggersInitialized && testRunCompletePayload != null)
             {
                 // Send last chunk to logger manager.
                 if (testRunCompletePayload.LastRunTests != null)
                 {
-                    this.LoggerManager.HandleTestRunStatsChange(testRunCompletePayload.LastRunTests);
+                    LoggerManager.HandleTestRunStatsChange(testRunCompletePayload.LastRunTests);
                 }
 
                 // Note: In HandleRawMessage attachments are considered from TestRunCompleteArgs, while in HandleTestRunComplete attachments are considered directly from testRunCompletePayload.
                 // Ideally we should have attachmentSets at one place only.
                 // Send test run complete to logger manager.
                 TestRunCompleteEventArgs testRunCompleteArgs =
-                    new TestRunCompleteEventArgs(
+                    new(
                         testRunCompletePayload.TestRunCompleteArgs.TestRunStatistics,
                         testRunCompletePayload.TestRunCompleteArgs.IsCanceled,
                         testRunCompletePayload.TestRunCompleteArgs.IsAborted,
                         testRunCompletePayload.TestRunCompleteArgs.Error,
                         testRunCompletePayload.TestRunCompleteArgs.AttachmentSets,
                         testRunCompletePayload.TestRunCompleteArgs.InvokedDataCollectors,
-                        this.runRequestTimeTracker.Elapsed);
-                this.LoggerManager.HandleTestRunComplete(testRunCompleteArgs);
+                        runRequestTimeTracker.Elapsed);
+                LoggerManager.HandleTestRunComplete(testRunCompleteArgs);
             }
         }
 
@@ -603,24 +593,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         private string UpdateRawMessageWithTelemetryInfo(TestRunCompletePayload testRunCompletePayload, Message message)
         {
             var rawMessage = default(string);
-            if (this.requestData.IsTelemetryOptedIn)
+            if (requestData.IsTelemetryOptedIn)
             {
                 if (testRunCompletePayload?.TestRunCompleteArgs != null)
                 {
                     if (testRunCompletePayload.TestRunCompleteArgs.Metrics == null)
                     {
-                        testRunCompletePayload.TestRunCompleteArgs.Metrics = this.requestData.MetricsCollection.Metrics;
+                        testRunCompletePayload.TestRunCompleteArgs.Metrics = requestData.MetricsCollection.Metrics;
                     }
                     else
                     {
-                        foreach (var kvp in this.requestData.MetricsCollection.Metrics)
+                        foreach (var kvp in requestData.MetricsCollection.Metrics)
                         {
                             testRunCompletePayload.TestRunCompleteArgs.Metrics[kvp.Key] = kvp.Value;
                         }
                     }
 
                     // Fill in the time taken to complete the run
-                    var executionTotalTimeTakenForDesignMode = DateTime.UtcNow - this.executionStartTime;
+                    var executionTotalTimeTakenForDesignMode = DateTime.UtcNow - executionStartTime;
                     testRunCompletePayload.TestRunCompleteArgs.Metrics[TelemetryDataConstants.TimeTakenInSecForRun] = executionTotalTimeTakenForDesignMode.TotalSeconds;
                 }
 
@@ -628,14 +618,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 {
                     var version = message1.Version;
 
-                    rawMessage = this.dataSerializer.SerializePayload(
+                    rawMessage = dataSerializer.SerializePayload(
                         MessageType.ExecutionComplete,
                         testRunCompletePayload,
                         version);
                 }
                 else
                 {
-                    rawMessage = this.dataSerializer.SerializePayload(
+                    rawMessage = dataSerializer.SerializePayload(
                         MessageType.ExecutionComplete,
                         testRunCompletePayload);
                 }
@@ -654,9 +644,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             int processId = -1;
 
             // Only launch while the test run is in progress and the launcher is a debug one
-            if (this.State == TestRunState.InProgress && this.testRunCriteria.TestHostLauncher.IsDebug)
+            if (State == TestRunState.InProgress && testRunCriteria.TestHostLauncher.IsDebug)
             {
-                processId = this.testRunCriteria.TestHostLauncher.LaunchTestHost(testProcessStartInfo);
+                processId = testRunCriteria.TestHostLauncher.LaunchTestHost(testProcessStartInfo);
             }
 
             return processId;
@@ -665,7 +655,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
-            return this.testRunCriteria.TestHostLauncher is ITestHostLauncher2 launcher
+            return testRunCriteria.TestHostLauncher is ITestHostLauncher2 launcher
                     && launcher.AttachDebuggerToProcess(pid);
         }
 
@@ -677,18 +667,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             EqtTrace.Verbose("TestRunRequest.Dispose: Starting.");
 
-            lock (this.syncObject)
+            lock (syncObject)
             {
-                if (!this.disposed)
+                if (!disposed)
                 {
                     if (disposing)
                     {
-                        this.runCompletionEvent?.Dispose();
+                        runCompletionEvent?.Dispose();
                     }
 
                     // Indicate that object has been disposed
-                    this.runCompletionEvent = null;
-                    this.disposed = true;
+                    runCompletionEvent = null;
+                    disposed = true;
                 }
             }
 

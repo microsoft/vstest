@@ -30,7 +30,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             // Useful additional arguments are -n 100, to collect all dumps that you can, or -o to overwrite dump, or -f EXCEPTION_NAME to add exception to filter list
             var procdumpAdditonalArgumentsFromEnv = Environment.GetEnvironmentVariable("VSTEST_DUMP_PROCDUMPADDITIONALARGUMENTS")?.Trim();
-            StringBuilder procDumpArgument = new StringBuilder($"-accepteula -e 1 -g -t {procdumpAdditonalArgumentsFromEnv}");
+            StringBuilder procDumpArgument = new($"-accepteula -e 1 -g -t {procdumpAdditonalArgumentsFromEnv}");
             if (isFullDump)
             {
                 procDumpArgument.Append("-ma ");
@@ -57,7 +57,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // -accepteula: Auto accept end-user license agreement
             // -ma: Full dump argument.
             // -n: Number of dumps to capture.
-            StringBuilder procDumpArgument = new StringBuilder("-accepteula -n 1");
+            StringBuilder procDumpArgument = new("-accepteula -n 1");
             if (isFullDump)
             {
                 procDumpArgument.Append(" -ma");

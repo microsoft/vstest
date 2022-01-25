@@ -14,13 +14,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class TelemetryTests : AcceptanceTestBase
     {
         private readonly string resultPath;
-        private string CurrentOptInStatus;
+        private readonly string CurrentOptInStatus;
         private const string TELEMETRY_OPTEDIN = "VSTEST_TELEMETRY_OPTEDIN";
         private const string LOG_TELEMETRY = "VSTEST_LOGTELEMETRY";
 
         public TelemetryTests()
         {
-            this.resultPath = Path.GetTempPath() + "TelemetryLogs";
+            resultPath = Path.GetTempPath() + "TelemetryLogs";
 
             // Get Current Opt In Status
             CurrentOptInStatus = Environment.GetEnvironmentVariable(TELEMETRY_OPTEDIN);
@@ -44,9 +44,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             // Unset the environment variable
             Environment.SetEnvironmentVariable(LOG_TELEMETRY, "0");
 
-            if (Directory.Exists(this.resultPath))
+            if (Directory.Exists(resultPath))
             {
-                Directory.Delete(this.resultPath, true);
+                Directory.Delete(resultPath, true);
             }
         }
 
@@ -55,9 +55,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void RunTestsShouldPublishMetrics(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            this.RunTests(runnerInfo.RunnerFramework);
+            RunTests(runnerInfo.RunnerFramework);
         }
 
         [TestMethod]
@@ -65,9 +65,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void DiscoverTestsShouldPublishMetrics(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            this.DiscoverTests(runnerInfo.RunnerFramework);
+            DiscoverTests(runnerInfo.RunnerFramework);
         }
 
         private void RunTests(string runnerFramework)
@@ -78,10 +78,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return;
             }
 
-            var assemblyPaths = this.GetAssetFullPath("SimpleTestProject2.dll");
+            var assemblyPaths = GetAssetFullPath("SimpleTestProject2.dll");
 
-            this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), this.FrameworkArgValue, string.Empty);
-            this.ValidateOutput("Execution");
+            InvokeVsTestForExecution(assemblyPaths, GetTestAdapterPath(), FrameworkArgValue, string.Empty);
+            ValidateOutput("Execution");
         }
 
         private void DiscoverTests(string runnerFramework)
@@ -92,19 +92,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return;
             }
 
-            var assemblyPaths = this.GetAssetFullPath("SimpleTestProject2.dll");
+            var assemblyPaths = GetAssetFullPath("SimpleTestProject2.dll");
 
-            this.InvokeVsTestForDiscovery(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
-            this.ValidateOutput("Discovery");
+            InvokeVsTestForDiscovery(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue);
+            ValidateOutput("Discovery");
         }
 
         private void ValidateOutput(string command)
         {
             bool isValid = false;
 
-            if (Directory.Exists(this.resultPath))
+            if (Directory.Exists(resultPath))
             {
-                var directory = new DirectoryInfo(this.resultPath);
+                var directory = new DirectoryInfo(resultPath);
                 var file = directory.GetFiles().OrderByDescending(f => f.CreationTime).First();
 
                 string[] lines = File.ReadAllLines(file.FullName);

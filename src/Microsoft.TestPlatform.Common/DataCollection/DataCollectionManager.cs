@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     /// </summary>
     internal class DataCollectionManager : IDataCollectionManager
     {
-        private static object syncObject = new object();
+        private static readonly object syncObject = new();
         private const string CodeCoverageFriendlyName = "Code Coverage";
 
         /// <summary>
@@ -41,17 +41,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <summary>
         /// Attachment manager for performing file transfers for datacollectors.
         /// </summary>
-        private IDataCollectionAttachmentManager attachmentManager;
+        private readonly IDataCollectionAttachmentManager attachmentManager;
 
         /// <summary>
         /// Message sink for sending data collection messages to client..
         /// </summary>
-        private IMessageSink messageSink;
+        private readonly IMessageSink messageSink;
 
         /// <summary>
         /// Events that can be subscribed by datacollectors.
         /// </summary>
-        private TestPlatformDataCollectionEvents events;
+        private readonly TestPlatformDataCollectionEvents events;
 
         /// <summary>
         /// Specifies whether the object is disposed or not.
@@ -66,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <summary>
         /// Request data
         /// </summary>
-        private IDataCollectionTelemetryManager dataCollectionTelemetryManager;
+        private readonly IDataCollectionTelemetryManager dataCollectionTelemetryManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionManager"/> class.
@@ -92,11 +92,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </remarks>
         protected DataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectionTelemetryManager dataCollectionTelemetryManager)
         {
-            this.attachmentManager = datacollectionAttachmentManager;
+            attachmentManager = datacollectionAttachmentManager;
             this.messageSink = messageSink;
-            this.events = new TestPlatformDataCollectionEvents();
-            this.dataCollectorExtensionManager = null;
-            this.RunDataCollectors = new Dictionary<Type, DataCollectorInformation>();
+            events = new TestPlatformDataCollectionEvents();
+            dataCollectorExtensionManager = null;
+            RunDataCollectors = new Dictionary<Type, DataCollectorInformation>();
             this.dataCollectionTelemetryManager = dataCollectionTelemetryManager;
         }
 
@@ -117,13 +117,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             get
             {
-                if (this.dataCollectorExtensionManager == null)
+                if (dataCollectorExtensionManager == null)
                 {
                     // TODO : change IMessageSink and use IMessageLogger instead.
-                    this.dataCollectorExtensionManager = DataCollectorExtensionManager.Create(TestSessionMessageLogger.Instance);
+                    dataCollectorExtensionManager = DataCollectorExtensionManager.Create(TestSessionMessageLogger.Instance);
                 }
 
-                return this.dataCollectorExtensionManager;
+                return dataCollectorExtensionManager;
             }
         }
 
@@ -164,12 +164,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             var sessionId = new SessionId(Guid.NewGuid());
             var dataCollectionContext = new DataCollectionContext(sessionId);
-            this.dataCollectionEnvironmentContext = DataCollectionEnvironmentContext.CreateForLocalEnvironment(dataCollectionContext);
+            dataCollectionEnvironmentContext = DataCollectionEnvironmentContext.CreateForLocalEnvironment(dataCollectionContext);
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
             var resultsDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
 
-            this.attachmentManager.Initialize(sessionId, resultsDirectory, this.messageSink);
+            attachmentManager.Initialize(sessionId, resultsDirectory, messageSink);
 
             // Environment variables are passed to testhost process, through ProcessStartInfo.EnvironmentVariables, which handles the key in a case-insensitive manner, which is translated to lowercase.
             // Therefore, using StringComparer.OrdinalIgnoreCase so that same keys with different cases are treated as same.
@@ -177,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settingsXml);
 
-            this.isDataCollectionEnabled = dataCollectionRunSettings.IsCollectionEnabled;
+            isDataCollectionEnabled = dataCollectionRunSettings.IsCollectionEnabled;
 
             // If dataCollectionRunSettings is null, that means datacollectors are not configured.
             if (dataCollectionRunSettings == null || !dataCollectionRunSettings.IsCollectionEnabled)
@@ -186,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             }
 
             // Get settings for each data collector, load and initialize the data collectors.
-            var enabledDataCollectorsSettings = this.GetDataCollectorsEnabledForRun(dataCollectionRunSettings);
+            var enabledDataCollectorsSettings = GetDataCollectorsEnabledForRun(dataCollectionRunSettings);
             if (enabledDataCollectorsSettings == null || enabledDataCollectorsSettings.Count == 0)
             {
                 return executionEnvironmentVariables;
@@ -194,11 +194,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             foreach (var dataCollectorSettings in enabledDataCollectorsSettings)
             {
-                this.LoadAndInitialize(dataCollectorSettings, settingsXml);
+                LoadAndInitialize(dataCollectorSettings, settingsXml);
             }
 
             // Once all data collectors have been initialized, query for environment variables
-            var dataCollectorEnvironmentVariables = this.GetEnvironmentVariables(out var unloadedAnyCollector);
+            var dataCollectorEnvironmentVariables = GetEnvironmentVariables(out _);
 
             foreach (var variable in dataCollectorEnvironmentVariables.Values)
             {
@@ -211,7 +211,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <inheritdoc/>
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
 
             // Use SupressFinalize in case a subclass
             // of this type implements a finalizer.
@@ -222,24 +222,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         public Collection<AttachmentSet> SessionEnded(bool isCancelled = false)
         {
             // Return null if datacollection is not enabled.
-            if (!this.isDataCollectionEnabled)
+            if (!isDataCollectionEnabled)
             {
                 return new Collection<AttachmentSet>();
             }
 
             if (isCancelled)
             {
-                this.attachmentManager.Cancel();
+                attachmentManager.Cancel();
                 return new Collection<AttachmentSet>();
             }
 
-            var endEvent = new SessionEndEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext);
-            this.SendEvent(endEvent);
+            var endEvent = new SessionEndEventArgs(dataCollectionEnvironmentContext.SessionDataCollectionContext);
+            SendEvent(endEvent);
 
             var result = new List<AttachmentSet>();
             try
             {
-                result = this.attachmentManager.GetAttachments(endEvent.Context);
+                result = attachmentManager.GetAttachments(endEvent.Context);
             }
             catch (Exception ex)
             {
@@ -253,7 +253,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             if (EqtTrace.IsVerboseEnabled)
             {
-                this.LogAttachments(result);
+                LogAttachments(result);
             }
 
             return new Collection<AttachmentSet>(result);
@@ -262,8 +262,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <inheritdoc/>
         public Collection<InvokedDataCollector> GetInvokedDataCollectors()
         {
-            List<InvokedDataCollector> invokedDataCollector = new List<InvokedDataCollector>();
-            foreach (DataCollectorInformation dataCollectorInformation in this.RunDataCollectors.Values)
+            List<InvokedDataCollector> invokedDataCollector = new();
+            foreach (DataCollectorInformation dataCollectorInformation in RunDataCollectors.Values)
             {
                 invokedDataCollector.Add(new InvokedDataCollector(dataCollectorInformation.DataCollectorConfig.TypeUri,
                     dataCollectorInformation.DataCollectorConfig.FriendlyName,
@@ -278,62 +278,62 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <inheritdoc/>
         public void TestHostLaunched(int processId)
         {
-            if (!this.isDataCollectionEnabled)
+            if (!isDataCollectionEnabled)
             {
                 return;
             }
 
-            var testHostLaunchedEventArgs = new TestHostLaunchedEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, processId);
+            var testHostLaunchedEventArgs = new TestHostLaunchedEventArgs(dataCollectionEnvironmentContext.SessionDataCollectionContext, processId);
 
-            this.SendEvent(testHostLaunchedEventArgs);
+            SendEvent(testHostLaunchedEventArgs);
         }
 
         /// <inheritdoc/>
         public bool SessionStarted(SessionStartEventArgs sessionStartEventArgs)
         {
             // If datacollectors are not configured or datacollection is not enabled, return false.
-            if (!this.isDataCollectionEnabled || this.RunDataCollectors.Count == 0)
+            if (!isDataCollectionEnabled || RunDataCollectors.Count == 0)
             {
                 return false;
             }
 
-            sessionStartEventArgs.Context = new DataCollectionContext(this.dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId);
-            this.SendEvent(sessionStartEventArgs);
+            sessionStartEventArgs.Context = new DataCollectionContext(dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId);
+            SendEvent(sessionStartEventArgs);
 
-            return this.events.AreTestCaseEventsSubscribed();
+            return events.AreTestCaseEventsSubscribed();
         }
 
         /// <inheritdoc/>
         public void TestCaseStarted(TestCaseStartEventArgs testCaseStartEventArgs)
         {
-            if (!this.isDataCollectionEnabled)
+            if (!isDataCollectionEnabled)
             {
                 return;
             }
 
-            var context = new DataCollectionContext(this.dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseStartEventArgs.TestElement);
+            var context = new DataCollectionContext(dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseStartEventArgs.TestElement);
             testCaseStartEventArgs.Context = context;
 
-            this.SendEvent(testCaseStartEventArgs);
+            SendEvent(testCaseStartEventArgs);
         }
 
         /// <inheritdoc/>
         public Collection<AttachmentSet> TestCaseEnded(TestCaseEndEventArgs testCaseEndEventArgs)
         {
-            if (!this.isDataCollectionEnabled)
+            if (!isDataCollectionEnabled)
             {
                 return new Collection<AttachmentSet>();
             }
 
-            var context = new DataCollectionContext(this.dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseEndEventArgs.TestElement);
+            var context = new DataCollectionContext(dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseEndEventArgs.TestElement);
             testCaseEndEventArgs.Context = context;
 
-            this.SendEvent(testCaseEndEventArgs);
+            SendEvent(testCaseEndEventArgs);
 
             List<AttachmentSet> result = null;
             try
             {
-                result = this.attachmentManager.GetAttachments(testCaseEndEventArgs.Context);
+                result = attachmentManager.GetAttachments(testCaseEndEventArgs.Context);
             }
             catch (Exception ex)
             {
@@ -347,7 +347,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             if (EqtTrace.IsVerboseEnabled)
             {
-                this.LogAttachments(result);
+                LogAttachments(result);
             }
 
             return new Collection<AttachmentSet>(result);
@@ -361,14 +361,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            if (!disposed)
             {
                 if (disposing)
                 {
                     CleanupPlugins();
                 }
 
-                this.disposed = true;
+                disposed = true;
             }
         }
 
@@ -376,17 +376,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             EqtTrace.Info("DataCollectionManager.CleanupPlugins: CleanupPlugins called");
 
-            if (!this.isDataCollectionEnabled)
+            if (!isDataCollectionEnabled)
             {
                 return;
             }
 
             if (EqtTrace.IsVerboseEnabled)
             {
-                EqtTrace.Verbose("DataCollectionManager.CleanupPlugins: Cleaning up {0} plugins", this.RunDataCollectors.Count);
+                EqtTrace.Verbose("DataCollectionManager.CleanupPlugins: Cleaning up {0} plugins", RunDataCollectors.Count);
             }
 
-            RemoveDataCollectors(new List<DataCollectorInformation>(this.RunDataCollectors.Values));
+            RemoveDataCollectors(new List<DataCollectorInformation>(RunDataCollectors.Values));
 
             EqtTrace.Info("DataCollectionManager.CleanupPlugins: CleanupPlugins finished");
         }
@@ -401,7 +401,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <returns><see cref="bool"/></returns>
         protected virtual bool TryGetUriFromFriendlyName(string friendlyName, out string dataCollectorUri)
         {
-            var extensionManager = this.dataCollectorExtensionManager;
+            var extensionManager = dataCollectorExtensionManager;
             foreach (var extension in extensionManager.TestExtensions)
             {
                 if (string.Equals(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase))
@@ -426,7 +426,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </returns>
         protected virtual DataCollectorConfig TryGetDataCollectorConfig(string extensionUri)
         {
-            var extensionManager = this.dataCollectorExtensionManager;
+            var extensionManager = dataCollectorExtensionManager;
             foreach (var extension in extensionManager.TestExtensions)
             {
                 if (string.Equals(extension.TestPluginInfo.IdentifierData, extensionUri, StringComparison.OrdinalIgnoreCase))
@@ -445,7 +445,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return false;
             }
 
-            var extensionManager = this.dataCollectorExtensionManager;
+            var extensionManager = dataCollectorExtensionManager;
             foreach (var extension in extensionManager.TestExtensions)
             {
                 if (string.Equals(uri, extension.Metadata.ExtensionUri, StringComparison.OrdinalIgnoreCase))
@@ -467,7 +467,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </returns>
         protected virtual DataCollector TryGetTestExtension(string extensionUri)
         {
-            return this.DataCollectorExtensionManager.TryGetTestExtension(extensionUri).Value;
+            return DataCollectorExtensionManager.TryGetTestExtension(extensionUri).Value;
         }
 
         /// <summary>
@@ -485,43 +485,43 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             try
             {
                 // Look up the extension and initialize it if one is found.
-                var extensionManager = this.DataCollectorExtensionManager;
+                var extensionManager = DataCollectorExtensionManager;
                 var dataCollectorUri = dataCollectorSettings.Uri?.ToString();
 
-                if (!IsUriValid(dataCollectorUri) && !this.TryGetUriFromFriendlyName(dataCollectorSettings.FriendlyName, out dataCollectorUri))
+                if (!IsUriValid(dataCollectorUri) && !TryGetUriFromFriendlyName(dataCollectorSettings.FriendlyName, out dataCollectorUri))
                 {
-                    this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.UnableToFetchUriString, dataCollectorSettings.FriendlyName));
+                    LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.UnableToFetchUriString, dataCollectorSettings.FriendlyName));
                 }
 
                 DataCollector dataCollector = null;
                 if (!string.IsNullOrWhiteSpace(dataCollectorUri))
                 {
-                    dataCollector = this.TryGetTestExtension(dataCollectorUri);
+                    dataCollector = TryGetTestExtension(dataCollectorUri);
                 }
 
                 if (dataCollector == null)
                 {
-                    this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorNotFound, dataCollectorSettings.FriendlyName));
+                    LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorNotFound, dataCollectorSettings.FriendlyName));
                     return;
                 }
 
-                if (this.RunDataCollectors.ContainsKey(dataCollector.GetType()))
+                if (RunDataCollectors.ContainsKey(dataCollector.GetType()))
                 {
                     // Collector is already loaded (may be configured twice). Ignore duplicates and return.
                     return;
                 }
 
-                dataCollectorConfig = this.TryGetDataCollectorConfig(dataCollectorUri);
+                dataCollectorConfig = TryGetDataCollectorConfig(dataCollectorUri);
 
                 // Attempt to get the data collector information verifying that all of the required metadata for the collector is available.
                 dataCollectorInfo = new DataCollectorInformation(
                                                     dataCollector,
                                                     dataCollectorSettings.Configuration,
                                                     dataCollectorConfig,
-                                                    this.dataCollectionEnvironmentContext,
-                                                    this.attachmentManager,
-                                                    this.events,
-                                                    this.messageSink,
+                                                    dataCollectionEnvironmentContext,
+                                                    attachmentManager,
+                                                    events,
+                                                    messageSink,
                                                     settingsXml);
             }
             catch (Exception ex)
@@ -532,17 +532,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 }
 
                 // No data collector info, so send the error with no direct association to the collector.
-                this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorInitializationError, dataCollectorSettings.FriendlyName, ex));
+                LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorInitializationError, dataCollectorSettings.FriendlyName, ex));
                 return;
             }
 
             try
             {
                 dataCollectorInfo.InitializeDataCollector();
-                lock (this.RunDataCollectors)
+                lock (RunDataCollectors)
                 {
                     // Add data collectors to run cache.
-                    this.RunDataCollectors[dataCollectorConfig.DataCollectorType] = dataCollectorInfo;
+                    RunDataCollectors[dataCollectorConfig.DataCollectorType] = dataCollectorInfo;
                 }
             }
             catch (Exception ex)
@@ -553,7 +553,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 }
 
                 // Log error.
-                dataCollectorInfo.Logger.LogError(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorInitializationError, dataCollectorConfig.FriendlyName, ex));
+                dataCollectorInfo.Logger.LogError(dataCollectionEnvironmentContext.SessionDataCollectionContext, string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorInitializationError, dataCollectorConfig.FriendlyName, ex));
 
                 // Dispose datacollector.
                 dataCollectorInfo.DisposeDataCollector();
@@ -575,7 +575,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     if (runEnabledDataCollectors.Any(dcSettings => string.Equals(dcSettings.FriendlyName, settings.FriendlyName, StringComparison.OrdinalIgnoreCase)))
                     {
                         // If Uri or assembly qualified type name is repeated, consider data collector as duplicate and ignore it.
-                        this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.IgnoredDuplicateConfiguration, settings.FriendlyName));
+                        LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.IgnoredDuplicateConfiguration, settings.FriendlyName));
                         continue;
                     }
 
@@ -598,7 +598,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <param name="warningMessage">The message to be logged.</param>
         private void LogWarning(string warningMessage)
         {
-            this.messageSink.SendMessage(new DataCollectionMessageEventArgs(TestMessageLevel.Warning, warningMessage));
+            messageSink.SendMessage(new DataCollectionMessageEventArgs(TestMessageLevel.Warning, warningMessage));
         }
 
         /// <summary>
@@ -610,7 +610,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             ValidateArg.NotNull(args, nameof(args));
 
-            if (!this.isDataCollectionEnabled)
+            if (!isDataCollectionEnabled)
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
@@ -621,7 +621,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             }
 
             // do not send events multiple times
-            this.events.RaiseEvent(args);
+            events.RaiseEvent(args);
         }
 
         /// <summary>
@@ -641,13 +641,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             // Ordering here is temporary to enable Fakes + Code Coverage integration in scenarios when Fakes decides to instrument code using
             // CLR Instrumentation Engine. This code will be cleaned when both Fakes and Code Coverage will fully switch to CLR Instrumentation Engine.
-            foreach (var dataCollectorInfo in this.RunDataCollectors.Values.
+            foreach (var dataCollectorInfo in RunDataCollectors.Values.
                 OrderBy(rdc => rdc.DataCollectorConfig.FriendlyName.Equals(CodeCoverageFriendlyName, StringComparison.OrdinalIgnoreCase) ? 1 : 0))
             {
                 try
                 {
                     dataCollectorInfo.SetTestExecutionEnvironmentVariables();
-                    this.AddCollectorEnvironmentVariables(dataCollectorInfo, dataCollectorEnvironmentVariable);
+                    AddCollectorEnvironmentVariables(dataCollectorInfo, dataCollectorEnvironmentVariable);
                 }
                 catch (Exception ex)
                 {
@@ -656,7 +656,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     var friendlyName = dataCollectorInfo.DataCollectorConfig.FriendlyName;
                     failedCollectors.Add(dataCollectorInfo);
                     dataCollectorInfo.Logger.LogError(
-                        this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
+                        dataCollectionEnvironmentContext.SessionDataCollectionContext,
                         string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorErrorOnGetVariable, friendlyName, ex));
 
                     if (EqtTrace.IsErrorEnabled)
@@ -666,7 +666,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 }
             }
 
-            this.RemoveDataCollectors(failedCollectors);
+            RemoveDataCollectors(failedCollectors);
             return dataCollectorEnvironmentVariable;
         }
 
@@ -715,7 +715,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                             }
                             else
                             {
-                                dataCollectionWrapper.Logger.LogError(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, message);
+                                dataCollectionWrapper.Logger.LogError(dataCollectionEnvironmentContext.SessionDataCollectionContext, message);
                             }
                         }
 
@@ -752,17 +752,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return;
             }
 
-            lock (this.RunDataCollectors)
+            lock (RunDataCollectors)
             {
                 foreach (var dataCollectorToRemove in dataCollectorsToRemove)
                 {
                     dataCollectorToRemove.DisposeDataCollector();
-                    this.RunDataCollectors.Remove(dataCollectorToRemove.DataCollector.GetType());
+                    RunDataCollectors.Remove(dataCollectorToRemove.DataCollector.GetType());
                 }
 
-                if (this.RunDataCollectors.Count == 0)
+                if (RunDataCollectors.Count == 0)
                 {
-                    this.isDataCollectionEnabled = false;
+                    isDataCollectionEnabled = false;
                 }
             }
         }

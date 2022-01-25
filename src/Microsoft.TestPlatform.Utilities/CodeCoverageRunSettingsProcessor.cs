@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Represents the default settings loaded as an <see cref="XmlNode"/>.
         /// </summary>
-        private XmlNode defaultSettingsRootNode;
+        private readonly XmlNode defaultSettingsRootNode;
         #endregion
 
         #region Constructors & Helpers
@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             var document = new XmlDocument();
             document.LoadXml(currentSettings);
 
-            return this.Process(document.DocumentElement);
+            return Process(document.DocumentElement);
         }
 
         /// <summary>
@@ -69,12 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <returns>An updated version of the current run settings.</returns>
         public XmlNode Process(XmlDocument currentSettingsDocument)
         {
-            if (currentSettingsDocument == null)
-            {
-                return null;
-            }
-
-            return this.Process(currentSettingsDocument.DocumentElement);
+            return currentSettingsDocument == null ? null : Process(currentSettingsDocument.DocumentElement);
         }
 
         /// <summary>
@@ -95,9 +90,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             // particular component down the path just add the default values for that component
             // from the default settings document and return since there's nothing else to be done.
             var codeCoveragePathComponents = new List<string>() { "CodeCoverage" };
-            var currentCodeCoverageNode = this.SelectNodeOrAddDefaults(
+            var currentCodeCoverageNode = SelectNodeOrAddDefaults(
                 currentSettingsRootNode,
-                this.defaultSettingsRootNode,
+                defaultSettingsRootNode,
                 codeCoveragePathComponents);
 
             // Cannot extract current code coverage node from the given settings so we bail out.
@@ -109,9 +104,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             // Get the code coverage node from the default settings.
-            var defaultCodeCoverageNode = this.ExtractNode(
-                this.defaultSettingsRootNode,
-                this.BuildPath(codeCoveragePathComponents));
+            var defaultCodeCoverageNode = ExtractNode(
+                defaultSettingsRootNode,
+                BuildPath(codeCoveragePathComponents));
 
             // Create the exclusion type list.
             var exclusions = new List<IList<string>>
@@ -128,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 // particular component down the path just add the default values for that
                 // component from the default settings document and continue since there's nothing
                 // else to be done.
-                var currentNode = this.SelectNodeOrAddDefaults(
+                var currentNode = SelectNodeOrAddDefaults(
                     currentCodeCoverageNode,
                     defaultCodeCoverageNode,
                     exclusion);
@@ -141,12 +136,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 }
 
                 // Extract the <Exclude> node from the default settings.
-                var defaultNode = this.ExtractNode(
+                var defaultNode = ExtractNode(
                     defaultCodeCoverageNode,
-                    this.BuildPath(exclusion));
+                    BuildPath(exclusion));
 
                 // Merge the current and default settings for the current exclusion rule.
-                this.MergeNodes(currentNode, defaultNode);
+                MergeNodes(currentNode, defaultNode);
             }
 
             return currentSettingsRootNode;
@@ -187,10 +182,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 partialPath.Append(currentPathComponent);
 
                 // Extract the node corresponding to the latest path component.
-                var tempNode = this.ExtractNode(currentNode, "." + currentPathComponent);
+                var tempNode = ExtractNode(currentNode, "." + currentPathComponent);
 
                 // Extraction is pruned here because we shouldn't be processing the current node.
-                if (tempNode != null && !this.ShouldProcessCurrentExclusion(tempNode))
+                if (tempNode != null && !ShouldProcessCurrentExclusion(tempNode))
                 {
                     return null;
                 }
@@ -199,7 +194,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 // default settings node and bail out.
                 if (tempNode == null)
                 {
-                    var defaultNode = this.ExtractNode(
+                    var defaultNode = ExtractNode(
                         defaultRootNode,
                         partialPath.ToString());
 

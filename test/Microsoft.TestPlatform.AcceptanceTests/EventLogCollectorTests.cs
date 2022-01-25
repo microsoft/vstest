@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         public EventLogCollectorTests()
         {
-            this.resultsDir = GetResultsDirectory();
+            resultsDir = GetResultsDirectory();
         }
 
         // Fails randomly https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Release_prtest/2084/console
@@ -30,20 +30,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource]
         public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
         {
-            SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var assemblyPaths = this.testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            var assemblyPaths = testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
 
-            string runSettings = this.GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: resultsDir);
+            string runSettings = GetRunsettingsFilePath();
+            var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), runSettings, FrameworkArgValue, resultsDirectory: resultsDir);
 
-            this.InvokeVsTest(arguments);
+            InvokeVsTest(arguments);
 
-            this.ValidateSummaryStatus(3, 0, 0);
-            this.VaildateDataCollectorOutput();
-            this.StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
-            this.StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
-            this.StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
-            this.StdErrorDoesNotContains("Unable to read event log");
+            ValidateSummaryStatus(3, 0, 0);
+            VaildateDataCollectorOutput();
+            StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
+            StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
+            StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
+            StdErrorDoesNotContains("Unable to read event log");
         }
 
         [TestMethod]
@@ -51,19 +51,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource]
         public void EventLogDataCollectorShoudCreateLogFileWithoutEventsIfEventsAreNotLogged(RunnerInfo runnerInfo)
         {
-            SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var assemblyPaths = this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
+            SetTestEnvironment(testEnvironment, runnerInfo);
+            var assemblyPaths = testEnvironment.GetTestAsset("SimpleTestProject.dll");
 
-            string runSettings = this.GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: resultsDir);
+            string runSettings = GetRunsettingsFilePath();
+            var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), runSettings, FrameworkArgValue, resultsDirectory: resultsDir);
 
-            this.InvokeVsTest(arguments);
+            InvokeVsTest(arguments);
 
-            this.ValidateSummaryStatus(1, 1, 1);
-            this.StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
-            this.StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
-            this.StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
-            this.StdErrorDoesNotContains("Unable to read event log");
+            ValidateSummaryStatus(1, 1, 1);
+            StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
+            StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
+            StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
+            StdErrorDoesNotContains("Unable to read event log");
         }
 
         private string GetRunsettingsFilePath()
@@ -121,14 +121,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         private void VaildateDataCollectorOutput()
         {
             // Verify attachments
-            var di = new DirectoryInfo(this.resultsDir);
+            var di = new DirectoryInfo(resultsDir);
             var resultFiles = di.EnumerateFiles("Event Log.xml", SearchOption.AllDirectories)
                 .OrderBy(d => d.CreationTime)
                 .Select(d => d.FullName)
                 .ToList();
 
             Assert.AreEqual(4, resultFiles.Count);
-            this.StdOutputContains("Event Log.xml");
+            StdOutputContains("Event Log.xml");
 
             var fileContent1 = File.ReadAllText(resultFiles[0]);
             var fileContent2 = File.ReadAllText(resultFiles[1]);
@@ -143,11 +143,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             };
 
             // Since there is no guaranty that test will run in a particular order, we will check file for all available list of ids
-            Assert.IsTrue(this.VerifyOrder2(fileContent1, eventIdsDics), string.Format("Event log file content: {0}", fileContent1));
-            Assert.IsTrue(this.VerifyOrder2(fileContent2, eventIdsDics), string.Format("Event log file content: {0}", fileContent2));
-            Assert.IsTrue(this.VerifyOrder2(fileContent3, eventIdsDics), string.Format("Event log file content: {0}", fileContent3));
+            Assert.IsTrue(VerifyOrder2(fileContent1, eventIdsDics), string.Format("Event log file content: {0}", fileContent1));
+            Assert.IsTrue(VerifyOrder2(fileContent2, eventIdsDics), string.Format("Event log file content: {0}", fileContent2));
+            Assert.IsTrue(VerifyOrder2(fileContent3, eventIdsDics), string.Format("Event log file content: {0}", fileContent3));
 
-            Assert.IsTrue(this.VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }), string.Format("Event log file content: {0}", fileContent4));
+            Assert.IsTrue(VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }), string.Format("Event log file content: {0}", fileContent4));
         }
 
         private bool VerifyOrder2(string content, Dictionary<string[], bool> eventIdsDics)

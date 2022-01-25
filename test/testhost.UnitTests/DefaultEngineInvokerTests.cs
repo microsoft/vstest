@@ -36,22 +36,22 @@ namespace testhost.UnitTests
         private static readonly string TimoutErrorMessage =
             "testhost process failed to connect to datacollector process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
 
-        private Mock<ITestRequestHandler> mockTestRequestHandler;
-        private Mock<IDataCollectionTestCaseEventSender> mockDataCollectionTestCaseEventSender;
-        private Mock<IProcessHelper> mockProcssHelper;
-        private DefaultEngineInvoker engineInvoker;
+        private readonly Mock<ITestRequestHandler> mockTestRequestHandler;
+        private readonly Mock<IDataCollectionTestCaseEventSender> mockDataCollectionTestCaseEventSender;
+        private readonly Mock<IProcessHelper> mockProcssHelper;
+        private readonly DefaultEngineInvoker engineInvoker;
 
         public DefaultEngineInvokerTests()
         {
-            this.mockDataCollectionTestCaseEventSender = new Mock<IDataCollectionTestCaseEventSender>();
-            this.mockTestRequestHandler = new Mock<ITestRequestHandler>();
-            this.mockProcssHelper = new Mock<IProcessHelper>();
-            this.engineInvoker = new DefaultEngineInvoker(
-                this.mockTestRequestHandler.Object,
-                this.mockDataCollectionTestCaseEventSender.Object,
-                this.mockProcssHelper.Object);
-            this.mockTestRequestHandler.Setup(h => h.WaitForRequestSenderConnection(It.IsAny<int>())).Returns(true);
-            this.mockDataCollectionTestCaseEventSender.Setup(s => s.WaitForRequestSenderConnection(It.IsAny<int>())).Returns(true);
+            mockDataCollectionTestCaseEventSender = new Mock<IDataCollectionTestCaseEventSender>();
+            mockTestRequestHandler = new Mock<ITestRequestHandler>();
+            mockProcssHelper = new Mock<IProcessHelper>();
+            engineInvoker = new DefaultEngineInvoker(
+                mockTestRequestHandler.Object,
+                mockDataCollectionTestCaseEventSender.Object,
+                mockProcssHelper.Object);
+            mockTestRequestHandler.Setup(h => h.WaitForRequestSenderConnection(It.IsAny<int>())).Returns(true);
+            mockDataCollectionTestCaseEventSender.Setup(s => s.WaitForRequestSenderConnection(It.IsAny<int>())).Returns(true);
         }
 
         [TestCleanup]
@@ -63,9 +63,9 @@ namespace testhost.UnitTests
         [TestMethod]
         public void InvokeShouldWaitForDefaultTimeoutIfNoEnvVariableSetDuringDataCollectorConnection()
         {
-            this.engineInvoker.Invoke(argsDictionary);
+            engineInvoker.Invoke(argsDictionary);
 
-            this.mockDataCollectionTestCaseEventSender.Verify(s => s.WaitForRequestSenderConnection(EnvironmentHelper.DefaultConnectionTimeout * 1000));
+            mockDataCollectionTestCaseEventSender.Verify(s => s.WaitForRequestSenderConnection(EnvironmentHelper.DefaultConnectionTimeout * 1000));
         }
 
         [TestMethod]
@@ -73,26 +73,26 @@ namespace testhost.UnitTests
         {
             var timeout = 10;
             Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, timeout.ToString());
-            this.engineInvoker.Invoke(argsDictionary);
+            engineInvoker.Invoke(argsDictionary);
 
-            this.mockDataCollectionTestCaseEventSender.Verify(s => s.WaitForRequestSenderConnection(timeout * 1000));
+            mockDataCollectionTestCaseEventSender.Verify(s => s.WaitForRequestSenderConnection(timeout * 1000));
         }
 
         [TestMethod]
         public void InvokeShouldThrowExceptionIfDataCollectorConnection()
         {
-            this.mockDataCollectionTestCaseEventSender.Setup(s => s.WaitForRequestSenderConnection(It.IsAny<int>())).Returns(false);
-            var message = Assert.ThrowsException<TestPlatformException>(() => this.engineInvoker.Invoke(argsDictionary)).Message;
+            mockDataCollectionTestCaseEventSender.Setup(s => s.WaitForRequestSenderConnection(It.IsAny<int>())).Returns(false);
+            var message = Assert.ThrowsException<TestPlatformException>(() => engineInvoker.Invoke(argsDictionary)).Message;
 
-            Assert.AreEqual(message, DefaultEngineInvokerTests.TimoutErrorMessage);
+            Assert.AreEqual(message, TimoutErrorMessage);
         }
 
         [TestMethod]
         public void InvokeShouldSetParentProcessExistCallback()
         {
-            this.engineInvoker.Invoke(argsDictionary);
+            engineInvoker.Invoke(argsDictionary);
 
-            this.mockProcssHelper.Verify(h => h.SetExitCallback(ParentProcessId, It.IsAny<Action<object>>()));
+            mockProcssHelper.Verify(h => h.SetExitCallback(ParentProcessId, It.IsAny<Action<object>>()));
         }
 
         [TestMethod]
@@ -105,7 +105,7 @@ namespace testhost.UnitTests
             EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
 #endif
 
-            this.engineInvoker.Invoke(argsDictionary);
+            engineInvoker.Invoke(argsDictionary);
 
             // Verify
             Assert.AreEqual(TraceLevel.Info, (TraceLevel)EqtTrace.TraceLevel);
@@ -124,7 +124,7 @@ namespace testhost.UnitTests
             try
             {
                 argsDictionary["--tracelevel"] = "5"; // int value which is not defined in TraceLevel.
-                this.engineInvoker.Invoke(argsDictionary);
+                engineInvoker.Invoke(argsDictionary);
             }
             finally{
                 argsDictionary["--tracelevel"] = "3"; // Setting to default value of 3.

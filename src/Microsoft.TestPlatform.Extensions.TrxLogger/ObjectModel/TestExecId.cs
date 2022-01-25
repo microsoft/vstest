@@ -12,16 +12,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// </summary>
     internal sealed class TestExecId
     {
-        private static TestExecId emptyId = new TestExecId(Guid.Empty);
-
-        private Guid execId;
+        private Guid _execId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestExecId"/> class.
         /// </summary>
         public TestExecId()
         {
-            this.execId = Guid.NewGuid();
+            _execId = Guid.NewGuid();
         }
 
         /// <summary>
@@ -32,23 +30,20 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </param>
         public TestExecId(Guid id)
         {
-            this.execId = id;
+            _execId = id;
         }
 
         /// <summary>
         /// Gets an object of <see cref="TestExecId"/> class which empty GUID
         /// </summary>
-        public static TestExecId Empty
-        {
-            get { return emptyId; }
-        }
+        public static TestExecId Empty { get; } = new TestExecId(Guid.Empty);
 
         /// <summary>
         /// Gets the id.
         /// </summary>
         public Guid Id
         {
-            get { return this.execId; }
+            get { return _execId; }
         }
 
         /// <summary>
@@ -62,14 +57,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public override bool Equals(object obj)
         {
-            TestExecId id = obj as TestExecId;
-
-            if (id == null)
-            {
-                return false;
-            }
-
-            return this.execId.Equals(id.execId);
+            return obj is TestExecId id && _execId.Equals(id._execId);
         }
 
         /// <summary>
@@ -80,7 +68,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public override int GetHashCode()
         {
-            return this.execId.GetHashCode();
+            return _execId.GetHashCode();
         }
 
         /// <summary>
@@ -91,7 +79,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public override string ToString()
         {
-            string s = this.execId.ToString("B");
+            string s = _execId.ToString("B");
             return string.Format(CultureInfo.InvariantCulture, s);
         }
     }

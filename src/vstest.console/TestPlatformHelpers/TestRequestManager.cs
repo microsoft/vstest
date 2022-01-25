@@ -50,15 +50,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private readonly ITestPlatform testPlatform;
         private readonly ITestPlatformEventSource testPlatformEventSource;
         private readonly Task<IMetricsPublisher> metricsPublisher;
-        private readonly object syncObject = new object();
+        private readonly object syncObject = new();
 
         private bool isDisposed;
         private bool telemetryOptedIn;
-        private CommandLineOptions commandLineOptions;
-        private TestRunResultAggregator testRunResultAggregator;
-        private InferHelper inferHelper;
-        private IProcessHelper processHelper;
-        private ITestRunAttachmentsProcessingManager attachmentsProcessingManager;
+        private readonly CommandLineOptions commandLineOptions;
+        private readonly TestRunResultAggregator testRunResultAggregator;
+        private readonly InferHelper inferHelper;
+        private readonly IProcessHelper processHelper;
+        private readonly ITestRunAttachmentsProcessingManager attachmentsProcessingManager;
 
         /// <summary>
         /// Maintains the current active execution request.
@@ -147,15 +147,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // duration. We clear the extensions cache to ensure the extensions don't get reused
             // across discovery/run requests.
             EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions started.");
-            this.testPlatform.ClearExtensions();
-            this.testPlatform.UpdateExtensions(pathToAdditionalExtensions, skipExtensionFilters);
+            testPlatform.ClearExtensions();
+            testPlatform.UpdateExtensions(pathToAdditionalExtensions, skipExtensionFilters);
             EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions completed.");
         }
 
         /// <inheritdoc />
         public void ResetOptions()
         {
-            this.commandLineOptions.Reset();
+            commandLineOptions.Reset();
         }
 
         /// <inheritdoc />
@@ -170,11 +170,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             if (discoveryPayload.TestPlatformOptions != null)
             {
-                this.telemetryOptedIn = discoveryPayload.TestPlatformOptions.CollectMetrics;
+                telemetryOptedIn = discoveryPayload.TestPlatformOptions.CollectMetrics;
             }
 
-            var requestData = this.GetRequestData(protocolConfig);
-            if (this.UpdateRunSettingsIfRequired(
+            var requestData = GetRequestData(protocolConfig);
+            if (UpdateRunSettingsIfRequired(
                 runsettings,
                 discoveryPayload.Sources?.ToList(),
                 discoveryEventsRegistrar,
@@ -190,60 +190,60 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             if (requestData.IsTelemetryOptedIn)
             {
                 // Collect metrics.
-                this.CollectMetrics(requestData, runConfiguration);
+                CollectMetrics(requestData, runConfiguration);
 
                 // Collect commands.
-                this.LogCommandsTelemetryPoints(requestData);
+                LogCommandsTelemetryPoints(requestData);
             }
 
             // Create discovery request.
             var criteria = new DiscoveryCriteria(
                 discoveryPayload.Sources,
                 batchSize,
-                this.commandLineOptions.TestStatsEventTimeout,
+                commandLineOptions.TestStatsEventTimeout,
                 runsettings,
                 discoveryPayload.TestSessionInfo)
             {
-                TestCaseFilter = this.commandLineOptions.TestCaseFilterValue
+                TestCaseFilter = commandLineOptions.TestCaseFilterValue
                     ?? testCaseFilterFromRunsettings
             };
 
             // Make sure to run the run request inside a lock as the below section is not thread-safe.
             // There can be only one discovery or execution request at a given point in time.
-            lock (this.syncObject)
+            lock (syncObject)
             {
                 try
                 {
                     EqtTrace.Info("TestRequestManager.DiscoverTests: Synchronization context taken");
 
-                    this.currentDiscoveryRequest = this.testPlatform.CreateDiscoveryRequest(
+                    currentDiscoveryRequest = testPlatform.CreateDiscoveryRequest(
                         requestData,
                         criteria,
                         discoveryPayload.TestPlatformOptions);
-                    discoveryEventsRegistrar?.RegisterDiscoveryEvents(this.currentDiscoveryRequest);
+                    discoveryEventsRegistrar?.RegisterDiscoveryEvents(currentDiscoveryRequest);
 
                     // Notify start of discovery start.
-                    this.testPlatformEventSource.DiscoveryRequestStart();
+                    testPlatformEventSource.DiscoveryRequestStart();
 
                     // Start the discovery of tests and wait for completion.
-                    this.currentDiscoveryRequest.DiscoverAsync();
-                    this.currentDiscoveryRequest.WaitForCompletion();
+                    currentDiscoveryRequest.DiscoverAsync();
+                    currentDiscoveryRequest.WaitForCompletion();
                 }
                 finally
                 {
-                    if (this.currentDiscoveryRequest != null)
+                    if (currentDiscoveryRequest != null)
                     {
                         // Dispose the discovery request and unregister for events.
                         discoveryEventsRegistrar?.UnregisterDiscoveryEvents(currentDiscoveryRequest);
-                        this.currentDiscoveryRequest.Dispose();
-                        this.currentDiscoveryRequest = null;
+                        currentDiscoveryRequest.Dispose();
+                        currentDiscoveryRequest = null;
                     }
 
                     EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed.");
-                    this.testPlatformEventSource.DiscoveryRequestStop();
+                    testPlatformEventSource.DiscoveryRequestStop();
 
                     // Posts the discovery complete event.
-                    this.metricsPublisher.Result.PublishMetrics(
+                    metricsPublisher.Result.PublishMetrics(
                         TelemetryDataConstants.TestDiscoveryCompleteEvent,
                         requestData.MetricsCollection.Metrics);
                 }
@@ -258,21 +258,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             ProtocolConfig protocolConfig)
         {
             EqtTrace.Info("TestRequestManager.RunTests: run tests started.");
-
-            TestRunCriteria runCriteria = null;
             var runsettings = testRunRequestPayload.RunSettings;
 
             if (testRunRequestPayload.TestPlatformOptions != null)
             {
-                this.telemetryOptedIn = testRunRequestPayload.TestPlatformOptions.CollectMetrics;
+                telemetryOptedIn = testRunRequestPayload.TestPlatformOptions.CollectMetrics;
             }
 
-            var requestData = this.GetRequestData(protocolConfig);
+            var requestData = GetRequestData(protocolConfig);
 
             // Get sources to auto detect fx and arch for both run selected or run all scenario.
             var sources = GetSources(testRunRequestPayload);
 
-            if (this.UpdateRunSettingsIfRequired(
+            if (UpdateRunSettingsIfRequired(
                 runsettings,
                 sources,
                 testRunEventsRegistrar,
@@ -295,13 +293,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             if (requestData.IsTelemetryOptedIn)
             {
                 // Collect metrics.
-                this.CollectMetrics(requestData, runConfiguration);
+                CollectMetrics(requestData, runConfiguration);
 
                 // Collect commands.
-                this.LogCommandsTelemetryPoints(requestData);
+                LogCommandsTelemetryPoints(requestData);
 
                 // Collect data for legacy settings.
-                this.LogTelemetryForLegacySettings(requestData, runsettings);
+                LogTelemetryForLegacySettings(requestData, runsettings);
             }
 
             // Get Fakes data collector settings.
@@ -309,55 +307,50 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 // The commandline options do not have sources in design time mode,
                 // and so we fall back to using sources instead.
-                if (this.commandLineOptions.Sources.Any())
+                if (commandLineOptions.Sources.Any())
                 {
                     GenerateFakesUtilities.GenerateFakesSettings(
-                        this.commandLineOptions,
-                        this.commandLineOptions.Sources.ToList(),
+                        commandLineOptions,
+                        commandLineOptions.Sources.ToList(),
                         ref runsettings);
                 }
                 else if (sources.Any())
                 {
                     GenerateFakesUtilities.GenerateFakesSettings(
-                        this.commandLineOptions,
+                        commandLineOptions,
                         sources,
                         ref runsettings);
                 }
             }
 
-            if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any())
-            {
-                runCriteria = new TestRunCriteria(
-                                  testRunRequestPayload.Sources,
-                                  batchSize,
-                                  testRunRequestPayload.KeepAlive,
-                                  runsettings,
-                                  this.commandLineOptions.TestStatsEventTimeout,
-                                  testHostLauncher,
-                                  testRunRequestPayload.TestPlatformOptions?.TestCaseFilter,
-                                  testRunRequestPayload.TestPlatformOptions?.FilterOptions,
-                                  testRunRequestPayload.TestSessionInfo,
-                                  debugEnabledForTestSession: testRunRequestPayload.TestSessionInfo != null
-                                      && testRunRequestPayload.DebuggingEnabled);
-            }
-            else
-            {
-                runCriteria = new TestRunCriteria(
-                                  testRunRequestPayload.TestCases,
-                                  batchSize,
-                                  testRunRequestPayload.KeepAlive,
-                                  runsettings,
-                                  this.commandLineOptions.TestStatsEventTimeout,
-                                  testHostLauncher,
-                                  testRunRequestPayload.TestSessionInfo,
-                                  debugEnabledForTestSession: testRunRequestPayload.TestSessionInfo != null
-                                      && testRunRequestPayload.DebuggingEnabled);
-            }
+            TestRunCriteria runCriteria = testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any()
+    ? new TestRunCriteria(
+                      testRunRequestPayload.Sources,
+                      batchSize,
+                      testRunRequestPayload.KeepAlive,
+                      runsettings,
+                      commandLineOptions.TestStatsEventTimeout,
+                      testHostLauncher,
+                      testRunRequestPayload.TestPlatformOptions?.TestCaseFilter,
+                      testRunRequestPayload.TestPlatformOptions?.FilterOptions,
+                      testRunRequestPayload.TestSessionInfo,
+                      debugEnabledForTestSession: testRunRequestPayload.TestSessionInfo != null
+                          && testRunRequestPayload.DebuggingEnabled)
+    : new TestRunCriteria(
+                      testRunRequestPayload.TestCases,
+                      batchSize,
+                      testRunRequestPayload.KeepAlive,
+                      runsettings,
+                      commandLineOptions.TestStatsEventTimeout,
+                      testHostLauncher,
+                      testRunRequestPayload.TestSessionInfo,
+                      debugEnabledForTestSession: testRunRequestPayload.TestSessionInfo != null
+                          && testRunRequestPayload.DebuggingEnabled);
 
             // Run tests.
             try
             {
-                this.RunTests(
+                RunTests(
                     requestData,
                     runCriteria,
                     testRunEventsRegistrar,
@@ -366,10 +359,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
             finally
             {
-                this.testPlatformEventSource.ExecutionRequestStop();
+                testPlatformEventSource.ExecutionRequestStop();
 
                 // Post the run complete event
-                this.metricsPublisher.Result.PublishMetrics(
+                metricsPublisher.Result.PublishMetrics(
                     TelemetryDataConstants.TestExecutionCompleteEvent,
                     requestData.MetricsCollection.Metrics);
             }
@@ -383,43 +376,43 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Test run attachments processing started.");
 
-            this.telemetryOptedIn = attachmentsProcessingPayload.CollectMetrics;
-            var requestData = this.GetRequestData(protocolConfig);
+            telemetryOptedIn = attachmentsProcessingPayload.CollectMetrics;
+            var requestData = GetRequestData(protocolConfig);
 
             // Make sure to run the run request inside a lock as the below section is not thread-safe.
             // There can be only one discovery, execution or attachments processing request at a given
             // point in time.
-            lock (this.syncObject)
+            lock (syncObject)
             {
                 try
                 {
                     EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Synchronization context taken.");
-                    this.testPlatformEventSource.TestRunAttachmentsProcessingRequestStart();
+                    testPlatformEventSource.TestRunAttachmentsProcessingRequestStart();
 
-                    this.currentAttachmentsProcessingCancellationTokenSource = new CancellationTokenSource();
+                    currentAttachmentsProcessingCancellationTokenSource = new CancellationTokenSource();
 
-                    Task task = this.attachmentsProcessingManager.ProcessTestRunAttachmentsAsync(
+                    Task task = attachmentsProcessingManager.ProcessTestRunAttachmentsAsync(
                         attachmentsProcessingPayload.RunSettings,
                         requestData,
                         attachmentsProcessingPayload.Attachments,
                         attachmentsProcessingPayload.InvokedDataCollectors,
                         attachmentsProcessingEventsHandler,
-                        this.currentAttachmentsProcessingCancellationTokenSource.Token);
+                        currentAttachmentsProcessingCancellationTokenSource.Token);
                     task.Wait();
                 }
                 finally
                 {
-                    if (this.currentAttachmentsProcessingCancellationTokenSource != null)
+                    if (currentAttachmentsProcessingCancellationTokenSource != null)
                     {
-                        this.currentAttachmentsProcessingCancellationTokenSource.Dispose();
-                        this.currentAttachmentsProcessingCancellationTokenSource = null;
+                        currentAttachmentsProcessingCancellationTokenSource.Dispose();
+                        currentAttachmentsProcessingCancellationTokenSource = null;
                     }
 
                     EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Test run attachments processing completed.");
-                    this.testPlatformEventSource.TestRunAttachmentsProcessingRequestStop();
+                    testPlatformEventSource.TestRunAttachmentsProcessingRequestStop();
 
                     // Post the attachments processing complete event.
-                    this.metricsPublisher.Result.PublishMetrics(
+                    metricsPublisher.Result.PublishMetrics(
                         TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent,
                         requestData.MetricsCollection.Metrics);
                 }
@@ -437,12 +430,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             if (payload.TestPlatformOptions != null)
             {
-                this.telemetryOptedIn = payload.TestPlatformOptions.CollectMetrics;
+                telemetryOptedIn = payload.TestPlatformOptions.CollectMetrics;
             }
 
-            var requestData = this.GetRequestData(protocolConfig);
+            var requestData = GetRequestData(protocolConfig);
 
-            if (this.UpdateRunSettingsIfRequired(
+            if (UpdateRunSettingsIfRequired(
                 payload.RunSettings,
                 payload.Sources,
                 null,
@@ -461,12 +454,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             // TODO (copoiena): Collect metrics ?
 
-            lock (this.syncObject)
+            lock (syncObject)
             {
                 try
                 {
                     EqtTrace.Info("TestRequestManager.StartTestRunner: Synchronization context taken.");
-                    this.testPlatformEventSource.StartTestSessionStart();
+                    testPlatformEventSource.StartTestSessionStart();
 
                     var criteria = new StartTestSessionCriteria()
                     {
@@ -475,7 +468,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         TestHostLauncher = testHostLauncher
                     };
 
-                    if (!this.testPlatform.StartTestSession(requestData, criteria, eventsHandler))
+                    if (!testPlatform.StartTestSession(requestData, criteria, eventsHandler))
                     {
                         EqtTrace.Warning("TestRequestManager.StartTestSession: Unable to start test session.");
                     }
@@ -483,10 +476,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 finally
                 {
                     EqtTrace.Info("TestRequestManager.StartTestSession: Starting test session completed.");
-                    this.testPlatformEventSource.StartTestSessionStop();
+                    testPlatformEventSource.StartTestSessionStop();
 
                     // Post the attachments processing complete event.
-                    this.metricsPublisher.Result.PublishMetrics(
+                    metricsPublisher.Result.PublishMetrics(
                         TelemetryDataConstants.StartTestSessionCompleteEvent,
                         requestData.MetricsCollection.Metrics);
                 }
@@ -520,35 +513,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         public void CancelTestRun()
         {
             EqtTrace.Info("TestRequestManager.CancelTestRun: Sending cancel request.");
-            this.currentTestRunRequest?.CancelAsync();
+            currentTestRunRequest?.CancelAsync();
         }
 
         /// <inheritdoc />
         public void CancelDiscovery()
         {
             EqtTrace.Info("TestRequestManager.CancelTestDiscovery: Sending cancel request.");
-            this.currentDiscoveryRequest?.Abort();
+            currentDiscoveryRequest?.Abort();
         }
 
         /// <inheritdoc />
         public void AbortTestRun()
         {
             EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request.");
-            this.currentTestRunRequest?.Abort();
+            currentTestRunRequest?.Abort();
         }
 
         /// <inheritdoc/>
         public void CancelTestRunAttachmentsProcessing()
         {
             EqtTrace.Info("TestRequestManager.CancelTestRunAttachmentsProcessing: Sending cancel request.");
-            this.currentAttachmentsProcessingCancellationTokenSource?.Cancel();
+            currentAttachmentsProcessingCancellationTokenSource?.Cancel();
         }
 
         #endregion
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
 
             // Use SupressFinalize in case a subclass
             // of this type implements a finalizer.
@@ -557,14 +550,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private void Dispose(bool disposing)
         {
-            if (!this.isDisposed)
+            if (!isDisposed)
             {
                 if (disposing)
                 {
-                    this.metricsPublisher.Result.Dispose();
+                    metricsPublisher.Result.Dispose();
                 }
 
-                this.isDisposed = true;
+                isDisposed = true;
             }
         }
 
@@ -593,7 +586,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml)
                     ?? new LoggerRunSettings();
 
-                settingsUpdated |= this.UpdateFramework(
+                settingsUpdated |= UpdateFramework(
                     document,
                     navigator,
                     sources,
@@ -634,24 +627,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     EqtTrace.Verbose($"Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}");
                 }
 
-                settingsUpdated |= this.UpdatePlatform(
+                settingsUpdated |= UpdatePlatform(
                     document,
                     navigator,
                     sources,
                     sourcePlatforms,
                     defaultArchitecture,
                     out Architecture chosenPlatform);
-                this.CheckSourcesForCompatibility(
+                CheckSourcesForCompatibility(
                     chosenFramework,
                     chosenPlatform,
                     defaultArchitecture,
                     sourcePlatforms,
                     sourceFrameworks,
                     registrar);
-                settingsUpdated |= this.UpdateDesignMode(document, runConfiguration);
-                settingsUpdated |= this.UpdateCollectSourceInformation(document, runConfiguration);
-                settingsUpdated |= this.UpdateTargetDevice(navigator, document, runConfiguration);
-                settingsUpdated |= this.AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
+                settingsUpdated |= UpdateDesignMode(document, runConfiguration);
+                settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
+                settingsUpdated |= UpdateTargetDevice(navigator, document, runConfiguration);
+                settingsUpdated |= AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
 
                 updatedRunSettingsXml = navigator.OuterXml;
             }
@@ -686,15 +679,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             LoggerRunSettings loggerRunSettings)
         {
             // Update console logger settings.
-            bool consoleLoggerUpdated = this.UpdateConsoleLoggerIfExists(document, loggerRunSettings);
+            bool consoleLoggerUpdated = UpdateConsoleLoggerIfExists(document, loggerRunSettings);
 
             // In case of CLI, add console logger if not already present.
             bool designMode = runConfiguration.DesignModeSet
                 ? runConfiguration.DesignMode
-                : this.commandLineOptions.IsDesignMode;
+                : commandLineOptions.IsDesignMode;
             if (!designMode && !consoleLoggerUpdated)
             {
-                this.AddConsoleLogger(document, loggerRunSettings);
+                AddConsoleLogger(document, loggerRunSettings);
             }
 
             // Update is required:
@@ -725,7 +718,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 InferRunSettingsHelper.UpdateCollectSourceInformation(
                     document,
-                    this.commandLineOptions.ShouldCollectSourceInformation);
+                    commandLineOptions.ShouldCollectSourceInformation);
             }
             return updateRequired;
         }
@@ -738,7 +731,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 InferRunSettingsHelper.UpdateDesignMode(
                     document,
-                    this.commandLineOptions.IsDesignMode);
+                    commandLineOptions.IsDesignMode);
             }
             return updateRequired;
         }
@@ -916,24 +909,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // whereas below logic needs to deserialize and do some cleanup.
             // While this section is cleaning up, TranslationLayer can trigger run causing multiple
             // threads to run the below section at the same time.
-            lock (this.syncObject)
+            lock (syncObject)
             {
                 try
                 {
-                    this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(
+                    currentTestRunRequest = testPlatform.CreateTestRunRequest(
                         requestData,
                         testRunCriteria,
                         options);
 
-                    this.testRunResultAggregator.RegisterTestRunEvents(this.currentTestRunRequest);
-                    testRunEventsRegistrar?.RegisterTestRunEvents(this.currentTestRunRequest);
+                    testRunResultAggregator.RegisterTestRunEvents(currentTestRunRequest);
+                    testRunEventsRegistrar?.RegisterTestRunEvents(currentTestRunRequest);
 
-                    this.testPlatformEventSource.ExecutionRequestStart();
+                    testPlatformEventSource.ExecutionRequestStart();
 
-                    this.currentTestRunRequest.ExecuteAsync();
+                    currentTestRunRequest.ExecuteAsync();
 
                     // Wait for the run completion event
-                    this.currentTestRunRequest.WaitForCompletion();
+                    currentTestRunRequest.WaitForCompletion();
                 }
                 catch (Exception ex)
                 {
@@ -943,13 +936,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 }
                 finally
                 {
-                    if (this.currentTestRunRequest != null)
+                    if (currentTestRunRequest != null)
                     {
-                        this.testRunResultAggregator.UnregisterTestRunEvents(this.currentTestRunRequest);
-                        testRunEventsRegistrar?.UnregisterTestRunEvents(this.currentTestRunRequest);
+                        testRunResultAggregator.UnregisterTestRunEvents(currentTestRunRequest);
+                        testRunEventsRegistrar?.UnregisterTestRunEvents(currentTestRunRequest);
 
-                        this.currentTestRunRequest.Dispose();
-                        this.currentTestRunRequest = null;
+                        currentTestRunRequest.Dispose();
+                        currentTestRunRequest = null;
                     }
                 }
             }
@@ -1095,43 +1088,43 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             var commandsUsed = new List<string>();
 
-            var parallel = this.commandLineOptions.Parallel;
+            var parallel = commandLineOptions.Parallel;
             if (parallel)
             {
                 commandsUsed.Add("/Parallel");
             }
 
-            var platform = this.commandLineOptions.ArchitectureSpecified;
+            var platform = commandLineOptions.ArchitectureSpecified;
             if (platform)
             {
                 commandsUsed.Add("/Platform");
             }
 
-            var enableCodeCoverage = this.commandLineOptions.EnableCodeCoverage;
+            var enableCodeCoverage = commandLineOptions.EnableCodeCoverage;
             if (enableCodeCoverage)
             {
                 commandsUsed.Add("/EnableCodeCoverage");
             }
 
-            var inIsolation = this.commandLineOptions.InIsolation;
+            var inIsolation = commandLineOptions.InIsolation;
             if (inIsolation)
             {
                 commandsUsed.Add("/InIsolation");
             }
 
-            var useVsixExtensions = this.commandLineOptions.UseVsixExtensions;
+            var useVsixExtensions = commandLineOptions.UseVsixExtensions;
             if (useVsixExtensions)
             {
                 commandsUsed.Add("/UseVsixExtensions");
             }
 
-            var frameworkVersionSpecified = this.commandLineOptions.FrameworkVersionSpecified;
+            var frameworkVersionSpecified = commandLineOptions.FrameworkVersionSpecified;
             if (frameworkVersionSpecified)
             {
                 commandsUsed.Add("/Framework");
             }
 
-            var settings = this.commandLineOptions.SettingsFile;
+            var settings = commandLineOptions.SettingsFile;
             if (!string.IsNullOrEmpty(settings))
             {
                 var extension = Path.GetExtension(settings);
@@ -1169,16 +1162,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 ProtocolConfig = protocolConfig,
                 MetricsCollection =
-                               this.telemetryOptedIn || IsTelemetryOptedIn()
+                               telemetryOptedIn || IsTelemetryOptedIn()
                                    ? (IMetricsCollection)new MetricsCollection()
                                    : new NoOpMetricsCollection(),
-                IsTelemetryOptedIn = this.telemetryOptedIn || IsTelemetryOptedIn()
+                IsTelemetryOptedIn = telemetryOptedIn || IsTelemetryOptedIn()
             };
         }
 
         private List<String> GetSources(TestRunRequestPayload testRunRequestPayload)
         {
-            List<string> sources = new List<string>();
+            List<string> sources = new();
             if (testRunRequestPayload.Sources != null
                 && testRunRequestPayload.Sources.Count > 0)
             {

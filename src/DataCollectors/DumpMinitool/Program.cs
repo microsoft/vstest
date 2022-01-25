@@ -102,9 +102,7 @@ namespace DumpMinitool
             }
 
             [Flags]
-#pragma warning disable SA1201 // Elements must appear in the correct order
             public enum MINIDUMP_TYPE : uint
-#pragma warning restore SA1201 // Elements must appear in the correct order
             {
                 MiniDumpNormal = 0,
                 MiniDumpWithDataSegs = 1 << 0,

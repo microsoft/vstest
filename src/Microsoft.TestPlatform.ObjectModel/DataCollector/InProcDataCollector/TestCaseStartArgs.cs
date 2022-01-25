@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
         /// </param>
         public TestCaseStartArgs(TestCase testCase)
         {
-            this.TestCase = testCase;
+            TestCase = testCase;
         }
 
         /// <summary>

@@ -117,7 +117,6 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
         // parse arity in the form `nn where nn is an integer value.
         private static int ParseArity(string managedMethodName, int start, out int arity)
         {
-            arity = 0;
             Debug.Assert(managedMethodName[start] == '`');
 
             int i = start + 1; // skip initial '`' char
@@ -175,7 +174,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             parameterType = string.Empty;
             var quoted = false;
 
-            int i = start;
+            int i;
             for (i = start; i < managedMethodName.Length; i++)
             {
                 if (managedMethodName[i] == '\'' || quoted)

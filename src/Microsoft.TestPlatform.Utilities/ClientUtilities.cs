@@ -22,7 +22,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         /// <param name="xmlDocument">Xml Document containing Runsettings xml</param>
         /// <param name="path">Path of the .runsettings xml file</param>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public static void FixRelativePathsInRunSettings(XmlDocument xmlDocument, string path)
         {
             if (xmlDocument == null)

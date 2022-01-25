@@ -73,17 +73,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>
         /// The <see cref="XmlElement"/>.
         /// </returns>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public XmlElement ToXml()
         {
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             XmlElement root = doc.CreateElement(Constants.DataCollectorSettingName);
-            AppendAttribute(doc, root, "uri", this.Uri.ToString());
-            AppendAttribute(doc, root, "assemblyQualifiedName", this.AssemblyQualifiedName);
-            AppendAttribute(doc, root, "friendlyName", this.FriendlyName);
+            AppendAttribute(doc, root, "uri", Uri.ToString());
+            AppendAttribute(doc, root, "assemblyQualifiedName", AssemblyQualifiedName);
+            AppendAttribute(doc, root, "friendlyName", FriendlyName);
 
-            root.AppendChild(doc.ImportNode(this.Configuration, true));
+            root.AppendChild(doc.ImportNode(Configuration, true));
 
             return root;
         }
@@ -97,37 +95,35 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>
         /// The <see cref="XmlElement"/>.
         /// </returns>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public XmlElement ToXml(string dataCollectorName)
         {
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             XmlElement root = doc.CreateElement(dataCollectorName);
-            if (this.Uri != null)
+            if (Uri != null)
             {
-                AppendAttribute(doc, root, "uri", this.Uri.ToString());
+                AppendAttribute(doc, root, "uri", Uri.ToString());
             }
 
-            if (!string.IsNullOrWhiteSpace(this.AssemblyQualifiedName))
+            if (!string.IsNullOrWhiteSpace(AssemblyQualifiedName))
             {
-                AppendAttribute(doc, root, "assemblyQualifiedName", this.AssemblyQualifiedName);
+                AppendAttribute(doc, root, "assemblyQualifiedName", AssemblyQualifiedName);
             }
 
-            if (!string.IsNullOrWhiteSpace(this.FriendlyName))
+            if (!string.IsNullOrWhiteSpace(FriendlyName))
             {
-                AppendAttribute(doc, root, "friendlyName", this.FriendlyName);
+                AppendAttribute(doc, root, "friendlyName", FriendlyName);
             }
 
-            AppendAttribute(doc, root, "enabled", this.IsEnabled.ToString());
+            AppendAttribute(doc, root, "enabled", IsEnabled.ToString());
 
-            if (!string.IsNullOrWhiteSpace(this.CodeBase))
+            if (!string.IsNullOrWhiteSpace(CodeBase))
             {
-                AppendAttribute(doc, root, "codebase", this.CodeBase);
+                AppendAttribute(doc, root, "codebase", CodeBase);
             }
 
-            if (this.Configuration != null)
+            if (Configuration != null)
             {
-                root.AppendChild(doc.ImportNode(this.Configuration, true));
+                root.AppendChild(doc.ImportNode(Configuration, true));
             }
 
             return root;
@@ -145,11 +141,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <exception cref="SettingsException">
         /// Settings exception
         /// </exception>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         internal static DataCollectorSettings FromXml(XmlReader reader)
         {
-            DataCollectorSettings settings = new DataCollectorSettings();
+            DataCollectorSettings settings = new();
             settings.IsEnabled = true;
             bool empty = reader.IsEmptyElement;
             if (reader.HasAttributes)
@@ -209,7 +203,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     switch (reader.Name)
                     {
                         case "Configuration":
-                            XmlDocument doc = new XmlDocument();
+                            XmlDocument doc = new();
                             XmlElement element = doc.CreateElement("Configuration");
                             element.InnerXml = reader.ReadInnerXml();
                             settings.Configuration = element;

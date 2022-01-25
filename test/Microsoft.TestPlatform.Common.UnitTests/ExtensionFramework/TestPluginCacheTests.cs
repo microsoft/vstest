@@ -30,10 +30,10 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
             // Reset the singleton.
             TestPluginCache.Instance = null;
-            this.mockFileHelper = new Mock<IFileHelper>();
-            this.testablePluginCache = new TestableTestPluginCache(new List<string> { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location });
+            mockFileHelper = new Mock<IFileHelper>();
+            testablePluginCache = new TestableTestPluginCache(new List<string> { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location });
 
-            this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
+            mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
         }
 
         #region Properties tests
@@ -242,10 +242,10 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         public void GetDefaultResolutionPathsShouldReturnDirectoryFromDefaultExtensionsPath()
         {
             // Setup the testable instance.
-            TestPluginCache.Instance = this.testablePluginCache;
+            TestPluginCache.Instance = testablePluginCache;
 
             var defaultExtensionsFile = typeof(TestPluginCache).GetTypeInfo().Assembly.Location;
-            this.testablePluginCache.DefaultExtensionPaths = new List<string>() { defaultExtensionsFile };
+            testablePluginCache.DefaultExtensionPaths = new List<string>() { defaultExtensionsFile };
 
             var resolutionPaths = TestPluginCache.Instance.GetDefaultResolutionPaths();
 
@@ -307,10 +307,10 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
             var extensionAssembly = typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location;
 
-            var testDiscovererPluginInfos = this.testablePluginCache.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(extensionAssembly);
+            var testDiscovererPluginInfos = testablePluginCache.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(extensionAssembly);
 
             CollectionAssert.AreEqual(
-                this.testablePluginCache.TestExtensions.TestDiscoverers.Keys,
+                testablePluginCache.TestExtensions.TestDiscoverers.Keys,
                 testDiscovererPluginInfos.Keys);
         }
 
@@ -318,13 +318,13 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         public void GetTestExtensionsShouldGetTestExtensionsFromCache()
         {
             var extensionAssembly = typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location;
-            var testDiscovererPluginInfos = this.testablePluginCache.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(extensionAssembly);
+            var testDiscovererPluginInfos = testablePluginCache.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(extensionAssembly);
             Assert.IsFalse(testDiscovererPluginInfos.ContainsKey("td"));
 
             // Set the cache.
-            this.testablePluginCache.TestExtensions.TestDiscoverers.Add("td", new TestDiscovererPluginInformation(typeof(TestPluginCacheTests)));
+            testablePluginCache.TestExtensions.TestDiscoverers.Add("td", new TestDiscovererPluginInformation(typeof(TestPluginCacheTests)));
 
-            testDiscovererPluginInfos = this.testablePluginCache.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(extensionAssembly);
+            testDiscovererPluginInfos = testablePluginCache.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(extensionAssembly);
             Assert.IsTrue(testDiscovererPluginInfos.ContainsKey("td"));
         }
 
@@ -335,7 +335,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             //TODO : make ITestDiscoverer interface and then mock it in order to make this test case pass.
 
             var extensionAssembly = typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location;
-            Assert.ThrowsException<Exception>(() => this.testablePluginCache.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(extensionAssembly));
+            Assert.ThrowsException<Exception>(() => testablePluginCache.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(extensionAssembly));
         }
 
         #endregion

@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestSession
             var proxyTestSessionManager = new ProxyTestSessionManager(
                 new StartTestSessionCriteria(),
                 1,
-                () => { return null; });
+                () => null);
 
             Assert.IsTrue(TestSessionPool.Instance.AddSession(testSessionInfo, proxyTestSessionManager));
             Assert.IsFalse(TestSessionPool.Instance.AddSession(testSessionInfo, proxyTestSessionManager));
@@ -39,7 +39,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestSession
             var mockProxyTestSessionManager = new Mock<ProxyTestSessionManager>(
                 new StartTestSessionCriteria(),
                 1,
-                (Func<ProxyOperationManager>)(() => { return null; }));
+                (Func<ProxyOperationManager>)(() => null));
 
             mockProxyTestSessionManager.SetupSequence(tsm => tsm.StopSession())
                 .Returns(true)
@@ -66,7 +66,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestSession
             var mockProxyTestSessionManager = new Mock<ProxyTestSessionManager>(
                 new StartTestSessionCriteria(),
                 1,
-                (Func<ProxyOperationManager>)(() => { return null; }));
+                (Func<ProxyOperationManager>)(() => null));
 
             mockProxyTestSessionManager.SetupSequence(tsm => tsm.DequeueProxy(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws(new InvalidOperationException("Test Exception"))
@@ -96,7 +96,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestSession
             var mockProxyTestSessionManager = new Mock<ProxyTestSessionManager>(
                 new StartTestSessionCriteria(),
                 1,
-                (Func<ProxyOperationManager>)(() => { return null; }));
+                (Func<ProxyOperationManager>)(() => null));
 
             mockProxyTestSessionManager.SetupSequence(tsm => tsm.EnqueueProxy(It.IsAny<int>()))
                 .Throws(new ArgumentException("Test Exception"))

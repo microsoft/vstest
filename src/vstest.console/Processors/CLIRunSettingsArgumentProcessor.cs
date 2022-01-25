@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
     /// <summary>
@@ -41,12 +41,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new CLIRunSettingsArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new CLIRunSettingsArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -57,17 +57,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new CLIRunSettingsArgumentExecutor(RunSettingsManager.Instance, CommandLineOptions.Instance));
+                    executor = new Lazy<IArgumentExecutor>(() => new CLIRunSettingsArgumentExecutor(RunSettingsManager.Instance, CommandLineOptions.Instance));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -89,8 +89,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     internal class CLIRunSettingsArgumentExecutor : IArgumentsExecutor
     {
-        private IRunSettingsProvider runSettingsManager;
-        private CommandLineOptions commandLineOptions;
+        private readonly IRunSettingsProvider runSettingsManager;
+        private readonly CommandLineOptions commandLineOptions;
 
         internal CLIRunSettingsArgumentExecutor(IRunSettingsProvider runSettingsManager, CommandLineOptions commandLineOptions)
         {
@@ -117,7 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             try
             {
                 // Append / Override run settings supplied in CLI
-                CreateOrOverwriteRunSettings(this.runSettingsManager, arguments);
+                CreateOrOverwriteRunSettings(runSettingsManager, arguments);
             }
             catch (XPathException exception)
             {
@@ -247,7 +247,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 Framework framework = Framework.FromString(value);
                 if (framework != null)
                 {
-                    this.commandLineOptions.TargetFrameworkVersion = framework;
+                    commandLineOptions.TargetFrameworkVersion = framework;
                 }
             }
 
@@ -257,7 +257,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 if (success)
                 {
                     RunSettingsHelper.Instance.IsDefaultTargetArchitecture = false;
-                    this.commandLineOptions.TargetArchitecture = architecture;
+                    commandLineOptions.TargetArchitecture = architecture;
                 }
             }
         }

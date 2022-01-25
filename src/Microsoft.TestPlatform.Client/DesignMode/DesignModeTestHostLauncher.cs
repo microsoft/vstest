@@ -29,25 +29,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <inheritdoc/>
         public bool AttachDebuggerToProcess(int pid)
         {
-            return this.designModeClient.AttachDebuggerToProcess(pid, CancellationToken.None);
+            return designModeClient.AttachDebuggerToProcess(pid, CancellationToken.None);
         }
 
         /// <inheritdoc/>
         public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
         {
-            return this.designModeClient.AttachDebuggerToProcess(pid, cancellationToken);
+            return designModeClient.AttachDebuggerToProcess(pid, cancellationToken);
         }
 
         /// <inheritdoc/>
         public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
         {
-            return this.designModeClient.LaunchCustomHost(defaultTestHostStartInfo, CancellationToken.None);
+            return designModeClient.LaunchCustomHost(defaultTestHostStartInfo, CancellationToken.None);
         }
 
         /// <inheritdoc/>
         public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken)
         {
-            return this.designModeClient.LaunchCustomHost(defaultTestHostStartInfo, cancellationToken);
+            return designModeClient.LaunchCustomHost(defaultTestHostStartInfo, cancellationToken);
         }
     }
 

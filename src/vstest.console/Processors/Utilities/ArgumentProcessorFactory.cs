@@ -34,7 +34,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Available argument processors.
         /// </summary>
-        private readonly IEnumerable<IArgumentProcessor> argumentProcessors;
         private Dictionary<string, IArgumentProcessor> commandToProcessorMap;
         private Dictionary<string, IArgumentProcessor> specialCommandToProcessorMap;
 
@@ -54,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         protected ArgumentProcessorFactory(IEnumerable<IArgumentProcessor> argumentProcessors)
         {
             Contract.Requires(argumentProcessors != null);
-            this.argumentProcessors = argumentProcessors;
+            AllArgumentProcessors = argumentProcessors;
         }
 
         #endregion
@@ -78,10 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Returns all of the available argument processors.
         /// </summary>
-        public IEnumerable<IArgumentProcessor> AllArgumentProcessors
-        {
-            get { return argumentProcessors; }
-        }
+        public IEnumerable<IArgumentProcessor> AllArgumentProcessors { get; private set; }
 
         /// <summary>
         /// Gets a mapping between command and Argument Executor.
@@ -91,12 +87,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             get
             {
                 // Build the mapping if it does not already exist.
-                if (this.commandToProcessorMap == null)
+                if (commandToProcessorMap == null)
                 {
                     BuildCommandMaps();
                 }
 
-                return this.commandToProcessorMap;
+                return commandToProcessorMap;
             }
         }
 
@@ -108,12 +104,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             get
             {
                 // Build the mapping if it does not already exist.
-                if (this.specialCommandToProcessorMap == null)
+                if (specialCommandToProcessorMap == null)
                 {
                     BuildCommandMaps();
                 }
 
-                return this.specialCommandToProcessorMap;
+                return specialCommandToProcessorMap;
             }
         }
 
@@ -139,8 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             var pair = new CommandArgumentPair(argument);
 
             // Find the associated argument processor.
-            IArgumentProcessor argumentProcessor;
-            CommandToProcessorMap.TryGetValue(pair.Command, out argumentProcessor);
+            CommandToProcessorMap.TryGetValue(pair.Command, out IArgumentProcessor argumentProcessor);
 
             // If an argument processor was not found for the command, then consider it as a test source argument.
             if (argumentProcessor == null)
@@ -176,8 +171,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             Contract.EndContractBlock();
 
             // Find the associated argument processor.
-            IArgumentProcessor argumentProcessor;
-            CommandToProcessorMap.TryGetValue(command, out argumentProcessor);
+            CommandToProcessorMap.TryGetValue(command, out IArgumentProcessor argumentProcessor);
 
             if (argumentProcessor != null)
             {
@@ -252,15 +246,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private void BuildCommandMaps()
         {
-            this.commandToProcessorMap = new Dictionary<string, IArgumentProcessor>(StringComparer.OrdinalIgnoreCase);
-            this.specialCommandToProcessorMap = new Dictionary<string, IArgumentProcessor>(StringComparer.OrdinalIgnoreCase);
+            commandToProcessorMap = new Dictionary<string, IArgumentProcessor>(StringComparer.OrdinalIgnoreCase);
+            specialCommandToProcessorMap = new Dictionary<string, IArgumentProcessor>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (IArgumentProcessor argumentProcessor in this.argumentProcessors)
+            foreach (IArgumentProcessor argumentProcessor in AllArgumentProcessors)
             {
                 // Add the command to the appropriate dictionary.
                 var processorsMap = argumentProcessor.Metadata.Value.IsSpecialCommand
-                                      ? this.specialCommandToProcessorMap
-                                      : this.commandToProcessorMap;
+                                      ? specialCommandToProcessorMap
+                                      : commandToProcessorMap;
 
                 string commandName = argumentProcessor.Metadata.Value.CommandName;
                 processorsMap.Add(commandName, argumentProcessor);

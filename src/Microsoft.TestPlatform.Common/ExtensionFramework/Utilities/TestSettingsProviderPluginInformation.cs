@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             if (testSettingsProviderType != null)
             {
-                this.SettingsName = GetTestSettingsName(testSettingsProviderType);
+                SettingsName = GetTestSettingsName(testSettingsProviderType);
             }
         }
 
@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             get
             {
-                return this.SettingsName;
+                return SettingsName;
             }
         }
 
@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             get
             {
-                return new object[] { this.SettingsName };
+                return new object[] { SettingsName };
             }
         }
 

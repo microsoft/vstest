@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         internal Dictionary<string, TPluginInfo> AddExtension<TPluginInfo>(
             Dictionary<string, TPluginInfo> newExtensions) where TPluginInfo : TestPluginInformation
         {
-            var existingExtensions = this.GetTestExtensionCache<TPluginInfo>();
+            var existingExtensions = GetTestExtensionCache<TPluginInfo>();
             if (newExtensions == null)
             {
                 return existingExtensions;
@@ -116,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
 
             if (existingExtensions == null)
             {
-                this.SetTestExtensionCache<TPluginInfo>(newExtensions);
+                SetTestExtensionCache(newExtensions);
                 return newExtensions;
             }
 
@@ -147,32 +147,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             var testExtensions = new TestExtensions();
 
             testExtensions.TestDiscoverers =
-                this.GetExtensionsDiscoveredFromAssembly(
-                    this.TestDiscoverers,
+                GetExtensionsDiscoveredFromAssembly(
+                    TestDiscoverers,
                     extensionAssembly);
             testExtensions.TestExecutors =
-                this.GetExtensionsDiscoveredFromAssembly(
-                    this.TestExecutors,
+                GetExtensionsDiscoveredFromAssembly(
+                    TestExecutors,
                     extensionAssembly);
             testExtensions.TestExecutors2 =
-                this.GetExtensionsDiscoveredFromAssembly(
-                    this.TestExecutors2,
+                GetExtensionsDiscoveredFromAssembly(
+                    TestExecutors2,
                     extensionAssembly);
             testExtensions.TestSettingsProviders =
-                this.GetExtensionsDiscoveredFromAssembly(
-                    this.TestSettingsProviders,
+                GetExtensionsDiscoveredFromAssembly(
+                    TestSettingsProviders,
                     extensionAssembly);
             testExtensions.TestLoggers =
-                this.GetExtensionsDiscoveredFromAssembly(
-                    this.TestLoggers,
+                GetExtensionsDiscoveredFromAssembly(
+                    TestLoggers,
                     extensionAssembly);
             testExtensions.TestHosts =
-                this.GetExtensionsDiscoveredFromAssembly(
-                    this.TestHosts,
+                GetExtensionsDiscoveredFromAssembly(
+                    TestHosts,
                     extensionAssembly);
             testExtensions.DataCollectors =
-                this.GetExtensionsDiscoveredFromAssembly(
-                    this.DataCollectors,
+                GetExtensionsDiscoveredFromAssembly(
+                    DataCollectors,
                     extensionAssembly);
 
             if (testExtensions.TestDiscoverers.Any()
@@ -196,31 +196,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
 
             if (type == typeof(TestDiscovererPluginInformation))
             {
-                return (Dictionary<string, TPluginInfo>)(object)this.TestDiscoverers;
+                return (Dictionary<string, TPluginInfo>)(object)TestDiscoverers;
             }
             else if (type == typeof(TestExecutorPluginInformation))
             {
-                return (Dictionary<string, TPluginInfo>)(object)this.TestExecutors;
+                return (Dictionary<string, TPluginInfo>)(object)TestExecutors;
             }
             else if (type == typeof(TestExecutorPluginInformation2))
             {
-                return (Dictionary<string, TPluginInfo>)(object)this.TestExecutors2;
+                return (Dictionary<string, TPluginInfo>)(object)TestExecutors2;
             }
             else if (type == typeof(TestLoggerPluginInformation))
             {
-                return (Dictionary<string, TPluginInfo>)(object)this.TestLoggers;
+                return (Dictionary<string, TPluginInfo>)(object)TestLoggers;
             }
             else if (type == typeof(TestSettingsProviderPluginInformation))
             {
-                return (Dictionary<string, TPluginInfo>)(object)this.TestSettingsProviders;
+                return (Dictionary<string, TPluginInfo>)(object)TestSettingsProviders;
             }
             else if (type == typeof(TestRuntimePluginInformation))
             {
-                return (Dictionary<string, TPluginInfo>)(object)this.TestHosts;
+                return (Dictionary<string, TPluginInfo>)(object)TestHosts;
             }
             else if (type == typeof(DataCollectorConfig))
             {
-                return (Dictionary<string, TPluginInfo>)(object)this.DataCollectors;
+                return (Dictionary<string, TPluginInfo>)(object)DataCollectors;
             }
 
             return null;
@@ -240,31 +240,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
   
             if (type == typeof(TestDiscovererPluginInformation))
             {
-                return this.AreTestDiscoverersCached;
+                return AreTestDiscoverersCached;
             }
             else if (type == typeof(TestExecutorPluginInformation))
             {
-                return this.AreTestExecutorsCached;
+                return AreTestExecutorsCached;
             }
             else if (type == typeof(TestExecutorPluginInformation2))
             {
-                return this.AreTestExecutors2Cached;
+                return AreTestExecutors2Cached;
             }
             else if (type == typeof(TestLoggerPluginInformation))
             {
-                return this.AreTestLoggersCached;
+                return AreTestLoggersCached;
             }
             else if (type == typeof(TestSettingsProviderPluginInformation))
             {
-                return this.AreTestSettingsProvidersCached;
+                return AreTestSettingsProvidersCached;
             }
             else if (type == typeof(TestRuntimePluginInformation))
             {
-                return this.AreTestHostsCached;
+                return AreTestHostsCached;
             }
             else if (type == typeof(DataCollectorConfig))
             {
-                return this.AreDataCollectorsCached;
+                return AreDataCollectorsCached;
             }
 
             return false;
@@ -281,31 +281,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             
             if (type == typeof(TestDiscovererPluginInformation))
             {
-                this.AreTestDiscoverersCached = true;
+                AreTestDiscoverersCached = true;
             }
             else if (type == typeof(TestExecutorPluginInformation))
             {
-                this.AreTestExecutorsCached = true;
+                AreTestExecutorsCached = true;
             }
             else if (type == typeof(TestExecutorPluginInformation2))
             {
-                this.AreTestExecutors2Cached = true;
+                AreTestExecutors2Cached = true;
             }
             else if (type == typeof(TestLoggerPluginInformation))
             {
-                this.AreTestLoggersCached = true;
+                AreTestLoggersCached = true;
             }
             else if (type == typeof(TestSettingsProviderPluginInformation))
             {
-                this.AreTestSettingsProvidersCached = true;
+                AreTestSettingsProvidersCached = true;
             }
             else if (type == typeof(TestRuntimePluginInformation))
             {
-                this.AreTestHostsCached = true;
+                AreTestHostsCached = true;
             }
             else if (type == typeof(DataCollectorConfig))
             {
-                this.AreDataCollectorsCached = true;
+                AreDataCollectorsCached = true;
             }
         }
 
@@ -314,13 +314,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// </summary>
         internal void InvalidateCache()
         {
-            this.AreTestDiscoverersCached = false;
-            this.AreTestExecutorsCached = false;
-            this.AreTestExecutors2Cached = false;
-            this.AreTestLoggersCached = false;
-            this.AreTestSettingsProvidersCached = false;
-            this.AreTestHostsCached = false;
-            this.AreDataCollectorsCached = false;
+            AreTestDiscoverersCached = false;
+            AreTestExecutorsCached = false;
+            AreTestExecutors2Cached = false;
+            AreTestLoggersCached = false;
+            AreTestSettingsProvidersCached = false;
+            AreTestHostsCached = false;
+            AreDataCollectorsCached = false;
         }
 
         /// <summary>
@@ -368,31 +368,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
 
             if (type == typeof(TestDiscovererPluginInformation))
             {
-                this.TestDiscoverers = (Dictionary<string, TestDiscovererPluginInformation>)(object)testPluginInfos;
+                TestDiscoverers = (Dictionary<string, TestDiscovererPluginInformation>)(object)testPluginInfos;
             }
             else if (type == typeof(TestExecutorPluginInformation))
             {
-                this.TestExecutors = (Dictionary<string, TestExecutorPluginInformation>)(object)testPluginInfos;
+                TestExecutors = (Dictionary<string, TestExecutorPluginInformation>)(object)testPluginInfos;
             }
             else if (type == typeof(TestExecutorPluginInformation2))
             {
-                this.TestExecutors2 = (Dictionary<string, TestExecutorPluginInformation2>)(object)testPluginInfos;
+                TestExecutors2 = (Dictionary<string, TestExecutorPluginInformation2>)(object)testPluginInfos;
             }
             else if (type == typeof(TestLoggerPluginInformation))
             {
-                this.TestLoggers = (Dictionary<string, TestLoggerPluginInformation>)(object)testPluginInfos;
+                TestLoggers = (Dictionary<string, TestLoggerPluginInformation>)(object)testPluginInfos;
             }
             else if (type == typeof(TestSettingsProviderPluginInformation))
             {
-                this.TestSettingsProviders = (Dictionary<string, TestSettingsProviderPluginInformation>)(object)testPluginInfos;
+                TestSettingsProviders = (Dictionary<string, TestSettingsProviderPluginInformation>)(object)testPluginInfos;
             }
             else if (type == typeof(TestRuntimePluginInformation))
             {
-                this.TestHosts = (Dictionary<string, TestRuntimePluginInformation>)(object)testPluginInfos;
+                TestHosts = (Dictionary<string, TestRuntimePluginInformation>)(object)testPluginInfos;
             }
             else if (type == typeof(DataCollectorConfig))
             {
-                this.DataCollectors = (Dictionary<string, DataCollectorConfig>)(object)testPluginInfos;
+                DataCollectors = (Dictionary<string, DataCollectorConfig>)(object)testPluginInfos;
             }
         }
 

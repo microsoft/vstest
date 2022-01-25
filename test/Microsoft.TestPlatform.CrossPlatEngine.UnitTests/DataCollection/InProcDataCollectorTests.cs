@@ -21,47 +21,47 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     [TestClass]
     public class InProcDataCollectorTests
     {
-        private Mock<IAssemblyLoadContext> assemblyLoadContext;
+        private readonly Mock<IAssemblyLoadContext> assemblyLoadContext;
 
         private IInProcDataCollector inProcDataCollector;
 
         public InProcDataCollectorTests()
         {
-            this.assemblyLoadContext = new Mock<IAssemblyLoadContext>();
+            assemblyLoadContext = new Mock<IAssemblyLoadContext>();
         }
 
         [TestMethod]
         public void InProcDataCollectorShouldNotThrowExceptionIfInvalidAssemblyIsProvided()
         {
-            this.assemblyLoadContext.Setup(alc => alc.LoadAssemblyFromPath(It.IsAny<string>()))
+            assemblyLoadContext.Setup(alc => alc.LoadAssemblyFromPath(It.IsAny<string>()))
                 .Throws<FileNotFoundException>();
 
-            this.inProcDataCollector = new InProcDataCollector(
+            inProcDataCollector = new InProcDataCollector(
                 string.Empty,
                 string.Empty,
                 null,
                 string.Empty,
-                this.assemblyLoadContext.Object,
+                assemblyLoadContext.Object,
                 TestPluginCache.Instance);
 
-            Assert.IsNull(this.inProcDataCollector.AssemblyQualifiedName);
+            Assert.IsNull(inProcDataCollector.AssemblyQualifiedName);
         }
 
         [TestMethod]
         public void InProcDataCollectorShouldNotThrowExceptionIfAssemblyDoesNotContainAnyInProcDataCollector()
         {
-            this.assemblyLoadContext.Setup(alc => alc.LoadAssemblyFromPath(It.IsAny<string>()))
+            assemblyLoadContext.Setup(alc => alc.LoadAssemblyFromPath(It.IsAny<string>()))
                 .Returns(Assembly.GetEntryAssembly());
 
-            this.inProcDataCollector = new InProcDataCollector(
+            inProcDataCollector = new InProcDataCollector(
                 string.Empty,
                 string.Empty,
                 null,
                 string.Empty,
-                this.assemblyLoadContext.Object,
+                assemblyLoadContext.Object,
                 TestPluginCache.Instance);
 
-            Assert.IsNull(this.inProcDataCollector.AssemblyQualifiedName);
+            Assert.IsNull(inProcDataCollector.AssemblyQualifiedName);
         }
 
         [TestMethod]
@@ -69,19 +69,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         {
             var typeInfo = typeof(TestableInProcDataCollector).GetTypeInfo();
 
-            this.assemblyLoadContext.Setup(alc => alc.LoadAssemblyFromPath(It.IsAny<string>()))
+            assemblyLoadContext.Setup(alc => alc.LoadAssemblyFromPath(It.IsAny<string>()))
                 .Returns(typeInfo.Assembly);
 
-            this.inProcDataCollector = new InProcDataCollector(
+            inProcDataCollector = new InProcDataCollector(
                 string.Empty,
                 typeInfo.AssemblyQualifiedName,
                 typeInfo,
                 string.Empty,
-                this.assemblyLoadContext.Object,
+                assemblyLoadContext.Object,
                 TestPluginCache.Instance);
 
-            Assert.IsNotNull(this.inProcDataCollector.AssemblyQualifiedName);
-            Assert.AreEqual(this.inProcDataCollector.AssemblyQualifiedName, typeInfo.AssemblyQualifiedName);
+            Assert.IsNotNull(inProcDataCollector.AssemblyQualifiedName);
+            Assert.AreEqual(inProcDataCollector.AssemblyQualifiedName, typeInfo.AssemblyQualifiedName);
         }
 
         [TestMethod]
@@ -91,25 +91,25 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             Assert.AreEqual("9.9.9.9", typeInfo.Assembly.GetName().Version.ToString());
 
-            this.assemblyLoadContext.Setup(alc => alc.LoadAssemblyFromPath(It.IsAny<string>()))
+            assemblyLoadContext.Setup(alc => alc.LoadAssemblyFromPath(It.IsAny<string>()))
                 .Returns(typeInfo.Assembly);
 
             // We need to mock TestPluginCache because we have to create assembly resolver instance
             // using SetupAssemblyResolver method, we don't use any other method of class(like DiscoverTestExtensions etc...)
             // that fire creation
-            TestableTestPluginCache testablePlugin = new TestableTestPluginCache();
+            TestableTestPluginCache testablePlugin = new();
             testablePlugin.SetupAssemblyResolver(typeInfo.Assembly.Location);
 
-            this.inProcDataCollector = new InProcDataCollector(
+            inProcDataCollector = new InProcDataCollector(
                 typeInfo.Assembly.Location,
                 "Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
                 typeof(InProcDataCollection).GetTypeInfo(),
                 string.Empty,
-                this.assemblyLoadContext.Object,
+                assemblyLoadContext.Object,
                 testablePlugin);
 
-            Assert.IsNotNull(this.inProcDataCollector.AssemblyQualifiedName);
-            Assert.AreEqual(this.inProcDataCollector.AssemblyQualifiedName, typeInfo.AssemblyQualifiedName);
+            Assert.IsNotNull(inProcDataCollector.AssemblyQualifiedName);
+            Assert.AreEqual(inProcDataCollector.AssemblyQualifiedName, typeInfo.AssemblyQualifiedName);
         }
 
         private class TestableInProcDataCollector : InProcDataCollection

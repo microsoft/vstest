@@ -18,7 +18,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Logging
         [TestInitialize]
         public void TestInit()
         {
-            this.testSessionMessageLogger = TestSessionMessageLogger.Instance;
+            testSessionMessageLogger = TestSessionMessageLogger.Instance;
         }
 
         [TestCleanup]
@@ -30,37 +30,37 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Logging
         [TestMethod]
         public void InstanceShouldReturnALoggerInstance()
         {
-            Assert.IsNotNull(this.testSessionMessageLogger);
+            Assert.IsNotNull(testSessionMessageLogger);
         }
 
         [TestMethod]
         public void SendMessageShouldLogErrorMessages()
         {
-            this.testSessionMessageLogger.TestRunMessage += OnMessage;
+            testSessionMessageLogger.TestRunMessage += OnMessage;
 
             var message = "Alert";
-            this.testSessionMessageLogger.SendMessage(TestMessageLevel.Error, message);
+            testSessionMessageLogger.SendMessage(TestMessageLevel.Error, message);
 
-            Assert.AreEqual(TestMessageLevel.Error, this.currentEventArgs.Level);
-            Assert.AreEqual(message, this.currentEventArgs.Message);
+            Assert.AreEqual(TestMessageLevel.Error, currentEventArgs.Level);
+            Assert.AreEqual(message, currentEventArgs.Message);
         }
 
         [TestMethod]
         public void SendMessageShouldLogErrorAsWarningIfSpecifiedSo()
         {
-            this.testSessionMessageLogger.TestRunMessage += OnMessage;
-            this.testSessionMessageLogger.TreatTestAdapterErrorsAsWarnings = true;
+            testSessionMessageLogger.TestRunMessage += OnMessage;
+            testSessionMessageLogger.TreatTestAdapterErrorsAsWarnings = true;
 
             var message = "Alert";
-            this.testSessionMessageLogger.SendMessage(TestMessageLevel.Error, message);
+            testSessionMessageLogger.SendMessage(TestMessageLevel.Error, message);
 
-            Assert.AreEqual(TestMessageLevel.Warning, this.currentEventArgs.Level);
-            Assert.AreEqual(message, this.currentEventArgs.Message);
+            Assert.AreEqual(TestMessageLevel.Warning, currentEventArgs.Level);
+            Assert.AreEqual(message, currentEventArgs.Message);
         }
 
         private void OnMessage(object sender, TestRunMessageEventArgs e)
         {
-            this.currentEventArgs = e;
+            currentEventArgs = e;
         }
     }
 }

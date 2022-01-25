@@ -56,7 +56,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             return string.Join(";", left, right);
         }
 
-        protected string FrameworkArgValue => DeriveFrameworkArgValue(this.testEnvironment);
+        protected string FrameworkArgValue => DeriveFrameworkArgValue(testEnvironment);
 
         protected static void SetTestEnvironment(IntegrationTestEnvironment testEnvironment, RunnerInfo runnerInfo)
         {
@@ -102,20 +102,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         protected bool IsDesktopTargetFramework()
         {
-            return this.testEnvironment.TargetFramework == AcceptanceTestBase.DesktopTargetFramework;
+            return testEnvironment.TargetFramework == DesktopTargetFramework;
         }
 
         protected string GetTargetFramworkForRunsettings()
         {
-            var targetFramework = string.Empty;
-            if (this.testEnvironment.TargetFramework == DesktopTargetFramework)
-            {
-                targetFramework = "Framework45";
-            }
-            else
-            {
-                targetFramework = "FrameworkCore10";
-            }
+            string targetFramework = testEnvironment.TargetFramework == DesktopTargetFramework ? "Framework45" : "FrameworkCore10";
 
             return targetFramework;
         }

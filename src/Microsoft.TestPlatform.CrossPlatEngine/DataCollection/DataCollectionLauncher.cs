@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             this.processHelper = processHelper;
             this.messageLogger = messageLogger;
-            this.processStdError = new StringBuilder(0, CoreUtilities.Constants.StandardErrorMaxLength);
+            processStdError = new StringBuilder(0, CoreUtilities.Constants.StandardErrorMaxLength);
         }
 
         /// <inheritdoc />
@@ -47,10 +47,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         protected Action<object> ExitCallBack => (process) =>
         {
-            var exitCode = 0;
-            var processStdErrorStr = this.processStdError.ToString();
+            var processStdErrorStr = processStdError.ToString();
 
-            this.processHelper.TryGetExitCode(process, out exitCode);
+            processHelper.TryGetExitCode(process, out int exitCode);
 
             if (exitCode != 0)
             {
@@ -58,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
                 if (!string.IsNullOrWhiteSpace(processStdErrorStr))
                 {
-                    this.messageLogger.SendMessage(TestMessageLevel.Error, processStdErrorStr);
+                    messageLogger.SendMessage(TestMessageLevel.Error, processStdErrorStr);
                 }
             }
             else
@@ -76,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             // This is helpful in abnormal failure of datacollector.
             EqtTrace.Warning("DataCollectionLauncher.ErrorReceivedCallback datacollector standard error line: {0}", data);
 
-            this.processStdError.AppendSafeWithNewLine(data);
+            processStdError.AppendSafeWithNewLine(data);
         };
 
         /// <summary>

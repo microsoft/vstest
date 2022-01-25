@@ -13,8 +13,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// </summary>
     internal class UnitTestElement : TestElement, IXmlTestStoreCustom
     {
-        private string codeBase;
-        private TestMethod testMethod;
+        private string _codeBase;
 
         public UnitTestElement(
             Guid id,
@@ -26,7 +25,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             Debug.Assert(testMethod != null, "testMethod is null");
             Debug.Assert(testMethod != null && testMethod.ClassName != null, "className is null");
 
-            this.testMethod = testMethod;
+            TestMethod = testMethod;
         }
 
         string IXmlTestStoreCustom.ElementName
@@ -50,22 +49,19 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <summary>
         /// Gets the test method.
         /// </summary>
-        public TestMethod TestMethod
-        {
-            get { return this.testMethod; }
-        }
+        public TestMethod TestMethod { get; private set; }
 
         /// <summary>
         /// Gets or sets the storage.
         /// </summary>
         public string CodeBase
         {
-            get { return this.codeBase; }
+            get { return _codeBase; }
 
             set
             {
                 EqtAssert.StringNotNullOrEmpty(value, "CodeBase");
-                this.codeBase = value;
+                _codeBase = value;
             }
         }
 
@@ -81,11 +77,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         public override void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
         {
             base.Save(element, parameters);
-            XmlPersistence h = new XmlPersistence();
+            XmlPersistence h = new();
 
-            h.SaveSimpleField(element, "TestMethod/@codeBase", this.codeBase, string.Empty);
-            h.SaveSimpleField(element, "TestMethod/@adapterTypeName", this.adapter, string.Empty);
-            h.SaveObject(this.testMethod, element, "TestMethod", parameters);
+            h.SaveSimpleField(element, "TestMethod/@codeBase", _codeBase, string.Empty);
+            h.SaveSimpleField(element, "TestMethod/@adapterTypeName", _adapter, string.Empty);
+            h.SaveObject(TestMethod, element, "TestMethod", parameters);
         }
     }
 }

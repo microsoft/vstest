@@ -85,7 +85,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         public void GetTestExtensionsShouldDiscoverExtensionsOnlyOnce()
         {
             var discoveryCount = 0;
-            TestPluginCacheHelper.SetupMockExtensions(typeof(TestPluginManagerTests), () => { discoveryCount++; });
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestPluginManagerTests), () => discoveryCount++);
 
             TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                 TestPlatformConstants.TestAdapterEndsWithPattern,
@@ -110,7 +110,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             TestPluginManager.Instance
                 .GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                     typeof(TestPluginManagerTests).GetTypeInfo().Assembly.Location,
-                    out var unfilteredTestExtensions,
+                    out _,
                     out var testExtensions);
 
             Assert.IsNotNull(testExtensions);

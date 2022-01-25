@@ -7,20 +7,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using TestPlatform.CommandLine.Processors;
     using vstest.console.UnitTests.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using ExceptionUtilities = Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.ExceptionUtilities;
+    using ExceptionUtilities = ExceptionUtilities;
     using System;
 
     [TestClass]
     public class PlatformArgumentProcessorTests
     {
-        private PlatformArgumentExecutor executor;
-        private TestableRunSettingsProvider runSettingsProvider;
+        private PlatformArgumentExecutor _executor;
+        private TestableRunSettingsProvider _runSettingsProvider;
 
         [TestInitialize]
         public void Init()
         {
-            this.runSettingsProvider = new TestableRunSettingsProvider();
-            this.executor = new PlatformArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider);
+            _runSettingsProvider = new TestableRunSettingsProvider();
+            _executor = new PlatformArgumentExecutor(CommandLineOptions.Instance, _runSettingsProvider);
         }
 
         [TestCleanup]
@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void InitializeShouldThrowIfArgumentIsNull()
         {
             ExceptionUtilities.ThrowsException<CommandLineException>(
-                () => this.executor.Initialize(null),
+                () => _executor.Initialize(null),
                 "The /Platform argument requires the target platform type for the test run to be provided.   Example:  /Platform:x86");
         }
 
@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void InitializeShouldThrowIfArgumentIsEmpty()
         {
             ExceptionUtilities.ThrowsException<CommandLineException>(
-                () => this.executor.Initialize("  "),
+                () => _executor.Initialize("  "),
                 "The /Platform argument requires the target platform type for the test run to be provided.   Example:  /Platform:x86");
         }
 
@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void InitializeShouldThrowIfArgumentIsNotAnArchitecture()
         {
             ExceptionUtilities.ThrowsException<CommandLineException>(
-                () => this.executor.Initialize("foo"),
+                () => _executor.Initialize("foo"),
                 "Invalid platform type: {0}. Valid platform types are X86, X64, ARM, ARM64.",
                 "foo");
         }
@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void InitializeShouldThrowIfArgumentIsNotASupportedArchitecture()
         {
             ExceptionUtilities.ThrowsException<CommandLineException>(
-                () => this.executor.Initialize("AnyCPU"),
+                () => _executor.Initialize("AnyCPU"),
                 "Invalid platform type: {0}. Valid platform types are X86, X64, ARM, ARM64.",
                 "AnyCPU");
         }
@@ -103,17 +103,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldSetCommandLineOptionsArchitecture()
         {
-            this.executor.Initialize("x64");
+            _executor.Initialize("x64");
             Assert.AreEqual(ObjectModel.Architecture.X64, CommandLineOptions.Instance.TargetArchitecture);
-            Assert.AreEqual(nameof(ObjectModel.Architecture.X64), this.runSettingsProvider.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath));
+            Assert.AreEqual(nameof(ObjectModel.Architecture.X64), _runSettingsProvider.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
         public void InitializeShouldNotConsiderCaseSensitivityOfTheArgumentPassed()
         {
-            executor.Initialize("ArM");
+            _executor.Initialize("ArM");
             Assert.AreEqual(ObjectModel.Architecture.ARM, CommandLineOptions.Instance.TargetArchitecture);
-            Assert.AreEqual(nameof(ObjectModel.Architecture.ARM), this.runSettingsProvider.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath));
+            Assert.AreEqual(nameof(ObjectModel.Architecture.ARM), _runSettingsProvider.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath));
         }
 
         #endregion
@@ -123,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecuteShouldReturnSuccess()
         {
-            Assert.AreEqual(ArgumentProcessorResult.Success, this.executor.Execute());
+            Assert.AreEqual(ArgumentProcessorResult.Success, _executor.Execute());
         }
 
         #endregion

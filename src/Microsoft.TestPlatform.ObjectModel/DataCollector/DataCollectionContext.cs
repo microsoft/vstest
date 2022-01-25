@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <param name="testCase">test case to identify the context</param>
         public DataCollectionContext(TestCase testCase)
         {
-            this.TestCase = testCase;
+            TestCase = testCase;
         }
 
         /// <summary>
@@ -62,14 +62,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             //TODO
             //EqtAssert.ParameterNotNull(sessionId, "sessionId");
 
-            this.sessionId = sessionId;
-            this.testExecId = testExecId;
-            this.hashCode = ComputeHashCode();
+            SessionId = sessionId;
+            TestExecId = testExecId;
+            hashCode = ComputeHashCode();
         }
 
         protected internal DataCollectionContext(SessionId sessionId, TestCase testCase) : this(sessionId, new TestExecId(testCase.Id))
         {
-            this.TestCase = testCase;
+            TestCase = testCase;
 
         }
         #endregion
@@ -86,26 +86,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// Identifies the session under which the data collection occurs.  Will not be null.
         /// </summary>
         [DataMember]
-        public SessionId SessionId
-        {
-            get
-            {
-                return sessionId;
-            }
-        }
+        public SessionId SessionId { get; private set; }
 
         /// <summary>
         /// Identifies the test execution under which the data collection occurs,
         /// or null if no such test exists.
         /// </summary>
         [DataMember]
-        public TestExecId TestExecId
-        {
-            get
-            {
-                return testExecId;
-            }
-        }
+        public TestExecId TestExecId { get; private set; }
 
         /// <summary>
         /// Returns true if there is an executing test case associated with this context.
@@ -113,7 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         [DataMember]
         public bool HasTestCase
         {
-            get { return testExecId != null; }
+            get { return TestExecId != null; }
         }
 
         #endregion
@@ -122,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 
         public static bool operator ==(DataCollectionContext context1, DataCollectionContext context2)
         {
-            return object.Equals(context1, context2);
+            return Equals(context1, context2);
         }
 
         public static bool operator !=(DataCollectionContext context1, DataCollectionContext context2)
@@ -134,13 +122,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         {
             DataCollectionContext other = obj as DataCollectionContext;
 
-            if (other == null)
-            {
-                return false;
-            }
-
-            return sessionId.Equals(other.sessionId)
-                && (testExecId == null ? other.testExecId == null : testExecId.Equals(other.testExecId));
+            return other != null
+&& SessionId.Equals(other.SessionId)
+                && (TestExecId == null ? other.TestExecId == null : TestExecId.Equals(other.TestExecId));
         }
 
         public override int GetHashCode()
@@ -156,11 +140,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         {
             int hashCode = 17;
 
-            hashCode = 31 * hashCode + sessionId.GetHashCode();
+            hashCode = 31 * hashCode + SessionId.GetHashCode();
 
-            if (testExecId != null)
+            if (TestExecId != null)
             {
-                hashCode = 31 * hashCode + testExecId.GetHashCode();
+                hashCode = 31 * hashCode + TestExecId.GetHashCode();
             }
 
             return hashCode;
@@ -170,8 +154,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 
         #region Private Fields
 
-        private readonly SessionId sessionId;
-        private readonly TestExecId testExecId;
         private readonly int hashCode;
 
         #endregion

@@ -41,10 +41,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestInitialize]
         public void TestInit()
         {
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
-            this.sessionLogger = TestSessionMessageLogger.Instance;
-            this.executionManager = new ExecutionManager(new RequestData
+            mockRequestData = new Mock<IRequestData>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+            sessionLogger = TestSessionMessageLogger.Instance;
+            executionManager = new ExecutionManager(new RequestData
             {
                 MetricsCollection = new NoOpMetricsCollection()
             });
@@ -85,7 +85,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 () => { });
 
 
-            this.executionManager.Initialize(new List<string> { commonAssemblyLocation }, mockTestMessageEventHandler.Object);
+            executionManager.Initialize(new List<string> { commonAssemblyLocation }, mockTestMessageEventHandler.Object);
 
             Assert.IsNotNull(TestPluginCache.Instance.TestExtensions);
 
@@ -132,14 +132,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                     isExecutorCalled = true;
                     var tr =
                         new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(
-                            new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase(
+                            new TestCase(
                                 "A.C.M",
                                 new Uri("e://d/"),
                                 "A.dll"));
                     fh.RecordResult(tr);
                 };
 
-            this.executionManager.StartTestRun(adapterSourceMap, null, null, testExecutionContext, null, mockTestRunEventsHandler.Object);
+            executionManager.StartTestRun(adapterSourceMap, null, null, testExecutionContext, null, mockTestRunEventsHandler.Object);
 
             Assert.IsTrue(isExecutorCalled);
             mockTestRunEventsHandler.Verify(
@@ -170,7 +170,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 isExecutorCalled = true;
                 var tr =
                     new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(
-                        new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase(
+                        new TestCase(
                             "A.C.M",
                             new Uri(RunTestsWithSourcesTestsExecutorUri),
                             "A.dll"));
@@ -179,7 +179,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             TestPluginCacheHelper.SetupMockExtensions(new string[] { assemblyLocation }, () => { });
 
 
-            this.executionManager.StartTestRun(tests, null, null, testExecutionContext, null, mockTestRunEventsHandler.Object);
+            executionManager.StartTestRun(tests, null, null, testExecutionContext, null, mockTestRunEventsHandler.Object);
 
             Assert.IsTrue(isExecutorCalled);
             mockTestRunEventsHandler.Verify(
@@ -198,7 +198,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
             // Call StartTestRun with faulty runsettings so that it will throw exception
-            this.executionManager.StartTestRun(new List<TestCase>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>-1</TestSessionTimeout></RunConfiguration></RunSettings>", testExecutionContext, null, mockTestRunEventsHandler.Object);
+            executionManager.StartTestRun(new List<TestCase>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>-1</TestSessionTimeout></RunConfiguration></RunSettings>", testExecutionContext, null, mockTestRunEventsHandler.Object);
 
             // Verify that TestRunComplete get called and error message are getting logged
             mockTestRunEventsHandler.Verify(treh => treh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once);
@@ -211,7 +211,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
             // Call StartTestRun with faulty runsettings so that it will throw exception
-            this.executionManager.StartTestRun(new Dictionary<string, IEnumerable<string>>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>-1</TestSessionTimeout></RunConfiguration></RunSettings>", testExecutionContext, null, mockTestRunEventsHandler.Object);
+            executionManager.StartTestRun(new Dictionary<string, IEnumerable<string>>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>-1</TestSessionTimeout></RunConfiguration></RunSettings>", testExecutionContext, null, mockTestRunEventsHandler.Object);
 
             // Verify that TestRunComplete get called and error message are getting logged
             mockTestRunEventsHandler.Verify(treh => treh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once);

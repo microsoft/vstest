@@ -34,7 +34,7 @@ namespace TestPlatform.Common.UnitTests.SettingsProvider
         [TestMethod]
         public void ConstructorShouldPopulateSettingsProviderMap()
         {
-            var extensions = this.GetMockExtensions("TestableSettings");
+            var extensions = GetMockExtensions("TestableSettings");
             var unfilteredExtensions = new List<LazyExtension<ISettingsProvider, Dictionary<string, object>>>
                                            {
                                                new LazyExtension<ISettingsProvider,Dictionary<string,object>>
@@ -51,7 +51,7 @@ namespace TestPlatform.Common.UnitTests.SettingsProvider
         [TestMethod]
         public void ConstructorShouldLogWarningOnDuplicateSettingsProviderNames()
         {
-            var extensions = this.GetMockExtensions("TestableSettings", "TestableSettings");
+            var extensions = GetMockExtensions("TestableSettings", "TestableSettings");
             var unfilteredExtensions = new List<LazyExtension<ISettingsProvider, Dictionary<string, object>>>
                                            {
                                                new LazyExtension<ISettingsProvider,Dictionary<string,object>>
@@ -126,7 +126,7 @@ namespace TestPlatform.Common.UnitTests.SettingsProvider
         [TestMethod]
         public void GetSettingsProviderShouldThrowIfSettingsNameIsNullOrEmpty()
         {
-            var extensions = this.GetMockExtensions("TestableSettings");
+            var extensions = GetMockExtensions("TestableSettings");
             var unfilteredExtensions = new List<LazyExtension<ISettingsProvider, Dictionary<string, object>>>
                                            {
                                                new LazyExtension<ISettingsProvider,Dictionary<string,object>>
@@ -143,7 +143,7 @@ namespace TestPlatform.Common.UnitTests.SettingsProvider
         [TestMethod]
         public void GetSettingsProviderShouldReturnNullIfSettingsProviderWithSpecifiedNameIsNotFound()
         {
-            var extensions = this.GetMockExtensions("TestableSettings");
+            var extensions = GetMockExtensions("TestableSettings");
             var unfilteredExtensions = new List<LazyExtension<ISettingsProvider, Dictionary<string, object>>>
                                            {
                                                new LazyExtension<ISettingsProvider,Dictionary<string,object>>
@@ -161,7 +161,7 @@ namespace TestPlatform.Common.UnitTests.SettingsProvider
         [TestMethod]
         public void GetSettingsProviderShouldReturnSettingsProviderInstance()
         {
-            var extensions = this.GetMockExtensions("TestableSettings");
+            var extensions = GetMockExtensions("TestableSettings");
             var unfilteredExtensions = new List<LazyExtension<ISettingsProvider, Dictionary<string, object>>>
                                            {
                                                new LazyExtension<ISettingsProvider,Dictionary<string,object>>

@@ -12,7 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 #if NETFRAMEWORK
     [Serializable]
 #endif
-    [SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]
     public class TestPlatformException : Exception
     {
         public TestPlatformException(String message)
@@ -99,7 +98,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 #if NETFRAMEWORK
     [Serializable]
 #endif
-    [SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]
     public class ProcessExitedException : TestPlatformException
     {
         public ProcessExitedException(string message) : base(message) { }

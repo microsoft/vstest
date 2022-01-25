@@ -23,13 +23,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     public sealed class LazyPropertyValue<T> : ILazyPropertyValue
     {
         private T value;
-        private Func<T> getValue;
+        private readonly Func<T> getValue;
         private bool isValueCreated;
 
         public LazyPropertyValue(Func<T> getValue)
         {
-            this.isValueCreated = false;
-            this.value = default(T);
+            isValueCreated = false;
+            value = default;
             this.getValue = getValue;
         }
 
@@ -42,11 +42,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 if (!isValueCreated)
                 {
-                    this.value = this.getValue();
+                    value = getValue();
                     isValueCreated = true;
                 }
 
-                return this.value;
+                return value;
             }
         }
 
@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.Value;
+                return Value;
             }
         }
     }

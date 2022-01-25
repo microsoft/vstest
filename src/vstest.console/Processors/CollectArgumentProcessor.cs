@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     /// The argument processor for enabling data collectors.
@@ -45,12 +45,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new CollectArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new CollectArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -61,17 +61,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new CollectArgumentExecutor(RunSettingsManager.Instance, new FileHelper()));
+                    executor = new Lazy<IArgumentExecutor>(() => new CollectArgumentExecutor(RunSettingsManager.Instance, new FileHelper()));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -97,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         private readonly IRunSettingsProvider runSettingsManager;
         private readonly IFileHelper fileHelper;
-        internal static List<string> EnabledDataCollectors = new List<string>();
+        internal static List<string> EnabledDataCollectors = new();
         internal CollectArgumentExecutor(IRunSettingsProvider runSettingsManager, IFileHelper fileHelper)
         {
             this.runSettingsManager = runSettingsManager;
@@ -127,11 +127,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(exceptionMessage);
             }
 
-            if (InferRunSettingsHelper.IsTestSettingsEnabled(this.runSettingsManager.ActiveRunSettings.SettingsXml))
+            if (InferRunSettingsHelper.IsTestSettingsEnabled(runSettingsManager.ActiveRunSettings.SettingsXml))
             {
                 throw new SettingsException(string.Format(CommandLineResources.CollectWithTestSettingErrorMessage, argument));
             }
-            AddDataCollectorToRunSettings(collectArgumentList, this.runSettingsManager, this.fileHelper, exceptionMessage);
+            AddDataCollectorToRunSettings(collectArgumentList, runSettingsManager, fileHelper, exceptionMessage);
         }
 
         /// <summary>
@@ -160,9 +160,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         internal static DataCollectorSettings EnableDataCollectorUsingFriendlyName(string argument, DataCollectionRunSettings dataCollectionRunSettings)
         {
-            DataCollectorSettings dataCollectorSettings = null;
 
-            if (!DoesDataCollectorSettingsExist(argument, dataCollectionRunSettings, out dataCollectorSettings))
+            if (!DoesDataCollectorSettingsExist(argument, dataCollectionRunSettings, out DataCollectorSettings dataCollectorSettings))
             {
                 dataCollectorSettings = new DataCollectorSettings();
                 dataCollectorSettings.FriendlyName = argument;
@@ -181,7 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (dataCollectorSettings.Configuration == null)
             {
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new();
                 dataCollectorSettings.Configuration = doc.CreateElement("Configuration");
             }
 
@@ -224,9 +223,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         internal static void EnableCoverletInProcDataCollector(string argument, DataCollectionRunSettings dataCollectionRunSettings, IRunSettingsProvider runSettingProvider, IFileHelper fileHelper)
         {
-            DataCollectorSettings dataCollectorSettings = null;
 
-            if (!DoesDataCollectorSettingsExist(argument, dataCollectionRunSettings, out dataCollectorSettings))
+            if (!DoesDataCollectorSettingsExist(argument, dataCollectionRunSettings, out DataCollectorSettings dataCollectorSettings))
             {
                 // Create a new setting with default values
                 dataCollectorSettings = new DataCollectorSettings();
@@ -239,7 +237,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             else
             {
                 // Set Assembly qualified name and code base if not already set
-                dataCollectorSettings.AssemblyQualifiedName = dataCollectorSettings.AssemblyQualifiedName ?? CoverletConstants.CoverletDataCollectorAssemblyQualifiedName;
+                dataCollectorSettings.AssemblyQualifiedName ??= CoverletConstants.CoverletDataCollectorAssemblyQualifiedName;
                 dataCollectorSettings.CodeBase = (dataCollectorSettings.CodeBase ?? GetCoverletCodeBasePath(runSettingProvider, fileHelper)) ?? CoverletConstants.CoverletDataCollectorCodebase;
                 dataCollectorSettings.IsEnabled = true;
             }

@@ -19,15 +19,15 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     [TestClass]
     public class DataCollectionRequestSenderTests
     {
-        private Mock<ICommunicationManager> mockCommunicationManager;
-        private DataCollectionRequestSender requestSender;
-        private Mock<IDataSerializer> mockDataSerializer;
+        private readonly Mock<ICommunicationManager> mockCommunicationManager;
+        private readonly DataCollectionRequestSender requestSender;
+        private readonly Mock<IDataSerializer> mockDataSerializer;
 
         public DataCollectionRequestSenderTests()
         {
-            this.mockCommunicationManager = new Mock<ICommunicationManager>();
-            this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.requestSender = new DataCollectionRequestSender(this.mockCommunicationManager.Object, this.mockDataSerializer.Object);
+            mockCommunicationManager = new Mock<ICommunicationManager>();
+            mockDataSerializer = new Mock<IDataSerializer>();
+            requestSender = new DataCollectionRequestSender(mockCommunicationManager.Object, mockDataSerializer.Object);
         }
 
         [TestMethod]
@@ -39,11 +39,11 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             var attachment = new AttachmentSet(datacollectorUri, displayName);
             attachment.Attachments.Add(new UriDataAttachment(attachmentUri, "filename.txt"));
             var invokedDataCollector = new InvokedDataCollector(datacollectorUri, displayName, typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false);
-            this.mockDataSerializer.Setup(x => x.DeserializePayload<AfterTestRunEndResult>(It.IsAny<Message>())).Returns(
+            mockDataSerializer.Setup(x => x.DeserializePayload<AfterTestRunEndResult>(It.IsAny<Message>())).Returns(
                 new AfterTestRunEndResult(new Collection<AttachmentSet>() { attachment }, new Collection<InvokedDataCollector>() { invokedDataCollector }, new Dictionary<string, object>()));
-            this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.AfterTestRunEndResult, Payload = null });
+            mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.AfterTestRunEndResult, Payload = null });
 
-            var result = this.requestSender.SendAfterTestRunEndAndGetResult(null, false);
+            var result = requestSender.SendAfterTestRunEndAndGetResult(null, false);
 
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.AttachmentSets);
@@ -65,7 +65,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void SendAfterTestRunEndAndGetResultShouldNotReturnAttachmentsWhenRequestCancelled()
         {
-            var attachmentSets = this.requestSender.SendAfterTestRunEndAndGetResult(null, true);
+            var attachmentSets = requestSender.SendAfterTestRunEndAndGetResult(null, true);
 
             Assert.IsNull(attachmentSets);
         }
@@ -74,10 +74,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void SendBeforeTestRunStartAndGetResultShouldSendBeforeTestRunStartMessageAndPayload()
         {
             var testSources = new List<string>() { "test1.dll" };
-            this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.BeforeTestRunStartResult, Payload = null });
-            this.requestSender.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, true, null);
+            mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.BeforeTestRunStartResult, Payload = null });
+            requestSender.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, true, null);
 
-            this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStart, It.Is<BeforeTestRunStartPayload>(p => p.SettingsXml == string.Empty && p.IsTelemetryOptedIn)));
+            mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStart, It.Is<BeforeTestRunStartPayload>(p => p.SettingsXml == string.Empty && p.IsTelemetryOptedIn)));
         }
     }
 }

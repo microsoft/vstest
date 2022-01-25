@@ -15,14 +15,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void GetMetadataShouldReturnTestCaseFilterArgumentProcessorCapabilities()
         {
-            TestCaseFilterArgumentProcessor processor = new TestCaseFilterArgumentProcessor();
+            TestCaseFilterArgumentProcessor processor = new();
             Assert.IsTrue(processor.Metadata.Value is TestCaseFilterArgumentProcessorCapabilities);
         }
 
         [TestMethod]
         public void GetExecutorShouldReturnTestCaseFilterArgumentProcessorCapabilities()
         {
-            TestCaseFilterArgumentProcessor processor = new TestCaseFilterArgumentProcessor();
+            TestCaseFilterArgumentProcessor processor = new();
             Assert.IsTrue(processor.Executor.Value is TestCaseFilterArgumentExecutor);
         }
 
@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void CapabilitiesShouldAppropriateProperties()
         {
-            TestCaseFilterArgumentProcessorCapabilities capabilities = new TestCaseFilterArgumentProcessorCapabilities();
+            TestCaseFilterArgumentProcessorCapabilities capabilities = new();
             Assert.AreEqual("/TestCaseFilter", capabilities.CommandName);
             StringAssert.Contains(capabilities.HelpContentResourceName, "/TestCaseFilter:<Expression>" + Environment.NewLine + "      Run tests that match the given expression." + Environment.NewLine + "      <Expression> is of the format <property>Operator<value>[|&<Expression>]");
 
@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void ExecutorInitializeWithNullOrEmptyTestCaseFilterShouldThrowCommandLineException()
         {
             var options = CommandLineOptions.Instance;
-            TestCaseFilterArgumentExecutor executor = new TestCaseFilterArgumentExecutor(options);
+            TestCaseFilterArgumentExecutor executor = new(options);
 
             try
             {
@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {            
             var options = CommandLineOptions.Instance;
             options.TestCaseFilterValue = "Test=FilterFromPreviousStep";
-            TestCaseFilterArgumentExecutor executor = new TestCaseFilterArgumentExecutor(options);
+            TestCaseFilterArgumentExecutor executor = new(options);
 
             executor.Initialize(null);
         }
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var defaultValue = "Test=FilterFromPreviousStep";
             options.TestCaseFilterValue = defaultValue;
             Assert.AreEqual(defaultValue, options.TestCaseFilterValue);
-            TestCaseFilterArgumentExecutor executor = new TestCaseFilterArgumentExecutor(options);
+            TestCaseFilterArgumentExecutor executor = new(options);
 
             var value = "Test=NewFilter";
             executor.Initialize(value);

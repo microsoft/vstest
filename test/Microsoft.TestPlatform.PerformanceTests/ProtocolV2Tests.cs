@@ -10,12 +10,12 @@ namespace Microsoft.TestPlatform.PerformanceTests
     using System.Diagnostics;
     using System.IO;
 
-    using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
+    using TestResult = VisualStudio.TestPlatform.ObjectModel.TestResult;
 
     [TestClass]
     public class ProtocolV2Tests
     {
-        private static TestCase testCase = new TestCase(
+        private static readonly TestCase testCase = new(
                                               "sampleTestClass.sampleTestCase",
                                               new Uri("executor://sampleTestExecutor"),
                                               "sampleTest.dll")
@@ -27,9 +27,9 @@ namespace Microsoft.TestPlatform.PerformanceTests
             Traits = { new Trait("Priority", "0"), new Trait("Category", "unit") }
         };
 
-        private static DateTimeOffset startTime = new DateTimeOffset(new DateTime(2007, 3, 10, 0, 0, 0, DateTimeKind.Utc));
+        private static DateTimeOffset startTime = new(new DateTime(2007, 3, 10, 0, 0, 0, DateTimeKind.Utc));
 
-        private static TestResult testResult = new TestResult(testCase)
+        private static readonly TestResult testResult = new(testCase)
         {
             // Attachments = ?
             // Messages = ?

@@ -17,8 +17,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="error">Specifies the error encountered during the execution of the attachments processing.</param>
         public TestRunAttachmentsProcessingCompleteEventArgs(bool isCanceled, Exception error)
         {
-            this.IsCanceled = isCanceled;
-            this.Error = error;
+            IsCanceled = isCanceled;
+            Error = error;
         }
 
         /// <summary>

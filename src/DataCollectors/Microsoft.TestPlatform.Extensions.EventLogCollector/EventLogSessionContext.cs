@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
     /// </summary>
     internal class EventLogSessionContext
     {
-        private IDictionary<string, IEventLogContainer> eventLogContainerMap;
+        private readonly IDictionary<string, IEventLogContainer> eventLogContainerMap;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventLogSessionContext"/> class.
@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         public EventLogSessionContext(IDictionary<string, IEventLogContainer> eventLogContainerMap)
         {
             this.eventLogContainerMap = eventLogContainerMap;
-            this.CreateEventLogContainerStartIndexMap();
+            CreateEventLogContainerStartIndexMap();
         }
 
         /// <summary>
@@ -39,13 +39,13 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// </summary>
         public void CreateEventLogContainerEndIndexMap()
         {
-            this.EventLogContainerEndIndexMap = new Dictionary<string, int>(this.eventLogContainerMap.Count);
+            EventLogContainerEndIndexMap = new Dictionary<string, int>(eventLogContainerMap.Count);
 
-            foreach (KeyValuePair<string, IEventLogContainer> kvp in this.eventLogContainerMap)
+            foreach (KeyValuePair<string, IEventLogContainer> kvp in eventLogContainerMap)
             {
                 kvp.Value.OnEventLogEntryWritten(kvp.Value.EventLog, null);
 
-                this.EventLogContainerEndIndexMap.Add(kvp.Key, kvp.Value.EventLogEntries.Count - 1);
+                EventLogContainerEndIndexMap.Add(kvp.Key, kvp.Value.EventLogEntries.Count - 1);
             }
         }
 
@@ -54,11 +54,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// </summary>
         public void CreateEventLogContainerStartIndexMap()
         {
-            this.EventLogContainerStartIndexMap = new Dictionary<string, int>(this.eventLogContainerMap.Count);
+            EventLogContainerStartIndexMap = new Dictionary<string, int>(eventLogContainerMap.Count);
 
-            foreach (KeyValuePair<string, IEventLogContainer> kvp in this.eventLogContainerMap)
+            foreach (KeyValuePair<string, IEventLogContainer> kvp in eventLogContainerMap)
             {
-                this.EventLogContainerStartIndexMap.Add(kvp.Key, kvp.Value.EventLogEntries.Count);
+                EventLogContainerStartIndexMap.Add(kvp.Key, kvp.Value.EventLogEntries.Count);
             }
         }
     }

@@ -21,11 +21,11 @@ namespace vstest.console.UnitTests.Processors
     [TestClass]
     public class EnableBlameArgumentProcessorTests
     {
-        private Mock<IEnvironment> mockEnvronment;
-        private Mock<IOutput> mockOutput;
-        private TestableRunSettingsProvider settingsProvider;
-        private EnableBlameArgumentExecutor executor;
-        private string DefaultRunSettings = string.Join(Environment.NewLine,
+        private readonly Mock<IEnvironment> _mockEnvronment;
+        private readonly Mock<IOutput> _mockOutput;
+        private readonly TestableRunSettingsProvider _settingsProvider;
+        private readonly EnableBlameArgumentExecutor _executor;
+        private readonly string _defaultRunSettings = string.Join(Environment.NewLine,
             "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
             "<RunSettings>",
             "  <DataCollectionRunSettings>",
@@ -36,11 +36,11 @@ namespace vstest.console.UnitTests.Processors
 
         public EnableBlameArgumentProcessorTests()
         {
-            this.settingsProvider = new TestableRunSettingsProvider();
-            this.mockEnvronment = new Mock<IEnvironment>();
-            this.mockOutput = new Mock<IOutput>();
+            _settingsProvider = new TestableRunSettingsProvider();
+            _mockEnvronment = new Mock<IEnvironment>();
+            _mockOutput = new Mock<IOutput>();
 
-            this.executor = new TestableEnableBlameArgumentExecutor(this.settingsProvider, this.mockEnvronment.Object, this.mockOutput.Object);
+            _executor = new TestableEnableBlameArgumentExecutor(_settingsProvider, _mockEnvronment.Object, _mockOutput.Object);
             CollectArgumentExecutor.EnabledDataCollectors.Clear();
         }
 
@@ -77,14 +77,15 @@ namespace vstest.console.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldCreateEntryForBlameInRunSettingsIfNotAlreadyPresent()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, "");
+            string runsettingsString;
+            _ = string.Format(_defaultRunSettings, "");
             var runsettings = new RunSettings();
-            runsettings.LoadSettingsXml(DefaultRunSettings);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            runsettings.LoadSettingsXml(_defaultRunSettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.executor.Initialize("");
+            _executor.Initialize("");
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<RunSettings>",
@@ -106,13 +107,13 @@ namespace vstest.console.UnitTests.Processors
                 "    </Loggers>",
                 "  </LoggerRunSettings>",
                 "</RunSettings>"
-                ), this.settingsProvider.ActiveRunSettings.SettingsXml);
+                ), _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldOverwriteEntryForBlameInRunSettingsIfAlreadyPresent()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, "");
+            _ = string.Format(_defaultRunSettings, "");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -136,11 +137,11 @@ namespace vstest.console.UnitTests.Processors
                 "    </Loggers>",
                 "  </LoggerRunSettings>",
                 "</RunSettings>"));
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.executor.Initialize("CollectDump;DumpType=full;CollectAlways=true");
+            _executor.Initialize("CollectDump;DumpType=full;CollectAlways=true");
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<RunSettings>",
@@ -163,16 +164,16 @@ namespace vstest.console.UnitTests.Processors
                 "    </Loggers>",
                 "  </LoggerRunSettings>",
                 "</RunSettings>"),
-                this.settingsProvider.ActiveRunSettings.SettingsXml);
+                _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldWarnIfPlatformNotSupportedForCollectDumpOption()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettingsString = string.Format(_defaultRunSettings, "");
             var runsettings = new RunSettings();
-            runsettings.LoadSettingsXml(DefaultRunSettings);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            runsettings.LoadSettingsXml(_defaultRunSettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
             var unsupportedPlatforms = new List<Tuple<PlatformOperatingSystem, PlatformArchitecture>>()
             {
@@ -182,13 +183,13 @@ namespace vstest.console.UnitTests.Processors
 
             foreach (var tuple in unsupportedPlatforms)
             {
-                this.mockEnvronment.SetupGet(s => s.OperatingSystem).Returns(tuple.Item1);
-                this.mockEnvronment.SetupGet(s => s.Architecture).Returns(tuple.Item2);
+                _mockEnvronment.SetupGet(s => s.OperatingSystem).Returns(tuple.Item1);
+                _mockEnvronment.SetupGet(s => s.Architecture).Returns(tuple.Item2);
 
-                this.executor.Initialize("collectdump");
-                this.mockOutput.Verify(x => x.WriteLine(CommandLineResources.BlameCollectDumpNotSupportedForPlatform, OutputLevel.Warning));
+                _executor.Initialize("collectdump");
+                _mockOutput.Verify(x => x.WriteLine(CommandLineResources.BlameCollectDumpNotSupportedForPlatform, OutputLevel.Warning));
 
-                Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+                Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
                 Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<RunSettings>",
@@ -210,7 +211,7 @@ namespace vstest.console.UnitTests.Processors
                 "    </Loggers>",
                 "  </LoggerRunSettings>",
                 "</RunSettings>"),
-                this.settingsProvider.ActiveRunSettings.SettingsXml);
+                _settingsProvider.ActiveRunSettings.SettingsXml);
             }
         }
 
@@ -218,20 +219,20 @@ namespace vstest.console.UnitTests.Processors
         public void InitializeShouldWarnIfIncorrectParameterIsSpecifiedForCollectDumpOption()
         {
             var invalidParameter = "CollectDumpXX";
-            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettingsString = string.Format(_defaultRunSettings, "");
             var runsettings = new RunSettings();
-            runsettings.LoadSettingsXml(DefaultRunSettings);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            runsettings.LoadSettingsXml(_defaultRunSettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.mockEnvronment.Setup(x => x.OperatingSystem)
+            _mockEnvronment.Setup(x => x.OperatingSystem)
                                .Returns(PlatformOperatingSystem.Windows);
-            this.mockEnvronment.Setup(x => x.Architecture)
+            _mockEnvronment.Setup(x => x.Architecture)
                                .Returns(PlatformArchitecture.X64);
 
-            this.executor.Initialize(invalidParameter);
-            this.mockOutput.Verify(x => x.WriteLine(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameIncorrectOption, invalidParameter), OutputLevel.Warning));
+            _executor.Initialize(invalidParameter);
+            _mockOutput.Verify(x => x.WriteLine(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameIncorrectOption, invalidParameter), OutputLevel.Warning));
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<RunSettings>",
@@ -253,7 +254,7 @@ namespace vstest.console.UnitTests.Processors
                 "    </Loggers>",
                 "  </LoggerRunSettings>",
                 "</RunSettings>"),
-                this.settingsProvider.ActiveRunSettings.SettingsXml);
+                _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -261,20 +262,20 @@ namespace vstest.console.UnitTests.Processors
         public void InitializeShouldThrowIfInvalidParameterFormatIsSpecifiedForCollectDumpOption()
         {
             var invalidString = "CollectDump;sdf=sdg;;as;a=";
-            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettingsString = string.Format(_defaultRunSettings, "");
             var runsettings = new RunSettings();
-            runsettings.LoadSettingsXml(DefaultRunSettings);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            runsettings.LoadSettingsXml(_defaultRunSettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.mockEnvronment.Setup(x => x.OperatingSystem)
+            _mockEnvronment.Setup(x => x.OperatingSystem)
                                .Returns(PlatformOperatingSystem.Windows);
-            this.mockEnvronment.Setup(x => x.Architecture)
+            _mockEnvronment.Setup(x => x.Architecture)
                                .Returns(PlatformArchitecture.X64);
 
-            this.executor.Initialize(invalidString);
-            this.mockOutput.Verify(x => x.WriteLine(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidBlameArgument, invalidString), OutputLevel.Warning));
+            _executor.Initialize(invalidString);
+            _mockOutput.Verify(x => x.WriteLine(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidBlameArgument, invalidString), OutputLevel.Warning));
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<RunSettings>",
@@ -296,25 +297,25 @@ namespace vstest.console.UnitTests.Processors
                 "    </Loggers>",
                 "  </LoggerRunSettings>",
                 "</RunSettings>"),
-                this.settingsProvider.ActiveRunSettings.SettingsXml);
+                _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldCreateEntryForBlameAlongWithCollectDumpEntryIfEnabled()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettingsString = string.Format(_defaultRunSettings, "");
             var runsettings = new RunSettings();
-            runsettings.LoadSettingsXml(DefaultRunSettings);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            runsettings.LoadSettingsXml(_defaultRunSettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.mockEnvronment.Setup(x => x.OperatingSystem)
+            _mockEnvronment.Setup(x => x.OperatingSystem)
                                .Returns(PlatformOperatingSystem.Windows);
-            this.mockEnvronment.Setup(x => x.Architecture)
+            _mockEnvronment.Setup(x => x.Architecture)
                                .Returns(PlatformArchitecture.X64);
 
-            this.executor.Initialize("CollectDump");
+            _executor.Initialize("CollectDump");
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<RunSettings>",
@@ -337,25 +338,25 @@ namespace vstest.console.UnitTests.Processors
                 "    </Loggers>",
                 "  </LoggerRunSettings>",
                 "</RunSettings>"),
-                this.settingsProvider.ActiveRunSettings.SettingsXml);
+                _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldCreateEntryForBlameAlongWithCollectDumpParametersIfEnabled()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettingsString = string.Format(_defaultRunSettings, "");
             var runsettings = new RunSettings();
-            runsettings.LoadSettingsXml(DefaultRunSettings);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            runsettings.LoadSettingsXml(_defaultRunSettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.mockEnvronment.Setup(x => x.OperatingSystem)
+            _mockEnvronment.Setup(x => x.OperatingSystem)
                                .Returns(PlatformOperatingSystem.Windows);
-            this.mockEnvronment.Setup(x => x.Architecture)
+            _mockEnvronment.Setup(x => x.Architecture)
                                .Returns(PlatformArchitecture.X64);
 
-            this.executor.Initialize("CollectDump;DumpType=full;CollectAlways=true");
+            _executor.Initialize("CollectDump;DumpType=full;CollectAlways=true");
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<RunSettings>",
@@ -378,25 +379,25 @@ namespace vstest.console.UnitTests.Processors
                 "    </Loggers>",
                 "  </LoggerRunSettings>",
                 "</RunSettings>"),
-                this.settingsProvider.ActiveRunSettings.SettingsXml);
+                _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldCreateEntryForBlameAlongWithCollectHangDumpEntryIfEnabled()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettingsString = string.Format(_defaultRunSettings, "");
             var runsettings = new RunSettings();
-            runsettings.LoadSettingsXml(DefaultRunSettings);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            runsettings.LoadSettingsXml(_defaultRunSettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.mockEnvronment.Setup(x => x.OperatingSystem)
+            _mockEnvronment.Setup(x => x.OperatingSystem)
                                .Returns(PlatformOperatingSystem.Windows);
-            this.mockEnvronment.Setup(x => x.Architecture)
+            _mockEnvronment.Setup(x => x.Architecture)
                                .Returns(PlatformArchitecture.X64);
 
-            this.executor.Initialize("CollectHangDump");
+            _executor.Initialize("CollectHangDump");
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
             Assert.AreEqual(
                 string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -420,25 +421,25 @@ namespace vstest.console.UnitTests.Processors
                 "    </Loggers>",
                 "  </LoggerRunSettings>",
                 "</RunSettings>"),
-                this.settingsProvider.ActiveRunSettings.SettingsXml);
+                _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldCreateEntryForBlameAlongWithCollectHangDumpParametersIfEnabled()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettingsString = string.Format(_defaultRunSettings, "");
             var runsettings = new RunSettings();
-            runsettings.LoadSettingsXml(DefaultRunSettings);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
+            runsettings.LoadSettingsXml(_defaultRunSettings);
+            _settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.mockEnvronment.Setup(x => x.OperatingSystem)
+            _mockEnvronment.Setup(x => x.OperatingSystem)
                                .Returns(PlatformOperatingSystem.Windows);
-            this.mockEnvronment.Setup(x => x.Architecture)
+            _mockEnvronment.Setup(x => x.Architecture)
                                .Returns(PlatformArchitecture.X64);
 
-            this.executor.Initialize("CollectHangDump;TestTimeout=10min;HangDumpType=Mini");
+            _executor.Initialize("CollectHangDump;TestTimeout=10min;HangDumpType=Mini");
 
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<RunSettings>",
@@ -461,7 +462,7 @@ namespace vstest.console.UnitTests.Processors
                 "    </Loggers>",
                 "  </LoggerRunSettings>",
                 "</RunSettings>"),
-                this.settingsProvider.ActiveRunSettings.SettingsXml);
+                _settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         internal class TestableEnableBlameArgumentExecutor : EnableBlameArgumentExecutor
@@ -469,7 +470,7 @@ namespace vstest.console.UnitTests.Processors
             internal TestableEnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, IEnvironment environment, IOutput output)
                 : base(runSettingsManager, environment, new Mock<IFileHelper>().Object)
             {
-                this.Output = output;
+                Output = output;
             }
         }
     }

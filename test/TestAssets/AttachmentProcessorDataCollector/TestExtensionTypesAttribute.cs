@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform
     {
         public TestExtensionTypesAttribute(params Type[] types)
         {
-            this.Types = types;
+            Types = types;
         }
 
         public Type[] Types { get; }

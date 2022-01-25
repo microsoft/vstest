@@ -120,15 +120,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
     {
         public HostProviderEventArgs(string message)
         {
-            this.Data = message;
-            this.ErrroCode = 0;
+            Data = message;
+            ErrroCode = 0;
         }
 
         public HostProviderEventArgs(string message, int errorCode, int processId)
         {
-            this.Data = message;
-            this.ErrroCode = errorCode;
-            this.ProcessId = processId;
+            Data = message;
+            ErrroCode = errorCode;
+            ProcessId = processId;
         }
 
         public string Data { get; set; }

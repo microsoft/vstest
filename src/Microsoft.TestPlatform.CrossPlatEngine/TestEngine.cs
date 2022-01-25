@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
         private readonly TestRuntimeProviderManager testHostProviderManager;
         private ITestExtensionManager testExtensionManager;
-        private IProcessHelper processHelper;
+        private readonly IProcessHelper processHelper;
 
         #endregion
 
@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             ITestRuntimeProvider testHostManager,
             DiscoveryCriteria discoveryCriteria)
         {
-            var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(
+            var parallelLevel = VerifyParallelSettingAndCalculateParallelLevel(
                 discoveryCriteria.Sources.Count(),
                 discoveryCriteria.RunSettings);
 
@@ -69,10 +69,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 TelemetryDataConstants.ParallelEnabledDuringDiscovery,
                 parallelLevel > 1 ? "True" : "False");
 
-            if (this.ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
+            if (ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
             {
                 var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
-                var newRequestData = this.GetRequestData(isTelemetryOptedIn);
+                var newRequestData = GetRequestData(isTelemetryOptedIn);
                 return new InProcessProxyDiscoveryManager(
                     testHostManager,
                     new TestHostManagerFactory(newRequestData));
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = () =>
             {
-                var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
+                var hostManager = testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
                 hostManager?.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
                 // This function is used to either take a pre-existing proxy operation manager from
@@ -145,7 +145,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             TestRunCriteria testRunCriteria)
         {
             var distinctSources = GetDistinctNumberOfSources(testRunCriteria);
-            var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(
+            var parallelLevel = VerifyParallelSettingAndCalculateParallelLevel(
                 distinctSources,
                 testRunCriteria.TestRunSettings);
 
@@ -157,13 +157,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
             var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
-            if (this.ShouldRunInNoIsolation(
+            if (ShouldRunInNoIsolation(
                 testRunCriteria.TestRunSettings,
                 parallelLevel > 1,
                 isDataCollectorEnabled || isInProcDataCollectorEnabled))
             {
                 var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
-                var newRequestData = this.GetRequestData(isTelemetryOptedIn);
+                var newRequestData = GetRequestData(isTelemetryOptedIn);
                 return new InProcessProxyExecutionManager(
                     testHostManager,
                     new TestHostManagerFactory(newRequestData));
@@ -175,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             {
                 // Create a new host manager, to be associated with individual
                 // ProxyExecutionManager(&POM)
-                var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
+                var hostManager = testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
                 hostManager?.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
 
                 if (testRunCriteria.TestHostLauncher != null)
@@ -263,7 +263,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             IRequestData requestData,
             StartTestSessionCriteria testSessionCriteria)
         {
-            var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(
+            var parallelLevel = VerifyParallelSettingAndCalculateParallelLevel(
                 testSessionCriteria.Sources.Count,
                 testSessionCriteria.RunSettings);
 
@@ -274,7 +274,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testSessionCriteria.RunSettings);
             var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testSessionCriteria.RunSettings);
 
-            if (this.ShouldRunInNoIsolation(
+            if (ShouldRunInNoIsolation(
                 testSessionCriteria.RunSettings,
                 parallelLevel > 1,
                 isDataCollectorEnabled || isInProcDataCollectorEnabled))
@@ -287,7 +287,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             Func<ProxyOperationManager> proxyCreator = () =>
             {
-                var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
+                var hostManager = testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
                 if (hostManager == null)
                 {
                     throw new TestPlatformException(
@@ -336,7 +336,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                         hostManager);
             };
 
-            var testhostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
+            var testhostManager = testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
             testhostManager.Initialize(TestSessionMessageLogger.Instance, testSessionCriteria.RunSettings);
             var testhostCount = (parallelLevel > 1 || !testhostManager.Shared)
                 ? testSessionCriteria.Sources.Count
@@ -348,8 +348,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <inheritdoc/>
         public ITestExtensionManager GetExtensionManager()
         {
-            return this.testExtensionManager
-                ?? (this.testExtensionManager = new TestExtensionManager());
+            return testExtensionManager
+                ?? (testExtensionManager = new TestExtensionManager());
         }
 
         /// <inheritdoc/>
@@ -367,17 +367,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
             // No point in creating more processes if number of sources is less than what the user
             // configured for.
-            int numSources = 1;
-            if (testRunCriteria.HasSpecificTests)
-            {
-                numSources = new HashSet<string>(
-                             testRunCriteria.Tests.Select(testCase => testCase.Source)).Count;
-            }
-            else
-            {
-                numSources = testRunCriteria.Sources.Count();
-            }
-
+            int numSources = testRunCriteria.HasSpecificTests
+                ? new HashSet<string>(
+                             testRunCriteria.Tests.Select(testCase => testCase.Source)).Count
+                : testRunCriteria.Sources.Count();
             return numSources;
         }
 
@@ -394,7 +387,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             string runSettings)
         {
             // Default is 1.
-            int parallelLevelToUse = 1;
+            int parallelLevelToUse;
             try
             {
                 // Check the user parallel setting.
@@ -462,7 +455,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 return false;
             }
 
-            var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
+            var currentProcessPath = processHelper.GetCurrentProcessFileName();
 
             // If running with the dotnet executable, then don't run in in process.
             if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)

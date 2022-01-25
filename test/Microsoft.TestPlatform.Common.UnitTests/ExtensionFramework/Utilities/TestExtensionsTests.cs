@@ -17,22 +17,22 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         [TestInitialize]
         public void TestInit()
         {
-            this.testExtensions = new TestExtensions();
+            testExtensions = new TestExtensions();
         }
 
         [TestMethod]
         public void AddExtensionsShouldNotThrowIfExtensionsIsNull()
         {
-            this.testExtensions.AddExtension<TestPluginInformation>(null);
+            testExtensions.AddExtension<TestPluginInformation>(null);
 
             // Validate that the default state does not change.
-            Assert.IsNull(this.testExtensions.TestDiscoverers);
+            Assert.IsNull(testExtensions.TestDiscoverers);
         }
 
         [TestMethod]
         public void AddExtensionsShouldNotThrowIfExistingExtensionCollectionIsNull()
         {
-            var testDiscoverers = new System.Collections.Generic.Dictionary<string, TestDiscovererPluginInformation>
+            var testDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>
             {
                 {
                     "td",
@@ -40,33 +40,33 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
                 }
             };
 
-            this.testExtensions.AddExtension<TestDiscovererPluginInformation>(testDiscoverers);
+            testExtensions.AddExtension(testDiscoverers);
 
-            Assert.IsNotNull(this.testExtensions.TestDiscoverers);
-            CollectionAssert.AreEqual(this.testExtensions.TestDiscoverers, testDiscoverers);
+            Assert.IsNotNull(testExtensions.TestDiscoverers);
+            CollectionAssert.AreEqual(testExtensions.TestDiscoverers, testDiscoverers);
 
             // Validate that the others remain same.
-            Assert.IsNull(this.testExtensions.TestExecutors);
-            Assert.IsNull(this.testExtensions.TestSettingsProviders);
-            Assert.IsNull(this.testExtensions.TestLoggers);
+            Assert.IsNull(testExtensions.TestExecutors);
+            Assert.IsNull(testExtensions.TestSettingsProviders);
+            Assert.IsNull(testExtensions.TestLoggers);
         }
 
         [TestMethod]
         public void AddExtensionsShouldAddToExistingExtensionCollection()
         {
-            var testDiscoverers = new System.Collections.Generic.Dictionary<string, TestDiscovererPluginInformation>
+            var testDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>
             {
                 { "td1", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)) },
                 { "td2", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)) }
             };
 
-            this.testExtensions.TestDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>
+            testExtensions.TestDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>
             {
                 { "td", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)) }
             };
 
             // Act.
-            this.testExtensions.AddExtension<TestDiscovererPluginInformation>(testDiscoverers);
+            testExtensions.AddExtension(testDiscoverers);
 
             // Validate.
             var expectedTestExtensions = new Dictionary<string, TestDiscovererPluginInformation>
@@ -76,37 +76,37 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
                 { "td2", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)) }
             };
 
-            CollectionAssert.AreEqual(this.testExtensions.TestDiscoverers.Keys, expectedTestExtensions.Keys);
+            CollectionAssert.AreEqual(testExtensions.TestDiscoverers.Keys, expectedTestExtensions.Keys);
 
             // Validate that the others remain same.
-            Assert.IsNull(this.testExtensions.TestExecutors);
-            Assert.IsNull(this.testExtensions.TestSettingsProviders);
-            Assert.IsNull(this.testExtensions.TestLoggers);
+            Assert.IsNull(testExtensions.TestExecutors);
+            Assert.IsNull(testExtensions.TestSettingsProviders);
+            Assert.IsNull(testExtensions.TestLoggers);
         }
 
         [TestMethod]
         public void AddExtensionsShouldNotAddAnAlreadyExistingExtensionToTheCollection()
         {
-            var testDiscoverers = new System.Collections.Generic.Dictionary<string, TestDiscovererPluginInformation>
+            var testDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>
             {
                 { "td", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)) }
             };
 
-            this.testExtensions.TestDiscoverers = new System.Collections.Generic.Dictionary<string, TestDiscovererPluginInformation>
+            testExtensions.TestDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>
             {
                 { "td", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)) }
             };
 
             // Act.
-            this.testExtensions.AddExtension<TestDiscovererPluginInformation>(testDiscoverers);
+            testExtensions.AddExtension(testDiscoverers);
 
             // Validate.
-            CollectionAssert.AreEqual(this.testExtensions.TestDiscoverers.Keys, testDiscoverers.Keys);
+            CollectionAssert.AreEqual(testExtensions.TestDiscoverers.Keys, testDiscoverers.Keys);
 
             // Validate that the others remain same.
-            Assert.IsNull(this.testExtensions.TestExecutors);
-            Assert.IsNull(this.testExtensions.TestSettingsProviders);
-            Assert.IsNull(this.testExtensions.TestLoggers);
+            Assert.IsNull(testExtensions.TestExecutors);
+            Assert.IsNull(testExtensions.TestSettingsProviders);
+            Assert.IsNull(testExtensions.TestLoggers);
         }
 
         [TestMethod]
@@ -114,18 +114,18 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         {
             var assemblyLocation = typeof(TestExtensionsTests).GetTypeInfo().Assembly.Location;
 
-            Assert.IsNull(this.testExtensions.GetExtensionsDiscoveredFromAssembly(assemblyLocation));
+            Assert.IsNull(testExtensions.GetExtensionsDiscoveredFromAssembly(assemblyLocation));
         }
 
         [TestMethod]
         public void GetExtensionsDiscoveredFromAssemblyShouldNotThrowIfExtensionAssemblyIsNull()
         {
-            this.testExtensions.TestDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>
+            testExtensions.TestDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>
             {
                 { "td", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)) }
             };
 
-            Assert.IsNull(this.testExtensions.GetExtensionsDiscoveredFromAssembly(null));
+            Assert.IsNull(testExtensions.GetExtensionsDiscoveredFromAssembly(null));
         }
 
         [TestMethod]
@@ -133,13 +133,13 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         {
             var assemblyLocation = typeof(TestExtensionsTests).GetTypeInfo().Assembly.Location;
 
-            this.testExtensions.TestDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>
+            testExtensions.TestDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>
             {
                 { "td", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)) },
                 { "td1", new TestDiscovererPluginInformation(typeof(TestExtensions)) }
             };
 
-            var extensions = this.testExtensions.GetExtensionsDiscoveredFromAssembly(assemblyLocation);
+            var extensions = testExtensions.GetExtensionsDiscoveredFromAssembly(assemblyLocation);
 
             var expectedExtensions = new Dictionary<string, TestDiscovererPluginInformation>
             {
@@ -153,13 +153,13 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         {
             var assemblyLocation = typeof(TestExtensionsTests).GetTypeInfo().Assembly.Location;
 
-            this.testExtensions.TestExecutors = new Dictionary<string, TestExecutorPluginInformation>
+            testExtensions.TestExecutors = new Dictionary<string, TestExecutorPluginInformation>
             {
                 { "te", new TestExecutorPluginInformation(typeof(TestExtensionsTests)) },
                 { "te1", new TestExecutorPluginInformation(typeof(TestExtensions)) }
             };
 
-            var extensions = this.testExtensions.GetExtensionsDiscoveredFromAssembly(assemblyLocation);
+            var extensions = testExtensions.GetExtensionsDiscoveredFromAssembly(assemblyLocation);
 
             var expectedExtensions = new Dictionary<string, TestExecutorPluginInformation>
             {
@@ -173,13 +173,13 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         {
             var assemblyLocation = typeof(TestExtensionsTests).GetTypeInfo().Assembly.Location;
 
-            this.testExtensions.TestSettingsProviders = new Dictionary<string, TestSettingsProviderPluginInformation>
+            testExtensions.TestSettingsProviders = new Dictionary<string, TestSettingsProviderPluginInformation>
             {
                 { "tsp", new TestSettingsProviderPluginInformation(typeof(TestExtensionsTests)) },
                 { "tsp1", new TestSettingsProviderPluginInformation(typeof(TestExtensions)) }
             };
 
-            var extensions = this.testExtensions.GetExtensionsDiscoveredFromAssembly(assemblyLocation);
+            var extensions = testExtensions.GetExtensionsDiscoveredFromAssembly(assemblyLocation);
 
             var expectedExtensions = new Dictionary<string, TestSettingsProviderPluginInformation>
             {
@@ -193,13 +193,13 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         {
             var assemblyLocation = typeof(TestExtensionsTests).GetTypeInfo().Assembly.Location;
 
-            this.testExtensions.TestLoggers = new Dictionary<string, TestLoggerPluginInformation>
+            testExtensions.TestLoggers = new Dictionary<string, TestLoggerPluginInformation>
             {
                 { "tl", new TestLoggerPluginInformation(typeof(TestExtensionsTests)) },
                 { "tl1", new TestLoggerPluginInformation(typeof(TestExtensions)) }
             };
 
-            var extensions = this.testExtensions.GetExtensionsDiscoveredFromAssembly(assemblyLocation);
+            var extensions = testExtensions.GetExtensionsDiscoveredFromAssembly(assemblyLocation);
 
             var expectedExtensions = new Dictionary<string, TestLoggerPluginInformation>
             {
@@ -213,17 +213,17 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         {
             var assemblyLocation = typeof(TestExtensionsTests).GetTypeInfo().Assembly.Location;
 
-            this.testExtensions.TestDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>
+            testExtensions.TestDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>
             {
                 { "td", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)) }
             };
 
-            this.testExtensions.TestLoggers = new Dictionary<string, TestLoggerPluginInformation>
+            testExtensions.TestLoggers = new Dictionary<string, TestLoggerPluginInformation>
             {
                 { "tl", new TestLoggerPluginInformation(typeof(TestExtensionsTests)) }
             };
 
-            var extensions = this.testExtensions.GetExtensionsDiscoveredFromAssembly(assemblyLocation);
+            var extensions = testExtensions.GetExtensionsDiscoveredFromAssembly(assemblyLocation);
 
             var expectedDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>
             {

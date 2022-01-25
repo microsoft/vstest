@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <summary>
         /// Friendly names of data collectors that requested this environment variable
         /// </summary>
-        private List<string> dataCollectorsThatRequested;
+        private readonly List<string> dataCollectorsThatRequested;
 
         #endregion
 
@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             ValidateArg.NotNullOrEmpty(requestingDataCollectorFriendlyName, nameof(requestingDataCollectorFriendlyName));
 
             this.variable = variable;
-            this.dataCollectorsThatRequested = new List<string> { requestingDataCollectorFriendlyName };
+            dataCollectorsThatRequested = new List<string> { requestingDataCollectorFriendlyName };
         }
 
         #endregion
@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             get
             {
-                return this.variable.Key;
+                return variable.Key;
             }
         }
 
@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             get
             {
-                return this.variable.Value;
+                return variable.Value;
             }
         }
 
@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             get
             {
-                return this.dataCollectorsThatRequested[0];
+                return dataCollectorsThatRequested[0];
             }
         }
 
@@ -99,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         public void AddRequestingDataCollector(string requestingDataCollectorFriendlyName)
         {
             ValidateArg.NotNullOrEmpty(requestingDataCollectorFriendlyName, nameof(requestingDataCollectorFriendlyName));
-            this.dataCollectorsThatRequested.Add(requestingDataCollectorFriendlyName);
+            dataCollectorsThatRequested.Add(requestingDataCollectorFriendlyName);
         }
 
         #endregion

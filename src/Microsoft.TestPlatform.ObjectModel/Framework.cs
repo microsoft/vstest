@@ -13,14 +13,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public class Framework
     {
-#if NETFRAMEWORK
-        private static readonly Framework Default = Framework.FromString(".NETFramework,Version=v4.0");
-#elif NETSTANDARD1_0
-        private static readonly Framework Default = null;
-#else
-        private static readonly Framework Default = Framework.FromString(".NETCoreApp,Version=v1.0");
-#endif
-
         private Framework()
         {
         }
@@ -28,7 +20,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Default .Net target framework.
         /// </summary>
-        public static Framework DefaultFramework => Framework.Default;
+        public static Framework DefaultFramework =>
+#if NETFRAMEWORK
+            FromString(".NETFramework,Version=v4.0");
+#elif NETSTANDARD1_0
+        null;
+#else
+        FromString(".NETCoreApp,Version=v1.0");
+#endif
 
         /// <summary>
         /// Gets the FullName of framework.
@@ -124,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>String presentation of the object.</returns>
         public override string ToString()
         {
-            return this.Name;
+            return Name;
         }
     }
 }

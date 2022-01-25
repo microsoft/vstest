@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         /// <summary>
         /// Holds type symbols available in the source.
         /// </summary>
-        private Dictionary<string, IDiaSymbol> typeSymbols = new Dictionary<string, IDiaSymbol>();
+        private Dictionary<string, IDiaSymbol> typeSymbols = new();
 
         /// <summary>
         /// Holds method symbols for all types in the source.
@@ -33,14 +33,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         /// Bug: Method overrides in same type are not handled (not a regression)
         /// ToDo(Solution): Use method token along with as identifier, this will always give unique method.The adapters would need to send this token to us to correct the behavior.
         /// </summary>
-        private Dictionary<string, Dictionary<string, IDiaSymbol>> methodSymbols = new Dictionary<string, Dictionary<string, IDiaSymbol>>();
+        private Dictionary<string, Dictionary<string, IDiaSymbol>> methodSymbols = new();
 
         /// <summary>
         /// dispose caches
         /// </summary>
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
 
             // Use SupressFinalize in case a subclass
             // of this type implements a finalizer.
@@ -62,12 +62,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             {
                 if(OpenSession(binaryPath, searchPath))
                 {
-                    this.PopulateCacheForTypeAndMethodSymbols();
+                    PopulateCacheForTypeAndMethodSymbols();
                 }
             }
             catch (COMException)
             {
-                this.Dispose();
+                Dispose();
                 throw;
             }
         }
@@ -88,12 +88,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         public INavigationData GetNavigationData(string declaringTypeName, string methodName)
         {
             INavigationData navigationData = null;
-            IDiaSymbol methodSymbol = null;
-
-            IDiaSymbol typeSymbol = this.GetTypeSymbol(declaringTypeName, SymTagEnum.SymTagCompiland);
+            IDiaSymbol typeSymbol = GetTypeSymbol(declaringTypeName, SymTagEnum.SymTagCompiland);
+            IDiaSymbol methodSymbol;
             if (typeSymbol != null)
             {
-                methodSymbol = this.GetMethodSymbol(typeSymbol, methodName);
+                methodSymbol = GetMethodSymbol(typeSymbol, methodName);
             }
             else
             {
@@ -101,12 +100,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 string fullMethodName = declaringTypeName.Replace(".", "::");
                 fullMethodName = fullMethodName + "::" + methodName;
 
-                methodSymbol = this.GetTypeSymbol(fullMethodName, SymTagEnum.SymTagFunction);
+                methodSymbol = GetTypeSymbol(fullMethodName, SymTagEnum.SymTagFunction);
             }
 
             if (methodSymbol != null)
             {
-                navigationData = this.GetSymbolNavigationData(methodSymbol);
+                navigationData = GetSymbolNavigationData(methodSymbol);
             }
 
             return navigationData;
@@ -117,9 +116,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             try
             {
                 // Activate the DIA data source COM object
-                this.source = DiaSourceObject.GetDiaSourceObject();
+                source = DiaSourceObject.GetDiaSourceObject();
 
-                if (this.source == null)
+                if (source == null)
                 {
                     return false;
                 }
@@ -135,14 +134,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 }
 
                 // Load the data for the executable
-                int hResult = this.source.LoadDataForExe(filename, searchPath, IntPtr.Zero);
+                int hResult = source.LoadDataForExe(filename, searchPath, IntPtr.Zero);
                 if (HResult.Failed(hResult))
                 {
                     throw new COMException(string.Format(Resources.Resources.FailedToCreateDiaSession, hResult));
                 }
 
                 // Open the session and return it
-                if (HResult.Failed(this.source.OpenSession(out this.session)))
+                if (HResult.Failed(source.OpenSession(out session)))
                 {
                     return false;
                 }
@@ -153,9 +152,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             }
             finally
             {
-                if (this.source != null)
+                if (source != null)
                 {
-                    Marshal.FinalReleaseComObject(this.source);
+                    Marshal.FinalReleaseComObject(source);
                 }
             }
 
@@ -166,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         {
             ValidateArg.NotNull(symbol, nameof(symbol));
 
-            DiaNavigationData navigationData = new DiaNavigationData(null, int.MaxValue, int.MinValue);
+            DiaNavigationData navigationData = new(null, int.MaxValue, int.MinValue);
 
             IDiaEnumLineNumbers lines = null;
 
@@ -190,7 +189,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     return navigationData;
                 }
 
-                this.session.FindLinesByAddress(section, offset, (uint)length, out lines);
+                session.FindLinesByAddress(section, offset, (uint)length, out lines);
 
                 while (true)
                 {
@@ -247,7 +246,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             IDiaSymbol global = null;
             try
             {
-                this.session.GetGlobalScope(out global);
+                session.GetGlobalScope(out global);
                 global.FindChildren(SymTagEnum.SymTagCompiland, null, 0, out enumTypeSymbols);
 
                 // NOTE::
@@ -257,12 +256,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 while (celtTypeSymbol == 1 && typeSymbol != null)
                 {
                     typeSymbol.GetName(out var name);
-                    this.typeSymbols[name] = typeSymbol;
+                    typeSymbols[name] = typeSymbol;
 
                     IDiaEnumSymbols enumMethodSymbols = null;
                     try
                     {
-                        Dictionary<string, IDiaSymbol> methodSymbolsForType = new Dictionary<string, IDiaSymbol>();
+                        Dictionary<string, IDiaSymbol> methodSymbolsForType = new();
                         typeSymbol.FindChildren(SymTagEnum.SymTagFunction, null, 0, out enumMethodSymbols);
 
                         enumMethodSymbols.GetNext(1, out IDiaSymbol methodSymbol, out uint celtMethodSymbol);
@@ -273,7 +272,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                             enumMethodSymbols.GetNext(1, out methodSymbol, out celtMethodSymbol);
                         }
 
-                        this.methodSymbols[name] = methodSymbolsForType;
+                        methodSymbols[name] = methodSymbolsForType;
                     }
                     catch (Exception ex)
                     {
@@ -318,12 +317,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             try
             {
                 typeName = typeName.Replace('+', '.');
-                if (this.typeSymbols.ContainsKey(typeName))
+                if (typeSymbols.ContainsKey(typeName))
                 {
-                    return this.typeSymbols[typeName];
+                    return typeSymbols[typeName];
                 }
 
-                this.session.GetGlobalScope(out global);
+                session.GetGlobalScope(out global);
                 global.FindChildren(symTag, typeName, 0, out enumSymbols);
 
                 enumSymbols.GetNext(1, out typeSymbol, out uint celt);
@@ -335,7 +334,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     try
                     {
                         global.FindChildren(symTag, null, 0, out enumAllSymbols);
-                        List<string> children = new List<string>();
+                        List<string> children = new();
 
                         while (true)
                         {
@@ -368,7 +367,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
             if (typeSymbol != null)
             {
-                this.typeSymbols[typeName] = typeSymbol;
+                typeSymbols[typeName] = typeSymbol;
             }
 
             return typeSymbol;
@@ -386,9 +385,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             try
             {
                 typeSymbol.GetName(out string symbolName);
-                if (this.methodSymbols.ContainsKey(symbolName))
+                if (methodSymbols.ContainsKey(symbolName))
                 {
-                    methodSymbolsForType = this.methodSymbols[symbolName];
+                    methodSymbolsForType = methodSymbols[symbolName];
                     if (methodSymbolsForType.ContainsKey(methodName))
                     {
                         return methodSymbolsForType[methodName];
@@ -397,7 +396,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 else
                 {
                     methodSymbolsForType = new Dictionary<string, IDiaSymbol>();
-                    this.methodSymbols[symbolName] = methodSymbolsForType;
+                    methodSymbols[symbolName] = methodSymbolsForType;
                 }
 
                 typeSymbol.FindChildren(SymTagEnum.SymTagFunction, methodName, 0, out enumSymbols);
@@ -411,7 +410,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     try
                     {
                         typeSymbol.FindChildren(SymTagEnum.SymTagFunction, null, 0, out enumAllSymbols);
-                        List<string> children = new List<string>();
+                        List<string> children = new();
 
                         while (true)
                         {
@@ -480,11 +479,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
         private void Dispose(bool disposing)
         {
-            if (!this.isDisposed)
+            if (!isDisposed)
             {
                 if (disposing)
                 {
-                    foreach (Dictionary<string, IDiaSymbol> methodSymbolsForType in this.methodSymbols.Values)
+                    foreach (Dictionary<string, IDiaSymbol> methodSymbolsForType in methodSymbols.Values)
                     {
                         foreach (IDiaSymbol methodSymbol in methodSymbolsForType.Values)
                         {
@@ -495,21 +494,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                         methodSymbolsForType.Clear();
                     }
 
-                    this.methodSymbols.Clear();
-                    this.methodSymbols = null;
-                    foreach (IDiaSymbol typeSymbol in this.typeSymbols.Values)
+                    methodSymbols.Clear();
+                    methodSymbols = null;
+                    foreach (IDiaSymbol typeSymbol in typeSymbols.Values)
                     {
                         IDiaSymbol symToRelease = typeSymbol;
                         ReleaseComObject(ref symToRelease);
                     }
 
-                    this.typeSymbols.Clear();
-                    this.typeSymbols = null;
-                    ReleaseComObject(ref this.session);
-                    ReleaseComObject(ref this.source);
+                    typeSymbols.Clear();
+                    typeSymbols = null;
+                    ReleaseComObject(ref session);
+                    ReleaseComObject(ref source);
                 }
 
-                this.isDisposed = true;
+                isDisposed = true;
             }
         }
     }

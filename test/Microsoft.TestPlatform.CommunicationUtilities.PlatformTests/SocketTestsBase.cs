@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         [TestMethod]
         public void SocketEndpointStartShouldRaiseServerConnectedEventOnServerConnection()
         {
-            this.SetupChannel(out ConnectedEventArgs connectedEventArgs);
+            SetupChannel(out ConnectedEventArgs connectedEventArgs);
 
             Assert.IsNotNull(connectedEventArgs);
         }
@@ -29,14 +29,14 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         public void SocketEndpointShouldNotifyChannelOnDataAvailable()
         {
             var message = string.Empty;
-            ManualResetEvent waitForMessage = new ManualResetEvent(false);
-            this.SetupChannel(out ConnectedEventArgs _).MessageReceived += (s, e) =>
+            ManualResetEvent waitForMessage = new(false);
+            SetupChannel(out ConnectedEventArgs _).MessageReceived += (s, e) =>
             {
                 message = e.Data;
                 waitForMessage.Set();
             };
 
-            WriteData(this.Client);
+            WriteData(Client);
 
             waitForMessage.WaitOne();
             Assert.AreEqual(DUMMYDATA, message);
@@ -44,13 +44,13 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 
         protected static string ReadData(TcpClient client)
         {
-            using BinaryReader reader = new BinaryReader(client.GetStream());
+            using BinaryReader reader = new(client.GetStream());
             return reader.ReadString();
         }
 
         protected static void WriteData(TcpClient client)
         {
-            using BinaryWriter writer = new BinaryWriter(client.GetStream());
+            using BinaryWriter writer = new(client.GetStream());
             writer.Write(DUMMYDATA);
         }
 

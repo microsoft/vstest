@@ -82,30 +82,24 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <summary>
         /// Ordered test type guid
         /// </summary>
-        public static readonly Guid OrderedTestTypeGuid = new Guid("ec4800e8-40e5-4ab3-8510-b8bf29b1904d");
+        public static readonly Guid OrderedTestTypeGuid = new("ec4800e8-40e5-4ab3-8510-b8bf29b1904d");
 
         /// <summary>
         /// Ordered test type
         /// </summary>
-        public static readonly TestType OrderedTestType = new TestType(OrderedTestTypeGuid);
+        public static readonly TestType OrderedTestType = new(OrderedTestTypeGuid);
 
         /// <summary>
         /// Unit test type guid
         /// </summary>
-        public static readonly Guid UnitTestTypeGuid = new Guid("13CDC9D9-DDB5-4fa4-A97D-D965CCFC6D4B");
+        public static readonly Guid UnitTestTypeGuid = new("13CDC9D9-DDB5-4fa4-A97D-D965CCFC6D4B");
 
         /// <summary>
         /// Unit test type
         /// </summary>
-        public static readonly TestType UnitTestType = new TestType(UnitTestTypeGuid);
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
+        public static readonly TestType UnitTestType = new(UnitTestTypeGuid);
         public static readonly TestProperty ExecutionIdProperty = TestProperty.Register("ExecutionId", ExecutionIdPropertyIdentifier, typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty ParentExecIdProperty = TestProperty.Register("ParentExecId", ParentExecutionIdPropertyIdentifier, typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty TestTypeProperty = TestProperty.Register("TestType", TestTypePropertyIdentifier, typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
     }
 }

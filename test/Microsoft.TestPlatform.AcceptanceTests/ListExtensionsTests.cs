@@ -14,26 +14,26 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource(inIsolation: false, inProcess: true)]
         public void ListDiscoverersShouldShowInboxDiscoverers(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            this.InvokeVsTest("/listDiscoverers");
+            InvokeVsTest("/listDiscoverers");
 
-            if (this.IsDesktopRunner())
+            if (IsDesktopRunner())
             {
-                this.StdOutputContains("executor://codedwebtestadapter/v1");
-                this.StdOutputContains("executor://mstestadapter/v1");
-                this.StdOutputContains("executor://webtestadapter/v1");
-                this.StdOutputContains(".Webtest");
-                this.StdOutputContains("executor://cppunittestexecutor/v1");
+                StdOutputContains("executor://codedwebtestadapter/v1");
+                StdOutputContains("executor://mstestadapter/v1");
+                StdOutputContains("executor://webtestadapter/v1");
+                StdOutputContains(".Webtest");
+                StdOutputContains("executor://cppunittestexecutor/v1");
             }
             else
             {
                 // There are no inbox adapters for dotnet core
-                this.StdOutputDoesNotContains("executor://codedwebtestadapter/v1");  
-                this.StdOutputDoesNotContains("executor://mstestadapter/v1");
-                this.StdOutputDoesNotContains("executor://webtestadapter/v1");
-                this.StdOutputDoesNotContains(".Webtest");
-                this.StdOutputDoesNotContains("executor://cppunittestexecutor/v1");
+                StdOutputDoesNotContains("executor://codedwebtestadapter/v1");  
+                StdOutputDoesNotContains("executor://mstestadapter/v1");
+                StdOutputDoesNotContains("executor://webtestadapter/v1");
+                StdOutputDoesNotContains(".Webtest");
+                StdOutputDoesNotContains("executor://cppunittestexecutor/v1");
             }
         }
 
@@ -41,26 +41,26 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource(inIsolation: false, inProcess: true)]
         public void ListExecutorsShouldShowInboxExecutors(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            this.InvokeVsTest("/listExecutors");
+            InvokeVsTest("/listExecutors");
 
-            if (this.IsDesktopRunner())
+            if (IsDesktopRunner())
             {
-                this.StdOutputContains("executor://CodedWebTestAdapter/v1");               
-                this.StdOutputContains("executor://MSTestAdapter/v1");
-                this.StdOutputContains("executor://WebTestAdapter/v1");
-                this.StdOutputContains("executor://CppUnitTestExecutor/v1");
-                this.StdOutputContains("executor://UAPCppExecutorIdentifier");
+                StdOutputContains("executor://CodedWebTestAdapter/v1");               
+                StdOutputContains("executor://MSTestAdapter/v1");
+                StdOutputContains("executor://WebTestAdapter/v1");
+                StdOutputContains("executor://CppUnitTestExecutor/v1");
+                StdOutputContains("executor://UAPCppExecutorIdentifier");
             }
             else
             {
                 // There are no inbox adapters for dotnet core
-                this.StdOutputDoesNotContains("executor://CodedWebTestAdapter/v1");
-                this.StdOutputDoesNotContains("executor://MSTestAdapter/v1");
-                this.StdOutputDoesNotContains("executor://WebTestAdapter/v1");
-                this.StdOutputDoesNotContains("executor://CppUnitTestExecutor/v1");
-                this.StdOutputDoesNotContains("executor://UAPCppExecutorIdentifier");
+                StdOutputDoesNotContains("executor://CodedWebTestAdapter/v1");
+                StdOutputDoesNotContains("executor://MSTestAdapter/v1");
+                StdOutputDoesNotContains("executor://WebTestAdapter/v1");
+                StdOutputDoesNotContains("executor://CppUnitTestExecutor/v1");
+                StdOutputDoesNotContains("executor://UAPCppExecutorIdentifier");
             }
         }
 
@@ -68,30 +68,30 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource(inIsolation: false, inProcess: true)]
         public void ListLoggersShouldShowInboxLoggers(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            this.InvokeVsTest("/listLoggers");
+            InvokeVsTest("/listLoggers");
 
-            this.StdOutputContains("logger://Microsoft/TestPlatform/Extensions/Blame/v1");
-            this.StdOutputContains("logger://Microsoft/TestPlatform/TrxLogger/v1");
+            StdOutputContains("logger://Microsoft/TestPlatform/Extensions/Blame/v1");
+            StdOutputContains("logger://Microsoft/TestPlatform/TrxLogger/v1");
         }
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource(inIsolation: false, inProcess: true)]
         public void ListSettingsProvidersShouldShowInboxSettingsProviders(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            this.InvokeVsTest("/listSettingsProviders");
+            InvokeVsTest("/listSettingsProviders");
 
-            if (this.IsDesktopRunner())
+            if (IsDesktopRunner())
             {
-                this.StdOutputContains("MSTestSettingsProvider");
+                StdOutputContains("MSTestSettingsProvider");
             }
             else
             {
                 // There are no inbox adapters for dotnet core
-                this.StdOutputDoesNotContains("MSTestSettingsProvider");
+                StdOutputDoesNotContains("MSTestSettingsProvider");
             }
         }
     }

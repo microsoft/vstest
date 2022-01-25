@@ -21,9 +21,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
     internal class InProcessProxyExecutionManager : IProxyExecutionManager
     {
-        private ITestHostManagerFactory testHostManagerFactory;
-        private IExecutionManager executionManager;
-        private ITestRuntimeProvider testHostManager;
+        private readonly ITestHostManagerFactory testHostManagerFactory;
+        private readonly IExecutionManager executionManager;
+        private readonly ITestRuntimeProvider testHostManager;
 
         public bool IsInitialized { get; private set; } = false;
 
@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             this.testHostManager = testHostManager;
             this.testHostManagerFactory = testHostManagerFactory;
-            this.executionManager = this.testHostManagerFactory.GetExecutionManager();
+            executionManager = this.testHostManagerFactory.GetExecutionManager();
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                             filterOptions: testRunCriteria.FilterOptions);
 
                 // Initialize extension before execution
-                this.InitializeExtensions(testPackages);
+                InitializeExtensions(testPackages);
 
                 if (testRunCriteria.HasSpecificSources)
                 {
@@ -113,7 +113,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
         public void Abort(ITestRunEventsHandler eventHandler)
         {
-            Task.Run(() => this.testHostManagerFactory.GetExecutionManager().Abort(eventHandler));
+            Task.Run(() => testHostManagerFactory.GetExecutionManager().Abort(eventHandler));
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
         public void Cancel(ITestRunEventsHandler eventHandler)
         {
-            Task.Run(() => this.testHostManagerFactory.GetExecutionManager().Cancel(eventHandler));
+            Task.Run(() => testHostManagerFactory.GetExecutionManager().Cancel(eventHandler));
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {
-            var extensionsFromSource = this.testHostManager.GetTestPlatformExtensions(sources, Enumerable.Empty<string>());
+            var extensionsFromSource = testHostManager.GetTestPlatformExtensions(sources, Enumerable.Empty<string>());
             if (extensionsFromSource.Any())
             {
                 TestPluginCache.Instance.UpdateExtensions(extensionsFromSource, false);

@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     ///  An argument processor that allows the user to specify whether the execution
@@ -33,12 +33,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new InIsolationArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new InIsolationArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -49,20 +49,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor =
+                    executor =
                         new Lazy<IArgumentExecutor>(
                             () =>
                             new InIsolationArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -84,8 +84,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     internal class InIsolationArgumentExecutor : IArgumentExecutor
     {
-        private CommandLineOptions commandLineOptions;
-        private IRunSettingsProvider runSettingsManager;
+        private readonly CommandLineOptions commandLineOptions;
+        private readonly IRunSettingsProvider runSettingsManager;
 
         public const string RunSettingsPath = "RunConfiguration.InIsolation";
 
@@ -98,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public InIsolationArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
         {
             Contract.Requires(options != null);
-            this.commandLineOptions = options;
+            commandLineOptions = options;
             this.runSettingsManager = runSettingsManager;
         }
         #endregion
@@ -118,8 +118,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidInIsolationCommand, argument));
             }
 
-            this.commandLineOptions.InIsolation = true;
-            this.runSettingsManager.UpdateRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath, "true");
+            commandLineOptions.InIsolation = true;
+            runSettingsManager.UpdateRunSettingsNode(RunSettingsPath, "true");
         }
 
         /// <summary>

@@ -26,32 +26,32 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     public class ParallelProxyDiscoveryManagerTests
     {
         private const int taskTimeout = 15 * 1000; // In milliseconds.
-        private List<Mock<IProxyDiscoveryManager>> createdMockManagers;
-        private Func<IProxyDiscoveryManager> proxyManagerFunc;
-        private Mock<ITestDiscoveryEventsHandler2> mockHandler;
-        private List<string> sources = new List<string>() { "1.dll", "2.dll" };
-        private DiscoveryCriteria testDiscoveryCriteria;
+        private readonly List<Mock<IProxyDiscoveryManager>> createdMockManagers;
+        private readonly Func<IProxyDiscoveryManager> proxyManagerFunc;
+        private readonly Mock<ITestDiscoveryEventsHandler2> mockHandler;
+        private readonly List<string> sources = new() { "1.dll", "2.dll" };
+        private readonly DiscoveryCriteria testDiscoveryCriteria;
         private bool proxyManagerFuncCalled;
-        private List<string> processedSources;
-        private ManualResetEventSlim discoveryCompleted;
-        private Mock<IRequestData> mockRequestData;
+        private readonly List<string> processedSources;
+        private readonly ManualResetEventSlim discoveryCompleted;
+        private readonly Mock<IRequestData> mockRequestData;
 
         public ParallelProxyDiscoveryManagerTests()
         {
-            this.processedSources = new List<string>();
-            this.createdMockManagers = new List<Mock<IProxyDiscoveryManager>>();
-            this.proxyManagerFunc = () =>
+            processedSources = new List<string>();
+            createdMockManagers = new List<Mock<IProxyDiscoveryManager>>();
+            proxyManagerFunc = () =>
             {
-                this.proxyManagerFuncCalled = true;
+                proxyManagerFuncCalled = true;
                 var manager = new Mock<IProxyDiscoveryManager>();
-                this.createdMockManagers.Add(manager);
+                createdMockManagers.Add(manager);
                 return manager.Object;
             };
-            this.mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
-            this.testDiscoveryCriteria = new DiscoveryCriteria(sources, 100, null);
-            this.discoveryCompleted = new ManualResetEventSlim(false);
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+            mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            testDiscoveryCriteria = new DiscoveryCriteria(sources, 100, null);
+            discoveryCompleted = new ManualResetEventSlim(false);
+            mockRequestData = new Mock<IRequestData>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
         }
 
         [TestMethod]
@@ -76,7 +76,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void AbortShouldCallAllConcurrentManagersOnce()
         {
-            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.mockRequestData.Object, this.proxyManagerFunc, 4, false);
+            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(mockRequestData.Object, proxyManagerFunc, 4, false);
 
             parallelDiscoveryManager.Abort();
 
@@ -88,15 +88,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void DiscoverTestsShouldProcessAllSources()
         {
             // Testcase filter should be passed to all parallel discovery criteria.
-            this.testDiscoveryCriteria.TestCaseFilter = "Name~Test";
-            var parallelDiscoveryManager = this.SetupDiscoveryManager(this.proxyManagerFunc, 2, false);
+            testDiscoveryCriteria.TestCaseFilter = "Name~Test";
+            var parallelDiscoveryManager = SetupDiscoveryManager(proxyManagerFunc, 2, false);
 
-            Task.Run(() =>
-            {
-                parallelDiscoveryManager.DiscoverTests(this.testDiscoveryCriteria, this.mockHandler.Object);
-            });
+            Task.Run(() => parallelDiscoveryManager.DiscoverTests(testDiscoveryCriteria, mockHandler.Object));
 
-            Assert.IsTrue(this.discoveryCompleted.Wait(ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
+            Assert.IsTrue(discoveryCompleted.Wait(taskTimeout), "Test discovery not completed.");
             Assert.AreEqual(sources.Count, processedSources.Count, "All Sources must be processed.");
             AssertMissingAndDuplicateSources(processedSources);
         }
@@ -110,15 +107,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             // Since the hosts are aborted, total aggregated tests sent across will be -1
             var discoveryManagerMock = new Mock<IProxyDiscoveryManager>();
-            this.createdMockManagers.Add(discoveryManagerMock);
-            var parallelDiscoveryManager = this.SetupDiscoveryManager(() => discoveryManagerMock.Object, 1, true, totalTests: -1);
+            createdMockManagers.Add(discoveryManagerMock);
+            var parallelDiscoveryManager = SetupDiscoveryManager(() => discoveryManagerMock.Object, 1, true, totalTests: -1);
 
-            Task.Run(() =>
-            {
-                parallelDiscoveryManager.DiscoverTests(this.testDiscoveryCriteria, this.mockHandler.Object);
-            });
+            Task.Run(() => parallelDiscoveryManager.DiscoverTests(testDiscoveryCriteria, mockHandler.Object));
 
-            Assert.IsTrue(this.discoveryCompleted.Wait(ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
+            Assert.IsTrue(discoveryCompleted.Wait(taskTimeout), "Test discovery not completed.");
             Assert.AreEqual(2, processedSources.Count, "All Sources must be processed.");
         }
 
@@ -131,16 +125,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             // Since the hosts are aborted, total aggregated tests sent across will be -1
             var discoveryManagerMock = new Mock<IProxyDiscoveryManager>();
-            this.createdMockManagers.Add(discoveryManagerMock);
-            var parallelDiscoveryManager = this.SetupDiscoveryManager(() => discoveryManagerMock.Object, 1, true, totalTests: -1);
+            createdMockManagers.Add(discoveryManagerMock);
+            var parallelDiscoveryManager = SetupDiscoveryManager(() => discoveryManagerMock.Object, 1, true, totalTests: -1);
 
             Task.Run(() =>
             {
-                parallelDiscoveryManager.DiscoverTests(this.testDiscoveryCriteria, this.mockHandler.Object);
+                parallelDiscoveryManager.DiscoverTests(testDiscoveryCriteria, mockHandler.Object);
                 parallelDiscoveryManager.Abort();
             });
 
-            Assert.IsTrue(this.discoveryCompleted.Wait(taskTimeout), "Test discovery not completed.");
+            Assert.IsTrue(discoveryCompleted.Wait(taskTimeout), "Test discovery not completed.");
             Assert.AreEqual(1, processedSources.Count, "One source should be processed.");
         }
 
@@ -149,20 +143,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             // Ensure that second discovery manager never starts. Expect 10 total tests.
             // Override DiscoveryComplete since overall aborted should be true
-            var parallelDiscoveryManager = this.SetupDiscoveryManager(this.proxyManagerFunc, 2, false, totalTests: 10);
-            this.createdMockManagers[1].Reset();
-            this.createdMockManagers[1].Setup(dm => dm.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()))
+            var parallelDiscoveryManager = SetupDiscoveryManager(proxyManagerFunc, 2, false, totalTests: 10);
+            createdMockManagers[1].Reset();
+            createdMockManagers[1].Setup(dm => dm.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()))
                 .Throws<NotImplementedException>();
-            this.mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
-                .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>((t, l) => { this.discoveryCompleted.Set(); });
+            mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
+                .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>((t, l) => discoveryCompleted.Set());
 
-            Task.Run(() =>
-            {
-                parallelDiscoveryManager.DiscoverTests(this.testDiscoveryCriteria, this.mockHandler.Object);
-            });
+            Task.Run(() => parallelDiscoveryManager.DiscoverTests(testDiscoveryCriteria, mockHandler.Object));
 
             // Processed sources should be 1 since the 2nd source is never discovered
-            Assert.IsTrue(this.discoveryCompleted.Wait(ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
+            Assert.IsTrue(discoveryCompleted.Wait(taskTimeout), "Test discovery not completed.");
             Assert.AreEqual(1, processedSources.Count, "All Sources must be processed.");
         }
 
@@ -171,20 +162,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             // Ensure that second discovery manager never starts. Expect 10 total tests.
             // Override DiscoveryComplete since overall aborted should be true
-            var parallelDiscoveryManager = this.SetupDiscoveryManager(this.proxyManagerFunc, 2, false, totalTests: 10);
-            this.createdMockManagers[1].Reset();
-            this.createdMockManagers[1].Setup(dm => dm.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()))
+            var parallelDiscoveryManager = SetupDiscoveryManager(proxyManagerFunc, 2, false, totalTests: 10);
+            createdMockManagers[1].Reset();
+            createdMockManagers[1].Setup(dm => dm.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()))
                 .Throws<NotImplementedException>();
-            this.mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
-                .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>((t, l) => { this.discoveryCompleted.Set(); });
+            mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
+                .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>((t, l) => discoveryCompleted.Set());
 
-            Task.Run(() =>
-            {
-                parallelDiscoveryManager.DiscoverTests(this.testDiscoveryCriteria, this.mockHandler.Object);
-            });
+            Task.Run(() => parallelDiscoveryManager.DiscoverTests(testDiscoveryCriteria, mockHandler.Object));
 
             // Processed sources should be 1 since the 2nd source is never discovered
-            Assert.IsTrue(this.discoveryCompleted.Wait(ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
+            Assert.IsTrue(discoveryCompleted.Wait(taskTimeout), "Test discovery not completed.");
             mockHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
         }
 
@@ -193,44 +181,41 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             // Ensure that second discovery manager never starts. Expect 10 total tests.
             // Override DiscoveryComplete since overall aborted should be true
-            var parallelDiscoveryManager = this.SetupDiscoveryManager(this.proxyManagerFunc, 2, false, totalTests: 10);
-            this.createdMockManagers[1].Reset();
-            this.createdMockManagers[1].Setup(dm => dm.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()))
+            var parallelDiscoveryManager = SetupDiscoveryManager(proxyManagerFunc, 2, false, totalTests: 10);
+            createdMockManagers[1].Reset();
+            createdMockManagers[1].Setup(dm => dm.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()))
                 .Throws<NotImplementedException>();
-            this.mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
-                .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>((t, l) => { this.discoveryCompleted.Set(); });
+            mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
+                .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>((t, l) => discoveryCompleted.Set());
 
-            Task.Run(() =>
-            {
-                parallelDiscoveryManager.DiscoverTests(this.testDiscoveryCriteria, this.mockHandler.Object);
-            });
+            Task.Run(() => parallelDiscoveryManager.DiscoverTests(testDiscoveryCriteria, mockHandler.Object));
 
             // Processed sources should be 1 since the 2nd source is never discovered
-            Assert.IsTrue(this.discoveryCompleted.Wait(ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
+            Assert.IsTrue(discoveryCompleted.Wait(taskTimeout), "Test discovery not completed.");
             mockHandler.Verify(s => s.HandleRawMessage(It.Is<string>(str => str.Contains(MessageType.TestMessage))));
         }
 
         [TestMethod]
         public void HandlePartialDiscoveryCompleteShouldCreateANewProxyDiscoveryManagerIfIsAbortedIsTrue()
         {
-            this.proxyManagerFuncCalled = false;
-            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.mockRequestData.Object, this.proxyManagerFunc, 1, false);
-            var proxyDiscovermanager = new ProxyDiscoveryManager(this.mockRequestData.Object, new Mock<ITestRequestSender>().Object, new Mock<ITestRuntimeProvider>().Object);
+            proxyManagerFuncCalled = false;
+            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(mockRequestData.Object, proxyManagerFunc, 1, false);
+            var proxyDiscovermanager = new ProxyDiscoveryManager(mockRequestData.Object, new Mock<ITestRequestSender>().Object, new Mock<ITestRuntimeProvider>().Object);
 
             parallelDiscoveryManager.HandlePartialDiscoveryComplete(proxyDiscovermanager, 20, new List<TestCase>(), isAborted: true);
 
-            Assert.IsTrue(this.proxyManagerFuncCalled);
+            Assert.IsTrue(proxyManagerFuncCalled);
         }
 
         private IParallelProxyDiscoveryManager SetupDiscoveryManager(Func<IProxyDiscoveryManager> getProxyManager, int parallelLevel, bool abortDiscovery, int totalTests = 20)
         {
-            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.mockRequestData.Object, getProxyManager, parallelLevel, false);
-            this.SetupDiscoveryTests(this.processedSources, abortDiscovery);
+            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(mockRequestData.Object, getProxyManager, parallelLevel, false);
+            SetupDiscoveryTests(processedSources, abortDiscovery);
 
             // Setup a complete handler for parallel discovery manager
-            this.mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
+            mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
                 .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>(
-                    (discoveryCompleteEventArgs, lastChunk) => { this.discoveryCompleted.Set(); });
+                    (discoveryCompleteEventArgs, lastChunk) => discoveryCompleted.Set());
 
             return parallelDiscoveryManager;
         }
@@ -238,7 +223,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private void SetupDiscoveryTests(List<string> processedSources, bool isAbort)
         {
             var syncObject = new object();
-            foreach (var manager in this.createdMockManagers)
+            foreach (var manager in createdMockManagers)
             {
                 manager.Setup(m => m.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>())).
                     Callback<DiscoveryCriteria, ITestDiscoveryEventsHandler2>(
@@ -251,7 +236,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                             Task.Delay(100).Wait();
 
-                            Assert.AreEqual(this.testDiscoveryCriteria.TestCaseFilter, criteria.TestCaseFilter);
+                            Assert.AreEqual(testDiscoveryCriteria.TestCaseFilter, criteria.TestCaseFilter);
                             handler.HandleDiscoveryComplete(isAbort ? new DiscoveryCompleteEventArgs(-1, isAbort) : new DiscoveryCompleteEventArgs(10, isAbort), null);
                         });
             }
@@ -259,7 +244,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private void AssertMissingAndDuplicateSources(List<string> processedSources)
         {
-            foreach (var source in this.sources)
+            foreach (var source in sources)
             {
                 bool matchFound = false;
 
@@ -282,7 +267,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private void InvokeAndVerifyInitialize(int concurrentManagersCount, bool skipDefaultAdapters = false)
         {
-            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.mockRequestData.Object, this.proxyManagerFunc, concurrentManagersCount, false);
+            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(mockRequestData.Object, proxyManagerFunc, concurrentManagersCount, false);
 
             // Action
             parallelDiscoveryManager.Initialize(skipDefaultAdapters);

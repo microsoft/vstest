@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         #region Fields
 
         private static TestExecutorExtensionManager testExecutorExtensionManager;
-        private static object synclock = new object();
+        private static readonly object synclock = new();
 
         #endregion
 
@@ -38,7 +38,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// This constructor is not public because instances should be retrieved using the
         /// factory method.  The constructor is protected for testing purposes.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         protected TestExecutorExtensionManager(
             IEnumerable<LazyExtension<ITestExecutor, Dictionary<string, object>>> unfilteredTestExtensions,
             IEnumerable<LazyExtension<ITestExecutor, ITestExecutorCapabilities>> testExtensions,
@@ -133,11 +132,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                                 out var testExtensions2);
 
                         // Merge the extension lists.
-                        var mergedUnfilteredTestExtensions = TestExecutorExtensionManager.MergeTestExtensionLists(
+                        var mergedUnfilteredTestExtensions = MergeTestExtensionLists(
                             unfilteredTestExtensions1,
                             unfilteredTestExtensions2);
 
-                        var mergedTestExtensions = TestExecutorExtensionManager.MergeTestExtensionLists(
+                        var mergedTestExtensions = MergeTestExtensionLists(
                             testExtensions1,
                             testExtensions2);
 
@@ -178,11 +177,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     out var testExtensions2);
 
             // Merge the extension lists.
-            var mergedUnfilteredTestExtensions = TestExecutorExtensionManager.MergeTestExtensionLists(
+            var mergedUnfilteredTestExtensions = MergeTestExtensionLists(
                     unfilteredTestExtensions1,
                     unfilteredTestExtensions2);
 
-            var mergedTestExtensions = TestExecutorExtensionManager.MergeTestExtensionLists(
+            var mergedTestExtensions = MergeTestExtensionLists(
                 testExtensions1,
                 testExtensions2);
 
@@ -252,7 +251,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <param name="extensionUri">Uri identifying the executor</param>
         public TestExecutorMetadata(string extensionUri)
         {
-            this.ExtensionUri = extensionUri;
+            ExtensionUri = extensionUri;
         }
 
         /// <summary>

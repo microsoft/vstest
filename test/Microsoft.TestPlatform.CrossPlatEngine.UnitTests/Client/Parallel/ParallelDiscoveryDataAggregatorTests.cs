@@ -145,8 +145,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.AggregateDiscoveryDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
-
-            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.DiscoveryState, out var value));
+            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.DiscoveryState, out _));
         }
 
         [TestMethod]
@@ -166,8 +165,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         public void GetAggregatedDiscoveryDataMetricsShouldReturnEmptyIfMetricsIsNull()
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
-
-            var dict = new Dictionary<string, object>();
+            _ = new Dictionary<string, object>();
 
             aggregator.AggregateDiscoveryDataMetrics(null);
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
@@ -222,8 +220,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.AggregateDiscoveryDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
-
-            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, out var value));
+            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, out _));
         }
 
         [TestMethod]
@@ -235,8 +232,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.AggregateDiscoveryDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
-
-            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, out var value));
+            object value;
+            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, out _));
         }
     }
 }

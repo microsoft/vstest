@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         internal DefaultDataCollectionLauncher(IProcessHelper processHelper, IMessageLogger messageLogger) : base(processHelper, messageLogger)
         {
             this.processHelper = processHelper;
-            this.DataCollectorProcessId = -1;
+            DataCollectorProcessId = -1;
         }
 
         /// <summary>
@@ -52,26 +52,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
         public override int LaunchDataCollector(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
         {
-            string dataCollectorProcessPath = null;
             var dataCollectorDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation());
 
-            var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
+            var currentProcessPath = processHelper.GetCurrentProcessFileName();
 
             // If current process is dotnet/dotnet.exe and you are here, datacollector.exe is present in TestHost folder.
-            if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
-                || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
-            {
-                dataCollectorProcessPath = Path.Combine(dataCollectorDirectory, "TestHost", DataCollectorProcessName);
-            }
-            else
-            {
-                dataCollectorProcessPath = Path.Combine(dataCollectorDirectory, DataCollectorProcessName);
-            }
+            string dataCollectorProcessPath = currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
+                || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase)
+                ? Path.Combine(dataCollectorDirectory, "TestHost", DataCollectorProcessName)
+                : Path.Combine(dataCollectorDirectory, DataCollectorProcessName);
 
             var argumentsString = string.Join(" ", commandLineArguments);
-            var dataCollectorProcess = this.processHelper.LaunchProcess(dataCollectorProcessPath, argumentsString, Directory.GetCurrentDirectory(), environmentVariables, this.ErrorReceivedCallback, this.ExitCallBack, null) ;
-            this.DataCollectorProcessId = this.processHelper.GetProcessId(dataCollectorProcess);
-            return this.DataCollectorProcessId;
+            var dataCollectorProcess = processHelper.LaunchProcess(dataCollectorProcessPath, argumentsString, Directory.GetCurrentDirectory(), environmentVariables, ErrorReceivedCallback, ExitCallBack, null) ;
+            DataCollectorProcessId = processHelper.GetProcessId(dataCollectorProcess);
+            return DataCollectorProcessId;
         }
     }
 }

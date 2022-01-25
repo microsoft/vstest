@@ -47,26 +47,26 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         public RunEventHandler()
         {
-            this.TestResults = new List<TestResult>();
-            this.Errors = new List<string>();
-            this.Attachments = new List<AttachmentSet>();
-            this.InvokedDataCollectors = new List<InvokedDataCollector>();
+            TestResults = new List<TestResult>();
+            Errors = new List<string>();
+            Attachments = new List<AttachmentSet>();
+            InvokedDataCollectors = new List<InvokedDataCollector>();
         }
 
         public void EnsureSuccess()
         {
-            if (this.Errors.Any())
+            if (Errors.Any())
             {
-                throw new InvalidOperationException($"Test run reported errors:{Environment.NewLine}{string.Join(Environment.NewLine + Environment.NewLine, this.Errors)}");
+                throw new InvalidOperationException($"Test run reported errors:{Environment.NewLine}{string.Join(Environment.NewLine + Environment.NewLine, Errors)}");
             }
         }
 
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            this.LogMessage = message;
-            this.TestMessageLevel = level;
+            LogMessage = message;
+            TestMessageLevel = level;
             if (level == TestMessageLevel.Error) {
-                this.Errors.Add(message);
+                Errors.Add(message);
             }
         }
 
@@ -78,27 +78,27 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             if (lastChunkArgs != null && lastChunkArgs.NewTestResults != null)
             {
-                this.TestResults.AddRange(lastChunkArgs.NewTestResults);
+                TestResults.AddRange(lastChunkArgs.NewTestResults);
             }
 
             if (testRunCompleteArgs.AttachmentSets != null)
             {
-                this.Attachments.AddRange(testRunCompleteArgs.AttachmentSets);
+                Attachments.AddRange(testRunCompleteArgs.AttachmentSets);
             }
 
             if (testRunCompleteArgs.InvokedDataCollectors != null)
             {
-                this.InvokedDataCollectors.AddRange(testRunCompleteArgs.InvokedDataCollectors);
+                InvokedDataCollectors.AddRange(testRunCompleteArgs.InvokedDataCollectors);
             }
 
-            this.Metrics = testRunCompleteArgs.Metrics;
+            Metrics = testRunCompleteArgs.Metrics;
         }
 
         public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
         {
             if (testRunChangedArgs != null && testRunChangedArgs.NewTestResults != null)
             {
-                this.TestResults.AddRange(testRunChangedArgs.NewTestResults);
+                TestResults.AddRange(testRunChangedArgs.NewTestResults);
             }
         }
 

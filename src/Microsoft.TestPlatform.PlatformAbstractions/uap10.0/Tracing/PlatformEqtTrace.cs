@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public class PlatformEqtTrace : IPlatformEqtTrace
     {
-        private static object initLock = new object();
+        private static readonly object initLock = new();
 
         private static bool isInitialized = false;
 
@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public void WriteLine(PlatformTraceLevel level, string message)
         {
-            if (this.TraceInitialized() && TraceLevel > PlatformTraceLevel.Off)
+            if (TraceInitialized() && TraceLevel > PlatformTraceLevel.Off)
             {
                 switch (level)
                 {
@@ -72,13 +72,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public bool InitializeVerboseTrace(string customLogFile)
         {
-            return this.InitializeTrace(customLogFile, PlatformTraceLevel.Verbose);
+            return InitializeTrace(customLogFile, PlatformTraceLevel.Verbose);
         }
 
         /// <inheritdoc/>
         public bool InitializeTrace(string customLogFile, PlatformTraceLevel traceLevel)
         {
-            string logFileName = string.Empty;
+            string logFileName;
             try
             {
                 logFileName = Path.GetFileNameWithoutExtension(customLogFile.TrimStart('"').TrimEnd('"')).Replace(" ", "_");
@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             LogFile = Path.Combine(Path.GetTempPath(), logFileName + ".TpTrace.log");
             TraceLevel = traceLevel;
 
-            return this.TraceInitialized();
+            return TraceInitialized();
         }
 
         /// <inheritdoc/>
@@ -137,7 +137,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 {
                     var eventListener = new FileEventListener(string.IsNullOrEmpty(LogFile) ? "UnitTestLog" : LogFile);
 
-                    PlatformTraceLevel traceLevel = this.GetTraceLevel();
+                    PlatformTraceLevel traceLevel = GetTraceLevel();
                     if (traceLevel > PlatformTraceLevel.Off)
                     {
                         eventListener.EnableEvents(UnitTestEventSource.Log, EventLevel.Error);
@@ -162,7 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 }
                 catch (Exception ex)
                 {
-                    this.UnInitializeTrace();
+                    UnInitializeTrace();
                     ErrorOnInitialization = ex.Message;
                     return false;
                 }

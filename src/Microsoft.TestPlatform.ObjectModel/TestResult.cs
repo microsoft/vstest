@@ -25,14 +25,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="testCase">The test case the result is for.</param>
         public TestResult(TestCase testCase)
         {
-            this.TestCase = testCase ?? throw new ArgumentNullException(nameof(testCase));
-            this.Messages = new Collection<TestResultMessage>();
-            this.Attachments = new Collection<AttachmentSet>();
+            TestCase = testCase ?? throw new ArgumentNullException(nameof(testCase));
+            Messages = new Collection<TestResultMessage>();
+            Attachments = new Collection<AttachmentSet>();
 
             // Default start and end time values for a test result are initialized to current time stamp
             // to maintain compatibility.
-            this.StartTime = DateTimeOffset.UtcNow;
-            this.EndTime = DateTimeOffset.UtcNow;
+            StartTime = DateTimeOffset.UtcNow;
+            EndTime = DateTimeOffset.UtcNow;
         }
 
         #endregion
@@ -123,38 +123,38 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            StringBuilder result = new();
 
             // Add the outcome of the test and the name of the test.
             result.AppendFormat(
                 CultureInfo.CurrentUICulture,
                 Resources.Resources.BasicTestResultFormat,
-                this.TestCase.DisplayName,
-                TestOutcomeHelper.GetOutcomeString(this.Outcome));
+                TestCase.DisplayName,
+                TestOutcomeHelper.GetOutcomeString(Outcome));
 
             // Add the error message and stack trace if this is a test failure.
-            if (this.Outcome == TestOutcome.Failed)
+            if (Outcome == TestOutcome.Failed)
             {
                 // Add Error message.
                 result.AppendLine();
-                result.AppendFormat(CultureInfo.CurrentUICulture, Resources.Resources.TestFailureMessageFormat, this.ErrorMessage);
+                result.AppendFormat(CultureInfo.CurrentUICulture, Resources.Resources.TestFailureMessageFormat, ErrorMessage);
 
                 // Add stack trace if we have one.
-                if (!string.IsNullOrWhiteSpace(this.ErrorStackTrace))
+                if (!string.IsNullOrWhiteSpace(ErrorStackTrace))
                 {
                     result.AppendLine();
                     result.AppendFormat(
                         CultureInfo.CurrentUICulture,
                         Resources.Resources.TestFailureStackTraceFormat,
-                        this.ErrorStackTrace);
+                        ErrorStackTrace);
                 }
             }
 
             // Add any text messages we have.
-            if (this.Messages.Count > 0)
+            if (Messages.Count > 0)
             {
-                StringBuilder testMessages = new StringBuilder();
-                foreach (TestResultMessage message in this.Messages)
+                StringBuilder testMessages = new();
+                foreach (TestResultMessage message in Messages)
                 {
                     if (!string.IsNullOrEmpty(message?.Category) && !string.IsNullOrEmpty(message.Text))
                     {
@@ -191,21 +191,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             switch (property.Id)
             {
                 case "TestResult.ComputerName":
-                    return this.ComputerName;
+                    return ComputerName;
                 case "TestResult.DisplayName":
-                    return this.DisplayName;
+                    return DisplayName;
                 case "TestResult.Duration":
-                    return this.Duration;
+                    return Duration;
                 case "TestResult.EndTime":
-                    return this.EndTime;
+                    return EndTime;
                 case "TestResult.ErrorMessage":
-                    return this.ErrorMessage;
+                    return ErrorMessage;
                 case "TestResult.ErrorStackTrace":
-                    return this.ErrorStackTrace;
+                    return ErrorStackTrace;
                 case "TestResult.Outcome":
-                    return this.Outcome;
+                    return Outcome;
                 case "TestResult.StartTime":
-                    return this.StartTime;
+                    return StartTime;
             }
 
             return base.ProtectedGetPropertyValue(property, defaultValue);
@@ -221,21 +221,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             switch (property.Id)
             {
                 case "TestResult.ComputerName":
-                    this.ComputerName = (string)value; return;
+                    ComputerName = (string)value; return;
                 case "TestResult.DisplayName":
-                    this.DisplayName = (string)value; return;
+                    DisplayName = (string)value; return;
                 case "TestResult.Duration":
-                    this.Duration = (TimeSpan)value; return;
+                    Duration = (TimeSpan)value; return;
                 case "TestResult.EndTime":
-                    this.EndTime = (DateTimeOffset)value; return;
+                    EndTime = (DateTimeOffset)value; return;
                 case "TestResult.ErrorMessage":
-                    this.ErrorMessage = (string)value; return;
+                    ErrorMessage = (string)value; return;
                 case "TestResult.ErrorStackTrace":
-                    this.ErrorStackTrace = (string)value; return;
+                    ErrorStackTrace = (string)value; return;
                 case "TestResult.Outcome":
-                    this.Outcome = (TestOutcome)value; return;
+                    Outcome = (TestOutcome)value; return;
                 case "TestResult.StartTime":
-                    this.StartTime = (DateTimeOffset)value; return;
+                    StartTime = (DateTimeOffset)value; return;
             }
             base.ProtectedSetPropertyValue(property, value);
         }
@@ -279,8 +279,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="text">Text of the message.</param>
         public TestResultMessage(string category, string text)
         {
-            this.Category = category;
-            this.Text = text;
+            Category = category;
+            Text = text;
         }
 
         /// <summary>
@@ -310,28 +310,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     public static class TestResultProperties
     {
 #if !FullCLR
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty DisplayName = TestProperty.Register("TestResult.DisplayName", "TestResult Display Name", typeof(string), TestPropertyAttributes.Hidden, typeof(TestResult));
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty ComputerName = TestProperty.Register("TestResult.ComputerName", "Computer Name", typeof(string), TestPropertyAttributes.None, typeof(TestResult));
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty Outcome = TestProperty.Register("TestResult.Outcome", "Outcome", string.Empty, string.Empty, typeof(TestOutcome), ValidateOutcome, TestPropertyAttributes.None, typeof(TestResult));
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty Duration = TestProperty.Register("TestResult.Duration", "Duration", typeof(TimeSpan), typeof(TestResult));
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty StartTime = TestProperty.Register("TestResult.StartTime", "Start Time", typeof(DateTimeOffset), typeof(TestResult));
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty EndTime = TestProperty.Register("TestResult.EndTime", "End Time", typeof(DateTimeOffset), typeof(TestResult));
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty ErrorMessage = TestProperty.Register("TestResult.ErrorMessage", "Error Message", typeof(string), typeof(TestResult));
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty ErrorStackTrace = TestProperty.Register("TestResult.ErrorStackTrace", "Error Stack Trace", typeof(string), typeof(TestResult));
 #else
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]

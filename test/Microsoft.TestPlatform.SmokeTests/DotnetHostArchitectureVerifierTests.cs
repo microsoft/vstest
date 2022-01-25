@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.SmokeTests
         [DataRow("X86")]
         public void VerifyHostArchitecture(string architecture)
         {
-            using Workspace workSpace = new Workspace(GetResultsDirectory());
+            using Workspace workSpace = new(GetResultsDirectory());
             string dotnetPath = GetDownloadedDotnetMuxerFromTools(architecture);
             var vstestConsolePath = GetDotnetRunnerPath();
             var dotnetRunnerPath = workSpace.CreateDirectory("dotnetrunner");
@@ -39,7 +39,7 @@ namespace Microsoft.TestPlatform.SmokeTests
                 ["ExpectedArchitecture"] = architecture
             };
 
-            this.ExecuteApplication(dotnetPath, "new mstest", out string stdOut, out string stdError, out int exitCode, environmentVariables, workSpace.Path);
+            ExecuteApplication(dotnetPath, "new mstest", out string stdOut, out string stdError, out int exitCode, environmentVariables, workSpace.Path);
 
             // Patch test file
             File.WriteAllText(Path.Combine(workSpace.Path, "UnitTest1.cs"),
@@ -59,7 +59,7 @@ public class UnitTest1
     }
 }");
 
-            this.ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\"", out stdOut, out stdError, out exitCode, environmentVariables, workSpace.Path);
+            ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\"", out stdOut, out stdError, out exitCode, environmentVariables, workSpace.Path);
             Assert.AreEqual(0, exitCode, stdOut);
         }
 

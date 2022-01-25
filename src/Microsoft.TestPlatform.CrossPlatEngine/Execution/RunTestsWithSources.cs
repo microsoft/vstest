@@ -26,11 +26,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
     internal class RunTestsWithSources : BaseRunTests
     {
-        private Dictionary<string, IEnumerable<string>> adapterSourceMap;
+        private readonly Dictionary<string, IEnumerable<string>> adapterSourceMap;
 
         private Dictionary<Tuple<Uri,string>, IEnumerable<string>> executorUriVsSourceList;
 
-        private ITestCaseEventsHandler testCaseEventsHandler;
+        private readonly ITestCaseEventsHandler testCaseEventsHandler;
 
         public RunTestsWithSources(IRequestData requestData, Dictionary<string, IEnumerable<string>> adapterSourceMap, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
             : this(requestData, adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
@@ -62,30 +62,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             // If run was with sources and no test was executed and cancellation was not requested,
             // then raise a warning saying that no test was present in the sources.
             // The warning is raised only if total no of tests that have been run is zero.
-            if (!exceptionsHitDuringRunTests && this.executorUriVsSourceList?.Count > 0 && !this.IsCancellationRequested
-                && this.TestRunCache?.TotalExecutedTests <= 0)
+            if (!exceptionsHitDuringRunTests && executorUriVsSourceList?.Count > 0 && !IsCancellationRequested
+                && TestRunCache?.TotalExecutedTests <= 0)
             {
-                this.LogWarningOnNoTestsExecuted();
+                LogWarningOnNoTestsExecuted();
             }
         }
 
         private void LogWarningOnNoTestsExecuted()
         {
             IEnumerable<string> sources = new List<string>();
-            var sourcesArray = this.adapterSourceMap.Values
+            var sourcesArray = adapterSourceMap.Values
                 .Aggregate(sources, (current, enumerable) => current.Concat(enumerable)).ToArray();
             var sourcesString = string.Join(" ", sourcesArray);
 
-            if (this.TestExecutionContext.TestCaseFilter != null)
+            if (TestExecutionContext.TestCaseFilter != null)
             {
-                var testCaseFilterToShow = TestCaseFilterDeterminer.ShortenTestCaseFilterIfRequired(this.TestExecutionContext.TestCaseFilter);
-                this.TestRunEventsHandler?.HandleLogMessage(
+                var testCaseFilterToShow = TestCaseFilterDeterminer.ShortenTestCaseFilterIfRequired(TestExecutionContext.TestCaseFilter);
+                TestRunEventsHandler?.HandleLogMessage(
                     TestMessageLevel.Warning,
                     string.Format(CrossPlatEngineResources.NoTestsAvailableForGivenTestCaseFilter, testCaseFilterToShow, sourcesString));
             }
             else
             {
-                this.TestRunEventsHandler?.HandleLogMessage(
+                TestRunEventsHandler?.HandleLogMessage(
                     TestMessageLevel.Warning,
                     string.Format(
                         CultureInfo.CurrentUICulture,
@@ -96,17 +96,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         protected override IEnumerable<Tuple<Uri,string>> GetExecutorUriExtensionMap(IFrameworkHandle testExecutorFrameworkHandle, RunContext runContext)
         {
-            this.executorUriVsSourceList = this.GetExecutorVsSourcesList(testExecutorFrameworkHandle);
-            var executorUris = this.executorUriVsSourceList.Keys;
+            executorUriVsSourceList = GetExecutorVsSourcesList(testExecutorFrameworkHandle);
+            var executorUris = executorUriVsSourceList.Keys;
 
-            if (!string.IsNullOrEmpty(this.TestExecutionContext.TestCaseFilter))
-            {
-                runContext.FilterExpressionWrapper = new FilterExpressionWrapper(this.TestExecutionContext.TestCaseFilter, this.TestExecutionContext.FilterOptions);
-            }
-            else
-            {
-                runContext.FilterExpressionWrapper = null;
-            }
+            runContext.FilterExpressionWrapper = !string.IsNullOrEmpty(TestExecutionContext.TestCaseFilter)
+                ? new FilterExpressionWrapper(TestExecutionContext.TestCaseFilter, TestExecutionContext.FilterOptions)
+                : null;
 
             return executorUris;
         }
@@ -117,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             RunContext runContext,
             IFrameworkHandle frameworkHandle)
         {
-            executor?.Value.RunTests(this.executorUriVsSourceList[executorUriExtensionTuple], runContext, frameworkHandle);
+            executor?.Value.RunTests(executorUriVsSourceList[executorUriExtensionTuple], runContext, frameworkHandle);
         }
 
         /// <inheritdoc />
@@ -128,13 +123,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             // If the adapter doesn't implement the new test executor interface we should attach to
             // the default test host by default to preserve old behavior.
-            if (!(executor?.Value is ITestExecutor2 convertedExecutor))
-            {
-                return true;
-            }
-
-            return convertedExecutor.ShouldAttachToTestHost(
-                this.executorUriVsSourceList[executorUriExtensionTuple],
+            return !(executor?.Value is ITestExecutor2 convertedExecutor)
+|| convertedExecutor.ShouldAttachToTestHost(
+                executorUriVsSourceList[executorUriExtensionTuple],
                 runContext);
         }
 
@@ -148,7 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             var verifiedExtensionSourceMap = new Dictionary<string, IEnumerable<string>>();
 
             // Validate the sources 
-            foreach (var kvp in this.adapterSourceMap)
+            foreach (var kvp in adapterSourceMap)
             {
                 var verifiedSources = DiscoveryManager.GetValidSources(kvp.Value, logger, package);
                 if (verifiedSources.Any())
@@ -215,17 +206,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private static string TestCaseFilterToShow(string testCaseFilter)
         {
             var maxTestCaseFilterToShowLength = 63;
-            string testCaseFilterToShow;
-
-            if (testCaseFilter.Length > maxTestCaseFilterToShowLength)
-            {
-                testCaseFilterToShow = testCaseFilter.Substring(0, maxTestCaseFilterToShowLength - 3) + "...";
-            }
-            else
-            {
-                testCaseFilterToShow = testCaseFilter;
-            }
-
+            string testCaseFilterToShow = testCaseFilter.Length > maxTestCaseFilterToShowLength
+                ? testCaseFilter.Substring(0, maxTestCaseFilterToShowLength - 3) + "..."
+                : testCaseFilter;
             return testCaseFilterToShow;
         }
 
@@ -234,7 +217,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// </summary>
         protected override void SendSessionEnd()
         {
-            this.testCaseEventsHandler?.SendSessionEnd();
+            testCaseEventsHandler?.SendSessionEnd();
         }
 
         /// <summary>
@@ -243,17 +226,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         protected override void SendSessionStart()
         {
             // Send session start with test sources in property bag for session start event args.
-            if (this.testCaseEventsHandler == null)
+            if (testCaseEventsHandler == null)
             {
                 return;
             }
 
             var properties = new Dictionary<string, object>
             {
-                { "TestSources", TestSourcesUtility.GetSources(this.adapterSourceMap) }
+                { "TestSources", TestSourcesUtility.GetSources(adapterSourceMap) }
             };
 
-            this.testCaseEventsHandler.SendSessionStart(properties);
+            testCaseEventsHandler.SendSessionStart(properties);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void GetMetadataShouldReturnHelpArgumentProcessorCapabilities()
         {
-            HelpArgumentProcessor processor = new HelpArgumentProcessor();
+            HelpArgumentProcessor processor = new();
             Assert.IsTrue(processor.Metadata.Value is HelpArgumentProcessorCapabilities);
         }
 
@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void GetExecuterShouldReturnHelpArgumentProcessorCapabilities()
         {
-            HelpArgumentProcessor processor = new HelpArgumentProcessor();
+            HelpArgumentProcessor processor = new();
             Assert.IsTrue(processor.Executor.Value is HelpArgumentExecutor);
         }
 
@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void CapabilitiesShouldAppropriateProperties()
         {
-            HelpArgumentProcessorCapabilities capabilities = new HelpArgumentProcessorCapabilities();
+            HelpArgumentProcessorCapabilities capabilities = new();
             Assert.AreEqual("/Help", capabilities.CommandName);
             Assert.AreEqual("-?|--Help|/?|/Help" + Environment.NewLine + "      Display this usage message.", capabilities.HelpContentResourceName);
 
@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecuterExecuteReturnArgumentProcessorResultAbort()
         {
-            HelpArgumentExecutor executor = new HelpArgumentExecutor();
+            HelpArgumentExecutor executor = new();
             var result = executor.Execute();
             Assert.AreEqual(ArgumentProcessorResult.Abort, result);
         }
@@ -64,10 +64,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecuterExecuteWritesAppropriateDataToConsole()
         {
-            HelpArgumentExecutor executor = new HelpArgumentExecutor();
+            HelpArgumentExecutor executor = new();
             var output = new DummyConsoleOutput();
             executor.Output = output;
-            var result = executor.Execute();
+            _ = executor.Execute();
             Assert.IsTrue(output.Lines.Contains("Usage: vstest.console.exe [Arguments] [Options] [[--] <RunSettings arguments>...]]"));
             Assert.IsTrue(output.Lines.Contains("Arguments:"));
             Assert.IsTrue(output.Lines.Contains("Options:"));
@@ -85,17 +85,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
         public DummyConsoleOutput()
         {
-            this.Lines = new List<string>();
+            Lines = new List<string>();
         }
 
         public void WriteLine(string message, OutputLevel level)
         {
-            this.Lines.Add(message);
+            Lines.Add(message);
         }
 
         public void Write(string message, OutputLevel level)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

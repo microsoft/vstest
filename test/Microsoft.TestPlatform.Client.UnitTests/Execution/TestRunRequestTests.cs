@@ -33,19 +33,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         Mock<IProxyExecutionManager> executionManager;
         private readonly Mock<ITestLoggerManager> loggerManager;
         TestRunCriteria testRunCriteria;
-        private Mock<IRequestData> mockRequestData;
+        private readonly Mock<IRequestData> mockRequestData;
 
-        private Mock<IDataSerializer> mockDataSerializer;
+        private readonly Mock<IDataSerializer> mockDataSerializer;
 
         public TestRunRequestTests()
         {
             testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1);
             executionManager = new Mock<IProxyExecutionManager>();
-            this.loggerManager = new Mock<ITestLoggerManager>();
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
-            this.mockDataSerializer = new Mock<IDataSerializer>();
-            testRunRequest = new TestRunRequest(this.mockRequestData.Object, testRunCriteria, executionManager.Object, loggerManager.Object, this.mockDataSerializer.Object);
+            loggerManager = new Mock<ITestLoggerManager>();
+            mockRequestData = new Mock<IRequestData>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+            mockDataSerializer = new Mock<IDataSerializer>();
+            testRunRequest = new TestRunRequest(mockRequestData.Object, testRunCriteria, executionManager.Object, loggerManager.Object, mockDataSerializer.Object);
         }
 
         [TestMethod]
@@ -159,9 +159,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         [TestMethod]
         public void OnTestSessionTimeoutShouldCallAbort()
         {
-            this.testRunRequest.ExecuteAsync();
-            this.testRunRequest.OnTestSessionTimeout(null);
-            this.executionManager.Verify(o => o.Abort(It.IsAny<ITestRunEventsHandler>()), Times.Once);
+            testRunRequest.ExecuteAsync();
+            testRunRequest.OnTestSessionTimeout(null);
+            executionManager.Verify(o => o.Abort(It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
         [TestMethod]
@@ -170,17 +170,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             bool handleLogMessageCalled = false;
             bool handleRawMessageCalled = false;
 
-            this.testRunRequest.TestRunMessage += (object sender, TestRunMessageEventArgs e) =>
-                {
-                    handleLogMessageCalled = true;
-                };
+            testRunRequest.TestRunMessage += (object sender, TestRunMessageEventArgs e) => handleLogMessageCalled = true;
 
-            this.testRunRequest.OnRawMessageReceived += (object sender, string message) =>
-                {
-                    handleRawMessageCalled = true;
-                };
+            testRunRequest.OnRawMessageReceived += (object sender, string message) => handleRawMessageCalled = true;
 
-            this.testRunRequest.OnTestSessionTimeout(null);
+            testRunRequest.OnTestSessionTimeout(null);
 
             Assert.IsTrue(handleLogMessageCalled, "OnTestSessionTimeout should call HandleLogMessage");
             Assert.IsTrue(handleRawMessageCalled, "OnTestSessionTimeout should call HandleRawMessage");
@@ -199,9 +193,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
             var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1, true, settingsXml);
             var executionManager = new Mock<IProxyExecutionManager>();
-            var testRunRequest = new TestRunRequest(this.mockRequestData.Object, testRunCriteria, executionManager.Object, loggerManager.Object);
+            var testRunRequest = new TestRunRequest(mockRequestData.Object, testRunCriteria, executionManager.Object, loggerManager.Object);
 
-            ManualResetEvent onTestSessionTimeoutCalled = new ManualResetEvent(true);
+            ManualResetEvent onTestSessionTimeoutCalled = new(true);
             onTestSessionTimeoutCalled.Reset();
             executionManager.Setup(o => o.Abort(It.IsAny<ITestRunEventsHandler>())).Callback(() => onTestSessionTimeoutCalled.Set());
 
@@ -227,9 +221,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
             var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1, true, settingsXml);
             var executionManager = new Mock<IProxyExecutionManager>();
-            var testRunRequest = new TestRunRequest(this.mockRequestData.Object, testRunCriteria, executionManager.Object, loggerManager.Object);
+            var testRunRequest = new TestRunRequest(mockRequestData.Object, testRunCriteria, executionManager.Object, loggerManager.Object);
 
-            executionManager.Setup(o => o.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).Callback(() => System.Threading.Thread.Sleep(5 * 1000));
+            executionManager.Setup(o => o.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).Callback(() => Thread.Sleep(5 * 1000));
 
             testRunRequest.ExecuteAsync();
 
@@ -244,14 +238,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             var testResults = new List<ObjectModel.TestResult>
                                   {
                                       new ObjectModel.TestResult(
-                                          new ObjectModel.TestCase(
+                                          new TestCase(
                                           "A.C.M",
                                           new Uri("executor://dummy"),
                                           "A"))
                                   };
-            var activeTestCases = new List<ObjectModel.TestCase>
+            var activeTestCases = new List<TestCase>
                                       {
-                                          new ObjectModel.TestCase(
+                                          new TestCase(
                                               "A.C.M2",
                                               new Uri("executor://dummy"),
                                               "A")
@@ -259,10 +253,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             var testRunChangedEventArgs = new TestRunChangedEventArgs(mockStats.Object, testResults, activeTestCases);
             TestRunChangedEventArgs receivedArgs = null;
 
-            testRunRequest.OnRunStatsChange += (object sender, TestRunChangedEventArgs e) =>
-                {
-                    receivedArgs = e;
-                };
+            testRunRequest.OnRunStatsChange += (object sender, TestRunChangedEventArgs e) => receivedArgs = e;
 
             // Act.
             testRunRequest.HandleTestRunStatsChange(testRunChangedEventArgs);
@@ -285,7 +276,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             // Call should NOT fail even if on raw message received is not registered.
             testRunRequest.HandleRawMessage(rawMessage);
 
-            EventHandler<string> handler = (sender, e) => { messageReceived = e; };
+            EventHandler<string> handler = (sender, e) => messageReceived = e;
             testRunRequest.OnRawMessageReceived += handler;
 
             testRunRequest.HandleRawMessage(rawMessage);
@@ -298,68 +289,65 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         public void HandleRawMessageShouldAddVSTestDataPointsIfTelemetryOptedIn()
         {
             bool onDiscoveryCompleteInvoked = true;
-            this.mockRequestData.Setup(x => x.IsTelemetryOptedIn).Returns(true);
-            this.testRunRequest.OnRawMessageReceived += (object sender, string e) =>
-                {
-                    onDiscoveryCompleteInvoked = true;
-                };
+            mockRequestData.Setup(x => x.IsTelemetryOptedIn).Returns(true);
+            testRunRequest.OnRawMessageReceived += (object sender, string e) => onDiscoveryCompleteInvoked = true;
 
-            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
+            mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
                 .Returns(new Message() { MessageType = MessageType.ExecutionComplete });
 
-            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
+            mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
                 .Returns(new TestRunCompletePayload()
                 {
                     TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.MinValue)
                 });
 
-            this.testRunRequest.HandleRawMessage(string.Empty);
+            testRunRequest.HandleRawMessage(string.Empty);
 
-            this.mockDataSerializer.Verify(x => x.SerializePayload(It.IsAny<string>(), It.IsAny<TestRunCompletePayload>()), Times.Once);
-            this.mockRequestData.Verify(x => x.MetricsCollection, Times.AtLeastOnce);
+            mockDataSerializer.Verify(x => x.SerializePayload(It.IsAny<string>(), It.IsAny<TestRunCompletePayload>()), Times.Once);
+            mockRequestData.Verify(x => x.MetricsCollection, Times.AtLeastOnce);
             Assert.IsTrue(onDiscoveryCompleteInvoked);
         }
 
         [TestMethod]
         public void HandleRawMessageShouldInvokeHandleTestRunCompleteOfLoggerManager()
         {
-            this.loggerManager.Setup(x => x.LoggersInitialized).Returns(true);
-            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
+            loggerManager.Setup(x => x.LoggersInitialized).Returns(true);
+            mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
                 .Returns(new Message() { MessageType = MessageType.ExecutionComplete });
 
             var testRunCompleteEvent = new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null,
                 null, TimeSpan.FromSeconds(0));
-            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
+            mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
                 .Returns(new TestRunCompletePayload()
                 {
                     TestRunCompleteArgs = testRunCompleteEvent
                 });
 
-            this.testRunRequest.ExecuteAsync();
-            this.testRunRequest.HandleRawMessage(string.Empty);
+            testRunRequest.ExecuteAsync();
+            testRunRequest.HandleRawMessage(string.Empty);
 
-            this.loggerManager.Verify(lm => lm.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>()), Times.Once);
+            loggerManager.Verify(lm => lm.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>()), Times.Once);
         }
 
         [TestMethod]
         public void HandleRawMessageShouldNotInvokeHandleTestRunCompleteOfLoggerManagerWhenNoLoggersInitiailized()
         {
-            this.loggerManager.Setup(x => x.LoggersInitialized).Returns(false);
-            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
+            loggerManager.Setup(x => x.LoggersInitialized).Returns(false);
+            mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
                 .Returns(new Message() { MessageType = MessageType.ExecutionComplete });
 
             var testRunCompleteEvent = new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null,
                 null, TimeSpan.FromSeconds(0));
-            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
+            mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
                 .Returns(new TestRunCompletePayload()
                 {
                     TestRunCompleteArgs = testRunCompleteEvent
                 });
 
-            this.testRunRequest.ExecuteAsync();
-            this.testRunRequest.HandleRawMessage(string.Empty);
+            testRunRequest.ExecuteAsync();
+            testRunRequest.HandleRawMessage(string.Empty);
 
-            this.loggerManager.Verify(lm => lm.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>()), Times.Never);
+            loggerManager.Verify(lm => lm.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>()), Times.Never);
         }
 
         [TestMethod]
@@ -370,36 +358,36 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             var testResults = new List<ObjectModel.TestResult>
             {
                 new ObjectModel.TestResult(
-                    new ObjectModel.TestCase(
+                    new TestCase(
                         "A.C.M",
                         new Uri("executor://dummy"),
                         "A"))
             };
-            var activeTestCases = new List<ObjectModel.TestCase>
+            var activeTestCases = new List<TestCase>
             {
-                new ObjectModel.TestCase(
+                new TestCase(
                     "A.C.M2",
                     new Uri("executor://dummy"),
                     "A")
             };
 
-            this.loggerManager.Setup(x => x.LoggersInitialized).Returns(true);
-            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
+            loggerManager.Setup(x => x.LoggersInitialized).Returns(true);
+            mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
                 .Returns(new Message() { MessageType = MessageType.ExecutionComplete });
 
             var testRunChangedEventArgs = new TestRunChangedEventArgs(mockStats.Object, testResults, activeTestCases);
             var testRunCompleteEvent = new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null,
                 null, TimeSpan.FromSeconds(0));
 
-            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
+            mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
                 .Returns(new TestRunCompletePayload()
                 {
                     TestRunCompleteArgs = testRunCompleteEvent,
                     LastRunTests = testRunChangedEventArgs
                 });
 
-            this.testRunRequest.ExecuteAsync();
-            this.testRunRequest.HandleRawMessage(string.Empty);
+            testRunRequest.ExecuteAsync();
+            testRunRequest.HandleRawMessage(string.Empty);
 
             loggerManager.Verify(lm => lm.HandleTestRunStatsChange(testRunChangedEventArgs), Times.Once);
             loggerManager.Verify(lm => lm.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>()), Times.Once);
@@ -413,14 +401,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             var testResults = new List<ObjectModel.TestResult>
             {
                 new ObjectModel.TestResult(
-                    new ObjectModel.TestCase(
+                    new TestCase(
                         "A.C.M",
                         new Uri("executor://dummy"),
                         "A"))
             };
-            var activeTestCases = new List<ObjectModel.TestCase>
+            var activeTestCases = new List<TestCase>
             {
-                new ObjectModel.TestCase(
+                new TestCase(
                     "A.C.M2",
                     new Uri("executor://dummy"),
                     "A")
@@ -440,14 +428,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             var testResults = new List<ObjectModel.TestResult>
             {
                 new ObjectModel.TestResult(
-                    new ObjectModel.TestCase(
+                    new TestCase(
                         "A.C.M",
                         new Uri("executor://dummy"),
                         "A"))
             };
-            var activeTestCases = new List<ObjectModel.TestCase>
+            var activeTestCases = new List<TestCase>
             {
-                new ObjectModel.TestCase(
+                new TestCase(
                     "A.C.M2",
                     new Uri("executor://dummy"),
                     "A")
@@ -492,9 +480,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             };
 
             mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
-            this.testRunRequest.ExecuteAsync();
+            testRunRequest.ExecuteAsync();
             var testRunCompeleteEventsArgs = new TestRunCompleteEventArgs(
                 new TestRunStatistics(1, null),
                 false,
@@ -506,7 +494,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             testRunCompeleteEventsArgs.Metrics = dict;
 
             // Act
-            this.testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, null, null);
+            testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, null, null);
 
             // Verify.
             mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForRun, It.IsAny<double>()), Times.Once);
@@ -517,14 +505,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         public void HandleTestRunCompleteShouldHandleListAttachments()
         {
             bool attachmentsFound = false;
-            this.testRunRequest.OnRunCompletion += (s, e) =>
-             {
-                 attachmentsFound = e.AttachmentSets != null && e.AttachmentSets.Count == 1;
-             };
+            testRunRequest.OnRunCompletion += (s, e) => attachmentsFound = e.AttachmentSets != null && e.AttachmentSets.Count == 1;
 
-            List<AttachmentSet> attachmentSets = new List<AttachmentSet> { new AttachmentSet(new Uri("datacollector://attachment"), "datacollectorAttachment") };
+            List<AttachmentSet> attachmentSets = new() { new AttachmentSet(new Uri("datacollector://attachment"), "datacollectorAttachment") };
 
-            this.testRunRequest.ExecuteAsync();
+            testRunRequest.ExecuteAsync();
             var testRunCompeleteEventsArgs = new TestRunCompleteEventArgs(
                 new TestRunStatistics(1, null),
                 false,
@@ -535,7 +520,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
                 TimeSpan.FromSeconds(0));
 
             // Act
-            this.testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, attachmentSets, null);
+            testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, attachmentSets, null);
 
             // Verify.
             Assert.IsTrue(attachmentsFound);
@@ -545,14 +530,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         public void HandleTestRunCompleteShouldHandleCollectionAttachments()
         {
             bool attachmentsFound = false;
-            this.testRunRequest.OnRunCompletion += (s, e) =>
-            {
-                attachmentsFound = e.AttachmentSets != null && e.AttachmentSets.Count == 1;
-            };
+            testRunRequest.OnRunCompletion += (s, e) => attachmentsFound = e.AttachmentSets != null && e.AttachmentSets.Count == 1;
 
-            Collection<AttachmentSet> attachmentSets = new Collection<AttachmentSet>(new List<AttachmentSet> { new AttachmentSet(new Uri("datacollector://attachment"), "datacollectorAttachment") });
+            Collection<AttachmentSet> attachmentSets = new(new List<AttachmentSet> { new AttachmentSet(new Uri("datacollector://attachment"), "datacollectorAttachment") });
 
-            this.testRunRequest.ExecuteAsync();
+            testRunRequest.ExecuteAsync();
             var testRunCompeleteEventsArgs = new TestRunCompleteEventArgs(
                 new TestRunStatistics(1, null),
                 false,
@@ -563,7 +545,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
                 TimeSpan.FromSeconds(0));
 
             // Act
-            this.testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, attachmentSets, null);
+            testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, attachmentSets, null);
 
             // Verify.
             Assert.IsTrue(attachmentsFound);
@@ -573,12 +555,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         public void HandleTestRunCompleteShouldHandleEmptyAttachments()
         {
             bool attachmentsFound = false;
-            this.testRunRequest.OnRunCompletion += (s, e) =>
-            {
-                attachmentsFound = (e.AttachmentSets.Count == 0);
-            };
+            testRunRequest.OnRunCompletion += (s, e) => attachmentsFound = (e.AttachmentSets.Count == 0);
 
-            this.testRunRequest.ExecuteAsync();
+            testRunRequest.ExecuteAsync();
             var testRunCompeleteEventsArgs = new TestRunCompleteEventArgs(
                 new TestRunStatistics(1, null),
                 false,
@@ -589,7 +568,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
                 TimeSpan.FromSeconds(0));
 
             // Act
-            this.testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, null, null);
+            testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, null, null);
 
             // Verify.
             Assert.IsTrue(attachmentsFound);
@@ -599,11 +578,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         public void HandleTestRunCompleteShouldCloseExecutionManager()
         {
             var events = new List<string>();
-            this.executionManager.Setup(em => em.Close()).Callback(() => events.Add("close"));
-            this.testRunRequest.OnRunCompletion += (s, e) => events.Add("complete");
-            this.testRunRequest.ExecuteAsync();
+            executionManager.Setup(em => em.Close()).Callback(() => events.Add("close"));
+            testRunRequest.OnRunCompletion += (s, e) => events.Add("complete");
+            testRunRequest.ExecuteAsync();
 
-            this.testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, null, TimeSpan.FromSeconds(0)), null, null, null);
+            testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, null, TimeSpan.FromSeconds(0)), null, null, null);
 
             Assert.AreEqual(2, events.Count);
             Assert.AreEqual("close", events[0]);
@@ -616,7 +595,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
             testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1, false, null, TimeSpan.Zero, mockCustomLauncher.Object);
             executionManager = new Mock<IProxyExecutionManager>();
-            testRunRequest = new TestRunRequest(this.mockRequestData.Object, testRunCriteria, executionManager.Object, loggerManager.Object);
+            testRunRequest = new TestRunRequest(mockRequestData.Object, testRunCriteria, executionManager.Object, loggerManager.Object);
 
             var testProcessStartInfo = new TestProcessStartInfo();
             testRunRequest.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
@@ -630,7 +609,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
             testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1, false, null, TimeSpan.Zero, mockCustomLauncher.Object);
             executionManager = new Mock<IProxyExecutionManager>();
-            testRunRequest = new TestRunRequest(this.mockRequestData.Object, testRunCriteria, executionManager.Object, loggerManager.Object);
+            testRunRequest = new TestRunRequest(mockRequestData.Object, testRunCriteria, executionManager.Object, loggerManager.Object);
 
             testRunRequest.ExecuteAsync();
 
@@ -646,7 +625,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
             testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1, false, null, TimeSpan.Zero, mockCustomLauncher.Object);
             executionManager = new Mock<IProxyExecutionManager>();
-            testRunRequest = new TestRunRequest(this.mockRequestData.Object, testRunCriteria, executionManager.Object, loggerManager.Object);
+            testRunRequest = new TestRunRequest(mockRequestData.Object, testRunCriteria, executionManager.Object, loggerManager.Object);
 
             testRunRequest.ExecuteAsync();
 
@@ -664,10 +643,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         public void ExecuteAsyncShouldInvokeOnRunStart()
         {
             bool onRunStartHandlerCalled = false;
-            this.testRunRequest.OnRunStart += (s, e) => onRunStartHandlerCalled = true;
+            testRunRequest.OnRunStart += (s, e) => onRunStartHandlerCalled = true;
 
             // Action
-            this.testRunRequest.ExecuteAsync();
+            testRunRequest.ExecuteAsync();
 
             // Assert
             Assert.IsTrue(onRunStartHandlerCalled, "ExecuteAsync should invoke OnRunstart event");
@@ -676,7 +655,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         [TestMethod]
         public void ExecuteAsyncShouldInvokeHandleTestRunStartOfLoggerManager()
         {
-            this.testRunRequest.ExecuteAsync();
+            testRunRequest.ExecuteAsync();
 
             loggerManager.Verify(lm => lm.HandleTestRunStart(It.IsAny<TestRunStartEventArgs>()), Times.Once);
         }

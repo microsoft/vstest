@@ -21,8 +21,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
         /// </param>
         public TestCaseEndArgs(DataCollectionContext dataCollectionContext, TestOutcome outcome)
         {
-            this.TestOutcome = outcome;
-            this.DataCollectionContext = dataCollectionContext;
+            TestOutcome = outcome;
+            DataCollectionContext = dataCollectionContext;
         }
 
         /// <summary>

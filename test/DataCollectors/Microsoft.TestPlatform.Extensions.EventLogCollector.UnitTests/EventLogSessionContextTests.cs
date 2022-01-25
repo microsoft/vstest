@@ -11,45 +11,45 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
     [TestClass]
     public class EventLogSessionContextTests
     {
-        private Dictionary<string, IEventLogContainer> eventLogContainersMap;
+        private readonly Dictionary<string, IEventLogContainer> eventLogContainersMap;
 
-        private DummyEventLogContainer mockEventLogContainer;
+        private readonly DummyEventLogContainer mockEventLogContainer;
 
         private EventLogSessionContext eventLogSessionContext;
 
         public EventLogSessionContextTests()
         {
-            this.mockEventLogContainer = new DummyEventLogContainer(true);
-            this.eventLogContainersMap = new Dictionary<string, IEventLogContainer>
+            mockEventLogContainer = new DummyEventLogContainer(true);
+            eventLogContainersMap = new Dictionary<string, IEventLogContainer>
             {
-                { "LogName", this.mockEventLogContainer }
+                { "LogName", mockEventLogContainer }
             };
         }
 
         [TestMethod]
         public void CreateEventLogContainerStartIndexMapShouldCreateStartIndexMap()
         {
-            this.eventLogSessionContext = new EventLogSessionContext(this.eventLogContainersMap);
-            Assert.IsTrue(this.eventLogSessionContext.EventLogContainerStartIndexMap["LogName"] == 2);
+            eventLogSessionContext = new EventLogSessionContext(eventLogContainersMap);
+            Assert.IsTrue(eventLogSessionContext.EventLogContainerStartIndexMap["LogName"] == 2);
         }
 
         [TestMethod]
         public void CreateEventLogContainerEndIndexMapShouldCreateEndIndexMap()
         {
-            this.eventLogSessionContext = new EventLogSessionContext(this.eventLogContainersMap);
-            this.eventLogSessionContext.CreateEventLogContainerEndIndexMap();
-            Assert.IsTrue(this.eventLogSessionContext.EventLogContainerEndIndexMap["LogName"] == 1);
+            eventLogSessionContext = new EventLogSessionContext(eventLogContainersMap);
+            eventLogSessionContext.CreateEventLogContainerEndIndexMap();
+            Assert.IsTrue(eventLogSessionContext.EventLogContainerEndIndexMap["LogName"] == 1);
         }
 
         [TestMethod]
         public void CreateEventLogContainerShouldNotAddIndexEntriesIfEventLogContainerMapsIsEmpty()
         {
-            this.eventLogSessionContext = new EventLogSessionContext(new Dictionary<string, IEventLogContainer>());
-            this.eventLogSessionContext.CreateEventLogContainerStartIndexMap();
-            this.eventLogSessionContext.CreateEventLogContainerEndIndexMap();
+            eventLogSessionContext = new EventLogSessionContext(new Dictionary<string, IEventLogContainer>());
+            eventLogSessionContext.CreateEventLogContainerStartIndexMap();
+            eventLogSessionContext.CreateEventLogContainerEndIndexMap();
 
-            Assert.IsTrue(this.eventLogSessionContext.EventLogContainerStartIndexMap.Count == 0);
-            Assert.IsTrue(this.eventLogSessionContext.EventLogContainerEndIndexMap.Count == 0);
+            Assert.IsTrue(eventLogSessionContext.EventLogContainerStartIndexMap.Count == 0);
+            Assert.IsTrue(eventLogSessionContext.EventLogContainerEndIndexMap.Count == 0);
         }
 
         [TestMethod]
@@ -59,12 +59,12 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             var dummyEventLogContainer = new DummyEventLogContainer(false);
             dict.Add("DummyEventLog", dummyEventLogContainer);
 
-            this.eventLogSessionContext = new EventLogSessionContext(dict);
-            this.eventLogSessionContext.CreateEventLogContainerStartIndexMap();
-            this.eventLogSessionContext.CreateEventLogContainerEndIndexMap();
+            eventLogSessionContext = new EventLogSessionContext(dict);
+            eventLogSessionContext.CreateEventLogContainerStartIndexMap();
+            eventLogSessionContext.CreateEventLogContainerEndIndexMap();
 
-            Assert.IsTrue(this.eventLogSessionContext.EventLogContainerStartIndexMap["DummyEventLog"] == 0);
-            Assert.IsTrue(this.eventLogSessionContext.EventLogContainerEndIndexMap["DummyEventLog"] == -1);
+            Assert.IsTrue(eventLogSessionContext.EventLogContainerStartIndexMap["DummyEventLog"] == 0);
+            Assert.IsTrue(eventLogSessionContext.EventLogContainerEndIndexMap["DummyEventLog"] == -1);
         }
     }
 
@@ -72,14 +72,14 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
     {
         public DummyEventLogContainer(bool initialize)
         {
-            this.EventLogEntries = new List<EventLogEntry>(10);
-            EventLog eventLog = new EventLog("Application");
+            EventLogEntries = new List<EventLogEntry>(10);
+            EventLog eventLog = new("Application");
 
             if (initialize)
             {
                 int currentIndex = eventLog.Entries[eventLog.Entries.Count - 1].Index - eventLog.Entries[0].Index;
-                this.EventLogEntries.Add(eventLog.Entries[currentIndex]);
-                this.EventLogEntries.Add(eventLog.Entries[currentIndex - 1]);
+                EventLogEntries.Add(eventLog.Entries[currentIndex]);
+                EventLogEntries.Add(eventLog.Entries[currentIndex - 1]);
             }
         }
 

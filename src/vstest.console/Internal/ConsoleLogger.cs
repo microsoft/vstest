@@ -23,8 +23,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     /// All the console logger messages prints to Standard Output with respective color, except OutputLevel.Error messages
     /// from adapters and test run result on failed.
     /// </summary>
-    [FriendlyName(ConsoleLogger.FriendlyName)]
-    [ExtensionUri(ConsoleLogger.ExtensionUri)]
+    [FriendlyName(FriendlyName)]
+    [ExtensionUri(ExtensionUri)]
     internal class ConsoleLogger : ITestLoggerWithParameters
     {
         #region Constants
@@ -82,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
         // Figure out the longest result string (+1 for ! where applicable), so we don't 
         // get misaligned output on non-english systems
-        private static int LongestResultIndicator = new[]
+        private static readonly int LongestResultIndicator = new[]
         {
             CommandLineResources.FailedTestIndicator.Length + 1,
             CommandLineResources.PassedTestIndicator.Length + 1,
@@ -106,10 +106,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// Level of verbosity
         /// </summary>
 #if NETFRAMEWORK
-        private Verbosity verbosityLevel = Verbosity.Normal;
 #else
         // Keep default verbosity for x-plat command line as minimal
-        private Verbosity verbosityLevel = Verbosity.Minimal;
 #endif
 
         private bool testRunHasErrorMessages = false;
@@ -136,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <param name="output"></param>
         internal ConsoleLogger(IOutput output, IProgressIndicator progressIndicator)
         {
-            ConsoleLogger.Output = output;
+            Output = output;
             this.progressIndicator = progressIndicator;
         }
 
@@ -159,7 +157,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <summary>
         /// Get the verbosity level for the console logger
         /// </summary>
-        public Verbosity VerbosityLevel => verbosityLevel;
+
+        public Verbosity VerbosityLevel { get; private set; } = Verbosity.Minimal;
 
         /// <summary>
         /// Tracks leaf test outcomes per source. This is needed to correctly count hierarchical tests as well as 
@@ -183,26 +182,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 throw new ArgumentNullException(nameof(events));
             }
 
-            if (ConsoleLogger.Output == null)
+            if (Output == null)
             {
-                ConsoleLogger.Output = ConsoleOutput.Instance;
+                Output = ConsoleOutput.Instance;
             }
 
-            if (this.progressIndicator == null && !Console.IsOutputRedirected && EnableProgress)
+            if (progressIndicator == null && !Console.IsOutputRedirected && EnableProgress)
             {
                 // Progress indicator needs to be displayed only for cli experience.
-                this.progressIndicator = new ProgressIndicator(Output, new ConsoleHelper());
+                progressIndicator = new ProgressIndicator(Output, new ConsoleHelper());
             }
 
             // Register for the events.
-            events.TestRunMessage += this.TestMessageHandler;
-            events.TestResult += this.TestResultHandler;
-            events.TestRunComplete += this.TestRunCompleteHandler;
-            events.TestRunStart += this.TestRunStartHandler;
+            events.TestRunMessage += TestMessageHandler;
+            events.TestResult += TestResultHandler;
+            events.TestRunComplete += TestRunCompleteHandler;
+            events.TestRunStart += TestRunStartHandler;
 
             // Register for the discovery events.
-            events.DiscoveryMessage += this.TestMessageHandler;
-            this.LeafTestResults = new ConcurrentDictionary<Guid, MinimalTestResult>();
+            events.DiscoveryMessage += TestMessageHandler;
+            LeafTestResults = new ConcurrentDictionary<Guid, MinimalTestResult>();
 
             // TODO Get changes from https://github.com/Microsoft/vstest/pull/1111/
             // events.DiscoveredTests += DiscoveredTestsHandler;
@@ -220,26 +219,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 throw new ArgumentException("No default parameters added", nameof(parameters));
             }
 
-            var verbosityExists = parameters.TryGetValue(ConsoleLogger.VerbosityParam, out var verbosity);
+            var verbosityExists = parameters.TryGetValue(VerbosityParam, out var verbosity);
             if (verbosityExists && Enum.TryParse(verbosity, true, out Verbosity verbosityLevel))
             {
-                this.verbosityLevel = verbosityLevel;
+                VerbosityLevel = verbosityLevel;
             }
 
-            var prefixExists = parameters.TryGetValue(ConsoleLogger.PrefixParam, out var prefix);
+            var prefixExists = parameters.TryGetValue(PrefixParam, out var prefix);
             if (prefixExists)
             {
                 bool.TryParse(prefix, out AppendPrefix);
             }
 
-            var progressArgExists = parameters.TryGetValue(ConsoleLogger.ProgressIndicatorParam, out var enableProgress);
+            var progressArgExists = parameters.TryGetValue(ProgressIndicatorParam, out var enableProgress);
             if (progressArgExists)
             {
                 bool.TryParse(enableProgress, out EnableProgress);
             }
 
-            parameters.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out this.targetFramework);
-            this.targetFramework = !string.IsNullOrEmpty(this.targetFramework) ? NuGetFramework.Parse(this.targetFramework).GetShortFolderName() : this.targetFramework;
+            parameters.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out targetFramework);
+            targetFramework = !string.IsNullOrEmpty(targetFramework) ? NuGetFramework.Parse(targetFramework).GetShortFolderName() : targetFramework;
 
             Initialize(events, String.Empty);
         }
@@ -429,12 +428,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestRunStartHandler(object sender, TestRunStartEventArgs e)
         {
-            ValidateArg.NotNull<object>(sender, nameof(sender));
-            ValidateArg.NotNull<TestRunStartEventArgs>(e, nameof(e));
+            ValidateArg.NotNull(sender, nameof(sender));
+            ValidateArg.NotNull(e, nameof(e));
 
             // Print all test containers.
             Output.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information);
-            if (verbosityLevel == Verbosity.Detailed)
+            if (VerbosityLevel == Verbosity.Detailed)
             {
                 foreach (var source in CommandLineOptions.Instance.Sources)
                 {
@@ -448,43 +447,43 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            ValidateArg.NotNull<object>(sender, nameof(sender));
-            ValidateArg.NotNull<TestRunMessageEventArgs>(e, nameof(e));
+            ValidateArg.NotNull(sender, nameof(sender));
+            ValidateArg.NotNull(e, nameof(e));
 
             switch (e.Level)
             {
                 case TestMessageLevel.Informational:
                     {
-                        if (verbosityLevel == Verbosity.Quiet || verbosityLevel == Verbosity.Minimal)
+                        if (VerbosityLevel == Verbosity.Quiet || VerbosityLevel == Verbosity.Minimal)
                         {
                             break;
                         }
 
                         // Pause the progress indicator to print the message
-                        this.progressIndicator?.Pause();
+                        progressIndicator?.Pause();
 
                         Output.Information(AppendPrefix, e.Message);
 
                         // Resume the progress indicator after printing the message
-                        this.progressIndicator?.Start();
+                        progressIndicator?.Start();
 
                         break;
                     }
 
                 case TestMessageLevel.Warning:
                     {
-                        if (verbosityLevel == Verbosity.Quiet)
+                        if (VerbosityLevel == Verbosity.Quiet)
                         {
                             break;
                         }
 
                         // Pause the progress indicator to print the message
-                        this.progressIndicator?.Pause();
+                        progressIndicator?.Pause();
 
                         Output.Warning(AppendPrefix, e.Message);
 
                         // Resume the progress indicator after printing the message
-                        this.progressIndicator?.Start();
+                        progressIndicator?.Start();
 
                         break;
                     }
@@ -492,13 +491,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 case TestMessageLevel.Error:
                     {
                         // Pause the progress indicator to print the message
-                        this.progressIndicator?.Pause();
+                        progressIndicator?.Pause();
 
-                        this.testRunHasErrorMessages = true;
+                        testRunHasErrorMessages = true;
                         Output.Error(AppendPrefix, e.Message);
 
                         // Resume the progress indicator after printing the message
-                        this.progressIndicator?.Start();
+                        progressIndicator?.Start();
 
                         break;
                     }
@@ -513,8 +512,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestResultHandler(object sender, TestResultEventArgs e)
         {
-            ValidateArg.NotNull<object>(sender, nameof(sender));
-            ValidateArg.NotNull<TestResultEventArgs>(e, nameof(e));
+            ValidateArg.NotNull(sender, nameof(sender));
+            ValidateArg.NotNull(e, nameof(e));
 
             var testDisplayName = e.Result.DisplayName;
 
@@ -523,7 +522,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 testDisplayName = e.Result.TestCase.DisplayName;
             }
 
-            string formattedDuration = this.GetFormattedDurationString(e.Result.Duration);
+            string formattedDuration = GetFormattedDurationString(e.Result.Duration);
             if (!string.IsNullOrEmpty(formattedDuration))
             {
                 testDisplayName = string.Format("{0} [{1}]", testDisplayName, formattedDuration);
@@ -552,63 +551,63 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 case TestOutcome.Skipped:
                     {
-                        if (this.verbosityLevel == Verbosity.Quiet)
+                        if (VerbosityLevel == Verbosity.Quiet)
                         {
                             break;
                         }
 
                         // Pause the progress indicator before displaying test result information
-                        this.progressIndicator?.Pause();
+                        progressIndicator?.Pause();
 
                         Output.Write(string.Format("{0}{1} ", TestResultPrefix, CommandLineResources.SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
                         Output.WriteLine(testDisplayName, OutputLevel.Information);
-                        if (this.verbosityLevel == Verbosity.Detailed)
+                        if (VerbosityLevel == Verbosity.Detailed)
                         {
                             DisplayFullInformation(e.Result);
                         }
 
                         // Resume the progress indicator after displaying the test result information
-                        this.progressIndicator?.Start();
+                        progressIndicator?.Start();
 
                         break;
                     }
 
                 case TestOutcome.Failed:
                     {
-                        if (this.verbosityLevel == Verbosity.Quiet)
+                        if (VerbosityLevel == Verbosity.Quiet)
                         {
                             break;
                         }
 
                         // Pause the progress indicator before displaying test result information
-                        this.progressIndicator?.Pause();
+                        progressIndicator?.Pause();
 
                         Output.Write(string.Format("{0}{1} ", TestResultPrefix, CommandLineResources.FailedTestIndicator), OutputLevel.Information, ConsoleColor.Red);
                         Output.WriteLine(testDisplayName, OutputLevel.Information);
                         DisplayFullInformation(e.Result);
 
                         // Resume the progress indicator after displaying the test result information
-                        this.progressIndicator?.Start();
+                        progressIndicator?.Start();
 
                         break;
                     }
 
                 case TestOutcome.Passed:
                     {
-                        if (this.verbosityLevel == Verbosity.Normal || this.verbosityLevel == Verbosity.Detailed)
+                        if (VerbosityLevel == Verbosity.Normal || VerbosityLevel == Verbosity.Detailed)
                         {
                             // Pause the progress indicator before displaying test result information
-                            this.progressIndicator?.Pause();
+                            progressIndicator?.Pause();
 
                             Output.Write(string.Format("{0}{1} ", TestResultPrefix, CommandLineResources.PassedTestIndicator), OutputLevel.Information, ConsoleColor.Green);
                             Output.WriteLine(testDisplayName, OutputLevel.Information);
-                            if (this.verbosityLevel == Verbosity.Detailed)
+                            if (VerbosityLevel == Verbosity.Detailed)
                             {
                                 DisplayFullInformation(e.Result);
                             }
 
                             // Resume the progress indicator after displaying the test result information
-                            this.progressIndicator?.Start();
+                            progressIndicator?.Start();
                         }
 
                         break;
@@ -616,23 +615,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 default:
                     {
-                        if (this.verbosityLevel == Verbosity.Quiet)
+                        if (VerbosityLevel == Verbosity.Quiet)
                         {
                             break;
                         }
 
                         // Pause the progress indicator before displaying test result information
-                        this.progressIndicator?.Pause();
+                        progressIndicator?.Pause();
 
                         Output.Write(string.Format("{0}{1} ", TestResultPrefix, CommandLineResources.SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
                         Output.WriteLine(testDisplayName, OutputLevel.Information);
-                        if (this.verbosityLevel == Verbosity.Detailed)
+                        if (VerbosityLevel == Verbosity.Detailed)
                         {
                             DisplayFullInformation(e.Result);
                         }
 
                         // Resume the progress indicator after displaying the test result information
-                        this.progressIndicator?.Start();
+                        progressIndicator?.Start();
 
                         break;
                     }
@@ -641,7 +640,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
         private string GetFormattedDurationString(TimeSpan duration)
         {
-            if (duration == default(TimeSpan))
+            if (duration == default)
             {
                 return null;
             }
@@ -679,7 +678,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
             // Stop the progress indicator as we are about to print the summary
-            this.progressIndicator?.Stop();
+            progressIndicator?.Stop();
             var passedTests = 0;
             var failedTests = 0;
             var skippedTests = 0;
@@ -701,7 +700,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
             }
 
-            var leafTestResultsPerSource = this.LeafTestResults.Select(p => p.Value).GroupBy(r => r.TestCase.Source);
+            var leafTestResultsPerSource = LeafTestResults.Select(p => p.Value).GroupBy(r => r.TestCase.Source);
             foreach (var sd in leafTestResultsPerSource)
             {
                 var source = sd.Key;
@@ -731,7 +730,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     }
                 }
 
-                if (verbosityLevel == Verbosity.Quiet || verbosityLevel == Verbosity.Minimal)
+                if (VerbosityLevel == Verbosity.Quiet || VerbosityLevel == Verbosity.Minimal)
                 {
                     TestOutcome sourceOutcome = TestOutcome.None;
                     if (sourceSummary.FailedTests > 0)
@@ -823,7 +822,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 totalTests += sourceSummary.TotalTests;
             }
 
-            if (verbosityLevel == Verbosity.Quiet || verbosityLevel == Verbosity.Minimal)
+            if (VerbosityLevel == Verbosity.Quiet || VerbosityLevel == Verbosity.Minimal)
             {
                 if (e.IsCanceled)
                 {
@@ -859,7 +858,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     Output.Error(false, CommandLineResources.TestRunAbortedWithError, e.Error);
                 }
             }
-            else if (failedTests > 0 || this.testRunHasErrorMessages)
+            else if (failedTests > 0 || testRunHasErrorMessages)
             {
                 Output.Error(false, CommandLineResources.TestRunFailed);
             }
@@ -908,9 +907,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <param name="warningMessage"></param>
         public static void RaiseTestRunWarning(string warningMessage)
         {
-            if (ConsoleLogger.Output == null)
+            if (Output == null)
             {
-                ConsoleLogger.Output = ConsoleOutput.Instance;
+                Output = ConsoleOutput.Instance;
             }
 
             Output.Warning(AppendPrefix, warningMessage);

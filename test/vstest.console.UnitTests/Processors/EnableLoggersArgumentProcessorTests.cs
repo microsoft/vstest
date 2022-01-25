@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     [TestClass]
     public class EnableLoggersArgumentProcessorTests
@@ -24,21 +24,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void GetMetadataShouldReturnEnableLoggerArgumentProcessorCapabilities()
         {
-            EnableLoggerArgumentProcessor processor = new EnableLoggerArgumentProcessor();
+            EnableLoggerArgumentProcessor processor = new();
             Assert.IsTrue(processor.Metadata.Value is EnableLoggerArgumentProcessorCapabilities);
         }
 
         [TestMethod]
         public void GetExecuterShouldReturnEnableLoggerArgumentExecutor()
         {
-            EnableLoggerArgumentProcessor processor = new EnableLoggerArgumentProcessor();
+            EnableLoggerArgumentProcessor processor = new();
             Assert.IsTrue(processor.Executor.Value is EnableLoggerArgumentExecutor);
         }
 
         [TestMethod]
         public void CapabilitiesShouldAppropriateProperties()
         {
-            EnableLoggerArgumentProcessorCapabilities capabilities = new EnableLoggerArgumentProcessorCapabilities();
+            EnableLoggerArgumentProcessorCapabilities capabilities = new();
             Assert.AreEqual("/Logger", capabilities.CommandName);
 #if NETFRAMEWORK
             Assert.AreEqual("--logger|/logger:<Logger Uri/FriendlyName>" + Environment.NewLine + "      Specify a logger for test results. For example, to log results into a " + Environment.NewLine + "      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=<Defaults to unique file name>]" + Environment.NewLine + "      Creates file in TestResults directory with given LogFileName." + Environment.NewLine + "" + Environment.NewLine + "      Change the verbosity level in log messages for console logger as shown below" + Environment.NewLine + "      Example: /logger:console;verbosity=<Defaults to \"normal\">" + Environment.NewLine + "      Allowed values for verbosity: quiet, minimal, normal and detailed." + Environment.NewLine + "" + Environment.NewLine + "      Change the diagnostic level prefix for console logger as shown below" + Environment.NewLine + "      Example: /logger:console;prefix=<Defaults to \"false\">" + Environment.NewLine + "      More info on Console Logger here : https://aka.ms/console-logger", capabilities.HelpContentResourceName);

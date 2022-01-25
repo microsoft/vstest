@@ -12,8 +12,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.Text;
     using System.Xml;
     using System.Xml.XPath;
-    using OMResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
-    using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resources;
+    using OMResources = ObjectModel.Resources.CommonResources;
+    using UtilitiesResources = Resources.Resources;
 
     /// <summary>
     /// Utility class for Inferring the runsettings from the current environment and the user specified command line switches.
@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string LegacyElementsString = "Elements";
         private const string DeploymentAttributesString = "DeploymentAttributes";
         private const string ExecutionAttributesString = "ExecutionAttributes";
-        private static readonly List<string> ExecutionNodesPaths = new List<string> { @"/RunSettings/LegacySettings/Execution/TestTypeSpecific/UnitTestRunConfig/AssemblyResolution", @"/RunSettings/LegacySettings/Execution/Timeouts", @"/RunSettings/LegacySettings/Execution/Hosts" };
+        private static readonly List<string> ExecutionNodesPaths = new() { @"/RunSettings/LegacySettings/Execution/TestTypeSpecific/UnitTestRunConfig/AssemblyResolution", @"/RunSettings/LegacySettings/Execution/Timeouts", @"/RunSettings/LegacySettings/Execution/Hosts" };
 
         /// <summary>
         /// Make runsettings compatible with testhost of version 15.0.0-preview
@@ -199,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="designModeValue">Value to set</param>
         public static void UpdateDesignMode(XmlDocument runSettingsDocument, bool designModeValue)
         {
-            AddNodeIfNotPresent<bool>(runSettingsDocument, DesignModeNodePath, DesignModeNodeName, designModeValue);
+            AddNodeIfNotPresent(runSettingsDocument, DesignModeNodePath, DesignModeNodeName, designModeValue);
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="collectSourceInformationValue">Value to set</param>
         public static void UpdateCollectSourceInformation(XmlDocument runSettingsDocument, bool collectSourceInformationValue)
         {
-            AddNodeIfNotPresent<bool>(runSettingsDocument, CollectSourceInformationNodePath, CollectSourceInformationNodeName, collectSourceInformationValue);
+            AddNodeIfNotPresent(runSettingsDocument, CollectSourceInformationNodePath, CollectSourceInformationNodeName, collectSourceInformationValue);
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="targetDevice">Value to set</param>
         public static void UpdateTargetDevice(XmlDocument runSettingsDocument, string targetDevice)
         {
-            AddNodeIfNotPresent<string>(runSettingsDocument, TargetDeviceNodePath, TargetDevice, targetDevice);
+            AddNodeIfNotPresent(runSettingsDocument, TargetDeviceNodePath, TargetDevice, targetDevice);
         }
 
         /// <summary>
@@ -434,7 +434,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="overwrite">Overwrite option.</param>
         public static void UpdateTargetPlatform(XmlDocument runSettingsDocument, string platform, bool overwrite = false)
         {
-            AddNodeIfNotPresent<string>(runSettingsDocument, TargetPlatformNodePath, TargetPlatformNodeName, platform, overwrite);
+            AddNodeIfNotPresent(runSettingsDocument, TargetPlatformNodePath, TargetPlatformNodeName, platform, overwrite);
         }
 
         public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, out String deviceXml)
@@ -612,12 +612,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 var value = (Architecture)Enum.Parse(typeof(Architecture), xml, true);
 
-                if (!Enum.IsDefined(typeof(Architecture), value) || value == Architecture.Default || value == Architecture.AnyCPU)
-                {
-                    return false;
-                }
-
-                return true;
+                return Enum.IsDefined(typeof(Architecture), value) && value != Architecture.Default && value != Architecture.AnyCPU;
             };
 
             return XmlUtilities.IsValidNodeXmlValue(platformXml, validator);
@@ -645,12 +640,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
                 var value = (FrameworkVersion)Enum.Parse(typeof(FrameworkVersion), xml, true);
 
-                if (!Enum.IsDefined(typeof(FrameworkVersion), value) || value == FrameworkVersion.None)
-                {
-                    return false;
-                }
-
-                return true;
+                return Enum.IsDefined(typeof(FrameworkVersion), value) && value != FrameworkVersion.None;
             };
 
             return XmlUtilities.IsValidNodeXmlValue(frameworkXml, validator);
@@ -663,8 +653,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform, Architecture defaultArchitecture, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks, out String incompatibleSettingWarning)
         {
             incompatibleSettingWarning = string.Empty;
-            List<String> compatibleSources = new List<String>();
-            StringBuilder warnings = new StringBuilder();
+            List<String> compatibleSources = new();
+            StringBuilder warnings = new();
             warnings.AppendLine();
             bool incompatiblityFound = false;
             foreach (var source in sourcePlatforms.Keys)
@@ -717,12 +707,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 return false;
             }
-            if (targetPlatform == Architecture.X64 && !Is64BitOperatingSystem())
-            {
-                return true;
-            }
-            return sourcePlatform != targetPlatform;
-
+            return targetPlatform == Architecture.X64 && !Is64BitOperatingSystem() || sourcePlatform != targetPlatform;
             bool Is64BitOperatingSystem()
             {
 #if !NETSTANDARD1_3
@@ -739,11 +724,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         private static bool IsFrameworkIncompatible(Framework sourceFramework, Framework targetFramework)
         {
-            if (sourceFramework.Name.Equals(Framework.DefaultFramework.Name, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-            return !sourceFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
+            return !sourceFramework.Name.Equals(Framework.DefaultFramework.Name, StringComparison.OrdinalIgnoreCase)
+&& !sourceFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

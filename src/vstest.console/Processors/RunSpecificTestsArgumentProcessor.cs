@@ -33,12 +33,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new RunSpecificTestsArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new RunSpecificTestsArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -46,9 +46,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() =>
+                    executor = new Lazy<IArgumentExecutor>(() =>
                     new RunSpecificTestsArgumentExecutor(
                         CommandLineOptions.Instance,
                         RunSettingsManager.Instance,
@@ -56,12 +56,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                         ConsoleOutput.Instance));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -91,12 +91,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Used for getting sources.
         /// </summary>
-        private CommandLineOptions commandLineOptions;
+        private readonly CommandLineOptions commandLineOptions;
 
         /// <summary>
         /// The instance of testPlatforms
         /// </summary>
-        private ITestRequestManager testRequestManager;
+        private readonly ITestRequestManager testRequestManager;
 
         /// <summary>
         /// Used for sending output.
@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// RunSettingsManager to get currently active run settings.
         /// </summary>
-        private IRunSettingsProvider runSettingsManager;
+        private readonly IRunSettingsProvider runSettingsManager;
 
         /// <summary>
         /// Given Collection of strings for filtering test cases
@@ -121,7 +121,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Collection of test cases that match at least one of the given search strings
         /// </summary>
-        private Collection<TestCase> selectedTestCases = new Collection<TestCase>();
+        private readonly Collection<TestCase> selectedTestCases = new();
 
         /// <summary>
         /// Effective run settings applicable to test run after inferring the multi-targeting settings.
@@ -131,17 +131,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// List of filters that have not yet been discovered
         /// </summary>
-        HashSet<string> undiscoveredFilters = new HashSet<string>();
+        HashSet<string> undiscoveredFilters = new();
 
         /// <summary>
         /// Registers for discovery events during discovery
         /// </summary>
-        private ITestDiscoveryEventsRegistrar discoveryEventsRegistrar;
+        private readonly ITestDiscoveryEventsRegistrar discoveryEventsRegistrar;
 
         /// <summary>
         /// Registers and Unregisters for test run events before and after test run
         /// </summary>
-        private ITestRunEventsRegistrar testRunEventsRegistrar;
+        private readonly ITestRunEventsRegistrar testRunEventsRegistrar;
 
         #endregion
 
@@ -159,13 +159,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             Contract.Requires(options != null);
             Contract.Requires(testRequestManager != null);
 
-            this.commandLineOptions = options;
+            commandLineOptions = options;
             this.testRequestManager = testRequestManager;
 
-            this.runSettingsManager = runSettingsProvider;
+            runSettingsManager = runSettingsProvider;
             this.output = output;
-            this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(this.DiscoveryRequest_OnDiscoveredTests);
-            this.testRunEventsRegistrar = new TestRunRequestEventsRegistrar(this.output, this.commandLineOptions);
+            discoveryEventsRegistrar = new DiscoveryEventsRegistrar(DiscoveryRequest_OnDiscoveredTests);
+            testRunEventsRegistrar = new TestRunRequestEventsRegistrar(this.output, commandLineOptions);
         }
 
         #endregion
@@ -180,19 +180,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (!string.IsNullOrWhiteSpace(argument))
             {
-                this.selectedTestNames = new Collection<string>(
+                selectedTestNames = new Collection<string>(
                     argument.Tokenize(SplitDelimiter, EscapeDelimiter)
                         .Where(x => !string.IsNullOrWhiteSpace(x))
                         .Select(s => s.Trim()).ToList());
             }
 
-            if (this.selectedTestNames == null || this.selectedTestNames.Count <= 0)
+            if (selectedTestNames == null || selectedTestNames.Count <= 0)
             {
                 throw new CommandLineException(CommandLineResources.SpecificTestsRequired);
             }
 
             // by default all filters are not discovered on launch
-            this.undiscoveredFilters = new HashSet<string>(this.selectedTestNames);
+            undiscoveredFilters = new HashSet<string>(selectedTestNames);
         }
 
         /// <summary>
@@ -201,32 +201,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns></returns>
         public ArgumentProcessorResult Execute()
         {
-            Contract.Assert(this.output != null);
-            Contract.Assert(this.commandLineOptions != null);
-            Contract.Assert(this.testRequestManager != null);
-            Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager.ActiveRunSettings.SettingsXml));
+            Contract.Assert(output != null);
+            Contract.Assert(commandLineOptions != null);
+            Contract.Assert(testRequestManager != null);
+            Contract.Assert(!string.IsNullOrWhiteSpace(runSettingsManager.ActiveRunSettings.SettingsXml));
 
-            if (!this.commandLineOptions.Sources.Any())
+            if (!commandLineOptions.Sources.Any())
             {
                 throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
             }
 
-            this.effectiveRunSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
+            effectiveRunSettings = runSettingsManager.ActiveRunSettings.SettingsXml;
 
             // Discover tests from sources and filter on every discovery reported.
-            this.DiscoverTestsAndSelectSpecified(this.commandLineOptions.Sources);
+            DiscoverTestsAndSelectSpecified(commandLineOptions.Sources);
 
             // Now that tests are discovered and filtered, we run only those selected tests.
-            this.ExecuteSelectedTests();
+            ExecuteSelectedTests();
 
             bool treatNoTestsAsError = RunSettingsUtilities.GetTreatNoTestsAsError(effectiveRunSettings);
 
-            if (treatNoTestsAsError && this.selectedTestCases.Count == 0)
-            {
-                return ArgumentProcessorResult.Fail;
-            }
-
-            return ArgumentProcessorResult.Success;
+            return treatNoTestsAsError && selectedTestCases.Count == 0 ? ArgumentProcessorResult.Fail : ArgumentProcessorResult.Success;
         }
 
         #endregion
@@ -239,14 +234,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="sources"> Test source assemblies paths. </param>
         private void DiscoverTestsAndSelectSpecified(IEnumerable<string> sources)
         {
-            this.output.WriteLine(CommandLineResources.StartingDiscovery, OutputLevel.Information);
+            output.WriteLine(CommandLineResources.StartingDiscovery, OutputLevel.Information);
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))
             {
-                this.output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
+                output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
             }
 
-            this.testRequestManager.DiscoverTests(
-                new DiscoveryRequestPayload() { Sources = sources, RunSettings = this.effectiveRunSettings }, this.discoveryEventsRegistrar, Constants.DefaultProtocolConfig);
+            testRequestManager.DiscoverTests(
+                new DiscoveryRequestPayload() { Sources = sources, RunSettings = effectiveRunSettings }, discoveryEventsRegistrar, Constants.DefaultProtocolConfig);
         }
 
         /// <summary>
@@ -254,42 +249,42 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private void ExecuteSelectedTests()
         {
-            if (this.selectedTestCases.Count > 0)
+            if (selectedTestCases.Count > 0)
             {
-                if (this.undiscoveredFilters.Count != 0)
+                if (undiscoveredFilters.Count != 0)
                 {
-                    string missingFilters = string.Join(", ", this.undiscoveredFilters);
-                    string warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.SomeTestsUnavailableAfterFiltering, this.discoveredTestCount, missingFilters);
-                    this.output.Warning(false, warningMessage);
+                    string missingFilters = string.Join(", ", undiscoveredFilters);
+                    string warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.SomeTestsUnavailableAfterFiltering, discoveredTestCount, missingFilters);
+                    output.Warning(false, warningMessage);
                 }
 
                 // for command line keep alive is always false.
                 bool keepAlive = false;
 
                 EqtTrace.Verbose("RunSpecificTestsArgumentProcessor:Execute: Test run is queued.");
-                var runRequestPayload = new TestRunRequestPayload() { TestCases = this.selectedTestCases.ToList(), RunSettings = this.effectiveRunSettings, KeepAlive = keepAlive, TestPlatformOptions = new TestPlatformOptions() { TestCaseFilter = this.commandLineOptions.TestCaseFilterValue }};
-                this.testRequestManager.RunTests(runRequestPayload, null, this.testRunEventsRegistrar, Constants.DefaultProtocolConfig);
+                var runRequestPayload = new TestRunRequestPayload() { TestCases = selectedTestCases.ToList(), RunSettings = effectiveRunSettings, KeepAlive = keepAlive, TestPlatformOptions = new TestPlatformOptions() { TestCaseFilter = commandLineOptions.TestCaseFilterValue }};
+                testRequestManager.RunTests(runRequestPayload, null, testRunEventsRegistrar, Constants.DefaultProtocolConfig);
             }
             else
             {
                 string warningMessage;
-                if (this.discoveredTestCount > 0)
+                if (discoveredTestCount > 0)
                 {
                     // No tests that matched any of the given strings.
-                    warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoTestsAvailableAfterFiltering, this.discoveredTestCount, string.Join(", ", this.selectedTestNames));
+                    warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoTestsAvailableAfterFiltering, discoveredTestCount, string.Join(", ", selectedTestNames));
                 }
                 else
                 {
                     // No tests were discovered from the given sources.
-                    warningMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.NoTestsAvailableInSources, string.Join(", ", this.commandLineOptions.Sources));
+                    warningMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.NoTestsAvailableInSources, string.Join(", ", commandLineOptions.Sources));
 
-                    if (string.IsNullOrEmpty(this.commandLineOptions.TestAdapterPath))
+                    if (string.IsNullOrEmpty(commandLineOptions.TestAdapterPath))
                     {
                         warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.StringFormatToJoinTwoStrings, warningMessage, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
                     }
                 }
 
-                this.output.Warning(false, warningMessage);
+                output.Warning(false, warningMessage);
             }
         }
 
@@ -301,17 +296,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="args"></param>
         private void DiscoveryRequest_OnDiscoveredTests(object sender, DiscoveredTestsEventArgs args)
         {
-            this.discoveredTestCount += args.DiscoveredTestCases.Count();
+            discoveredTestCount += args.DiscoveredTestCases.Count();
             foreach (var testCase in args.DiscoveredTestCases)
             {
-                foreach (var nameCriteria in this.selectedTestNames)
+                foreach (var nameCriteria in selectedTestNames)
                 {
                     if (testCase.FullyQualifiedName.IndexOf(nameCriteria, StringComparison.OrdinalIgnoreCase) != -1)
                     {
-                        this.selectedTestCases.Add(testCase);
+                        selectedTestCases.Add(testCase);
 
                         // If a testcase matched then a filter matched - so remove the filter from not found list
-                        this.undiscoveredFilters.Remove(nameCriteria);
+                        undiscoveredFilters.Remove(nameCriteria);
                         break;
                     }
                 }
@@ -322,7 +317,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         private class DiscoveryEventsRegistrar : ITestDiscoveryEventsRegistrar
         {
-            private EventHandler<DiscoveredTestsEventArgs> discoveredTestsHandler;
+            private readonly EventHandler<DiscoveredTestsEventArgs> discoveredTestsHandler;
 
             public DiscoveryEventsRegistrar(EventHandler<DiscoveredTestsEventArgs> discoveredTestsHandler)
             {
@@ -336,19 +331,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
-                discoveryRequest.OnDiscoveredTests += this.discoveredTestsHandler;
+                discoveryRequest.OnDiscoveredTests += discoveredTestsHandler;
             }
 
             public void UnregisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
-                discoveryRequest.OnDiscoveredTests -= this.discoveredTestsHandler;
+                discoveryRequest.OnDiscoveredTests -= discoveredTestsHandler;
             }
         }
 
         private class TestRunRequestEventsRegistrar : ITestRunEventsRegistrar
         {
-            private IOutput output;
-            private CommandLineOptions commandLineOptions;
+            private readonly IOutput output;
+            private readonly CommandLineOptions commandLineOptions;
 
             public TestRunRequestEventsRegistrar(IOutput output, CommandLineOptions commandLineOptions)
             {
@@ -382,12 +377,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 // we need to check if there are any tests executed - to try show some help info to user to check for installed vsix extensions
                 if (!e.IsAborted && !e.IsCanceled)
                 {
-                    var testsFoundInAnySource = (e.TestRunStatistics == null) ? false : (e.TestRunStatistics.ExecutedTests > 0);
+                    var testsFoundInAnySource = e.TestRunStatistics != null && (e.TestRunStatistics.ExecutedTests > 0);
 
                     // Indicate the user to use testadapterpath command if there are no tests found
-                    if (!testsFoundInAnySource && string.IsNullOrEmpty(CommandLineOptions.Instance.TestAdapterPath) && this.commandLineOptions.TestCaseFilterValue == null)
+                    if (!testsFoundInAnySource && string.IsNullOrEmpty(CommandLineOptions.Instance.TestAdapterPath) && commandLineOptions.TestCaseFilterValue == null)
                     {
-                        this.output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
+                        output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
                     }
                 }
             }

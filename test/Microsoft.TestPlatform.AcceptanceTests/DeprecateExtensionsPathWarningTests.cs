@@ -31,7 +31,7 @@
         {
             try
             {
-                foreach (var file in this.copiedFiles)
+                foreach (var file in copiedFiles)
                 {
                     File.Delete(file);
                 }
@@ -45,16 +45,16 @@
         [TestInitialize]
         public void CopyAdapterToExtensions()
         {
-            this.copiedFiles = new List<string>();
-            var extensionsDir = Path.Combine(Path.GetDirectoryName(this.GetConsoleRunnerPath()), "Extensions");
-            this.adapterDependencies = Directory.GetFiles(this.GetTestAdapterPath(), "*.dll", SearchOption.TopDirectoryOnly);
+            copiedFiles = new List<string>();
+            var extensionsDir = Path.Combine(Path.GetDirectoryName(GetConsoleRunnerPath()), "Extensions");
+            adapterDependencies = Directory.GetFiles(GetTestAdapterPath(), "*.dll", SearchOption.TopDirectoryOnly);
 
             try
             {
-                foreach (var file in this.adapterDependencies)
+                foreach (var file in adapterDependencies)
                 {
                     var fileCopied = Path.Combine(extensionsDir, Path.GetFileName(file));
-                    this.copiedFiles.Add(fileCopied);
+                    copiedFiles.Add(fileCopied);
                     File.Copy(file, fileCopied);
                 }
             }
@@ -68,10 +68,10 @@
         public void VerifyDeprecatedWarningIsThrownWhenAdaptersPickedFromExtensionDirectory()
         {
             var resultsDir = GetResultsDirectory();
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), null, null, this.FrameworkArgValue, resultsDirectory: resultsDir);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), null, null, FrameworkArgValue, resultsDirectory: resultsDir);
 
-            this.InvokeVsTest(arguments);
-            this.StdOutputContains("Adapter lookup is being changed, please follow");
+            InvokeVsTest(arguments);
+            StdOutputContains("Adapter lookup is being changed, please follow");
 
             TryRemoveDirectory(resultsDir);
         }

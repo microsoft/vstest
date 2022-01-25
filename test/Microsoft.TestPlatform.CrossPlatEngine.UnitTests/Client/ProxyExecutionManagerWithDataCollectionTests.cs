@@ -48,23 +48,23 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestInitialize]
         public void TestInit()
         {
-            this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
-            this.mockRequestSender = new Mock<ITestRequestSender>();
-            this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockMetricsCollection = new Mock<IMetricsCollection>();
-            this.mockFileHelper = new Mock<IFileHelper>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
-            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.mockFileHelper.Object);
-            this.mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
-            this.mockProcessHelper = new Mock<IProcessHelper>();
-            this.proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+            mockTestHostManager = new Mock<ITestRuntimeProvider>();
+            mockRequestSender = new Mock<ITestRequestSender>();
+            mockDataSerializer = new Mock<IDataSerializer>();
+            mockRequestData = new Mock<IRequestData>();
+            mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockFileHelper = new Mock<IFileHelper>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+            testExecutionManager = new ProxyExecutionManager(mockRequestData.Object, mockRequestSender.Object, mockTestHostManager.Object, mockDataSerializer.Object, mockFileHelper.Object);
+            mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
+            mockProcessHelper = new Mock<IProcessHelper>();
+            proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(mockRequestData.Object, mockRequestSender.Object, mockTestHostManager.Object, mockDataCollectionManager.Object);
         }
 
         [TestMethod]
         public void InitializeShouldInitializeDataCollectionProcessIfDataCollectionIsEnabled()
         {
-            this.proxyExecutionManager.Initialize(false);
+            proxyExecutionManager.Initialize(false);
 
             mockDataCollectionManager.Verify(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
         }
@@ -72,12 +72,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void InitializeShouldThrowExceptionIfThrownByDataCollectionManager()
         {
-            this.mockDataCollectionManager.Setup(x => x.Initialize()).Throws<Exception>();
+            mockDataCollectionManager.Setup(x => x.Initialize()).Throws<Exception>();
 
-            Assert.ThrowsException<Exception>(() =>
-            {
-                this.proxyExecutionManager.Initialize(false);
-            });
+            Assert.ThrowsException<Exception>(() => proxyExecutionManager.Initialize(false));
         }
 
         [TestMethod]
@@ -85,10 +82,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             mockDataCollectionManager.Setup(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Throws(new Exception("MyException"));
 
-            Assert.ThrowsException<Exception>(() =>
-            {
-                this.proxyExecutionManager.Initialize(false);
-            });
+            Assert.ThrowsException<Exception>(() => proxyExecutionManager.Initialize(false));
 
             mockDataCollectionManager.Verify(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
             mockDataCollectionManager.Verify(dc => dc.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
@@ -103,9 +97,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             mockRequestSender.Setup(x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
             var mockDataCollectionLauncher = new Mock<IDataCollectionLauncher>();
-            var proxyDataCollectonManager = new ProxyDataCollectionManager(this.mockRequestData.Object, string.Empty, testSources, mockRequestSender.Object, this.mockProcessHelper.Object, mockDataCollectionLauncher.Object);
+            var proxyDataCollectonManager = new ProxyDataCollectionManager(mockRequestData.Object, string.Empty, testSources, mockRequestSender.Object, mockProcessHelper.Object, mockDataCollectionLauncher.Object);
 
-            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, proxyDataCollectonManager);
+            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(mockRequestData.Object, this.mockRequestSender.Object, mockTestHostManager.Object, proxyDataCollectonManager);
             proxyExecutionManager.Initialize(false);
             Assert.IsNotNull(proxyExecutionManager.DataCollectionRunEventsHandler.Messages);
             Assert.AreEqual(TestMessageLevel.Error, proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item1);
@@ -115,12 +109,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void UpdateTestProcessStartInfoShouldUpdateDataCollectionPortArg()
         {
-            this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
+            mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
 
             var testProcessStartInfo = new TestProcessStartInfo();
             testProcessStartInfo.Arguments = string.Empty;
 
-            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(mockRequestSender.Object, mockTestHostManager.Object, mockDataCollectionManager.Object);
             proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
 
             Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--datacollectionport 0"));
@@ -132,12 +126,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var mockRequestData = new Mock<IRequestData>();
             this.mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(true);
 
-            this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
+            mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
 
             var testProcessStartInfo = new TestProcessStartInfo();
             testProcessStartInfo.Arguments = string.Empty;
 
-            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, mockRequestSender.Object, mockTestHostManager.Object, mockDataCollectionManager.Object);
 
             // Act.
             proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
@@ -152,12 +146,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var mockRequestData = new Mock<IRequestData>();
             this.mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(false);
 
-            this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
+            mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
 
             var testProcessStartInfo = new TestProcessStartInfo();
             testProcessStartInfo.Arguments = string.Empty;
 
-            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, mockRequestSender.Object, mockTestHostManager.Object, mockDataCollectionManager.Object);
 
             // Act.
             proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
@@ -173,8 +167,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var mockRunEventsHandler = new Mock<ITestRunEventsHandler>();
             TestProcessStartInfo launchedStartInfo = null;
             mockRunEventsHandler.Setup(runHandler => runHandler.LaunchProcessWithDebuggerAttached(It.IsAny<TestProcessStartInfo>())).Callback
-                ((TestProcessStartInfo startInfo) => { launchedStartInfo = startInfo; });
-            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+                ((TestProcessStartInfo startInfo) => launchedStartInfo = startInfo);
+            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(mockRequestData.Object, mockRequestSender.Object, mockTestHostManager.Object, mockDataCollectionManager.Object);
             var mockTestRunCriteria = new Mock<TestRunCriteria>(new List<string> { "source.dll" }, 10);
             var testProcessStartInfo = new TestProcessStartInfo
             {
@@ -201,11 +195,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void TestHostManagerHostLaunchedTriggerShouldSendTestHostLaunchedEvent()
         {
-            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(mockRequestData.Object, mockRequestSender.Object, mockTestHostManager.Object, mockDataCollectionManager.Object);
 
-            this.mockTestHostManager.Raise(x => x.HostLaunched += null, new HostProviderEventArgs("launched", 0, 1234));
+            mockTestHostManager.Raise(x => x.HostLaunched += null, new HostProviderEventArgs("launched", 0, 1234));
 
-            this.mockDataCollectionManager.Verify(x => x.TestHostLaunched(It.IsAny<int>()));
+            mockDataCollectionManager.Verify(x => x.TestHostLaunched(It.IsAny<int>()));
         }
     }
 
@@ -221,7 +215,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         public TestProcessStartInfo UpdateTestProcessStartInfoWrapper(TestProcessStartInfo testProcessStartInfo)
         {
-            return this.UpdateTestProcessStartInfo(testProcessStartInfo);
+            return UpdateTestProcessStartInfo(testProcessStartInfo);
         }
 
         public override TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)

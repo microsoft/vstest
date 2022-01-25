@@ -27,11 +27,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
     [TestClass]
     public class ConsoleLoggerTests
     {
-        private Mock<IRequestData> mockRequestData;
-        private Mock<IMetricsCollection> mockMetricsCollection;
-        private Mock<IOutput> mockOutput;
-        private ConsoleLogger consoleLogger;
-        private Mock<IProgressIndicator> mockProgressIndicator;
+        private Mock<IRequestData> _mockRequestData;
+        private Mock<IMetricsCollection> _mockMetricsCollection;
+        private Mock<IOutput> _mockOutput;
+        private ConsoleLogger _consoleLogger;
+        private Mock<IProgressIndicator> _mockProgressIndicator;
 
         private const string PassedTestIndicator = "  Passed ";
         private const string FailedTestIndicator = "  Failed ";
@@ -43,22 +43,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             RunTestsArgumentProcessorTests.SetupMockExtensions();
 
             // Setup Mocks and other dependencies
-            this.Setup();
+            Setup();
         }
 
         [TestMethod]
         public void InitializeShouldThrowExceptionIfEventsIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.consoleLogger.Initialize(null, string.Empty);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => _consoleLogger.Initialize(null, string.Empty));
         }
 
         [TestMethod]
         public void InitializeShouldNotThrowExceptionIfEventsIsNotNull()
         {
-            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, string.Empty);
+            _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, string.Empty);
         }
 
         [TestMethod]
@@ -69,28 +66,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 { "param1", "value" },
             };
 
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.consoleLogger.Initialize(null, parameters);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => _consoleLogger.Initialize(null, parameters));
         }
 
         [TestMethod]
         public void InitializeWithParametersShouldThrowExceptionIfParametersIsEmpty()
         {
-            Assert.ThrowsException<ArgumentException>(() =>
-            {
-                this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, new Dictionary<string, string>());
-            });
+            Assert.ThrowsException<ArgumentException>(() => _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, new Dictionary<string, string>()));
         }
 
         [TestMethod]
         public void InitializeWithParametersShouldThrowExceptionIfParametersIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, (Dictionary<string, string>)null);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, (Dictionary<string, string>)null));
         }
 
         [TestMethod]
@@ -101,9 +89,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 { "verbosity", "minimal" },
                 { DefaultLoggerParameterNames.TargetFramework , "net451"}
             };
-            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+            _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
-            Assert.AreEqual(ConsoleLogger.Verbosity.Minimal, this.consoleLogger.VerbosityLevel);
+            Assert.AreEqual(ConsoleLogger.Verbosity.Minimal, _consoleLogger.VerbosityLevel);
         }
 
         [TestMethod]
@@ -114,12 +102,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 { "verbosity", "" },
             };
 
-            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+            _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
 #if NETFRAMEWORK
-            Assert.AreEqual(ConsoleLogger.Verbosity.Normal, this.consoleLogger.VerbosityLevel);
+            Assert.AreEqual(ConsoleLogger.Verbosity.Normal, _consoleLogger.VerbosityLevel);
 #else
-            Assert.AreEqual(ConsoleLogger.Verbosity.Minimal, this.consoleLogger.VerbosityLevel);
+            Assert.AreEqual(ConsoleLogger.Verbosity.Minimal, _consoleLogger.VerbosityLevel);
 #endif
         }
 
@@ -132,7 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             };
             Assert.IsFalse(ConsoleLogger.AppendPrefix);
 
-            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+            _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
             Assert.IsTrue(ConsoleLogger.AppendPrefix);
             ConsoleLogger.AppendPrefix = false;
@@ -146,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             Assert.IsFalse(ConsoleLogger.EnableProgress);
 
             parameters.Add("progress", "true");
-            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+            _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
             Assert.IsTrue(ConsoleLogger.EnableProgress);
 
@@ -159,20 +147,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
 
-            Assert.ThrowsException<ArgumentNullException>(() =>
-           {
-               loggerEvents.RaiseTestRunMessage(default);
-           });
+            Assert.ThrowsException<ArgumentNullException>(() => loggerEvents.RaiseTestRunMessage(default));
         }
 
         [TestMethod]
         public void TestMessageHandlerShouldWriteToConsoleWhenTestRunMessageIsRaised()
         {
             var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
+            _mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
+                (s, o) => count++);
 
-            this.SetupForTestMessageHandler(out var loggerEvents);
+            SetupForTestMessageHandler(out var loggerEvents);
 
             loggerEvents.RaiseTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Informational, "Informational123"));
             loggerEvents.RaiseTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Error, "Error123"));
@@ -182,19 +167,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             // Added this for synchronization
             SpinWait.SpinUntil(() => count == 3, 300);
 
-            this.AssertsForTestMessageHandler();
-            this.mockProgressIndicator.Verify(pi => pi.Pause(), Times.Exactly(3));
-            this.mockProgressIndicator.Verify(pi => pi.Start(), Times.Exactly(3));
+            AssertsForTestMessageHandler();
+            _mockProgressIndicator.Verify(pi => pi.Pause(), Times.Exactly(3));
+            _mockProgressIndicator.Verify(pi => pi.Start(), Times.Exactly(3));
         }
 
         [TestMethod]
         public void TestMessageHandlerShouldWriteToConsoleWhenTestDiscoveryMessageIsRaised()
         {
             var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
+            _mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
+                (s, o) => count++);
 
-            this.SetupForTestMessageHandler(out var loggerEvents);
+            SetupForTestMessageHandler(out var loggerEvents);
 
             loggerEvents.RaiseDiscoveryMessage(new TestRunMessageEventArgs(TestMessageLevel.Informational, "Informational123"));
             loggerEvents.RaiseDiscoveryMessage(new TestRunMessageEventArgs(TestMessageLevel.Error, "Error123"));
@@ -204,16 +189,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             // Added this for synchronization
             SpinWait.SpinUntil(() => count == 3, 300);
 
-            this.AssertsForTestMessageHandler();
-            this.mockProgressIndicator.Verify(pi => pi.Pause(), Times.Exactly(3));
-            this.mockProgressIndicator.Verify(pi => pi.Start(), Times.Exactly(3));
+            AssertsForTestMessageHandler();
+            _mockProgressIndicator.Verify(pi => pi.Pause(), Times.Exactly(3));
+            _mockProgressIndicator.Verify(pi => pi.Start(), Times.Exactly(3));
         }
 
         private void AssertsForTestMessageHandler()
         {
-            this.mockOutput.Verify(o => o.WriteLine("Informational123", OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine("Warning123", OutputLevel.Warning), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine("Error123", OutputLevel.Error), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine("Informational123", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine("Warning123", OutputLevel.Warning), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine("Error123", OutputLevel.Error), Times.Once());
         }
 
         private void SetupForTestMessageHandler(out InternalTestLoggerEvents loggerEvents)
@@ -224,7 +209,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
         }
 
         [TestMethod]
@@ -233,18 +218,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
 
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                loggerEvents.RaiseTestResult(default);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => loggerEvents.RaiseTestResult(default));
         }
 
         [TestMethod]
         public void TestResultHandlerShouldShowStdOutMessagesBannerIfStdOutIsNotEmpty()
         {
             var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
+            _mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
+                (s, o) => count++);
 
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
@@ -252,11 +234,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
             string message = "Dummy message";
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
-            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardOutCategory, message);
+            TestResultMessage testResultMessage = new(TestResultMessage.StandardOutCategory, message);
             var testresult = new ObjectModel.TestResult(testcase)
             {
                 Outcome = TestOutcome.Failed
@@ -269,8 +251,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             // Added this for synchronization
             SpinWait.SpinUntil(() => count == 2, 300);
 
-            this.mockOutput.Verify(o => o.WriteLine("  Standard Output Messages:", OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine("  Standard Output Messages:", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
@@ -284,10 +266,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 { "verbosity", "normal" }
             };
 
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
             string message = "Dummy message";
-            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardOutCategory, message);
+            TestResultMessage testResultMessage = new(TestResultMessage.StandardOutCategory, message);
 
             var testresult = new ObjectModel.TestResult(testcase);
             testresult.Outcome = TestOutcome.Passed;
@@ -298,8 +280,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.WaitForEventCompletion();
 
             // Verify
-            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Never());
-            this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Never());
         }
 
         [TestMethod]
@@ -313,11 +295,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 { "verbosity", "detailed" }
             };
 
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
             string message = "Dummy message";
 
-            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardOutCategory, message);
+            TestResultMessage testResultMessage = new(TestResultMessage.StandardOutCategory, message);
             var testresult = new ObjectModel.TestResult(testcase)
             {
                 Outcome = TestOutcome.Passed
@@ -330,8 +312,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.WaitForEventCompletion();
 
             // Verify
-            this.mockOutput.Verify(o => o.WriteLine("  Standard Output Messages:", OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine("  Standard Output Messages:", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
@@ -345,7 +327,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 { "verbosity", "detailed" }
             };
 
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
             string message = "Adapter Error";
 
             // Act. Raise an event on mock object
@@ -354,8 +336,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.WaitForEventCompletion();
 
             // Verify
-            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunFailed, OutputLevel.Error), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(message, OutputLevel.Error), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunFailed, OutputLevel.Error), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(message, OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
@@ -370,7 +352,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 { DefaultLoggerParameterNames.TargetFramework , "abc" }
             };
 
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
             string message = "Adapter Error";
 
             // Act. Raise an event on mock object
@@ -379,7 +361,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.WaitForEventCompletion();
 
             // Verify
-            this.mockOutput.Verify(o => o.WriteLine(message, OutputLevel.Error), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(message, OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
@@ -394,7 +376,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 { DefaultLoggerParameterNames.TargetFramework , "abc" }
             };
 
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
             string message = "Adapter Warning";
 
             // Act. Raise an event on mock object
@@ -403,7 +385,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.WaitForEventCompletion();
 
             // Verify
-            this.mockOutput.Verify(o => o.WriteLine(message, OutputLevel.Warning), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine(message, OutputLevel.Warning), Times.Never());
         }
 
         [TestMethod]
@@ -417,7 +399,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 { "verbosity", "normal" }
             };
 
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
             string message = "Adapter Warning";
             string errorMessage = "Adapter Error";
 
@@ -428,9 +410,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.WaitForEventCompletion();
 
             // Verify
-            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunFailed, OutputLevel.Error), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(message, OutputLevel.Warning), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(errorMessage, OutputLevel.Error), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunFailed, OutputLevel.Error), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(message, OutputLevel.Warning), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(errorMessage, OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
@@ -442,10 +424,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
-            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardOutCategory, null);
+            TestResultMessage testResultMessage = new(TestResultMessage.StandardOutCategory, null);
             var testresult = new ObjectModel.TestResult(testcase)
             {
                 Outcome = TestOutcome.Failed
@@ -455,7 +437,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testresult));
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Never());
         }
 
         [TestMethod]
@@ -467,11 +449,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
             string message = "Dummy message";
-            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardErrorCategory, message);
+            TestResultMessage testResultMessage = new(TestResultMessage.StandardErrorCategory, message);
             var testresult = new ObjectModel.TestResult(testcase)
             {
                 Outcome = TestOutcome.Failed
@@ -481,8 +463,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testresult));
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine("  Standard Error Messages:", OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine("  Standard Error Messages:", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
@@ -494,10 +476,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
-            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardErrorCategory, null);
+            TestResultMessage testResultMessage = new(TestResultMessage.StandardErrorCategory, null);
             var testresult = new ObjectModel.TestResult(testcase)
             {
                 Outcome = TestOutcome.Failed
@@ -507,7 +489,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testresult));
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdErrMessagesBanner, OutputLevel.Information), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdErrMessagesBanner, OutputLevel.Information), Times.Never());
         }
 
         [TestMethod]
@@ -519,11 +501,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
             string message = "Dummy message";
-            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.AdditionalInfoCategory, message);
+            TestResultMessage testResultMessage = new(TestResultMessage.AdditionalInfoCategory, message);
             var testresult = new ObjectModel.TestResult(testcase)
             {
                 Outcome = TestOutcome.Failed
@@ -533,8 +515,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testresult));
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine("  Additional Information Messages:", OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine("  Additional Information Messages:", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
@@ -546,11 +528,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
 
-            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.AdditionalInfoCategory, null);
+            TestResultMessage testResultMessage = new(TestResultMessage.AdditionalInfoCategory, null);
 
             var testresult = new ObjectModel.TestResult(testcase)
             {
@@ -561,7 +543,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testresult));
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.AddnlInfoMessagesBanner, OutputLevel.Information), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine(CommandLineResources.AddnlInfoMessagesBanner, OutputLevel.Information), Times.Never());
         }
 
         [TestMethod]
@@ -573,22 +555,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
-            foreach (var testResult in this.GetTestResultsObject())
+            foreach (var testResult in GetTestResultsObject())
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.Write(PassedTestIndicator, OutputLevel.Information), Times.Once);
-            this.mockOutput.Verify(o => o.WriteLine("TestName [1 h 2 m]", OutputLevel.Information), Times.Once);
-            this.mockOutput.Verify(o => o.Write(FailedTestIndicator, OutputLevel.Information), Times.Once);
-            this.mockOutput.Verify(o => o.WriteLine("TestName [4 m 5 s]", OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.Write(SkippedTestIndicator, OutputLevel.Information), Times.Exactly(3));
-            this.mockOutput.Verify(o => o.WriteLine("TestName", OutputLevel.Information), Times.Exactly(3));
-            this.mockProgressIndicator.Verify(pi => pi.Pause(), Times.Exactly(5));
-            this.mockProgressIndicator.Verify(pi => pi.Start(), Times.Exactly(5));
+            _mockOutput.Verify(o => o.Write(PassedTestIndicator, OutputLevel.Information), Times.Once);
+            _mockOutput.Verify(o => o.WriteLine("TestName [1 h 2 m]", OutputLevel.Information), Times.Once);
+            _mockOutput.Verify(o => o.Write(FailedTestIndicator, OutputLevel.Information), Times.Once);
+            _mockOutput.Verify(o => o.WriteLine("TestName [4 m 5 s]", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.Write(SkippedTestIndicator, OutputLevel.Information), Times.Exactly(3));
+            _mockOutput.Verify(o => o.WriteLine("TestName", OutputLevel.Information), Times.Exactly(3));
+            _mockProgressIndicator.Verify(pi => pi.Pause(), Times.Exactly(5));
+            _mockProgressIndicator.Verify(pi => pi.Start(), Times.Exactly(5));
         }
 
         [DataRow(".NETFramework,version=v4.5.1", "(net451)", "quiet")]
@@ -605,14 +587,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 { "verbosity", verbosityLevel },
                 { DefaultLoggerParameterNames.TargetFramework , framework}
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
-            foreach (var testResult in this.GetTestResultsObject())
+            foreach (var testResult in GetTestResultsObject())
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
 
-            foreach (var testResult in this.GetPassedTestResultsObject())
+            foreach (var testResult in GetPassedTestResultsObject())
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
@@ -620,7 +602,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.RaiseTestRunComplete(new TestRunCompleteEventArgs(new Mock<ITestRunStatistics>().Object, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), TimeSpan.FromSeconds(1)));
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
+            _mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
                 (CommandLineResources.PassedTestIndicator + "!").PadRight(8),
                 0.ToString().PadLeft(5),
                 1.ToString().PadLeft(5),
@@ -628,11 +610,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 .ToString().PadLeft(5),
                 "1 m 2 s"), OutputLevel.Information), Times.Once);
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework,
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework,
                 "TestSourcePassed",
                 expectedFramework), OutputLevel.Information), Times.Once);
 
-            this.mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
+            _mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
                 (CommandLineResources.FailedTestIndicator + "!").PadRight(8),
                 1.ToString().PadLeft(5),
                 1.ToString().PadLeft(5),
@@ -640,7 +622,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 3.ToString().PadLeft(5),
                 "1 h 2 m"), OutputLevel.Information), Times.Once);
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework,
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework,
                 "TestSource",
                 expectedFramework), OutputLevel.Information), Times.Once);
         }
@@ -657,14 +639,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 { "verbosity", verbosityLevel },
                 { DefaultLoggerParameterNames.TargetFramework , "net451"}
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
-            foreach (var testResult in this.GetTestResultsObject())
+            foreach (var testResult in GetTestResultsObject())
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
 
-            foreach (var testResult in this.GetPassedTestResultsObject())
+            foreach (var testResult in GetPassedTestResultsObject())
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
@@ -672,8 +654,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.RaiseTestRunComplete(new TestRunCompleteEventArgs(new Mock<ITestRunStatistics>().Object, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), TimeSpan.FromSeconds(1)));
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, CommandLineResources.PassedTestIndicator, 2, 1, 0, 1, "1 m 2 s", "TestSourcePassed", "(net451)"), OutputLevel.Information), Times.Never);
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, CommandLineResources.FailedTestIndicator, 5, 1, 1, 1, "1 h 6 m", "TestSource", "(net451)"), OutputLevel.Information), Times.Never);
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, CommandLineResources.PassedTestIndicator, 2, 1, 0, 1, "1 m 2 s", "TestSourcePassed", "(net451)"), OutputLevel.Information), Times.Never);
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, CommandLineResources.FailedTestIndicator, 5, 1, 1, 1, "1 h 6 m", "TestSource", "(net451)"), OutputLevel.Information), Times.Never);
         }
 
         [TestMethod]
@@ -685,11 +667,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
             string message = "Dummy message";
-            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardOutCategory, message);
+            TestResultMessage testResultMessage = new(TestResultMessage.StandardOutCategory, message);
             var testresult = new ObjectModel.TestResult(testcase)
             {
                 Outcome = TestOutcome.Passed
@@ -699,8 +681,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testresult));
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine("", OutputLevel.Information), Times.Never());
-            this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine("", OutputLevel.Information), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Never());
         }
 
         [TestMethod]
@@ -712,11 +694,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
             string message = "Dummy message";
-            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.DebugTraceCategory, message);
+            TestResultMessage testResultMessage = new(TestResultMessage.DebugTraceCategory, message);
             var testresult = new ObjectModel.TestResult(testcase)
             {
                 Outcome = TestOutcome.Passed
@@ -726,8 +708,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testresult));
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.DbgTrcMessagesBanner, OutputLevel.Information), Times.Never());
-            this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine(CommandLineResources.DbgTrcMessagesBanner, OutputLevel.Information), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Never());
         }
 
         [TestMethod]
@@ -740,20 +722,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 { "verbosity", "minimal" },
                 { DefaultLoggerParameterNames.TargetFramework , "net451"}
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
-            foreach (var testResult in this.GetTestResultsObject())
+            foreach (var testResult in GetTestResultsObject())
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.Write(PassedTestIndicator, OutputLevel.Information), Times.Never);
-            this.mockOutput.Verify(o => o.WriteLine("TestName [1 h 2 m]", OutputLevel.Information), Times.Never);
-            this.mockOutput.Verify(o => o.Write(FailedTestIndicator, OutputLevel.Information), Times.Once);
-            this.mockOutput.Verify(o => o.WriteLine("TestName [4 m 5 s]", OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.Write(SkippedTestIndicator, OutputLevel.Information), Times.Exactly(3));
-            this.mockOutput.Verify(o => o.WriteLine("TestName", OutputLevel.Information), Times.Exactly(3));
+            _mockOutput.Verify(o => o.Write(PassedTestIndicator, OutputLevel.Information), Times.Never);
+            _mockOutput.Verify(o => o.WriteLine("TestName [1 h 2 m]", OutputLevel.Information), Times.Never);
+            _mockOutput.Verify(o => o.Write(FailedTestIndicator, OutputLevel.Information), Times.Once);
+            _mockOutput.Verify(o => o.WriteLine("TestName [4 m 5 s]", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.Write(SkippedTestIndicator, OutputLevel.Information), Times.Exactly(3));
+            _mockOutput.Verify(o => o.WriteLine("TestName", OutputLevel.Information), Times.Exactly(3));
         }
 
         [TestMethod]
@@ -766,18 +748,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 { "verbosity", "quiet" },
                 { DefaultLoggerParameterNames.TargetFramework , "net451"}
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
-            foreach (var testResult in this.GetTestResultsObject())
+            foreach (var testResult in GetTestResultsObject())
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, "TestName [1 h 2 m]"), OutputLevel.Information), Times.Never);
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.FailedTestIndicator, "TestName [4 m 5 s]"), OutputLevel.Information), Times.Never);
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.SkippedTestIndicator, "TestName"), OutputLevel.Warning), Times.Never);
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.NotRunTestIndicator, "TestName"), OutputLevel.Information), Times.Never);
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, "TestName [1 h 2 m]"), OutputLevel.Information), Times.Never);
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.FailedTestIndicator, "TestName [4 m 5 s]"), OutputLevel.Information), Times.Never);
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.SkippedTestIndicator, "TestName"), OutputLevel.Warning), Times.Never);
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.NotRunTestIndicator, "TestName"), OutputLevel.Information), Times.Never);
         }
 
         [DataRow("[1 h 2 m]", new int[5] { 0, 1, 2, 3, 78 })]
@@ -796,18 +778,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
-            var TestResultWithHrMinSecMs = new ObjectModel.TestResult(new TestCase("DymmyNamespace.DummyClass.TestName", new Uri("some://uri"), "TestSource") { DisplayName = "TestName" })
+            _consoleLogger.Initialize(loggerEvents, parameters);
+            var testResultWithHrMinSecMs = new ObjectModel.TestResult(new TestCase("DymmyNamespace.DummyClass.TestName", new Uri("some://uri"), "TestSource") { DisplayName = "TestName" })
             {
                 Outcome = TestOutcome.Passed,
                 Duration = new TimeSpan(timeSpanArgs[0], timeSpanArgs[1], timeSpanArgs[2], timeSpanArgs[3], timeSpanArgs[4])
             };
 
-            loggerEvents.RaiseTestResult(new TestResultEventArgs(TestResultWithHrMinSecMs));
+            loggerEvents.RaiseTestResult(new TestResultEventArgs(testResultWithHrMinSecMs));
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.Write(PassedTestIndicator, OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine("TestName " + expectedDuration, OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.Write(PassedTestIndicator, OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine("TestName " + expectedDuration, OutputLevel.Information), Times.Once());
         }
 
         [DataTestMethod]
@@ -819,18 +801,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
-            var TestResultWithHrMinSecMs = new ObjectModel.TestResult(new TestCase("DymmyNamespace.DummyClass.TestName", new Uri("some://uri"), "TestSource") { DisplayName = "TestName" })
+            _consoleLogger.Initialize(loggerEvents, parameters);
+            var testResultWithHrMinSecMs = new ObjectModel.TestResult(new TestCase("DymmyNamespace.DummyClass.TestName", new Uri("some://uri"), "TestSource") { DisplayName = "TestName" })
             {
                 Outcome = TestOutcome.Passed,
                 Duration = TimeSpan.FromTicks(50)
             };
 
-            loggerEvents.RaiseTestResult(new TestResultEventArgs(TestResultWithHrMinSecMs));
+            loggerEvents.RaiseTestResult(new TestResultEventArgs(testResultWithHrMinSecMs));
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.Write(PassedTestIndicator, OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine("TestName [< 1 ms]", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.Write(PassedTestIndicator, OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine("TestName [< 1 ms]", OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
@@ -842,20 +824,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
-            foreach (var testResult in this.GetTestResultObject(TestOutcome.Passed))
+            foreach (var testResult in GetTestResultObject(TestOutcome.Passed))
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
             loggerEvents.CompleteTestRun(null, false, false, null, null, null, new TimeSpan(1, 0, 0, 0));
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryTotalTests, 1), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassedTests, 1), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, 0), OutputLevel.Information), Times.Never());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummarySkippedTests, 0), OutputLevel.Information), Times.Never());
-            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunSuccessful, OutputLevel.Information), Times.Once());
-            this.mockProgressIndicator.Verify(pi => pi.Stop(), Times.Once);
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryTotalTests, 1), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassedTests, 1), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, 0), OutputLevel.Information), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummarySkippedTests, 0), OutputLevel.Information), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunSuccessful, OutputLevel.Information), Times.Once());
+            _mockProgressIndicator.Verify(pi => pi.Stop(), Times.Once);
         }
 
         [TestMethod]
@@ -867,19 +849,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
-            foreach (var testResult in this.GetTestResultObject(TestOutcome.Failed))
+            foreach (var testResult in GetTestResultObject(TestOutcome.Failed))
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
             loggerEvents.CompleteTestRun(null, false, false, null, null, null, new TimeSpan(1, 0, 0, 0));
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryTotalTests, 1), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, 1), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassedTests, 0), OutputLevel.Information), Times.Never());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummarySkippedTests, 0), OutputLevel.Information), Times.Never());
-            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunFailed, OutputLevel.Error), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryTotalTests, 1), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, 1), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassedTests, 0), OutputLevel.Information), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummarySkippedTests, 0), OutputLevel.Information), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunFailed, OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
@@ -891,19 +873,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
-            foreach (var testResult in this.GetTestResultObject(TestOutcome.Failed))
+            foreach (var testResult in GetTestResultObject(TestOutcome.Failed))
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
             loggerEvents.CompleteTestRun(null, true, false, null, null, null, new TimeSpan(1, 0, 0, 0));
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, 1), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassedTests, 0), OutputLevel.Information), Times.Never());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummarySkippedTests, 0), OutputLevel.Information), Times.Never());
-            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunCanceled, OutputLevel.Error), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, 1), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassedTests, 0), OutputLevel.Information), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummarySkippedTests, 0), OutputLevel.Information), Times.Never());
+            _mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunCanceled, OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
@@ -915,11 +897,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
             loggerEvents.CompleteTestRun(null, true, false, null, null, null, new TimeSpan(1, 0, 0, 0));
 
-            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunCanceled, OutputLevel.Error), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunCanceled, OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
@@ -931,16 +913,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
-            foreach (var testResult in this.GetTestResultObject(TestOutcome.Failed))
+            foreach (var testResult in GetTestResultObject(TestOutcome.Failed))
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
             loggerEvents.CompleteTestRun(null, false, true, null, null, null, new TimeSpan(1, 0, 0, 0));
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunAborted, OutputLevel.Error), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunAborted, OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
@@ -952,11 +934,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
             loggerEvents.CompleteTestRun(null, false, true, null, null, null, new TimeSpan(1, 0, 0, 0));
 
-            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunAborted, OutputLevel.Error), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunAborted, OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
@@ -978,13 +960,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
             var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { testFilePath }, 1));
             loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
@@ -1010,15 +992,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "detailed" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
             var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { testFilePath }, 1));
             loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(testFilePath, OutputLevel.Information), Times.Once);
-            this.mockOutput.Verify(o => o.WriteLine(testFilePath, OutputLevel.Information), Times.Once);
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(testFilePath, OutputLevel.Information), Times.Once);
+            _mockOutput.Verify(o => o.WriteLine(testFilePath, OutputLevel.Information), Times.Once);
         }
 
         [TestMethod]
@@ -1044,15 +1026,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
             var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { testFilePath }, 1));
             loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(testFilePath, OutputLevel.Information), Times.Never);
-            this.mockOutput.Verify(o => o.WriteLine(testFilePath2, OutputLevel.Information), Times.Never);
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(testFilePath, OutputLevel.Information), Times.Never);
+            _mockOutput.Verify(o => o.WriteLine(testFilePath2, OutputLevel.Information), Times.Never);
         }
 
         [TestMethod]
@@ -1064,9 +1046,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
-            foreach (var testResult in this.GetTestResultObject(TestOutcome.Passed))
+            foreach (var testResult in GetTestResultObject(TestOutcome.Passed))
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
@@ -1076,10 +1058,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.CompleteTestRun(null, false, false, null, null, null, new TimeSpan(0, 0, 0, 1));
 
             // Verify PrintTimeSpan with different formats
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, 1, CommandLineResources.Days), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, 1, CommandLineResources.Hours), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, 1, CommandLineResources.Minutes), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, 1, CommandLineResources.Seconds), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, 1, CommandLineResources.Days), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, 1, CommandLineResources.Hours), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, 1, CommandLineResources.Minutes), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, 1, CommandLineResources.Seconds), OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
@@ -1091,9 +1073,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
-            var testresults = this.GetTestResultObject(TestOutcome.Failed);
+            var testresults = GetTestResultObject(TestOutcome.Failed);
             testresults[0].ErrorMessage = "ErrorMessage";
             testresults[0].ErrorStackTrace = "ErrorStackTrace";
             foreach (var testResult in testresults)
@@ -1102,10 +1084,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             }
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, "{0}", "   ErrorMessage"), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, "{0}", "  ErrorStackTrace"), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine("  Error Message:", OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine("  Stack Trace:", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, "{0}", "   ErrorMessage"), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, "{0}", "  ErrorStackTrace"), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine("  Error Message:", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine("  Stack Trace:", OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
@@ -1117,9 +1099,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "detailed" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
-            var testresults = this.GetTestResultObject(TestOutcome.Passed);
+            var testresults = GetTestResultObject(TestOutcome.Passed);
             testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, "Hello"));
 
             foreach (var testResult in testresults)
@@ -1128,10 +1110,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             }
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.Write(PassedTestIndicator, OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine("TestName", OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(" Hello", OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(String.Empty, OutputLevel.Information), Times.AtLeastOnce);
+            _mockOutput.Verify(o => o.Write(PassedTestIndicator, OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine("TestName", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(" Hello", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(String.Empty, OutputLevel.Information), Times.AtLeastOnce);
         }
 
         [TestMethod]
@@ -1143,9 +1125,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
-            var testresults = this.GetTestResultObject(TestOutcome.Failed);
+            var testresults = GetTestResultObject(TestOutcome.Failed);
             testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, "StandardOutCategory"));
             testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, "StandardErrorCategory"));
             testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, "AdditionalInfoCategory"));
@@ -1157,14 +1139,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             }
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine("  Standard Output Messages:", OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(" StandardOutCategory", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine("  Standard Output Messages:", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(" StandardOutCategory", OutputLevel.Information), Times.Once());
 
-            this.mockOutput.Verify(o => o.WriteLine("  Standard Error Messages:", OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(" StandardErrorCategory", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine("  Standard Error Messages:", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(" StandardErrorCategory", OutputLevel.Information), Times.Once());
 
-            this.mockOutput.Verify(o => o.WriteLine("  Additional Information Messages:", OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(" AdditionalInfoCategory AnotherAdditionalInfoCategory", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine("  Additional Information Messages:", OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(" AdditionalInfoCategory AnotherAdditionalInfoCategory", OutputLevel.Information), Times.Once());
         }
 
         [DataRow("quiet")]
@@ -1180,7 +1162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", verbosityLevel }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
             var attachmentSet = new AttachmentSet(new Uri("test://uri"), "myattachmentset");
             var uriDataAttachment = new UriDataAttachment(new Uri("file://server/filename.ext"), "description");
@@ -1193,8 +1175,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             };
             loggerEvents.CompleteTestRun(null, false, false, null, new Collection<AttachmentSet>(attachmentSetList), new Collection<InvokedDataCollector>(), new TimeSpan(1, 0, 0, 0));
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment1.Uri.LocalPath), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment1.Uri.LocalPath), OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
@@ -1206,27 +1188,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 { "verbosity", "normal" }
             };
-            this.consoleLogger.Initialize(loggerEvents, parameters);
+            _consoleLogger.Initialize(loggerEvents, parameters);
 
             TestCase testCase1 = CreateTestCase("TestCase1");
             TestCase testCase2 = CreateTestCase("TestCase2");
             TestCase testCase3 = CreateTestCase("TestCase3");
 
             Guid parentExecutionId = Guid.NewGuid();
-            TestProperty ParentExecIdProperty = TestProperty.Register("ParentExecId", "ParentExecId", typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
-            TestProperty ExecutionIdProperty = TestProperty.Register("ExecutionId", "ExecutionId", typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
-            TestProperty TestTypeProperty = TestProperty.Register("TestType", "TestType", typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
+            TestProperty parentExecIdProperty = TestProperty.Register("ParentExecId", "ParentExecId", typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
+            TestProperty executionIdProperty = TestProperty.Register("ExecutionId", "ExecutionId", typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
+            TestProperty testTypeProperty = TestProperty.Register("TestType", "TestType", typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
 
             var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
-            result1.SetPropertyValue(ExecutionIdProperty, parentExecutionId);
+            result1.SetPropertyValue(executionIdProperty, parentExecutionId);
 
             var result2 = new ObjectModel.TestResult(testCase2) { Outcome = TestOutcome.Passed };
-            result2.SetPropertyValue(ExecutionIdProperty, Guid.NewGuid());
-            result2.SetPropertyValue(ParentExecIdProperty, parentExecutionId);
+            result2.SetPropertyValue(executionIdProperty, Guid.NewGuid());
+            result2.SetPropertyValue(parentExecIdProperty, parentExecutionId);
 
             var result3 = new ObjectModel.TestResult(testCase3) { Outcome = TestOutcome.Failed };
-            result3.SetPropertyValue(ExecutionIdProperty, Guid.NewGuid());
-            result3.SetPropertyValue(ParentExecIdProperty, parentExecutionId);
+            result3.SetPropertyValue(executionIdProperty, Guid.NewGuid());
+            result3.SetPropertyValue(parentExecIdProperty, parentExecutionId);
 
             loggerEvents.RaiseTestResult(new TestResultEventArgs(result1));
             loggerEvents.RaiseTestResult(new TestResultEventArgs(result2));
@@ -1234,9 +1216,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             loggerEvents.CompleteTestRun(null, false, false, null, null, null, new TimeSpan(1, 0, 0, 0));
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, 1), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassedTests, 1), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryTotalTests, 2), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, 1), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassedTests, 1), OutputLevel.Information), Times.Once());
+            _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryTotalTests, 2), OutputLevel.Information), Times.Once());
         }
 
         private TestCase CreateTestCase(string testCaseName)
@@ -1246,13 +1228,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
         private void Setup()
         {
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockMetricsCollection = new Mock<IMetricsCollection>();
-            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+            _mockRequestData = new Mock<IRequestData>();
+            _mockMetricsCollection = new Mock<IMetricsCollection>();
+            _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
 
-            this.mockOutput = new Mock<IOutput>();
-            this.mockProgressIndicator = new Mock<IProgressIndicator>();
-            this.consoleLogger = new ConsoleLogger(this.mockOutput.Object, this.mockProgressIndicator.Object);
+            _mockOutput = new Mock<IOutput>();
+            _mockProgressIndicator = new Mock<IProgressIndicator>();
+            _consoleLogger = new ConsoleLogger(_mockOutput.Object, _mockProgressIndicator.Object);
         }
 
         private List<ObjectModel.TestResult> GetTestResultsObject()

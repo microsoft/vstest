@@ -28,36 +28,36 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
-    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+    using CommunicationUtilitiesResources = Resources.Resources;
+    using CoreUtilitiesConstants = CoreUtilities.Constants;
 
     /// <summary>
     /// Handles test session events received from vstest console process.
     /// </summary>
     internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDisposable
     {
-        private static readonly object SyncObject = new object();
+        private static readonly object SyncObject = new();
 
         private readonly ICommunicationManager communicationManager;
 
-        private IMessageSink messageSink;
+        private readonly IMessageSink messageSink;
 
-        private IDataCollectionManager dataCollectionManager;
+        private readonly IDataCollectionManager dataCollectionManager;
 
-        private IDataCollectionTestCaseEventHandler dataCollectionTestCaseEventHandler;
+        private readonly IDataCollectionTestCaseEventHandler dataCollectionTestCaseEventHandler;
 
         private Task testCaseEventMonitorTask;
 
-        private IDataSerializer dataSerializer;
+        private readonly IDataSerializer dataSerializer;
 
-        private IFileHelper fileHelper;
+        private readonly IFileHelper fileHelper;
 
-        private IRequestData requestData;
+        private readonly IRequestData requestData;
 
         /// <summary>
         /// Use to cancel data collection test case events monitoring if test run is canceled.
         /// </summary>
-        private CancellationTokenSource cancellationTokenSource;
+        private readonly CancellationTokenSource cancellationTokenSource;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionRequestHandler"/> class.
@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             this.dataCollectionManager = dataCollectionManager;
             this.dataSerializer = dataSerializer;
             this.dataCollectionTestCaseEventHandler = dataCollectionTestCaseEventHandler;
-            this.cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource = new CancellationTokenSource();
             this.fileHelper = fileHelper;
             this.requestData = requestData;
         }
@@ -173,13 +173,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <inheritdoc />
         public void InitializeCommunication(int port)
         {
-            this.communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
+            communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
         }
 
         /// <inheritdoc />
         public bool WaitForRequestSenderConnection(int connectionTimeout)
         {
-            return this.communicationManager.WaitForServerConnection(connectionTimeout);
+            return communicationManager.WaitForServerConnection(connectionTimeout);
         }
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
             do
             {
-                var message = this.communicationManager.ReceiveMessage();
+                var message = communicationManager.ReceiveMessage();
 
                 if (EqtTrace.IsInfoEnabled)
                 {
@@ -201,17 +201,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 switch (message.MessageType)
                 {
                     case MessageType.BeforeTestRunStart:
-                        this.HandleBeforeTestRunStart(message);
+                        HandleBeforeTestRunStart(message);
                         break;
 
                     case MessageType.AfterTestRunEnd:
-                        this.HandleAfterTestRunEnd(message);
+                        HandleAfterTestRunEnd(message);
                         isSessionEnded = true;
                         break;
 
                     case MessageType.TestHostLaunched:
-                        var testHostLaunchedPayload = this.dataSerializer.DeserializePayload<TestHostLaunchedPayload>(message);
-                        this.dataCollectionManager.TestHostLaunched(testHostLaunchedPayload.ProcessId);
+                        var testHostLaunchedPayload = dataSerializer.DeserializePayload<TestHostLaunchedPayload>(message);
+                        dataCollectionManager.TestHostLaunched(testHostLaunchedPayload.ProcessId);
                         break;
 
                     default:
@@ -230,7 +230,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// </param>
         public void SendDataCollectionMessage(DataCollectionMessageEventArgs args)
         {
-            this.communicationManager.SendMessage(MessageType.DataCollectionMessage, args);
+            communicationManager.SendMessage(MessageType.DataCollectionMessage, args);
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// </summary>
         public void Dispose()
         {
-            this.communicationManager?.StopClient();
+            communicationManager?.StopClient();
         }
 
         /// <summary>
@@ -246,7 +246,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// </summary>
         public void Close()
         {
-            this.Dispose();
+            Dispose();
             EqtTrace.Info("Closing the connection !");
         }
 
@@ -275,19 +275,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                     datacollectorSearchPaths.UnionWith(customTestAdaptersPaths);
                 }
 
-                List<string> extensionAssemblies = new List<string>();
+                List<string> extensionAssemblies = new();
                 foreach (var datacollectorSearchPath in datacollectorSearchPaths)
                 {
                     var adapterPath =
                         Path.GetFullPath(Environment.ExpandEnvironmentVariables(datacollectorSearchPath));
-                    if (!this.fileHelper.DirectoryExists(adapterPath))
+                    if (!fileHelper.DirectoryExists(adapterPath))
                     {
                         EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
                         continue;
                     }
 
                     extensionAssemblies.AddRange(
-                        this.fileHelper.EnumerateFiles(
+                        fileHelper.EnumerateFiles(
                             adapterPath,
                             SearchOption.AllDirectories,
                             TestPlatformConstants.DataCollectorEndsWithPattern));
@@ -311,11 +311,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         private void HandleBeforeTestRunStart(Message message)
         {
             // Initialize datacollectors and get environment variables.
-            var payload = this.dataSerializer.DeserializePayload<BeforeTestRunStartPayload>(message);
-            this.UpdateRequestData(payload.IsTelemetryOptedIn);
-            this.AddExtensionAssemblies(payload);
+            var payload = dataSerializer.DeserializePayload<BeforeTestRunStartPayload>(message);
+            UpdateRequestData(payload.IsTelemetryOptedIn);
+            AddExtensionAssemblies(payload);
 
-            var envVariables = this.dataCollectionManager.InitializeDataCollectors(payload.SettingsXml);
+            var envVariables = dataCollectionManager.InitializeDataCollectors(payload.SettingsXml);
 
             var properties = new Dictionary<string, object>
             {
@@ -323,30 +323,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             };
             var eventArgs = new SessionStartEventArgs(properties);
 
-            var areTestCaseLevelEventsRequired = this.dataCollectionManager.SessionStarted(eventArgs);
+            var areTestCaseLevelEventsRequired = dataCollectionManager.SessionStarted(eventArgs);
 
             // Open a socket communication port for test level events.
             var testCaseEventsPort = 0;
             if (areTestCaseLevelEventsRequired)
             {
-                testCaseEventsPort = this.dataCollectionTestCaseEventHandler.InitializeCommunication();
+                testCaseEventsPort = dataCollectionTestCaseEventHandler.InitializeCommunication();
 
-                this.testCaseEventMonitorTask = Task.Factory.StartNew(
+                testCaseEventMonitorTask = Task.Factory.StartNew(
                     () =>
                     {
                         try
                         {
                             var timeout = EnvironmentHelper.GetConnectionTimeout();
-                            if (this.dataCollectionTestCaseEventHandler.WaitForRequestHandlerConnection(
+                            if (dataCollectionTestCaseEventHandler.WaitForRequestHandlerConnection(
                                 timeout * 1000))
                             {
-                                this.dataCollectionTestCaseEventHandler.ProcessRequests();
+                                dataCollectionTestCaseEventHandler.ProcessRequests();
                             }
                             else
                             {
                                 EqtTrace.Error(
                                     "DataCollectionRequestHandler.HandleBeforeTestRunStart: TestCaseEventHandler timed out while connecting to the Sender.");
-                                this.dataCollectionTestCaseEventHandler.Close();
+                                dataCollectionTestCaseEventHandler.Close();
                                 throw new TestPlatformException(
                                     string.Format(
                                         CultureInfo.CurrentUICulture,
@@ -362,10 +362,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                             EqtTrace.Error("DataCollectionRequestHandler.HandleBeforeTestRunStart : Error occurred during initialization of TestHost : {0}", e);
                         }
                     },
-                    this.cancellationTokenSource.Token);
+                    cancellationTokenSource.Token);
             }
 
-            this.communicationManager.SendMessage(
+            communicationManager.SendMessage(
                 MessageType.BeforeTestRunStartResult,
                 new BeforeTestRunStartResult(envVariables, testCaseEventsPort));
 
@@ -374,53 +374,53 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
         private void HandleAfterTestRunEnd(Message message)
         {
-            var isCancelled = this.dataSerializer.DeserializePayload<bool>(message);
+            var isCancelled = dataSerializer.DeserializePayload<bool>(message);
 
             if (isCancelled)
             {
-                this.cancellationTokenSource.Cancel();
+                cancellationTokenSource.Cancel();
             }
 
             try
             {
-                this.testCaseEventMonitorTask?.Wait(this.cancellationTokenSource.Token);
-                this.dataCollectionTestCaseEventHandler.Close();
+                testCaseEventMonitorTask?.Wait(cancellationTokenSource.Token);
+                dataCollectionTestCaseEventHandler.Close();
             }
             catch (Exception ex)
             {
                 EqtTrace.Error("DataCollectionRequestHandler.HandleAfterTestRunEnd : Error while processing event from testhost: {0}", ex.ToString());
             }
 
-            var attachmentsets = this.dataCollectionManager.SessionEnded(isCancelled);
-            var invokedDataCollectors = this.dataCollectionManager.GetInvokedDataCollectors();
+            var attachmentsets = dataCollectionManager.SessionEnded(isCancelled);
+            var invokedDataCollectors = dataCollectionManager.GetInvokedDataCollectors();
 
             if (invokedDataCollectors != null && invokedDataCollectors.Any())
             {
                 // For the invoked collectors we report the same information as ProxyDataCollectionManager.cs line ~416
                 var invokedDataCollectorsForMetrics = invokedDataCollectors.Select(x => new { x.Uri, x.FriendlyName, x.HasAttachmentProcessor }.ToString());
-                this.requestData.MetricsCollection.Add(TelemetryDataConstants.InvokedDataCollectors, string.Join(",", invokedDataCollectorsForMetrics.ToArray()));
+                requestData.MetricsCollection.Add(TelemetryDataConstants.InvokedDataCollectors, string.Join(",", invokedDataCollectorsForMetrics.ToArray()));
             }
 
-            var afterTestRunEndResult = new AfterTestRunEndResult(attachmentsets, invokedDataCollectors, this.requestData.MetricsCollection.Metrics);
+            var afterTestRunEndResult = new AfterTestRunEndResult(attachmentsets, invokedDataCollectors, requestData.MetricsCollection.Metrics);
 
             // Dispose all datacollectors before sending attachments to vstest.console process.
             // As datacollector process exits itself on parent process(vstest.console) exits.
-            this.dataCollectionManager?.Dispose();
+            dataCollectionManager?.Dispose();
 
-            this.communicationManager.SendMessage(MessageType.AfterTestRunEndResult, afterTestRunEndResult);
+            communicationManager.SendMessage(MessageType.AfterTestRunEndResult, afterTestRunEndResult);
             EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : Session End message received from server. Closing the connection.");
 
-            this.Close();
+            Close();
 
             EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : DataCollection completed");
         }
 
         private void UpdateRequestData(bool isTelemetryOptedIn)
         {
-            if (isTelemetryOptedIn != this.requestData.IsTelemetryOptedIn)
+            if (isTelemetryOptedIn != requestData.IsTelemetryOptedIn)
             {
-                this.requestData.MetricsCollection = isTelemetryOptedIn ? (IMetricsCollection)new MetricsCollection() : new NoOpMetricsCollection();
-                this.requestData.IsTelemetryOptedIn = isTelemetryOptedIn;
+                requestData.MetricsCollection = isTelemetryOptedIn ? (IMetricsCollection)new MetricsCollection() : new NoOpMetricsCollection();
+                requestData.IsTelemetryOptedIn = isTelemetryOptedIn;
             }
         }
     }

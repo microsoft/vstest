@@ -8,7 +8,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using System.Globalization;
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-    using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+    using TrxLoggerResources = VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
     /// <summary>
     /// Test element.
@@ -20,29 +20,29 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         protected const int DefaultPriority = int.MaxValue;
 
-        protected TestId id;
-        protected string name;
-        protected string owner;
-        protected string storage;
-        protected string adapter;
-        protected int priority;
-        protected bool isRunnable;
-        protected TestExecId executionId;
-        protected TestExecId parentExecutionId;
-        protected TestCategoryItemCollection testCategories;
-        protected WorkItemCollection workItems;
-        protected TestListCategoryId catId;
+        protected TestId _id;
+        protected string _name;
+        protected string _owner;
+        protected string _storage;
+        protected string _adapter;
+        protected int _priority;
+        protected bool _isRunnable;
+        protected TestExecId _executionId;
+        protected TestExecId _parentExecutionId;
+        protected TestCategoryItemCollection _testCategories;
+        protected WorkItemCollection _workItems;
+        protected TestListCategoryId _catId;
 
         public TestElement(Guid id, string name, string adapter)
         {
             Debug.Assert(!string.IsNullOrEmpty(name), "name is null");
             Debug.Assert(!string.IsNullOrEmpty(adapter), "adapter is null");
 
-            this.Initialize();
+            Initialize();
 
-            this.id = new TestId(id);
-            this.name = name;
-            this.adapter = adapter;
+            this._id = new TestId(id);
+            this._name = name;
+            this._adapter = adapter;
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public TestId Id
         {
-            get { return this.id; }
+            get { return _id; }
         }
 
         /// <summary>
@@ -58,12 +58,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public string Name
         {
-            get { return this.name; }
+            get { return _name; }
 
             set
             {
                 EqtAssert.ParameterNotNull(value, "Name");
-                this.name = value;
+                _name = value;
             }
         }
 
@@ -72,12 +72,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public string Owner
         {
-            get { return this.owner; }
+            get { return _owner; }
 
             set
             {
                 EqtAssert.ParameterNotNull(value, "Owner");
-                this.owner = value;
+                _owner = value;
             }
         }
 
@@ -86,8 +86,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public int Priority
         {
-            get { return this.priority; }
-            set { this.priority = value; }
+            get { return _priority; }
+            set { _priority = value; }
         }
 
         /// <summary>
@@ -95,12 +95,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public string Storage
         {
-            get { return this.storage; }
+            get { return _storage; }
 
             set
             {
                 EqtAssert.StringNotNullOrEmpty(value, "Storage");
-                this.storage = value.ToLowerInvariant();
+                _storage = value.ToLowerInvariant();
             }
         }
 
@@ -109,8 +109,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public TestExecId ExecutionId
         {
-            get { return this.executionId; }
-            set { this.executionId = value; }
+            get { return _executionId; }
+            set { _executionId = value; }
         }
 
         /// <summary>
@@ -118,8 +118,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public TestExecId ParentExecutionId
         {
-            get { return this.parentExecutionId; }
-            set { this.parentExecutionId = value; }
+            get { return _parentExecutionId; }
+            set { _parentExecutionId = value; }
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public bool IsRunnable
         {
-            get { return this.isRunnable; }
+            get { return _isRunnable; }
         }
 
         /// <summary>
@@ -138,12 +138,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </remarks>
         public TestListCategoryId CategoryId
         {
-            get { return this.catId; }
+            get { return _catId; }
 
             set
             {
                 EqtAssert.ParameterNotNull(value, "CategoryId");
-                this.catId = value;
+                _catId = value;
             }
         }
 
@@ -152,12 +152,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public TestCategoryItemCollection TestCategories
         {
-            get { return this.testCategories; }
+            get { return _testCategories; }
 
             set
             {
                 EqtAssert.ParameterNotNull(value, "value");
-                this.testCategories = value;
+                _testCategories = value;
             }
         }
 
@@ -166,12 +166,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public WorkItemCollection WorkItems
         {
-            get { return this.workItems; }
+            get { return _workItems; }
 
             set
             {
                 EqtAssert.ParameterNotNull(value, "value");
-                this.workItems = value;
+                _workItems = value;
             }
         }
 
@@ -180,7 +180,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public string Adapter
         {
-            get { return adapter; }
+            get { return _adapter; }
         }
 
         /// <summary>
@@ -197,8 +197,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             return string.Format(
                 CultureInfo.InvariantCulture,
                 "'{0}' {1}",
-                this.name ?? TrxLoggerResources.Common_NullInMessages,
-                this.id != null ? this.id.ToString() : TrxLoggerResources.Common_NullInMessages);
+                _name ?? TrxLoggerResources.Common_NullInMessages,
+                _id != null ? _id.ToString() : TrxLoggerResources.Common_NullInMessages);
         }
 
         /// <summary>
@@ -212,10 +212,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public override bool Equals(object other)
         {
-            TestElement otherTest = other as TestElement;
-            return (otherTest == null) ?
-                false :
-                this.id.Equals(otherTest.id);
+            return other is TestElement otherTest && _id.Equals(otherTest._id);
         }
 
         /// <summary>
@@ -226,44 +223,44 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public override int GetHashCode()
         {
-            return this.id.GetHashCode();
+            return _id.GetHashCode();
         }
 
         public virtual void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
         {
-            XmlPersistence h = new XmlPersistence();
+            XmlPersistence h = new();
 
-            h.SaveSimpleField(element, "@name", this.name, null);
-            h.SaveSimpleField(element, "@storage", this.storage, string.Empty);
-            h.SaveSimpleField(element, "@priority", this.priority, DefaultPriority);
-            h.SaveSimpleField(element, "Owners/Owner/@name", this.owner, string.Empty);
-            h.SaveObject(this.testCategories, element, "TestCategory", parameters);
+            h.SaveSimpleField(element, "@name", _name, null);
+            h.SaveSimpleField(element, "@storage", _storage, string.Empty);
+            h.SaveSimpleField(element, "@priority", _priority, DefaultPriority);
+            h.SaveSimpleField(element, "Owners/Owner/@name", _owner, string.Empty);
+            h.SaveObject(_testCategories, element, "TestCategory", parameters);
 
-            if (this.executionId != null)
-                h.SaveGuid(element, "Execution/@id", this.executionId.Id);
-            if (this.parentExecutionId != null)
-                h.SaveGuid(element, "Execution/@parentId", this.parentExecutionId.Id);
+            if (_executionId != null)
+                h.SaveGuid(element, "Execution/@id", _executionId.Id);
+            if (_parentExecutionId != null)
+                h.SaveGuid(element, "Execution/@parentId", _parentExecutionId.Id);
 
-            h.SaveObject(this.workItems, element, "Workitems", parameters);
+            h.SaveObject(_workItems, element, "Workitems", parameters);
 
             XmlTestStoreParameters testIdParameters = XmlTestStoreParameters.GetParameters();
             testIdParameters[TestId.IdLocationKey] = "@id";
-            h.SaveObject(this.id, element, testIdParameters);
+            h.SaveObject(_id, element, testIdParameters);
         }
 
         private void Initialize()
         {
-            this.id = TestId.Empty;
-            this.name = string.Empty;
-            this.owner = string.Empty;
-            this.priority = DefaultPriority;
-            this.storage = string.Empty;
-            this.executionId = TestExecId.Empty;
-            this.parentExecutionId = TestExecId.Empty;
-            this.testCategories = new TestCategoryItemCollection();
-            this.workItems = new WorkItemCollection();
-            this.isRunnable = true;
-            this.catId = TestListCategoryId.Uncategorized;
+            _id = TestId.Empty;
+            _name = string.Empty;
+            _owner = string.Empty;
+            _priority = DefaultPriority;
+            _storage = string.Empty;
+            _executionId = TestExecId.Empty;
+            _parentExecutionId = TestExecId.Empty;
+            _testCategories = new TestCategoryItemCollection();
+            _workItems = new WorkItemCollection();
+            _isRunnable = true;
+            _catId = TestListCategoryId.Uncategorized;
         }
     }
 }

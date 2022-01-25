@@ -36,9 +36,9 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             TestSessionPool.Instance = null;
 
-            this.mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+            mockEventsHandler = new Mock<ITestSessionEventsHandler>();
 
-            this.mockEventsHandler.Setup(e => e.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>()))
+            mockEventsHandler.Setup(e => e.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>()))
                 .Callback((TestSessionInfo tsi) => { });
         }
 
@@ -49,26 +49,26 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client
             mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
                 .Returns(true);
 
-            var testSessionCriteria = this.CreateTestSession(this.fakeTestSources, this.fakeRunSettings);
-            var proxyManager = this.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+            var testSessionCriteria = CreateTestSession(fakeTestSources, fakeRunSettings);
+            var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
             // First call to StartSession should succeed.
-            Assert.IsTrue(proxyManager.StartSession(this.mockEventsHandler.Object));
+            Assert.IsTrue(proxyManager.StartSession(mockEventsHandler.Object));
             mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                     testSessionCriteria.Sources,
                     testSessionCriteria.RunSettings),
                 Times.Once);
-            this.mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+            mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                     It.IsAny<TestSessionInfo>()),
                 Times.Once);
 
             // Second call to StartSession should fail.
-            Assert.IsFalse(proxyManager.StartSession(this.mockEventsHandler.Object));
+            Assert.IsFalse(proxyManager.StartSession(mockEventsHandler.Object));
             mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                     testSessionCriteria.Sources,
                     testSessionCriteria.RunSettings),
                 Times.Once);
-            this.mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+            mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                     It.IsAny<TestSessionInfo>()),
                 Times.Once);
         }
@@ -80,16 +80,16 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client
             mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
                 .Returns(true);
 
-            var testSessionCriteria = this.CreateTestSession(this.fakeTestMultipleSources, this.fakeRunSettings);
-            var proxyManager = this.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+            var testSessionCriteria = CreateTestSession(fakeTestMultipleSources, fakeRunSettings);
+            var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
             // First call to StartSession should succeed.
-            Assert.IsTrue(proxyManager.StartSession(this.mockEventsHandler.Object));
+            Assert.IsTrue(proxyManager.StartSession(mockEventsHandler.Object));
             mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                     It.IsAny<IEnumerable<string>>(),
                     testSessionCriteria.RunSettings),
-                Times.Exactly(this.fakeTestMultipleSources.Count));
-            this.mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+                Times.Exactly(fakeTestMultipleSources.Count));
+            mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                     It.IsAny<TestSessionInfo>()),
                 Times.Once);
         }
@@ -97,11 +97,11 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void StartSessionShouldFailIfProxyCreatorIsNull()
         {
-            var testSessionCriteria = this.CreateTestSession(this.fakeTestSources, this.fakeRunSettings);
-            var proxyManager = this.CreateProxy(testSessionCriteria, null);
+            var testSessionCriteria = CreateTestSession(fakeTestSources, fakeRunSettings);
+            var proxyManager = CreateProxy(testSessionCriteria, null);
 
-            Assert.IsFalse(proxyManager.StartSession(this.mockEventsHandler.Object));
-            this.mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+            Assert.IsFalse(proxyManager.StartSession(mockEventsHandler.Object));
+            mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                     It.IsAny<TestSessionInfo>()),
                 Times.Never);
         }
@@ -114,17 +114,17 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client
                 .Returns(false);
             mockProxyOperationManager.Setup(pom => pom.Close()).Callback(() => { });
 
-            var testSessionCriteria = this.CreateTestSession(this.fakeTestSources, this.fakeRunSettings);
-            var proxyManager = this.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+            var testSessionCriteria = CreateTestSession(fakeTestSources, fakeRunSettings);
+            var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
             // Call fails because SetupChannel returns false.
-            Assert.IsFalse(proxyManager.StartSession(this.mockEventsHandler.Object));
+            Assert.IsFalse(proxyManager.StartSession(mockEventsHandler.Object));
             mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                     It.IsAny<IEnumerable<string>>(),
                     It.IsAny<string>()),
                 Times.Once);
             mockProxyOperationManager.Verify(pom => pom.Close(), Times.Never);
-            this.mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+            mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                     It.IsAny<TestSessionInfo>()),
                 Times.Never);
         }
@@ -137,17 +137,17 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client
                 .Throws(new TestPlatformException("Dummy exception."));
             mockProxyOperationManager.Setup(pom => pom.Close()).Callback(() => { });
 
-            var testSessionCriteria = this.CreateTestSession(this.fakeTestSources, this.fakeRunSettings);
-            var proxyManager = this.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+            var testSessionCriteria = CreateTestSession(fakeTestSources, fakeRunSettings);
+            var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
             // Call fails because SetupChannel returns false.
-            Assert.IsFalse(proxyManager.StartSession(this.mockEventsHandler.Object));
+            Assert.IsFalse(proxyManager.StartSession(mockEventsHandler.Object));
             mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                     It.IsAny<IEnumerable<string>>(),
                     It.IsAny<string>()),
                 Times.Once);
             mockProxyOperationManager.Verify(pom => pom.Close(), Times.Never);
-            this.mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+            mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                     It.IsAny<TestSessionInfo>()),
                 Times.Never);
         }
@@ -165,17 +165,17 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client
                 .Returns(true);
             mockProxyOperationManager.Setup(pom => pom.Close()).Callback(() => { });
 
-            var testSessionCriteria = this.CreateTestSession(this.fakeTestSources, this.fakeRunSettings);
-            var proxyManager = this.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+            var testSessionCriteria = CreateTestSession(fakeTestSources, fakeRunSettings);
+            var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
             // Call to StartSession should fail because AddSession fails.
-            Assert.IsFalse(proxyManager.StartSession(this.mockEventsHandler.Object));
+            Assert.IsFalse(proxyManager.StartSession(mockEventsHandler.Object));
             mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                     testSessionCriteria.Sources,
                     testSessionCriteria.RunSettings),
                 Times.Once);
             mockProxyOperationManager.Verify(pom => pom.Close(), Times.Once);
-            this.mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+            mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                     It.IsAny<TestSessionInfo>()),
                 Times.Never);
         }
@@ -188,16 +188,16 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client
                 .Returns(true);
             mockProxyOperationManager.Setup(pom => pom.Close()).Callback(() => { });
 
-            var testSessionCriteria = this.CreateTestSession(this.fakeTestSources, this.fakeRunSettings);
-            var proxyManager = this.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+            var testSessionCriteria = CreateTestSession(fakeTestSources, fakeRunSettings);
+            var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
             // StartSession should succeed.
-            Assert.IsTrue(proxyManager.StartSession(this.mockEventsHandler.Object));
+            Assert.IsTrue(proxyManager.StartSession(mockEventsHandler.Object));
             mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                     testSessionCriteria.Sources,
                     testSessionCriteria.RunSettings),
                 Times.Once);
-            this.mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+            mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                     It.IsAny<TestSessionInfo>()),
                 Times.Once);
 
@@ -218,16 +218,16 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client
                 .Returns(true);
             mockProxyOperationManager.Setup(pom => pom.Close()).Callback(() => { });
 
-            var testSessionCriteria = this.CreateTestSession(this.fakeTestMultipleSources, this.fakeRunSettings);
-            var proxyManager = this.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+            var testSessionCriteria = CreateTestSession(fakeTestMultipleSources, fakeRunSettings);
+            var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
             // StartSession should succeed.
-            Assert.IsTrue(proxyManager.StartSession(this.mockEventsHandler.Object));
+            Assert.IsTrue(proxyManager.StartSession(mockEventsHandler.Object));
             mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                     It.IsAny<IEnumerable<string>>(),
                     testSessionCriteria.RunSettings),
                 Times.Exactly(testSessionCriteria.Sources.Count));
-            this.mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+            mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                     It.IsAny<TestSessionInfo>()),
                 Times.Once);
 
@@ -243,16 +243,16 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client
             mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
                 .Returns(true);
 
-            var testSessionCriteria = this.CreateTestSession(this.fakeTestSources, this.fakeRunSettings);
-            var proxyManager = this.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+            var testSessionCriteria = CreateTestSession(fakeTestSources, fakeRunSettings);
+            var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
             // StartSession should succeed.
-            Assert.IsTrue(proxyManager.StartSession(this.mockEventsHandler.Object));
+            Assert.IsTrue(proxyManager.StartSession(mockEventsHandler.Object));
             mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                     It.IsAny<IEnumerable<string>>(),
                     testSessionCriteria.RunSettings),
                 Times.Exactly(testSessionCriteria.Sources.Count));
-            this.mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+            mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                     It.IsAny<TestSessionInfo>()),
                 Times.Once);
 
@@ -285,20 +285,20 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client
             mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
                 .Returns(true);
 
-            var testSessionCriteria = this.CreateTestSession(this.fakeTestSources, this.fakeRunSettings);
-            var proxyManager = this.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+            var testSessionCriteria = CreateTestSession(fakeTestSources, fakeRunSettings);
+            var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
             // Validate sanity checks.
             Assert.ThrowsException<ArgumentException>(() => proxyManager.EnqueueProxy(-1));
             Assert.ThrowsException<ArgumentException>(() => proxyManager.EnqueueProxy(1));
 
             // StartSession should succeed.
-            Assert.IsTrue(proxyManager.StartSession(this.mockEventsHandler.Object));
+            Assert.IsTrue(proxyManager.StartSession(mockEventsHandler.Object));
             mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                     It.IsAny<IEnumerable<string>>(),
                     testSessionCriteria.RunSettings),
                 Times.Exactly(testSessionCriteria.Sources.Count));
-            this.mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+            mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                     It.IsAny<TestSessionInfo>()),
                 Times.Once);
 
@@ -329,7 +329,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client
             return new ProxyTestSessionManager(
                 testSessionCriteria,
                 testSessionCriteria.Sources.Count,
-                () => { return proxyOperationManager; });
+                () => proxyOperationManager);
         }
     }
 }

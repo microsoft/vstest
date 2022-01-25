@@ -11,11 +11,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     internal class ListExtensionsArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
     {
-        private string commandName;
+        private readonly string commandName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ListExtensionsArgumentProcessorCapabilities"/> class.
@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.commandName = commandName;
         }
 
-        public override string CommandName => this.commandName;
+        public override string CommandName => commandName;
 
         /// <inheritdoc />
         public override bool AllowMultiple => false;
@@ -39,8 +39,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         private Lazy<IArgumentProcessorCapabilities> metadata;
         private Lazy<IArgumentExecutor> executor;
-        private Func<IArgumentExecutor> getExecutor;
-        private Func<IArgumentProcessorCapabilities> getCapabilities;
+        private readonly Func<IArgumentExecutor> getExecutor;
+        private readonly Func<IArgumentProcessorCapabilities> getCapabilities;
 
         public ListExtensionsArgumentProcessor(Func<IArgumentExecutor> getExecutor, Func<IArgumentProcessorCapabilities> getCapabilities)
         {
@@ -52,17 +52,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(getExecutor);
+                    executor = new Lazy<IArgumentExecutor>(getExecutor);
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
 
@@ -70,12 +70,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(getCapabilities);
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(getCapabilities);
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
     }
@@ -103,7 +103,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public ArgumentProcessorResult Execute()
         {
             ConsoleOutput.Instance.WriteLine(CommandLineResources.AvailableDiscoverersHeaderMessage, OutputLevel.Information);
-            var testPlatform = TestPlatformFactory.GetTestPlatform();
+            _ = TestPlatformFactory.GetTestPlatform();
             var extensionManager = TestDiscoveryExtensionManager.Create();
             foreach (var extension in extensionManager.Discoverers)
             {
@@ -140,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public ArgumentProcessorResult Execute()
         {
             ConsoleOutput.Instance.WriteLine(CommandLineResources.AvailableExecutorsHeaderMessage, OutputLevel.Information);
-            var testPlatform = TestPlatformFactory.GetTestPlatform();
+            _ = TestPlatformFactory.GetTestPlatform();
             var extensionManager = TestExecutorExtensionManager.Create();
             foreach (var extension in extensionManager.TestExtensions)
             {
@@ -176,7 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public ArgumentProcessorResult Execute()
         {
             ConsoleOutput.Instance.WriteLine(CommandLineResources.AvailableLoggersHeaderMessage, OutputLevel.Information);
-            var testPlatform = TestPlatformFactory.GetTestPlatform();
+            _ = TestPlatformFactory.GetTestPlatform();
             var extensionManager = TestLoggerExtensionManager.Create(new NullMessageLogger());
             foreach (var extension in extensionManager.TestExtensions)
             {
@@ -220,7 +220,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public ArgumentProcessorResult Execute()
         {
             ConsoleOutput.Instance.WriteLine(CommandLineResources.AvailableSettingsProvidersHeaderMessage, OutputLevel.Information);
-            var testPlatform = TestPlatformFactory.GetTestPlatform();
+            _ = TestPlatformFactory.GetTestPlatform();
             var extensionManager = SettingsProviderExtensionManager.Create();
             foreach (var extension in extensionManager.SettingsProvidersMap.Values)
             {

@@ -18,7 +18,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     {
         #region Fields
         [StoreXmlSimpleField(Location = "@TestCategory", DefaultValue = "")]
-        private string category = string.Empty;
+        private readonly string _category = string.Empty;
 
         #endregion
 
@@ -36,7 +36,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             }
 
 
-            this.category = this.StripIllegalChars(category);
+            this._category = StripIllegalChars(category);
         }
 
         #endregion
@@ -49,7 +49,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             get
             {
-                return this.category;
+                return _category;
             }
         }
 
@@ -73,13 +73,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>True if the values are the same and false otherwise.</returns>
         public override bool Equals(object other)
         {
-            TestCategoryItem otherItem = other as TestCategoryItem;
-            if (otherItem == null)
+            if (other is not TestCategoryItem otherItem)
             {
                 return false;
             }
-            Debug.Assert(this.category != null, "category is null");
-            return String.Equals(this.category, otherItem.category, StringComparison.OrdinalIgnoreCase);
+            Debug.Assert(_category != null, "category is null");
+            return String.Equals(_category, otherItem._category, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -88,8 +87,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>Hashcode of the category.</returns>
         public override int GetHashCode()
         {
-            Debug.Assert(this.category != null, "category is null");
-            return this.category.ToUpperInvariant().GetHashCode();
+            Debug.Assert(_category != null, "category is null");
+            return _category.ToUpperInvariant().GetHashCode();
         }
 
         /// <summary>
@@ -98,8 +97,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>The category.</returns>
         public override string ToString()
         {
-            Debug.Assert(this.category != null, "category is null");
-            return this.category;
+            Debug.Assert(_category != null, "category is null");
+            return _category;
         }
         #endregion
 
@@ -142,7 +141,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             EqtAssert.ParameterNotNull(items, nameof(items));
             foreach (string s in items)
             {
-                this.Add(s);
+                Add(s);
             }
         }
 
@@ -156,7 +155,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="item">Category to be added.</param>
         public void Add(string item)
         {
-            this.Add(new TestCategoryItem(item));
+            Add(new TestCategoryItem(item));
         }
 
         /// <summary>
@@ -181,8 +180,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns></returns>
         public override string ToString()
         {
-            StringBuilder returnString = new StringBuilder();
-            if (this.Count > 0)
+            StringBuilder returnString = new();
+            if (Count > 0)
             {
                 returnString.Append(",");
                 foreach (TestCategoryItem item in this)
@@ -201,7 +200,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>Array of strings containing the test categories.</returns>
         public string[] ToArray()
         {
-            string[] result = new string[this.Count];
+            string[] result = new string[Count];
 
             int i = 0;
             foreach (TestCategoryItem item in this)
@@ -219,20 +218,19 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>true if the collections contain the same items</returns>
         public override bool Equals(object obj)
         {
-            TestCategoryItemCollection other = obj as TestCategoryItemCollection;
             bool result = false;
 
-            if (other == null)
+            if (obj is not TestCategoryItemCollection other)
             {
                 // Other object is not a TestCategoryItemCollection.
                 result = false;
             }
-            else if (Object.ReferenceEquals(this, other))
+            else if (ReferenceEquals(this, other))
             {
                 // The other object is the same object as this one.
                 result = true;
             }
-            else if (this.Count != other.Count)
+            else if (Count != other.Count)
             {
                 // The count of categories in the other object does not
                 // match this one, so they are not equal.

@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         private const string SuspendCodeCoverageEnvVarName = "__VANGUARD_SUSPEND_INSTRUMENT__";
         private const string SuspendCodeCoverageEnvVarTrueValue = "TRUE";
 
-        private string prevEnvValue;
+        private readonly string prevEnvValue;
 
         /// <summary>
         /// Whether the object is disposed or not.
@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// </summary>
         public SuspendCodeCoverage()
         {
-            this.prevEnvValue = Environment.GetEnvironmentVariable(SuspendCodeCoverageEnvVarName, EnvironmentVariableTarget.Process);
+            prevEnvValue = Environment.GetEnvironmentVariable(SuspendCodeCoverageEnvVarName, EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable(SuspendCodeCoverageEnvVarName, SuspendCodeCoverageEnvVarTrueValue, EnvironmentVariableTarget.Process);
         }
 
@@ -44,7 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// </summary>
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -54,14 +54,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <param name="disposing"> Should dispose. </param>
         internal void Dispose(bool disposing)
         {
-            if (!this.isDisposed)
+            if (!isDisposed)
             {
                 if (disposing)
                 {
-                    Environment.SetEnvironmentVariable(SuspendCodeCoverageEnvVarName, this.prevEnvValue, EnvironmentVariableTarget.Process);
+                    Environment.SetEnvironmentVariable(SuspendCodeCoverageEnvVarName, prevEnvValue, EnvironmentVariableTarget.Process);
                 }
 
-                this.isDisposed = true;
+                isDisposed = true;
             }
         }
 

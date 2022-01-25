@@ -15,8 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     {
         private Guid execId;
 
-        private static TestExecId empty = new TestExecId(Guid.Empty);
-
         public TestExecId()
         {
             execId = Guid.NewGuid();
@@ -28,10 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         [DataMember]
-        public static TestExecId Empty
-        {
-            get { return empty; }
-        }
+        public static TestExecId Empty { get; } = new TestExecId(Guid.Empty);
 
         [DataMember]
         public Guid Id
@@ -41,14 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 
         public override bool Equals(object obj)
         {
-            TestExecId id = obj as TestExecId;
-
-            if (id == null)
-            {
-                return false;
-            }
-
-            return execId.Equals(id.execId);
+            return obj is TestExecId id && execId.Equals(id.execId);
         }
 
         public override int GetHashCode()

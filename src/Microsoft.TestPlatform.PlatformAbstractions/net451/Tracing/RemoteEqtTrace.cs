@@ -34,7 +34,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Register listeners from parent domain in current domain.
         /// </summary>
         /// <param name="listener">Trace listener instance.</param>
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Used in remote objects.")]
         internal void SetupRemoteListeners(TraceListener listener)
         {
             PlatformEqtTrace.SetupRemoteListeners(listener);

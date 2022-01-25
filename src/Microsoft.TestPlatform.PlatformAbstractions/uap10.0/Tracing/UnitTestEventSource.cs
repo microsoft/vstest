@@ -9,44 +9,36 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
     internal sealed class UnitTestEventSource : EventSource
     {
-        private static UnitTestEventSource log = new UnitTestEventSource();
-
-        public static UnitTestEventSource Log
-        {
-            get
-            {
-                return log;
-            }
-        }
+        public static UnitTestEventSource Log { get; } = new UnitTestEventSource();
 
         [Event(1, Level = EventLevel.Verbose)]
         public void Verbose(string message)
         {
-            this.WriteEvent(1, message);
+            WriteEvent(1, message);
         }
 
         [Event(2, Level = EventLevel.Informational)]
         public void Info(string message)
         {
-            this.WriteEvent(2, message);
+            WriteEvent(2, message);
         }
 
         [Event(3, Level = EventLevel.Warning)]
         public void Warn(string message)
         {
-            this.WriteEvent(3, message);
+            WriteEvent(3, message);
         }
 
         [Event(4, Level = EventLevel.Error)]
         public void Error(string message)
         {
-            this.WriteEvent(4, message);
+            WriteEvent(4, message);
         }
 
         [Event(5, Level = EventLevel.Critical)]
         public void Critical(string message)
         {
-            this.WriteEvent(5, message);
+            WriteEvent(5, message);
         }
     }
 }

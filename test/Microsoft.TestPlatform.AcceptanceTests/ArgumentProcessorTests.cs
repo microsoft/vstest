@@ -15,20 +15,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource]
         public void PassingNoArgumentsToVsTestConsoleShouldPrintHelpMessage(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            this.InvokeVsTest(null);
+            InvokeVsTest(null);
 
             //Check for help usage, description and arguments text.
-            this.StdOutputContains("Usage: vstest.console.exe");
-            this.StdOutputContains("Description: Runs tests from the specified files.");
-            this.StdOutputContains("Arguments:");
+            StdOutputContains("Usage: vstest.console.exe");
+            StdOutputContains("Description: Runs tests from the specified files.");
+            StdOutputContains("Arguments:");
 
             //Check for help options text
-            this.StdOutputContains("Options:");
+            StdOutputContains("Options:");
 
             //Check for help examples text
-            this.StdOutputContains("To run tests: >vstest.console.exe tests.dll");
+            StdOutputContains("To run tests: >vstest.console.exe tests.dll");
         }
 
         [TestMethod]
@@ -36,27 +36,27 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource]
         public void PassingInvalidArgumentsToVsTestConsoleShouldNotPrintHelpMessage(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
             var testResults = GetResultsDirectory();
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, resultsDirectory: testResults);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, resultsDirectory: testResults);
             arguments = string.Concat(arguments, " /badArgument");
 
-            this.InvokeVsTest(arguments);
+            InvokeVsTest(arguments);
 
             //Check for help usage, description and arguments text.
-            this.StdOutputDoesNotContains("Usage: vstest.console.exe");
-            this.StdOutputDoesNotContains("Description: Runs tests from the specified files.");
-            this.StdOutputDoesNotContains("Arguments:");
+            StdOutputDoesNotContains("Usage: vstest.console.exe");
+            StdOutputDoesNotContains("Description: Runs tests from the specified files.");
+            StdOutputDoesNotContains("Arguments:");
 
             //Check for help options text
-            this.StdOutputDoesNotContains("Options:");
+            StdOutputDoesNotContains("Options:");
 
             //Check for help examples text
-            this.StdOutputDoesNotContains("To run tests: >vstest.console.exe tests.dll");
+            StdOutputDoesNotContains("To run tests: >vstest.console.exe tests.dll");
 
             //Check for message which guides using help option
-            this.StdErrorContains("Please use the /help option to check the list of valid arguments");
+            StdErrorContains("Please use the /help option to check the list of valid arguments");
 
             TryRemoveDirectory(testResults);
         }

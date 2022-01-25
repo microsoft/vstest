@@ -50,14 +50,14 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void HandleTestRunComplete_ShouldCallProcessTestRunAttachmentsAsyncWithAttachmentsAndUseResults()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input1"),
                 new AttachmentSet(new Uri(uri2), "uri2_input1"),
                 new AttachmentSet(new Uri(uri3), "uri3_input1")
             };
 
-            Collection<AttachmentSet> outputAttachments = new Collection<AttachmentSet>
+            Collection<AttachmentSet> outputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input1")
             };
@@ -76,7 +76,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void HandleTestRunComplete_ShouldCallProcessTestRunAttachmentsAsyncWithAttachmentsAndNotUserResults_IfManagerReturnsNull()
         {
             // arrange
-            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            List<AttachmentSet> inputAttachments = new()
             {
                 new AttachmentSet(new Uri(uri1), "uri1_input1"),
                 new AttachmentSet(new Uri(uri2), "uri2_input1"),

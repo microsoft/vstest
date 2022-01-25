@@ -49,9 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <param name="mode"><see cref="FileMode"/> for file operations.</param>
         /// <param name="access"><see cref="FileAccess"/> for file operations.</param>
         /// <returns>A <see cref="Stream"/> that supports read/write on the file.</returns>
-#pragma warning disable RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
         Stream GetStream(string filePath, FileMode mode, FileAccess access = FileAccess.ReadWrite);
-#pragma warning restore RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
 
         /// <summary>
         /// Gets a stream for the file.

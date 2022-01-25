@@ -20,9 +20,9 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
 
         public TestPlatformTask(string taskName, double eventStarted)
         {
-            this.EventStarted = eventStarted;
-            this.TaskName = taskName;
-            this.PayLoadProperties = new Dictionary<string, string>();
+            EventStarted = eventStarted;
+            TaskName = taskName;
+            PayLoadProperties = new Dictionary<string, string>();
         }
     }
 }

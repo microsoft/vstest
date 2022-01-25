@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public string GetCurrentProcessLocation()
         {
-            return Path.GetDirectoryName(this.GetCurrentProcessFileName());
+            return Path.GetDirectoryName(GetCurrentProcessFileName());
         }
 
         public IntPtr GetProcessHandle(int processId)
@@ -27,12 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public PlatformArchitecture GetCurrentProcessArchitecture()
         {
-            if (IntPtr.Size == 8)
-            {
-                return PlatformArchitecture.X64;
-            }
-
-            return PlatformArchitecture.X86;
+            return IntPtr.Size == 8 ? PlatformArchitecture.X64 : PlatformArchitecture.X86;
         }
     }
 }

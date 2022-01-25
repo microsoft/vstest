@@ -27,24 +27,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <param name="useCoreRunner">To run tests with core runner(dotnet vstest.console.dll)</param>
         public NetFullTargetFrameworkDataSource(bool inIsolation = true, bool inProcess = false, bool useDesktopRunner = true, bool useCoreRunner = true)
         {
-            this.dataRows = new List<object[]>();
+            dataRows = new List<object[]>();
 
             var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
             if (useCoreRunner && isWindows)
             {
-                this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework) });
+                dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework) });
             }
 
             if (useDesktopRunner && isWindows)
             {
                 if (inIsolation)
                 {
-                    this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.InIsolation) });
+                    dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.InIsolation) });
                 }
 
                 if (inProcess)
                 {
-                    this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework) });
+                    dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework) });
                 }
             }
         }
@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 foreach (var fmw in targetFrameworks)
                 {
-                    this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw, AcceptanceTestBase.InIsolation) });
+                    dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw, AcceptanceTestBase.InIsolation) });
                 }
             }
 
@@ -68,7 +68,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 foreach (var fmw in targetFrameworks)
                 {
-                    this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw) });
+                    dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw) });
                 }
             }
         }
@@ -76,11 +76,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <summary>
         /// Gets or sets the data rows.
         /// </summary>
-        private List<object[]> dataRows = new List<object[]>();
+        private readonly List<object[]> dataRows = new();
 
         public IEnumerable<object[]> GetData(MethodInfo methodInfo)
         {
-            return this.dataRows;
+            return dataRows;
         }
 
         public string GetDisplayName(MethodInfo methodInfo, object[] data)

@@ -25,38 +25,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.UnitTests
 
         public LengthPrefixCommunicationChannelTests()
         {
-            this.stream = new MemoryStream();
-            this.channel = new LengthPrefixCommunicationChannel(this.stream);
+            stream = new MemoryStream();
+            channel = new LengthPrefixCommunicationChannel(stream);
 
-            this.reader = new BinaryReader(this.stream);
-            this.writer = new BinaryWriter(this.stream);
+            reader = new BinaryReader(stream);
+            writer = new BinaryWriter(stream);
         }
 
         public void Dispose()
         {
-            this.stream.Dispose();
+            stream.Dispose();
 
-            this.reader.Dispose();
-            this.writer.Dispose();
+            reader.Dispose();
+            writer.Dispose();
             GC.SuppressFinalize(this);
         }
 
         [TestMethod]
         public async Task SendShouldWriteTheDataOnStream()
         {
-            await this.channel.Send(DUMMYDATA);
+            await channel.Send(DUMMYDATA);
 
-            SeekToBeginning(this.stream);
-            Assert.AreEqual(DUMMYDATA, this.reader.ReadString());
+            SeekToBeginning(stream);
+            Assert.AreEqual(DUMMYDATA, reader.ReadString());
         }
 
         [TestMethod]
         public async Task SendShouldWriteInLengthPrefixedFormat()
         {
-            await this.channel.Send(DUMMYDATA);
+            await channel.Send(DUMMYDATA);
 
-            SeekToBeginning(this.stream);
-            Assert.AreEqual(DUMMYDATA.Length, Read7BitEncodedInt(this.reader));
+            SeekToBeginning(stream);
+            Assert.AreEqual(DUMMYDATA.Length, Read7BitEncodedInt(reader));
         }
 
         [TestMethod]
@@ -64,45 +64,42 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.UnitTests
         {
             // Every day is a good day
             var utf8Data = "日日是好日";
-            await this.channel.Send(utf8Data);
+            await channel.Send(utf8Data);
 
-            SeekToBeginning(this.stream);
-            Assert.AreEqual(utf8Data, this.reader.ReadString());
+            SeekToBeginning(stream);
+            Assert.AreEqual(utf8Data, reader.ReadString());
         }
 
         [TestMethod]
         public async Task SendShouldFlushTheStream()
         {
             // A buffered stream doesn't immediately flush, it waits until buffer is filled in
-            using var bufferedStream = new BufferedStream(this.stream, 2048);
+            using var bufferedStream = new BufferedStream(stream, 2048);
             var communicationChannel = new LengthPrefixCommunicationChannel(bufferedStream);
 
             await communicationChannel.Send("a");
 
-            SeekToBeginning(this.stream);
-            Assert.AreEqual("a", this.reader.ReadString());
+            SeekToBeginning(stream);
+            Assert.AreEqual("a", reader.ReadString());
         }
 
         [TestMethod]
         public void SendShouldThrowIfChannelIsDisconnected()
         {
-            this.stream.Dispose();
+            stream.Dispose();
 
-            Assert.ThrowsException<CommunicationException>(() => this.channel.Send(DUMMYDATA).Wait());
+            Assert.ThrowsException<CommunicationException>(() => channel.Send(DUMMYDATA).Wait());
         }
 
         [TestMethod]
         public async Task MessageReceivedShouldProvideDataOverStream()
         {
             var data = string.Empty;
-            this.channel.MessageReceived += (sender, messageEventArgs) =>
-            {
-                data = messageEventArgs.Data;
-            };
-            this.writer.Write(DUMMYDATA);
-            SeekToBeginning(this.stream);
+            channel.MessageReceived += (sender, messageEventArgs) => data = messageEventArgs.Data;
+            writer.Write(DUMMYDATA);
+            SeekToBeginning(stream);
 
-            await this.channel.NotifyDataAvailable();
+            await channel.NotifyDataAvailable();
 
             Assert.AreEqual(DUMMYDATA, data);
         }
@@ -110,23 +107,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public async Task NotifyDataAvailableShouldNotReadStreamIfNoListenersAreRegistered()
         {
-            this.writer.Write(DUMMYDATA);
-            SeekToBeginning(this.stream);
+            writer.Write(DUMMYDATA);
+            SeekToBeginning(stream);
 
-            await this.channel.NotifyDataAvailable();
+            await channel.NotifyDataAvailable();
 
             // Data is read irrespective of listeners. See note in NotifyDataAvailable
             // implementation.
-            Assert.AreEqual(0, this.stream.Position);
+            Assert.AreEqual(0, stream.Position);
         }
 
         [TestMethod]
         public void DisposeShouldNotCloseTheStream()
         {
-            this.channel.Dispose();
+            channel.Dispose();
 
             // Should throw if stream is disposed.
-            Assert.IsTrue(this.stream.CanWrite);
+            Assert.IsTrue(stream.CanWrite);
         }
 
         // TODO

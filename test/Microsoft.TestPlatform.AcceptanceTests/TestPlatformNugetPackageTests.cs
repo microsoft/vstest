@@ -45,7 +45,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestInitialize]
         public void SetUp()
         {
-            this.resultsDirectory = GetResultsDirectory();
+            resultsDirectory = GetResultsDirectory();
         }
 
         [TestCleanup]
@@ -60,16 +60,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
         public void RunMultipleTestAssembliesWithCodeCoverage(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
-            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+            var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
 
             var arguments = CreateCodeCoverageArguments(runnerInfo, assemblyPaths, out var trxFilePath);
-            this.InvokeVsTest(arguments);
+            InvokeVsTest(arguments);
 
-            this.ExitCodeEquals(1); // failing tests
+            ExitCodeEquals(1); // failing tests
 
-            var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory);
+            var actualCoverageFile = GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory);
             Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
             Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
         }
@@ -78,7 +78,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             string consoleRunnerPath = string.Empty;
 
-            if (this.IsDesktopRunner())
+            if (IsDesktopRunner())
             {
                 consoleRunnerPath = Path.Combine(nugetPackageFolder, "tools", "net451", "Common7", "IDE", "Extensions", "TestPlatform", "vstest.console.exe");
             }
@@ -92,14 +92,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             string assemblyPaths,
             out string trxFilePath)
         {
-            string diagFileName = Path.Combine(this.resultsDirectory, "diaglog.txt");
+            string diagFileName = Path.Combine(resultsDirectory, "diaglog.txt");
 
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty,
-                this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDirectory);
+            var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty,
+                FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDirectory);
 
             arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /EnableCodeCoverage");
 
-            trxFilePath = Path.Combine(this.resultsDirectory, Guid.NewGuid() + ".trx");
+            trxFilePath = Path.Combine(resultsDirectory, Guid.NewGuid() + ".trx");
             arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
 
             return arguments;

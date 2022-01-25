@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
         [TestMethod]
         public void GetConnectionTimeoutShouldReturnDefaultValue()
         {
-            Assert.AreEqual(EnvironmentHelperTests.DefaultTimeout, EnvironmentHelper.GetConnectionTimeout());
+            Assert.AreEqual(DefaultTimeout, EnvironmentHelper.GetConnectionTimeout());
         }
 
         [TestMethod]
@@ -36,7 +36,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
         public void GetConnectionTimeoutShouldReturnDefaultOnNegativeValue()
         {
             Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, "-1");
-            Assert.AreEqual(EnvironmentHelperTests.DefaultTimeout, EnvironmentHelper.GetConnectionTimeout());
+            Assert.AreEqual(DefaultTimeout, EnvironmentHelper.GetConnectionTimeout());
         }
 
         [TestMethod]
@@ -50,14 +50,14 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
         public void GetConnectionTimeoutShouldReturnDefaultOnEnvVariableValueDecimal()
         {
             Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, "10.4");
-            Assert.AreEqual(EnvironmentHelperTests.DefaultTimeout, EnvironmentHelper.GetConnectionTimeout());
+            Assert.AreEqual(DefaultTimeout, EnvironmentHelper.GetConnectionTimeout());
         }
 
         [TestMethod]
         public void GetConnectionTimeoutShouldReturnDefaultOnInvalidValue()
         {
             Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, "InvalidValue");
-            Assert.AreEqual(EnvironmentHelperTests.DefaultTimeout, EnvironmentHelper.GetConnectionTimeout());
+            Assert.AreEqual(DefaultTimeout, EnvironmentHelper.GetConnectionTimeout());
         }
     }
 }

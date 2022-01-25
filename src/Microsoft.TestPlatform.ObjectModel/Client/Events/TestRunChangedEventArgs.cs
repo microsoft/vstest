@@ -21,9 +21,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="activeTests"> The active tests. </param>
         public TestRunChangedEventArgs(ITestRunStatistics stats, IEnumerable<TestResult> newTestResults, IEnumerable<TestCase> activeTests)
         {
-            this.TestRunStatistics = stats;
-            this.NewTestResults = newTestResults;
-            this.ActiveTests = activeTests;
+            TestRunStatistics = stats;
+            NewTestResults = newTestResults;
+            ActiveTests = activeTests;
         }
 
         /// <summary>

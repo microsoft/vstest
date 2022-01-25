@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public static class EqtTrace
     {
-        private static IPlatformEqtTrace traceImpl = new PlatformEqtTrace();
+        private static readonly IPlatformEqtTrace traceImpl = new PlatformEqtTrace();
 
 #if NETFRAMEWORK
         public static void SetupRemoteEqtTraceListeners(AppDomain childDomain)
@@ -727,7 +727,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             string prefix = Environment.NewLine + '\t';
 
             // Format this exception
-            StringBuilder message = new StringBuilder();
+            StringBuilder message = new();
             message.Append(
                 string.Format(
                     CultureInfo.InvariantCulture,

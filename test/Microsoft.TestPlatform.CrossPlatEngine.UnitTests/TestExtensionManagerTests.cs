@@ -14,11 +14,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     [TestClass]
     public class TestExtensionManagerTests
     {
-        private ITestExtensionManager testExtensionManager;
+        private readonly ITestExtensionManager testExtensionManager;
 
         public TestExtensionManagerTests()
         {
-            this.testExtensionManager = new TestExtensionManager();
+            testExtensionManager = new TestExtensionManager();
 
             // Reset the singleton
             TestPluginCache.Instance = null;
@@ -35,7 +35,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         {
             var extensions = new List<string> { typeof(TestExtensionManagerTests).GetTypeInfo().Assembly.Location };
 
-            this.testExtensionManager.UseAdditionalExtensions(extensions, true);
+            testExtensionManager.UseAdditionalExtensions(extensions, true);
 
             CollectionAssert.AreEquivalent(extensions, TestPluginCache.Instance.GetExtensionPaths(string.Empty));
         }
@@ -44,9 +44,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         public void ClearExtensionsShouldClearExtensionsInCache()
         {
             var extensions = new List<string> { @"Foo.dll" };
-            this.testExtensionManager.UseAdditionalExtensions(extensions, false);
+            testExtensionManager.UseAdditionalExtensions(extensions, false);
 
-            this.testExtensionManager.ClearExtensions();
+            testExtensionManager.ClearExtensions();
 
             Assert.AreEqual(0, TestPluginCache.Instance.GetExtensionPaths(string.Empty).Count);
         }

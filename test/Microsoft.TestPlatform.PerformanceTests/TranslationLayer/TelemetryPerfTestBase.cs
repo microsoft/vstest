@@ -17,8 +17,8 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
     public class TelemetryPerfTestbase
     {
         private const string TelemetryInstrumentationKey = "76b373ba-8a55-45dd-b6db-7f1a83288691";
-        private TelemetryClient client;
-        private DirectoryInfo currentDirectory = new DirectoryInfo(typeof(DiscoveryPerfTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent;
+        private readonly TelemetryClient client;
+        private readonly DirectoryInfo currentDirectory = new DirectoryInfo(typeof(DiscoveryPerfTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent;
 
         public TelemetryPerfTestbase()
         {
@@ -48,8 +48,8 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
                     properties.Add(entry.Key, stringValue);
                 }
             }
-            this.client.TrackEvent(perfScenario, properties, metrics);
-            this.client.Flush();
+            client.TrackEvent(perfScenario, properties, metrics);
+            client.Flush();
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         /// <returns></returns>
         public string GetPerfAssetFullPath(string dllDirectory, string dllName)
         {
-            return Path.Combine(this.currentDirectory.FullName, "TestAssets\\PerfAssets", dllDirectory , dllName );
+            return Path.Combine(currentDirectory.FullName, "TestAssets\\PerfAssets", dllDirectory , dllName );
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         /// <returns></returns>
         public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
         {
-            var vstestConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath());
+            var vstestConsoleWrapper = new VsTestConsoleWrapper(GetConsoleRunnerPath());
             vstestConsoleWrapper.StartSession();
 
             return vstestConsoleWrapper;
@@ -90,7 +90,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         private string GetConsoleRunnerPath()
         {
             // Find the root
-            var root = this.currentDirectory.Parent.Parent.Parent;
+            var root = currentDirectory.Parent.Parent.Parent;
             // Path to artifacts vstest.console
             return Path.Combine(root.FullName, BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
         }

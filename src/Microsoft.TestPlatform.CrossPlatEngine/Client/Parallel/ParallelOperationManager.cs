@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Singleton Instance of this class
         /// </summary>
-        protected static T instance = default(T);
+        protected static T instance = default;
 
         /// <summary>
         /// Default number of Processes
@@ -47,17 +47,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// LockObject to iterate our sourceEnumerator in parallel
         /// We can use the sourceEnumerator itself as lockObject, but since its a changing object - it's risky to use it as one
         /// </summary>
-        protected object sourceEnumeratorLockObject = new object();
+        protected object sourceEnumeratorLockObject = new();
 
         #endregion
 
         protected ParallelOperationManager(Func<T> createNewManager, int parallelLevel, bool sharedHosts)
         {
-            this.CreateNewConcurrentManager = createNewManager;
-            this.SharedHosts = sharedHosts;
+            CreateNewConcurrentManager = createNewManager;
+            SharedHosts = sharedHosts;
 
             // Update Parallel Level
-            this.UpdateParallelLevel(parallelLevel);
+            UpdateParallelLevel(parallelLevel);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="manager">Manager to remove</param>
         public void RemoveManager(T manager)
         {
-            this.concurrentManagerHandlerMap.Remove(manager);
+            concurrentManagerHandlerMap.Remove(manager);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="handler">eventHandler of the manager</param>
         public void AddManager(T manager, U handler)
         {
-            this.concurrentManagerHandlerMap.Add(manager, handler);
+            concurrentManagerHandlerMap.Add(manager, handler);
         }
 
         /// <summary>
@@ -87,13 +87,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="handler">event handler to update for manager</param>
         public void UpdateHandlerForManager(T manager, U handler)
         {
-            if(this.concurrentManagerHandlerMap.ContainsKey(manager))
+            if(concurrentManagerHandlerMap.ContainsKey(manager))
             {
-                this.concurrentManagerHandlerMap[manager] = handler;
+                concurrentManagerHandlerMap[manager] = handler;
             }
             else
             {
-                this.AddManager(manager, handler);
+                AddManager(manager, handler);
             }
         }
 
@@ -103,7 +103,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="manager">Manager</param>
         public U GetHandlerForGivenManager(T manager)
         {
-            return this.concurrentManagerHandlerMap[manager];
+            return concurrentManagerHandlerMap[manager];
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public int GetConcurrentManagersCount()
         {
-            return this.concurrentManagerHandlerMap.Count;
+            return concurrentManagerHandlerMap.Count;
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public IEnumerable<T> GetConcurrentManagerInstances()
         {
-            return this.concurrentManagerHandlerMap.Keys.ToList();
+            return concurrentManagerHandlerMap.Keys.ToList();
         }
 
 
@@ -129,25 +129,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="newParallelLevel">Number of Parallel Executors allowed</param>
         public void UpdateParallelLevel(int newParallelLevel)
         {
-            if (this.concurrentManagerHandlerMap == null)
+            if (concurrentManagerHandlerMap == null)
             {
                 // not initialized yet
                 // create rest of concurrent clients other than default one
-                this.concurrentManagerHandlerMap = new ConcurrentDictionary<T, U>();
+                concurrentManagerHandlerMap = new ConcurrentDictionary<T, U>();
                 for (int i = 0; i < newParallelLevel; i++)
                 {
-                    this.AddManager(this.CreateNewConcurrentManager(), default(U));
+                    AddManager(CreateNewConcurrentManager(), default);
                 }
             }
-            else if (this.currentParallelLevel != newParallelLevel)
+            else if (currentParallelLevel != newParallelLevel)
             {
                 // If number of concurrent clients is less than the new level
                 // Create more concurrent clients and update the list
-                if (this.currentParallelLevel < newParallelLevel)
+                if (currentParallelLevel < newParallelLevel)
                 {
-                    for (int i = 0; i < newParallelLevel - this.currentParallelLevel; i++)
+                    for (int i = 0; i < newParallelLevel - currentParallelLevel; i++)
                     {
-                        this.AddManager(this.CreateNewConcurrentManager(), default(U));
+                        AddManager(CreateNewConcurrentManager(), default);
                     }
                 }
                 else
@@ -156,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     // Dispose off the extra ones
                     int managersCount = currentParallelLevel - newParallelLevel;
 
-                    foreach(var concurrentManager in this.GetConcurrentManagerInstances())
+                    foreach(var concurrentManager in GetConcurrentManagerInstances())
                     {
                         if (managersCount == 0)
                         {
@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         }
                         else
                         {
-                            this.RemoveManager(concurrentManager);
+                            RemoveManager(concurrentManager);
                             managersCount--;
                         }
                     }
@@ -172,29 +172,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             // Update current parallel setting to new one
-            this.currentParallelLevel = newParallelLevel;
+            currentParallelLevel = newParallelLevel;
         }
 
         public void Dispose()
         {
-            if (this.concurrentManagerHandlerMap != null)
+            if (concurrentManagerHandlerMap != null)
             {
-                foreach (var managerInstance in this.GetConcurrentManagerInstances())
+                foreach (var managerInstance in GetConcurrentManagerInstances())
                 {
-                    this.RemoveManager(managerInstance);
+                    RemoveManager(managerInstance);
                 }
             }
 
-            instance = default(T);
+            instance = default;
         }
 
         protected void DoActionOnAllManagers(Action<T> action, bool doActionsInParallel = false)
         {
-            if (this.concurrentManagerHandlerMap != null && this.concurrentManagerHandlerMap.Count > 0)
+            if (concurrentManagerHandlerMap != null && concurrentManagerHandlerMap.Count > 0)
             {
                 int i = 0;
-                var actionTasks = new Task[this.concurrentManagerHandlerMap.Count];
-                foreach (var client in this.GetConcurrentManagerInstances())
+                var actionTasks = new Task[concurrentManagerHandlerMap.Count];
+                foreach (var client in GetConcurrentManagerInstances())
                 {
                     // Read the array before firing the task - beware of closures
                     if (doActionsInParallel)
@@ -204,13 +204,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     }
                     else
                     {
-                        this.DoManagerAction(() => action(client));
+                        DoManagerAction(() => action(client));
                     }
                 }
 
                 if (doActionsInParallel)
                 {
-                    this.DoManagerAction(() => Task.WaitAll(actionTasks));
+                    DoManagerAction(() => Task.WaitAll(actionTasks));
                 }
             }
         }
@@ -240,9 +240,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <returns>True, if data exists. False otherwise</returns>
         protected bool TryFetchNextSource<Y>(IEnumerator enumerator, out Y source)
         {
-            source = default(Y);
+            source = default;
             var hasNext = false;
-            lock (this.sourceEnumeratorLockObject)
+            lock (sourceEnumeratorLockObject)
             {
                 if (enumerator != null && enumerator.MoveNext())
                 {

@@ -21,17 +21,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     /// </summary>
     internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     {
-        private IProxyDiscoveryManager proxyDiscoveryManager;
+        private readonly IProxyDiscoveryManager proxyDiscoveryManager;
 
-        private ITestDiscoveryEventsHandler2 actualDiscoveryEventsHandler;
+        private readonly ITestDiscoveryEventsHandler2 actualDiscoveryEventsHandler;
 
-        private IParallelProxyDiscoveryManager parallelProxyDiscoveryManager;
+        private readonly IParallelProxyDiscoveryManager parallelProxyDiscoveryManager;
 
-        private ParallelDiscoveryDataAggregator discoveryDataAggregator;
+        private readonly ParallelDiscoveryDataAggregator discoveryDataAggregator;
 
-        private IDataSerializer dataSerializer;
+        private readonly IDataSerializer dataSerializer;
 
-        private IRequestData requestData;
+        private readonly IRequestData requestData;
 
         public ParallelDiscoveryEventsHandler(IRequestData requestData,
             IProxyDiscoveryManager proxyDiscoveryManager,
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             if (lastChunk != null)
             {
                 ConvertToRawMessageAndSend(MessageType.TestCasesFound, lastChunk);
-                this.HandleDiscoveredTests(lastChunk);
+                HandleDiscoveredTests(lastChunk);
             }
 
             // Aggregate for final discovery complete
@@ -80,8 +80,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             // Do not send TestDiscoveryComplete to actual test discovery handler
             // We need to see if there are still sources left - let the parallel manager decide
-            var parallelDiscoveryComplete = this.parallelProxyDiscoveryManager.HandlePartialDiscoveryComplete(
-                    this.proxyDiscoveryManager,
+            var parallelDiscoveryComplete = parallelProxyDiscoveryManager.HandlePartialDiscoveryComplete(
+                    proxyDiscoveryManager,
                     totalTests,
                     null, // lastChunk should be null as we already sent this data above
                     isAborted);
@@ -98,21 +98,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 };
 
                 // Collecting Final Discovery State
-                this.requestData.MetricsCollection.Add(TelemetryDataConstants.DiscoveryState, isAborted ? "Aborted" : "Completed");
+                requestData.MetricsCollection.Add(TelemetryDataConstants.DiscoveryState, isAborted ? "Aborted" : "Completed");
 
                 // Collect Aggregated Metrics Data
                 var aggregatedDiscoveryDataMetrics = discoveryDataAggregator.GetAggregatedDiscoveryDataMetrics();
                 testDiscoveryCompletePayload.Metrics = aggregatedDiscoveryDataMetrics;
 
                 // we have to send raw messages as we block the discovery complete actual raw messages
-                this.ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
+                ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
 
-                var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(this.discoveryDataAggregator.TotalTests,
-                    this.discoveryDataAggregator.IsAborted);
+                var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryDataAggregator.TotalTests,
+                    discoveryDataAggregator.IsAborted);
                 finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
 
                 // send actual test discovery complete to clients
-                this.actualDiscoveryEventsHandler.HandleDiscoveryComplete(finalDiscoveryCompleteEventArgs, null);
+                actualDiscoveryEventsHandler.HandleDiscoveryComplete(finalDiscoveryCompleteEventArgs, null);
             }
         }
 
@@ -122,7 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             // In case of parallel - we can send everything but handle complete
             // DiscoveryComplete is not true-end of the overall discovery as we only get completion of one host here
             // Always aggregate data, deserialize and raw for complete events
-            var message = this.dataSerializer.DeserializeMessage(rawMessage);
+            var message = dataSerializer.DeserializeMessage(rawMessage);
 
             // Do not send CancellationRequested message to Output window in IDE, as it is not useful for user
             if (string.Equals(message.MessageType, MessageType.TestMessage)
@@ -134,20 +134,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             // Do not deserialize further
             if (!string.Equals(MessageType.DiscoveryComplete, message.MessageType))
             {
-                this.actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
+                actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
             }
         }
 
         /// <inheritdoc/>
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
-            this.actualDiscoveryEventsHandler.HandleDiscoveredTests(discoveredTestCases);
+            actualDiscoveryEventsHandler.HandleDiscoveredTests(discoveredTestCases);
         }
 
         /// <inheritdoc/>
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            this.actualDiscoveryEventsHandler.HandleLogMessage(level, message);
+            actualDiscoveryEventsHandler.HandleLogMessage(level, message);
         }
 
         /// <summary>
@@ -157,8 +157,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <param name="payload"></param>
         private void ConvertToRawMessageAndSend(string messageType, object payload)
         {
-            var rawMessage = this.dataSerializer.SerializePayload(messageType, payload);
-            this.actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
+            var rawMessage = dataSerializer.SerializePayload(messageType, payload);
+            actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
         }
     }
 }

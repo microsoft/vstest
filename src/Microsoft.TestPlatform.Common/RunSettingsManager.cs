@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
     {
         #region private members
 
-        private static object lockObject = new object();
+        private static readonly object lockObject = new();
 
         private static RunSettingsManager runSettingsManagerInstance;
 
@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// </summary>
         private RunSettingsManager()
         {
-            this.ActiveRunSettings = new RunSettings();
+            ActiveRunSettings = new RunSettings();
         }
 
 
@@ -74,8 +74,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// <param name="runSettings">RunSettings to make the active Run Settings.</param>
         public void SetActiveRunSettings(RunSettings runSettings)
         {
-            ValidateArg.NotNull<RunSettings>(runSettings, nameof(runSettings));
-            this.ActiveRunSettings = runSettings;
+            ValidateArg.NotNull(runSettings, nameof(runSettings));
+            ActiveRunSettings = runSettings;
         }
 
         #endregion

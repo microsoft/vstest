@@ -17,8 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public class RollingFileTraceListener : TextWriterTraceListener
     {
-        private readonly StreamWriterRollingHelper rollingHelper;
-
         private readonly int rollSizeInBytes;
 
         /// <summary>
@@ -27,7 +25,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="fileName">The filename where the entries will be logged.</param>
         /// <param name="name">Name of the trace listener.</param>
         /// <param name="rollSizeKB">The maximum file size (KB) before rolling.</param>
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "the fileStream is passed into the TextWriterTraceListener")]
         public RollingFileTraceListener(
             string fileName,
             string name,
@@ -44,9 +41,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 throw new ArgumentOutOfRangeException(nameof(rollSizeKB));
             }
 
-            this.TraceFileName = fileName;
-            this.rollSizeInBytes = rollSizeKB * 1024;
-            this.rollingHelper = new StreamWriterRollingHelper(this);
+            TraceFileName = fileName;
+            rollSizeInBytes = rollSizeKB * 1024;
+            RollingHelper = new StreamWriterRollingHelper(this);
         }
 
         /// <summary>
@@ -64,10 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <value>
         /// The <see cref="StreamWriterRollingHelper"/> for the flat file.
         /// </value>
-        internal StreamWriterRollingHelper RollingHelper
-        {
-            get { return this.rollingHelper; }
-        }
+        internal StreamWriterRollingHelper RollingHelper { get; private set; }
 
         /// <summary>
         /// Writes the trace messages to the file.
@@ -75,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="message">Trace message string</param>
         public override void WriteLine(string message)
         {
-            this.rollingHelper.RollIfNecessary();
+            RollingHelper.RollIfNecessary();
             base.WriteLine(message);
         }
 
@@ -94,7 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)
         {
-            this.rollingHelper?.Dispose();
+            RollingHelper?.Dispose();
 
             base.Dispose(disposing);
         }
@@ -120,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             /// <summary>
             /// Synchronization lock.
             /// </summary>
-            private object synclock = new object();
+            private readonly object synclock = new();
 
             /// <summary>
             /// Whether the object is disposed or not.
@@ -137,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             /// <summary>
             /// The trace listener for which rolling is being managed.
             /// </summary>
-            private RollingFileTraceListener owner;
+            private readonly RollingFileTraceListener owner;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="StreamWriterRollingHelper"/> class.
@@ -148,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             public StreamWriterRollingHelper(RollingFileTraceListener owner)
             {
                 this.owner = owner;
-                this.managedWriter = owner.Writer as TallyKeepingFileStreamWriter;
+                managedWriter = owner.Writer as TallyKeepingFileStreamWriter;
             }
 
             /// <summary>
@@ -162,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             public DateTime? CheckIsRollNecessary()
             {
                 // check for size roll, if enabled.
-                if (this.managedWriter != null && this.managedWriter.Tally > this.owner.rollSizeInBytes)
+                if (managedWriter != null && managedWriter.Tally > owner.rollSizeInBytes)
                 {
                     return DateTime.Now;
                 }
@@ -177,14 +171,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             /// <param name="rollDateTime">The roll date.</param>
             public void PerformRoll(DateTime rollDateTime)
             {
-                string actualFileName = ((FileStream)((StreamWriter)this.owner.Writer).BaseStream).Name;
+                string actualFileName = ((FileStream)((StreamWriter)owner.Writer).BaseStream).Name;
 
                 // calculate archive name
                 string directory = Path.GetDirectoryName(actualFileName);
                 string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(actualFileName);
                 string extension = Path.GetExtension(actualFileName);
 
-                StringBuilder fileNameBuilder = new StringBuilder(fileNameWithoutExtension);
+                StringBuilder fileNameBuilder = new(fileNameWithoutExtension);
                 fileNameBuilder.Append('.');
                 fileNameBuilder.Append("bak");
                 fileNameBuilder.Append(extension);
@@ -200,9 +194,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 SafeMove(actualFileName, archiveFileName, rollDateTime);
 
                 // update writer - let TWTL open the file as needed to keep consistency
-                this.owner.Writer = null;
-                this.managedWriter = null;
-                this.UpdateRollingInformationIfNecessary();
+                owner.Writer = null;
+                managedWriter = null;
+                UpdateRollingInformationIfNecessary();
             }
 
             /// <summary>
@@ -210,21 +204,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             /// </summary>
             public void RollIfNecessary()
             {
-                if (!this.UpdateRollingInformationIfNecessary())
+                if (!UpdateRollingInformationIfNecessary())
                 {
                     // an error was detected while handling roll information - avoid further processing
                     return;
                 }
 
                 DateTime? rollDateTime;
-                if ((rollDateTime = this.CheckIsRollNecessary()) != null)
+                if ((rollDateTime = CheckIsRollNecessary()) != null)
                 {
-                    lock (this.synclock)
+                    lock (synclock)
                     {
                         // double check if the roll is still required and do it...
-                        if ((rollDateTime = this.CheckIsRollNecessary()) != null)
+                        if ((rollDateTime = CheckIsRollNecessary()) != null)
                         {
-                            this.PerformRoll(rollDateTime.Value);
+                            PerformRoll(rollDateTime.Value);
                         }
                     }
                 }
@@ -238,11 +232,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             public bool UpdateRollingInformationIfNecessary()
             {
                 // replace writer with the tally keeping version if necessary for size rolling
-                if (this.managedWriter == null)
+                if (managedWriter == null)
                 {
                     try
                     {
-                        this.managedWriter = OpenTextWriter(this.owner.TraceFileName);
+                        managedWriter = OpenTextWriter(owner.TraceFileName);
                     }
                     catch (Exception)
                     {
@@ -250,7 +244,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         return false;
                     }
 
-                    this.owner.Writer = this.managedWriter;
+                    owner.Writer = managedWriter;
                 }
 
                 return true;
@@ -261,7 +255,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             /// </summary>
             public void Dispose()
             {
-                this.Dispose(true);
+                Dispose(true);
                 GC.SuppressFinalize(this);
             }
 
@@ -295,16 +289,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             private void Dispose(bool disposing)
             {
-                if (!this.disposed)
+                if (!disposed)
                 {
-                    if (disposing && this.managedWriter != null)
+                    if (disposing && managedWriter != null)
                     {
 #if TODO
                         managedWriter.Close();
 #endif
                     }
 
-                    this.disposed = true;
+                    disposed = true;
                 }
             }
         }
@@ -314,7 +308,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         internal sealed class TallyKeepingFileStreamWriter : StreamWriter
         {
-            private long tally;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="TallyKeepingFileStreamWriter"/> class.
@@ -330,7 +323,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     throw new ArgumentNullException(nameof(stream));
                 }
 
-                this.tally = stream.Length;
+                Tally = stream.Length;
             }
 
             /// <summary>
@@ -355,7 +348,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     throw new ArgumentNullException(nameof(encoding));
                 }
 
-                this.tally = stream.Length;
+                Tally = stream.Length;
             }
 
             /// <summary>
@@ -364,10 +357,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             /// <value>
             /// The tally of the length of the string.
             /// </value>
-            public long Tally
-            {
-                get { return this.tally; }
-            }
+            public long Tally { get; private set; }
 
             /// <summary>
             /// Writes a character to the stream.
@@ -388,7 +378,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             public override void Write(char value)
             {
                 base.Write(value);
-                this.tally += this.Encoding.GetByteCount(new[] { value });
+                Tally += Encoding.GetByteCount(new[] { value });
             }
 
             /// <summary>
@@ -410,7 +400,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             public override void Write(char[] buffer)
             {
                 base.Write(buffer);
-                this.tally += this.Encoding.GetByteCount(buffer);
+                Tally += Encoding.GetByteCount(buffer);
             }
 
             /// <summary>
@@ -447,7 +437,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             public override void Write(char[] buffer, int index, int count)
             {
                 base.Write(buffer, index, count);
-                this.tally += this.Encoding.GetByteCount(buffer, index, count);
+                Tally += Encoding.GetByteCount(buffer, index, count);
             }
 
             /// <summary>
@@ -469,7 +459,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             public override void Write(string value)
             {
                 base.Write(value);
-                this.tally += this.Encoding.GetByteCount(value);
+                Tally += Encoding.GetByteCount(value);
             }
         }
     }

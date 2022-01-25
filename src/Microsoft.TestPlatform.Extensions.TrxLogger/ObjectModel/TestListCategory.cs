@@ -8,7 +8,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
-    using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+    using TrxLoggerResources = VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
     /// <summary>
     /// The test list category.
@@ -17,18 +17,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     {
         #region Fields
 
-        private static TestListCategory uncategorizedResults;
+        private static TestListCategory s_uncategorizedResults;
 
-        private static TestListCategory allResults;
+        private static TestListCategory s_allResults;
 
-        private static object reservedCategoryLock = new object();
-
-        private TestListCategoryId id = new TestListCategoryId();
-
+        private static readonly object ReservedCategoryLock = new();
         [StoreXmlSimpleField(DefaultValue = "")]
-        private string name = string.Empty;
+        private readonly string _name = string.Empty;
 
-        private TestListCategoryId parentCategoryId;
+        private TestListCategoryId _parentCategoryId;
 
         #endregion
 
@@ -42,8 +39,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             EqtAssert.StringNotNullOrEmpty(name, nameof(name));
             EqtAssert.ParameterNotNull(parentCategoryId, nameof(parentCategoryId));
 
-            this.name = name;
-            this.parentCategoryId = parentCategoryId;
+            this._name = name;
+            this._parentCategoryId = parentCategoryId;
         }
 
         /// <summary>
@@ -61,7 +58,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         private TestListCategory(string name, TestListCategoryId id, TestListCategoryId parentId) : this(name, parentId)
         {
             EqtAssert.ParameterNotNull(id, nameof(id));
-            this.id = id;
+            Id = id;
         }
 
         #region Properties
@@ -73,19 +70,19 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             get
             {
-                if (uncategorizedResults == null)
+                if (s_uncategorizedResults == null)
                 {
-                    lock (reservedCategoryLock)
+                    lock (ReservedCategoryLock)
                     {
-                        if (uncategorizedResults == null)
+                        if (s_uncategorizedResults == null)
                         {
-                            uncategorizedResults = new TestListCategory(
+                            s_uncategorizedResults = new TestListCategory(
                                 TrxLoggerResources.TS_UncategorizedResults, TestListCategoryId.Uncategorized, TestListCategoryId.Root);
                         }
                     }
                 }
 
-                return uncategorizedResults;
+                return s_uncategorizedResults;
             }
         }
 
@@ -96,29 +93,26 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             get
             {
-                if (allResults == null)
+                if (s_allResults == null)
                 {
-                    lock (reservedCategoryLock)
+                    lock (ReservedCategoryLock)
                     {
-                        if (allResults == null)
+                        if (s_allResults == null)
                         {
-                            allResults = new TestListCategory(
+                            s_allResults = new TestListCategory(
                                         TrxLoggerResources.TS_AllResults, TestListCategoryId.AllItems, TestListCategoryId.Root);
                         }
                     }
                 }
 
-                return allResults;
+                return s_allResults;
             }
         }
 
         /// <summary>
         /// Gets the id.
         /// </summary>
-        public TestListCategoryId Id
-        {
-            get { return this.id; }
-        }
+        public TestListCategoryId Id { get; private set; } = new TestListCategoryId();
 
         /// <summary>
         /// Gets or sets id of parent category. Use TestCategoryId.Root for top level categories.
@@ -128,13 +122,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             get
             {
-                return this.parentCategoryId;
+                return _parentCategoryId;
             }
 
             set
             {
                 EqtAssert.ParameterNotNull(value, "ParentCategoryId.value");
-                this.parentCategoryId = value;
+                _parentCategoryId = value;
             }
         }
 
@@ -153,14 +147,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public override bool Equals(object obj)
         {
-            TestListCategory cat = obj as TestListCategory;
-            if (cat == null)
+            if (obj is not TestListCategory cat)
             {
                 return false;
             }
 
-            Debug.Assert(this.id != null, "id is null");
-            return this.id.Equals(cat.id);
+            Debug.Assert(Id != null, "id is null");
+            return Id.Equals(cat.Id);
         }
 
         /// <summary>
@@ -171,7 +164,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public override int GetHashCode()
         {
-            return this.id.GetHashCode();
+            return Id.GetHashCode();
         }
         #endregion
 
@@ -188,11 +181,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </param>
         public void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
         {
-            XmlPersistence h = new XmlPersistence();
+            XmlPersistence h = new();
 
             h.SaveSingleFields(element, this, parameters);
-            h.SaveGuid(element, "@id", this.Id.Id);
-            h.SaveGuid(element, "@parentListId", this.ParentCategoryId.Id);
+            h.SaveGuid(element, "@id", Id.Id);
+            h.SaveGuid(element, "@parentListId", ParentCategoryId.Id);
         }
 
         #endregion

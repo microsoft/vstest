@@ -11,21 +11,21 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     public class InactivityTimerTests
     {
         private int callBackCount = 0;
-        private ManualResetEventSlim timerEvent = new ManualResetEventSlim();
+        private readonly ManualResetEventSlim timerEvent = new();
 
         [TestMethod]
         public void InactivityTimerShouldResetAndCallbackWhenResetIsCalled()
         {
-            var timer = new InactivityTimer(this.TimerCallback);
+            var timer = new InactivityTimer(TimerCallback);
             timer.ResetTimer(TimeSpan.FromMilliseconds(1));
-            this.timerEvent.Wait(1000);
-            Assert.AreEqual(1, this.callBackCount, "Should have fired once.");
+            timerEvent.Wait(1000);
+            Assert.AreEqual(1, callBackCount, "Should have fired once.");
         }
 
         private void TimerCallback()
         {
-            this.callBackCount++;
-            this.timerEvent.Set();
+            callBackCount++;
+            timerEvent.Set();
         }
     }
 }

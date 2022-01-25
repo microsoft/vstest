@@ -29,8 +29,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     public class TestLoggerManagerTests
     {
         private static int counter = 0;
-        private static EventWaitHandle waitHandle = new AutoResetEvent(false);
-        private string loggerUri = "testlogger://logger";
+        private static readonly EventWaitHandle waitHandle = new AutoResetEvent(false);
+        private readonly string loggerUri = "testlogger://logger";
 
         [TestInitialize]
         public void Initialize()
@@ -262,10 +262,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         {
             var testLoggerManager = new DummyTestLoggerManager();
             Assert.ThrowsException<ArgumentNullException>(
-                () =>
-                {
-                    testLoggerManager.InitializeLoggerByUri(null, null);
-                });
+                () => testLoggerManager.InitializeLoggerByUri(null, null));
         }
 
         [TestMethod]
@@ -330,10 +327,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.Dispose();
 
             Assert.ThrowsException<ObjectDisposedException>(
-                () =>
-                {
-                    testLoggerManager.InitializeLoggerByUri(new Uri("some://uri"), null);
-                });
+                () => testLoggerManager.InitializeLoggerByUri(new Uri("some://uri"), null));
         }
 
 
@@ -343,10 +337,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             var testLoggerManager = new DummyTestLoggerManager();
             testLoggerManager.Dispose();
             Assert.ThrowsException<ObjectDisposedException>(
-                () =>
-                {
-                    testLoggerManager.EnableLogging();
-                });
+                () => testLoggerManager.EnableLogging());
         }
 
         [TestMethod]
@@ -357,7 +348,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
             var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
-            testLoggerManager.InitializeLoggerByUri(new Uri(this.loggerUri), new Dictionary<string, string>());
+            testLoggerManager.InitializeLoggerByUri(new Uri(loggerUri), new Dictionary<string, string>());
 
             // Act.
             testLoggerManager.Initialize(null);
@@ -376,8 +367,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             counter = 0;
             waitHandle.Reset();
 
-            DiscoveryCriteria discoveryCriteria = new DiscoveryCriteria() { TestCaseFilter = "Name=Test1" };
-            DiscoveryStartEventArgs discoveryStartEventArgs = new DiscoveryStartEventArgs(discoveryCriteria);
+            DiscoveryCriteria discoveryCriteria = new() { TestCaseFilter = "Name=Test1" };
+            DiscoveryStartEventArgs discoveryStartEventArgs = new(discoveryCriteria);
 
             // setup TestLogger
             var testLoggerManager = new DummyTestLoggerManager();
@@ -400,8 +391,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             counter = 0;
             waitHandle.Reset();
 
-            DiscoveryCriteria discoveryCriteria = new DiscoveryCriteria() { TestCaseFilter = "Name=Test1" };
-            DiscoveryStartEventArgs discoveryStartEventArgs = new DiscoveryStartEventArgs(discoveryCriteria);
+            DiscoveryCriteria discoveryCriteria = new() { TestCaseFilter = "Name=Test1" };
+            DiscoveryStartEventArgs discoveryStartEventArgs = new(discoveryCriteria);
 
             // setup TestLogger
             var testLoggerManager = new DummyTestLoggerManager();
@@ -424,8 +415,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             counter = 0;
             waitHandle.Reset();
 
-            List<TestCase> testCases = new List<TestCase> { new TestCase("This is a string.", new Uri("some://uri"), "DummySourceFileName") };
-            DiscoveredTestsEventArgs discoveredTestsEventArgs = new DiscoveredTestsEventArgs(testCases);
+            List<TestCase> testCases = new() { new TestCase("This is a string.", new Uri("some://uri"), "DummySourceFileName") };
+            DiscoveredTestsEventArgs discoveredTestsEventArgs = new(testCases);
 
             // setup TestLogger
             var testLoggerManager = new DummyTestLoggerManager();
@@ -445,8 +436,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             counter = 0;
             waitHandle.Reset();
 
-            List<TestCase> testCases = new List<TestCase> { new TestCase("This is a string.", new Uri("some://uri"), "DummySourceFileName") };
-            DiscoveredTestsEventArgs discoveredTestsEventArgs = new DiscoveredTestsEventArgs(testCases);
+            List<TestCase> testCases = new() { new TestCase("This is a string.", new Uri("some://uri"), "DummySourceFileName") };
+            DiscoveredTestsEventArgs discoveredTestsEventArgs = new(testCases);
 
             // setup TestLogger
             var testLoggerManager = new DummyTestLoggerManager();
@@ -469,8 +460,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             counter = 0;
             waitHandle.Reset();
 
-            TestRunCriteria testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, false, string.Empty, TimeSpan.MaxValue, null, "Name=Test1", null);
-            TestRunStartEventArgs testRunStartEventArgs = new TestRunStartEventArgs(testRunCriteria);
+            TestRunCriteria testRunCriteria = new(new List<string> { @"x:dummy\foo.dll" }, 10, false, string.Empty, TimeSpan.MaxValue, null, "Name=Test1", null);
+            TestRunStartEventArgs testRunStartEventArgs = new(testRunCriteria);
 
             // setup TestLogger
             var testLoggerManager = new DummyTestLoggerManager();
@@ -493,8 +484,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             counter = 0;
             waitHandle.Reset();
 
-            TestRunCriteria testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, false, string.Empty, TimeSpan.MaxValue, null, "Name=Test1", null);
-            TestRunStartEventArgs testRunStartEventArgs = new TestRunStartEventArgs(testRunCriteria);
+            TestRunCriteria testRunCriteria = new(new List<string> { @"x:dummy\foo.dll" }, 10, false, string.Empty, TimeSpan.MaxValue, null, "Name=Test1", null);
+            TestRunStartEventArgs testRunStartEventArgs = new(testRunCriteria);
 
             // setup TestLogger
             var testLoggerManager = new DummyTestLoggerManager();
@@ -517,7 +508,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             counter = 0;
             waitHandle.Reset();
 
-            DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false);
+            DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new(2, false);
 
             // setup TestLogger
             var testLoggerManager = new DummyTestLoggerManager();
@@ -581,7 +572,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             waitHandle.Reset();
 
             string message = "This is the test message";
-            TestRunMessageEventArgs testRunMessageEventArgs = new TestRunMessageEventArgs(TestMessageLevel.Informational, message);
+            TestRunMessageEventArgs testRunMessageEventArgs = new(TestMessageLevel.Informational, message);
 
             // setup TestLogger
             var testLoggerManager = new DummyTestLoggerManager();
@@ -605,7 +596,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             waitHandle.Reset();
 
             string message = "This is the test message";
-            TestRunMessageEventArgs testRunMessageEventArgs = new TestRunMessageEventArgs(TestMessageLevel.Informational, message);
+            TestRunMessageEventArgs testRunMessageEventArgs = new(TestMessageLevel.Informational, message);
 
             // setup TestLogger
             var testLoggerManager = new DummyTestLoggerManager();
@@ -721,10 +712,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
 
-            Assert.ThrowsException<InvalidLoggerException>(() =>
-            {
-                testLoggerManager.Initialize(settingsXml);
-            });
+            Assert.ThrowsException<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
             Assert.AreEqual(0, ValidLoggerWithParameters.counter);
         }
 
@@ -751,10 +739,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
 
-            Assert.ThrowsException<InvalidLoggerException>(() =>
-            {
-                testLoggerManager.Initialize(settingsXml);
-            });
+            Assert.ThrowsException<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
             Assert.AreEqual(0, InvalidLogger.counter);
         }
 
@@ -779,10 +764,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 </RunSettings>";
 
             var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
-            Assert.ThrowsException<InvalidLoggerException>(() =>
-            {
-                testLoggerManager.Initialize(settingsXml);
-            });
+            Assert.ThrowsException<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
             Assert.AreEqual(0, ValidLoggerWithParameters.counter);
         }
 
@@ -809,10 +791,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
 
-            Assert.ThrowsException<InvalidLoggerException>(() =>
-            {
-                testLoggerManager.Initialize(settingsXml);
-            });
+            Assert.ThrowsException<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
             Assert.AreEqual(0, ValidLoggerWithParameters.counter);
         }
 
@@ -903,10 +882,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
 
-            Assert.ThrowsException<InvalidLoggerException>(() =>
-            {
-                testLoggerManager.Initialize(settingsXml);
-            });
+            Assert.ThrowsException<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
         }
 
         [TestMethod]
@@ -1472,10 +1448,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
 
-            Assert.ThrowsException<InvalidLoggerException>(() =>
-            {
-                testLoggerManager.Initialize(settingsXml);
-            });
+            Assert.ThrowsException<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
             Assert.AreEqual(0, ValidLoggerWithParameters.counter);
         }
 
@@ -1588,14 +1561,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             private void Events_TestResult(object sender, TestResultEventArgs e)
             {
-                TestLoggerManagerTests.counter++;
-                TestLoggerManagerTests.waitHandle.Set();
+                counter++;
+                waitHandle.Set();
             }
 
             private void Events_TestRunComplete(object sender, TestRunCompleteEventArgs e)
             {
-                TestLoggerManagerTests.counter++;
-                TestLoggerManagerTests.waitHandle.Set();
+                counter++;
+                waitHandle.Set();
 
             }
 
@@ -1603,40 +1576,40 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             {
                 if (e.Message.Equals("TestRunMessage"))
                 {
-                    TestLoggerManagerTests.counter++;
-                    TestLoggerManagerTests.waitHandle.Set();
+                    counter++;
+                    waitHandle.Set();
 
                 }
             }
 
             private void TestRunStartHandler(object sender, TestRunStartEventArgs e)
             {
-                TestLoggerManagerTests.counter++;
-                TestLoggerManagerTests.waitHandle.Set();
+                counter++;
+                waitHandle.Set();
             }
 
             private void DiscoveryMessageHandler(object sender, TestRunMessageEventArgs e)
             {
-                TestLoggerManagerTests.counter++;
-                TestLoggerManagerTests.waitHandle.Set();
+                counter++;
+                waitHandle.Set();
             }
 
             private void DiscoveryStartHandler(object sender, DiscoveryStartEventArgs e)
             {
-                TestLoggerManagerTests.counter++;
-                TestLoggerManagerTests.waitHandle.Set();
+                counter++;
+                waitHandle.Set();
             }
 
             private void DiscoveredTestsHandler(object sender, DiscoveredTestsEventArgs e)
             {
-                TestLoggerManagerTests.counter++;
-                TestLoggerManagerTests.waitHandle.Set();
+                counter++;
+                waitHandle.Set();
             }
 
             private void DiscoveryCompleteHandler(object sender, DiscoveryCompleteEventArgs e)
             {
-                TestLoggerManagerTests.counter++;
-                TestLoggerManagerTests.waitHandle.Set();
+                counter++;
+                waitHandle.Set();
             }
         }
 
@@ -1694,7 +1667,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             public static void Reset()
             {
                 counter = 0;
-                ValidLoggerWithParameters.parameters = null;
+                parameters = null;
             }
         }
 

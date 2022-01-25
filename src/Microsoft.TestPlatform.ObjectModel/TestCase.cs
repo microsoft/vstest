@@ -17,12 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     [DataContract]
     public sealed class TestCase : TestObject
     {
-        /// <summary>
-        /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties.
-        /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
-        /// </summary>
-        private object localExtensionData;
-
         private Guid defaultId = Guid.Empty;
         private Guid id;
         private string displayName;
@@ -58,10 +52,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             ValidateArg.NotNull(executorUri, nameof(executorUri));
             ValidateArg.NotNullOrEmpty(source, nameof(source));
 
-            this.FullyQualifiedName = fullyQualifiedName;
-            this.ExecutorUri = executorUri;
-            this.Source = source;
-            this.LineNumber = -1;
+            FullyQualifiedName = fullyQualifiedName;
+            ExecutorUri = executorUri;
+            Source = source;
+            LineNumber = -1;
         }
         #endregion
 
@@ -71,11 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties.
         /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
         /// </summary>
-        public object LocalExtensionData
-        {
-            get { return localExtensionData; }
-            set { localExtensionData = value; }
-        }
+        public object LocalExtensionData { get; set; }
 
         /// <summary>
         /// Gets or sets the id of the test case.
@@ -85,22 +75,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                if (this.id == Guid.Empty)
+                if (id == Guid.Empty)
                 {
-                    if (this.defaultId == Guid.Empty)
+                    if (defaultId == Guid.Empty)
                     {
-                        this.defaultId = this.GetTestId();
+                        defaultId = GetTestId();
                     }
 
-                    return this.defaultId;
+                    return defaultId;
                 }
 
-                return this.id;
+                return id;
             }
 
             set
             {
-                this.id = value;
+                id = value;
             }
         }
 
@@ -124,16 +114,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                if (string.IsNullOrEmpty(this.displayName))
-                {
-                    return this.GetFullyQualifiedName();
-                }
-
-                return this.displayName;
+                return string.IsNullOrEmpty(displayName) ? GetFullyQualifiedName() : displayName;
             }
             set
             {
-                this.displayName = value;
+                displayName = value;
             }
         }
 
@@ -154,14 +139,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.source;
+                return source;
             }
             set
             {
-                this.source = value;
+                source = value;
 
                 // defaultId should be reset as it is based on FullyQualifiedName and Source.
-                this.defaultId = Guid.Empty;
+                defaultId = Guid.Empty;
             }
         }
 
@@ -210,7 +195,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             // file might have moved between discovery and execution (in appx mode for example)
             // This is not elegant because the Source contents should be a black box to the framework.
             // For example in the database adapter case this is not a file path.
-            string source = this.Source;
+            string source = Source;
 
             // As discussed with team, we found no scenario for netcore, & fullclr where the Source is not present where ID is generated,
             // which means we would always use FileName to generate ID. In cases where somehow Source Path contained garbage character the API Path.GetFileName()
@@ -228,10 +213,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             // We still need to handle parameters in the case of a Theory or TestGroup of test cases that are only
             // distinguished by parameters.
-            var testcaseFullName = this.ExecutorUri + source;
+            var testcaseFullName = ExecutorUri + source;
 
             // If ManagedType and ManagedMethod properties are filled than TestId should be based on those.
-            testcaseFullName += this.GetFullyQualifiedName();
+            testcaseFullName += GetFullyQualifiedName();
 
             return EqtHash.GuidFromString(testcaseFullName);
         }
@@ -239,13 +224,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private void SetVariableAndResetId<T>(ref T variable, T value)
         {
             variable = value;
-            this.defaultId = Guid.Empty;
+            defaultId = Guid.Empty;
         }
 
         private void SetPropertyAndResetId<T>(TestProperty property, T value)
         {
             SetPropertyValue(property, value);
-            this.defaultId = Guid.Empty;
+            defaultId = Guid.Empty;
         }
 
         #endregion
@@ -263,19 +248,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             switch (property.Id)
             {
                 case "TestCase.CodeFilePath":
-                    return this.CodeFilePath;
+                    return CodeFilePath;
                 case "TestCase.DisplayName":
-                    return this.DisplayName;
+                    return DisplayName;
                 case "TestCase.ExecutorUri":
-                    return this.ExecutorUri;
+                    return ExecutorUri;
                 case "TestCase.FullyQualifiedName":
-                    return this.FullyQualifiedName;
+                    return FullyQualifiedName;
                 case "TestCase.Id":
-                    return this.Id;
+                    return Id;
                 case "TestCase.LineNumber":
-                    return this.LineNumber;
+                    return LineNumber;
                 case "TestCase.Source":
-                    return this.Source;
+                    return Source;
             }
 
             // It is a custom test case property. Should be retrieved from the TestObject store.
@@ -292,31 +277,31 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             switch (property.Id)
             {
                 case "TestCase.CodeFilePath":
-                    this.CodeFilePath = value as string;
+                    CodeFilePath = value as string;
                     return;
 
                 case "TestCase.DisplayName":
-                    this.DisplayName = value as string;
+                    DisplayName = value as string;
                     return;
 
                 case "TestCase.ExecutorUri":
-                    this.ExecutorUri = value as Uri ?? new Uri(value as string);
+                    ExecutorUri = value as Uri ?? new Uri(value as string);
                     return;
 
                 case "TestCase.FullyQualifiedName":
-                    this.FullyQualifiedName = value as string;
+                    FullyQualifiedName = value as string;
                     return;
 
                 case "TestCase.Id":
-                    this.Id = value is Guid ? (Guid)value : Guid.Parse(value as string);
+                    Id = value is Guid guid ? guid : Guid.Parse(value as string);
                     return;
 
                 case "TestCase.LineNumber":
-                    this.LineNumber = (int)value;
+                    LineNumber = (int)value;
                     return;
 
                 case "TestCase.Source":
-                    this.Source = value as string;
+                    Source = value as string;
                     return;
             }
 
@@ -350,7 +335,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         #endregion
 
         /// <inheritdoc/>
-        public override string ToString() => this.GetFullyQualifiedName();
+        public override string ToString() => GetFullyQualifiedName();
     }
 
     /// <summary>

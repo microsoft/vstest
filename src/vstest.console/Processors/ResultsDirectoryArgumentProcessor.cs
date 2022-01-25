@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     /// Allows the user to specify a path to save test results.
@@ -39,12 +39,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ResultsDirectoryArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ResultsDirectoryArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -55,17 +55,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
+                    executor = new Lazy<IArgumentExecutor>(() => new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -98,9 +98,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Used for getting sources.
         /// </summary>
-        private CommandLineOptions commandLineOptions;
+        private readonly CommandLineOptions commandLineOptions;
 
-        private IRunSettingsProvider runSettingsManager;
+        private readonly IRunSettingsProvider runSettingsManager;
 
         public const string RunSettingsPath = "RunConfiguration.ResultsDirectory";
 
@@ -118,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             Contract.Requires(options != null);
             Contract.Requires(runSettingsManager != null);
 
-            this.commandLineOptions = options;
+            commandLineOptions = options;
             this.runSettingsManager = runSettingsManager;
         }
 
@@ -151,8 +151,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(string.Format(CommandLineResources.InvalidResultsDirectoryPathCommand, argument, ex.Message));
             }
 
-            this.commandLineOptions.ResultsDirectory = argument;
-            this.runSettingsManager.UpdateRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath, argument);
+            commandLineOptions.ResultsDirectory = argument;
+            runSettingsManager.UpdateRunSettingsNode(RunSettingsPath, argument);
         }
 
         /// <summary>

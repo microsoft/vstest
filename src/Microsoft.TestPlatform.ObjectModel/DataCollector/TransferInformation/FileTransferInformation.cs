@@ -64,9 +64,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             }
 
             // Make sure the path we have is a full path (not relative).
-            this.Path = this.fileHelper.GetFullPath(path);
+            Path = this.fileHelper.GetFullPath(path);
 
-            this.PerformCleanup = deleteFile;
+            PerformCleanup = deleteFile;
         }
 
         #endregion
@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// The name of the file to use on the client machine.
         /// </summary>
-        protected internal override string FileName => this.Path;
+        protected internal override string FileName => Path;
 
         #endregion
     }

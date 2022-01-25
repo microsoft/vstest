@@ -13,7 +13,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
     [TestClass]
     public class MetadataReaderHelperTests
     {
-        private readonly MetadataReaderExtensionsHelper metadataReaderHelper = new MetadataReaderExtensionsHelper();
+        private readonly MetadataReaderExtensionsHelper metadataReaderHelper = new();
 
         [TestMethod]
         public void MetadataReaderHelper_GetCollectorExtensionTypes()

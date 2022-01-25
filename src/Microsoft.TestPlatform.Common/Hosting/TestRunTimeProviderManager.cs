@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
         /// </param>
         protected TestRuntimeProviderManager(IMessageLogger sessionLogger)
         {
-            this.testHostExtensionManager = TestRuntimeExtensionManager.Create(sessionLogger);
+            testHostExtensionManager = TestRuntimeExtensionManager.Create(sessionLogger);
         }
 
         /// <summary>
@@ -48,13 +48,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
 
         public ITestRuntimeProvider GetTestHostManagerByUri(string hostUri)
         {
-            var host = this.testHostExtensionManager.TryGetTestExtension(hostUri);
+            var host = testHostExtensionManager.TryGetTestExtension(hostUri);
             return host?.Value;
         }
 
         public virtual ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration)
         {
-            foreach (var testExtension in this.testHostExtensionManager.TestExtensions)
+            foreach (var testExtension in testHostExtensionManager.TestExtensions)
             {
                 if (testExtension.Value.CanExecuteCurrentRunConfiguration(runConfiguration))
                 {

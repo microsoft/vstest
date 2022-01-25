@@ -9,19 +9,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using System;
     using vstest.console.UnitTests.Processors;
 
-    using ExceptionUtilities = Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.ExceptionUtilities;
+    using ExceptionUtilities = ExceptionUtilities;
 
     [TestClass]
     public class InIsolationArgumentProcessorTests
     {
-        private InIsolationArgumentExecutor executor;
-        private TestableRunSettingsProvider runSettingsProvider;
+        private InIsolationArgumentExecutor _executor;
+        private TestableRunSettingsProvider _runSettingsProvider;
 
         [TestInitialize]
         public void Init()
         {
-            this.runSettingsProvider = new TestableRunSettingsProvider();
-            this.executor = new InIsolationArgumentExecutor(CommandLineOptions.Instance, this.runSettingsProvider);
+            _runSettingsProvider = new TestableRunSettingsProvider();
+            _executor = new InIsolationArgumentExecutor(CommandLineOptions.Instance, _runSettingsProvider);
         }
 
         [TestCleanup]
@@ -64,22 +64,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             // InProcess should not have any values or arguments
             ExceptionUtilities.ThrowsException<CommandLineException>(
-                () => this.executor.Initialize("true"),
+                () => _executor.Initialize("true"),
                 "Argument true is not expected in the 'InIsolation' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /InIsolation) and try again.");
         }
 
         [TestMethod]
         public void InitializeShouldSetInIsolationValue()
         {
-            this.executor.Initialize(null);
+            _executor.Initialize(null);
             Assert.IsTrue(CommandLineOptions.Instance.InIsolation, "InProcess option must be set to true.");
-            Assert.AreEqual("true", this.runSettingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
+            Assert.AreEqual("true", _runSettingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
         public void ExecuteShouldReturnSuccess()
         {
-            Assert.AreEqual(ArgumentProcessorResult.Success, this.executor.Execute());
+            Assert.AreEqual(ArgumentProcessorResult.Success, _executor.Execute());
         }
     }
 }

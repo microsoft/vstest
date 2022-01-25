@@ -153,13 +153,11 @@ namespace Microsoft.TestPlatform.AdapterUtilities
                 {
                     return B ^ C ^ D;
                 }
-                else if (t >= 40 && t <= 59)
-                {
-                    return (B & C) | (B & D) | (C & D);
-                }
                 else
                 {
-                    throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t));
+                    return t >= 40 && t <= 59
+                        ? (B & C) | (B & D) | (C & D)
+                        : throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t));
                 }
             }
 
@@ -187,13 +185,9 @@ namespace Microsoft.TestPlatform.AdapterUtilities
                 {
                     return 0x8F1BBCDCu;
                 }
-                else if (t >= 60 && t <= 79)
-                {
-                    return 0xCA62C1D6u;
-                }
                 else
                 {
-                    throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t));
+                    return t >= 60 && t <= 79 ? 0xCA62C1D6u : throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t));
                 }
             }
 
@@ -205,12 +199,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities
             /// <returns>S^n(X)  =  (X << n) OR (X >> 32-n)</returns>
             private static uint S(uint X, byte n)
             {
-                if (n > 32)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(n));
-                }
-
-                return (X << n) | (X >> (32 - n));
+                return n > 32 ? throw new ArgumentOutOfRangeException(nameof(n)) : (X << n) | (X >> (32 - n));
             }
 
             /// <summary>

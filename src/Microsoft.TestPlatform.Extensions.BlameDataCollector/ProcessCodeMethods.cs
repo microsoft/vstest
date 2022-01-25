@@ -85,7 +85,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 var output = new StringBuilder();
                 var err = new StringBuilder();
-                Process ps = new Process();
+                Process ps = new();
                 ps.StartInfo.FileName = "kill";
                 ps.StartInfo.Arguments = $"-STOP {process.Id}";
                 ps.StartInfo.UseShellExecute = false;
@@ -157,12 +157,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 var stat = File.ReadAllText(path);
                 var parts = stat.Split(' ');
 
-                if (parts.Length < 5)
-                {
-                    return InvalidProcessId;
-                }
-
-                return int.Parse(parts[3]);
+                return parts.Length < 5 ? InvalidProcessId : int.Parse(parts[3]);
             }
             catch (Exception ex)
             {
@@ -177,7 +172,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 var output = new StringBuilder();
                 var err = new StringBuilder();
-                Process ps = new Process();
+                Process ps = new();
                 ps.StartInfo.FileName = "ps";
                 ps.StartInfo.Arguments = $"-o ppid= {process.Id}";
                 ps.StartInfo.UseShellExecute = false;
@@ -249,7 +244,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         [DllImport("ntdll.dll", SetLastError = true)]
-#pragma warning disable SA1201 // Elements must appear in the correct order
         private static extern int NtQueryInformationProcess(
                 IntPtr processHandle,
                 int processInformationClass,
@@ -259,7 +253,5 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
         [DllImport("ntdll.dll", SetLastError = true)]
         private static extern IntPtr NtSuspendProcess(IntPtr processHandle);
-
-#pragma warning restore SA1201 // Elements must appear in the correct order
     }
 }

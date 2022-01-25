@@ -15,15 +15,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+    using CommonResources = Common.Resources.Resources;
 
     /// <summary>
     /// Utility class that facilitates the IPC communication. Acts as server.
     /// </summary>
     public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     {
-        private ICommunicationManager communicationManager;
-        private IDataSerializer dataSerializer;
+        private readonly ICommunicationManager communicationManager;
+        private readonly IDataSerializer dataSerializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionRequestSender"/> class.
@@ -59,8 +59,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 EqtTrace.Verbose("DataCollectionRequestSender.InitializeCommunication : Initialize communication. ");
             }
 
-            var endpoint = this.communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0));
-            this.communicationManager.AcceptClientAsync();
+            var endpoint = communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0));
+            communicationManager.AcceptClientAsync();
             return endpoint.Port;
         }
 
@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 EqtTrace.Verbose("DataCollectionRequestSender.WaitForRequestHandlerConnection : Waiting for connection with timeout: {0}", clientConnectionTimeout);
             }
 
-            return this.communicationManager.WaitForClientConnection(clientConnectionTimeout);
+            return communicationManager.WaitForClientConnection(clientConnectionTimeout);
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// </summary>
         public void Dispose()
         {
-            this.communicationManager?.StopServer();
+            communicationManager?.StopServer();
         }
 
         /// <summary>
@@ -97,13 +97,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 EqtTrace.Info("Closing the connection");
             }
 
-            this.communicationManager?.StopServer();
+            communicationManager?.StopServer();
         }
 
         /// <inheritdoc/>
         public void SendTestHostLaunched(TestHostLaunchedPayload testHostLaunchedPayload)
         {
-            this.communicationManager.SendMessage(MessageType.TestHostLaunched, testHostLaunchedPayload);
+            communicationManager.SendMessage(MessageType.TestHostLaunched, testHostLaunchedPayload);
         }
 
         /// <inheritdoc/>
@@ -124,11 +124,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 IsTelemetryOptedIn = isTelemetryOptedIn
             };
 
-            this.communicationManager.SendMessage(MessageType.BeforeTestRunStart, payload);
+            communicationManager.SendMessage(MessageType.BeforeTestRunStart, payload);
 
             while (!isDataCollectionStarted)
             {
-                var message = this.communicationManager.ReceiveMessage();
+                var message = communicationManager.ReceiveMessage();
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
@@ -137,13 +137,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                 if (message.MessageType == MessageType.DataCollectionMessage)
                 {
-                    var dataCollectionMessageEventArgs = this.dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
-                    this.LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
+                    var dataCollectionMessageEventArgs = dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
+                    LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
                 }
                 else if (message.MessageType == MessageType.BeforeTestRunStartResult)
                 {
                     isDataCollectionStarted = true;
-                    result = this.dataSerializer.DeserializePayload<BeforeTestRunStartResult>(message);
+                    result = dataSerializer.DeserializePayload<BeforeTestRunStartResult>(message);
                 }
             }
 
@@ -161,13 +161,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 EqtTrace.Verbose("DataCollectionRequestSender.SendAfterTestRunStartAndGetResult : Send AfterTestRunEnd message with isCancelled: {0}", isCancelled);
             }
 
-            this.communicationManager.SendMessage(MessageType.AfterTestRunEnd, isCancelled);
+            communicationManager.SendMessage(MessageType.AfterTestRunEnd, isCancelled);
 
             // Cycle through the messages that the datacollector sends.
             // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
             while (!isDataCollectionComplete && !isCancelled)
             {
-                var message = this.communicationManager.ReceiveMessage();
+                var message = communicationManager.ReceiveMessage();
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
@@ -176,12 +176,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                 if (message.MessageType == MessageType.DataCollectionMessage)
                 {
-                    var dataCollectionMessageEventArgs = this.dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
-                    this.LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
+                    var dataCollectionMessageEventArgs = dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
+                    LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
                 }
                 else if (message.MessageType == MessageType.AfterTestRunEndResult)
                 {
-                    result = this.dataSerializer.DeserializePayload<AfterTestRunEndResult>(message);
+                    result = dataSerializer.DeserializePayload<AfterTestRunEndResult>(message);
                     isDataCollectionComplete = true;
                 }
             }

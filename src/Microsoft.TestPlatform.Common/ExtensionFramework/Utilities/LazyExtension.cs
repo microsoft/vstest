@@ -15,13 +15,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
     {
         #region Private Members
 
-        private static object synclock = new object();
+        private static readonly object synclock = new();
         private TExtension extension;
         private TMetadata metadata;
-        private TestPluginInformation testPluginInfo;
-        private Type metadataType;
-        private bool isExtensionCreated;
-        private Func<TExtension> extensionCreator;
+        private readonly Type metadataType;
+        private readonly Func<TExtension> extensionCreator;
 
         #endregion
 
@@ -44,9 +42,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
                 throw new ArgumentNullException(nameof(instance));
             }
 
-            this.extension = instance;
+            extension = instance;
             this.metadata = metadata;
-            this.isExtensionCreated = true;
+            IsExtensionCreated = true;
         }
 
         /// <summary>
@@ -56,9 +54,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// <param name="metadataType">Metadata type to instantiate on demand</param>
         public LazyExtension(TestPluginInformation pluginInfo, Type metadataType)
         {
-            this.testPluginInfo = pluginInfo ?? throw new ArgumentNullException(nameof(pluginInfo));
+            TestPluginInfo = pluginInfo ?? throw new ArgumentNullException(nameof(pluginInfo));
             this.metadataType = metadataType ?? throw new ArgumentNullException(nameof(metadataType));
-            this.isExtensionCreated = false;
+            IsExtensionCreated = false;
         }
 
         /// <summary>
@@ -73,9 +71,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
                 throw new ArgumentNullException(nameof(metadata));
             }
 
-            this.testPluginInfo = pluginInfo ?? throw new ArgumentNullException(nameof(pluginInfo));
+            TestPluginInfo = pluginInfo ?? throw new ArgumentNullException(nameof(pluginInfo));
             this.metadata = metadata;
-            this.isExtensionCreated = false;
+            IsExtensionCreated = false;
         }
 
         /// <summary>
@@ -90,9 +88,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
                 throw new ArgumentNullException(nameof(metadata));
             }
 
-            this.extensionCreator = creator ?? throw new ArgumentNullException(nameof(creator));
+            extensionCreator = creator ?? throw new ArgumentNullException(nameof(creator));
             this.metadata = metadata;
-            this.isExtensionCreated = false;
+            IsExtensionCreated = false;
         }
 
         #endregion
@@ -102,15 +100,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// <summary>
         /// Gets a value indicating whether is extension created.
         /// </summary>
-        internal bool IsExtensionCreated
-        {
-            get
-            {
-                return this.isExtensionCreated;
-            }
-        }
+        internal bool IsExtensionCreated { get; private set; }
 
-        internal TestPluginInformation TestPluginInfo => this.testPluginInfo;
+        internal TestPluginInformation TestPluginInfo { get; private set; }
 
         /// <summary>
         /// Gets the test extension instance.
@@ -119,28 +111,28 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             get
             {
-                if (!this.isExtensionCreated)
+                if (!IsExtensionCreated)
                 {
-                    if (this.extensionCreator != null)
+                    if (extensionCreator != null)
                     {
-                        this.extension = this.extensionCreator();
+                        extension = extensionCreator();
                     }
-                    else if (this.extension == null)
+                    else if (extension == null)
                     {
                         lock (synclock)
                         {
-                            if (this.extension == null && this.testPluginInfo != null)
+                            if (extension == null && TestPluginInfo != null)
                             {
-                                var pluginType = TestPluginManager.GetTestExtensionType(this.testPluginInfo.AssemblyQualifiedName);
-                                this.extension = TestPluginManager.CreateTestExtension<TExtension>(pluginType);
+                                var pluginType = TestPluginManager.GetTestExtensionType(TestPluginInfo.AssemblyQualifiedName);
+                                extension = TestPluginManager.CreateTestExtension<TExtension>(pluginType);
                             }
                         }
                     }
 
-                    this.isExtensionCreated = true;
+                    IsExtensionCreated = true;
                 }
 
-                return this.extension;
+                return extension;
             }
         }
 
@@ -151,20 +143,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
                     lock (synclock)
                     {
-                        if (this.metadata == null && this.testPluginInfo != null)
+                        if (metadata == null && TestPluginInfo != null)
                         {
-                            var parameters = this.testPluginInfo.Metadata?.ToArray();
-                            var dataObject = Activator.CreateInstance(this.metadataType, parameters);
-                            this.metadata = (TMetadata)dataObject;
+                            var parameters = TestPluginInfo.Metadata?.ToArray();
+                            var dataObject = Activator.CreateInstance(metadataType, parameters);
+                            metadata = (TMetadata)dataObject;
                         }
                     }
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 

@@ -23,10 +23,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     /// </summary>
     internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
     {
-        private IProxyDataCollectionManager proxyDataCollectionManager;
-        private ITestRunEventsHandler testRunEventsHandler;
+        private readonly IProxyDataCollectionManager proxyDataCollectionManager;
+        private readonly ITestRunEventsHandler testRunEventsHandler;
         private CancellationToken cancellationToken;
-        private IDataSerializer dataSerializer;
+        private readonly IDataSerializer dataSerializer;
         private Collection<AttachmentSet> dataCollectionAttachmentSets;
         private Collection<InvokedDataCollector> invokedDataCollectors;
 
@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, IDataSerializer dataSerializer, CancellationToken cancellationToken)
         {
             this.proxyDataCollectionManager = proxyDataCollectionManager;
-            this.testRunEventsHandler = baseTestRunEventsHandler;
+            testRunEventsHandler = baseTestRunEventsHandler;
             this.cancellationToken = cancellationToken;
             this.dataSerializer = dataSerializer;
         }
@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </param>
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            this.testRunEventsHandler.HandleLogMessage(level, message);
+            testRunEventsHandler.HandleLogMessage(level, message);
         }
 
         /// <summary>
@@ -87,38 +87,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         public void HandleRawMessage(string rawMessage)
         {
             // In case of data collection, data collection attachments should be attached to raw message for ExecutionComplete
-            var message = this.dataSerializer.DeserializeMessage(rawMessage);
+            var message = dataSerializer.DeserializeMessage(rawMessage);
 
             if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
             {
-                var dataCollectionResult = this.proxyDataCollectionManager?.AfterTestRunEnd(this.cancellationToken.IsCancellationRequested, this);
-                this.dataCollectionAttachmentSets = dataCollectionResult?.Attachments;
+                var dataCollectionResult = proxyDataCollectionManager?.AfterTestRunEnd(cancellationToken.IsCancellationRequested, this);
+                dataCollectionAttachmentSets = dataCollectionResult?.Attachments;
 
                 var testRunCompletePayload =
-                            this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
+                            dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
 
-                if (this.dataCollectionAttachmentSets != null && this.dataCollectionAttachmentSets.Any())
+                if (dataCollectionAttachmentSets != null && dataCollectionAttachmentSets.Any())
                 {
                     GetCombinedAttachmentSets(
                         testRunCompletePayload.TestRunCompleteArgs.AttachmentSets,
-                        this.dataCollectionAttachmentSets);
+                        dataCollectionAttachmentSets);
                 }
 
-                this.invokedDataCollectors = dataCollectionResult?.InvokedDataCollectors;
-                if (this.invokedDataCollectors?.Count > 0)
+                invokedDataCollectors = dataCollectionResult?.InvokedDataCollectors;
+                if (invokedDataCollectors?.Count > 0)
                 {
-                    foreach (var dataCollector in this.invokedDataCollectors)
+                    foreach (var dataCollector in invokedDataCollectors)
                     {
                         testRunCompletePayload.TestRunCompleteArgs.InvokedDataCollectors.Add(dataCollector);
                     }
                 }
 
-                rawMessage = this.dataSerializer.SerializePayload(
+                rawMessage = dataSerializer.SerializePayload(
                     MessageType.ExecutionComplete,
                     testRunCompletePayload);
             }
 
-            this.testRunEventsHandler.HandleRawMessage(rawMessage);
+            testRunEventsHandler.HandleRawMessage(rawMessage);
         }
 
         /// <summary>
@@ -138,22 +138,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </param>
         public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
         {
-            if (this.dataCollectionAttachmentSets != null && this.dataCollectionAttachmentSets.Any())
+            if (dataCollectionAttachmentSets != null && dataCollectionAttachmentSets.Any())
             {
-                runContextAttachments = GetCombinedAttachmentSets(this.dataCollectionAttachmentSets, runContextAttachments);
+                runContextAttachments = GetCombinedAttachmentSets(dataCollectionAttachmentSets, runContextAttachments);
             }
 
             // At the moment, we don't support running data collectors inside testhost process, so it will always be empty inside "TestRunCompleteEventArgs testRunCompleteArgs".
             // We load invoked data collectors from data collector process inside "DataCollectionTestRunEventsHandler.HandleRawMessage" method.
-            if (this.invokedDataCollectors != null && this.invokedDataCollectors.Any())
+            if (invokedDataCollectors != null && invokedDataCollectors.Any())
             {
-                foreach (var dataCollector in this.invokedDataCollectors)
+                foreach (var dataCollector in invokedDataCollectors)
                 {
                     testRunCompleteArgs.InvokedDataCollectors.Add(dataCollector);
                 }
             }
 
-            this.testRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
+            testRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </param>
         public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
         {
-            this.testRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
+            testRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
         }
 
         /// <summary>
@@ -175,13 +175,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <returns>ProcessId of the launched process</returns>
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
-            return this.testRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+            return testRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
         }
 
         /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
-            return ((ITestRunEventsHandler2)this.testRunEventsHandler).AttachDebuggerToProcess(pid);
+            return ((ITestRunEventsHandler2)testRunEventsHandler).AttachDebuggerToProcess(pid);
         }
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             foreach (var attachmentSet in newAttachments)
             {
-                var attSet = originalAttachmentSets.FirstOrDefault(item => Uri.Equals(item.Uri, attachmentSet.Uri));
+                var attSet = originalAttachmentSets.FirstOrDefault(item => Equals(item.Uri, attachmentSet.Uri));
                 if (attSet == null)
                 {
                     originalAttachmentSets.Add(attachmentSet);

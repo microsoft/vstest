@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessin
                 Attachments = lastChunk
             };
 
-            this.communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, payload);
+            communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, payload);
         }
 
         /// <inheritdoc/>
@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessin
                 AttachmentsProcessingProgressEventArgs = attachmentsProcessingProgressEventArgs,
             };
 
-            this.communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingProgress, payload);
+            communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingProgress, payload);
         }
 
         /// <inheritdoc/>
@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessin
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
             var testMessagePayload = new TestMessagePayload { MessageLevel = level, Message = message };
-            this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+            communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
         }
 
         /// <inheritdoc/>

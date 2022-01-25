@@ -22,9 +22,9 @@ namespace vstest.console.Internal
     /// </summary>
     public class FilePatternParser
     {
-        private Matcher matcher;
-        private IFileHelper fileHelper;
-        private char[] wildCardCharacters = { '*' };
+        private readonly Matcher matcher;
+        private readonly IFileHelper fileHelper;
+        private readonly char[] wildCardCharacters = { '*' };
 
         public FilePatternParser()
             : this(new Matcher(), new FileHelper())
@@ -48,7 +48,7 @@ namespace vstest.console.Internal
             // Convert the relative path to absolute path
             if (!Path.IsPathRooted(filePattern))
             {
-                filePattern = Path.Combine(this.fileHelper.GetCurrentDirectory(), filePattern);
+                filePattern = Path.Combine(fileHelper.GetCurrentDirectory(), filePattern);
             }
 
             // If there is no wild card simply add the file to the list of matching files.
@@ -57,7 +57,7 @@ namespace vstest.console.Internal
                 EqtTrace.Info($"FilePatternParser: The given file {filePattern} is a full path.");
 
                 // Check if the file exists.
-                if (!this.fileHelper.Exists(filePattern))
+                if (!fileHelper.Exists(filePattern))
                 {
                     throw new TestSourceException(
                         string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestSourceFileNotFound, filePattern));
@@ -72,10 +72,10 @@ namespace vstest.console.Internal
             var splitPattern = SplitFilePatternOnWildCard(filePattern);
             EqtTrace.Info($"FilePatternParser: Matching file pattern '{splitPattern.Item2}' within directory '{splitPattern.Item1}'");
 
-            this.matcher.AddInclude(splitPattern.Item2);
+            matcher.AddInclude(splitPattern.Item2);
 
             // Execute the given pattern in the search directory.
-            var matches = this.matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(splitPattern.Item1)));
+            var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(splitPattern.Item1)));
 
             // Add all the files to the list of matching files.
             foreach (var match in matches.Files)
@@ -98,7 +98,7 @@ namespace vstest.console.Internal
             string searchDir = filePattern.Substring(0, directorySeparatorIndex);
             string pattern = filePattern.Substring(directorySeparatorIndex + 1);
 
-            Tuple<string, string> splitPattern = new Tuple<string, string>(searchDir, pattern);
+            Tuple<string, string> splitPattern = new(searchDir, pattern);
             return splitPattern;
         }
     }

@@ -18,7 +18,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     {
         #region Fields
         [StoreXmlField(Location = ".")]
-        private int id = 0;
+        private readonly int _id = 0;
 
         #endregion
 
@@ -29,7 +29,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="workitemId">The workitem.</param>
         public WorkItem(int workitemId)
         {
-            this.id = workitemId;
+            _id = workitemId;
         }
 
         #endregion
@@ -42,7 +42,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             get
             {
-                return this.id;
+                return _id;
             }
         }
 
@@ -56,12 +56,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>True if the values are the same and false otherwise.</returns>
         public override bool Equals(object other)
         {
-            WorkItem otherItem = other as WorkItem;
-            if (otherItem == null)
-            {
-                return false;
-            }
-            return this.id == otherItem.id;
+            return other is WorkItem otherItem && _id == otherItem._id;
         }
 
         /// <summary>
@@ -70,7 +65,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>Hashcode of the workitem.</returns>
         public override int GetHashCode()
         {
-            return this.id.GetHashCode();
+            return _id.GetHashCode();
         }
 
         /// <summary>
@@ -79,7 +74,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>The workitem.</returns>
         public override string ToString()
         {
-            return this.id.ToString(CultureInfo.InvariantCulture);
+            return _id.ToString(CultureInfo.InvariantCulture);
         }
         #endregion
 
@@ -90,7 +85,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         /// <param name="element"> XmlElement element </param>
         /// <param name="parameters"> XmlTestStoreParameters parameters</param>
-        public void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
+        public void Save(XmlElement element, XmlTestStoreParameters parameters)
         {
             new XmlPersistence().SaveSingleFields(element, this, parameters);
         }
@@ -122,7 +117,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             EqtAssert.ParameterNotNull(items, nameof(items));
             foreach (int i in items)
             {
-                this.Add(new WorkItem(i));
+                Add(new WorkItem(i));
             }
         }
 
@@ -135,7 +130,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="item">WorkItem to be added.</param>
         public void Add(int item)
         {
-            this.Add(new WorkItem(item));
+            Add(new WorkItem(item));
         }
 
         /// <summary>
@@ -155,8 +150,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns></returns>
         public override string ToString()
         {
-            StringBuilder returnString = new StringBuilder();
-            if (this.Count > 0)
+            StringBuilder returnString = new();
+            if (Count > 0)
             {
                 returnString.Append(",");
                 foreach (WorkItem item in this)
@@ -175,7 +170,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>Array of ints containing the workitems.</returns>
         public int[] ToArray()
         {
-            int[] result = new int[this.Count];
+            int[] result = new int[Count];
 
             int i = 0;
             foreach (WorkItem item in this)
@@ -193,18 +188,17 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>true if the collections contain the same items</returns>
         public override bool Equals(object obj)
         {
-            WorkItemCollection other = obj as WorkItemCollection;
             bool result = false;
 
-            if (other == null)
+            if (obj is not WorkItemCollection other)
             {
                 result = false;
             }
-            else if (object.ReferenceEquals(this, other))
+            else if (ReferenceEquals(this, other))
             {
                 result = true;
             }
-            else if (this.Count != other.Count)
+            else if (Count != other.Count)
             {
                 result = false;
             }
@@ -234,8 +228,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
         public override void Save(XmlElement element, XmlTestStoreParameters parameters)
         {
-            XmlPersistence xmlPersistence = new XmlPersistence();
-            xmlPersistence.SaveHashtable(this.container, element, ".", ".", null, "Workitem", parameters);
+            XmlPersistence xmlPersistence = new();
+            xmlPersistence.SaveHashtable(_container, element, ".", ".", null, "Workitem", parameters);
         }
         #endregion
     }

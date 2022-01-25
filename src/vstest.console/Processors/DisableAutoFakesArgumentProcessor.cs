@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     /// An argument processor that allows the user to disable fakes
@@ -27,20 +27,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                return this.executor ?? (this.executor =
+                return executor ?? (executor =
                                              new Lazy<IArgumentExecutor>(
                                                  () => new DisableAutoFakesArgumentExecutor(
                                                      CommandLineOptions.Instance)));
             }
 
-            set => this.executor = value;
+            set => executor = value;
         }
 
         public Lazy<IArgumentProcessorCapabilities> Metadata
         {
             get
             {
-                return this.metadata ?? (this.metadata =
+                return metadata ?? (metadata =
                                              new Lazy<IArgumentProcessorCapabilities>(
                                                  () => new DisableAutoFakesArgumentProcessorCapabilities()));
             }
@@ -82,13 +82,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(CommandLineResources.DisableAutoFakesUsage);
             }
 
-            bool value;
-            if (!bool.TryParse(argument, out value))
+            if (!bool.TryParse(argument, out bool value))
             {
                 throw new CommandLineException(CommandLineResources.DisableAutoFakesUsage);
             }
 
-            this.commandLineOptions.DisableAutoFakes = value;
+            commandLineOptions.DisableAutoFakes = value;
         }
 
         /// <summary>

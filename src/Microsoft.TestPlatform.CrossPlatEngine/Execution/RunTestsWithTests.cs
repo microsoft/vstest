@@ -21,11 +21,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
     internal class RunTestsWithTests : BaseRunTests
     {
-        private IEnumerable<TestCase> testCases;
+        private readonly IEnumerable<TestCase> testCases;
 
         private Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList;
 
-        private ITestCaseEventsHandler testCaseEventsHandler;
+        private readonly ITestCaseEventsHandler testCaseEventsHandler;
 
         public RunTestsWithTests(IRequestData requestData, IEnumerable<TestCase> testCases, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
             : this(requestData, testCases, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
@@ -58,12 +58,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         protected override IEnumerable<Tuple<Uri, string>> GetExecutorUriExtensionMap(IFrameworkHandle testExecutorFrameworkHandle, RunContext runContext)
         {
-            this.executorUriVsTestList = this.GetExecutorVsTestCaseList(this.testCases);
+            executorUriVsTestList = GetExecutorVsTestCaseList(testCases);
 
-            Debug.Assert(this.TestExecutionContext.TestCaseFilter == null, "TestCaseFilter should be null for specific tests.");
+            Debug.Assert(TestExecutionContext.TestCaseFilter == null, "TestCaseFilter should be null for specific tests.");
             runContext.FilterExpressionWrapper = null;
 
-            return this.executorUriVsTestList.Keys;
+            return executorUriVsTestList.Keys;
         }
 
         protected override void InvokeExecutor(
@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             RunContext runContext,
             IFrameworkHandle frameworkHandle)
         {
-            executor?.Value.RunTests(this.executorUriVsTestList[executorUri], runContext, frameworkHandle);
+            executor?.Value.RunTests(executorUriVsTestList[executorUri], runContext, frameworkHandle);
         }
 
         /// <inheritdoc />
@@ -83,12 +83,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             // If the adapter doesn't implement the new test executor interface we should attach to
             // the default test host by default to preserve old behavior.
-            if (!(executor?.Value is ITestExecutor2 convertedExecutor))
-            {
-                return true;
-            }
-
-            return convertedExecutor.ShouldAttachToTestHost(this.executorUriVsTestList[executorUri], runContext);
+            return !(executor?.Value is ITestExecutor2 convertedExecutor)
+|| convertedExecutor.ShouldAttachToTestHost(executorUriVsTestList[executorUri], runContext);
         }
 
         /// <summary>
@@ -96,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// </summary>
         protected override void SendSessionEnd()
         {
-            this.testCaseEventsHandler?.SendSessionEnd();
+            testCaseEventsHandler?.SendSessionEnd();
         }
 
         /// <summary>
@@ -105,17 +101,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         protected override void SendSessionStart()
         {
             // Send session start with test sources in property bag for session start event args.
-            if (this.testCaseEventsHandler == null)
+            if (testCaseEventsHandler == null)
             {
                 return;
             }
 
             var properties = new Dictionary<string, object>
             {
-                { "TestSources", TestSourcesUtility.GetSources(this.testCases) }
+                { "TestSources", TestSourcesUtility.GetSources(testCases) }
             };
 
-            this.testCaseEventsHandler.SendSessionStart(properties);
+            testCaseEventsHandler.SendSessionStart(properties);
         }
 
         /// <summary>
@@ -126,14 +122,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             var result = new Dictionary<Tuple<Uri, string>, List<TestCase>>();
             foreach (var test in tests)
             {
-                List<TestCase> testList;
 
                 // TODO: Fill this in with the right extension value.
                 var executorUriExtensionTuple = new Tuple<Uri, string>(
                     test.ExecutorUri,
                     Constants.UnspecifiedAdapterPath);
 
-                if (result.TryGetValue(executorUriExtensionTuple, out testList))
+                if (result.TryGetValue(executorUriExtensionTuple, out List<TestCase> testList))
                 {
                     testList.Add(test);
                 }

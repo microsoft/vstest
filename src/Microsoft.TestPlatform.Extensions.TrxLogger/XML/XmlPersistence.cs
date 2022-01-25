@@ -56,7 +56,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             public DuplicateKeyLoadException(object key, string message, Exception innerException)
                 : base(message, innerException)
             {
-                this.Key = key;
+                Key = key;
             }
 
             #endregion
@@ -96,17 +96,17 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// <summary>
         /// this is the top level cache: Type->field information
         /// </summary>
-        private static Dictionary<Type, IEnumerable<FieldPersistenceInfo>> typeToPersistenceInfoCache =
-            new Dictionary<Type, IEnumerable<FieldPersistenceInfo>>();
+        private static readonly Dictionary<Type, IEnumerable<FieldPersistenceInfo>> TypeToPersistenceInfoCache =
+            new();
 
         /// <summary>
         /// Optimization: avoid re-parsing same query multiple times
         /// </summary>
-        private static Dictionary<string, string> queryCache = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> QueryCache = new();
 
-        private string prefix;
-        private string namespaceUri;
-        private XmlNamespaceManager xmlNamespaceManager = new XmlNamespaceManager(new NameTable());
+        private readonly string _prefix;
+        private readonly string _namespaceUri;
+        private readonly XmlNamespaceManager _xmlNamespaceManager = new(new NameTable());
 
         #endregion Fields
 
@@ -117,16 +117,16 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// </summary>
         public XmlPersistence()
         {
-            this.prefix = string.Empty;
-            this.namespaceUri = "http://microsoft.com/schemas/VisualStudio/TeamTest/2010";
+            _prefix = string.Empty;
+            _namespaceUri = "http://microsoft.com/schemas/VisualStudio/TeamTest/2010";
 
-            if (!string.IsNullOrEmpty(this.prefix))
+            if (!string.IsNullOrEmpty(_prefix))
             {
                 // Register the specified prefix with the specified namespace
-                this.xmlNamespaceManager.AddNamespace(this.prefix, this.namespaceUri);
+                _xmlNamespaceManager.AddNamespace(_prefix, _namespaceUri);
             }
 
-            if (!string.IsNullOrEmpty(this.namespaceUri))
+            if (!string.IsNullOrEmpty(_namespaceUri))
             {
                 // Register a prefix for the namespace. This is needed for XPath queries, since an element in an XPath
                 // expression without a prefix is assumed to be in the empty namespace, and NOT in the provided XML namespace
@@ -136,7 +136,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
                 //
                 // See the documentation for the 'XmlNamespaceManager.AddNamespace' method, specifically the Note for the
                 // 'prefix' parameter.
-                this.xmlNamespaceManager.AddNamespace(DefaultNamespacePrefixEquivalent, this.namespaceUri);
+                _xmlNamespaceManager.AddNamespace(DefaultNamespacePrefixEquivalent, _namespaceUri);
             }
         }
 
@@ -153,21 +153,19 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// </returns>
         public XmlElement CreateRootElement(string name)
         {
-            return this.CreateRootElement(name, this.namespaceUri);
+            return CreateRootElement(name, _namespaceUri);
         }
 
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         private XmlElement CreateRootElement(string name, string namespaceUri)
         {
             if (namespaceUri == null)
             {
-                namespaceUri = this.namespaceUri;
+                namespaceUri = this._namespaceUri;
             }
 
-            XmlDocument dom = new XmlDocument();
+            XmlDocument dom = new();
             dom.AppendChild(dom.CreateXmlDeclaration("1.0", "UTF-8", null));
-            return (XmlElement)dom.AppendChild(dom.CreateElement(this.prefix, name, namespaceUri));
+            return (XmlElement)dom.AppendChild(dom.CreateElement(_prefix, name, namespaceUri));
         }
 
         #region PublicSaveDataInTrx
@@ -186,7 +184,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// </param>
         public void SaveSingleFields(XmlElement parentXml, object instance, XmlTestStoreParameters parameters)
         {
-            this.SaveSingleFields(parentXml, instance, null, parameters);
+            SaveSingleFields(parentXml, instance, null, parameters);
         }
 
         /// <summary>
@@ -220,11 +218,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
                 {
                     if (info.FieldAttribute != null)
                     {
-                        this.SaveObject(fieldValue, parentXml, info.Location, parameters);
+                        SaveObject(fieldValue, parentXml, info.Location, parameters);
                     }
                     else if (info.SimpleFieldAttribute != null)
                     {
-                        this.SaveSimpleField(parentXml, info.Location, fieldValue, info.SimpleFieldAttribute.DefaultValue);
+                        SaveSimpleField(parentXml, info.Location, fieldValue, info.SimpleFieldAttribute.DefaultValue);
                     }
                 }
             }
@@ -249,14 +247,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         {
             if (objectToSave != null && location != null)
             {
-                string nameSpaceUri = this.namespaceUri;
+                string nameSpaceUri = _namespaceUri;
                 if (objectToSave is IXmlTestStoreCustom customStore)
                 {
                     nameSpaceUri = customStore.NamespaceUri;
                 }
 
-                XmlNode xmlNode = this.EnsureLocationExists(parentXml, location, nameSpaceUri);
-                this.SaveObject(objectToSave, xmlNode, parameters);
+                XmlNode xmlNode = EnsureLocationExists(parentXml, location, nameSpaceUri);
+                SaveObject(objectToSave, xmlNode, parameters);
 
                 if (xmlNode is XmlElement element &&
                     !element.HasAttributes &&
@@ -282,7 +280,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// </param>
         public void SaveObject(object objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters parameters)
         {
-            this.SaveObject(objectToSave, nodeToSaveAt, parameters, null);
+            SaveObject(objectToSave, nodeToSaveAt, parameters, null);
         }
 
         /// <summary>
@@ -310,7 +308,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
                 }
                 else
                 {
-                    this.SaveSimpleData(objectToSave, nodeToSaveAt, defaultValue);
+                    SaveSimpleData(objectToSave, nodeToSaveAt, defaultValue);
                 }
             }
         }
@@ -337,8 +335,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
                 return;
             }
 
-            XmlNode saveTarget = this.EnsureLocationExists(xml, location);
-            this.SaveSimpleData(value, saveTarget, defaultValue);
+            XmlNode saveTarget = EnsureLocationExists(xml, location);
+            SaveSimpleData(value, saveTarget, defaultValue);
         }
 
         /// <summary>
@@ -355,20 +353,20 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// </param>
         public void SaveGuid(XmlElement xml, string location, Guid guid)
         {
-            this.SaveSimpleField(xml, location, guid.ToString(), EmptyGuidString);
+            SaveSimpleField(xml, location, guid.ToString(), EmptyGuidString);
         }
 
         public void SaveHashtable(Hashtable ht, XmlElement element, string location, string keyLocation, string valueLocation, string itemElementName, XmlTestStoreParameters parameters)
         {
             if (ht != null && ht.Count > 0)
             {
-                XmlElement dictionaryElement = (XmlElement)this.EnsureLocationExists(element, location);
+                XmlElement dictionaryElement = (XmlElement)EnsureLocationExists(element, location);
                 foreach (DictionaryEntry de in ht)
                 {
-                    XmlElement itemXml = this.CreateElement(dictionaryElement, itemElementName);
+                    XmlElement itemXml = CreateElement(dictionaryElement, itemElementName);
 
-                    this.SaveObject(de.Key, itemXml, keyLocation, parameters);
-                    this.SaveObject(de.Value, itemXml, valueLocation, parameters);
+                    SaveObject(de.Key, itemXml, keyLocation, parameters);
+                    SaveObject(de.Value, itemXml, valueLocation, parameters);
                 }
             }
         }
@@ -380,10 +378,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
                 XmlElement dictionaryElement = (XmlElement)EnsureLocationExists(element, location);
                 foreach (DictionaryEntry de in dict)
                 {
-                    XmlElement itemXml = this.CreateElement(dictionaryElement, itemElementName);
+                    XmlElement itemXml = CreateElement(dictionaryElement, itemElementName);
 
-                    this.SaveObject(de.Key, itemXml, keyLocation, parameters);
-                    this.SaveObject(de.Value, itemXml, valueLocation, parameters);
+                    SaveObject(de.Key, itemXml, keyLocation, parameters);
+                    SaveObject(de.Value, itemXml, valueLocation, parameters);
                 }
             }
         }
@@ -414,11 +412,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         {
             if (list != null && list.GetEnumerator().MoveNext())
             {
-                XmlElement listElement = (XmlElement)this.EnsureLocationExists(element, listXmlElement);
+                XmlElement listElement = (XmlElement)EnsureLocationExists(element, listXmlElement);
                 foreach (object item in list)
                 {
-                    XmlElement itemXml = this.CreateElement(listElement, itemElementName, item);
-                    this.SaveObject(item, itemXml, itemLocation, parameters);
+                    XmlElement itemXml = CreateElement(listElement, itemElementName, item);
+                    SaveObject(item, itemXml, itemLocation, parameters);
                 }
             }
         }
@@ -450,18 +448,17 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         {
             if (list != null && list.Count > 0)
             {
-                XmlElement listElement = (XmlElement)this.EnsureLocationExists(element, listXmlElement);
+                XmlElement listElement = (XmlElement)EnsureLocationExists(element, listXmlElement);
                 foreach (V item in list)
                 {
-                    XmlElement itemXml = this.CreateElement(listElement, itemElementName, item);
-                    this.SaveObject(item, itemXml, itemLocation, parameters);
+                    XmlElement itemXml = CreateElement(listElement, itemElementName, item);
+                    SaveObject(item, itemXml, itemLocation, parameters);
                 }
             }
         }
 
         #region Counters
 
-        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
         public void SaveCounters(XmlElement xml, string location, int[] counters)
         {
             xml = (XmlElement)LocationToXmlNode(xml, location);
@@ -482,7 +479,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
 
         internal static void SaveUsingReflection(XmlElement element, object instance, Type requestedType, XmlTestStoreParameters parameters)
         {
-            XmlPersistence helper = new XmlPersistence();
+            XmlPersistence helper = new();
             helper.SaveSingleFields(element, instance, requestedType, parameters);
         }
 
@@ -503,14 +500,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// </returns>
         private static IEnumerable<FieldPersistenceInfo> GetFieldInfos(Type type)
         {
-            if (!typeToPersistenceInfoCache.TryGetValue(type, out var toReturn))
+            if (!TypeToPersistenceInfoCache.TryGetValue(type, out var toReturn))
             {
                 toReturn = ReflectFields(type);
-                lock (typeToPersistenceInfoCache)
+                lock (TypeToPersistenceInfoCache)
                 {
-                    if (!typeToPersistenceInfoCache.TryGetValue(type, out var checkCache))
+                    if (!TypeToPersistenceInfoCache.TryGetValue(type, out var checkCache))
                     {
-                        typeToPersistenceInfoCache.Add(type, toReturn);
+                        TypeToPersistenceInfoCache.Add(type, toReturn);
                     }
                 }
             }
@@ -525,14 +522,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// <returns>collection of field information</returns>
         private static IEnumerable<FieldPersistenceInfo> ReflectFields(Type type)
         {
-            List<FieldPersistenceInfo> toReturn = new List<FieldPersistenceInfo>();
+            List<FieldPersistenceInfo> toReturn = new();
 
             foreach (
                 FieldInfo reflectedFieldInfo in
                     type.GetTypeInfo().GetFields(
                         BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
             {
-                FieldPersistenceInfo info = new FieldPersistenceInfo(reflectedFieldInfo);
+                FieldPersistenceInfo info = new(reflectedFieldInfo);
 
                 // only fields with known location need to be persisted
                 if (!string.IsNullOrEmpty(info.Location))
@@ -607,15 +604,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         {
             var attributes = fieldInfo.GetCustomAttributes(typeof(T), false).ToArray();
 
-            if (attributes.Length > 0)
-            {
-                return (T)attributes[0];
-            }
-
-            return default;
+            return attributes.Length > 0 ? (T)attributes[0] : default;
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Reviewed. Suppression is OK here.")]
         private void SaveSimpleData(object value, XmlNode nodeToSaveAt, object defaultValue)
         {
             if (value == null || value.Equals(defaultValue))
@@ -669,7 +660,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
 
         public XmlNode EnsureLocationExists(XmlElement xml, string location)
         {
-            return this.EnsureLocationExists(xml, location, this.namespaceUri);
+            return EnsureLocationExists(xml, location, _namespaceUri);
         }
 
         private static string RemoveInvalidXmlChar(string str)
@@ -681,7 +672,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
 
                 // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
                 // because C# support unicode character in range \u0000 to \uFFFF
-                MatchEvaluator evaluator = new MatchEvaluator(ReplaceInvalidCharacterWithUniCodeEscapeSequence);
+                MatchEvaluator evaluator = new(ReplaceInvalidCharacterWithUniCodeEscapeSequence);
                 string invalidChar = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD]";
                 return Regex.Replace(str, invalidChar, evaluator);
             }
@@ -697,7 +688,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
 
         private XmlNode EnsureLocationExists(XmlElement xml, string location, string nameSpaceUri)
         {
-            XmlNode node = this.LocationToXmlNode(xml, location);
+            XmlNode node = LocationToXmlNode(xml, location);
             if (node != null)
             {
                 return node;
@@ -706,40 +697,28 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             if (location.StartsWith("@", StringComparison.Ordinal))
             {
                 string attributeName = location.Substring(1, location.Length - 1);
-                if (xml.HasAttribute(attributeName))
-                {
-                    return xml.GetAttributeNode(attributeName);
-                }
-                else
-                {
-                    return xml.Attributes.Append(xml.OwnerDocument.CreateAttribute(attributeName));
-                }
+                return xml.HasAttribute(attributeName)
+                    ? xml.GetAttributeNode(attributeName)
+                    : (XmlNode)xml.Attributes.Append(xml.OwnerDocument.CreateAttribute(attributeName));
             }
             else
             {
                 string[] parts = location.Split(new char[] { '/' }, 2);
                 string firstPart = parts[0];
 
-                XmlNode firstChild = this.LocationToXmlNode(xml, firstPart);
+                XmlNode firstChild = LocationToXmlNode(xml, firstPart);
                 if (firstChild == null)
                 {
-                    firstChild = this.CreateElement(xml, firstPart, this.GetNamespaceUriOrDefault(nameSpaceUri));
+                    firstChild = CreateElement(xml, firstPart, GetNamespaceUriOrDefault(nameSpaceUri));
                 }
 
-                if (parts.Length > 1)
-                {
-                    return this.EnsureLocationExists((XmlElement)firstChild, parts[1]);
-                }
-                else
-                {
-                    return firstChild;
-                }
+                return parts.Length > 1 ? EnsureLocationExists((XmlElement)firstChild, parts[1]) : firstChild;
             }
         }
 
         private string GetNamespaceUriOrDefault(string nameSpaceUri)
         {
-            return nameSpaceUri ?? this.namespaceUri;
+            return nameSpaceUri ?? _namespaceUri;
         }
 
         /// <summary>
@@ -750,12 +729,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// <returns>a new XmlElement attached to the parent</returns>
         private XmlElement CreateElement(XmlElement xml, string name)
         {
-            return this.CreateElement(xml, name, this.namespaceUri);
+            return CreateElement(xml, name, _namespaceUri);
         }
 
         private XmlElement CreateElement(XmlElement xml, string name, string elementNamespaceUri)
         {
-            return (XmlElement)xml.AppendChild(xml.OwnerDocument.CreateElement(this.prefix, name, elementNamespaceUri));
+            return (XmlElement)xml.AppendChild(xml.OwnerDocument.CreateElement(_prefix, name, elementNamespaceUri));
         }
 
         /// <summary>
@@ -769,12 +748,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         {
             if (name != null)
             {
-                return this.CreateElement(parent, name);
+                return CreateElement(parent, name);
             }
             else
             {
-                NewElementCreateData createData = this.GetElementCreateData(instance);
-                return this.CreateElement(parent, createData.ElementName, createData.NamespaceUri);
+                NewElementCreateData createData = GetElementCreateData(instance);
+                return CreateElement(parent, createData.ElementName, createData.NamespaceUri);
             }
         }
 
@@ -782,7 +761,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         {
             Debug.Assert(persistee != null, "persistee is null");
 
-            NewElementCreateData toReturn = new NewElementCreateData();
+            NewElementCreateData toReturn = new();
             if (persistee is IXmlTestStoreCustom custom)
             {
                 toReturn.ElementName = custom.ElementName;
@@ -796,7 +775,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
 
             if (toReturn.NamespaceUri == null)
             {
-                toReturn.NamespaceUri = this.namespaceUri;
+                toReturn.NamespaceUri = _namespaceUri;
             }
 
             return toReturn;
@@ -804,11 +783,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
 
         private XmlNode LocationToXmlNode(XmlElement element, string location)
         {
-            location = this.ProcessXPathQuery(location);
+            location = ProcessXPathQuery(location);
 
             try
             {
-                return element.SelectSingleNode(location, this.xmlNamespaceManager);
+                return element.SelectSingleNode(location, _xmlNamespaceManager);
             }
             catch (System.Xml.XPath.XPathException e)
             {
@@ -820,20 +799,20 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         {
             // If we are working with the empty namespace, there is no need to decorate elements in the XPath expression, since
             // elements in the XPath expression that don't have a prefix will be searched for in the empty namespace.
-            if (string.IsNullOrEmpty(this.namespaceUri))
+            if (string.IsNullOrEmpty(_namespaceUri))
             {
                 return queryIn;
             }
 
-            if (queryCache.ContainsKey(queryIn))
+            if (QueryCache.ContainsKey(queryIn))
             {
-                return queryCache[queryIn];
+                return QueryCache[queryIn];
             }
 
             // fix the empty namespaces to a temp prefix, so xpath query can understand them
             string[] parts = queryIn.Split(new char[] { '/' }, StringSplitOptions.None);
 
-            StringBuilder query = new StringBuilder();
+            StringBuilder query = new();
 
             foreach (string part in parts)
             {
@@ -851,7 +830,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             }
 
             string queryString = query.ToString();
-            queryCache[queryIn] = queryString;
+            QueryCache[queryIn] = queryString;
 
             return queryString;
         }
@@ -870,7 +849,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// <summary>
         /// caches information about a field
         /// </summary>
-        [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Reviewed. Suppression is OK here.")]
         private class FieldPersistenceInfo
         {
             internal FieldInfo FieldInfo;
@@ -885,12 +863,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
 
             internal FieldPersistenceInfo(FieldInfo fieldInfo)
             {
-                this.FieldInfo = fieldInfo;
-                this.Location = GetFieldLocation(fieldInfo);
+                FieldInfo = fieldInfo;
+                Location = GetFieldLocation(fieldInfo);
 
-                this.Attribute = GetAttribute<StoreXmlAttribute>(fieldInfo);
-                this.SimpleFieldAttribute = this.Attribute as StoreXmlSimpleFieldAttribute;
-                this.FieldAttribute = this.Attribute as StoreXmlFieldAttribute;
+                Attribute = GetAttribute<StoreXmlAttribute>(fieldInfo);
+                SimpleFieldAttribute = Attribute as StoreXmlSimpleFieldAttribute;
+                FieldAttribute = Attribute as StoreXmlFieldAttribute;
             }
         }
 

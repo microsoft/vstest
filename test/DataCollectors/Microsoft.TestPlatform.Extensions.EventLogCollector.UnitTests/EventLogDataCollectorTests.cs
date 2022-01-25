@@ -23,29 +23,29 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         private const string ConfigurationString =
             @"<Configuration><Setting name=""key"" value=""value"" /></Configuration>";
 
-        private Mock<DataCollectionEvents> mockDataCollectionEvents;
+        private readonly Mock<DataCollectionEvents> mockDataCollectionEvents;
 
-        private TestableDataCollectionSink mockDataCollectionSink;
+        private readonly TestableDataCollectionSink mockDataCollectionSink;
 
-        private Mock<DataCollectionLogger> mockDataCollectionLogger;
+        private readonly Mock<DataCollectionLogger> mockDataCollectionLogger;
 
-        private DataCollectionEnvironmentContext dataCollectionEnvironmentContext;
+        private readonly DataCollectionEnvironmentContext dataCollectionEnvironmentContext;
 
-        private EventLogDataCollector eventLogDataCollector;
+        private readonly EventLogDataCollector eventLogDataCollector;
 
-        private Mock<IFileHelper> mockFileHelper;
+        private readonly Mock<IFileHelper> mockFileHelper;
 
         public EventLogDataCollectorTests()
         {
-            this.mockDataCollectionEvents = new Mock<DataCollectionEvents>();
-            this.mockDataCollectionSink = new TestableDataCollectionSink();
-            this.mockFileHelper = new Mock<IFileHelper>();
-            TestCase tc = new TestCase();
+            mockDataCollectionEvents = new Mock<DataCollectionEvents>();
+            mockDataCollectionSink = new TestableDataCollectionSink();
+            mockFileHelper = new Mock<IFileHelper>();
+            _ = new();
             DataCollectionContext dataCollectionContext =
-                new DataCollectionContext(new SessionId(Guid.NewGuid()));
-            this.dataCollectionEnvironmentContext = new DataCollectionEnvironmentContext(dataCollectionContext);
-            this.mockDataCollectionLogger = new Mock<DataCollectionLogger>();
-            this.eventLogDataCollector = new EventLogDataCollector(this.mockFileHelper.Object);
+                new(new SessionId(Guid.NewGuid()));
+            dataCollectionEnvironmentContext = new DataCollectionEnvironmentContext(dataCollectionContext);
+            mockDataCollectionLogger = new Mock<DataCollectionLogger>();
+            eventLogDataCollector = new EventLogDataCollector(mockFileHelper.Object);
         }
 
         [TestMethod]
@@ -53,13 +53,13 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         {
             string configurationString =
             @"<Configuration><Setting name=""EventLogs"" value=""MyEventName"" /></Configuration>";
-            XmlDocument expectedXmlDoc = new XmlDocument();
+            XmlDocument expectedXmlDoc = new();
             expectedXmlDoc.LoadXml(configurationString);
             var mockCollector = new Mock<DataCollectionLogger>();
             mockCollector.Setup(m => m.LogError(It.IsAny<DataCollectionContext>(), It.Is<string>(s => s.Contains(@"The event log 'MyEventName' on computer '.' does not exist.")), It.IsAny<Exception>()));
 
             var eventLogDataCollector = new EventLogDataCollector();
-            eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, mockCollector.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, mockDataCollectionEvents.Object, mockDataCollectionSink, mockCollector.Object, dataCollectionEnvironmentContext);
 
             mockCollector.Verify(m => m.LogError(It.IsAny<DataCollectionContext>(), It.IsAny<string>(), It.IsAny<Exception>()), Times.Once);
         }
@@ -68,59 +68,50 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         public void InitializeShouldThrowExceptionIfEventsIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(
-                () =>
-                    {
-                        this.eventLogDataCollector.Initialize(
+                () => eventLogDataCollector.Initialize(
                             null,
                             null,
-                            this.mockDataCollectionSink,
-                            this.mockDataCollectionLogger.Object,
-                            this.dataCollectionEnvironmentContext);
-                    });
+                            mockDataCollectionSink,
+                            mockDataCollectionLogger.Object,
+                            dataCollectionEnvironmentContext));
         }
 
         [TestMethod]
         public void InitializeShouldThrowExceptionIfCollectionSinkIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(
-                () =>
-                    {
-                        this.eventLogDataCollector.Initialize(
+                () => eventLogDataCollector.Initialize(
                             null,
-                            this.mockDataCollectionEvents.Object,
+                            mockDataCollectionEvents.Object,
                             null,
-                            this.mockDataCollectionLogger.Object,
-                            this.dataCollectionEnvironmentContext);
-                    });
+                            mockDataCollectionLogger.Object,
+                            dataCollectionEnvironmentContext));
         }
 
         [TestMethod]
         public void InitializeShouldThrowExceptionIfLoggerIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(
-                () =>
-                    {
-                        this.eventLogDataCollector.Initialize(
+                () => eventLogDataCollector.Initialize(
                             null,
-                            this.mockDataCollectionEvents.Object,
-                            this.mockDataCollectionSink,
+                            mockDataCollectionEvents.Object,
+                            mockDataCollectionSink,
                             null,
-                            this.dataCollectionEnvironmentContext);
-                    });
+                            dataCollectionEnvironmentContext));
         }
 
         [TestMethod]
         public void InitializeShouldInitializeDefaultEventLogNames()
         {
-            List<string> eventLogNames = new List<string>
+            List<string> eventLogNames = new()
             {
                 "System",
                 "Application"
             };
 
-            this.eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(null, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
 
-            CollectionAssert.AreEqual(eventLogNames, this.eventLogDataCollector.EventLogNames.ToList());
+            CollectionAssert.AreEqual(eventLogNames, eventLogDataCollector.EventLogNames.ToList());
         }
 
         [TestMethod]
@@ -129,33 +120,33 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             string configurationString =
             @"<Configuration><Setting name=""EventLogs"" value=""MyEventName,MyEventName2"" /></Configuration>";
 
-            List<string> eventLogNames = new List<string>
+            List<string> eventLogNames = new()
             {
                 "MyEventName",
                 "MyEventName2"
             };
 
-            XmlDocument expectedXmlDoc = new XmlDocument();
+            XmlDocument expectedXmlDoc = new();
             expectedXmlDoc.LoadXml(configurationString);
 
-            this.eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
 
-            CollectionAssert.AreEqual(eventLogNames, this.eventLogDataCollector.EventLogNames.ToList());
+            CollectionAssert.AreEqual(eventLogNames, eventLogDataCollector.EventLogNames.ToList());
         }
 
         [TestMethod]
         public void InitializeShouldInitializeDefaultLogEntryTypes()
         {
-            List<EventLogEntryType> entryTypes = new List<EventLogEntryType>
+            List<EventLogEntryType> entryTypes = new()
             {
                 EventLogEntryType.Error,
                 EventLogEntryType.Warning,
                 EventLogEntryType.FailureAudit
             };
 
-            this.eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(null, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
 
-            CollectionAssert.AreEqual(entryTypes, this.eventLogDataCollector.EntryTypes.ToList());
+            CollectionAssert.AreEqual(entryTypes, eventLogDataCollector.EntryTypes.ToList());
         }
 
         [TestMethod]
@@ -164,16 +155,16 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             string configurationString =
                 @"<Configuration><Setting name=""EntryTypes"" value=""Error"" /></Configuration>";
 
-            List<EventLogEntryType> entryTypes = new List<EventLogEntryType>
+            List<EventLogEntryType> entryTypes = new()
             {
                 EventLogEntryType.Error
             };
 
-            XmlDocument expectedXmlDoc = new XmlDocument();
+            XmlDocument expectedXmlDoc = new();
             expectedXmlDoc.LoadXml(configurationString);
-            this.eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
 
-            CollectionAssert.AreEqual(entryTypes, this.eventLogDataCollector.EntryTypes.ToList());
+            CollectionAssert.AreEqual(entryTypes, eventLogDataCollector.EntryTypes.ToList());
         }
 
         [TestMethod]
@@ -182,24 +173,24 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             string configurationString =
                 @"<Configuration><Setting name=""EventSources"" value=""MyEventSource"" /></Configuration>";
 
-            List<string> eventSources = new List<string>
+            List<string> eventSources = new()
             {
                 "MyEventSource"
             };
 
-            XmlDocument expectedXmlDoc = new XmlDocument();
+            XmlDocument expectedXmlDoc = new();
             expectedXmlDoc.LoadXml(configurationString);
-            this.eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
 
-            CollectionAssert.AreEqual(eventSources, this.eventLogDataCollector.EventSources.ToList());
+            CollectionAssert.AreEqual(eventSources, eventLogDataCollector.EventSources.ToList());
         }
 
         [TestMethod]
         public void InitializeShouldNotInitializeEventSourcesByDefault()
         {
-            this.eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(null, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
 
-            Assert.IsNull(this.eventLogDataCollector.EventSources);
+            Assert.IsNull(eventLogDataCollector.EventSources);
         }
 
         [TestMethod]
@@ -208,26 +199,26 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             string configurationString =
                 @"<Configuration><Setting name=""MaxEventLogEntriesToCollect"" value=""20"" /></Configuration>";
 
-            XmlDocument expectedXmlDoc = new XmlDocument();
+            XmlDocument expectedXmlDoc = new();
             expectedXmlDoc.LoadXml(configurationString);
-            this.eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
 
-            Assert.AreEqual(20, this.eventLogDataCollector.MaxEntries);
+            Assert.AreEqual(20, eventLogDataCollector.MaxEntries);
         }
 
         [TestMethod]
         public void InitializeShouldSetDefaultMaxEntries()
         {
-            this.eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(null, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
 
-            Assert.AreEqual(50000, this.eventLogDataCollector.MaxEntries);
+            Assert.AreEqual(50000, eventLogDataCollector.MaxEntries);
         }
 
         [TestMethod]
         public void InitializeShouldSubscribeToDataCollectionEvents()
         {
             var testableDataCollectionEvents = new TestableDataCollectionEvents();
-            this.eventLogDataCollector.Initialize(null, testableDataCollectionEvents, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(null, testableDataCollectionEvents, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
             Assert.AreEqual(1, testableDataCollectionEvents.GetTestHostLaunchedInvocationList().Length);
             Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseStartInvocationList().Length);
             Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseEndInvocationList().Length);
@@ -240,8 +231,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         {
             var eventLogDataCollector = new EventLogDataCollector();
             Assert.AreEqual(0, eventLogDataCollector.ContextMap.Count);
-            eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
-            this.mockDataCollectionEvents.Raise(x => x.SessionStart += null, new SessionStartEventArgs());
+            eventLogDataCollector.Initialize(null, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
+            mockDataCollectionEvents.Raise(x => x.SessionStart += null, new SessionStartEventArgs());
             Assert.AreEqual(1, eventLogDataCollector.ContextMap.Count);
         }
 
@@ -251,8 +242,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             var eventLogDataCollector = new EventLogDataCollector();
             Assert.AreEqual(0, eventLogDataCollector.ContextMap.Count);
 
-            eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
-            this.mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid())), new TestCase()));
+            eventLogDataCollector.Initialize(null, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
+            mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid())), new TestCase()));
             Assert.AreEqual(1, eventLogDataCollector.ContextMap.Count);
         }
 
@@ -261,60 +252,54 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         public void TestCaseEndEventShouldWriteEventLogEntriesAndSendFile()
         {
             var eventLogDataCollector = new EventLogDataCollector();
-            eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(null, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
             var tc = new TestCase();
             var context = new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid()));
-            this.mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(context, tc));
-            this.mockDataCollectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(context, tc, TestOutcome.Passed));
-            Assert.IsTrue(this.mockDataCollectionSink.IsSendFileAsyncInvoked);
+            mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(context, tc));
+            mockDataCollectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(context, tc, TestOutcome.Passed));
+            Assert.IsTrue(mockDataCollectionSink.IsSendFileAsyncInvoked);
         }
 
         public void TestCaseEndEventShouldInvokeSendFileAsync()
         {
             var eventLogDataCollector = new EventLogDataCollector();
-            eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(null, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
             var tc = new TestCase();
             var context = new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid()));
-            this.mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(context, tc));
-            this.mockDataCollectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(context, tc, TestOutcome.Passed));
-            Assert.IsTrue(this.mockDataCollectionSink.IsSendFileAsyncInvoked);
+            mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(context, tc));
+            mockDataCollectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(context, tc, TestOutcome.Passed));
+            Assert.IsTrue(mockDataCollectionSink.IsSendFileAsyncInvoked);
         }
 
         [TestMethod]
         public void TestCaseEndEventShouldThrowIfTestCaseStartIsNotInvoked()
         {
             var eventLogDataCollector = new EventLogDataCollector();
-            eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(null, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
             var tc = new TestCase();
             var context = new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid()));
 
-            Assert.ThrowsException<EventLogCollectorException>(() =>
-            {
-                this.mockDataCollectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(context, tc, TestOutcome.Passed));
-            });
+            Assert.ThrowsException<EventLogCollectorException>(() => mockDataCollectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(context, tc, TestOutcome.Passed)));
         }
 
         public void SessionEndEventShouldThrowIfSessionStartEventtIsNotInvoked()
         {
             var eventLogDataCollector = new EventLogDataCollector();
-            eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(null, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
             var tc = new TestCase();
 
-            Assert.ThrowsException<EventLogCollectorException>(() =>
-                {
-                    this.mockDataCollectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext));
-                });
+            Assert.ThrowsException<EventLogCollectorException>(() => mockDataCollectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(dataCollectionEnvironmentContext.SessionDataCollectionContext)));
         }
 
         [TestMethod]
         public void TestSessionEndEventShouldWriteEventLogEntriesAndSendFile()
         {
             var eventLogDataCollector = new EventLogDataCollector();
-            eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(null, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
             var testcase = new TestCase() { Id = Guid.NewGuid() };
-            this.mockDataCollectionEvents.Raise(x => x.SessionStart += null, new SessionStartEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, new Dictionary<string, object>()));
-            this.mockDataCollectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext));
-            Assert.IsTrue(this.mockDataCollectionSink.IsSendFileAsyncInvoked);
+            mockDataCollectionEvents.Raise(x => x.SessionStart += null, new SessionStartEventArgs(dataCollectionEnvironmentContext.SessionDataCollectionContext, new Dictionary<string, object>()));
+            mockDataCollectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(dataCollectionEnvironmentContext.SessionDataCollectionContext));
+            Assert.IsTrue(mockDataCollectionSink.IsSendFileAsyncInvoked);
         }
 
         [TestMethod]
@@ -323,19 +308,19 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             string configurationString =
                 @"<Configuration><Setting name=""MaxEventLogEntriesToCollect"" value=""20"" /><Setting name=""EventLog"" value=""Application"" /><Setting name=""EntryTypes"" value=""Warning"" /></Configuration>";
 
-            XmlDocument expectedXmlDoc = new XmlDocument();
+            XmlDocument expectedXmlDoc = new();
             expectedXmlDoc.LoadXml(configurationString);
 
-            this.mockFileHelper.SetupSequence(x => x.Exists(It.IsAny<string>())).Returns(false).Returns(true);
-            this.eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
-            this.eventLogDataCollector.WriteEventLogs(
+            mockFileHelper.SetupSequence(x => x.Exists(It.IsAny<string>())).Returns(false).Returns(true);
+            eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
+            eventLogDataCollector.WriteEventLogs(
                 new List<EventLogEntry>(),
                 20,
-                this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
+                dataCollectionEnvironmentContext.SessionDataCollectionContext,
                 TimeSpan.MaxValue,
                 DateTime.Now);
 
-            this.mockFileHelper.Verify(x => x.WriteAllTextToFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            mockFileHelper.Verify(x => x.WriteAllTextToFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [TestMethod]
@@ -344,19 +329,16 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             string configurationString =
                 @"<Configuration><Setting name=""MaxEventLogEntriesToCollect"" value=""20"" /><Setting name=""EventLog"" value=""Application"" /><Setting name=""EntryTypes"" value=""Warning"" /></Configuration>";
 
-            XmlDocument expectedXmlDoc = new XmlDocument();
+            XmlDocument expectedXmlDoc = new();
             expectedXmlDoc.LoadXml(configurationString);
-            this.mockFileHelper.Setup(x => x.Exists(It.IsAny<string>())).Throws<Exception>();
+            mockFileHelper.Setup(x => x.Exists(It.IsAny<string>())).Throws<Exception>();
             Assert.ThrowsException<Exception>(
-                () =>
-                    {
-                        this.eventLogDataCollector.WriteEventLogs(
+                () => eventLogDataCollector.WriteEventLogs(
                             new List<EventLogEntry>(),
                             20,
-                            this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
+                            dataCollectionEnvironmentContext.SessionDataCollectionContext,
                             TimeSpan.MaxValue,
-                            DateTime.Now);
-                    });
+                            DateTime.Now));
         }
 
         [TestMethod]
@@ -365,11 +347,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             string configurationString =
                 @"<Configuration><Setting name=""MaxEventLogEntriesToCollect"" value=""20"" /><Setting name=""EventLog"" value=""Application"" /><Setting name=""EntryTypes"" value=""Warning"" /></Configuration>";
 
-            XmlDocument expectedXmlDoc = new XmlDocument();
+            XmlDocument expectedXmlDoc = new();
             expectedXmlDoc.LoadXml(configurationString);
 
-            this.mockFileHelper.SetupSequence(x => x.Exists(It.IsAny<string>())).Returns(false).Returns(true);
-            this.eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            mockFileHelper.SetupSequence(x => x.Exists(It.IsAny<string>())).Returns(false).Returns(true);
+            eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
 
             var entries = new List<EventLogEntry>();
 
@@ -384,14 +366,14 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             var filteredEntries = entries.Where(entry => entry.TimeGenerated > DateTime.MinValue && entry.TimeGenerated < DateTime.MaxValue)
                 .OrderBy(x => x.TimeGenerated).Take(5).ToList();
 
-            this.eventLogDataCollector.WriteEventLogs(
+            eventLogDataCollector.WriteEventLogs(
                 entries,
                 5,
-                this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
+                dataCollectionEnvironmentContext.SessionDataCollectionContext,
                 TimeSpan.MaxValue,
                 DateTime.Now);
 
-            this.mockFileHelper.Verify(
+            mockFileHelper.Verify(
                 x => x.WriteAllTextToFile(
                     It.IsAny<string>(),
                     It.Is<string>(
@@ -408,11 +390,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             string configurationString =
                 @"<Configuration><Setting name=""MaxEventLogEntriesToCollect"" value=""20"" /><Setting name=""EventLog"" value=""Application"" /><Setting name=""EntryTypes"" value=""Warning"" /></Configuration>";
 
-            XmlDocument expectedXmlDoc = new XmlDocument();
+            XmlDocument expectedXmlDoc = new();
             expectedXmlDoc.LoadXml(configurationString);
 
-            this.mockFileHelper.SetupSequence(x => x.Exists(It.IsAny<string>())).Returns(false).Returns(true);
-            this.eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            mockFileHelper.SetupSequence(x => x.Exists(It.IsAny<string>())).Returns(false).Returns(true);
+            eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, mockDataCollectionEvents.Object, mockDataCollectionSink, mockDataCollectionLogger.Object, dataCollectionEnvironmentContext);
 
             var entries = new List<EventLogEntry>();
 
@@ -427,14 +409,14 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             var filteredEntries = entries.Where(entry => entry.TimeGenerated > DateTime.MinValue && entry.TimeGenerated < DateTime.MaxValue)
                 .OrderBy(x => x.TimeGenerated).Take(10).ToList();
 
-            this.eventLogDataCollector.WriteEventLogs(
+            eventLogDataCollector.WriteEventLogs(
                 entries,
                 5,
-                this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
+                dataCollectionEnvironmentContext.SessionDataCollectionContext,
                 TimeSpan.MaxValue,
                 DateTime.Now);
 
-            this.mockFileHelper.Verify(
+            mockFileHelper.Verify(
                 x => x.WriteAllTextToFile(
                     It.IsAny<string>(),
                     It.Is<string>(
@@ -463,27 +445,27 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
         public Delegate[] GetTestHostLaunchedInvocationList()
         {
-            return this.TestHostLaunched.GetInvocationList();
+            return TestHostLaunched.GetInvocationList();
         }
 
         public Delegate[] GetTestCaseStartInvocationList()
         {
-            return this.TestCaseStart.GetInvocationList();
+            return TestCaseStart.GetInvocationList();
         }
 
         public Delegate[] GetTestCaseEndInvocationList()
         {
-            return this.TestCaseEnd.GetInvocationList();
+            return TestCaseEnd.GetInvocationList();
         }
 
         public Delegate[] GetTestSessionStartInvocationList()
         {
-            return this.SessionStart.GetInvocationList();
+            return SessionStart.GetInvocationList();
         }
 
         public Delegate[] GetTestSessionEndInvocationList()
         {
-            return this.SessionEnd.GetInvocationList();
+            return SessionEnd.GetInvocationList();
         }
     }
 
@@ -504,8 +486,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
         public override void SendFileAsync(FileTransferInformation fileTransferInformation)
         {
-            this.IsSendFileAsyncInvoked = true;
-            if (this.SendFileCompleted == null)
+            IsSendFileAsyncInvoked = true;
+            if (SendFileCompleted == null)
             {
                 return;
             }

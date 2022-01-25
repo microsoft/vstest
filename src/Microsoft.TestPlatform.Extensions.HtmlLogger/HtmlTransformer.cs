@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         public HtmlTransformer()
         {
             xslTransform = new XslCompiledTransform();
-            xslTransform.Load(XmlReader.Create(this.GetType().Assembly.GetManifestResourceStream("Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.Html.xslt") ?? throw new InvalidOperationException()));
+            xslTransform.Load(XmlReader.Create(GetType().Assembly.GetManifestResourceStream("Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.Html.xslt") ?? throw new InvalidOperationException()));
         }
 
         /// <summary>

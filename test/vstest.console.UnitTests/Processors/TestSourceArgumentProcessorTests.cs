@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void GetMetadataShouldReturnTestSourceArgumentProcessorCapabilities()
         {
-            TestSourceArgumentProcessor processor = new TestSourceArgumentProcessor();
+            TestSourceArgumentProcessor processor = new();
             Assert.IsTrue(processor.Metadata.Value is TestSourceArgumentProcessorCapabilities);
         }
 
@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void GetExecuterShouldReturnTestSourceArgumentProcessorCapabilities()
         {
-            TestSourceArgumentProcessor processor = new TestSourceArgumentProcessor();
+            TestSourceArgumentProcessor processor = new();
             Assert.IsTrue(processor.Executor.Value is TestSourceArgumentExecutor);
         }
 
@@ -44,7 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void CapabilitiesShouldReturnAppropriateProperties()
         {
-            TestSourceArgumentProcessorCapabilities capabilities = new TestSourceArgumentProcessorCapabilities();
+            TestSourceArgumentProcessorCapabilities capabilities = new();
             Assert.AreEqual("/TestSource", capabilities.CommandName);
             Assert.IsNull(capabilities.HelpContentResourceName);
 
@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var mockFileHelper = new Mock<IFileHelper>();
             mockFileHelper.Setup(x => x.GetCurrentDirectory()).Returns("");
             options.FileHelper = mockFileHelper.Object;
-            TestSourceArgumentExecutor executor = new TestSourceArgumentExecutor(options);
+            TestSourceArgumentExecutor executor = new(options);
 
             // This path is invalid
             string testFilePath = "TestFile.txt";

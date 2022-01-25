@@ -29,8 +29,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             ValidateArg.NotNull(attachmentManager, nameof(attachmentManager));
             ValidateArg.NotNull(dataCollectorConfig, nameof(dataCollectorConfig));
 
-            this.DataCollectorConfig = dataCollectorConfig;
-            this.AttachmentManager = attachmentManager;
+            DataCollectorConfig = dataCollectorConfig;
+            AttachmentManager = attachmentManager;
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             ValidateArg.NotNull(fileTransferInformation, nameof(fileTransferInformation));
 
-            this.AttachmentManager.AddAttachment(fileTransferInformation, this.SendFileCompleted, this.DataCollectorConfig.TypeUri, this.DataCollectorConfig.FriendlyName);
+            AttachmentManager.AddAttachment(fileTransferInformation, SendFileCompleted, DataCollectorConfig.TypeUri, DataCollectorConfig.FriendlyName);
         }
     }
 }

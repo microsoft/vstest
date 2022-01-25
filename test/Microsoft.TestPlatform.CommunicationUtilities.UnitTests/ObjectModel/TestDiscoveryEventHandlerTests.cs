@@ -19,15 +19,15 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.ObjectModel
         [TestInitialize]
         public void InitializeTests()
         {
-            this.mockClient = new Mock<ITestRequestHandler>();
-            this.testDiscoveryEventHandler = new TestDiscoveryEventHandler(this.mockClient.Object);
+            mockClient = new Mock<ITestRequestHandler>();
+            testDiscoveryEventHandler = new TestDiscoveryEventHandler(mockClient.Object);
         }
 
         [TestMethod]
         public void HandleDiscoveredTestShouldSendTestCasesToClient()
         {
-            this.testDiscoveryEventHandler.HandleDiscoveredTests(null);
-            this.mockClient.Verify(th => th.SendTestCases(null), Times.Once);
+            testDiscoveryEventHandler.HandleDiscoveredTests(null);
+            mockClient.Verify(th => th.SendTestCases(null), Times.Once);
         }
 
         [TestMethod]
@@ -35,24 +35,24 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.ObjectModel
         {
             var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(0, false);
 
-            this.testDiscoveryEventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
-            this.mockClient.Verify(th => th.DiscoveryComplete(discoveryCompleteEventArgs, null), Times.Once);
+            testDiscoveryEventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
+            mockClient.Verify(th => th.DiscoveryComplete(discoveryCompleteEventArgs, null), Times.Once);
         }
 
         [TestMethod]
         public void HandleDiscoveryCompleteShouldNotSendASeparateTestFoundMessageToClient()
         {
-            this.testDiscoveryEventHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(0, false), null);
+            testDiscoveryEventHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(0, false), null);
 
-            this.mockClient.Verify(th => th.SendTestCases(null), Times.Never);
+            mockClient.Verify(th => th.SendTestCases(null), Times.Never);
         }
 
         [TestMethod]
         public void HandleDiscoveryMessageShouldSendMessageToClient()
         {
-            this.testDiscoveryEventHandler.HandleLogMessage(TestMessageLevel.Informational, string.Empty);
+            testDiscoveryEventHandler.HandleLogMessage(TestMessageLevel.Informational, string.Empty);
 
-            this.mockClient.Verify(th => th.SendLog(TestMessageLevel.Informational, string.Empty), Times.AtLeast(1));
+            mockClient.Verify(th => th.SendLog(TestMessageLevel.Informational, string.Empty), Times.AtLeast(1));
         }
     }
 }

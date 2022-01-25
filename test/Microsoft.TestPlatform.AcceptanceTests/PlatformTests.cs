@@ -22,10 +22,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void RunTestExecutionWithPlatformx64(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
             var platformArg = " /Platform:x64";
-            this.RunTestExecutionWithPlatform(platformArg, "testhost", 1);
+            RunTestExecutionWithPlatform(platformArg, "testhost", 1);
         }
 
         /// <summary>
@@ -36,10 +36,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void RunTestExecutionWithPlatformx86(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(testEnvironment, runnerInfo);
 
             var platformArg = " /Platform:x86";
-            this.RunTestExecutionWithPlatform(platformArg, "testhost.x86", 1);
+            RunTestExecutionWithPlatform(platformArg, "testhost.x86", 1);
         }
 
         private void SetExpectedParams(ref int expectedNumOfProcessCreated, ref string testhostProcessName, string desktopHostProcessName)
@@ -53,10 +53,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var resultsDir = GetResultsDirectory();
 
             var arguments = PrepareArguments(
-                this.GetSampleTestAssembly(),
-                this.GetTestAdapterPath(),
-                string.Empty, this.FrameworkArgValue,
-                this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
+                GetSampleTestAssembly(),
+                GetTestAdapterPath(),
+                string.Empty, FrameworkArgValue,
+                testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, platformArg);
 
             var cts = new CancellationTokenSource();
@@ -64,15 +64,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 cts,
                 testhostProcessName);
 
-            this.InvokeVsTest(arguments);
+            InvokeVsTest(arguments);
 
             cts.Cancel();
 
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
                 numOfProcessCreatedTask.Result.Count,
-                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) }) args: {arguments} runner path: {this.GetConsoleRunnerPath()}");
-            this.ValidateSummaryStatus(1, 1, 1);
+                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) }) args: {arguments} runner path: {GetConsoleRunnerPath()}");
+            ValidateSummaryStatus(1, 1, 1);
             TryRemoveDirectory(resultsDir);
         }
     }

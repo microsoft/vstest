@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public Assembly LoadAssemblyFromPath(string assemblyPath)
         {
-            return Assembly.Load(this.GetAssemblyNameFromPath(assemblyPath));
+            return Assembly.Load(GetAssemblyNameFromPath(assemblyPath));
         }
     }
 }

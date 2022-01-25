@@ -18,8 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         // We want to fallback to the non-public default constructor https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_ConstructorHandling.htm during deserialization
         private TestRunCompleteEventArgs()
         {
-            this.AttachmentSets = new Collection<AttachmentSet>();
-            this.InvokedDataCollectors = new Collection<InvokedDataCollector>();
+            AttachmentSets = new Collection<AttachmentSet>();
+            InvokedDataCollectors = new Collection<InvokedDataCollector>();
         }
 
         /// <summary>
@@ -47,13 +47,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="elapsedTime">Time elapsed in just running tests</param>
         public TestRunCompleteEventArgs(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSets, Collection<InvokedDataCollector> invokedDataCollectors, TimeSpan elapsedTime)
         {
-            this.TestRunStatistics = stats;
-            this.IsCanceled = isCanceled;
-            this.IsAborted = isAborted;
-            this.Error = error;
-            this.AttachmentSets = attachmentSets ?? new Collection<AttachmentSet>(); // Ensuring attachmentSets are not null, so that new attachmentSets can be combined whenever required.
-            this.InvokedDataCollectors = invokedDataCollectors ?? new Collection<InvokedDataCollector>(); // Ensuring that invoked data collectors are not null.
-            this.ElapsedTimeInRunningTests = elapsedTime;
+            TestRunStatistics = stats;
+            IsCanceled = isCanceled;
+            IsAborted = isAborted;
+            Error = error;
+            AttachmentSets = attachmentSets ?? new Collection<AttachmentSet>(); // Ensuring attachmentSets are not null, so that new attachmentSets can be combined whenever required.
+            InvokedDataCollectors = invokedDataCollectors ?? new Collection<InvokedDataCollector>(); // Ensuring that invoked data collectors are not null.
+            ElapsedTimeInRunningTests = elapsedTime;
         }
 
         /// <summary>

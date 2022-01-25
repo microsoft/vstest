@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <summary>
         /// Test run stats
         /// </summary>
-        private Dictionary<TestOutcome, long> runStats;
+        private readonly Dictionary<TestOutcome, long> runStats;
 
         /// <summary>
         /// Total tests which have currently executed
@@ -38,12 +38,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <summary>
         /// Callback used when cache is ready to report some test results/case.
         /// </summary>
-        private OnCacheHit onCacheHit;
+        private readonly OnCacheHit onCacheHit;
 
         /// <summary>
         /// Max size of the test result buffer
         /// </summary>
-        private long cacheSize;
+        private readonly long cacheSize;
 
         /// <summary>
         /// Timeout that triggers sending results regardless of cache size.
@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <summary>
         /// Sync object
         /// </summary>
-        private object syncObject;
+        private readonly object syncObject;
 
         #endregion
 
@@ -98,14 +98,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             this.cacheSize = cacheSize;
             this.onCacheHit = onCacheHit;
-            this.lastUpdate = DateTime.Now;
+            lastUpdate = DateTime.Now;
             this.cacheTimeout = cacheTimeout;
-            this.inProgressTests = new Collection<TestCase>();
-            this.testResults = new Collection<TestResult>();
-            this.runStats = new Dictionary<TestOutcome, long>();
-            this.syncObject = new object();
+            inProgressTests = new Collection<TestCase>();
+            testResults = new Collection<TestResult>();
+            runStats = new Dictionary<TestOutcome, long>();
+            syncObject = new object();
 
-            this.timer = new Timer(this.OnCacheTimeHit, this, cacheTimeout, cacheTimeout);
+            timer = new Timer(OnCacheTimeHit, this, cacheTimeout, cacheTimeout);
         }
 
         #endregion
@@ -128,9 +128,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             get
             {
-                lock (this.syncObject)
+                lock (syncObject)
                 {
-                    return this.testResults;
+                    return testResults;
                 }
             }
         }
@@ -142,9 +142,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             get
             {
-                lock (this.syncObject)
+                lock (syncObject)
                 {
-                    return this.inProgressTests;
+                    return inProgressTests;
                 }
             }
         }
@@ -156,9 +156,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             get
             {
-                lock (this.syncObject)
+                lock (syncObject)
                 {
-                    return this.totalExecutedTests;
+                    return totalExecutedTests;
                 }
             }
         }
@@ -170,10 +170,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             get
             {
-                lock (this.syncObject)
+                lock (syncObject)
                 {
-                    var stats = new TestRunStatistics(new Dictionary<TestOutcome, long>(this.runStats));
-                    stats.ExecutedTests = this.TotalExecutedTests;
+                    var stats = new TestRunStatistics(new Dictionary<TestOutcome, long>(runStats));
+                    stats.ExecutedTests = TotalExecutedTests;
 
                     return stats;
                 }
@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// </summary>
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
 
             // Use SupressFinalize in case a subclass
             // of this valueType implements a finalizer.
@@ -204,11 +204,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testCase"> The test Case. </param>
         public void OnTestStarted(TestCase testCase)
         {
-            lock (this.syncObject)
+            lock (syncObject)
             {
-                this.inProgressTests.Add(testCase);
+                inProgressTests.Add(testCase);
 
-                this.CheckForCacheHit();
+                CheckForCacheHit();
             }
         }
 
@@ -218,14 +218,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testResult"> The test result. </param>
         public void OnNewTestResult(TestResult testResult)
         {
-            lock (this.syncObject)
+            lock (syncObject)
             {
-                this.totalExecutedTests++;
-                this.testResults.Add(testResult);
-                MSTestV1TelemetryHelper.AddTelemetry(testResult, this.AdapterTelemetry);
+                totalExecutedTests++;
+                testResults.Add(testResult);
+                MSTestV1TelemetryHelper.AddTelemetry(testResult, AdapterTelemetry);
 
-                long count;
-                if (this.runStats.TryGetValue(testResult.Outcome, out count))
+                if (runStats.TryGetValue(testResult.Outcome, out long count))
                 {
                     count++;
                 }
@@ -234,11 +233,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     count = 1;
                 }
 
-                this.runStats[testResult.Outcome] = count;
+                runStats[testResult.Outcome] = count;
 
-                this.RemoveInProgress(testResult);
+                RemoveInProgress(testResult);
 
-                this.CheckForCacheHit();
+                CheckForCacheHit();
             }
         }
 
@@ -251,7 +250,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <returns> True if this test has been removed from the list of in progress tests. </returns>
         public bool OnTestCompletion(TestCase completedTest)
         {
-            lock (this.syncObject)
+            lock (syncObject)
             {
                 if (completedTest == null)
                 {
@@ -259,23 +258,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     return false;
                 }
 
-                if (this.inProgressTests == null || this.inProgressTests.Count == 0)
+                if (inProgressTests == null || inProgressTests.Count == 0)
                 {
                     EqtTrace.Warning("TestRunCache: InProgressTests is null");
                     return false;
                 }
 
-                var removed = this.inProgressTests.Remove(completedTest);
+                var removed = inProgressTests.Remove(completedTest);
                 if (removed)
                 {
                     return true;
                 }
 
                 // Try finding/removing a matching test corresponding to the completed test
-                var inProgressTest = this.inProgressTests.FirstOrDefault(inProgress => inProgress.Id == completedTest.Id);
+                var inProgressTest = inProgressTests.FirstOrDefault(inProgress => inProgress.Id == completedTest.Id);
                 if (inProgressTest != null)
                 {
-                    removed = this.inProgressTests.Remove(inProgressTest);
+                    removed = inProgressTests.Remove(inProgressTest);
                 }
 
                 return removed;
@@ -288,11 +287,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <returns> The set of test results remaining in the cache. </returns>
         public ICollection<TestResult> GetLastChunk()
         {
-            lock (this.syncObject)
+            lock (syncObject)
             {
-                var lastChunk = this.testResults;
+                var lastChunk = testResults;
 
-                this.testResults = new Collection<TestResult>();
+                testResults = new Collection<TestResult>();
 
                 return lastChunk;
             }
@@ -310,16 +309,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             // If you need thread safety, use a lock around these
             // operations, as well as in your methods that use the resource.
-            if (disposing && !this.isDisposed)
+            if (disposing && !isDisposed)
             {
-                if (this.timer != null)
+                if (timer != null)
                 {
-                    this.timer.Dispose();
-                    this.timer = null;
+                    timer.Dispose();
+                    timer = null;
                 }
 
                 // Indicate that the instance has been disposed.
-                this.isDisposed = true;
+                isDisposed = true;
             }
         }
 
@@ -332,28 +331,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// </summary>
         private void CheckForCacheHit()
         {
-            lock (this.syncObject)
+            lock (syncObject)
             {
                 // Send results when the specified cache size has been reached or
                 // after the specified cache timeout has been hit.
-                var timeDelta = DateTime.Now - this.lastUpdate;
+                var timeDelta = DateTime.Now - lastUpdate;
 
-                var inProgressTestsCount = this.inProgressTests.Count;
+                var inProgressTestsCount = inProgressTests.Count;
 
-                if ((this.testResults.Count + inProgressTestsCount) >= this.cacheSize || (timeDelta >= this.cacheTimeout && inProgressTestsCount > 0))
+                if ((testResults.Count + inProgressTestsCount) >= cacheSize || (timeDelta >= cacheTimeout && inProgressTestsCount > 0))
                 {
-                    this.SendResults();
+                    SendResults();
                 }
             }
         }
 
         private void CheckForCacheHitOnTimer()
         {
-            lock (this.syncObject)
+            lock (syncObject)
             {
-                if (this.testResults.Count > 0 || this.inProgressTests.Count > 0)
+                if (testResults.Count > 0 || inProgressTests.Count > 0)
                 {
-                    this.SendResults();
+                    SendResults();
                 }
             }
         }
@@ -361,25 +360,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private void SendResults()
         {
             // Pass on the buffer to the listener and clear the old one
-            this.onCacheHit(this.TestRunStatistics, this.testResults, this.inProgressTests);
-            this.testResults = new Collection<TestResult>();
-            this.inProgressTests = new Collection<TestCase>();
-            this.lastUpdate = DateTime.Now;
+            onCacheHit(TestRunStatistics, testResults, inProgressTests);
+            testResults = new Collection<TestResult>();
+            inProgressTests = new Collection<TestCase>();
+            lastUpdate = DateTime.Now;
 
             // Reset the timer
-            this.timer.Change(this.cacheTimeout, this.cacheTimeout);
+            timer.Change(cacheTimeout, cacheTimeout);
 
             EqtTrace.Verbose("TestRunCache: OnNewTestResult: Notified the onCacheHit callback.");
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void OnCacheTimeHit(object state)
         {
-            lock (this.syncObject)
+            lock (syncObject)
             {
                 try
                 {
-                    this.CheckForCacheHitOnTimer();
+                    CheckForCacheHitOnTimer();
                 }
                 catch (Exception ex)
                 {
@@ -393,7 +391,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private void RemoveInProgress(TestResult result)
         {
-            var removed = this.OnTestCompletion(result.TestCase);
+            var removed = OnTestCompletion(result.TestCase);
             if (!removed)
             {
                 EqtTrace.Warning("TestRunCache: No test found corresponding to testResult '{0}' in inProgress list.", result.DisplayName);

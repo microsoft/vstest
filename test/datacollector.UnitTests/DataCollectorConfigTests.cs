@@ -23,10 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         public void ConstructorShouldThrowExceptionIfTypeIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(
-                () =>
-                    {
-                        new DataCollectorConfig(null);
-                    });
+                () => new DataCollectorConfig(null));
         }
 
         [TestMethod]

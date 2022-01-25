@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+    using TrxLoggerResources = VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
     /// <summary>
     /// Class to uniquely identify test results
@@ -20,10 +20,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     {
         #region Fields
 
-        private Guid runId;
-        private Guid executionId;
-        private Guid parentExecutionId;
-        private Guid testId;
+        private Guid _runId;
+        private Guid _executionId;
+        private Guid _parentExecutionId;
+        private Guid _testId;
 
         #endregion
 
@@ -46,10 +46,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </param>
         public TestResultId(Guid runId, Guid executionId, Guid parentExecutionId, Guid testId)
         {
-            this.runId = runId;
-            this.executionId = executionId;
-            this.parentExecutionId = parentExecutionId;
-            this.testId = testId;
+            this._runId = runId;
+            this._executionId = executionId;
+            this._parentExecutionId = parentExecutionId;
+            this._testId = testId;
         }
 
         #endregion
@@ -61,7 +61,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public Guid ExecutionId
         {
-            get { return this.executionId; }
+            get { return _executionId; }
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public Guid ParentExecutionId
         {
-            get { return this.parentExecutionId; }
+            get { return _parentExecutionId; }
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public Guid TestId
         {
-            get { return this.testId; }
+            get { return _testId; }
         }
 
         #endregion
@@ -95,13 +95,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public override bool Equals(object obj)
         {
-            TestResultId tmpId = obj as TestResultId;
-            if (tmpId == null)
-            {
-                return false;
-            }
-
-            return this.runId.Equals(tmpId.runId) && this.executionId.Equals((object)tmpId.executionId);
+            return obj is TestResultId tmpId && _runId.Equals(tmpId._runId) && _executionId.Equals((object)tmpId._executionId);
         }
 
         /// <summary>
@@ -112,7 +106,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public override int GetHashCode()
         {
-            return this.runId.GetHashCode() ^ this.executionId.GetHashCode();
+            return _runId.GetHashCode() ^ _executionId.GetHashCode();
         }
 
         /// <summary>
@@ -123,7 +117,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public override string ToString()
         {
-            return this.executionId.ToString("B");
+            return _executionId.ToString("B");
         }
         #endregion
 
@@ -140,14 +134,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </param>
         public void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
         {
-            XmlPersistence helper = new XmlPersistence();
+            XmlPersistence helper = new();
 
-            if (this.executionId != Guid.Empty)
-                helper.SaveGuid(element, "@executionId", this.executionId);
-            if (this.parentExecutionId != Guid.Empty)
-                helper.SaveGuid(element, "@parentExecutionId", this.parentExecutionId);
+            if (_executionId != Guid.Empty)
+                helper.SaveGuid(element, "@executionId", _executionId);
+            if (_parentExecutionId != Guid.Empty)
+                helper.SaveGuid(element, "@parentExecutionId", _parentExecutionId);
 
-            helper.SaveGuid(element, "@testId", this.testId);
+            helper.SaveGuid(element, "@testId", _testId);
         }
 
         #endregion
@@ -159,10 +153,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     internal sealed class TestResultErrorInfo : IXmlTestStore
     {
         [StoreXmlSimpleField("Message", "")]
-        private string message;
+        private string _message;
 
         [StoreXmlSimpleField("StackTrace", "")]
-        private string stackTrace;
+        private string _stackTrace;
 
 
         /// <summary>
@@ -170,8 +164,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public string Message
         {
-            get { return this.message; }
-            set { this.message = value; }
+            get { return _message; }
+            set { _message = value; }
         }
 
         /// <summary>
@@ -179,8 +173,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public string StackTrace
         {
-            get { return this.stackTrace; }
-            set { this.stackTrace = value; }
+            get { return _stackTrace; }
+            set { _stackTrace = value; }
         }
 
         #region IXmlTestStore Members
@@ -209,39 +203,27 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     {
         #region Fields
 
-        private TestResultId id;
-        private string resultName;
-        private string computerInfo;
-        private string stdOut;
-        private string stdErr;
-        private string debugTrace;
-        private string resultType;
-        private int dataRowInfo;
-        private TimeSpan duration;
-        private DateTime startTime;
-        private DateTime endTime;
-        private TestType testType;
-        private TestOutcome outcome;
-        private TestRun testRun;
-        private TestResultErrorInfo errorInfo;
-        private TestListCategoryId categoryId;
-        private ArrayList textMessages;
-
-        /// <summary>
-        /// Directory containing the test result files, relative to the root test results directory
-        /// </summary>
-        private string relativeTestResultsDirectory;
-        private readonly TrxFileHelper trxFileHelper;
+        private readonly string _resultName;
+        private string _stdOut;
+        private string _stdErr;
+        private string _debugTrace;
+        private TimeSpan _duration;
+        private readonly TestType _testType;
+        private TestRun _testRun;
+        private TestResultErrorInfo _errorInfo;
+        private readonly TestListCategoryId _categoryId;
+        private ArrayList _textMessages;
+        private readonly TrxFileHelper _trxFileHelper;
 
         /// <summary>
         /// Paths to test result files, relative to the test results folder, sorted in increasing order
         /// </summary>
-        private SortedList<string, object> resultFiles = new SortedList<string, object>(StringComparer.OrdinalIgnoreCase);
+        private readonly SortedList<string, object> _resultFiles = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Information provided by data collectors for the test case
         /// </summary>
-        private List<CollectorDataEntry> collectorDataEntries = new List<CollectorDataEntry>();
+        private readonly List<CollectorDataEntry> _collectorDataEntries = new();
 
         #endregion
 
@@ -278,16 +260,16 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             Debug.Assert(!Guid.Empty.Equals(executionId), "ExecutionId is empty");
             Debug.Assert(!Guid.Empty.Equals(testId), "TestId is empty");
 
-            this.Initialize();
+            Initialize();
 
-            this.id = new TestResultId(runId, executionId, parentExecutionId, testId);
-            this.resultName = resultName;
-            this.testType = testType;
-            this.computerInfo = computerName;
-            this.outcome = outcome;
-            this.categoryId = testCategoryId;
-            this.relativeTestResultsDirectory = TestRunDirectories.GetRelativeTestResultsDirectory(executionId);
-            this.trxFileHelper = trxFileHelper;
+            Id = new TestResultId(runId, executionId, parentExecutionId, testId);
+            this._resultName = resultName;
+            this._testType = testType;
+            ComputerName = computerName;
+            Outcome = outcome;
+            _categoryId = testCategoryId;
+            RelativeTestResultsDirectory = TestRunDirectories.GetRelativeTestResultsDirectory(executionId);
+            this._trxFileHelper = trxFileHelper;
         }
 
         #endregion
@@ -297,27 +279,19 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <summary>
         /// Gets or sets the end time.
         /// </summary>
-        public DateTime EndTime
-        {
-            get { return this.endTime; }
-            set { this.endTime = value; }
-        }
+        public DateTime EndTime { get; set; }
 
         /// <summary>
         /// Gets or sets the start time.
         /// </summary>
-        public DateTime StartTime
-        {
-            get { return this.startTime; }
-            set { this.startTime = value; }
-        }
+        public DateTime StartTime { get; set; }
 
         /// <summary>
         /// Gets or sets the duration.
         /// </summary>
         public TimeSpan Duration
         {
-            get { return this.duration; }
+            get { return _duration; }
 
             set
             {
@@ -326,49 +300,38 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 // (seems to happen most on virtual machines or machines with AMD processors).  To prevent
                 // reporting a negative duration, use TimeSpan.Zero when the elapsed time is less than zero.
                 EqtTrace.WarningIf(value < TimeSpan.Zero, "TestResult.Duration: The duration is being set to {0}.  Since the duration is negative the duration will be updated to zero.", value);
-                this.duration = value > TimeSpan.Zero ? value : TimeSpan.Zero;
+                _duration = value > TimeSpan.Zero ? value : TimeSpan.Zero;
             }
         }
 
         /// <summary>
         /// Gets the computer name.
         /// </summary>
-        public string ComputerName
-        {
-            get { return this.computerInfo; }
-        }
+        public string ComputerName { get; private set; }
 
         /// <summary>
         /// Gets or sets the outcome.
         /// </summary>
-        public TestOutcome Outcome
-        {
-            get { return this.outcome; }
-            set { this.outcome = value; }
-        }
+        public TestOutcome Outcome { get; set; }
 
 
         /// <summary>
         /// Gets or sets the id.
         /// </summary>
-        public TestResultId Id
-        {
-            get { return this.id; }
-            internal set { this.id = value; }
-        }
+        public TestResultId Id { get; internal set; }
 
         /// <summary>
         /// Gets or sets the error message.
         /// </summary>
         public string ErrorMessage
         {
-            get { return this.errorInfo?.Message ?? string.Empty; }
+            get { return _errorInfo?.Message ?? string.Empty; }
             set
             {
-                if (this.errorInfo == null)
-                    this.errorInfo = new TestResultErrorInfo();
+                if (_errorInfo == null)
+                    _errorInfo = new TestResultErrorInfo();
 
-                this.errorInfo.Message = value;
+                _errorInfo.Message = value;
             }
         }
 
@@ -377,14 +340,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public string ErrorStackTrace
         {
-            get { return this.errorInfo?.StackTrace ?? string.Empty; }
+            get { return _errorInfo?.StackTrace ?? string.Empty; }
 
             set
             {
-                if (this.errorInfo == null)
-                    this.errorInfo = new TestResultErrorInfo();
+                if (_errorInfo == null)
+                    _errorInfo = new TestResultErrorInfo();
 
-                this.errorInfo.StackTrace = value;
+                _errorInfo.StackTrace = value;
             }
         }
 
@@ -397,14 +360,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </remarks>
         public string[] TextMessages
         {
-            get { return (string[])this.textMessages.ToArray(typeof(string)); }
+            get { return (string[])_textMessages.ToArray(typeof(string)); }
 
             set
             {
                 if (value != null)
-                    this.textMessages = new ArrayList(value);
+                    _textMessages = new ArrayList(value);
                 else
-                    this.textMessages.Clear();
+                    _textMessages.Clear();
             }
         }
 
@@ -413,8 +376,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public string StdOut
         {
-            get { return this.stdOut ?? string.Empty; }
-            set { this.stdOut = value; }
+            get { return _stdOut ?? string.Empty; }
+            set { _stdOut = value; }
         }
 
         /// <summary>
@@ -422,8 +385,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public string StdErr
         {
-            get { return this.stdErr ?? string.Empty; }
-            set { this.stdErr = value; }
+            get { return _stdErr ?? string.Empty; }
+            set { _stdErr = value; }
         }
 
         /// <summary>
@@ -431,8 +394,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public string DebugTrace
         {
-            get { return this.debugTrace ?? string.Empty; }
-            set { this.debugTrace = value; }
+            get { return _debugTrace ?? string.Empty; }
+            set { _debugTrace = value; }
         }
 
         /// <summary>
@@ -442,61 +405,49 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             get
             {
-                if (this.testRun == null)
+                if (_testRun == null)
                 {
                     Debug.Fail("'m_testRun' is null");
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunInResult));
                 }
 
-                return this.testRun.GetResultFilesDirectory(this);
+                return _testRun.GetResultFilesDirectory(this);
             }
         }
 
         /// <summary>
         /// Gets the directory containing the test result files, relative to the root results directory
         /// </summary>
-        public string RelativeTestResultsDirectory
-        {
-            get { return this.relativeTestResultsDirectory; }
-        }
+        public string RelativeTestResultsDirectory { get; private set; }
 
         /// <summary>
         /// Gets or sets the data row info.
         /// </summary>
-        public int DataRowInfo
-        {
-            get { return this.dataRowInfo; }
-            set { this.dataRowInfo = value; }
-        }
+        public int DataRowInfo { get; set; }
 
         /// <summary>
         /// Gets or sets the result type.
         /// </summary>
-        public string ResultType
-        {
-            get { return this.resultType; }
-            set { this.resultType = value; }
-        }
+        public string ResultType { get; set; }
 
         #endregion
 
         #region Overrides
         public override bool Equals(object obj)
         {
-            TestResult trm = obj as TestResult;
-            if (trm == null)
+            if (obj is not TestResult trm)
             {
                 return false;
             }
-            Debug.Assert(this.id != null, "id is null");
-            Debug.Assert(trm.id != null, "test result message id is null");
-            return this.id.Equals(trm.id);
+            Debug.Assert(Id != null, "id is null");
+            Debug.Assert(trm.Id != null, "test result message id is null");
+            return Id.Equals(trm.Id);
         }
 
         public override int GetHashCode()
         {
-            Debug.Assert(this.id != null, "id is null");
-            return this.id.GetHashCode();
+            Debug.Assert(Id != null, "id is null");
+            return Id.GetHashCode();
         }
 
         #endregion
@@ -508,7 +459,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         public void AddTextMessage(string text)
         {
             EqtAssert.ParameterNotNull(text, nameof(text));
-            this.textMessages.Add(text);
+            _textMessages.Add(text);
         }
 
         /// <summary>
@@ -518,42 +469,42 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         internal virtual void SetTestRun(TestRun testRun)
         {
             Debug.Assert(testRun != null, "'testRun' is null");
-            this.testRun = testRun;
+            this._testRun = testRun;
         }
 
         /// <summary>
-        /// Adds result files to the <see cref="resultFiles"/> collection
+        /// Adds result files to the <see cref="_resultFiles"/> collection
         /// </summary>
         /// <param name="resultFileList">Paths to the result files</param>
         internal void AddResultFiles(IEnumerable<string> resultFileList)
         {
             Debug.Assert(resultFileList != null, "'resultFileList' is null");
 
-            string testResultsDirectory = this.TestResultsDirectory;
+            string testResultsDirectory = TestResultsDirectory;
             foreach (string resultFile in resultFileList)
             {
                 Debug.Assert(!string.IsNullOrEmpty(resultFile), "'resultFile' is null or empty");
                 Debug.Assert(resultFile.Trim() == resultFile, "'resultFile' has whitespace at the ends");
 
-                this.resultFiles[trxFileHelper.MakePathRelative(resultFile, testResultsDirectory)] = null;
+                _resultFiles[_trxFileHelper.MakePathRelative(resultFile, testResultsDirectory)] = null;
             }
         }
 
         /// <summary>
-        /// Adds collector data entries to the <see cref="collectorDataEntries"/> collection
+        /// Adds collector data entries to the <see cref="_collectorDataEntries"/> collection
         /// </summary>
         /// <param name="collectorDataEntryList">The collector data entry to add</param>
         internal void AddCollectorDataEntries(IEnumerable<CollectorDataEntry> collectorDataEntryList)
         {
             Debug.Assert(collectorDataEntryList != null, "'collectorDataEntryList' is null");
 
-            string testResultsDirectory = this.TestResultsDirectory;
+            string testResultsDirectory = TestResultsDirectory;
             foreach (CollectorDataEntry collectorDataEntry in collectorDataEntryList)
             {
                 Debug.Assert(collectorDataEntry != null, "'collectorDataEntry' is null");
-                Debug.Assert(!this.collectorDataEntries.Contains(collectorDataEntry), "The collector data entry already exists in the collection");
+                Debug.Assert(!_collectorDataEntries.Contains(collectorDataEntry), "The collector data entry already exists in the collection");
 
-                this.collectorDataEntries.Add(collectorDataEntry.Clone(testResultsDirectory, false));
+                _collectorDataEntries.Add(collectorDataEntry.Clone(testResultsDirectory, false));
             }
         }
 
@@ -571,46 +522,46 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </param>
         public virtual void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
         {
-            XmlPersistence helper = new XmlPersistence();
+            XmlPersistence helper = new();
 
-            helper.SaveObject(this.id, element, ".", parameters);
-            helper.SaveSimpleField(element, "@testName", this.resultName, string.Empty);
-            helper.SaveSimpleField(element, "@computerName", this.computerInfo, string.Empty);
-            helper.SaveSimpleField(element, "@duration", this.duration, default(TimeSpan));
-            helper.SaveSimpleField(element, "@startTime", this.startTime, default(DateTime));
-            helper.SaveSimpleField(element, "@endTime", this.endTime, default(DateTime));
-            helper.SaveGuid(element, "@testType", this.testType.Id);
+            helper.SaveObject(Id, element, ".", parameters);
+            helper.SaveSimpleField(element, "@testName", _resultName, string.Empty);
+            helper.SaveSimpleField(element, "@computerName", ComputerName, string.Empty);
+            helper.SaveSimpleField(element, "@duration", _duration, default(TimeSpan));
+            helper.SaveSimpleField(element, "@startTime", StartTime, default(DateTime));
+            helper.SaveSimpleField(element, "@endTime", EndTime, default(DateTime));
+            helper.SaveGuid(element, "@testType", _testType.Id);
 
-            if (this.stdOut != null)
-                this.stdOut = this.stdOut.Trim();
+            if (_stdOut != null)
+                _stdOut = _stdOut.Trim();
 
-            if (this.stdErr != null)
-                this.stdErr = this.stdErr.Trim();
+            if (_stdErr != null)
+                _stdErr = _stdErr.Trim();
 
-            helper.SaveSimpleField(element, "@outcome", this.outcome, default(TestOutcome));
-            helper.SaveSimpleField(element, "Output/StdOut", this.stdOut, string.Empty);
-            helper.SaveSimpleField(element, "Output/StdErr", this.stdErr, string.Empty);
-            helper.SaveSimpleField(element, "Output/DebugTrace", this.debugTrace, string.Empty);
-            helper.SaveObject(this.errorInfo, element, "Output/ErrorInfo", parameters);
-            helper.SaveGuid(element, "@testListId", this.categoryId.Id);
-            helper.SaveIEnumerable(this.textMessages, element, "Output/TextMessages", ".", "Message", parameters);
-            helper.SaveSimpleField(element, "@relativeResultsDirectory", this.relativeTestResultsDirectory, null);
-            helper.SaveIEnumerable(this.resultFiles.Keys, element, "ResultFiles", "@path", "ResultFile", parameters);
-            helper.SaveIEnumerable(this.collectorDataEntries, element, "CollectorDataEntries", ".", "Collector", parameters);
+            helper.SaveSimpleField(element, "@outcome", Outcome, default(TestOutcome));
+            helper.SaveSimpleField(element, "Output/StdOut", _stdOut, string.Empty);
+            helper.SaveSimpleField(element, "Output/StdErr", _stdErr, string.Empty);
+            helper.SaveSimpleField(element, "Output/DebugTrace", _debugTrace, string.Empty);
+            helper.SaveObject(_errorInfo, element, "Output/ErrorInfo", parameters);
+            helper.SaveGuid(element, "@testListId", _categoryId.Id);
+            helper.SaveIEnumerable(_textMessages, element, "Output/TextMessages", ".", "Message", parameters);
+            helper.SaveSimpleField(element, "@relativeResultsDirectory", RelativeTestResultsDirectory, null);
+            helper.SaveIEnumerable(_resultFiles.Keys, element, "ResultFiles", "@path", "ResultFile", parameters);
+            helper.SaveIEnumerable(_collectorDataEntries, element, "CollectorDataEntries", ".", "Collector", parameters);
 
-            if (this.dataRowInfo >= 0)
-                helper.SaveSimpleField(element, "@dataRowInfo", this.dataRowInfo, -1);
+            if (DataRowInfo >= 0)
+                helper.SaveSimpleField(element, "@dataRowInfo", DataRowInfo, -1);
 
-            if (!string.IsNullOrEmpty(this.resultType))
-                helper.SaveSimpleField(element, "@resultType", this.resultType, string.Empty);
+            if (!string.IsNullOrEmpty(ResultType))
+                helper.SaveSimpleField(element, "@resultType", ResultType, string.Empty);
         }
 
         #endregion
 
         private void Initialize()
         {
-            this.textMessages = new ArrayList();
-            this.dataRowInfo = -1;
+            _textMessages = new ArrayList();
+            DataRowInfo = -1;
         }
     }
 }

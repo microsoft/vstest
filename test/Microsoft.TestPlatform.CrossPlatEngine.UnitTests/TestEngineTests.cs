@@ -27,35 +27,35 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     public class TestEngineTests
     {
         private ITestEngine testEngine;
-        private Mock<IProcessHelper> mockProcessHelper;
-        private ProtocolConfig protocolConfig = new ProtocolConfig { Version = 1 };
+        private readonly Mock<IProcessHelper> mockProcessHelper;
+        private readonly ProtocolConfig protocolConfig = new() { Version = 1 };
         private ITestRuntimeProvider testableTestRuntimeProvider;
-        private Mock<IRequestData> mockRequestData;
-        private Mock<IMetricsCollection> mockMetricsCollection;
+        private readonly Mock<IRequestData> mockRequestData;
+        private readonly Mock<IMetricsCollection> mockMetricsCollection;
 
         public TestEngineTests()
         {
             TestPluginCacheHelper.SetupMockExtensions(new[] { typeof(TestEngineTests).GetTypeInfo().Assembly.Location }, () => { });
-            this.mockProcessHelper = new Mock<IProcessHelper>();
-            this.testableTestRuntimeProvider = new TestableRuntimeProvider(true);
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockMetricsCollection = new Mock<IMetricsCollection>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
-            this.mockRequestData.Setup(rd => rd.ProtocolConfig).Returns(this.protocolConfig);
+            mockProcessHelper = new Mock<IProcessHelper>();
+            testableTestRuntimeProvider = new TestableRuntimeProvider(true);
+            mockRequestData = new Mock<IRequestData>();
+            mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+            mockRequestData.Setup(rd => rd.ProtocolConfig).Returns(protocolConfig);
         }
 
         [TestInitialize]
         public void Init()
         {
-            this.mockProcessHelper.Setup(o => o.GetCurrentProcessFileName()).Returns("vstest.console");
-            this.testEngine = new TestableTestEngine(this.mockProcessHelper.Object);
+            mockProcessHelper.Setup(o => o.GetCurrentProcessFileName()).Returns("vstest.console");
+            testEngine = new TestableTestEngine(mockProcessHelper.Object);
         }
 
         [TestMethod]
         public void GetDiscoveryManagerShouldReturnANonNullInstance()
         {
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, null);
-            Assert.IsNotNull(this.testEngine.GetDiscoveryManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, discoveryCriteria));
+            Assert.IsNotNull(testEngine.GetDiscoveryManager(mockRequestData.Object, testableTestRuntimeProvider, discoveryCriteria));
         }
 
         [TestMethod]
@@ -68,10 +68,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                     </RunConfiguration >
                  </RunSettings>";
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
-            var discoveryManager = this.testEngine.GetDiscoveryManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, discoveryCriteria);
+            var discoveryManager = testEngine.GetDiscoveryManager(mockRequestData.Object, testableTestRuntimeProvider, discoveryCriteria);
 
-            Assert.AreNotSame(discoveryManager, this.testEngine.GetDiscoveryManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, discoveryCriteria));
-            Assert.IsInstanceOfType(this.testEngine.GetDiscoveryManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, discoveryCriteria), typeof(ProxyDiscoveryManager));
+            Assert.AreNotSame(discoveryManager, testEngine.GetDiscoveryManager(mockRequestData.Object, testableTestRuntimeProvider, discoveryCriteria));
+            Assert.IsInstanceOfType(testEngine.GetDiscoveryManager(mockRequestData.Object, testableTestRuntimeProvider, discoveryCriteria), typeof(ProxyDiscoveryManager));
         }
 
         [TestMethod]
@@ -84,19 +84,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                     </RunConfiguration >
                  </RunSettings>";
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
-            this.testableTestRuntimeProvider = new TestableRuntimeProvider(false);
+            testableTestRuntimeProvider = new TestableRuntimeProvider(false);
 
-            Assert.IsNotNull(this.testEngine.GetDiscoveryManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, discoveryCriteria));
-            Assert.IsInstanceOfType(this.testEngine.GetDiscoveryManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, discoveryCriteria), typeof(ParallelProxyDiscoveryManager));
+            Assert.IsNotNull(testEngine.GetDiscoveryManager(mockRequestData.Object, testableTestRuntimeProvider, discoveryCriteria));
+            Assert.IsInstanceOfType(testEngine.GetDiscoveryManager(mockRequestData.Object, testableTestRuntimeProvider, discoveryCriteria), typeof(ParallelProxyDiscoveryManager));
         }
 
         [TestMethod]
         public void GetDiscoveryManagerShouldNotReturnsInProcessProxyDiscoveryManagerIfCurrentProcessIsDotnet()
         {
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, null);
-            this.mockProcessHelper.Setup(o => o.GetCurrentProcessFileName()).Returns("dotnet.exe");
+            mockProcessHelper.Setup(o => o.GetCurrentProcessFileName()).Returns("dotnet.exe");
 
-            var discoveryManager = this.testEngine.GetDiscoveryManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, discoveryCriteria);
+            var discoveryManager = testEngine.GetDiscoveryManager(mockRequestData.Object, testableTestRuntimeProvider, discoveryCriteria);
             Assert.IsNotNull(discoveryManager);
             Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
         }
@@ -116,7 +116,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
 
-            var discoveryManager = this.testEngine.GetDiscoveryManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, discoveryCriteria);
+            var discoveryManager = testEngine.GetDiscoveryManager(mockRequestData.Object, testableTestRuntimeProvider, discoveryCriteria);
             Assert.IsNotNull(discoveryManager);
             Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
         }
@@ -136,7 +136,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
 
-            var discoveryManager = this.testEngine.GetDiscoveryManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, discoveryCriteria);
+            var discoveryManager = testEngine.GetDiscoveryManager(mockRequestData.Object, testableTestRuntimeProvider, discoveryCriteria);
             Assert.IsNotNull(discoveryManager);
             Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
         }
@@ -156,7 +156,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
 
-            var discoveryManager = this.testEngine.GetDiscoveryManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, discoveryCriteria);
+            var discoveryManager = testEngine.GetDiscoveryManager(mockRequestData.Object, testableTestRuntimeProvider, discoveryCriteria);
             Assert.IsNotNull(discoveryManager);
             Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
         }
@@ -176,7 +176,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
 
-            var discoveryManager = this.testEngine.GetDiscoveryManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, discoveryCriteria);
+            var discoveryManager = testEngine.GetDiscoveryManager(mockRequestData.Object, testableTestRuntimeProvider, discoveryCriteria);
             Assert.IsNotNull(discoveryManager);
             Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
         }
@@ -196,7 +196,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
 
-            var discoveryManager = this.testEngine.GetDiscoveryManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, discoveryCriteria);
+            var discoveryManager = testEngine.GetDiscoveryManager(mockRequestData.Object, testableTestRuntimeProvider, discoveryCriteria);
             Assert.IsNotNull(discoveryManager);
             Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
         }
@@ -219,7 +219,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
 
-            var discoveryManager = this.testEngine.GetDiscoveryManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, discoveryCriteria);
+            var discoveryManager = testEngine.GetDiscoveryManager(mockRequestData.Object, testableTestRuntimeProvider, discoveryCriteria);
             Assert.IsNotNull(discoveryManager);
             Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
         }
@@ -239,7 +239,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
 
-            var discoveryManager = this.testEngine.GetDiscoveryManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, discoveryCriteria);
+            var discoveryManager = testEngine.GetDiscoveryManager(mockRequestData.Object, testableTestRuntimeProvider, discoveryCriteria);
             Assert.IsNotNull(discoveryManager);
             Assert.IsInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
         }
@@ -249,16 +249,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         {
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100);
 
-            Assert.IsNotNull(this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria));
+            Assert.IsNotNull(testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria));
         }
 
         [TestMethod]
         public void GetExecutionManagerShouldReturnNewInstance()
         {
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100);
-            var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
+            var executionManager = testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria);
 
-            Assert.AreNotSame(executionManager, this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria));
+            Assert.AreNotSame(executionManager, testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria));
         }
 
         [TestMethod]
@@ -267,8 +267,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             string settingXml = @"<RunSettings><RunConfiguration><InIsolation>true</InIsolation></RunConfiguration></RunSettings>";
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingXml);
 
-            Assert.IsNotNull(this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria));
-            Assert.IsInstanceOfType(this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria), typeof(ProxyExecutionManager));
+            Assert.IsNotNull(testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria));
+            Assert.IsInstanceOfType(testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria), typeof(ProxyExecutionManager));
         }
 
         [TestMethod]
@@ -283,8 +283,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 </RunSettings>";
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingXml);
 
-            Assert.IsNotNull(this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria));
-            Assert.IsInstanceOfType(this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria), typeof(ProxyExecutionManager));
+            Assert.IsNotNull(testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria));
+            Assert.IsInstanceOfType(testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria), typeof(ProxyExecutionManager));
         }
 
         [TestMethod]
@@ -293,8 +293,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             string settingXml = @"<RunSettings><RunConfiguration><MaxCpuCount>2</MaxCpuCount></RunConfiguration></RunSettings>";
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
 
-            Assert.IsNotNull(this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria));
-            Assert.IsInstanceOfType(this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria), typeof(ParallelProxyExecutionManager));
+            Assert.IsNotNull(testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria));
+            Assert.IsInstanceOfType(testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria), typeof(ParallelProxyExecutionManager));
         }
 
         [TestMethod]
@@ -306,11 +306,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                         <InIsolation>true</InIsolation>
                     </RunConfiguration >
                 </RunSettings>";
-            this.testableTestRuntimeProvider = new TestableRuntimeProvider(false);
+            testableTestRuntimeProvider = new TestableRuntimeProvider(false);
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
 
-            Assert.IsNotNull(this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria));
-            Assert.IsInstanceOfType(this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria), typeof(ParallelProxyExecutionManager));
+            Assert.IsNotNull(testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria));
+            Assert.IsInstanceOfType(testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria), typeof(ParallelProxyExecutionManager));
         }
 
         [TestMethod]
@@ -318,7 +318,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         {
             var settingXml = @"<RunSettings><DataCollectionRunSettings><DataCollectors><DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector></DataCollectors></DataCollectionRunSettings></RunSettings>";
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingXml);
-            var result = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
+            var result = testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria);
 
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(ProxyExecutionManagerWithDataCollection));
@@ -339,7 +339,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
 
-            var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
+            var executionManager = testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria);
 
             Assert.IsNotNull(executionManager);
             Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -360,7 +360,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
 
-            var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
+            var executionManager = testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria);
 
             Assert.IsNotNull(executionManager);
             Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -387,7 +387,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
 
-            var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
+            var executionManager = testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria);
 
             Assert.IsNotNull(executionManager);
             Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -417,7 +417,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
 
-            var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
+            var executionManager = testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria);
 
             Assert.IsNotNull(executionManager);
             Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -441,7 +441,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
 
-            var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
+            var executionManager = testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria);
 
             Assert.IsNotNull(executionManager);
             Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -463,7 +463,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
 
-            var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
+            var executionManager = testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria);
 
             Assert.IsNotNull(executionManager);
             Assert.IsInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -472,7 +472,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetExtensionManagerShouldReturnANonNullInstance()
         {
-            Assert.IsNotNull(this.testEngine.GetExtensionManager());
+            Assert.IsNotNull(testEngine.GetExtensionManager());
         }
 
         [TestMethod]
@@ -490,9 +490,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
 
-            var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
+            var executionManager = testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria);
 
-            this.mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, It.IsAny<object>()), Times.Once);
+            mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, It.IsAny<object>()), Times.Once);
         }
 
         [TestMethod]
@@ -502,7 +502,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
 
-            var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
+            var executionManager = testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria);
 
             Assert.IsTrue((executionManager as ProxyExecutionManagerWithDataCollection).ProxyDataCollectionManager.Sources.Contains("1.dll"));
         }
@@ -515,7 +515,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             var testCaseList = new List<TestCase> { new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll") };
             var testRunCriteria = new TestRunCriteria(testCaseList, 100, false, settingXml);
 
-            var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
+            var executionManager = testEngine.GetExecutionManager(mockRequestData.Object, testableTestRuntimeProvider, testRunCriteria);
 
             Assert.IsTrue((executionManager as ProxyExecutionManagerWithDataCollection).ProxyDataCollectionManager.Sources.Contains("x.dll"));
         }
@@ -526,7 +526,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetLoggerManagerShouldReturnNonNullInstance()
         {
-            Assert.IsNotNull(this.testEngine.GetLoggerManager(mockRequestData.Object));
+            Assert.IsNotNull(testEngine.GetLoggerManager(mockRequestData.Object));
         }
 
         /// <summary>
@@ -535,7 +535,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetLoggerManagerShouldAlwaysReturnNewInstance()
         {
-            Assert.AreNotSame(this.testEngine.GetLoggerManager(mockRequestData.Object), this.testEngine.GetLoggerManager(mockRequestData.Object));
+            Assert.AreNotSame(testEngine.GetLoggerManager(mockRequestData.Object), testEngine.GetLoggerManager(mockRequestData.Object));
         }
 
         [TestMethod]
@@ -548,8 +548,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 RunSettings = settingXml
             };
 
-            Assert.IsNotNull(this.testEngine.GetTestSessionManager(
-                this.mockRequestData.Object,
+            Assert.IsNotNull(testEngine.GetTestSessionManager(
+                mockRequestData.Object,
                 testSessionCriteria));
         }
 
@@ -563,13 +563,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 RunSettings = settingXml
             };
 
-            var testSessionManager1 = this.testEngine.GetTestSessionManager(
-                this.mockRequestData.Object,
+            var testSessionManager1 = testEngine.GetTestSessionManager(
+                mockRequestData.Object,
                 testSessionCriteria);
 
             Assert.AreNotSame(
-                this.testEngine.GetTestSessionManager(
-                    this.mockRequestData.Object,
+                testEngine.GetTestSessionManager(
+                    mockRequestData.Object,
                     testSessionCriteria),
                 testSessionManager1);
         }
@@ -584,8 +584,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 RunSettings = settingXml
             };
 
-            var testSessionManager = this.testEngine.GetTestSessionManager(
-                this.mockRequestData.Object,
+            var testSessionManager = testEngine.GetTestSessionManager(
+                mockRequestData.Object,
                 testSessionCriteria);
 
             Assert.IsNotNull(testSessionManager);
@@ -608,8 +608,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 RunSettings = settingXml
             };
 
-            var testSessionManager = this.testEngine.GetTestSessionManager(
-                this.mockRequestData.Object,
+            var testSessionManager = testEngine.GetTestSessionManager(
+                mockRequestData.Object,
                 testSessionCriteria);
 
             Assert.IsNotNull(testSessionManager);
@@ -626,8 +626,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 RunSettings = settingXml
             };
 
-            var testSessionManager = this.testEngine.GetTestSessionManager(
-                this.mockRequestData.Object,
+            var testSessionManager = testEngine.GetTestSessionManager(
+                mockRequestData.Object,
                 testSessionCriteria);
 
             Assert.IsNotNull(testSessionManager);
@@ -649,8 +649,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 RunSettings = settingXml
             };
 
-            var testSessionManager = this.testEngine.GetTestSessionManager(
-                this.mockRequestData.Object,
+            var testSessionManager = testEngine.GetTestSessionManager(
+                mockRequestData.Object,
                 testSessionCriteria);
 
             Assert.IsNotNull(testSessionManager);
@@ -675,8 +675,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 RunSettings = settingXml
             };
 
-            var testSessionManager = this.testEngine.GetTestSessionManager(
-                this.mockRequestData.Object,
+            var testSessionManager = testEngine.GetTestSessionManager(
+                mockRequestData.Object,
                 testSessionCriteria);
 
             Assert.IsNotNull(testSessionManager);
@@ -698,8 +698,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 RunSettings = settingXml
             };
 
-            Assert.IsNull(this.testEngine.GetTestSessionManager(
-                this.mockRequestData.Object,
+            Assert.IsNull(testEngine.GetTestSessionManager(
+                mockRequestData.Object,
                 testSessionCriteria));
         }
 
@@ -711,10 +711,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 Sources = new List<string> { "1.dll" },
                 RunSettings = null
             };
-            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("dotnet.exe");
+            mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("dotnet.exe");
 
-            var testSessionManager = this.testEngine.GetTestSessionManager(
-                this.mockRequestData.Object,
+            var testSessionManager = testEngine.GetTestSessionManager(
+                mockRequestData.Object,
                 testSessionCriteria);
 
             Assert.IsNotNull(testSessionManager);
@@ -739,8 +739,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 RunSettings = settingXml
             };
 
-            var testSessionManager = this.testEngine.GetTestSessionManager(
-                this.mockRequestData.Object,
+            var testSessionManager = testEngine.GetTestSessionManager(
+                mockRequestData.Object,
                 testSessionCriteria);
 
             Assert.IsNotNull(testSessionManager);
@@ -765,8 +765,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 RunSettings = settingXml
             };
 
-            var testSessionManager = this.testEngine.GetTestSessionManager(
-                this.mockRequestData.Object,
+            var testSessionManager = testEngine.GetTestSessionManager(
+                mockRequestData.Object,
                 testSessionCriteria);
 
             Assert.IsNotNull(testSessionManager);
@@ -791,8 +791,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 RunSettings = settingXml
             };
 
-            var testSessionManager = this.testEngine.GetTestSessionManager(
-                this.mockRequestData.Object,
+            var testSessionManager = testEngine.GetTestSessionManager(
+                mockRequestData.Object,
                 testSessionCriteria);
 
             Assert.IsNotNull(testSessionManager);
@@ -817,8 +817,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 RunSettings = settingXml
             };
 
-            var testSessionManager = this.testEngine.GetTestSessionManager(
-                this.mockRequestData.Object,
+            var testSessionManager = testEngine.GetTestSessionManager(
+                mockRequestData.Object,
                 testSessionCriteria);
 
             Assert.IsNotNull(testSessionManager);
@@ -843,8 +843,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 RunSettings = settingXml
             };
 
-            var testSessionManager = this.testEngine.GetTestSessionManager(
-                this.mockRequestData.Object,
+            var testSessionManager = testEngine.GetTestSessionManager(
+                mockRequestData.Object,
                 testSessionCriteria);
 
             Assert.IsNotNull(testSessionManager);
@@ -872,8 +872,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 RunSettings = settingXml
             };
 
-            var testSessionManager = this.testEngine.GetTestSessionManager(
-                this.mockRequestData.Object,
+            var testSessionManager = testEngine.GetTestSessionManager(
+                mockRequestData.Object,
                 testSessionCriteria);
 
             Assert.IsNotNull(testSessionManager);

@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     ///  An argument processor that allows the user to specify the target platform architecture
@@ -41,12 +41,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.metadata == null)
+                if (metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new FrameworkArgumentProcessorCapabilities());
+                    metadata = new Lazy<IArgumentProcessorCapabilities>(() => new FrameworkArgumentProcessorCapabilities());
                 }
 
-                return this.metadata;
+                return metadata;
             }
         }
 
@@ -57,17 +57,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             get
             {
-                if (this.executor == null)
+                if (executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new FrameworkArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
+                    executor = new Lazy<IArgumentExecutor>(() => new FrameworkArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
                 }
 
-                return this.executor;
+                return executor;
             }
 
             set
             {
-                this.executor = value;
+                executor = value;
             }
         }
     }
@@ -97,9 +97,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Used for getting sources.
         /// </summary>
-        private CommandLineOptions commandLineOptions;
+        private readonly CommandLineOptions commandLineOptions;
 
-        private IRunSettingsProvider runSettingsManager;
+        private readonly IRunSettingsProvider runSettingsManager;
 
         public const string RunSettingsPath = "RunConfiguration.TargetFrameworkVersion";
 
@@ -116,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             Contract.Requires(options != null);
             Contract.Requires(runSettingsManager != null);
-            this.commandLineOptions = options;
+            commandLineOptions = options;
             this.runSettingsManager = runSettingsManager;
         }
 
@@ -136,24 +136,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             var validFramework = Framework.FromString(argument);
-            this.commandLineOptions.TargetFrameworkVersion = validFramework ?? throw new CommandLineException(
+            commandLineOptions.TargetFrameworkVersion = validFramework ?? throw new CommandLineException(
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidFrameworkVersion, argument));
 
-            if (this.commandLineOptions.TargetFrameworkVersion != Framework.DefaultFramework
-                && !string.IsNullOrWhiteSpace(this.commandLineOptions.SettingsFile)
-                && MSTestSettingsUtilities.IsLegacyTestSettingsFile(this.commandLineOptions.SettingsFile))
+            if (commandLineOptions.TargetFrameworkVersion != Framework.DefaultFramework
+                && !string.IsNullOrWhiteSpace(commandLineOptions.SettingsFile)
+                && MSTestSettingsUtilities.IsLegacyTestSettingsFile(commandLineOptions.SettingsFile))
             {
                 // Legacy testsettings file support only default target framework.
                 IOutput output = ConsoleOutput.Instance;
                 output.Warning(
                     false,
                     CommandLineResources.TestSettingsFrameworkMismatch,
-                    this.commandLineOptions.TargetFrameworkVersion.ToString(),
+                    commandLineOptions.TargetFrameworkVersion.ToString(),
                     Framework.DefaultFramework.ToString());
             }
             else
             {
-                this.runSettingsManager.UpdateRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath,
+                runSettingsManager.UpdateRunSettingsNode(RunSettingsPath,
                     validFramework.ToString());
             }
 

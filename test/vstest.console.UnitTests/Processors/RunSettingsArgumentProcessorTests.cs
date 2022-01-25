@@ -20,17 +20,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Moq;
     using System.Text;
 
-    using ExceptionUtilities = Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.ExceptionUtilities;
+    using ExceptionUtilities = ExceptionUtilities;
 
     [TestClass]
     public class RunSettingsArgumentProcessorTests
     {
-        private TestableRunSettingsProvider settingsProvider;
+        private TestableRunSettingsProvider _settingsProvider;
 
         [TestInitialize]
         public void Init()
         {
-            this.settingsProvider = new TestableRunSettingsProvider();
+            _settingsProvider = new TestableRunSettingsProvider();
         }
 
         [TestCleanup]
@@ -122,7 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,
-                this.settingsProvider,
+                _settingsProvider,
                 settingsXml);
 
             // Setup mocks.
@@ -146,7 +146,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,
-                this.settingsProvider,
+                _settingsProvider,
                 settingsXml);
 
             // Setup mocks.
@@ -158,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             executor.Initialize(fileName);
 
             // Assert.
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
             Assert.AreEqual(fileName, CommandLineOptions.Instance.SettingsFile);
         }
 
@@ -171,7 +171,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,
-                this.settingsProvider,
+                _settingsProvider,
                 settingsXml);
 
             // Setup mocks.
@@ -195,7 +195,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,
-                this.settingsProvider,
+                _settingsProvider,
                 settingsXml);
 
             // Setup mocks.
@@ -207,9 +207,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             executor.Initialize(fileName);
 
             // Assert.
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
             RunConfiguration runConfiguration =
-                XmlRunSettingsUtilities.GetRunConfigurationNode(this.settingsProvider.ActiveRunSettings.SettingsXml);
+                XmlRunSettingsUtilities.GetRunConfigurationNode(_settingsProvider.ActiveRunSettings.SettingsXml);
             Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
             Assert.AreEqual(runConfiguration.TargetFramework.ToString(), Framework.DefaultFramework.ToString());
             Assert.AreEqual(runConfiguration.TargetPlatform, Constants.DefaultPlatform);
@@ -225,7 +225,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,
-                this.settingsProvider,
+                _settingsProvider,
                 settingsXml);
 
             // Setup mocks.
@@ -238,7 +238,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
 
             // Assert.
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
 
             var expected = string.Join(Environment.NewLine,
                 $"<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -256,7 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 $"    <DataCollectors />",
                 $"  </DataCollectionRunSettings>",
                 $"</RunSettings>");
-            StringAssert.Contains(this.settingsProvider.ActiveRunSettings.SettingsXml, expected);
+            StringAssert.Contains(_settingsProvider.ActiveRunSettings.SettingsXml, expected);
         }
 
 
@@ -269,7 +269,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,
-                this.settingsProvider,
+                _settingsProvider,
                 settingsXml);
 
             // Setup mocks.
@@ -296,7 +296,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,
-                this.settingsProvider,
+                _settingsProvider,
                 settingsXml);
 
             // Setup mocks.
@@ -322,11 +322,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,
-                this.settingsProvider,
+                _settingsProvider,
                 null);
 
             executor.Initialize(runsettingsFile);
-            Assert.IsTrue(this.settingsProvider.ActiveRunSettings.SettingsXml.Contains(@"C:\新しいフォルダー"));
+            Assert.IsTrue(_settingsProvider.ActiveRunSettings.SettingsXml.Contains(@"C:\新しいフォルダー"));
             File.Delete(runsettingsFile);
         }
 
@@ -340,7 +340,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,
-                this.settingsProvider,
+                _settingsProvider,
                 settingsXml);
 
             // Setup mocks.
@@ -353,7 +353,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             // Assert.
             Assert.IsTrue(CommandLineOptions.Instance.InIsolation);
-            Assert.AreEqual("true", this.settingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
+            Assert.AreEqual("true", _settingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
@@ -366,7 +366,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,
-                this.settingsProvider,
+                _settingsProvider,
                 settingsXml);
 
             // Setup mocks.
@@ -379,7 +379,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             // Assert.
             Assert.IsFalse(CommandLineOptions.Instance.InIsolation);
-            Assert.IsNull(this.settingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
+            Assert.IsNull(_settingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
@@ -392,7 +392,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,
-                this.settingsProvider,
+                _settingsProvider,
                 settingsXml);
 
             // Setup mocks.
@@ -412,7 +412,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
         private class TestableRunSettingsArgumentExecutor : RunSettingsArgumentExecutor
         {
-            private string runSettingsString;
+            private readonly string _runSettingsString;
 
             internal TestableRunSettingsArgumentExecutor(
                 CommandLineOptions commandLineOptions,
@@ -421,17 +421,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 : base(commandLineOptions, runSettingsManager)
 
             {
-                this.runSettingsString = runSettings;
+                _runSettingsString = runSettings;
             }
 
             protected override XmlReader GetReaderForFile(string runSettingsFile)
             {
-                if (this.runSettingsString == null)
+                if (_runSettingsString == null)
                 {
                     return base.GetReaderForFile(runSettingsFile);
                 }
 
-                var reader = new StringReader(this.runSettingsString);
+                var reader = new StringReader(_runSettingsString);
                 var xmlReader = XmlReader.Create(reader, XmlRunSettingsUtilities.ReaderSettings);
 
                 return xmlReader;

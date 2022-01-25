@@ -15,91 +15,70 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     [TestClass]
     public class TestPlatformDataCollectionLoggerTests
     {
-        private TestPlatformDataCollectionLogger logger;
-        private Mock<IMessageSink> messageSink;
-        private DataCollectorConfig dataCollectorConfig;
-        private DataCollectionContext context;
+        private readonly TestPlatformDataCollectionLogger logger;
+        private readonly Mock<IMessageSink> messageSink;
+        private readonly DataCollectorConfig dataCollectorConfig;
+        private readonly DataCollectionContext context;
 
         public TestPlatformDataCollectionLoggerTests()
         {
-            this.messageSink = new Mock<IMessageSink>();
-            this.dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollector));
-            this.logger = new TestPlatformDataCollectionLogger(this.messageSink.Object, this.dataCollectorConfig);
+            messageSink = new Mock<IMessageSink>();
+            dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollector));
+            logger = new TestPlatformDataCollectionLogger(messageSink.Object, dataCollectorConfig);
 
             var guid = Guid.NewGuid();
             var sessionId = new SessionId(guid);
-            this.context = new DataCollectionContext(sessionId);
+            context = new DataCollectionContext(sessionId);
         }
 
         [TestMethod]
         public void LogErrorShouldThrowExceptionIfContextIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.logger.LogError(null, string.Empty);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => logger.LogError(null, string.Empty));
 
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.logger.LogError(null, new Exception());
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => logger.LogError(null, new Exception()));
 
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.logger.LogError(null, string.Empty, new Exception());
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => logger.LogError(null, string.Empty, new Exception()));
         }
 
         [TestMethod]
         public void LogErrorShouldThrowExceptionIfTextIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.logger.LogError(this.context, (string)null);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => logger.LogError(context, (string)null));
 
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.logger.LogError(this.context, null, new Exception());
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => logger.LogError(context, null, new Exception()));
         }
 
         [TestMethod]
         public void LogErrorShouldThrowExceptionIfExceptionIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.logger.LogError(this.context, (Exception)null);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => logger.LogError(context, (Exception)null));
 
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.logger.LogError(this.context, string.Empty, (Exception)null);
-            });
+            Assert.ThrowsException<ArgumentNullException>(() => logger.LogError(context, string.Empty, (Exception)null));
         }
 
         [TestMethod]
         public void LogErrorShouldSendMessageToMessageSink()
         {
             var text = "customtext";
-            this.logger.LogError(this.context, text);
+            logger.LogError(context, text);
 
-            this.messageSink.Verify(x => x.SendMessage(It.IsAny<DataCollectionMessageEventArgs>()), Times.Once());
+            messageSink.Verify(x => x.SendMessage(It.IsAny<DataCollectionMessageEventArgs>()), Times.Once());
 
-            this.logger.LogError(this.context, new Exception(text));
-            this.messageSink.Verify(x => x.SendMessage(It.IsAny<DataCollectionMessageEventArgs>()), Times.Exactly(2));
+            logger.LogError(context, new Exception(text));
+            messageSink.Verify(x => x.SendMessage(It.IsAny<DataCollectionMessageEventArgs>()), Times.Exactly(2));
 
-            this.logger.LogError(this.context, text, new Exception(text));
-            this.messageSink.Verify(x => x.SendMessage(It.IsAny<DataCollectionMessageEventArgs>()), Times.Exactly(3));
+            logger.LogError(context, text, new Exception(text));
+            messageSink.Verify(x => x.SendMessage(It.IsAny<DataCollectionMessageEventArgs>()), Times.Exactly(3));
         }
 
         [TestMethod]
         public void LogWarningShouldSendMessageToMessageSink()
         {
             var text = "customtext";
-            this.logger.LogWarning(this.context, text);
+            logger.LogWarning(context, text);
 
-            this.messageSink.Verify(x => x.SendMessage(It.IsAny<DataCollectionMessageEventArgs>()), Times.Once());
+            messageSink.Verify(x => x.SendMessage(It.IsAny<DataCollectionMessageEventArgs>()), Times.Once());
         }
     }
 }

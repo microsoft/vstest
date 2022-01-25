@@ -18,7 +18,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     /// </summary>
     public class NetCoreTargetFrameworkDataSource : Attribute, ITestDataSource
     {
-        private List<object[]> dataRows = new List<object[]>();
+        private readonly List<object[]> dataRows = new();
         /// <summary>
         /// Initializes a new instance of the <see cref="NetCoreTargetFrameworkDataSource"/> class.
         /// </summary>
@@ -40,12 +40,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 var runnerFramework = IntegrationTestBase.DesktopRunnerFramework;
                 if (useNetCore21Target)
                 {
-                    this.AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core21TargetFramework);
+                    AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core21TargetFramework);
                 }
 
                 if (useNetCore31Target)
                 {
-                    this.AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core31TargetFramework);
+                    AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core31TargetFramework);
                 }
             }
 
@@ -54,12 +54,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 var runnerFramework = IntegrationTestBase.CoreRunnerFramework;
                 if (useNetCore21Target)
                 {
-                    this.AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core21TargetFramework);
+                    AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core21TargetFramework);
                 }
 
                 if (useNetCore31Target)
                 {
-                    this.AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core31TargetFramework);
+                    AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core31TargetFramework);
                 }
             }
         }
@@ -67,12 +67,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         private void AddRunnerDataRow(string runnerFramework, string targetFramework)
         {
             var runnerInfo = new RunnerInfo(runnerFramework, targetFramework);
-            this.dataRows.Add(new object[] { runnerInfo });
+            dataRows.Add(new object[] { runnerInfo });
         }
 
         public IEnumerable<object[]> GetData(MethodInfo methodInfo)
         {
-            return this.dataRows;
+            return dataRows;
         }
 
         public string GetDisplayName(MethodInfo methodInfo, object[] data)

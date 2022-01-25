@@ -20,9 +20,9 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
         public DataCollectionTelemetryManagerTests()
         {
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockMetricsCollection = new Mock<IMetricsCollection>();
-            this.mockRequestData.Setup(m => m.MetricsCollection).Returns(this.mockMetricsCollection.Object);
+            mockRequestData = new Mock<IRequestData>();
+            mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockRequestData.Setup(m => m.MetricsCollection).Returns(mockMetricsCollection.Object);
 
             var dataCollectorMock = new Mock<CodeCoverageDataCollector>();
             var evnVariablesMock = dataCollectorMock.As<ITestExecutionEnvironmentSpecifier>();
@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
                 new KeyValuePair<string, string>("MicrosoftInstrumentationEngine_ConfigPath64_VanguardInstrumentationProfiler", "path2")
             });
 
-            this.dataCollectorInformation = new DataCollectorInformation(
+            dataCollectorInformation = new DataCollectorInformation(
                 dataCollectorMock.Object,
                 null,
                 new DataCollectorConfig(typeof(CustomDataCollector)),
@@ -42,37 +42,37 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
                 new Mock<IMessageSink>().Object,
                 string.Empty);
 
-            this.telemetryManager = new DataCollectionTelemetryManager(this.mockRequestData.Object);
+            telemetryManager = new DataCollectionTelemetryManager(mockRequestData.Object);
         }
 
         [TestMethod]
         public void RecordEnvironmentVariableAddition_ShouldDoNothing_IfNotProfilerVariable()
         {
             // act
-            this.telemetryManager.RecordEnvironmentVariableAddition(this.dataCollectorInformation, "key", "value");
+            telemetryManager.RecordEnvironmentVariableAddition(dataCollectorInformation, "key", "value");
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
+            mockMetricsCollection.Verify(c => c.Add(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
         }
 
         [TestMethod]
         public void RecordEnvironmentVariableConflict_ShouldDoNothing_IfNotProfilerVariable_ValuesSame()
         {
             // act
-            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "key", "value", "value");
+            telemetryManager.RecordEnvironmentVariableConflict(dataCollectorInformation, "key", "value", "value");
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
+            mockMetricsCollection.Verify(c => c.Add(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
         }
 
         [TestMethod]
         public void RecordEnvironmentVariableConflict_ShouldDoNothing_IfNotProfilerVariable_ValuesDifferent()
         {
             // act
-            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "key", "value", "othervalue");
+            telemetryManager.RecordEnvironmentVariableConflict(dataCollectorInformation, "key", "value", "othervalue");
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
+            mockMetricsCollection.Verify(c => c.Add(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
         }
 
         [TestMethod]
@@ -87,10 +87,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         public void RecordEnvironmentVariableAddition_ShouldCollectTelemetry_IfCorProfilerVariable(string profilerGuid, string profilerName)
         {
             // act
-            this.telemetryManager.RecordEnvironmentVariableAddition(this.dataCollectorInformation, "COR_PROFILER", profilerGuid);
+            telemetryManager.RecordEnvironmentVariableAddition(dataCollectorInformation, "COR_PROFILER", profilerGuid);
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CorProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", profilerName), Times.Once);
+            mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CorProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", profilerName), Times.Once);
         }
 
         [TestMethod]
@@ -105,10 +105,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         public void RecordEnvironmentVariableAddition_ShouldCollectTelemetry_IfCoreClrProfilerVariable(string profilerGuid, string profilerName)
         {
             // act
-            this.telemetryManager.RecordEnvironmentVariableAddition(this.dataCollectorInformation, "CORECLR_PROFILER", profilerGuid);
+            telemetryManager.RecordEnvironmentVariableAddition(dataCollectorInformation, "CORECLR_PROFILER", profilerGuid);
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CoreClrProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", profilerName), Times.Once);
+            mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CoreClrProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", profilerName), Times.Once);
         }
 
         [TestMethod]
@@ -123,10 +123,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         public void RecordEnvironmentVariableConflict_ShouldCollectOverwrittenTelemetry_IfCorProfilerVariable(string existingProfilerGuid, string profilerGuid, string expectedOverwrittenProfiler)
         {
             // act
-            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "COR_PROFILER", profilerGuid, existingProfilerGuid);
+            telemetryManager.RecordEnvironmentVariableConflict(dataCollectorInformation, "COR_PROFILER", profilerGuid, existingProfilerGuid);
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CorProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", $"{Guid.Parse(existingProfilerGuid)}(overwritten:{expectedOverwrittenProfiler})"), Times.Once);
+            mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CorProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", $"{Guid.Parse(existingProfilerGuid)}(overwritten:{expectedOverwrittenProfiler})"), Times.Once);
         }
 
         [TestMethod]
@@ -141,10 +141,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         public void RecordEnvironmentVariableConflict_ShouldCollectOverwrittenTelemetry_IfCoreClrProfilerVariable(string existingProfilerGuid, string profilerGuid, string expectedOverwrittenProfiler)
         {
             // act
-            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "CORECLR_PROFILER", profilerGuid, existingProfilerGuid);
+            telemetryManager.RecordEnvironmentVariableConflict(dataCollectorInformation, "CORECLR_PROFILER", profilerGuid, existingProfilerGuid);
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CoreClrProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", $"{Guid.Parse(existingProfilerGuid)}(overwritten:{expectedOverwrittenProfiler})"), Times.Once);
+            mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CoreClrProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", $"{Guid.Parse(existingProfilerGuid)}(overwritten:{expectedOverwrittenProfiler})"), Times.Once);
         }
 
         [TestMethod]
@@ -159,13 +159,13 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         public void RecordEnvironmentVariableConflict_ShouldCollectClrIeTelemetry_IfCorProfilerVariableAndCollectorSpecifiesClrIeProfile(string profilerGuid)
         {
             // arrange
-            this.dataCollectorInformation.SetTestExecutionEnvironmentVariables();
+            dataCollectorInformation.SetTestExecutionEnvironmentVariables();
 
             // act
-            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "COR_PROFILER", profilerGuid, "{324F817A-7420-4E6D-B3C1-143FBED6D855}");
+            telemetryManager.RecordEnvironmentVariableConflict(dataCollectorInformation, "COR_PROFILER", profilerGuid, "{324F817A-7420-4E6D-B3C1-143FBED6D855}");
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CorProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", "324f817a-7420-4e6d-b3c1-143fbed6d855"), Times.Once);
+            mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CorProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", "324f817a-7420-4e6d-b3c1-143fbed6d855"), Times.Once);
         }
 
         [TestMethod]
@@ -180,13 +180,13 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         public void RecordEnvironmentVariableConflict_ShouldCollectClrIeTelemetry_IfCoreClrProfilerVariableAndCollectorSpecifiesClrIeProfile(string profilerGuid)
         {
             // arrange
-            this.dataCollectorInformation.SetTestExecutionEnvironmentVariables();
+            dataCollectorInformation.SetTestExecutionEnvironmentVariables();
 
             // act
-            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "CORECLR_PROFILER", profilerGuid, "{324F817A-7420-4E6D-B3C1-143FBED6D855}");
+            telemetryManager.RecordEnvironmentVariableConflict(dataCollectorInformation, "CORECLR_PROFILER", profilerGuid, "{324F817A-7420-4E6D-B3C1-143FBED6D855}");
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CoreClrProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", "324f817a-7420-4e6d-b3c1-143fbed6d855"), Times.Once);
+            mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CoreClrProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", "324f817a-7420-4e6d-b3c1-143fbed6d855"), Times.Once);
         }
 
         [TestMethod]
@@ -201,10 +201,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         public void RecordEnvironmentVariableConflict_ShouldCollectTelemetry_IfCorProfilerVariableAndBothValuesSame(string profilerGuid, string profilerName)
         {
             // act
-            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "COR_PROFILER", profilerGuid, profilerGuid.ToLower());
+            telemetryManager.RecordEnvironmentVariableConflict(dataCollectorInformation, "COR_PROFILER", profilerGuid, profilerGuid.ToLower());
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CorProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", profilerName), Times.Once);
+            mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CorProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", profilerName), Times.Once);
         }
 
         [TestMethod]
@@ -219,10 +219,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         public void RecordEnvironmentVariableConflict_ShouldCollectTelemetry_IfCoreClrProfilerVariableAndBothValuesSame(string profilerGuid, string profilerName)
         {
             // act
-            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "CORECLR_PROFILER", profilerGuid, profilerGuid.ToUpper());
+            telemetryManager.RecordEnvironmentVariableConflict(dataCollectorInformation, "CORECLR_PROFILER", profilerGuid, profilerGuid.ToUpper());
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CoreClrProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", profilerName), Times.Once);
+            mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CoreClrProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", profilerName), Times.Once);
         }
     }
 }

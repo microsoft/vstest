@@ -24,10 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestExecutor
         /// <param name="arguments">testhost initialization arguments</param>
         public static void Run(string arguments)
         {
-            Task.Run(() =>
-            {
-                Program.Run(SplitArguments(arguments));
-            });
+            Task.Run(() => Program.Run(SplitArguments(arguments)));
         }
 
         /// <summary>

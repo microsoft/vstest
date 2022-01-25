@@ -52,7 +52,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// If no extensions are installed then it returns an empty list.
         /// </summary>
         /// <returns></returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public IEnumerable<string> GetUnitTestExtensions()
         {
             try
@@ -75,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
             // Navigate up to the IDE folder
             // In case of xcopyable vstest.console, this functionality is not supported.
-            var installContext = new InstallationContext(this.fileHelper);
+            var installContext = new InstallationContext(fileHelper);
             if (!installContext.TryGetVisualStudioDirectory(out string vsInstallPath))
             {
                 throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.VSInstallationNotFound));

@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             this.windowsRegistryHelper = windowsRegistryHelper;
             this.environmentVariableHelper = environmentVariableHelper;
             this.processHelper = processHelper;
-            this.muxerName = environment.OperatingSystem == PlatformOperatingSystem.Windows ? "dotnet.exe" : "dotnet";
+            muxerName = environment.OperatingSystem == PlatformOperatingSystem.Windows ? "dotnet.exe" : "dotnet";
         }
 
         /// <inheritdoc />
@@ -97,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
         private bool TryGetExecutablePath(string executableBaseName, out string executablePath)
         {
-            if (this.environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
+            if (environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
             {
                 executableBaseName += ".exe";
             }
@@ -107,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             foreach (string path in pathString.Split(Path.PathSeparator))
             {
                 string exeFullPath = Path.Combine(path.Trim(), executableBaseName);
-                if (this.fileHelper.Exists(exeFullPath))
+                if (fileHelper.Exists(exeFullPath))
                 {
                     executablePath = exeFullPath;
                     return true;
@@ -119,10 +119,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
         public bool TryGetDotnetPathByArchitecture(PlatformArchitecture targetArchitecture, out string muxerPath)
         {
-            if (this.processHelper.GetCurrentProcessArchitecture() == targetArchitecture)
+            if (processHelper.GetCurrentProcessArchitecture() == targetArchitecture)
             {
-                string currentProcessFileName = this.processHelper.GetCurrentProcessFileName();
-                if (Path.GetFileName(currentProcessFileName) != this.muxerName)
+                string currentProcessFileName = processHelper.GetCurrentProcessFileName();
+                if (Path.GetFileName(currentProcessFileName) != muxerName)
                 {
                     EqtTrace.Verbose($"DotnetHostHelper.TryGetDotnetPathByArchitecture: Target architecture is the same as the current process architecture '{targetArchitecture}', but the current process is not a muxer: '{currentProcessFileName}'");
                 }
@@ -148,34 +148,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             string envKey = $"DOTNET_ROOT_{targetArchitecture.ToString().ToUpperInvariant()}";
 
             // Try on arch specific env var
-            string envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
+            string envVar = environmentVariableHelper.GetEnvironmentVariable(envKey);
 
             // Try on non virtualized x86 var(should happen only on non-x86 architecture)
-            if ((envVar == null || !this.fileHelper.DirectoryExists(envVar)) &&
-                targetArchitecture == PlatformArchitecture.X86 && this.environment.OperatingSystem == PlatformOperatingSystem.Windows)
+            if ((envVar == null || !fileHelper.DirectoryExists(envVar)) &&
+                targetArchitecture == PlatformArchitecture.X86 && environment.OperatingSystem == PlatformOperatingSystem.Windows)
             {
                 envKey = $"DOTNET_ROOT(x86)";
-                envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
+                envVar = environmentVariableHelper.GetEnvironmentVariable(envKey);
             }
 
             // Try on default DOTNET_ROOT
-            if (envVar == null || !this.fileHelper.DirectoryExists(envVar))
+            if (envVar == null || !fileHelper.DirectoryExists(envVar))
             {
                 envKey = "DOTNET_ROOT";
-                envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
+                envVar = environmentVariableHelper.GetEnvironmentVariable(envKey);
             }
 
             if (envVar != null)
             {
                 // If directory specified by env vars does not exists, it's like env var doesn't exists as well.
-                if (!this.fileHelper.DirectoryExists(envVar))
+                if (!fileHelper.DirectoryExists(envVar))
                 {
                     EqtTrace.Verbose($"DotnetHostHelper.TryGetDotnetPathByArchitecture: Folder specified by env variable does not exist: '{envVar}={envKey}'");
                 }
                 else
                 {
                     muxerPath = Path.Combine(envVar, muxerName);
-                    if (!this.fileHelper.Exists(muxerPath))
+                    if (!fileHelper.Exists(muxerPath))
                     {
                         // If environment variable was specified, and the directory it points at exists, but it does not contain a muxer, or the muxer is incompatible with the target architecture
                         // we stop the search to be compliant with the approach that apphost (compiled .NET executables) use to find the muxer.
@@ -199,18 +199,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             EqtTrace.Verbose($"DotnetHostHelper.TryGetDotnetPathByArchitecture: Muxer was not found using DOTNET_ROOT* env variables.");
 
             // Try to search for global registration
-            if (isWinOs)
-            {
-                muxerPath = GetMuxerFromGlobalRegistrationWin(targetArchitecture);
-            }
-            else
-            {
-                muxerPath = GetMuxerFromGlobalRegistrationOnUnix(targetArchitecture);
-            }
+            muxerPath = isWinOs ? GetMuxerFromGlobalRegistrationWin(targetArchitecture) : GetMuxerFromGlobalRegistrationOnUnix(targetArchitecture);
 
             if (muxerPath != null)
             {
-                if (!this.fileHelper.Exists(muxerPath))
+                if (!fileHelper.Exists(muxerPath))
                 {
                     // If muxer doesn't exists or it's wrong we stop the search
                     EqtTrace.Verbose($"DotnetHostHelper.TryGetDotnetPathByArchitecture: Muxer file not found for global registration '{muxerPath}'");
@@ -236,37 +229,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             if (isWinOs)
             {
                 // If we're on x64/arm64 SDK and target is x86 we need to search on non virtualized windows folder
-                if ((this.environment.Architecture == PlatformArchitecture.X64 || this.environment.Architecture == PlatformArchitecture.ARM64) &&
+                if ((environment.Architecture == PlatformArchitecture.X64 || environment.Architecture == PlatformArchitecture.ARM64) &&
                      targetArchitecture == PlatformArchitecture.X86)
                 {
-                    muxerPath = Path.Combine(this.environmentVariableHelper.GetEnvironmentVariable("ProgramFiles(x86)"), "dotnet", muxerName);
+                    muxerPath = Path.Combine(environmentVariableHelper.GetEnvironmentVariable("ProgramFiles(x86)"), "dotnet", muxerName);
                 }
                 else
                 {
                     // If we're on ARM and target is x64 we expect correct installation inside x64 folder
-                    if (this.environment.Architecture == PlatformArchitecture.ARM64 && targetArchitecture == PlatformArchitecture.X64)
-                    {
-                        muxerPath = Path.Combine(this.environmentVariableHelper.GetEnvironmentVariable("ProgramFiles"), "dotnet", "x64", muxerName);
-                    }
-                    else
-                    {
-                        muxerPath = Path.Combine(this.environmentVariableHelper.GetEnvironmentVariable("ProgramFiles"), "dotnet", muxerName);
-                    }
+                    muxerPath = environment.Architecture == PlatformArchitecture.ARM64 && targetArchitecture == PlatformArchitecture.X64
+                        ? Path.Combine(environmentVariableHelper.GetEnvironmentVariable("ProgramFiles"), "dotnet", "x64", muxerName)
+                        : Path.Combine(environmentVariableHelper.GetEnvironmentVariable("ProgramFiles"), "dotnet", muxerName);
                 }
             }
             else
             {
-                if (this.environment.OperatingSystem == PlatformOperatingSystem.OSX)
+                if (environment.OperatingSystem == PlatformOperatingSystem.OSX)
                 {
                     // If we're on ARM and target is x64 we expect correct installation inside x64 folder
-                    if (this.environment.Architecture == PlatformArchitecture.ARM64 && targetArchitecture == PlatformArchitecture.X64)
-                    {
-                        muxerPath = Path.Combine("/usr/local/share/dotnet/x64", muxerName);
-                    }
-                    else
-                    {
-                        muxerPath = Path.Combine("/usr/local/share/dotnet", muxerName);
-                    }
+                    muxerPath = environment.Architecture == PlatformArchitecture.ARM64 && targetArchitecture == PlatformArchitecture.X64
+                        ? Path.Combine("/usr/local/share/dotnet/x64", muxerName)
+                        : Path.Combine("/usr/local/share/dotnet", muxerName);
                 }
                 else
                 {
@@ -274,7 +257,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 }
             }
 
-            if (!this.fileHelper.Exists(muxerPath))
+            if (!fileHelper.Exists(muxerPath))
             {
                 // If muxer doesn't exists we stop the search
                 EqtTrace.Verbose($"DotnetHostHelper.TryGetDotnetPathByArchitecture: Muxer was not found in default installation location: '{muxerPath}'");
@@ -312,7 +295,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
                         if (installLocation != null)
                         {
-                            string path = Path.Combine(installLocation.Trim(), this.muxerName);
+                            string path = Path.Combine(installLocation.Trim(), muxerName);
                             EqtTrace.Verbose($@"DotnetHostHelper.GetMuxerFromGlobalRegistrationWin: Muxer resolved using win registry key 'SOFTWARE\dotnet\Setup\InstalledVersions\{targetArchitecture.ToString().ToLowerInvariant()}\InstallLocation' in '{path}'");
                             return path;
                         }
@@ -343,20 +326,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             string installLocation = $"{baseInstallLocation}install_location_{targetArchitecture.ToString().ToLowerInvariant()}";
 
             // We try to load archless install location file
-            if (!this.fileHelper.Exists(installLocation))
+            if (!fileHelper.Exists(installLocation))
             {
                 installLocation = $"{baseInstallLocation}install_location";
             }
 
-            if (this.fileHelper.Exists(installLocation))
+            if (fileHelper.Exists(installLocation))
             {
                 try
                 {
-                    using Stream stream = this.fileHelper.GetStream(installLocation, FileMode.Open, FileAccess.Read);
-                    using StreamReader streamReader = new StreamReader(stream);
+                    using Stream stream = fileHelper.GetStream(installLocation, FileMode.Open, FileAccess.Read);
+                    using StreamReader streamReader = new(stream);
                     string content = streamReader.ReadToEnd().Trim();
                     EqtTrace.Verbose($"DotnetHostHelper: '{installLocation}' content '{content}'");
-                    string path = Path.Combine(content, this.muxerName);
+                    string path = Path.Combine(content, muxerName);
                     EqtTrace.Verbose($"DotnetHostHelper: Muxer resolved using '{installLocation}' in '{path}'");
                     return path;
                 }
@@ -373,8 +356,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         {
             try
             {
-                using Stream stream = this.fileHelper.GetStream(path, FileMode.Open, FileAccess.Read);
-                using PEReader peReader = new PEReader(stream);
+                using Stream stream = fileHelper.GetStream(path, FileMode.Open, FileAccess.Read);
+                using PEReader peReader = new(stream);
                 switch (peReader.PEHeaders.CoffHeader.Machine)
                 {
                     case Machine.Amd64:
@@ -406,7 +389,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             try
             {
                 PlatformArchitecture? architecture;
-                using var headerReader = this.fileHelper.GetStream(path, FileMode.Open, FileAccess.Read);
+                using var headerReader = fileHelper.GetStream(path, FileMode.Open, FileAccess.Read);
                 var magicBytes = new byte[4];
                 var cpuInfoBytes = new byte[4];
                 headerReader.Read(magicBytes, 0, magicBytes.Length);
@@ -457,11 +440,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         private bool IsValidArchitectureMuxer(PlatformArchitecture targetArchitecture, string path)
         {
             PlatformArchitecture? muxerPlatform = null;
-            if (this.environment.OperatingSystem == PlatformOperatingSystem.Windows)
+            if (environment.OperatingSystem == PlatformOperatingSystem.Windows)
             {
                 muxerPlatform =  GetMuxerArchitectureByPEHeaderOnWin(path);
             }
-            else if (this.environment.OperatingSystem == PlatformOperatingSystem.OSX)
+            else if (environment.OperatingSystem == PlatformOperatingSystem.OSX)
             {
                 muxerPlatform = GetMuxerArchitectureByMachoOnMac(path);
             }

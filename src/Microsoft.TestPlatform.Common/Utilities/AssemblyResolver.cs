@@ -19,13 +19,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// <summary>
         /// The directories to look for assemblies to resolve.
         /// </summary>
-        private HashSet<string> searchDirectories;
+        private readonly HashSet<string> searchDirectories;
 
         /// <summary>
         /// Dictionary of Assemblies discovered to date. Must be locked as it may
         /// be accessed in a multi-threaded context.
         /// </summary>
-        private Dictionary<string, Assembly> resolvedAssemblies;
+        private readonly Dictionary<string, Assembly> resolvedAssemblies;
 
         /// <summary>
         /// Specifies whether the resolver is disposed or not
@@ -35,9 +35,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// <summary>
         /// Assembly resolver for platform
         /// </summary>
-        private IAssemblyResolver platformAssemblyResolver;
+        private readonly IAssemblyResolver platformAssemblyResolver;
 
-        private IAssemblyLoadContext platformAssemblyLoadContext;
+        private readonly IAssemblyLoadContext platformAssemblyLoadContext;
 
         private static readonly string[] SupportedFileExtensions = { ".dll", ".exe" };
 
@@ -53,21 +53,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 EqtTrace.Info($"AssemblyResolver.ctor: Creating AssemblyResolver with searchDirectories {string.Join(",", directories)}");
             }
 
-            this.resolvedAssemblies = new Dictionary<string, Assembly>();
+            resolvedAssemblies = new Dictionary<string, Assembly>();
 
-            if (directories == null || !directories.Any())
-            {
-                this.searchDirectories = new HashSet<string>();
-            }
-            else
-            {
-                this.searchDirectories = new HashSet<string>(directories);
-            }
+            searchDirectories = directories == null || !directories.Any() ? new HashSet<string>() : new HashSet<string>(directories);
 
-            this.platformAssemblyResolver = new PlatformAssemblyResolver();
-            this.platformAssemblyLoadContext = new PlatformAssemblyLoadContext();
+            platformAssemblyResolver = new PlatformAssemblyResolver();
+            platformAssemblyLoadContext = new PlatformAssemblyLoadContext();
 
-            this.platformAssemblyResolver.AssemblyResolve += this.OnResolve;
+            platformAssemblyResolver.AssemblyResolve += OnResolve;
         }
 
         /// <summary>
@@ -84,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
             foreach (var directory in directories)
             {
-                this.searchDirectories.Add(directory);
+                searchDirectories.Add(directory);
             }
         }
 
@@ -94,8 +87,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// <returns>
         /// The <see cref="Assembly"/>.
         /// </returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom")]
         private Assembly OnResolve(object sender, AssemblyResolveEventArgs args)
         {
             if (string.IsNullOrEmpty(args?.Name))
@@ -104,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 return null;
             }
 
-            if (this.searchDirectories == null || this.searchDirectories.Count == 0)
+            if (searchDirectories == null || searchDirectories.Count == 0)
             {
                 EqtTrace.Info("AssemblyResolver.OnResolve: {0}: There are no search directories, returning.", args.Name);
                 return null;
@@ -113,9 +104,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Resolving assembly.", args.Name);
 
             // args.Name is like: "Microsoft.VisualStudio.TestTools.Common, Version=[VersionMajor].0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a".
-            lock (this.resolvedAssemblies)
+            lock (resolvedAssemblies)
             {
-                if (this.resolvedAssemblies.TryGetValue(args.Name, out var assembly))
+                if (resolvedAssemblies.TryGetValue(args.Name, out var assembly))
                 {
                     EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Resolved from cache.", args.Name);
                     return assembly;
@@ -134,13 +125,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                         EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to create assemblyName. Reason:{1} ", args.Name, ex);
                     }
 
-                    this.resolvedAssemblies[args.Name] = null;
+                    resolvedAssemblies[args.Name] = null;
                     return null;
                 }
 
                 Debug.Assert(requestedName != null && !string.IsNullOrEmpty(requestedName.Name), "AssemblyResolver.OnResolve: requested is null or name is empty!");
 
-                foreach (var dir in this.searchDirectories)
+                foreach (var dir in searchDirectories)
                 {
                     if (string.IsNullOrEmpty(dir))
                     {
@@ -161,9 +152,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                                 continue;
                             }
 
-                            AssemblyName foundName = this.platformAssemblyLoadContext.GetAssemblyNameFromPath(assemblyPath);
+                            AssemblyName foundName = platformAssemblyLoadContext.GetAssemblyNameFromPath(assemblyPath);
 
-                            if (!this.RequestedAssemblyNameMatchesFound(requestedName, foundName))
+                            if (!RequestedAssemblyNameMatchesFound(requestedName, foundName))
                             {
                                 EqtTrace.Info("AssemblyResolver.OnResolve: {0}: File exists but version/public key is wrong. Try next extension.", args.Name);
                                 continue;   // File exists but version/public key is wrong. Try next extension.
@@ -171,8 +162,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
                             EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Loading assembly '{1}'.", args.Name, assemblyPath);
                             
-                            assembly = this.platformAssemblyLoadContext.LoadAssemblyFromPath(assemblyPath);
-                            this.resolvedAssemblies[args.Name] = assembly;
+                            assembly = platformAssemblyLoadContext.LoadAssemblyFromPath(assemblyPath);
+                            resolvedAssemblies[args.Name] = assembly;
 
                             EqtTrace.Info("AssemblyResolver.OnResolve: Resolved assembly: {0}, from path: {1}", args.Name, assemblyPath);
 
@@ -200,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                     EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to load assembly.", args.Name);
                 }
 
-                this.resolvedAssemblies[args.Name] = null;
+                resolvedAssemblies[args.Name] = null;
                 return null;
             }
         }
@@ -236,22 +227,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 }
             }
 
-            if (requestedName.Version != null)
-            {
-                return requestedName.Version.Equals(foundName.Version);
-            }
-
-            return true;
+            return requestedName.Version == null || requestedName.Version.Equals(foundName.Version);
         }
 
         ~AssemblyResolver()
         {
-            this.Dispose(false);
+            Dispose(false);
         }
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
 
             // Use SupressFinalize in case a subclass
             // of this type implements a finalizer.
@@ -261,15 +247,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         [System.Security.SecurityCritical]
         protected virtual void Dispose(bool disposing)
         {
-            if (!this.isDisposed)
+            if (!isDisposed)
             {
                 if (disposing)
                 {
-                    this.platformAssemblyResolver.AssemblyResolve -= this.OnResolve;
-                    this.platformAssemblyResolver.Dispose();
+                    platformAssemblyResolver.AssemblyResolve -= OnResolve;
+                    platformAssemblyResolver.Dispose();
                 }
 
-                this.isDisposed = true;
+                isDisposed = true;
             }
         }
     }

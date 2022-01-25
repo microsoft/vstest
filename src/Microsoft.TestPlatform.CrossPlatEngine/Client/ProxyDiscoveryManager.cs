@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDiscoveryEventsHandler2
     {
         private readonly TestSessionInfo testSessionInfo = null;
-        Func<string, ProxyDiscoveryManager, ProxyOperationManager> proxyOperationManagerCreator;
+        readonly Func<string, ProxyDiscoveryManager, ProxyOperationManager> proxyOperationManagerCreator;
 
         private ITestRuntimeProvider testHostManager;
         private IRequestData requestData;
@@ -56,11 +56,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.testSessionInfo = testSessionInfo;
             this.proxyOperationManagerCreator = proxyOperationManagerCreator;
 
-            this.requestData = null;
-            this.testHostManager = null;
-            this.dataSerializer = JsonDataSerializer.Instance;
-            this.fileHelper = new FileHelper();
-            this.isCommunicationEstablished = false;
+            requestData = null;
+            testHostManager = null;
+            dataSerializer = JsonDataSerializer.Instance;
+            fileHelper = new FileHelper();
+            isCommunicationEstablished = false;
         }
 
         /// <summary>
@@ -111,10 +111,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             this.dataSerializer = dataSerializer;
             this.fileHelper = fileHelper;
-            this.isCommunicationEstablished = false;
+            isCommunicationEstablished = false;
 
             // Create a new proxy operation manager.
-            this.proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
+            proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
         }
 
         #endregion
@@ -130,27 +130,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
-            if (this.proxyOperationManager == null)
+            if (proxyOperationManager == null)
             {
-                this.proxyOperationManager = this.proxyOperationManagerCreator(
+                proxyOperationManager = proxyOperationManagerCreator(
                     discoveryCriteria.Sources.First(),
                     this);
 
-                this.testHostManager = this.proxyOperationManager.TestHostManager;
-                this.requestData = this.proxyOperationManager.RequestData;
+                testHostManager = proxyOperationManager.TestHostManager;
+                requestData = proxyOperationManager.RequestData;
             }
 
-            this.baseTestDiscoveryEventsHandler = eventHandler;
+            baseTestDiscoveryEventsHandler = eventHandler;
             try
             {
-                this.isCommunicationEstablished = this.proxyOperationManager.SetupChannel(discoveryCriteria.Sources, discoveryCriteria.RunSettings);
+                isCommunicationEstablished = proxyOperationManager.SetupChannel(discoveryCriteria.Sources, discoveryCriteria.RunSettings);
 
-                if (this.isCommunicationEstablished)
+                if (isCommunicationEstablished)
                 {
-                    this.InitializeExtensions(discoveryCriteria.Sources);
+                    InitializeExtensions(discoveryCriteria.Sources);
                     discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
 
-                    this.proxyOperationManager.RequestSender.DiscoverTests(discoveryCriteria, this);
+                    proxyOperationManager.RequestSender.DiscoverTests(discoveryCriteria, this);
                 }
             }
             catch (Exception exception)
@@ -159,15 +159,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 // Log to vs ide test output
                 var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception.ToString() };
-                var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
-                this.HandleRawMessage(rawMessage);
+                var rawMessage = dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
+                HandleRawMessage(rawMessage);
 
                 // Log to vstest.console
                 // Send a discovery complete to caller. Similar logic is also used in ParallelProxyDiscoveryManager.DiscoverTestsOnConcurrentManager
                 // Aborted is `true`: in case of parallel discovery (or non shared host), an aborted message ensures another discovery manager
                 // created to replace the current one. This will help if the current discovery manager is aborted due to irreparable error
                 // and the test host is lost as well.
-                this.HandleLogMessage(TestMessageLevel.Error, exception.ToString());
+                HandleLogMessage(TestMessageLevel.Error, exception.ToString());
 
                 var discoveryCompletePayload = new DiscoveryCompletePayload()
                 {
@@ -175,10 +175,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     LastDiscoveredTests = null,
                     TotalTests = -1
                 };
-                this.HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, discoveryCompletePayload));
+                HandleRawMessage(dataSerializer.SerializePayload(MessageType.DiscoveryComplete, discoveryCompletePayload));
                 var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
 
-                this.HandleDiscoveryComplete(discoveryCompleteEventsArgs, new List<ObjectModel.TestCase>());
+                HandleDiscoveryComplete(discoveryCompleteEventsArgs, new List<TestCase>());
             }
         }
 
@@ -186,21 +186,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public void Abort()
         {
             // Do nothing if the proxy is not initialized yet.
-            if (this.proxyOperationManager == null)
+            if (proxyOperationManager == null)
             {
                 return;
             }
 
             // Cancel fast, try to stop testhost deployment/launch
-            this.proxyOperationManager.CancellationTokenSource.Cancel();
-            this.Close();
+            proxyOperationManager.CancellationTokenSource.Cancel();
+            Close();
         }
 
         /// <inheritdoc/>
         public void Close()
         {
             // Do nothing if the proxy is not initialized yet.
-            if (this.proxyOperationManager == null)
+            if (proxyOperationManager == null)
             {
                 return;
             }
@@ -211,43 +211,43 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             //
             // In contrast, the new workflow (using test sessions) means we should keep
             // the testhost alive until explicitly closed by the test session owner.
-            if (this.testSessionInfo == null)
+            if (testSessionInfo == null)
             {
-                this.proxyOperationManager.Close();
+                proxyOperationManager.Close();
                 return;
             }
 
-            TestSessionPool.Instance.ReturnProxy(this.testSessionInfo, this.proxyOperationManager.Id);
+            TestSessionPool.Instance.ReturnProxy(testSessionInfo, proxyOperationManager.Id);
         }
 
         /// <inheritdoc/>
         public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
-            this.baseTestDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, lastChunk);
+            baseTestDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, lastChunk);
         }
 
         /// <inheritdoc/>
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
-            this.baseTestDiscoveryEventsHandler.HandleDiscoveredTests(discoveredTestCases);
+            baseTestDiscoveryEventsHandler.HandleDiscoveredTests(discoveredTestCases);
         }
 
         /// <inheritdoc/>
         public void HandleRawMessage(string rawMessage)
         {
-            var message = this.dataSerializer.DeserializeMessage(rawMessage);
+            var message = dataSerializer.DeserializeMessage(rawMessage);
             if(string.Equals(message.MessageType, MessageType.DiscoveryComplete))
             {
-                this.Close();
+                Close();
             }
 
-            this.baseTestDiscoveryEventsHandler.HandleRawMessage(rawMessage);
+            baseTestDiscoveryEventsHandler.HandleRawMessage(rawMessage);
         }
 
         /// <inheritdoc/>
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            this.baseTestDiscoveryEventsHandler.HandleLogMessage(level, message);
+            baseTestDiscoveryEventsHandler.HandleLogMessage(level, message);
         }
 
         #endregion
@@ -257,7 +257,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
         {
             // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
-            var telemetryOptedIn = this.proxyOperationManager.RequestData.IsTelemetryOptedIn ? "true" : "false";
+            var telemetryOptedIn = proxyOperationManager.RequestData.IsTelemetryOptedIn ? "true" : "false";
             testProcessStartInfo.Arguments += " --telemetryoptedin " + telemetryOptedIn;
             return testProcessStartInfo;
         }
@@ -265,22 +265,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {
-            var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, this.skipDefaultAdapters);
+            var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, skipDefaultAdapters);
 
             // Filter out non existing extensions
-            var nonExistingExtensions = extensions.Where(extension => !this.fileHelper.Exists(extension));
+            var nonExistingExtensions = extensions.Where(extension => !fileHelper.Exists(extension));
             if (nonExistingExtensions.Any())
             {
-                this.LogMessage(TestMessageLevel.Warning, string.Format(Resources.Resources.NonExistingExtensions, string.Join(",", nonExistingExtensions)));
+                LogMessage(TestMessageLevel.Warning, string.Format(Resources.Resources.NonExistingExtensions, string.Join(",", nonExistingExtensions)));
             }
 
             var sourceList = sources.ToList();
-            var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions.Except(nonExistingExtensions));
+            var platformExtensions = testHostManager.GetTestPlatformExtensions(sourceList, extensions.Except(nonExistingExtensions));
 
             // Only send this if needed.
             if (platformExtensions.Any())
             {
-                this.proxyOperationManager.RequestSender.InitializeDiscovery(platformExtensions);
+                proxyOperationManager.RequestSender.InitializeDiscovery(platformExtensions);
             }
         }
 
@@ -288,11 +288,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             // Log to translation layer.
             var testMessagePayload = new TestMessagePayload { MessageLevel = testMessageLevel, Message = message };
-            var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
-            this.HandleRawMessage(rawMessage);
+            var rawMessage = dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
+            HandleRawMessage(rawMessage);
 
             // Log to vstest.console layer.
-            this.HandleLogMessage(testMessageLevel, message);
+            HandleLogMessage(testMessageLevel, message);
         }
     }
 }

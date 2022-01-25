@@ -42,7 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     internal class MetadataReaderExtensionsHelper
     {
         private const string TestExtensionTypesAttributeV2 = "Microsoft.VisualStudio.TestPlatform.TestExtensionTypesV2Attribute";
-        private static readonly ConcurrentDictionary<string, Assembly> assemblyCache = new ConcurrentDictionary<string, Assembly>();
+        private static readonly ConcurrentDictionary<string, Assembly> assemblyCache = new();
         private static readonly Type[] emptyTypeArray = new Type[0];
 
         public Type[] DiscoverTestExtensionTypesV2Attribute(Assembly loadedAssembly, string assemblyFilePath)
@@ -176,7 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         private string FormatException(Exception ex)
         {
-            StringBuilder log = new StringBuilder();
+            StringBuilder log = new();
             Exception current = ex;
             while (current != null)
             {

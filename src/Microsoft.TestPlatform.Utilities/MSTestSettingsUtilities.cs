@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-    using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resources;
+    using UtilitiesResources = Resources.Resources;
 
     /// <summary>
     /// The legacy mstest.exe settings utilities.
@@ -26,8 +26,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </param>
         /// <param name="defaultRunSettings"> Input RunSettings document to which settings file need to be imported. </param>
         /// <returns> Updated RunSetting Xml document with imported settings. </returns>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public static XmlDocument Import(string settingsFile, XmlDocument defaultRunSettings)
         {
             ValidateArg.NotNull(settingsFile, nameof(settingsFile));
@@ -68,8 +66,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                                 || string.Equals(Path.GetExtension(settingsFile), ".vsmdi", StringComparison.OrdinalIgnoreCase);
         }
 
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         private static XmlElement GenerateMSTestXml(string settingsFile)
         {
             // Generate the MSTest xml
@@ -79,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             //   <ForcedLegacyMode>true</ForcedLegacyMode>
             // </MSTest>
             //
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             XmlElement mstestNode = doc.CreateElement("MSTest");
 
             XmlElement testSettingsFileNode = doc.CreateElement("SettingsFile");
