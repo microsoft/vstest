@@ -129,6 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                             verbosity = parsedVerbosity;
                         }
                     }
+
                     args = args.Concat(new[] { $"--diag:{diag};TraceLevel={verbosity}" }).ToArray();
                 }
             }
