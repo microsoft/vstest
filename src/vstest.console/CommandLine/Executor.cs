@@ -92,6 +92,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             this.testPlatformEventSource.VsTestConsoleStart();
 
+            var isDiag = args != null && args.Any(arg => arg.StartsWith("--diag", StringComparison.OrdinalIgnoreCase));
+
             // If User specifies --nologo via dotnet, do not print splat screen
             if (args != null && args.Length !=0 && args.Contains("--nologo"))
             {
@@ -100,7 +102,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
             else
             {
-                var isDiag = args != null && args.Any(arg => arg.StartsWith("--diag", StringComparison.OrdinalIgnoreCase));
                 this.PrintSplashScreen(isDiag);
             }
 
@@ -112,6 +113,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 this.Output.Error(true, CommandLineResources.NoArgumentsProvided);
                 args = new string[] { HelpArgumentProcessor.CommandName };
                 exitCode = 1;
+            }
+
+            if (!isDiag)
+            {
+                var diagLog = Environment.GetEnvironmentVariable("VSTEST_DIAGLOG");
+                if (!string.IsNullOrWhiteSpace(diagLog))
+                {
+                    args = args.Concat(new[] { $"--diag:{diagLog}" }).ToArray();
+                }
             }
 
             // Flatten arguments and process response files.
