@@ -166,7 +166,6 @@ public class ParallelOperationManagerTests
 
     private class SampleConcurrentClass
     {
-        public bool IsDisposeCalled = false;
         public readonly bool CheckValue;
         public SampleConcurrentClass(bool value = false)
         {
