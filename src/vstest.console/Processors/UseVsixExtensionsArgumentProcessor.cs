@@ -57,7 +57,7 @@ internal class UseVsixExtensionsArgumentProcessor : IArgumentProcessor
         {
             if (_executor == null)
             {
-                _executor = new Lazy<IArgumentExecutor>(() => new UseVsixExtensionsArgumentExecutor(CommandLineOptions.Instance, TestRequestManager.Instance, new VsExtensionManager(), ConsoleOutput.Instance));
+                _executor = new Lazy<IArgumentExecutor>(() => new UseVsixExtensionsArgumentExecutor(CommandLineOptions.Instance, TestRequestManager.Instance, new VSExtensionManager(), ConsoleOutput.Instance));
             }
 
             return _executor;
@@ -93,10 +93,10 @@ internal class UseVsixExtensionsArgumentExecutor : IArgumentExecutor
 {
     private readonly CommandLineOptions _commandLineOptions;
     private readonly ITestRequestManager _testRequestManager;
-    private readonly IVsExtensionManager _extensionManager;
+    private readonly IVSExtensionManager _extensionManager;
     private readonly IOutput _output;
 
-    internal UseVsixExtensionsArgumentExecutor(CommandLineOptions commandLineOptions, ITestRequestManager testRequestManager, IVsExtensionManager extensionManager, IOutput output)
+    internal UseVsixExtensionsArgumentExecutor(CommandLineOptions commandLineOptions, ITestRequestManager testRequestManager, IVSExtensionManager extensionManager, IOutput output)
     {
         _commandLineOptions = commandLineOptions;
         _testRequestManager = testRequestManager;

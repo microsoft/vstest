@@ -13,17 +13,15 @@ using System.Linq;
 [TestClass]
 public class LiveUnitTestingTests : AcceptanceTestBase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private DiscoveryEventHandler _discoveryEventHandler;
-    private DiscoveryEventHandler2 _discoveryEventHandler2;
-    private RunEventHandler _runEventHandler;
+    private IVsTestConsoleWrapper vstestConsoleWrapper;
+    private DiscoveryEventHandler discoveryEventHandler;
+    private RunEventHandler runEventHandler;
 
     public void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
-        _discoveryEventHandler = new DiscoveryEventHandler();
-        _discoveryEventHandler2 = new DiscoveryEventHandler2();
-        _runEventHandler = new RunEventHandler();
+        this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
+        this.discoveryEventHandler = new DiscoveryEventHandler();
+        this.runEventHandler = new RunEventHandler();
     }
 
     [TestCleanup]

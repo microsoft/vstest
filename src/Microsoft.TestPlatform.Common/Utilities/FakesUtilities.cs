@@ -104,7 +104,7 @@ public static class FakesUtilities
         IEnumerable<string> sources,
         FrameworkVersion framework)
     {
-        // A new Fakes Congigurator API makes the decision to add the right datacollector uri to the configuration
+        // A new Fakes Configurator API makes the decision to add the right datacollector uri to the configuration
         // There now exist two data collector URIs to support two different scenarios. The new scenario involves 
         // using the CLRIE profiler, and the old involves using the Intellitrace profiler (which isn't supported in 
         // .NET Core scenarios). The old API still exists for fallback measures. 

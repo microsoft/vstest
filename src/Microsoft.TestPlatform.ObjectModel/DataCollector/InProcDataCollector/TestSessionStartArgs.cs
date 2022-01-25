@@ -9,7 +9,7 @@ using System.Collections.Generic;
 /// <summary>
 /// The test session start args.
 /// </summary>
-public class TestSessionStartArgs : INProcDataCollectionArgs
+public class TestSessionStartArgs : InProcDataCollectionArgs
 {
     private readonly IDictionary<string, object> _properties;
 

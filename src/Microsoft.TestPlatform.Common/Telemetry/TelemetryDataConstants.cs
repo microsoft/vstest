@@ -42,11 +42,11 @@ public static class TelemetryDataConstants
 
     public static string TargetPlatform = "VS.TestRun.TargetPlatform";
 
-    public static string MaxCpUcount = "VS.TestRun.MaxCPUcount";
+    public static string MaxCPUcount = "VS.TestRun.MaxCPUcount";
 
     public static string TestPlatformVersion = "VS.TestRun.TestPlatformVersion";
 
-    public static string TargetOs = "VS.TestRun.TargetOS";
+    public static string TargetOS = "VS.TestRun.TargetOS";
 
     public static string LoggerUsed = "VS.TestRun.LoggersUsed";
 
@@ -60,15 +60,15 @@ public static class TelemetryDataConstants
     // In case of parallel it will be sum of all time taken by an adapter to run tests in different execution process
     public static string TimeTakenToRunTestsByAnAdapter = "VS.TestRun.TimeTakenToRun";
 
-    // Reports details for MSTestV1. Reports just the count when TPv1 is used. 
+    // Reports details for MSTestV1. Reports just the count when TPv1 is used.
     // Reports legacy when the legacy runner TMI / TPv0 is used.
-    // Adds an extension when an extension (tips) is used. 
+    // Adds an extension when an extension (tips) is used.
     // eg:- VS.TestRun.TotalTestsRunByMSTestv1 - a unit test using TPv1 and MSTestV1
     // eg:- VS.TestRun.TotalTestsRunByMSTestv1.legacy - a unit test using TPv0 and MSTestV1
-    // eg:- VS.TestRun.TotalTestsRunByMSTestv1.legacy.extension.codedui - a coded ui test using TPv0 and MSTestV1 
-    // Counts in this metric are not subtracted from the TotalTestsRanByAdapter. This metrics just 
+    // eg:- VS.TestRun.TotalTestsRunByMSTestv1.legacy.extension.codedui - a coded ui test using TPv0 and MSTestV1
+    // Counts in this metric are not subtracted from the TotalTestsRanByAdapter. This metrics just
     // provides more insight into what was actually executed.
-    public static string TotalTestsRunByMsTestv1 = "VS.TestRun.TotalTestsRunByMSTestv1";
+    public static string TotalTestsRunByMSTestv1 = "VS.TestRun.TotalTestsRunByMSTestv1";
 
     // Total number of adapter discovered on the machine.
     public static string NumberOfAdapterDiscoveredDuringExecution = "VS.TestRun.AdaptersDiscoveredCount";

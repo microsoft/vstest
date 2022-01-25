@@ -44,13 +44,6 @@ internal struct TestParameters
 [TestCategory("Windows-Review")]
 public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 {
-    private readonly string _resultsDirectory;
-
-    public CodeCoverageTests()
-    {
-        _resultsDirectory = GetResultsDirectory();
-    }
-
     [TestMethod]
     [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
@@ -213,9 +206,10 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
     private void CollectCodeCoverage(RunnerInfo runnerInfo, TestParameters testParameters)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-        var arguments = CreateArguments(runnerInfo, testParameters, out var trxFilePath);
+        var arguments = this.CreateArguments(tempDir, runnerInfo, testParameters, out var trxFilePath);
 
         InvokeVsTest(arguments);
 
@@ -224,8 +218,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             testParameters.ExpectedSkippedTests,
             testParameters.ExpectedFailedTests);
 
-        var actualCoverageFile = GetCoverageFileNameFromTrx(trxFilePath, _resultsDirectory);
-        Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {_resultsDirectory} trxfile: {trxFilePath}");
+        var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, tempDir.Path);
+        Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {tempDir.Path} trxfile: {trxFilePath}");
         Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
 
         if (testParameters.RunSettingsType == TestParameters.SettingsType.XmlOutput)
@@ -241,35 +235,34 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             Assert.IsTrue(actualCoverageFile.EndsWith(".coverage", StringComparison.InvariantCultureIgnoreCase));
         }
 
-        var coverageDocument = GetXmlCoverage(actualCoverageFile);
+        var coverageDocument = this.GetXmlCoverage(actualCoverageFile, tempDir);
         if (testParameters.CheckSkipped)
         {
-            AssertSkippedMethod(coverageDocument);
+            this.AssertSkippedMethod(coverageDocument);
         }
 
-        ValidateCoverageData(coverageDocument, testParameters.AssemblyName, testParameters.RunSettingsType != TestParameters.SettingsType.CoberturaOutput);
-
-        Directory.Delete(_resultsDirectory, true);
+        this.ValidateCoverageData(coverageDocument, testParameters.AssemblyName, testParameters.RunSettingsType != TestParameters.SettingsType.CoberturaOutput);
     }
 
     private string CreateArguments(
+        TempDirectory tempDir,
         RunnerInfo runnerInfo,
         TestParameters testParameters,
         out string trxFilePath)
     {
-        var assemblyPaths = GetAssetFullPath(testParameters.AssemblyName);
+        var assemblyPaths = this.GetAssetFullPath(testParameters.AssemblyName);
 
         string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
             "artifacts", IntegrationTestEnvironment.BuildConfiguration, "Microsoft.CodeCoverage");
 
-        string diagFileName = Path.Combine(_resultsDirectory, "diaglog.txt");
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty,
-            FrameworkArgValue, runnerInfo.InIsolationValue, _resultsDirectory);
+        string diagFileName = Path.Combine(tempDir.Path, "diaglog.txt");
+        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty,
+            this.FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
         arguments = string.Concat(arguments, $" /Diag:{diagFileName}",
             $" /TestAdapterPath:{traceDataCollectorDir}");
         arguments = string.Concat(arguments, $" /Platform:{testParameters.TargetPlatform}");
 
-        trxFilePath = Path.Combine(_resultsDirectory, Guid.NewGuid() + ".trx");
+        trxFilePath = Path.Combine(tempDir.Path, Guid.NewGuid() + ".trx");
         arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
 
         var defaultRunSettingsPath = Path.Combine(

@@ -10,7 +10,7 @@ using Microsoft.Build.Utilities;
 
 using Resources;
 
-public class VsTestLogsTask : Task
+public class VSTestLogsTask : Task
 {
     public string LogType
     {

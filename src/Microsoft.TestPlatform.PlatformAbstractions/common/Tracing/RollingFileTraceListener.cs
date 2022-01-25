@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
@@ -24,11 +23,11 @@ public class RollingFileTraceListener : TextWriterTraceListener
     /// </summary>
     /// <param name="fileName">The filename where the entries will be logged.</param>
     /// <param name="name">Name of the trace listener.</param>
-    /// <param name="rollSizeKb">The maximum file size (KB) before rolling.</param>
+    /// <param name="rollSizeKB">The maximum file size (KB) before rolling.</param>
     public RollingFileTraceListener(
         string fileName,
         string name,
-        int rollSizeKb)
+        int rollSizeKB)
         : base(OpenTextWriter(fileName), name)
     {
         if (string.IsNullOrWhiteSpace(fileName))
@@ -36,13 +35,13 @@ public class RollingFileTraceListener : TextWriterTraceListener
             throw new ArgumentException("fileName was null or whitespace", nameof(fileName));
         }
 
-        if (rollSizeKb <= 0)
+        if (rollSizeKB <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(rollSizeKb));
+            throw new ArgumentOutOfRangeException(nameof(rollSizeKB));
         }
 
         TraceFileName = fileName;
-        _rollSizeInBytes = rollSizeKb * 1024;
+        _rollSizeInBytes = rollSizeKB * 1024;
         RollingHelper = new StreamWriterRollingHelper(this);
     }
 

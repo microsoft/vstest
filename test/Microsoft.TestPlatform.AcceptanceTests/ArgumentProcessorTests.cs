@@ -3,7 +3,8 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 [TestCategory("Windows-Review")]
@@ -38,8 +39,8 @@ public class ArgumentProcessorTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var testResults = GetResultsDirectory();
-        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, resultsDirectory: testResults);
+        using var tempDir = new TempDirectory();
+        var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /badArgument");
 
         InvokeVsTest(arguments);
@@ -56,8 +57,6 @@ public class ArgumentProcessorTests : AcceptanceTestBase
         StdOutputDoesNotContains("To run tests: >vstest.console.exe tests.dll");
 
         //Check for message which guides using help option
-        StdErrorContains("Please use the /help option to check the list of valid arguments");
-
-        TryRemoveDirectory(testResults);
+        this.StdErrorContains("Please use the /help option to check the list of valid arguments");
     }
 }

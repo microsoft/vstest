@@ -3,7 +3,8 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System.IO;
 
@@ -15,21 +16,20 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkOnFiles(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var resultsDir = GetResultsDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
         testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
 
         var arguments = PrepareArguments(
-            testAssembly,
-            GetTestAdapterPath(),
-            string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+           testAssembly,
+           this.GetTestAdapterPath(),
+           string.Empty, this.FrameworkArgValue,
+           runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(1, 1, 1);
-        TryRemoveDirectory(resultsDir);
+        this.InvokeVsTest(arguments);
+        this.ValidateSummaryStatus(1, 1, 1);
     }
 
     [TestMethod]
@@ -37,8 +37,8 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkOnArbitraryDepthDirectories(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var resultsDir = GetResultsDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
         var oldAssemblyPath = Path.Combine("Debug", _testEnvironment.TargetFramework, "SimpleTestProject.dll");
@@ -46,14 +46,13 @@ public class FilePatternParserTests : AcceptanceTestBase
         testAssembly = testAssembly.Replace(oldAssemblyPath, newAssemblyPath);
 
         var arguments = PrepareArguments(
-            testAssembly,
-            GetTestAdapterPath(),
-            string.Empty, string.Empty,
-            runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+           testAssembly,
+           this.GetTestAdapterPath(),
+           string.Empty, string.Empty,
+           runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(1, 1, 1);
-        TryRemoveDirectory(resultsDir);
+        this.InvokeVsTest(arguments);
+        this.ValidateSummaryStatus(1, 1, 1);
     }
 
     [TestMethod]
@@ -61,8 +60,8 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkForRelativeAssemblyPath(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var resultsDir = GetResultsDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
         testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
@@ -74,14 +73,13 @@ public class FilePatternParserTests : AcceptanceTestBase
         Directory.SetCurrentDirectory(testAssemblyDirectory);
 
         var arguments = PrepareArguments(
-            testAssembly,
-            GetTestAdapterPath(),
-            string.Empty, string.Empty,
-            runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+           testAssembly,
+           this.GetTestAdapterPath(),
+           string.Empty, string.Empty,
+           runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(1, 1, 1);
-        TryRemoveDirectory(resultsDir);
+        this.InvokeVsTest(arguments);
+        this.ValidateSummaryStatus(1, 1, 1);
     }
 
     [TestMethod]
@@ -89,21 +87,20 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkOnMultipleFiles(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var resultsDir = GetResultsDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
         var testAssembly = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
         testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
         testAssembly = testAssembly.Replace("SimpleTestProject2.dll", "*TestProj*.dll");
 
         var arguments = PrepareArguments(
-            testAssembly,
-            GetTestAdapterPath(),
-            string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+           testAssembly,
+           this.GetTestAdapterPath(),
+           string.Empty, this.FrameworkArgValue,
+           runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(2, 2, 2);
-        TryRemoveDirectory(resultsDir);
+        this.InvokeVsTest(arguments);
+        this.ValidateSummaryStatus(2, 2, 2);
     }
 }

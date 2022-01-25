@@ -3,14 +3,14 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.InProcDataCollector;
 
-using DataCollection;
-
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
 
 /// <summary>
 /// Listener interface for external exe from test host
 /// </summary>
-public interface INProcDataCollection
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Interface is part of the public API.")]
+public interface InProcDataCollection
 {
     /// <summary>
     /// Initializes the In Process DataCollection with the DataCollectionSink

@@ -7,9 +7,9 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 
-using TestUtilities;
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 public class PortableNugetPackageTests : AcceptanceTestBase
@@ -17,7 +17,7 @@ public class PortableNugetPackageTests : AcceptanceTestBase
     private static string s_portablePackageFolder;
 
     [ClassInitialize]
-    public static void ClassInit(TestContext testContext)
+    public static void ClassInit(TestContext _)
     {
         var packageLocation = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "packages");
         var nugetPackage = Directory.EnumerateFiles(packageLocation, "Microsoft.TestPlatform.Portable.*.nupkg").ToList();
@@ -40,14 +40,14 @@ public class PortableNugetPackageTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
 
-        InvokeVsTestForExecution(assemblyPaths, GetTestAdapterPath(), FrameworkArgValue, string.Empty);
+        this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), this.FrameworkArgValue, string.Empty);
 
-        ValidateSummaryStatus(2, 2, 2);
-        ExitCodeEquals(1); // failing tests
+        this.ValidateSummaryStatus(2, 2, 2);
+        this.ExitCodeEquals(1); // failing tests
     }
 
     [TestMethod]
@@ -55,38 +55,38 @@ public class PortableNugetPackageTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverAllTests(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-        InvokeVsTestForDiscovery(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue);
+        this.InvokeVsTestForDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
 
         var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
-        ValidateDiscoveredTests(listOfTests);
-        ExitCodeEquals(0);
+        this.ValidateDiscoveredTests(listOfTests);
+        this.ExitCodeEquals(0);
     }
 
     public override string GetConsoleRunnerPath()
     {
         string consoleRunnerPath = string.Empty;
 
-        if (IsDesktopRunner())
+        if (this.IsDesktopRunner())
         {
             consoleRunnerPath = Path.Combine(s_portablePackageFolder, "tools", "net451", "vstest.console.exe");
         }
-        else if (IsNetCoreRunner())
+        else if (this.IsNetCoreRunner())
         {
             var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
-            consoleRunnerPath = Path.Combine(_testEnvironment.ToolsDirectory, executablePath);
+            consoleRunnerPath = Path.Combine(this.testEnvironment.ToolsDirectory, executablePath);
         }
         else
         {
-            Assert.Fail("Unknown Runner framework - [{0}]", _testEnvironment.RunnerFramework);
+            Assert.Fail("Unknown Runner framework - [{0}]", this.testEnvironment.RunnerFramework);
         }
 
         Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
         return consoleRunnerPath;
     }
 
-    protected override string SetVsTestConsoleDllPathInArgs(string args)
+    protected override string SetVSTestConsoleDLLPathInArgs(string args)
     {
         var vstestConsoleDll = Path.Combine(s_portablePackageFolder, "tools", "netcoreapp2.1", "vstest.console.dll");
         vstestConsoleDll = vstestConsoleDll.AddDoubleQuote();

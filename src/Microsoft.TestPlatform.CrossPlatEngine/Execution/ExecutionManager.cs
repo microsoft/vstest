@@ -73,7 +73,7 @@ public class ExecutionManager : IExecutionManager
 
         LoadExtensions();
 
-        //unsubscrive session logger
+        //unsubscribe session logger
         _sessionMessageLogger.TestRunMessage -= TestSessionMessageHandler;
 
         _testPlatformEventSource.AdapterSearchStop();

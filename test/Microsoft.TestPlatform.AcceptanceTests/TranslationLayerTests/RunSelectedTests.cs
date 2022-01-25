@@ -6,24 +6,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 using System.Collections.Generic;
 using System.Linq;
 
-using VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 public class RunSelectedTests : AcceptanceTestBase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private RunEventHandler _runEventHandler;
-    private DiscoveryEventHandler _discoveryEventHandler;
+    private readonly IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private readonly RunEventHandler _runEventHandler;
+    private readonly DiscoveryEventHandler _discoveryEventHandler;
 
     private void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
-        _runEventHandler = new RunEventHandler();
-        _discoveryEventHandler = new DiscoveryEventHandler();
+        this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
+        this.runEventHandler = new RunEventHandler();
+        this.discoveryEventHandler = new DiscoveryEventHandler();
     }
 
     [TestCleanup]
@@ -73,7 +73,7 @@ public class RunSelectedTests : AcceptanceTestBase
         Assert.AreEqual(6, _runEventHandler.TestResults.Count);
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetDevice));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetFramework));
-        Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetOs));
+        Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetOS));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForRun));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.RunState));

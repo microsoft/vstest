@@ -276,7 +276,7 @@ internal class DefaultEngineInvoker :
         }
         else
         {
-            EqtTrace.DoNotInitialize = true;
+            EqtTrace.DoNotInitailize = true;
         }
     }
 

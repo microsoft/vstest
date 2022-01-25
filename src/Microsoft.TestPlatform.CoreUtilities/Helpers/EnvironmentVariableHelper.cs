@@ -7,13 +7,12 @@ using System;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers
+namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+
+internal class EnvironmentVariableHelper : IEnvironmentVariableHelper
 {
-    internal class EnvironmentVariableHelper : IEnvironmentVariableHelper
-    {
-        public string GetEnvironmentVariable(string variable)
-            => Environment.GetEnvironmentVariable(variable);
-    }
+    public string GetEnvironmentVariable(string variable)
+        => Environment.GetEnvironmentVariable(variable);
 }
 
 #endif

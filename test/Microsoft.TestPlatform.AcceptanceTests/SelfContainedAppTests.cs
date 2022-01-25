@@ -3,7 +3,8 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System.IO;
 
@@ -21,15 +22,14 @@ public class SelfContainedAppTests : AcceptanceTestBase
         // properties, the testhost.exe executable is given a runtimeconfig that instructs it to find a hostpolicy.dll and hostfxr.dll next to it
         // that will fail if we run the testhost.exe from the .nuget location, but will work when we run it from the output folder
         // see https://github.com/dotnet/runtime/issues/3569#issuecomment-595820524 and below for description of how it works
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var resultsDir = GetResultsDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
         // the app is published to win10-x64 because of the runtime identifier in the project
-        var assemblyPath = BuildMultipleAssemblyPath($@"win10-x64{Path.DirectorySeparatorChar}SelfContainedAppTestProject.dll").Trim('\"');
-        var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
-        InvokeVsTest(arguments);
+        var assemblyPath = this.BuildMultipleAssemblyPath($@"win10-x64{Path.DirectorySeparatorChar}SelfContainedAppTestProject.dll").Trim('\"');
+        var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+        this.InvokeVsTest(arguments);
 
-        ValidateSummaryStatus(passedTestsCount: 1, 0, 0);
-        TryRemoveDirectory(resultsDir);
+        this.ValidateSummaryStatus(passedTestsCount: 1, 0, 0);
     }
 }

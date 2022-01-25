@@ -30,7 +30,7 @@ public class DiaSessionTests : IntegrationTestBase
     [TestMethod]
     public void GetNavigationDataShouldReturnCorrectFileNameAndLineNumber()
     {
-        var currentTargetFrameWork = GetAndSetTargetFrameWork(_testEnvironment);
+        var currentTargetFrameWork = GetAndSetTargetFrameWork(testEnvironment);
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         DiaSession diaSession = new(assemblyPath);
@@ -42,13 +42,13 @@ public class DiaSessionTests : IntegrationTestBase
         ValidateMinLineNumber(12, diaNavigationData.MinLineNumber);
         Assert.AreEqual(14, diaNavigationData.MaxLineNumber, "Incorrect max line number");
 
-        _testEnvironment.TargetFramework = currentTargetFrameWork;
+        testEnvironment.TargetFramework = currentTargetFrameWork;
     }
 
     [TestMethod]
     public void GetNavigationDataShouldReturnCorrectDataForAsyncMethod()
     {
-        var currentTargetFrameWork = GetAndSetTargetFrameWork(_testEnvironment);
+        var currentTargetFrameWork = GetAndSetTargetFrameWork(testEnvironment);
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         DiaSession diaSession = new(assemblyPath);
@@ -60,13 +60,13 @@ public class DiaSessionTests : IntegrationTestBase
         ValidateMinLineNumber(17, diaNavigationData.MinLineNumber);
         Assert.AreEqual(19, diaNavigationData.MaxLineNumber, "Incorrect max line number");
 
-        _testEnvironment.TargetFramework = currentTargetFrameWork;
+        testEnvironment.TargetFramework = currentTargetFrameWork;
     }
 
     [TestMethod]
     public void GetNavigationDataShouldReturnCorrectDataForOverLoadedMethod()
     {
-        var currentTargetFrameWork = GetAndSetTargetFrameWork(_testEnvironment);
+        var currentTargetFrameWork = GetAndSetTargetFrameWork(testEnvironment);
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         DiaSession diaSession = new(assemblyPath);
@@ -79,13 +79,13 @@ public class DiaSessionTests : IntegrationTestBase
         // as compared to before when it used to return second method
         ValidateLineNumbers(diaNavigationData.MinLineNumber, diaNavigationData.MaxLineNumber);
 
-        _testEnvironment.TargetFramework = currentTargetFrameWork;
+        testEnvironment.TargetFramework = currentTargetFrameWork;
     }
 
     [TestMethod]
     public void GetNavigationDataShouldReturnNullForNotExistMethodNameOrNotExistTypeName()
     {
-        var currentTargetFrameWork = GetAndSetTargetFrameWork(_testEnvironment);
+        var currentTargetFrameWork = GetAndSetTargetFrameWork(testEnvironment);
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         DiaSession diaSession = new(assemblyPath);
@@ -98,13 +98,13 @@ public class DiaSessionTests : IntegrationTestBase
         diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.NotExistType", "PassingTest");
         Assert.IsNull(diaNavigationData);
 
-        _testEnvironment.TargetFramework = currentTargetFrameWork;
+        testEnvironment.TargetFramework = currentTargetFrameWork;
     }
 
     [TestMethod]
     public void DiaSessionPerfTest()
     {
-        var currentTargetFrameWork = GetAndSetTargetFrameWork(_testEnvironment);
+        var currentTargetFrameWork = GetAndSetTargetFrameWork(testEnvironment);
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         var watch = Stopwatch.StartNew();
@@ -119,7 +119,7 @@ public class DiaSessionTests : IntegrationTestBase
         var expectedTime = 150;
         Assert.IsTrue(watch.Elapsed.Milliseconds < expectedTime, string.Format("DiaSession Perf test Actual time:{0} ms Expected time:{1} ms", watch.Elapsed.Milliseconds, expectedTime));
 
-        _testEnvironment.TargetFramework = currentTargetFrameWork;
+        testEnvironment.TargetFramework = currentTargetFrameWork;
     }
 
     private void ValidateLineNumbers(int min, int max)

@@ -19,12 +19,12 @@ public class DotnetTestTests : AcceptanceTestBase
         var projectName = "SimpleTestProject.csproj";
         var projectPath = GetProjectFullPath(projectName);
 
-        InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal""");
+        this.InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal""");
 
         // ensure our dev version is used
-        StdOutputContains("-dev");
-        ValidateSummaryStatus(1, 1, 1);
-        ExitCodeEquals(1);
+        this.StdOutputContains("-dev");
+        this.ValidateSummaryStatus(1, 1, 1);
+        this.ExitCodeEquals(1);
     }
 
 
@@ -66,8 +66,7 @@ public class DotnetTestTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void PassInlineSettingsToDll(RunnerInfo runnerInfo)
     {
-
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
         var assemblyPath = BuildMultipleAssemblyPath("ParametrizedTestProject.dll").Trim('\"');
         InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name=\""weburl\"", value=\""http://localhost//def\"")");

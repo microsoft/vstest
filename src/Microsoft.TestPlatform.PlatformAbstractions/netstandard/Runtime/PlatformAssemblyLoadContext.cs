@@ -3,26 +3,25 @@
 
 #if NETSTANDARD && !NETSTANDARD2_0
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
-{
-    using System.Reflection;
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-    using Interfaces;
+using System.Reflection;
+
+using Interfaces;
+
+/// <inheritdoc/>
+public class PlatformAssemblyLoadContext : IAssemblyLoadContext
+{
+    /// <inheritdoc/>
+    public AssemblyName GetAssemblyNameFromPath(string assemblyPath)
+    {
+        throw new System.NotImplementedException();
+    }
 
     /// <inheritdoc/>
-    public class PlatformAssemblyLoadContext : IAssemblyLoadContext
+    public Assembly LoadAssemblyFromPath(string assemblyPath)
     {
-        /// <inheritdoc/>
-        public AssemblyName GetAssemblyNameFromPath(string assemblyPath)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        /// <inheritdoc/>
-        public Assembly LoadAssemblyFromPath(string assemblyPath)
-        {
-            throw new System.NotImplementedException();
-        }
+        throw new System.NotImplementedException();
     }
 }
 

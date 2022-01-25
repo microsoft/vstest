@@ -215,7 +215,7 @@ internal class InProcDataCollectionExtensionManager
             {
                 _inProcDataCollectorSettingsCollection = inProcDataCollectionRunSettings.DataCollectorSettingsList;
 
-                var interfaceTypeInfo = typeof(INProcDataCollection).GetTypeInfo();
+                var interfaceTypeInfo = typeof(InProcDataCollection).GetTypeInfo();
                 foreach (var inProcDc in _inProcDataCollectorSettingsCollection)
                 {
                     var codeBase = GetCodebase(inProcDc.CodeBase);
@@ -268,7 +268,7 @@ internal class InProcDataCollectionExtensionManager
         return properties;
     }
 
-    private void TriggerInProcDataCollectionMethods(string methodName, INProcDataCollectionArgs methodArg)
+    private void TriggerInProcDataCollectionMethods(string methodName, InProcDataCollectionArgs methodArg)
     {
         try
         {

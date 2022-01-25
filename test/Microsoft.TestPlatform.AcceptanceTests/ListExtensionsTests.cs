@@ -18,22 +18,22 @@ public class ListExtensionsTests : AcceptanceTestBase
 
         InvokeVsTest("/listDiscoverers");
 
-        if (IsDesktopRunner())
+        if (this.IsDesktopRunner())
         {
-            StdOutputContains("executor://codedwebtestadapter/v1");
-            StdOutputContains("executor://mstestadapter/v1");
-            StdOutputContains("executor://webtestadapter/v1");
-            StdOutputContains(".Webtest");
-            StdOutputContains("executor://cppunittestexecutor/v1");
+            this.StdOutputContains("executor://codedwebtestadapter/v1");
+            this.StdOutputContains("executor://mstestadapter/v1");
+            this.StdOutputContains("executor://webtestadapter/v1");
+            this.StdOutputContains(".Webtest");
+            this.StdOutputContains("executor://cppunittestexecutor/v1");
         }
         else
         {
             // There are no inbox adapters for dotnet core
-            StdOutputDoesNotContains("executor://codedwebtestadapter/v1");
-            StdOutputDoesNotContains("executor://mstestadapter/v1");
-            StdOutputDoesNotContains("executor://webtestadapter/v1");
-            StdOutputDoesNotContains(".Webtest");
-            StdOutputDoesNotContains("executor://cppunittestexecutor/v1");
+            this.StdOutputDoesNotContains("executor://codedwebtestadapter/v1");
+            this.StdOutputDoesNotContains("executor://mstestadapter/v1");
+            this.StdOutputDoesNotContains("executor://webtestadapter/v1");
+            this.StdOutputDoesNotContains(".Webtest");
+            this.StdOutputDoesNotContains("executor://cppunittestexecutor/v1");
         }
     }
 
@@ -45,22 +45,22 @@ public class ListExtensionsTests : AcceptanceTestBase
 
         InvokeVsTest("/listExecutors");
 
-        if (IsDesktopRunner())
+        if (this.IsDesktopRunner())
         {
-            StdOutputContains("executor://CodedWebTestAdapter/v1");
-            StdOutputContains("executor://MSTestAdapter/v1");
-            StdOutputContains("executor://WebTestAdapter/v1");
-            StdOutputContains("executor://CppUnitTestExecutor/v1");
-            StdOutputContains("executor://UAPCppExecutorIdentifier");
+            this.StdOutputContains("executor://CodedWebTestAdapter/v1");
+            this.StdOutputContains("executor://MSTestAdapter/v1");
+            this.StdOutputContains("executor://WebTestAdapter/v1");
+            this.StdOutputContains("executor://CppUnitTestExecutor/v1");
+            this.StdOutputContains("executor://UAPCppExecutorIdentifier");
         }
         else
         {
             // There are no inbox adapters for dotnet core
-            StdOutputDoesNotContains("executor://CodedWebTestAdapter/v1");
-            StdOutputDoesNotContains("executor://MSTestAdapter/v1");
-            StdOutputDoesNotContains("executor://WebTestAdapter/v1");
-            StdOutputDoesNotContains("executor://CppUnitTestExecutor/v1");
-            StdOutputDoesNotContains("executor://UAPCppExecutorIdentifier");
+            this.StdOutputDoesNotContains("executor://CodedWebTestAdapter/v1");
+            this.StdOutputDoesNotContains("executor://MSTestAdapter/v1");
+            this.StdOutputDoesNotContains("executor://WebTestAdapter/v1");
+            this.StdOutputDoesNotContains("executor://CppUnitTestExecutor/v1");
+            this.StdOutputDoesNotContains("executor://UAPCppExecutorIdentifier");
         }
     }
 

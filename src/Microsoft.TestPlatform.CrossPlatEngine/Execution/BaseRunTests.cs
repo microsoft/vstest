@@ -510,7 +510,7 @@ internal abstract class BaseRunTests
                         {
                             var value = TestRunCache.AdapterTelemetry[adapterMetrics];
 
-                            _requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsRunByMsTestv1, adapterMetrics), value);
+                            _requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsRunByMSTestv1, adapterMetrics), value);
                         }
                     }
 
@@ -578,7 +578,7 @@ internal abstract class BaseRunTests
 
     private bool NotRequiredStaThread()
     {
-        return _runConfiguration.ExecutionThreadApartmentState != PlatformApartmentState.Sta;
+        return _runConfiguration.ExecutionThreadApartmentState != PlatformApartmentState.STA;
     }
 
     private TestExecutorExtensionManager GetExecutorExtensionManager(string extensionAssembly)
@@ -704,7 +704,7 @@ internal abstract class BaseRunTests
         try
         {
             EqtTrace.Verbose("BaseRunTests.TryToRunInSTAThread: Using STA thread to call adapter API.");
-            _platformThread.Run(action, PlatformApartmentState.Sta, waitForCompletion);
+            _platformThread.Run(action, PlatformApartmentState.STA, waitForCompletion);
         }
         catch (ThreadApartmentStateNotSupportedException ex)
         {

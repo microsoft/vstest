@@ -11,13 +11,13 @@ using System.Diagnostics;
 
 using Trace;
 
-public class VsTestForwardingApp
+public class VSTestForwardingApp
 {
     private const string HostExe = "dotnet";
     private readonly List<string> _allArgs = new();
     private int _activeProcessId;
 
-    public VsTestForwardingApp(string vsTestExePath, IEnumerable<string> argsToForward)
+    public VSTestForwardingApp(string vsTestExePath, IEnumerable<string> argsToForward)
     {
         _allArgs.Add("exec");
 

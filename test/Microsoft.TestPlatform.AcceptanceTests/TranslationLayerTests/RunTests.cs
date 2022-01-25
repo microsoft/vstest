@@ -28,7 +28,7 @@ public class RunTests : AcceptanceTestBase
 
     private void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _);
         _runEventHandler = new RunEventHandler();
     }
 
@@ -58,6 +58,7 @@ public class RunTests : AcceptanceTestBase
     [TestMethod]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
+    [DoNotParallelize]
     public void EndSessionShouldEnsureVstestConsoleProcessDies(RunnerInfo runnerInfo)
     {
         var numOfProcesses = Process.GetProcessesByName("vstest.console").Length;
@@ -92,7 +93,7 @@ public class RunTests : AcceptanceTestBase
         Assert.AreEqual(6, _runEventHandler.TestResults.Count);
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetDevice));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetFramework));
-        Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetOs));
+        Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetOS));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForRun));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.RunState));
@@ -144,7 +145,7 @@ public class RunTests : AcceptanceTestBase
             ? $"The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.{Environment.NewLine}"
             : $"The active test run was aborted. Reason: Test host process crashed : Process is terminating due to StackOverflowException.{Environment.NewLine}";
 
-        Assert.AreEqual(errorMessage, _runEventHandler.LogMessage);
+        Assert.IsTrue(this.runEventHandler.Errors.Contains(errorMessage));
     }
 
     [TestMethod]

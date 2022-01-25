@@ -24,27 +24,30 @@ public class DataCollectionTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void ExecuteTestsWithDataCollection(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
-        var resultsDir = GetResultsDirectory();
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-        string runSettings = GetRunsettingsFilePath(resultsDir);
-        string diagFileName = Path.Combine(resultsDir, "diaglog.txt");
+        var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+        string runSettings = this.GetRunsettingsFilePath(tempDir.Path);
+        string diagFileName = Path.Combine(tempDir.Path, "diaglog.txt");
         var extensionsPath = Path.Combine(
-            _testEnvironment.TestAssetsPath,
+            this.testEnvironment.TestAssetsPath,
             Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
             "bin",
             IntegrationTestEnvironment.BuildConfiguration,
-            _testEnvironment.RunnerFramework);
-        var arguments = PrepareArguments(assemblyPaths, null, runSettings, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+            this.testEnvironment.RunnerFramework);
+        var arguments = PrepareArguments(assemblyPaths, null, runSettings, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
 
-        InvokeVsTest(arguments);
+        var env = new Dictionary<string, string>
+        {
+            ["TEST_ASSET_SAMPLE_COLLECTOR_PATH"] = tempDir.Path,
+        };
 
-        ValidateSummaryStatus(1, 1, 1);
-        VaildateDataCollectorOutput(resultsDir);
+        this.InvokeVsTest(arguments, env);
 
-        TryRemoveDirectory(resultsDir);
+        this.ValidateSummaryStatus(1, 1, 1);
+        this.VaildateDataCollectorOutput(tempDir.Path);
     }
 
     [TestMethod]
@@ -54,25 +57,28 @@ public class DataCollectionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var resultsDir = GetResultsDirectory();
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-        string diagFileName = Path.Combine(resultsDir, "diaglog.txt");
+        using var tempDir = new TempDirectory();
+        var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+        string diagFileName = Path.Combine(tempDir.Path, "diaglog.txt");
         var extensionsPath = Path.Combine(
-            _testEnvironment.TestAssetsPath,
+            this.testEnvironment.TestAssetsPath,
             Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
             "bin",
             IntegrationTestEnvironment.BuildConfiguration,
-            _testEnvironment.RunnerFramework);
+            this.testEnvironment.RunnerFramework);
 
-        var arguments = PrepareArguments(assemblyPaths, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDir);
+        var arguments = PrepareArguments(assemblyPaths, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
         arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /Collect:SampleDataCollector", $" /TestAdapterPath:{extensionsPath}");
 
-        InvokeVsTest(arguments);
+        var env = new Dictionary<string, string>
+        {
+            ["TEST_ASSET_SAMPLE_COLLECTOR_PATH"] = tempDir.Path,
+        };
 
-        ValidateSummaryStatus(1, 1, 1);
-        VaildateDataCollectorOutput(resultsDir);
+        this.InvokeVsTest(arguments, env);
 
-        TryRemoveDirectory(resultsDir);
+        this.ValidateSummaryStatus(1, 1, 1);
+        this.VaildateDataCollectorOutput(tempDir.Path);
     }
 
     [TestMethod]
@@ -81,13 +87,11 @@ public class DataCollectionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var resultsDir = GetResultsDirectory();
-        var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.1"), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: resultsDir);
+        using var tempDir = new TempDirectory();
+        var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.1"), string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
 
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(1, 0, 0);
-
-        TryRemoveDirectory(resultsDir);
+        this.InvokeVsTest(arguments);
+        this.ValidateSummaryStatus(1, 0, 0);
     }
 
     [TestMethod]
@@ -97,13 +101,11 @@ public class DataCollectionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var resultsDir = GetResultsDirectory();
-        var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll"), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: resultsDir);
+        using var tempDir = new TempDirectory();
+        var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll"), string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
 
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(1, 0, 0);
-
-        TryRemoveDirectory(resultsDir);
+        this.InvokeVsTest(arguments);
+        this.ValidateSummaryStatus(1, 0, 0);
     }
 
     [TestMethod]
@@ -113,18 +115,18 @@ public class DataCollectionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var resultsDir = GetResultsDirectory();
-        var assemblyPath = BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
-        var secondAssemblyPath = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-        string runSettings = GetRunsettingsFilePath(resultsDir);
-        string diagFileName = Path.Combine(resultsDir, "diaglog.txt");
+        using var tempDir = new TempDirectory();
+        var assemblyPath = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
+        var secondAssemblyPath = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+        string runSettings = this.GetRunsettingsFilePath(tempDir.Path);
+        string diagFileName = Path.Combine(tempDir.Path, "diaglog.txt");
         var extensionsPath = Path.Combine(
-            _testEnvironment.TestAssetsPath,
+            this.testEnvironment.TestAssetsPath,
             Path.GetFileNameWithoutExtension("AttachmentProcessorDataCollector"),
             "bin",
             IntegrationTestEnvironment.BuildConfiguration,
             "netstandard2.0");
-        var arguments = PrepareArguments(new string[] { assemblyPath, secondAssemblyPath }, null, runSettings, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+        var arguments = PrepareArguments(new string[] { assemblyPath, secondAssemblyPath }, null, runSettings, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
 
         XElement runSettingsXml = XElement.Load(runSettings);
@@ -142,12 +144,18 @@ public class DataCollectionTests : AcceptanceTestBase
             .Add(new XElement("Configuration", new XElement("MergeFile", "MergedFile.txt")));
         runSettingsXml.Save(runSettings);
 
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(2, 2, 2);
+        var env = new Dictionary<string, string>
+        {
+            ["SampleDataCollectorTempPath"] = tempDir.Path,
+        };
 
-        string mergedFile = Directory.GetFiles(resultsDir, "MergedFile.txt", SearchOption.AllDirectories).Single();
-        List<string> fileContent = new();
-        using (StreamReader streamReader = new(mergedFile))
+        this.InvokeVsTest(arguments, env);
+
+        this.ValidateSummaryStatus(2, 2, 2);
+
+        string mergedFile = Directory.GetFiles(tempDir.Path, "MergedFile.txt", SearchOption.AllDirectories).Single();
+        List<string> fileContent = new List<string>();
+        using (StreamReader streamReader = new StreamReader(mergedFile))
         {
             while (!streamReader.EndOfStream)
             {
@@ -159,7 +167,7 @@ public class DataCollectionTests : AcceptanceTestBase
 
         Assert.AreEqual(2, fileContent.Distinct().Count());
 
-        var dataCollectorsLogs = Directory.GetFiles(resultsDir, "*.datacollector.*", SearchOption.TopDirectoryOnly);
+        var dataCollectorsLogs = Directory.GetFiles(tempDir.Path, "*.datacollector.*", SearchOption.TopDirectoryOnly);
         Assert.AreEqual(2, dataCollectorsLogs.Distinct().Count());
         foreach (var dataCollectorLogFile in dataCollectorsLogs)
         {
@@ -168,8 +176,6 @@ public class DataCollectionTests : AcceptanceTestBase
             Assert.IsTrue(dataCollectorLog.Contains("MetadataReaderExtensionsHelper: Valid extension found: extension type 'DataCollector' identifier 'my://sample/datacollector' implementation 'AttachmentProcessorDataCollector.SampleDataCollectorV2' version '2'"));
             Assert.IsTrue(Regex.IsMatch(dataCollectorLog, @"GetTestExtensionFromType: Discovered multiple test extensions with identifier data 'my://sample/datacollector' and type 'AttachmentProcessorDataCollector\.SampleDataCollectorV1, AttachmentProcessorDataCollector, Version=.*, Culture=neutral, PublicKeyToken=null' inside file '.*AttachmentProcessorDataCollector\.dll'; keeping the first one 'AttachmentProcessorDataCollector\.SampleDataCollectorV2, AttachmentProcessorDataCollector, Version=.*, Culture=neutral, PublicKeyToken=null'\."));
         }
-
-        TryRemoveDirectory(resultsDir);
     }
 
     private static void CreateDataCollectionRunSettingsFile(string destinationRunsettingsPath, Dictionary<string, string> dataCollectionAttributes)

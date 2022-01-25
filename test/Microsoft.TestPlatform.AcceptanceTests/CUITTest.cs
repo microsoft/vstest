@@ -3,7 +3,8 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 [TestCategory("Windows-Review")]
@@ -26,13 +27,11 @@ public class CuitTest : AcceptanceTestBase
             return;
         }
 
-        var assemblyAbsolutePath = _testEnvironment.GetTestAsset("CUITTestProject.dll", "net451");
-        var resultsDirectory = GetResultsDirectory();
-        var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: resultsDirectory);
+        var assemblyAbsolutePath = testEnvironment.GetTestAsset("CUITTestProject.dll", "net451");
+        using var tempDir = new TempDirectory();
+        var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
 
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(1, 0, 0);
-
-        TryRemoveDirectory(resultsDirectory);
+        this.InvokeVsTest(arguments);
+        this.ValidateSummaryStatus(1, 0, 0);
     }
 }

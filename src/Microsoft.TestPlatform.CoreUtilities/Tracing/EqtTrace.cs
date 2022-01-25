@@ -72,7 +72,8 @@ public static class EqtTrace
         }
     }
 
-    public static bool DoNotInitialize
+    // There is a typo on this property but it's part of the public API so we cannot change it.
+    public static bool DoNotInitailize
     {
         get
         {

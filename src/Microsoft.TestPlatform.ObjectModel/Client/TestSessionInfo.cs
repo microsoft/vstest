@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 
 /// <summary>
 /// Defines the test session info object to be passed around between vstest.console and
-/// vstest.console wrapper in order to indentify the current session.
+/// vstest.console wrapper in order to identify the current session.
 /// </summary>
 [DataContract]
 public class TestSessionInfo : IEquatable<TestSessionInfo>

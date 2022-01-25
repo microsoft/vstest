@@ -3,77 +3,76 @@
 
 #if NETCOREAPP
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
-{
-    using System;
-    using System.Reflection;
-    using System.Runtime.Loader;
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-    using Interfaces;
+using System;
+using System.Reflection;
+using System.Runtime.Loader;
+
+using Interfaces;
+
+/// <inheritdoc/>
+public class PlatformAssemblyResolver : IAssemblyResolver
+{
+    /// <summary>
+    /// Specifies whether the resolver is disposed or not
+    /// </summary>
+    private bool _disposed;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PlatformAssemblyResolver"/> class.
+    /// </summary>
+    /// <param name="directories"> The search directories. </param>
+    public PlatformAssemblyResolver()
+    {
+        AssemblyLoadContext.Default.Resolving += AssemblyResolverEvent;
+    }
+
+    ~PlatformAssemblyResolver()
+    {
+        Dispose(false);
+    }
 
     /// <inheritdoc/>
-    public class PlatformAssemblyResolver : IAssemblyResolver
+    public event AssemblyResolveEventHandler AssemblyResolve;
+
+    public void Dispose()
     {
-        /// <summary>
-        /// Specifies whether the resolver is disposed or not
-        /// </summary>
-        private bool _disposed;
+        Dispose(true);
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PlatformAssemblyResolver"/> class.
-        /// </summary>
-        /// <param name="directories"> The search directories. </param>
-        public PlatformAssemblyResolver()
+        // Use SupressFinalize in case a subclass
+        // of this type implements a finalizer.
+        GC.SuppressFinalize(this);
+    }
+
+    protected void Dispose(bool disposing)
+    {
+        if (!_disposed)
         {
-            AssemblyLoadContext.Default.Resolving += AssemblyResolverEvent;
-        }
-
-        ~PlatformAssemblyResolver()
-        {
-            Dispose(false);
-        }
-
-        /// <inheritdoc/>
-        public event AssemblyResolveEventHandler AssemblyResolve;
-
-        public void Dispose()
-        {
-            Dispose(true);
-
-            // Use SupressFinalize in case a subclass
-            // of this type implements a finalizer.
-            GC.SuppressFinalize(this);
-        }
-
-        protected void Dispose(bool disposing)
-        {
-            if (!_disposed)
+            if (disposing)
             {
-                if (disposing)
-                {
-                    AssemblyLoadContext.Default.Resolving -= AssemblyResolverEvent;
-                }
-
-                _disposed = true;
+                AssemblyLoadContext.Default.Resolving -= AssemblyResolverEvent;
             }
-        }
 
-        /// <summary>
-        /// Assembly Resolve event handler for App Domain - called when CLR loader cannot resolve assembly.
-        /// </summary>
-        /// <param name="sender">
-        /// The sender.
-        /// </param>
-        /// <param name="eventArgs">
-        /// The event Args.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Assembly"/>.
-        /// </returns>
-        private Assembly AssemblyResolverEvent(object sender, object eventArgs)
-        {
-            return eventArgs is not AssemblyName args ? null : AssemblyResolve(this, new AssemblyResolveEventArgs(args.Name));
+            _disposed = true;
         }
+    }
+
+    /// <summary>
+    /// Assembly Resolve event handler for App Domain - called when CLR loader cannot resolve assembly.
+    /// </summary>
+    /// <param name="sender">
+    /// The sender.
+    /// </param>
+    /// <param name="eventArgs">
+    /// The event Args.
+    /// </param>
+    /// <returns>
+    /// The <see cref="Assembly"/>.
+    /// </returns>
+    private Assembly AssemblyResolverEvent(object sender, object eventArgs)
+    {
+        return eventArgs is not AssemblyName args ? null : AssemblyResolve(this, new AssemblyResolveEventArgs(args.Name));
     }
 }
 

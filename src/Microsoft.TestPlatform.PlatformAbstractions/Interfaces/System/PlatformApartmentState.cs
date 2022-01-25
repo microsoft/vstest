@@ -8,6 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 /// </summary>
 public enum PlatformApartmentState
 {
-    Mta,
-    Sta
+    MTA,
+    STA,
 }

@@ -660,9 +660,9 @@ internal class TestRequestManager : ITestRequestManager
                     return Architecture.X86;
                 case PlatformArchitecture.X64:
                     return Architecture.X64;
-                case PlatformArchitecture.Arm:
+                case PlatformArchitecture.ARM:
                     return Architecture.ARM;
-                case PlatformArchitecture.Arm64:
+                case PlatformArchitecture.ARM64:
                     return Architecture.ARM64;
                 default:
                     break;
@@ -1024,7 +1024,7 @@ internal class TestRequestManager : ITestRequestManager
 
         // Collecting Max CPU count.
         requestData.MetricsCollection.Add(
-            TelemetryDataConstants.MaxCpUcount,
+            TelemetryDataConstants.MaxCPUcount,
             runConfiguration.MaxCpuCount);
 
         // Collecting Target Device. Here, it will be updated run settings so, target device
@@ -1058,7 +1058,7 @@ internal class TestRequestManager : ITestRequestManager
 
         // Collecting TargetOS.
         requestData.MetricsCollection.Add(
-            TelemetryDataConstants.TargetOs,
+            TelemetryDataConstants.TargetOS,
             new PlatformEnvironment().OperatingSystemVersion);
 
         //Collecting DisableAppDomain.

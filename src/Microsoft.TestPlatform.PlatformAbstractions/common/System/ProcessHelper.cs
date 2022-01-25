@@ -188,7 +188,7 @@ public partial class ProcessHelper : IProcessHelper
     public string GetNativeDllDirectory()
     {
         var osArchitecture = new PlatformEnvironment().Architecture;
-        return osArchitecture == PlatformArchitecture.Arm || osArchitecture == PlatformArchitecture.Arm64
+        return osArchitecture == PlatformArchitecture.ARM || osArchitecture == PlatformArchitecture.ARM64
             ? Path.Combine(GetCurrentProcessLocation(), GetCurrentProcessArchitecture().ToString().ToLower(), Arm)
             : Path.Combine(GetCurrentProcessLocation(), GetCurrentProcessArchitecture().ToString().ToLower());
     }

@@ -25,7 +25,7 @@ public class NetCoreRunner : Attribute, ITestDataSource
     /// Initializes a new instance of the <see cref="NetCoreTargetFrameworkDataSource"/> class.
     /// </summary>
     /// <param name="targetFrameworks">To run tests with desktop runner(vstest.console.exe), use AcceptanceTestBase.Net452TargetFramework or alike values.</param>
-    public NetCoreRunner(string targetFrameworks = AcceptanceTestBase.Netfx452Net50)
+    public NetCoreRunner(string targetFrameworks = AcceptanceTestBase.NETFX452_NET50)
     {
         var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
         // on non-windows we want to filter down only to netcoreapp runner, and net5.0 and newer.

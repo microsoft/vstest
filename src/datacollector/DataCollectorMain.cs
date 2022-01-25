@@ -96,7 +96,7 @@ public class DataCollectorMain
         }
         else
         {
-            EqtTrace.DoNotInitialize = true;
+            EqtTrace.DoNotInitailize = true;
         }
 
         if (EqtTrace.IsVerboseEnabled)

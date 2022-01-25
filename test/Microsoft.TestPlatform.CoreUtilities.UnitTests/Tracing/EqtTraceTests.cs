@@ -20,8 +20,8 @@ public class EqtTraceTests
     [ClassInitialize]
     public static void Init(TestContext testContext)
     {
-        // Set DoNotInitialize to false.
-        EqtTrace.DoNotInitialize = false;
+        // Set DoNotInitailize to false.
+        EqtTrace.DoNotInitailize = false;
         s_dirPath = Path.Combine(Path.GetTempPath(), "TraceUT");
         try
         {
@@ -153,7 +153,7 @@ public class EqtTraceTests
     [TestMethod]
     public void TraceShouldNotWriteIfDoNotInitializationIsSetToTrue()
     {
-        EqtTrace.DoNotInitialize = true;
+        EqtTrace.DoNotInitailize = true;
 #if NETFRAMEWORK
         EqtTrace.TraceLevel = TraceLevel.Info;
 #else

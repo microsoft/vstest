@@ -645,9 +645,9 @@ public class BaseRunTestsTests
     [TestMethod]
     public void RunTestsShouldCreateStaThreadIfExecutionThreadApartmentStateIsSta()
     {
-        SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.Sta);
+        SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.STA);
         _runTestsInstance.RunTests();
-        _mockThread.Verify(t => t.Run(It.IsAny<Action>(), PlatformApartmentState.Sta, true));
+        _mockThread.Verify(t => t.Run(It.IsAny<Action>(), PlatformApartmentState.STA, true));
     }
 
     [TestMethod]
@@ -731,32 +731,32 @@ public class BaseRunTestsTests
     [TestMethod]
     public void RunTestsShouldNotCreateThreadIfExecutionThreadApartmentStateIsMta()
     {
-        SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.Mta);
+        SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.MTA);
         _runTestsInstance.RunTests();
 
-        _mockThread.Verify(t => t.Run(It.IsAny<Action>(), PlatformApartmentState.Sta, true), Times.Never);
+        _mockThread.Verify(t => t.Run(It.IsAny<Action>(), PlatformApartmentState.STA, true), Times.Never);
     }
 
     [TestMethod]
     public void RunTestsShouldRunTestsInMtaThreadWhenRunningInStaThreadFails()
     {
-        SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.Sta);
+        SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.STA);
         _mockThread.Setup(
-            mt => mt.Run(It.IsAny<Action>(), PlatformApartmentState.Sta, It.IsAny<bool>())).Throws<ThreadApartmentStateNotSupportedException>();
+            mt => mt.Run(It.IsAny<Action>(), PlatformApartmentState.STA, It.IsAny<bool>())).Throws<ThreadApartmentStateNotSupportedException>();
         bool isInvokeExecutorCalled = false;
         _runTestsInstance.InvokeExecutorCallback =
             (executor, executorUriTuple, runcontext, frameworkHandle) => isInvokeExecutorCalled = true;
         _runTestsInstance.RunTests();
 
         Assert.IsTrue(isInvokeExecutorCalled, "InvokeExecutor() should be called when STA thread creation fails.");
-        _mockThread.Verify(t => t.Run(It.IsAny<Action>(), PlatformApartmentState.Sta, true), Times.Once);
+        _mockThread.Verify(t => t.Run(It.IsAny<Action>(), PlatformApartmentState.STA, true), Times.Once);
     }
 
     [TestMethod]
     public void CancelShouldCreateStaThreadIfExecutionThreadApartmentStateIsSta()
     {
-        SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.Sta);
-        _mockThread.Setup(mt => mt.Run(It.IsAny<Action>(), PlatformApartmentState.Sta, It.IsAny<bool>()))
+        SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.STA);
+        _mockThread.Setup(mt => mt.Run(It.IsAny<Action>(), PlatformApartmentState.STA, It.IsAny<bool>()))
             .Callback<Action, PlatformApartmentState, bool>((action, start, waitForCompletion) =>
             {
                 if (waitForCompletion)
@@ -768,7 +768,7 @@ public class BaseRunTestsTests
 
         _runTestsInstance.RunTests();
         _mockThread.Verify(
-            t => t.Run(It.IsAny<Action>(), PlatformApartmentState.Sta, It.IsAny<bool>()),
+            t => t.Run(It.IsAny<Action>(), PlatformApartmentState.STA, It.IsAny<bool>()),
             Times.Exactly(2),
             "Both RunTests() and Cancel() should create STA thread.");
     }

@@ -15,7 +15,7 @@ public class PlatformThread : IThread
     /// <inheritdoc/>
     public void Run(Action action, PlatformApartmentState apartmentState, bool waitForCompletion)
     {
-        if (apartmentState == PlatformApartmentState.Sta)
+        if (apartmentState == PlatformApartmentState.STA)
         {
             throw new ThreadApartmentStateNotSupportedException();
         }

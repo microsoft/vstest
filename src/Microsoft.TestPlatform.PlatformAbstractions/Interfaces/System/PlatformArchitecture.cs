@@ -10,7 +10,7 @@ public enum PlatformArchitecture
 {
     X86,
     X64,
-    Arm,
-    Arm64,
-    S390X
+    ARM,
+    ARM64,
+    S390x,
 }

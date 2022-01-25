@@ -3,11 +3,8 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-using System.Threading;
-
-using global::TestPlatform.TestUtilities;
-
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 // monitoring the processes does not work correctly
@@ -42,37 +39,20 @@ public class PlatformTests : AcceptanceTestBase
         RunTestExecutionWithPlatform(platformArg, "testhost.x86", 1);
     }
 
-    private void SetExpectedParams(ref int expectedNumOfProcessCreated, ref string testhostProcessName, string desktopHostProcessName)
-    {
-        testhostProcessName = desktopHostProcessName;
-        expectedNumOfProcessCreated = 1;
-    }
-
     private void RunTestExecutionWithPlatform(string platformArg, string testhostProcessName, int expectedNumOfProcessCreated)
     {
-        var resultsDir = GetResultsDirectory();
+        using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(
-            GetSampleTestAssembly(),
-            GetTestAdapterPath(),
-            string.Empty, FrameworkArgValue,
-            _testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
-        arguments = string.Concat(arguments, platformArg);
+            this.GetSampleTestAssembly(),
+            this.GetTestAdapterPath(),
+            string.Empty, this.FrameworkArgValue,
+            this.testEnvironment.InIsolationValue, resultsDirectory: tempDir.Path);
 
-        var cts = new CancellationTokenSource();
-        var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
-            cts,
-            testhostProcessName);
+        arguments = string.Concat(arguments, platformArg, GetDiagArg(tempDir.Path));
+        this.InvokeVsTest(arguments);
 
-        InvokeVsTest(arguments);
-
-        cts.Cancel();
-
-        Assert.AreEqual(
-            expectedNumOfProcessCreated,
-            numOfProcessCreatedTask.Result.Count,
-            $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) }) args: {arguments} runner path: {GetConsoleRunnerPath()}");
-        ValidateSummaryStatus(1, 1, 1);
-        TryRemoveDirectory(resultsDir);
+        AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, tempDir.Path, new[] { testhostProcessName }, arguments, this.GetConsoleRunnerPath());
+        this.ValidateSummaryStatus(1, 1, 1);
     }
 }

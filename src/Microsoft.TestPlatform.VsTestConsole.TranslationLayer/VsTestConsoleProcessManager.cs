@@ -3,18 +3,20 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Threading;
+
 using Interfaces;
 
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Threading;
 
 using Resources = VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
 
@@ -96,8 +98,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
     {
         lock (_syncObject)
         {
-            return _vstestConsoleStarted && !_vstestConsoleExited &&
-                   _process != null;
+            return _vstestConsoleStarted && !_vstestConsoleExited && _process != null;
         }
     }
 
@@ -106,7 +107,17 @@ internal class VsTestConsoleProcessManager : IProcessManager
     /// </summary>
     public void StartProcess(ConsoleParameters consoleParameters)
     {
-        var info = new ProcessStartInfo(GetConsoleRunner(), string.Join(" ", BuildArguments(consoleParameters)))
+        var consoleRunnerPath = GetConsoleRunner();
+
+        // The console runner path we retrieve might have been escaped so we need to remove the
+        // extra double quotes before testing whether the file exists.
+        if (!File.Exists(consoleRunnerPath.Trim('"')))
+        {
+            throw new FileNotFoundException(string.Format(Resources.CannotFindConsoleRunner, consoleRunnerPath), consoleRunnerPath);
+        }
+
+        var arguments = string.Join(" ", BuildArguments(consoleParameters));
+        var info = new ProcessStartInfo(consoleRunnerPath, arguments)
         {
             UseShellExecute = false,
             CreateNoWindow = true,
@@ -129,7 +140,14 @@ internal class VsTestConsoleProcessManager : IProcessManager
             }
         }
 #endif
-        _process = Process.Start(info);
+        try
+        {
+            _process = Process.Start(info);
+        }
+        catch (Win32Exception ex)
+        {
+            throw new Exception(string.Format(Resources.ProcessStartWin32Failure, consoleRunnerPath, arguments), ex);
+        }
 
         lock (_syncObject)
         {

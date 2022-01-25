@@ -45,19 +45,19 @@ public class DotnetHostHelperTest : IDisposable
     [DataRow(PlatformArchitecture.X86, PlatformArchitecture.X64, PlatformOperatingSystem.Windows, "DOTNET_ROOT(x86)")]
     [DataRow(PlatformArchitecture.X86, PlatformArchitecture.X64, PlatformOperatingSystem.Windows, "DOTNET_ROOT")]
 
-    [DataRow(PlatformArchitecture.Arm64, PlatformArchitecture.X64, PlatformOperatingSystem.Windows, "DOTNET_ROOT(x86)", false)]
-    [DataRow(PlatformArchitecture.Arm64, PlatformArchitecture.X64, PlatformOperatingSystem.Windows, "DOTNET_ROOT_ARM64")]
-    [DataRow(PlatformArchitecture.Arm64, PlatformArchitecture.X64, PlatformOperatingSystem.Windows, "DOTNET_ROOT")]
+    [DataRow(PlatformArchitecture.ARM64, PlatformArchitecture.X64, PlatformOperatingSystem.Windows, "DOTNET_ROOT(x86)", false)]
+    [DataRow(PlatformArchitecture.ARM64, PlatformArchitecture.X64, PlatformOperatingSystem.Windows, "DOTNET_ROOT_ARM64")]
+    [DataRow(PlatformArchitecture.ARM64, PlatformArchitecture.X64, PlatformOperatingSystem.Windows, "DOTNET_ROOT")]
 
     [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, PlatformOperatingSystem.Windows, "DOTNET_ROOT(x86)", false)]
-    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.Arm64, PlatformOperatingSystem.Windows, "DOTNET_ROOT_X64")]
-    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.Arm64, PlatformOperatingSystem.Windows, "DOTNET_ROOT")]
+    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.ARM64, PlatformOperatingSystem.Windows, "DOTNET_ROOT_X64")]
+    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.ARM64, PlatformOperatingSystem.Windows, "DOTNET_ROOT")]
 
-    [DataRow(PlatformArchitecture.Arm64, PlatformArchitecture.X64, PlatformOperatingSystem.Osx, "DOTNET_ROOT_ARM64")]
-    [DataRow(PlatformArchitecture.Arm64, PlatformArchitecture.X64, PlatformOperatingSystem.Osx, "DOTNET_ROOT")]
+    [DataRow(PlatformArchitecture.ARM64, PlatformArchitecture.X64, PlatformOperatingSystem.OSX, "DOTNET_ROOT_ARM64")]
+    [DataRow(PlatformArchitecture.ARM64, PlatformArchitecture.X64, PlatformOperatingSystem.OSX, "DOTNET_ROOT")]
 
-    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.Arm64, PlatformOperatingSystem.Osx, "DOTNET_ROOT_X64")]
-    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.Arm64, PlatformOperatingSystem.Osx, "DOTNET_ROOT")]
+    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.ARM64, PlatformOperatingSystem.OSX, "DOTNET_ROOT_X64")]
+    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.ARM64, PlatformOperatingSystem.OSX, "DOTNET_ROOT")]
     public void GetDotnetPathByArchitecture_EnvVars(PlatformArchitecture targetArchitecture,
         PlatformArchitecture platformArchitecture,
         PlatformOperatingSystem platformSystem,
@@ -66,7 +66,7 @@ public class DotnetHostHelperTest : IDisposable
     {
         // Arrange
         string dotnetRootX64 = _muxerHelper.RenameMuxerAndReturnPath(platformSystem, PlatformArchitecture.X64);
-        string dotnetRootArm64 = _muxerHelper.RenameMuxerAndReturnPath(platformSystem, PlatformArchitecture.Arm64);
+        string dotnetRootArm64 = _muxerHelper.RenameMuxerAndReturnPath(platformSystem, PlatformArchitecture.ARM64);
         string dotnetRootX86 = null;
         if (platformSystem == PlatformOperatingSystem.Windows)
         {
@@ -99,13 +99,13 @@ public class DotnetHostHelperTest : IDisposable
     }
 
     [DataTestMethod]
-    [DataRow("DOTNET_ROOT_ARM64", "DOTNET_ROOT", PlatformArchitecture.Arm64, PlatformArchitecture.X64)]
+    [DataRow("DOTNET_ROOT_ARM64", "DOTNET_ROOT", PlatformArchitecture.ARM64, PlatformArchitecture.X64)]
     [DataRow("DOTNET_ROOT(x86)", "DOTNET_ROOT", PlatformArchitecture.X86, PlatformArchitecture.X64)]
     public void GetDotnetPathByArchitecture_EnvVars_DirectoryNotExists_TryNext(string notExists, string nextEnv, PlatformArchitecture targetAchitecture, PlatformArchitecture platformArchitecture)
     {
         // Arrange
         string dotnetRootX64 = _muxerHelper.RenameMuxerAndReturnPath(PlatformOperatingSystem.Windows, PlatformArchitecture.X64);
-        string dotnetRootArm64 = _muxerHelper.RenameMuxerAndReturnPath(PlatformOperatingSystem.Windows, PlatformArchitecture.Arm64);
+        string dotnetRootArm64 = _muxerHelper.RenameMuxerAndReturnPath(PlatformOperatingSystem.Windows, PlatformArchitecture.ARM64);
         string dotnetRootX86 = _muxerHelper.RenameMuxerAndReturnPath(PlatformOperatingSystem.Windows, PlatformArchitecture.X86);
         string dotnetRoot = _muxerHelper.RenameMuxerAndReturnPath(PlatformOperatingSystem.Windows, targetAchitecture);
         Dictionary<string, string> envVars = new()
@@ -176,17 +176,17 @@ public class DotnetHostHelperTest : IDisposable
     }
 
     [DataTestMethod]
-    [DataRow(PlatformArchitecture.Arm64, "/etc/dotnet/install_location_arm64", true, PlatformOperatingSystem.Osx)]
-    [DataRow(PlatformArchitecture.X64, "/etc/dotnet/install_location_x64", true, PlatformOperatingSystem.Osx)]
-    [DataRow(PlatformArchitecture.Arm64, "/etc/dotnet/install_location", true, PlatformOperatingSystem.Osx)]
-    [DataRow(PlatformArchitecture.X64, "/etc/dotnet/install_location", true, PlatformOperatingSystem.Osx)]
-    [DataRow(PlatformArchitecture.Arm64, "/etc/dotnet/install_location_x64", false, PlatformOperatingSystem.Osx)]
+    [DataRow(PlatformArchitecture.ARM64, "/etc/dotnet/install_location_arm64", true, PlatformOperatingSystem.OSX)]
+    [DataRow(PlatformArchitecture.X64, "/etc/dotnet/install_location_x64", true, PlatformOperatingSystem.OSX)]
+    [DataRow(PlatformArchitecture.ARM64, "/etc/dotnet/install_location", true, PlatformOperatingSystem.OSX)]
+    [DataRow(PlatformArchitecture.X64, "/etc/dotnet/install_location", true, PlatformOperatingSystem.OSX)]
+    [DataRow(PlatformArchitecture.ARM64, "/etc/dotnet/install_location_x64", false, PlatformOperatingSystem.OSX)]
 
-    [DataRow(PlatformArchitecture.Arm64, "/etc/dotnet/install_location_arm64", false, PlatformOperatingSystem.Unix)]
+    [DataRow(PlatformArchitecture.ARM64, "/etc/dotnet/install_location_arm64", false, PlatformOperatingSystem.Unix)]
     [DataRow(PlatformArchitecture.X64, "/etc/dotnet/install_location_x64", false, PlatformOperatingSystem.Unix)]
-    [DataRow(PlatformArchitecture.Arm64, "/etc/dotnet/install_location", false, PlatformOperatingSystem.Unix)]
+    [DataRow(PlatformArchitecture.ARM64, "/etc/dotnet/install_location", false, PlatformOperatingSystem.Unix)]
     [DataRow(PlatformArchitecture.X64, "/etc/dotnet/install_location", false, PlatformOperatingSystem.Unix)]
-    [DataRow(PlatformArchitecture.Arm64, "/etc/dotnet/install_location_x64", false, PlatformOperatingSystem.Unix)]
+    [DataRow(PlatformArchitecture.ARM64, "/etc/dotnet/install_location_x64", false, PlatformOperatingSystem.Unix)]
     public void GetDotnetPathByArchitecture_GlobalInstallation_Unix(PlatformArchitecture targetArchitecture, string installLocation, bool found, PlatformOperatingSystem os)
     {
         // Arrange
@@ -208,7 +208,7 @@ public class DotnetHostHelperTest : IDisposable
 
     [DataTestMethod]
     [DataRow(PlatformArchitecture.X86, PlatformArchitecture.X64, "ProgramFiles(x86)", "dotnet", true)]
-    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.Arm64, "ProgramFiles", @"dotnet\x64", true)]
+    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.ARM64, "ProgramFiles", @"dotnet\x64", true)]
     [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "ProgramFiles", "dotnet", true)]
     [DataRow(PlatformArchitecture.X86, PlatformArchitecture.X86, "ProgramFiles", "dotnet", true)]
     [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "ProgramFiles", "dotnet", false)]
@@ -233,14 +233,14 @@ public class DotnetHostHelperTest : IDisposable
     }
 
     [DataTestMethod]
-    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "/usr/local/share/dotnet", "", true, PlatformOperatingSystem.Osx)]
-    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.Arm64, "/usr/local/share/dotnet/x64", "", true, PlatformOperatingSystem.Osx)]
-    [DataRow(PlatformArchitecture.Arm64, PlatformArchitecture.X64, "/usr/local/share/dotnet", "", true, PlatformOperatingSystem.Osx)]
-    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "/usr/local/share/dotnet", "", false, PlatformOperatingSystem.Osx)]
+    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "/usr/local/share/dotnet", "", true, PlatformOperatingSystem.OSX)]
+    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.ARM64, "/usr/local/share/dotnet/x64", "", true, PlatformOperatingSystem.OSX)]
+    [DataRow(PlatformArchitecture.ARM64, PlatformArchitecture.X64, "/usr/local/share/dotnet", "", true, PlatformOperatingSystem.OSX)]
+    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "/usr/local/share/dotnet", "", false, PlatformOperatingSystem.OSX)]
 
     [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "/usr/share/dotnet", "", false, PlatformOperatingSystem.Unix)]
-    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.Arm64, "/usr/share/dotnet/x64", "", false, PlatformOperatingSystem.Unix)]
-    [DataRow(PlatformArchitecture.Arm64, PlatformArchitecture.X64, "/usr/share/dotnet", "", false, PlatformOperatingSystem.Unix)]
+    [DataRow(PlatformArchitecture.X64, PlatformArchitecture.ARM64, "/usr/share/dotnet/x64", "", false, PlatformOperatingSystem.Unix)]
+    [DataRow(PlatformArchitecture.ARM64, PlatformArchitecture.X64, "/usr/share/dotnet", "", false, PlatformOperatingSystem.Unix)]
     [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "/usr/share/dotnet", "", false, PlatformOperatingSystem.Unix)]
     public void GetDotnetPathByArchitecture_DefaultInstallation_Unix(PlatformArchitecture targetArchitecture, PlatformArchitecture platformArchitecture, string expectedFolder, string subfolder, bool found, PlatformOperatingSystem os)
     {
@@ -293,7 +293,7 @@ public class DotnetHostHelperTest : IDisposable
                     {
                         muxerPath = Path.Combine(tmpDirectory, Guid.NewGuid().ToString("N"), subfolder, "dotnet.exe");
                         Directory.CreateDirectory(Path.GetDirectoryName(muxerPath));
-                        if (architecture == PlatformArchitecture.Arm64)
+                        if (architecture == PlatformArchitecture.ARM64)
                         {
                             File.Copy(DotnetMuxerWinArm64, muxerPath);
                             break;
@@ -311,11 +311,11 @@ public class DotnetHostHelperTest : IDisposable
 
                         throw new NotSupportedException($"Unsupported architecture '{architecture}'");
                     }
-                case PlatformOperatingSystem.Osx:
+                case PlatformOperatingSystem.OSX:
                     {
                         muxerPath = Path.Combine(tmpDirectory, Guid.NewGuid().ToString("N"), subfolder, "dotnet");
                         Directory.CreateDirectory(Path.GetDirectoryName(muxerPath));
-                        if (architecture == PlatformArchitecture.Arm64)
+                        if (architecture == PlatformArchitecture.ARM64)
                         {
                             File.Copy(DotnetMuxerMacArm64, muxerPath);
                             break;

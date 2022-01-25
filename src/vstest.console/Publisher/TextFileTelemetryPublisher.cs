@@ -52,7 +52,8 @@ public class TextFileTelemetryPublisher : IMetricsPublisher
     /// </param>
     internal void LogToFile(string eventName, IDictionary<string, object> metrics, IFileHelper fileHelper)
     {
-        string resultDirectory = Path.GetTempPath() + "TelemetryLogs";
+        string resultDirectory = Environment.GetEnvironmentVariable("VSTEST_LOGTELEMETRY_PATH")
+            ?? Path.GetTempPath() + "TelemetryLogs";
         string resultFileName = Guid.NewGuid().ToString();
         string path = Path.Combine(resultDirectory, resultFileName);
 

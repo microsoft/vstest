@@ -6,6 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
 /// <summary>
 /// The test session end args.
 /// </summary>
-public class TestSessionEndArgs : INProcDataCollectionArgs
+public class TestSessionEndArgs : InProcDataCollectionArgs
 {
 }

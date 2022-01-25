@@ -3,8 +3,9 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System.Collections.Generic;
 using System.IO;
@@ -14,8 +15,8 @@ using System.Reflection;
 [TestCategory("Windows-Review")]
 public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
 {
-    private IList<string> _adapterDependencies;
-    private IList<string> _copiedFiles;
+    private IList<string> adapterDependencies;
+    private IList<string> copiedFiles;
 
     private string BuildConfiguration
     {
@@ -34,7 +35,7 @@ public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
     {
         try
         {
-            foreach (var file in _copiedFiles)
+            foreach (var file in this.copiedFiles)
             {
                 File.Delete(file);
             }
@@ -48,16 +49,16 @@ public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
     [TestInitialize]
     public void CopyAdapterToExtensions()
     {
-        _copiedFiles = new List<string>();
-        var extensionsDir = Path.Combine(Path.GetDirectoryName(GetConsoleRunnerPath()), "Extensions");
-        _adapterDependencies = Directory.GetFiles(GetTestAdapterPath(), "*.dll", SearchOption.TopDirectoryOnly);
+        this.copiedFiles = new List<string>();
+        var extensionsDir = Path.Combine(Path.GetDirectoryName(this.GetConsoleRunnerPath()), "Extensions");
+        this.adapterDependencies = Directory.GetFiles(this.GetTestAdapterPath(), "*.dll", SearchOption.TopDirectoryOnly);
 
         try
         {
-            foreach (var file in _adapterDependencies)
+            foreach (var file in this.adapterDependencies)
             {
                 var fileCopied = Path.Combine(extensionsDir, Path.GetFileName(file));
-                _copiedFiles.Add(fileCopied);
+                this.copiedFiles.Add(fileCopied);
                 File.Copy(file, fileCopied);
             }
         }
@@ -70,13 +71,11 @@ public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
     [TestMethod]
     public void VerifyDeprecatedWarningIsThrownWhenAdaptersPickedFromExtensionDirectory()
     {
-        var resultsDir = GetResultsDirectory();
-        var arguments = PrepareArguments(GetSampleTestAssembly(), null, null, FrameworkArgValue, resultsDirectory: resultsDir);
+        using var tempDir = new TempDirectory();
+        var arguments = PrepareArguments(this.GetSampleTestAssembly(), null, null, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
 
-        InvokeVsTest(arguments);
-        StdOutputContains("Adapter lookup is being changed, please follow");
-
-        TryRemoveDirectory(resultsDir);
+        this.InvokeVsTest(arguments);
+        this.StdOutputContains("Adapter lookup is being changed, please follow");
     }
 
     public override string GetConsoleRunnerPath()

@@ -414,7 +414,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             // If already running with the dotnet executable and the architecture is compatible, use it; otherwise search the correct muxer architecture on disk.
             else if (isRunningWithDotnetMuxer && isSameArchitecture && !forceToX64)
             {
-                EqtTrace.Verbose("DotnetTestHostmanager.LaunchTestHostAsync: Compatible muxer architecture of running process '{0}'", _platformEnvironment.Architecture);
+                EqtTrace.Verbose("DotnetTestHostmanager.LaunchTestHostAsync: Compatible muxer architecture of running process '{0}' and target architecture '{1}'", _processHelper.GetCurrentProcessArchitecture(), _architecture);
                 startInfo.FileName = currentProcessPath;
             }
             else
@@ -527,9 +527,9 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 case Architecture.X64:
                     return PlatformArchitecture.X64;
                 case Architecture.ARM:
-                    return PlatformArchitecture.Arm;
+                    return PlatformArchitecture.ARM;
                 case Architecture.ARM64:
-                    return PlatformArchitecture.Arm64;
+                    return PlatformArchitecture.ARM64;
                 case Architecture.AnyCPU:
                 case Architecture.Default:
                 default:
@@ -539,24 +539,15 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             throw new TestPlatformException($"Invalid target architecture '{targetArchitecture}'");
         }
 
-        bool IsSameArchitecture(Architecture targetArchitecture, PlatformArchitecture platformAchitecture)
-        {
-            switch (targetArchitecture)
+        static bool IsSameArchitecture(Architecture targetArchitecture, PlatformArchitecture platformAchitecture)
+            => targetArchitecture switch
             {
-                case Architecture.X86:
-                    return platformAchitecture == PlatformArchitecture.X86;
-                case Architecture.X64:
-                    return platformAchitecture == PlatformArchitecture.X64;
-                case Architecture.ARM:
-                    return platformAchitecture == PlatformArchitecture.Arm;
-                case Architecture.ARM64:
-                    return platformAchitecture == PlatformArchitecture.Arm64;
-                case Architecture.AnyCPU:
-                case Architecture.Default:
-                default:
-                    throw new TestPlatformException($"Invalid target architecture '{targetArchitecture}'");
-            }
-        }
+                Architecture.X86 => platformAchitecture == PlatformArchitecture.X86,
+                Architecture.X64 => platformAchitecture == PlatformArchitecture.X64,
+                Architecture.ARM => platformAchitecture == PlatformArchitecture.ARM,
+                Architecture.ARM64 => platformAchitecture == PlatformArchitecture.ARM64,
+                _ => throw new TestPlatformException($"Invalid target architecture '{targetArchitecture}'"),
+            };
 
         bool SilentlyForceToX64()
         {
@@ -564,8 +555,8 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             // https://github.com/dotnet/sdk/blob/main/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.RuntimeIdentifierInference.targets#L140-L143
 
             // If we are running on an M1 with a native SDK and the TFM is < 6.0, we have to use a x64 apphost since there are no osx-arm64 apphosts previous to .NET 6.0.
-            if (_platformEnvironment.OperatingSystem == PlatformOperatingSystem.Osx &&
-                _platformEnvironment.Architecture == PlatformArchitecture.Arm64 &&
+            if (_platformEnvironment.OperatingSystem == PlatformOperatingSystem.OSX &&
+                _platformEnvironment.Architecture == PlatformArchitecture.ARM64 &&
                 new Version(_targetFramework.Version).Major < 6)
             {
                 return true;
@@ -573,7 +564,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
             // If we are running on win-arm64 and the TFM is < 5.0, we have to use a x64 apphost since there are no win-arm64 apphosts previous to .NET 5.0.
             return _platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows &&
-                   _platformEnvironment.Architecture == PlatformArchitecture.Arm64 &&
+                   _platformEnvironment.Architecture == PlatformArchitecture.ARM64 &&
                    new Version(_targetFramework.Version).Major < 5;
         }
     }

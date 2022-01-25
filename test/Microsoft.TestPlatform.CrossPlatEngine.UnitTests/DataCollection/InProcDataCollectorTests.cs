@@ -114,7 +114,7 @@ public class InProcDataCollectorTests
         Assert.AreEqual(_inProcDataCollector.AssemblyQualifiedName, typeInfo.AssemblyQualifiedName);
     }
 
-    private class TestableInProcDataCollector : INProcDataCollection
+    private class TestableInProcDataCollector : InProcDataCollection
     {
         public void Initialize(IDataCollectionSink dataCollectionSink)
         {

@@ -3,7 +3,8 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System;
 using System.Collections.Generic;
@@ -18,23 +19,8 @@ using System.Xml;
 [TestCategory("Windows-Review")]
 public class BlameDataCollectorTests : AcceptanceTestBase
 {
-    private readonly string _resultsDir;
-
-    public const string Netcoreandfx = "net452;net472;netcoreapp3.1";
-    public const string Net50 = "net5.0";
-
-    public BlameDataCollectorTests()
-    {
-        _resultsDir = GetResultsDirectory();
-    }
-
-    [TestCleanup]
-    public void Cleanup()
-    {
-        Environment.SetEnvironmentVariable("PROCDUMP_PATH", null);
-
-        TryRemoveDirectory(_resultsDir);
-    }
+    public const string NETCOREANDFX = "net452;net472;netcoreapp3.1";
+    public const string NET50 = "net5.0";
 
     [TestMethod]
     // netcoreapp2.1 dump is not supported on Linux
@@ -43,14 +29,15 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void BlameDataCollectorShouldGiveCorrectTestCaseName(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = GetAssetFullPath("BlameUnitTestProject.dll");
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
+        using var tempDir = new TempDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        var assemblyPaths = this.GetAssetFullPath("BlameUnitTestProject.dll");
+        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /Blame");
-        arguments = string.Concat(arguments, $" /ResultsDirectory:{_resultsDir}");
-        InvokeVsTest(arguments);
+        arguments = string.Concat(arguments, $" /ResultsDirectory:{tempDir.Path}");
+        this.InvokeVsTest(arguments);
 
-        VaildateOutput("BlameUnitTestProject.UnitTest1.TestMethod2");
+        this.VaildateOutput(tempDir, "BlameUnitTestProject.UnitTest1.TestMethod2");
     }
 
     [TestMethod]
@@ -60,17 +47,23 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void BlameDataCollectorShouldOutputDumpFile(RunnerInfo runnerInfo)
     {
-        Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
+        using var tempDir = new TempDirectory();
 
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
+        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /Blame:CollectDump");
-        arguments = string.Concat(arguments, $" /ResultsDirectory:{_resultsDir}");
+        arguments = string.Concat(arguments, $" /ResultsDirectory:{tempDir.Path}");
         arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
-        InvokeVsTest(arguments);
 
-        VaildateOutput("SampleUnitTestProject3.UnitTest1.ExitWithStackoverFlow", validateDumpFile: true);
+        var env = new Dictionary<string, string>
+        {
+            ["PROCDUMP_PATH"] = Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"),
+        };
+
+        this.InvokeVsTest(arguments, env);
+
+        this.VaildateOutput(tempDir, "SampleUnitTestProject3.UnitTest1.ExitWithStackoverFlow", validateDumpFile: true);
     }
 
     [TestMethod]
@@ -80,17 +73,23 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void BlameDataCollectorShouldNotOutputDumpFileWhenNoCrashOccurs(RunnerInfo runnerInfo)
     {
-        Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
+        using var tempDir = new TempDirectory();
 
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
+        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /Blame:CollectDump");
-        arguments = string.Concat(arguments, $" /ResultsDirectory:{_resultsDir}");
+        arguments = string.Concat(arguments, $" /ResultsDirectory:{tempDir.Path}");
         arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
-        InvokeVsTest(arguments);
 
-        Assert.IsFalse(StdOut.Contains(".dmp"), "it should not collect a dump, because nothing crashed");
+        var env = new Dictionary<string, string>
+        {
+            ["PROCDUMP_PATH"] = Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"),
+        };
+
+        this.InvokeVsTest(arguments, env);
+
+        Assert.IsFalse(this.StdOut.Contains(".dmp"), "it should not collect a dump, because nothing crashed");
     }
 
     [TestMethod]
@@ -100,17 +99,23 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void BlameDataCollectorShouldOutputDumpFileWhenNoCrashOccursButCollectAlwaysIsEnabled(RunnerInfo runnerInfo)
     {
-        Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
+        using var tempDir = new TempDirectory();
 
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
+        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /Blame:CollectDump;CollectAlways=True");
-        arguments = string.Concat(arguments, $" /ResultsDirectory:{_resultsDir}");
+        arguments = string.Concat(arguments, $" /ResultsDirectory:{tempDir.Path}");
         arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
-        InvokeVsTest(arguments);
 
-        Assert.IsTrue(StdOut.Contains(".dmp"), "it should collect dump, even if nothing crashed");
+        var env = new Dictionary<string, string>
+        {
+            ["PROCDUMP_PATH"] = Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"),
+        };
+
+        this.InvokeVsTest(arguments, env);
+
+        Assert.IsTrue(this.StdOut.Contains(".dmp"), "it should collect dump, even if nothing crashed");
     }
 
     [TestMethod]
@@ -119,53 +124,65 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
     public void HangDumpOnTimeout(RunnerInfo runnerInfo)
     {
-        Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
-
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = GetAssetFullPath("timeout.dll");
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        var assemblyPaths = this.GetAssetFullPath("timeout.dll");
+        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=full;TestTimeout=3s""");
-        InvokeVsTest(arguments);
 
-        ValidateDump();
+        var env = new Dictionary<string, string>
+        {
+            ["PROCDUMP_PATH"] = Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"),
+        };
+
+        this.InvokeVsTest(arguments, env);
+
+        this.ValidateDump();
     }
 
     [TestMethod]
-    // net5.0 does not suppord dump on exit
+    // net5.0 does not support dump on exit
     [NetCoreRunner("net452;net472;netcoreapp3.1")]
     // should make no difference, keeping for easy debug
     // [NetFrameworkRunner("net452;net472;netcoreapp3.1")]
 
     public void CrashDumpWhenThereIsNoTimeout(RunnerInfo runnerInfo)
     {
-        Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
-
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = GetAssetFullPath("timeout.dll");
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        var assemblyPaths = this.GetAssetFullPath("timeout.dll");
+        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full;CollectAlways=true;CollectHangDump""");
-        InvokeVsTest(arguments);
 
-        ValidateDump();
+        var env = new Dictionary<string, string>
+        {
+            ["PROCDUMP_PATH"] = Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"),
+        };
+
+        this.InvokeVsTest(arguments, env);
+
+        this.ValidateDump();
     }
 
     [TestMethod]
-    // net5.0 does not suppord dump on exit
+    // net5.0 does not support dump on exit
     [NetCoreRunner("net452;net472;netcoreapp3.1")]
     // should make no difference, keeping for easy debug
     // [NetFrameworkRunner("net452;net472;netcoreapp3.1")]
 
     public void CrashDumpOnExit(RunnerInfo runnerInfo)
     {
-        Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
-
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = GetAssetFullPath("timeout.dll");
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        var assemblyPaths = this.GetAssetFullPath("timeout.dll");
+        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full;CollectAlways=true""");
-        InvokeVsTest(arguments);
 
-        ValidateDump();
+        var env = new Dictionary<string, string>
+        {
+            ["PROCDUMP_PATH"] = Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"),
+        };
+
+        this.InvokeVsTest(arguments, env);
+
+        this.ValidateDump();
     }
 
     [TestMethod]
@@ -174,30 +191,34 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
     public void CrashDumpOnStackOverflow(RunnerInfo runnerInfo)
     {
-        Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
-
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = GetAssetFullPath("crash.dll");
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        var assemblyPaths = this.GetAssetFullPath("crash.dll");
+        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full""");
-        InvokeVsTest(arguments);
 
-        ValidateDump();
+        var env = new Dictionary<string, string>
+        {
+            ["PROCDUMP_PATH"] = Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"),
+        };
+
+        this.InvokeVsTest(arguments, env);
+
+        this.ValidateDump();
     }
 
     [TestMethod]
-    [NetCoreRunner(Net50)]
+    [NetCoreRunner(NET50)]
     // should make no difference, keeping for easy debug
     // [NetFrameworkRunner(NET50)]
     public void CrashDumpChildProcesses(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = GetAssetFullPath("child-crash.dll");
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        var assemblyPaths = this.GetAssetFullPath("child-crash.dll");
+        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full""");
-        InvokeVsTest(arguments);
+        this.InvokeVsTest(arguments);
 
-        ValidateDump(2);
+        this.ValidateDump(2);
     }
 
     [TestMethod]
@@ -206,18 +227,18 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
     public void HangDumpChildProcesses(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = GetAssetFullPath("child-hang.dll");
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        var assemblyPaths = this.GetAssetFullPath("child-hang.dll");
+        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=full;TestTimeout=15s""");
-        InvokeVsTest(arguments);
+        this.InvokeVsTest(arguments);
 
-        ValidateDump(2);
+        this.ValidateDump(2);
     }
 
     private void ValidateDump(int expectedDumpCount = 1)
     {
-        var attachments = StdOutWithWhiteSpace.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+        var attachments = this.StdOutWithWhiteSpace.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
             .SkipWhile(l => !l.Contains("Attachments:")).Skip(1)
             .Where(l => !string.IsNullOrWhiteSpace(l))
             .ToList();
@@ -243,8 +264,8 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         if (dumps.Count < expectedDumpCount)
         {
             throw new AssertFailedException($"Expected at least {expectedDumpCount} dump file in Attachments, but there were {dumps.Count}."
-                                            + Environment.NewLine
-                                            + string.Join(Environment.NewLine, dumps));
+                + Environment.NewLine
+                + string.Join(Environment.NewLine, dumps));
         }
 
         var nonExistingDumps = new List<string>();
@@ -267,37 +288,37 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
         // allow some child dumps to be missing, they manage to terminate early from time to time
         if ((dumps.Count == 1 && nonExistingDumps.Any()) || (dumps.Count > 1 && nonExistingDumps.Count > 1)
-                                                         || emptyDumps.Any())
+            || emptyDumps.Any())
         {
             var err = new StringBuilder();
             err.AppendLine("Expected all dumps in the list of attachments to exist, and not be empty, but:");
             if (nonExistingDumps.Any())
             {
                 err.AppendLine($"{nonExistingDumps.Count} don't exist:")
-                    .AppendLine(string.Join(Environment.NewLine, nonExistingDumps));
+                .AppendLine(string.Join(Environment.NewLine, nonExistingDumps));
             }
 
             if (emptyDumps.Any())
             {
                 err.AppendLine($"{emptyDumps.Count} are empty:")
-                    .AppendLine(string.Join(Environment.NewLine, emptyDumps));
+                .AppendLine(string.Join(Environment.NewLine, emptyDumps));
             }
 
             err.AppendLine("Reported attachments:")
-                .AppendLine(output);
+            .AppendLine(output);
 
             throw new AssertFailedException(err.ToString());
         }
     }
 
-    private void VaildateOutput(string testName, bool validateDumpFile = false)
+    private void VaildateOutput(TempDirectory tempDir, string testName, bool validateDumpFile = false)
     {
         bool isSequenceAttachmentReceived = false;
         bool isDumpAttachmentReceived = false;
         bool isValid = false;
-        StdErrorContains(testName);
-        StdOutputContains("Sequence_");
-        var resultFiles = Directory.GetFiles(_resultsDir, "*", SearchOption.AllDirectories);
+        this.StdErrorContains(testName);
+        this.StdOutputContains("Sequence_");
+        var resultFiles = Directory.GetFiles(tempDir.Path, "*", SearchOption.AllDirectories);
 
         foreach (var file in resultFiles)
         {

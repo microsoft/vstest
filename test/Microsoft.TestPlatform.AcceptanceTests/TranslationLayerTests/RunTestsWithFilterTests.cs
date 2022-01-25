@@ -3,10 +3,10 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
-using VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System.Collections.Generic;
 using System.Linq;
@@ -17,19 +17,19 @@ using System.Linq;
 [TestClass]
 public class RunTestsWithFilterTests : AcceptanceTestBase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private RunEventHandler _runEventHandler;
+    private IVsTestConsoleWrapper vstestConsoleWrapper;
+    private RunEventHandler runEventHandler;
 
     private void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
-        _runEventHandler = new RunEventHandler();
+        this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
+        this.runEventHandler = new RunEventHandler();
     }
 
     [TestCleanup]
     public void Cleanup()
     {
-        _vstestConsoleWrapper?.EndSession();
+        this.vstestConsoleWrapper?.EndSession();
     }
 
     [TestMethod]
@@ -37,23 +37,23 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        this.Setup();
 
         var sources = new List<string>
-        {
-            GetAssetFullPath("SimpleTestProject.dll")
-        };
+                              {
+                                  this.GetAssetFullPath("SimpleTestProject.dll")
+                              };
 
-        _vstestConsoleWrapper.RunTests(
+        this.vstestConsoleWrapper.RunTests(
             sources,
-            GetDefaultRunSettings(),
+            this.GetDefaultRunSettings(),
             new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName=SampleUnitTestProject.UnitTest1.PassingTest" },
-            _runEventHandler);
+            this.runEventHandler);
 
         // Assert
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(TestOutcome.Passed, _runEventHandler.TestResults.FirstOrDefault().Outcome);
+        Assert.AreEqual(1, this.runEventHandler.TestResults.Count);
+        Assert.AreEqual(TestOutcome.Passed, this.runEventHandler.TestResults.FirstOrDefault().Outcome);
     }
 
     [TestMethod]
@@ -61,34 +61,23 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithFastFilter(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        this.Setup();
 
         var sources = new List<string>
-        {
-            GetAssetFullPath("SimpleTestProject.dll")
-        };
+                              {
+                                  this.GetAssetFullPath("SimpleTestProject.dll")
+                              };
 
-        _vstestConsoleWrapper.RunTests(
+        this.vstestConsoleWrapper.RunTests(
             sources,
-            GetDefaultRunSettings(),
+            this.GetDefaultRunSettings(),
             new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName=SampleUnitTestProject.UnitTest1.PassingTest | FullyQualifiedName=SampleUnitTestProject.UnitTest1.FailingTest" },
-            _runEventHandler);
+            this.runEventHandler);
 
         // Assert
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-    }
-
-    private IList<string> GetTestAssemblies()
-    {
-        var testAssemblies = new List<string>
-        {
-            GetAssetFullPath("SimpleTestProject.dll"),
-            GetAssetFullPath("SimpleTestProject2.dll")
-        };
-
-        return testAssemblies;
+        Assert.AreEqual(2, this.runEventHandler.TestResults.Count);
+        Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
     }
 }

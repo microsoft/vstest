@@ -5,7 +5,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 using System.IO;
 
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 public class ResultsDirectoryTests : AcceptanceTestBase
@@ -17,20 +18,19 @@ public class ResultsDirectoryTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
+        var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
         var trxFileName = "TestResults.trx";
-        var resultsDir = GetResultsDirectory();
-        var trxFilePath = Path.Combine(resultsDir, trxFileName);
+        using var tempDir = new TempDirectory();
+        var trxFilePath = Path.Combine(tempDir.Path, trxFileName);
         arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
-        arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+        arguments = string.Concat(arguments, $" /ResultsDirectory:{tempDir.Path}");
 
         // Delete if already exists
-        TryRemoveDirectory(resultsDir);
+        TempDirectory.TryRemoveDirectory(tempDir.Path);
 
         InvokeVsTest(arguments);
 
         Assert.IsTrue(File.Exists(trxFilePath), $"Expected Trx file: {trxFilePath} not created in results directory");
-        TryRemoveDirectory(resultsDir);
     }
 
     [TestMethod]
@@ -57,6 +57,6 @@ public class ResultsDirectoryTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         Assert.IsTrue(File.Exists(trxFilePath), $"Expected Trx file: {trxFilePath} not created in results directory");
-        TryRemoveDirectory(resultsDirectory);
+        TempDirectory.TryRemoveDirectory(resultsDirectory);
     }
 }

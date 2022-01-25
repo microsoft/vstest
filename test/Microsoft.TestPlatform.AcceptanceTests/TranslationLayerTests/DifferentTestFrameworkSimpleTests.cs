@@ -19,13 +19,13 @@ using System.Linq;
 [TestClass]
 public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private RunEventHandler _runEventHandler;
+    private readonly IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private readonly RunEventHandler _runEventHandler;
 
     private void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
-        _runEventHandler = new RunEventHandler();
+        this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
+        this.runEventHandler = new RunEventHandler();
     }
 
     [TestCleanup]

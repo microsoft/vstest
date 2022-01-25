@@ -227,7 +227,7 @@ public class InferRunSettingsHelperTests
             .WithMessage(string.Format(
                 "Incompatible Target platform settings '{0}' with system architecture '{1}'.",
                 "ARM",
-                XmlRunSettingsUtilities.OsArchitecture.ToString()));
+                XmlRunSettingsUtilities.OSArchitecture.ToString()));
     }
 
     [TestMethod]

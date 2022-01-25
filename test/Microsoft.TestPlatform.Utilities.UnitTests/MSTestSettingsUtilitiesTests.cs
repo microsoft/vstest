@@ -18,19 +18,19 @@ public class MsTestSettingsUtilitiesTests
     [TestMethod]
     public void IsLegacyTestSettingsFileShouldReturnTrueIfTestSettingsExtension()
     {
-        Assert.IsTrue(MsTestSettingsUtilities.IsLegacyTestSettingsFile("C:\\temp\\t.testsettings"));
+        Assert.IsTrue(MSTestSettingsUtilities.IsLegacyTestSettingsFile("C:\\temp\\t.testsettings"));
     }
 
     [TestMethod]
     public void IsLegacyTestSettingsFileShouldReturnTrueIfTestRunConfigExtension()
     {
-        Assert.IsTrue(MsTestSettingsUtilities.IsLegacyTestSettingsFile("C:\\temp\\t.testrunConfig"));
+        Assert.IsTrue(MSTestSettingsUtilities.IsLegacyTestSettingsFile("C:\\temp\\t.testrunConfig"));
     }
 
     [TestMethod]
     public void IsLegacyTestSettingsFileShouldReturnTrueIfVsmdiExtension()
     {
-        Assert.IsTrue(MsTestSettingsUtilities.IsLegacyTestSettingsFile("C:\\temp\\t.vsmdi"));
+        Assert.IsTrue(MSTestSettingsUtilities.IsLegacyTestSettingsFile("C:\\temp\\t.vsmdi"));
     }
 
     #endregion
@@ -46,7 +46,7 @@ public class MsTestSettingsUtilitiesTests
 
         Action action =
             () =>
-                MsTestSettingsUtilities.Import(
+                MSTestSettingsUtilities.Import(
                     "C:\\temp\\r.runsettings",
                     xmlDocument);
         Assert.That.Throws<XmlException>(action).WithMessage("Unexpected settings file specified.");
@@ -61,7 +61,7 @@ public class MsTestSettingsUtilitiesTests
 
         Action action =
             () =>
-                MsTestSettingsUtilities.Import(
+                MSTestSettingsUtilities.Import(
                     "C:\\temp\\r.testsettings",
                     xmlDocument);
         Assert.That.Throws<XmlException>(action).WithMessage("Could not find 'RunSettings' node.");
@@ -73,7 +73,7 @@ public class MsTestSettingsUtilitiesTests
         var defaultRunSettingsXml = "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
         var xmlDocument = new XmlDocument();
         xmlDocument.LoadXml(defaultRunSettingsXml);
-        var finalxPath = MsTestSettingsUtilities.Import(
+        var finalxPath = MSTestSettingsUtilities.Import(
             "C:\\temp\\r.testsettings",
             xmlDocument);
 
@@ -98,7 +98,7 @@ public class MsTestSettingsUtilitiesTests
         var defaultRunSettingsXml = "<RunSettings></RunSettings>";
         var xmlDocument = new XmlDocument();
         xmlDocument.LoadXml(defaultRunSettingsXml);
-        var finalxPath = MsTestSettingsUtilities.Import(
+        var finalxPath = MSTestSettingsUtilities.Import(
             "C:\\temp\\r.testsettings",
             xmlDocument);
 

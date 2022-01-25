@@ -279,7 +279,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
         }
         else
         {
-            filename = _environment.OperatingSystem == PlatformOperatingSystem.Unix || _environment.OperatingSystem == PlatformOperatingSystem.Osx
+            filename = _environment.OperatingSystem == PlatformOperatingSystem.Unix || _environment.OperatingSystem == PlatformOperatingSystem.OSX
                 ? Constants.ProcdumpUnixProcess
                 : throw new NotSupportedException($"Not supported platform {_environment.OperatingSystem}");
         }

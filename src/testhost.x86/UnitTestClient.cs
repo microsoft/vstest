@@ -15,7 +15,7 @@ public static class UnitTestClient
     /// <summary>
     /// Create default UI for UWP app
     /// </summary>
-    public static void CreateDefaultUi()
+    public static void CreateDefaultUI()
     {
     }
 

@@ -8,20 +8,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 
 [TestClass]
 [TestCategory("Windows-Review")]
 public class EventLogCollectorTests : AcceptanceTestBase
 {
-    private readonly string _resultsDir;
-
-    public EventLogCollectorTests()
-    {
-        _resultsDir = GetResultsDirectory();
-    }
-
     // Fails randomly https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Release_prtest/2084/console
     // https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Debug_prtest/2085/console
     [Ignore]
@@ -30,20 +24,21 @@ public class EventLogCollectorTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = _testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
+        SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
+        var assemblyPaths = this.testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
 
-        string runSettings = GetRunsettingsFilePath();
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), runSettings, FrameworkArgValue, resultsDirectory: _resultsDir);
+        string runSettings = this.GetRunsettingsFilePath(tempDir);
+        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
 
         InvokeVsTest(arguments);
 
-        ValidateSummaryStatus(3, 0, 0);
-        VaildateDataCollectorOutput();
-        StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
-        StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
-        StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
-        StdErrorDoesNotContains("Unable to read event log");
+        this.ValidateSummaryStatus(3, 0, 0);
+        this.VaildateDataCollectorOutput(tempDir);
+        this.StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
+        this.StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
+        this.StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
+        this.StdErrorDoesNotContains("Unable to read event log");
     }
 
     [TestMethod]
@@ -51,11 +46,12 @@ public class EventLogCollectorTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void EventLogDataCollectorShoudCreateLogFileWithoutEventsIfEventsAreNotLogged(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = _testEnvironment.GetTestAsset("SimpleTestProject.dll");
+        SetTestEnvironment(this.testEnvironment, runnerInfo);
+        var assemblyPaths = this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
+        using var tempDir = new TempDirectory();
 
-        string runSettings = GetRunsettingsFilePath();
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), runSettings, FrameworkArgValue, resultsDirectory: _resultsDir);
+        string runSettings = this.GetRunsettingsFilePath(tempDir);
+        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
 
         InvokeVsTest(arguments);
 
@@ -66,11 +62,9 @@ public class EventLogCollectorTests : AcceptanceTestBase
         StdErrorDoesNotContains("Unable to read event log");
     }
 
-    private string GetRunsettingsFilePath()
+    private string GetRunsettingsFilePath(TempDirectory tempDirectory)
     {
-        var runsettingsPath = Path.Combine(
-            Path.GetTempPath(),
-            "test_" + Guid.NewGuid() + ".runsettings");
+        var runsettingsPath = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
 
         string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
     <RunSettings>
@@ -92,36 +86,10 @@ public class EventLogCollectorTests : AcceptanceTestBase
         return runsettingsPath;
     }
 
-    private string GetRunsettingsFilePathWithCustomSource()
-    {
-        var runsettingsPath = Path.Combine(
-            Path.GetTempPath(),
-            "test_" + Guid.NewGuid() + ".runsettings");
-
-        string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
-    <RunSettings>
-      <RunConfiguration>
-        <MaxCpuCount>0</MaxCpuCount>
-        <TargetPlatform> x64 </TargetPlatform>
-        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
-      </RunConfiguration>
-      <DataCollectionRunSettings>
-        <DataCollectors>
-            <DataCollector friendlyName=""Event Log"" >
-                <Configuration><Setting name = ""EventLogs"" value = ""Application,System"" /><Setting name=""EntryTypes"" value=""Error,Warning"" /><Setting name=""EventSources"" value=""CustomEventSource"" /></Configuration>
-            </DataCollector>
-        </DataCollectors>
-      </DataCollectionRunSettings>
-    </RunSettings> ";
-
-        File.WriteAllText(runsettingsPath, runSettingsXml);
-        return runsettingsPath;
-    }
-
-    private void VaildateDataCollectorOutput()
+    private void VaildateDataCollectorOutput(TempDirectory tempDir)
     {
         // Verify attachments
-        var di = new DirectoryInfo(_resultsDir);
+        var di = new DirectoryInfo(tempDir.Path);
         var resultFiles = di.EnumerateFiles("Event Log.xml", SearchOption.AllDirectories)
             .OrderBy(d => d.CreationTime)
             .Select(d => d.FullName)

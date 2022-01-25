@@ -10,5 +10,5 @@ public enum PlatformOperatingSystem
 {
     Windows,
     Unix,
-    Osx
+    OSX,
 }

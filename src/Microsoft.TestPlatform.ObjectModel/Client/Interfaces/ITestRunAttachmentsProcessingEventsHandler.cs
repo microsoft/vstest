@@ -26,6 +26,6 @@ public interface ITestRunAttachmentsProcessingEventsHandler : ITestMessageEventH
     /// <summary>
     /// Dispatch TestRunAttachmentsProcessingProgress event to listeners.
     /// </summary>
-    /// <param name="attachmentsProcessingProgressEventArgs">AttachmentsProcessing Progress event args.</param>
-    void HandleTestRunAttachmentsProcessingProgress(TestRunAttachmentsProcessingProgressEventArgs attachmentsProcessingProgressEventArgs);
+    /// <param name="AttachmentsProcessingProgressEventArgs">AttachmentsProcessing Progress event args.</param>
+    void HandleTestRunAttachmentsProcessingProgress(TestRunAttachmentsProcessingProgressEventArgs AttachmentsProcessingProgressEventArgs);
 }

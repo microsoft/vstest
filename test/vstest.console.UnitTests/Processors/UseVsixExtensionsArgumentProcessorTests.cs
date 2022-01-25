@@ -20,14 +20,14 @@ public class UseVsixExtensionsArgumentProcessorTests
     private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
     private const string DeprecationMessage = @"/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.";
     private readonly Mock<ITestRequestManager> _testRequestManager;
-    private readonly Mock<IVsExtensionManager> _extensionManager;
+    private readonly Mock<IVSExtensionManager> _extensionManager;
     private readonly Mock<IOutput> _output;
     private readonly UseVsixExtensionsArgumentExecutor _executor;
 
     public UseVsixExtensionsArgumentProcessorTests()
     {
         _testRequestManager = new Mock<ITestRequestManager>();
-        _extensionManager = new Mock<IVsExtensionManager>();
+        _extensionManager = new Mock<IVSExtensionManager>();
         _output = new Mock<IOutput>();
         _executor = new UseVsixExtensionsArgumentExecutor(CommandLineOptions.Instance, _testRequestManager.Object, _extensionManager.Object, _output.Object);
     }

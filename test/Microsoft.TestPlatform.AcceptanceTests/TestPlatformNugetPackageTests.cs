@@ -8,51 +8,50 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 
-using TestUtilities;
-
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
 {
-    private static string s_nugetPackageFolder;
-    private string _resultsDirectory;
+    private static string nugetPackageFolder;
+    private TempDirectory resultsDirectory;
 
     [ClassInitialize]
-    public static void ClassInit(TestContext testContext)
+    public static void ClassInit(TestContext _)
     {
         var packageLocation = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "packages");
         var nugetPackage = Directory.EnumerateFiles(packageLocation, "Microsoft.TestPlatform.*.nupkg").OrderBy(a => a).FirstOrDefault();
-        s_nugetPackageFolder = Path.Combine(packageLocation, Path.GetFileNameWithoutExtension(nugetPackage));
-        ZipFile.ExtractToDirectory(nugetPackage, s_nugetPackageFolder);
+        nugetPackageFolder = Path.Combine(new TempDirectory().Path, Path.GetFileNameWithoutExtension(nugetPackage));
+        ZipFile.ExtractToDirectory(nugetPackage, nugetPackageFolder);
 
         TryMoveDirectory(
-            sourceDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team%20Tools"),
-            destDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team Tools")
+            sourceDirName: Path.Combine(nugetPackageFolder, "tools", "net451", "Team%20Tools"),
+            destDirName: Path.Combine(nugetPackageFolder, "tools", "net451", "Team Tools")
         );
 
         TryMoveDirectory(
-            sourceDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic%20Code%20Coverage%20Tools"),
-            destDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic Code Coverage Tools")
+            sourceDirName: Path.Combine(nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic%20Code%20Coverage%20Tools"),
+            destDirName: Path.Combine(nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic Code Coverage Tools")
         );
     }
 
     [ClassCleanup]
     public static void ClassCleanup()
     {
-        Directory.Delete(s_nugetPackageFolder, true);
+        Directory.Delete(nugetPackageFolder, true);
     }
 
     [TestInitialize]
     public void SetUp()
     {
-        _resultsDirectory = GetResultsDirectory();
+        this.resultsDirectory = new TempDirectory();
     }
 
     [TestCleanup]
     public void CleanUp()
     {
-        TryRemoveDirectory(_resultsDirectory);
+        this.resultsDirectory.Dispose();
     }
 
     [TestMethod]
@@ -61,17 +60,17 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
     [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
     public void RunMultipleTestAssembliesWithCodeCoverage(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
 
         var arguments = CreateCodeCoverageArguments(runnerInfo, assemblyPaths, out var trxFilePath);
-        InvokeVsTest(arguments);
+        this.InvokeVsTest(arguments);
 
-        ExitCodeEquals(1); // failing tests
+        this.ExitCodeEquals(1); // failing tests
 
-        var actualCoverageFile = GetCoverageFileNameFromTrx(trxFilePath, _resultsDirectory);
-        Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {_resultsDirectory} trxfile: {trxFilePath}");
+        var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory.Path);
+        Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
         Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
     }
 
@@ -79,9 +78,9 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
     {
         string consoleRunnerPath = string.Empty;
 
-        if (IsDesktopRunner())
+        if (this.IsDesktopRunner())
         {
-            consoleRunnerPath = Path.Combine(s_nugetPackageFolder, "tools", "net451", "Common7", "IDE", "Extensions", "TestPlatform", "vstest.console.exe");
+            consoleRunnerPath = Path.Combine(nugetPackageFolder, "tools", "net451", "Common7", "IDE", "Extensions", "TestPlatform", "vstest.console.exe");
         }
 
         Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
@@ -93,14 +92,14 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
         string assemblyPaths,
         out string trxFilePath)
     {
-        string diagFileName = Path.Combine(_resultsDirectory, "diaglog.txt");
+        string diagFileName = Path.Combine(this.resultsDirectory.Path, "diaglog.txt");
 
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty,
-            FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: _resultsDirectory);
+        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty,
+            this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDirectory.Path);
 
         arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /EnableCodeCoverage");
 
-        trxFilePath = Path.Combine(_resultsDirectory, Guid.NewGuid() + ".trx");
+        trxFilePath = Path.Combine(this.resultsDirectory.Path, Guid.NewGuid() + ".trx");
         arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
 
         return arguments;

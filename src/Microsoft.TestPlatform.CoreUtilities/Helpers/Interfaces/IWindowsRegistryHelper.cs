@@ -8,21 +8,20 @@ using System;
 
 using Microsoft.Win32;
 
-namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
+namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+internal interface IWindowsRegistryHelper
 {
-    internal interface IWindowsRegistryHelper
-    {
-        IRegistryKey OpenBaseKey(RegistryHive hKey, RegistryView view);
-    }
+    IRegistryKey OpenBaseKey(RegistryHive hKey, RegistryView view);
+}
 
-    internal interface IRegistryKey : IDisposable
-    {
-        IRegistryKey OpenSubKey(string name);
+internal interface IRegistryKey : IDisposable
+{
+    IRegistryKey OpenSubKey(string name);
 
-        object GetValue(string name);
+    object GetValue(string name);
 
-        string[] GetSubKeyNames();
-    }
+    string[] GetSubKeyNames();
 }
 
 #endif

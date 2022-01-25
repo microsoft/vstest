@@ -3,18 +3,16 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
-using global::TestPlatform.TestUtilities;
-
-using VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 
 /// <summary>
 /// The Run Tests using VsTestConsoleWrapper API's
@@ -25,19 +23,22 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     private const string Netcoreapp = "netcoreapp";
     private const string Message = "VsTestConsoleWrapper does not support .Net Core Runner";
 
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private RunEventHandler _runEventHandler;
+    private IVsTestConsoleWrapper vstestConsoleWrapper;
+    private TempDirectory logsDir;
+    private RunEventHandler runEventHandler;
 
     private void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
-        _runEventHandler = new RunEventHandler();
+        this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out var logsDir);
+        this.logsDir = logsDir;
+        this.runEventHandler = new RunEventHandler();
     }
 
     [TestCleanup]
     public void Cleanup()
     {
-        _vstestConsoleWrapper?.EndSession();
+        this.vstestConsoleWrapper?.EndSession();
+        this.logsDir?.Dispose();
     }
 
     [TestMethod]
@@ -79,31 +80,21 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
                                         </RunConfiguration>
                                     </RunSettings>";
 
-        var testHostNames = new[] { "testhost", "testhost.x86", "dotnet" };
+        var testHostNames = new[] { "testhost", "testhost.x86" };
         int expectedNumOfProcessCreated = 2;
 
-        var cts = new CancellationTokenSource();
-        var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
-            cts,
-            testHostNames);
-
-        _vstestConsoleWrapper.RunTests(
-            GetTestAssemblies(),
+        this.vstestConsoleWrapper.RunTests(
+            this.GetTestAssemblies(),
             runSettingsXml,
-            _runEventHandler);
-
-        cts.Cancel();
+            this.runEventHandler);
 
         // Assert
-        _runEventHandler.EnsureSuccess();
-        Assert.AreEqual(6, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
-        Assert.AreEqual(
-            expectedNumOfProcessCreated,
-            numOfProcessCreatedTask.Result.Count,
-            $"Number of '{ string.Join(", ", testHostNames) }' process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) })");
+        this.runEventHandler.EnsureSuccess();
+        Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
+        Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+        Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+        AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, this.logsDir.Path, testHostNames);
     }
 
     [TestMethod]
@@ -115,7 +106,8 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
         ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
         Setup();
 
-        var testsettingsFile = Path.Combine(Path.GetTempPath(), "tempsettings.testsettings");
+        using var tempDir = new TempDirectory();
+        var testsettingsFile = Path.Combine(tempDir.Path, "tempsettings.testsettings");
         string testSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?><TestSettings></TestSettings>";
 
         File.WriteAllText(testsettingsFile, testSettingsXml, Encoding.UTF8);
@@ -131,12 +123,10 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(5, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
-
-        File.Delete(testsettingsFile);
+        Assert.AreEqual(5, this.runEventHandler.TestResults.Count);
+        Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+        Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
     }
 
     [TestMethod]
@@ -154,11 +144,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
 
 
         int expectedNumOfProcessCreated = 1;
-        var testhostProcessNames = new[] { "testhost", "dotnet" };
-
-        var cts = new CancellationTokenSource();
-        var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
-            cts, testhostProcessNames);
+        var testhostProcessNames = new[] { "testhost" };
 
         _vstestConsoleWrapper.RunTests(
             sources,
@@ -166,16 +152,10 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
             new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName = SampleUnitTestProject3.UnitTest1.WorkingDirectoryTest" },
             _runEventHandler);
 
-        cts.Cancel();
-
         // Assert
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-        var numberOfProcessCreated = numOfProcessCreatedTask.Result;
-        Assert.AreEqual(
-            expectedNumOfProcessCreated,
-            numberOfProcessCreated.Count,
-            $"Number of { string.Join(" ,", testhostProcessNames) } process created, expected: {expectedNumOfProcessCreated} actual: {numberOfProcessCreated.Count} ({ string.Join(", ", numberOfProcessCreated) })");
+        Assert.AreEqual(1, this.runEventHandler.TestResults.Count);
+        Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, this.logsDir.Path, testhostProcessNames);
     }
 
     private IList<string> GetTestAssemblies()

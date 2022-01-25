@@ -25,9 +25,9 @@ public class PlatformEnvironment : IEnvironment
                 case System.Runtime.InteropServices.Architecture.X64:
                     return PlatformArchitecture.X64;
                 case System.Runtime.InteropServices.Architecture.Arm:
-                    return PlatformArchitecture.Arm;
+                    return PlatformArchitecture.ARM;
                 case System.Runtime.InteropServices.Architecture.Arm64:
-                    return PlatformArchitecture.Arm64;
+                    return PlatformArchitecture.ARM64;
                 default:
                     throw new NotSupportedException();
             }

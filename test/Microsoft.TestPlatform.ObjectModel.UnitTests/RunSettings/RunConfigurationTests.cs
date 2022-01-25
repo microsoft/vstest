@@ -108,7 +108,7 @@ public class RunConfigurationTests
         Assert.IsTrue(runConfiguration.DesignMode);
         Assert.IsTrue(runConfiguration.InIsolation);
         Assert.IsFalse(runConfiguration.ShouldCollectSourceInformation);
-        Assert.AreEqual(PlatformApartmentState.Sta, runConfiguration.ExecutionThreadApartmentState);
+        Assert.AreEqual(PlatformApartmentState.STA, runConfiguration.ExecutionThreadApartmentState);
     }
 
     [TestMethod]
@@ -328,7 +328,7 @@ public class RunConfigurationTests
     [TestMethod]
     public void RunConfigurationToXmlShouldProvideExecutionThreadApartmentState()
     {
-        var runConfiguration = new RunConfiguration { ExecutionThreadApartmentState = PlatformApartmentState.Sta };
+        var runConfiguration = new RunConfiguration { ExecutionThreadApartmentState = PlatformApartmentState.STA };
 
         StringAssert.Contains(runConfiguration.ToXml().InnerXml, "<ExecutionThreadApartmentState>STA</ExecutionThreadApartmentState>");
     }

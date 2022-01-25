@@ -16,10 +16,10 @@ using Utils;
 
 using Trace;
 
-public class VsTestTask : Task, ICancelableTask
+public class VSTestTask : Task, ICancelableTask
 {
     // The process which is invoking vstest.console
-    private VsTestForwardingApp _vsTestForwardingApp;
+    private VSTestForwardingApp _vsTestForwardingApp;
 
     private const string VsTestAppName = "vstest.console.dll";
     private const string CodeCovergaeString = "Code Coverage";
@@ -30,132 +30,132 @@ public class VsTestTask : Task, ICancelableTask
         set;
     }
 
-    public string VsTestSetting
+    public string VSTestSetting
     {
         get;
         set;
     }
 
-    public string[] VsTestTestAdapterPath
+    public string[] VSTestTestAdapterPath
     {
         get;
         set;
     }
 
-    public string VsTestFramework
+    public string VSTestFramework
     {
         get;
         set;
     }
 
-    public string VsTestPlatform
+    public string VSTestPlatform
     {
         get;
         set;
     }
 
-    public string VsTestTestCaseFilter
+    public string VSTestTestCaseFilter
     {
         get;
         set;
     }
-    public string[] VsTestLogger
-    {
-        get;
-        set;
-    }
-
-    public string VsTestListTests
+    public string[] VSTestLogger
     {
         get;
         set;
     }
 
-    public string VsTestDiag
+    public string VSTestListTests
     {
         get;
         set;
     }
 
-    public string[] VsTestCliRunSettings
+    public string VSTestDiag
+    {
+        get;
+        set;
+    }
+
+    public string[] VSTestCLIRunSettings
     {
         get;
         set;
     }
 
     [Required]
-    public string VsTestConsolePath
+    public string VSTestConsolePath
     {
         get;
         set;
     }
 
-    public string VsTestResultsDirectory
+    public string VSTestResultsDirectory
     {
         get;
         set;
     }
 
-    public string VsTestVerbosity
+    public string VSTestVerbosity
     {
         get;
         set;
     }
 
-    public string[] VsTestCollect
+    public string[] VSTestCollect
     {
         get;
         set;
     }
 
-    public string VsTestBlame
+    public string VSTestBlame
     {
         get;
         set;
     }
 
-    public string VsTestBlameCrash
+    public string VSTestBlameCrash
     {
         get;
         set;
     }
 
-    public string VsTestBlameCrashDumpType
+    public string VSTestBlameCrashDumpType
     {
         get;
         set;
     }
 
-    public string VsTestBlameCrashCollectAlways
+    public string VSTestBlameCrashCollectAlways
     {
         get;
         set;
     }
 
-    public string VsTestBlameHang
+    public string VSTestBlameHang
     {
         get;
         set;
     }
 
-    public string VsTestBlameHangDumpType
+    public string VSTestBlameHangDumpType
     {
         get;
         set;
     }
-    public string VsTestBlameHangTimeout
-    {
-        get;
-        set;
-    }
-
-    public string VsTestTraceDataCollectorDirectoryPath
+    public string VSTestBlameHangTimeout
     {
         get;
         set;
     }
 
-    public string VsTestNoLogo
+    public string VSTestTraceDataCollectorDirectoryPath
+    {
+        get;
+        set;
+    }
+
+    public string VSTestNoLogo
     {
         get;
         set;
@@ -164,7 +164,7 @@ public class VsTestTask : Task, ICancelableTask
     public override bool Execute()
     {
         var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
-        Tracing.TraceEnabled = !string.IsNullOrEmpty(traceEnabledValue) && traceEnabledValue.Equals("1", StringComparison.OrdinalIgnoreCase);
+        Tracing.traceEnabled = !string.IsNullOrEmpty(traceEnabledValue) && traceEnabledValue.Equals("1", StringComparison.OrdinalIgnoreCase);
 
         var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_BUILD_DEBUG");
         if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
@@ -187,10 +187,10 @@ public class VsTestTask : Task, ICancelableTask
         var allowfailureWithoutError = BuildEngine.GetType().GetProperty("AllowFailureWithoutError");
         allowfailureWithoutError?.SetValue(BuildEngine, true);
 
-        _vsTestForwardingApp = new VsTestForwardingApp(VsTestConsolePath, CreateArgument());
-        if (!string.IsNullOrEmpty(VsTestFramework))
+        _vsTestForwardingApp = new VSTestForwardingApp(VSTestConsolePath, CreateArgument());
+        if (!string.IsNullOrEmpty(VSTestFramework))
         {
-            Console.WriteLine(Resources.TestRunningSummary, TestFileFullPath, VsTestFramework);
+            Console.WriteLine(Resources.TestRunningSummary, TestFileFullPath, VSTestFramework);
         }
 
         return _vsTestForwardingApp.Execute() == 0;
@@ -214,10 +214,10 @@ public class VsTestTask : Task, ICancelableTask
 
     private void AddCliRunSettingsArgs(List<string> allArgs)
     {
-        if (VsTestCliRunSettings != null && VsTestCliRunSettings.Length > 0)
+        if (VSTestCLIRunSettings != null && VSTestCLIRunSettings.Length > 0)
         {
             allArgs.Add("--");
-            foreach (var arg in VsTestCliRunSettings)
+            foreach (var arg in VSTestCLIRunSettings)
             {
                 allArgs.Add(ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
             }
@@ -232,40 +232,40 @@ public class VsTestTask : Task, ICancelableTask
         var allArgs = new List<string>();
 
         // TODO log arguments in task
-        if (!string.IsNullOrEmpty(VsTestSetting))
+        if (!string.IsNullOrEmpty(VSTestSetting))
         {
             isRunSettingsEnabled = true;
-            allArgs.Add("--settings:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VsTestSetting));
+            allArgs.Add("--settings:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VSTestSetting));
         }
 
-        if (VsTestTestAdapterPath != null && VsTestTestAdapterPath.Length > 0)
+        if (VSTestTestAdapterPath != null && VSTestTestAdapterPath.Length > 0)
         {
-            foreach (var arg in VsTestTestAdapterPath)
+            foreach (var arg in VSTestTestAdapterPath)
             {
                 allArgs.Add("--testAdapterPath:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
             }
         }
 
-        if (!string.IsNullOrEmpty(VsTestFramework))
+        if (!string.IsNullOrEmpty(VSTestFramework))
         {
-            allArgs.Add("--framework:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VsTestFramework));
+            allArgs.Add("--framework:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VSTestFramework));
         }
 
         // vstest.console only support x86 and x64 for argument platform
-        if (!string.IsNullOrEmpty(VsTestPlatform) && !VsTestPlatform.Contains("AnyCPU"))
+        if (!string.IsNullOrEmpty(VSTestPlatform) && !VSTestPlatform.Contains("AnyCPU"))
         {
-            allArgs.Add("--platform:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VsTestPlatform));
+            allArgs.Add("--platform:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VSTestPlatform));
         }
 
-        if (!string.IsNullOrEmpty(VsTestTestCaseFilter))
+        if (!string.IsNullOrEmpty(VSTestTestCaseFilter))
         {
             allArgs.Add("--testCaseFilter:" +
-                        ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VsTestTestCaseFilter));
+                        ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VSTestTestCaseFilter));
         }
 
-        if (VsTestLogger != null && VsTestLogger.Length > 0)
+        if (VSTestLogger != null && VSTestLogger.Length > 0)
         {
-            foreach (var arg in VsTestLogger)
+            foreach (var arg in VSTestLogger)
             {
                 allArgs.Add("--logger:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
 
@@ -276,20 +276,20 @@ public class VsTestTask : Task, ICancelableTask
             }
         }
 
-        if (!string.IsNullOrEmpty(VsTestResultsDirectory))
+        if (!string.IsNullOrEmpty(VSTestResultsDirectory))
         {
             allArgs.Add("--resultsDirectory:" +
-                        ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VsTestResultsDirectory));
+                        ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VSTestResultsDirectory));
         }
 
-        if (!string.IsNullOrEmpty(VsTestListTests))
+        if (!string.IsNullOrEmpty(VSTestListTests))
         {
             allArgs.Add("--listTests");
         }
 
-        if (!string.IsNullOrEmpty(VsTestDiag))
+        if (!string.IsNullOrEmpty(VSTestDiag))
         {
-            allArgs.Add("--Diag:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VsTestDiag));
+            allArgs.Add("--Diag:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VSTestDiag));
         }
 
         if (string.IsNullOrEmpty(TestFileFullPath))
@@ -302,17 +302,17 @@ public class VsTestTask : Task, ICancelableTask
         }
 
         // Console logger was not specified by user, but verbosity was, hence add default console logger with verbosity as specified
-        if (!string.IsNullOrWhiteSpace(VsTestVerbosity) && !isConsoleLoggerSpecifiedByUser)
+        if (!string.IsNullOrWhiteSpace(VSTestVerbosity) && !isConsoleLoggerSpecifiedByUser)
         {
             var normalTestLogging = new List<string>() { "n", "normal", "d", "detailed", "diag", "diagnostic" };
             var quietTestLogging = new List<string>() { "q", "quiet" };
 
             string vsTestVerbosity = "minimal";
-            if (normalTestLogging.Contains(VsTestVerbosity.ToLowerInvariant()))
+            if (normalTestLogging.Contains(VSTestVerbosity.ToLowerInvariant()))
             {
                 vsTestVerbosity = "normal";
             }
-            else if (quietTestLogging.Contains(VsTestVerbosity.ToLowerInvariant()))
+            else if (quietTestLogging.Contains(VSTestVerbosity.ToLowerInvariant()))
             {
                 vsTestVerbosity = "quiet";
             }
@@ -320,9 +320,9 @@ public class VsTestTask : Task, ICancelableTask
             allArgs.Add("--logger:Console;Verbosity=" + vsTestVerbosity);
         }
 
-        var blameCrash = !string.IsNullOrEmpty(VsTestBlameCrash);
-        var blameHang = !string.IsNullOrEmpty(VsTestBlameHang);
-        if (!string.IsNullOrEmpty(VsTestBlame) || blameCrash || blameHang)
+        var blameCrash = !string.IsNullOrEmpty(VSTestBlameCrash);
+        var blameHang = !string.IsNullOrEmpty(VSTestBlameHang);
+        if (!string.IsNullOrEmpty(VSTestBlame) || blameCrash || blameHang)
         {
             var blameArgs = "--Blame";
 
@@ -332,14 +332,14 @@ public class VsTestTask : Task, ICancelableTask
                 if (blameCrash)
                 {
                     dumpArgs.Add("CollectDump");
-                    if (!string.IsNullOrEmpty(VsTestBlameCrashCollectAlways))
+                    if (!string.IsNullOrEmpty(VSTestBlameCrashCollectAlways))
                     {
-                        dumpArgs.Add($"CollectAlways={VsTestBlameCrashCollectAlways}");
+                        dumpArgs.Add($"CollectAlways={VSTestBlameCrashCollectAlways}");
                     }
 
-                    if (!string.IsNullOrEmpty(VsTestBlameCrashDumpType))
+                    if (!string.IsNullOrEmpty(VSTestBlameCrashDumpType))
                     {
-                        dumpArgs.Add($"DumpType={VsTestBlameCrashDumpType}");
+                        dumpArgs.Add($"DumpType={VSTestBlameCrashDumpType}");
                     }
                 }
 
@@ -347,14 +347,14 @@ public class VsTestTask : Task, ICancelableTask
                 {
                     dumpArgs.Add("CollectHangDump");
 
-                    if (!string.IsNullOrEmpty(VsTestBlameHangDumpType))
+                    if (!string.IsNullOrEmpty(VSTestBlameHangDumpType))
                     {
-                        dumpArgs.Add($"HangDumpType={VsTestBlameHangDumpType}");
+                        dumpArgs.Add($"HangDumpType={VSTestBlameHangDumpType}");
                     }
 
-                    if (!string.IsNullOrEmpty(VsTestBlameHangTimeout))
+                    if (!string.IsNullOrEmpty(VSTestBlameHangTimeout))
                     {
-                        dumpArgs.Add($"TestTimeout={VsTestBlameHangTimeout}");
+                        dumpArgs.Add($"TestTimeout={VSTestBlameHangTimeout}");
                     }
                 }
 
@@ -367,9 +367,9 @@ public class VsTestTask : Task, ICancelableTask
             allArgs.Add(blameArgs);
         }
 
-        if (VsTestCollect != null && VsTestCollect.Length > 0)
+        if (VSTestCollect != null && VSTestCollect.Length > 0)
         {
-            foreach (var arg in VsTestCollect)
+            foreach (var arg in VSTestCollect)
             {
                 // For collecting code coverage, argument value can be either "Code Coverage" or "Code Coverage;a=b;c=d".
                 // Split the argument with ';' and compare first token value.
@@ -394,11 +394,11 @@ public class VsTestTask : Task, ICancelableTask
             //    2. Impact of adding adapter path always is minimal. (worst case: loads additional data collector assembly in datacollector process.)
             // This is required due to currently trace datacollector not ships with dotnet sdk, can be remove once we have
             // go code coverage x-plat.
-            if (!string.IsNullOrEmpty(VsTestTraceDataCollectorDirectoryPath))
+            if (!string.IsNullOrEmpty(VSTestTraceDataCollectorDirectoryPath))
             {
                 allArgs.Add("--testAdapterPath:" +
                             ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(
-                                VsTestTraceDataCollectorDirectoryPath));
+                                VSTestTraceDataCollectorDirectoryPath));
             }
             else
             {
@@ -411,7 +411,7 @@ public class VsTestTask : Task, ICancelableTask
             }
         }
 
-        if (!string.IsNullOrWhiteSpace(VsTestNoLogo))
+        if (!string.IsNullOrWhiteSpace(VSTestNoLogo))
         {
             allArgs.Add("--nologo");
         }

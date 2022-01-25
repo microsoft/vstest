@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 
 using System.Collections.Generic;
 
-public interface IVsExtensionManager
+public interface IVSExtensionManager
 {
     /// <summary>
     /// Get the unit test extensions installed via vsix.

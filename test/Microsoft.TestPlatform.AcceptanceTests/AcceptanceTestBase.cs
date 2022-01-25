@@ -4,9 +4,8 @@
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 using System;
-using System.IO;
 
-using TestUtilities;
+using Microsoft.TestPlatform.TestUtilities;
 
 public class AcceptanceTestBase : IntegrationTestBase
 {
@@ -45,18 +44,18 @@ public class AcceptanceTestBase : IntegrationTestBase
     public const string CoreRunnerTargetRuntime = "";
     public const string InIsolation = "/InIsolation";
 
-    public const string Netfx45248 = "net452;net461;net472;net48";
-    public const string Netfx45148 = "net452;net461;net472;net48";
-    public const string Netcore2150 = "netcoreapp2.1;netcoreapp3.1;net5.0";
-    public const string Netfx452Net50 = "net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0";
-    public const string Netfx452Net31 = "net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1";
+    public const string NETFX452_48 = "net452;net461;net472;net48";
+    public const string NETFX451_48 = "net452;net461;net472;net48";
+    public const string NETCORE21_50 = "netcoreapp2.1;netcoreapp3.1;net5.0";
+    public const string NETFX452_NET50 = "net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0";
+    public const string NETFX452_NET31 = "net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1";
 
     public static string And(string left, string right)
     {
         return string.Join(";", left, right);
     }
 
-    protected string FrameworkArgValue => DeriveFrameworkArgValue(_testEnvironment);
+    protected string FrameworkArgValue => DeriveFrameworkArgValue(this.testEnvironment);
 
     protected static void SetTestEnvironment(IntegrationTestEnvironment testEnvironment, RunnerInfo runnerInfo)
     {
@@ -66,48 +65,30 @@ public class AcceptanceTestBase : IntegrationTestBase
     }
 
     protected static string DeriveFrameworkArgValue(IntegrationTestEnvironment testEnvironment)
-    {
-        switch (testEnvironment.TargetFramework)
+        => testEnvironment.TargetFramework switch
         {
-            case Core21TargetFramework:
-                return Core21FrameworkArgValue;
-            case Core31TargetFramework:
-                return Core31FrameworkArgValue;
-            case Core50TargetFramework:
-                return Core50FrameworkArgValue;
-            case Core60TargetFramework:
-                return Core60FrameworkArgValue;
-            case Net451TargetFramework:
-                return Net451FrameworkArgValue;
-            case Net452TargetFramework:
-                return Net452FrameworkArgValue;
-            case Net46TargetFramework:
-                return Net46FrameworkArgValue;
-            case Net461TargetFramework:
-                return Net461FrameworkArgValue;
-            case Net462TargetFramework:
-                return Net462FrameworkArgValue;
-            case Net47TargetFramework:
-                return Net47FrameworkArgValue;
-            case Net471TargetFramework:
-                return Net471FrameworkArgValue;
-            case Net472TargetFramework:
-                return Net472FrameworkArgValue;
-            case Net48TargetFramework:
-                return Net48FrameworkArgValue;
-            default:
-                throw new NotSupportedException($"{testEnvironment.TargetFramework} is not supported TargetFramework value.");
-        }
-    }
+            Core21TargetFramework => Core21FrameworkArgValue,
+            Core31TargetFramework => Core31FrameworkArgValue,
+            Core50TargetFramework => Core50FrameworkArgValue,
+            Core60TargetFramework => Core60FrameworkArgValue,
+            Net451TargetFramework => Net451FrameworkArgValue,
+            Net452TargetFramework => Net452FrameworkArgValue,
+            Net46TargetFramework => Net46FrameworkArgValue,
+            Net461TargetFramework => Net461FrameworkArgValue,
+            Net462TargetFramework => Net462FrameworkArgValue,
+            Net47TargetFramework => Net47FrameworkArgValue,
+            Net471TargetFramework => Net471FrameworkArgValue,
+            Net472TargetFramework => Net472FrameworkArgValue,
+            Net48TargetFramework => Net48FrameworkArgValue,
+            _ => throw new NotSupportedException($"{testEnvironment.TargetFramework} is not supported TargetFramework value."),
+        };
 
     protected bool IsDesktopTargetFramework()
-    {
-        return _testEnvironment.TargetFramework == DesktopTargetFramework;
-    }
+        => this.testEnvironment.TargetFramework == AcceptanceTestBase.DesktopTargetFramework;
 
     protected string GetTargetFramworkForRunsettings()
     {
-        string targetFramework = _testEnvironment.TargetFramework == DesktopTargetFramework ? "Framework45" : "FrameworkCore10";
+        string targetFramework = testEnvironment.TargetFramework == DesktopTargetFramework ? "Framework45" : "FrameworkCore10";
 
         return targetFramework;
     }

@@ -3,32 +3,31 @@
 
 #if NETSTANDARD && !NETSTANDARD2_0
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
-{
-    using System;
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-    using Interfaces;
+using System;
+
+using Interfaces;
+
+/// <inheritdoc/>
+public class PlatformAssemblyResolver : IAssemblyResolver
+{
+    public PlatformAssemblyResolver()
+    {
+        throw new NotImplementedException();
+    }
 
     /// <inheritdoc/>
-    public class PlatformAssemblyResolver : IAssemblyResolver
+    public event AssemblyResolveEventHandler AssemblyResolve;
+
+    public void Dispose()
     {
-        public PlatformAssemblyResolver()
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc/>
-        public event AssemblyResolveEventHandler AssemblyResolve;
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
-
-        private void DummyEventThrower()
-        {
-            AssemblyResolve(this, null);
-        }
+    private void DummyEventThrower()
+    {
+        AssemblyResolve(this, null);
     }
 }
 

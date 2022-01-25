@@ -5,14 +5,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Xml;
 
 #if !NETSTANDARD1_0
 using System.Xml.XPath;
-#endif 
+#endif
 
 using PlatformAbstractions;
 
@@ -26,25 +25,20 @@ public static class XmlRunSettingsUtilities
     /// <summary>
     /// Gets the os architecture of the machine where this application is running
     /// </summary>
-    public static Architecture OsArchitecture
+    public static Architecture OSArchitecture
     {
         get
         {
             var arch = new PlatformEnvironment().Architecture;
 
-            switch (arch)
+            return arch switch
             {
-                case PlatformArchitecture.X64:
-                    return Architecture.X64;
-                case PlatformArchitecture.X86:
-                    return Architecture.X86;
-                case PlatformArchitecture.Arm64:
-                    return Architecture.ARM64;
-                case PlatformArchitecture.Arm:
-                    return Architecture.ARM;
-                default:
-                    return Architecture.X64;
-            }
+                PlatformArchitecture.X64 => Architecture.X64,
+                PlatformArchitecture.X86 => Architecture.X86,
+                PlatformArchitecture.ARM64 => Architecture.ARM64,
+                PlatformArchitecture.ARM => Architecture.ARM,
+                _ => Architecture.X64,
+            };
         }
     }
 

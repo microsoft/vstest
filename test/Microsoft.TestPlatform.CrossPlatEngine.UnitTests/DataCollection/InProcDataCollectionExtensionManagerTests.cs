@@ -327,7 +327,7 @@ public class InProcDataCollectionExtensionManagerTests
             // Do Nothing
         }
 
-        public void TriggerInProcDataCollectionMethod(string methodName, INProcDataCollectionArgs methodArg)
+        public void TriggerInProcDataCollectionMethod(string methodName, InProcDataCollectionArgs methodArg)
         {
             switch (methodName)
             {

@@ -22,7 +22,7 @@ public class DataCollectorTests : IntegrationTestBase
 
         var runSettings = GetInProcDataCollectionRunsettingsFile();
 
-        InvokeVsTestForExecution(_testEnvironment.GetTestAsset(InProDataCollectorTestProject), GetTestAdapterPath(), ".NETFramework,Version=v4.5.1", runSettings);
+        InvokeVsTestForExecution(testEnvironment.GetTestAsset(InProDataCollectorTestProject), GetTestAdapterPath(), ".NETFramework,Version=v4.5.1", runSettings);
         ValidateSummaryStatus(1, 1, 1);
 
         ValidateInProcDataCollectionOutput();
@@ -40,8 +40,8 @@ public class DataCollectorTests : IntegrationTestBase
 
     private string GetInProcDataCollectionRunsettingsFile()
     {
-        var runSettings = Path.Combine(Path.GetDirectoryName(_testEnvironment.GetTestAsset(InProDataCollectorTestProject)), "runsettingstest.runsettings");
-        var inprocasm = _testEnvironment.GetTestAsset("SimpleDataCollector.dll");
+        var runSettings = Path.Combine(Path.GetDirectoryName(testEnvironment.GetTestAsset(InProDataCollectorTestProject)), "runsettingstest.runsettings");
+        var inprocasm = testEnvironment.GetTestAsset("SimpleDataCollector.dll");
         var fileContents = @"<RunSettings>
                                     <InProcDataCollectionRunSettings>
                                         <InProcDataCollectors>

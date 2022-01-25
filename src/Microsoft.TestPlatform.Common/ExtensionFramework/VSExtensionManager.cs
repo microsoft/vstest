@@ -17,7 +17,7 @@ using Resources;
 /// <summary>
 /// Manager for VisualStudio based extensions
 /// </summary>
-public class VsExtensionManager : IVsExtensionManager
+public class VSExtensionManager : IVSExtensionManager
 {
     private const string ExtensionManagerService = "Microsoft.VisualStudio.ExtensionManager.ExtensionManagerService";
     private const string ExtensionManagerAssemblyName = @"Microsoft.VisualStudio.ExtensionManager";
@@ -38,11 +38,12 @@ public class VsExtensionManager : IVsExtensionManager
     /// <summary>
     /// Default constructor for manager for Visual Studio based extensions
     /// </summary>
-    public VsExtensionManager() : this(new FileHelper())
+    public VSExtensionManager()
+        : this(new FileHelper())
     {
     }
 
-    internal VsExtensionManager(IFileHelper fileHelper)
+    internal VSExtensionManager(IFileHelper fileHelper)
     {
         _fileHelper = fileHelper;
     }

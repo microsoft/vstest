@@ -184,7 +184,7 @@ internal class RunSettingsArgumentExecutor : IArgumentExecutor
     {
         XmlDocument runSettingsDocument;
 
-        if (!MsTestSettingsUtilities.IsLegacyTestSettingsFile(runSettingsFile))
+        if (!MSTestSettingsUtilities.IsLegacyTestSettingsFile(runSettingsFile))
         {
             using XmlReader reader = GetReaderForFile(runSettingsFile);
             var settingsDocument = new XmlDocument();
@@ -195,7 +195,7 @@ internal class RunSettingsArgumentExecutor : IArgumentExecutor
         else
         {
             runSettingsDocument = XmlRunSettingsUtilities.CreateDefaultRunSettings();
-            runSettingsDocument = MsTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument);
+            runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument);
         }
 
         return runSettingsDocument;

@@ -42,8 +42,8 @@ public class DesignModeClient : IDesignModeClient
     private readonly TestSessionMessageLogger _testSessionMessageLogger;
     private readonly object _lockObject = new();
 
-    protected Action<Message> _onCustomTestHostLaunchAckReceived;
-    protected Action<Message> _onAttachDebuggerAckRecieved;
+    protected Action<Message> onCustomTestHostLaunchAckReceived;
+    protected Action<Message> onAttachDebuggerAckRecieved;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DesignModeClient"/> class.
@@ -250,13 +250,13 @@ public class DesignModeClient : IDesignModeClient
 
                     case MessageType.CustomTestHostLaunchCallback:
                         {
-                            _onCustomTestHostLaunchAckReceived?.Invoke(message);
+                            onCustomTestHostLaunchAckReceived?.Invoke(message);
                             break;
                         }
 
                     case MessageType.EditorAttachDebuggerCallback:
                         {
-                            _onAttachDebuggerAckRecieved?.Invoke(message);
+                            onAttachDebuggerAckRecieved?.Invoke(message);
                             break;
                         }
 
@@ -303,7 +303,7 @@ public class DesignModeClient : IDesignModeClient
         {
             var waitHandle = new AutoResetEvent(false);
             Message ackMessage = null;
-            _onCustomTestHostLaunchAckReceived = (ackRawMessage) =>
+            onCustomTestHostLaunchAckReceived = (ackRawMessage) =>
             {
                 ackMessage = ackRawMessage;
                 waitHandle.Set();
@@ -320,7 +320,7 @@ public class DesignModeClient : IDesignModeClient
 
             cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
 
-            _onCustomTestHostLaunchAckReceived = null;
+            onCustomTestHostLaunchAckReceived = null;
 
             var ackPayload = _dataSerializer.DeserializePayload<CustomHostLaunchAckPayload>(ackMessage);
 
@@ -343,7 +343,7 @@ public class DesignModeClient : IDesignModeClient
         {
             var waitHandle = new AutoResetEvent(false);
             Message ackMessage = null;
-            _onAttachDebuggerAckRecieved = (ackRawMessage) =>
+            onAttachDebuggerAckRecieved = (ackRawMessage) =>
             {
                 ackMessage = ackRawMessage;
                 waitHandle.Set();
@@ -354,7 +354,7 @@ public class DesignModeClient : IDesignModeClient
             WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
 
             cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
-            _onAttachDebuggerAckRecieved = null;
+            onAttachDebuggerAckRecieved = null;
 
             var ackPayload = _dataSerializer.DeserializePayload<EditorAttachDebuggerAckPayload>(ackMessage);
             if (!ackPayload.Attached)
@@ -383,7 +383,7 @@ public class DesignModeClient : IDesignModeClient
     }
 
     /// <summary>
-    /// Sends the test session logger warning and error messages to IDE; 
+    /// Sends the test session logger warning and error messages to IDE;
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -393,8 +393,8 @@ public class DesignModeClient : IDesignModeClient
         //
         // there is a mismatch between log levels that VS uses and that TP
         // uses. In VS you can choose Trace level which will enable Test platform
-        // logs on Verbose level. Below we report Errors and warnings always to the 
-        // IDE no matter what the level of VS logging is, but Info only when the Eqt trace 
+        // logs on Verbose level. Below we report Errors and warnings always to the
+        // IDE no matter what the level of VS logging is, but Info only when the Eqt trace
         // info level is enabled (so only when VS enables Trace logging)
         switch (e.Level)
         {

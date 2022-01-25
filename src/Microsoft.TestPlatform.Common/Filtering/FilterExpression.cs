@@ -167,7 +167,7 @@ internal class FilterExpression
     {
         ValidateArg.NotNull(filterString, nameof(filterString));
 
-        // Below parsing doesn't error out on pattern (), so explicitly search for that (empty parethesis).
+        // Below parsing doesn't error out on pattern (), so explicitly search for that (empty parenthesis).
         var invalidInput = Regex.Match(filterString, @"\(\s*\)");
         if (invalidInput.Success)
         {

@@ -85,7 +85,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
         {
             if (EqtTrace.IsWarningEnabled)
             {
-                EqtTrace.Warning("TestRunAttachmentsProcessingManager: operation was cancelled.");
+                EqtTrace.Warning("TestRunAttachmentsProcessingManager: Operation was cancelled.");
             }
             return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(true, null), attachments, stopwatch, eventHandler);
         }
@@ -93,7 +93,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
         {
             EqtTrace.Error("TestRunAttachmentsProcessingManager: Exception in ProcessTestRunAttachmentsAsync: " + e);
 
-            eventHandler?.HandleLogMessage(TestMessageLevel.Error, e.Message);
+            eventHandler?.HandleLogMessage(TestMessageLevel.Error, e.ToString());
             return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(false, e), attachments, stopwatch, eventHandler);
         }
     }
@@ -109,6 +109,13 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
         {
             var dataCollectorAttachmentsProcessor = dataCollectorAttachmentsProcessors[i];
             int attachmentsHandlerIndex = i + 1;
+
+            if (!dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.SupportsIncrementalProcessing)
+            {
+                EqtTrace.Error($"TestRunAttachmentsProcessingManager: Non incremental attachment processors are not supported, '{dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetType()}'");
+                logger.SendMessage(TestMessageLevel.Error, $"Non incremental attachment processors are not supported '{dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetType()}'");
+                continue;
+            }
 
             // We run processor code inside a try/catch because we want to continue with the others in case of failure.
             Collection<AttachmentSet> attachmentsBackup = null;
@@ -141,7 +148,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
                             configuration = collectorConfiguration.Configuration;
                         }
 
-                        EqtTrace.Info($"TestRunAttachmentsProcessingManager: invocation of data collector attachment processor '{dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName}' with configuration '{(configuration == null ? "null" : configuration.OuterXml)}'");
+                        EqtTrace.Info($"TestRunAttachmentsProcessingManager: Invocation of data collector attachment processor '{dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName}' with configuration '{(configuration == null ? "null" : configuration.OuterXml)}'");
                         ICollection<AttachmentSet> processedAttachments = await dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.ProcessAttachmentSetsAsync(
                             configuration,
                             new Collection<AttachmentSet>(attachmentsToBeProcessed),
@@ -162,7 +169,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
             catch (Exception e)
             {
                 EqtTrace.Error("TestRunAttachmentsProcessingManager: Exception in ProcessAttachmentsAsync: " + e);
-                logger.SendMessage(TestMessageLevel.Error, e.Message);
+                logger.SendMessage(TestMessageLevel.Error, e.ToString());
 
                 // Restore the attachment sets for the others attachment processors.
                 attachments = attachmentsBackup;

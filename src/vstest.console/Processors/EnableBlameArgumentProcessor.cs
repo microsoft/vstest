@@ -313,10 +313,10 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     {
         var dumpCollectionSupported =
             _environment.OperatingSystem == PlatformOperatingSystem.Unix ||
-            _environment.OperatingSystem == PlatformOperatingSystem.Osx ||
+            _environment.OperatingSystem == PlatformOperatingSystem.OSX ||
             (_environment.OperatingSystem == PlatformOperatingSystem.Windows
-             && _environment.Architecture != PlatformArchitecture.Arm64
-             && _environment.Architecture != PlatformArchitecture.Arm);
+             && _environment.Architecture != PlatformArchitecture.ARM64
+             && _environment.Architecture != PlatformArchitecture.ARM);
 
         if (!dumpCollectionSupported)
         {

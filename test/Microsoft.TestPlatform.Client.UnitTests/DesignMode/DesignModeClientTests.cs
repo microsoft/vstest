@@ -734,7 +734,7 @@ public class DesignModeClientTests
                 HostProcessId = processId,
                 ErrorMessage = errorMessage
             };
-            _onCustomTestHostLaunchAckReceived?.Invoke(
+            onCustomTestHostLaunchAckReceived?.Invoke(
                 new Message() { MessageType = MessageType.CustomTestHostLaunchCallback, Payload = JToken.FromObject(payload) });
         }
     }

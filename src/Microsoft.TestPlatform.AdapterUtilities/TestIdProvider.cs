@@ -47,7 +47,7 @@ public class TestIdProvider
         _hasher.ProcessBlock(_lastBlock, 0, _lastBlock.Length);
         _position = 0;
 
-        // We proccessed the entire string already
+        // We processed the entire string already
         if (end == bytes.Length)
         {
             return;
@@ -109,15 +109,15 @@ public class TestIdProvider
     /// SHA-1 Implementation as in https://tools.ietf.org/html/rfc3174
     /// </summary>
     /// <remarks>
-    /// This implementation only works with messages with a length 
+    /// This implementation only works with messages with a length
     /// that is a multiple of the size of 8-bits.
     /// </remarks>
     internal class Sha1Implementation
     {
-        /* 
-         * Many of the variable, function and parameter names in this code 
+        /*
+         * Many of the variable, function and parameter names in this code
          * were used because those were the names used in the publication.
-         * 
+         *
          * For more information please refer to https://tools.ietf.org/html/rfc3174.
          */
 
@@ -130,8 +130,8 @@ public class TestIdProvider
         }
 
         /// <summary>
-        /// A sequence of logical functions to be used in SHA-1. 
-        /// Each f(t), 0 <= t <= 79, operates on three 32-bit words B, C, D and produces a 32-bit word as output.  
+        /// A sequence of logical functions to be used in SHA-1.
+        /// Each f(t), 0 <= t <= 79, operates on three 32-bit words B, C, D and produces a 32-bit word as output.
         /// </summary>
         /// <param name="t">Function index. 0 <= t <= 79</param>
         /// <param name="b">Word B</param>

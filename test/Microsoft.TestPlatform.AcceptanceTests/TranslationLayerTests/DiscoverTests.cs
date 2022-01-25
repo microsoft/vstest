@@ -20,15 +20,15 @@ using Moq;
 [TestClass]
 public class DiscoverTests : AcceptanceTestBase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private DiscoveryEventHandler _discoveryEventHandler;
-    private DiscoveryEventHandler2 _discoveryEventHandler2;
+    private readonly IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private readonly DiscoveryEventHandler _discoveryEventHandler;
+    private readonly DiscoveryEventHandler2 _discoveryEventHandler2;
 
     public void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
-        _discoveryEventHandler = new DiscoveryEventHandler();
-        _discoveryEventHandler2 = new DiscoveryEventHandler2();
+        this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
+        this.discoveryEventHandler = new DiscoveryEventHandler();
+        this.discoveryEventHandler2 = new DiscoveryEventHandler2();
     }
 
     [TestCleanup]
@@ -165,11 +165,11 @@ public class DiscoverTests : AcceptanceTestBase
         // Release builds optimize code, hence line numbers are different.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
         {
-            Assert.AreEqual(23, testCase.FirstOrDefault().LineNumber);
+            Assert.AreEqual(25, testCase.FirstOrDefault().LineNumber);
         }
         else
         {
-            Assert.AreEqual(22, testCase.FirstOrDefault().LineNumber);
+            Assert.AreEqual(24, testCase.FirstOrDefault().LineNumber);
         }
     }
 

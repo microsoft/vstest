@@ -20,7 +20,7 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
     [DataRow("X86")]
     public void VerifyHostArchitecture(string architecture)
     {
-        using Workspace workSpace = new(GetResultsDirectory());
+        using var workSpace = new TempDirectory();
         string dotnetPath = GetDownloadedDotnetMuxerFromTools(architecture);
         var vstestConsolePath = GetDotnetRunnerPath();
         var dotnetRunnerPath = workSpace.CreateDirectory("dotnetrunner");
@@ -39,11 +39,11 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
             ["ExpectedArchitecture"] = architecture
         };
 
-        ExecuteApplication(dotnetPath, "new mstest", out string stdOut, out string stdError, out int exitCode, environmentVariables, workSpace.Path);
+        this.ExecuteApplication(dotnetPath, "new mstest", out string stdOut, out string stdError, out int exitCode, environmentVariables, workSpace.Path);
 
         // Patch test file
         File.WriteAllText(Path.Combine(workSpace.Path, "UnitTest1.cs"),
-            @"
+@"
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 

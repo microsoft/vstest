@@ -21,7 +21,7 @@ using System.Reflection.PortableExecutable;
 
 public class DotnetHostHelper : IDotnetHostHelper
 {
-    public const string MonoExeName = "mono";
+    public const string MONOEXENAME = "mono";
 
     private readonly IFileHelper _fileHelper;
     private readonly IEnvironment _environment;
@@ -85,9 +85,9 @@ public class DotnetHostHelper : IDotnetHostHelper
 
     public string GetMonoPath()
     {
-        if (!TryGetExecutablePath(MonoExeName, out var monoPath))
+        if (!TryGetExecutablePath(MONOEXENAME, out var monoPath))
         {
-            string errorMessage = string.Format(Resources.NoDotnetExeFound, MonoExeName);
+            string errorMessage = string.Format(Resources.NoDotnetExeFound, MONOEXENAME);
 
             EqtTrace.Error(errorMessage);
             throw new FileNotFoundException(errorMessage);
@@ -230,7 +230,7 @@ public class DotnetHostHelper : IDotnetHostHelper
         if (isWinOs)
         {
             // If we're on x64/arm64 SDK and target is x86 we need to search on non virtualized windows folder
-            if ((_environment.Architecture == PlatformArchitecture.X64 || _environment.Architecture == PlatformArchitecture.Arm64) &&
+            if ((_environment.Architecture == PlatformArchitecture.X64 || _environment.Architecture == PlatformArchitecture.ARM64) &&
                  targetArchitecture == PlatformArchitecture.X86)
             {
                 muxerPath = Path.Combine(_environmentVariableHelper.GetEnvironmentVariable("ProgramFiles(x86)"), "dotnet", _muxerName);
@@ -238,17 +238,17 @@ public class DotnetHostHelper : IDotnetHostHelper
             else
             {
                 // If we're on ARM and target is x64 we expect correct installation inside x64 folder
-                muxerPath = _environment.Architecture == PlatformArchitecture.Arm64 && targetArchitecture == PlatformArchitecture.X64
+                muxerPath = _environment.Architecture == PlatformArchitecture.ARM64 && targetArchitecture == PlatformArchitecture.X64
                     ? Path.Combine(_environmentVariableHelper.GetEnvironmentVariable("ProgramFiles"), "dotnet", "x64", _muxerName)
                     : Path.Combine(_environmentVariableHelper.GetEnvironmentVariable("ProgramFiles"), "dotnet", _muxerName);
             }
         }
         else
         {
-            if (_environment.OperatingSystem == PlatformOperatingSystem.Osx)
+            if (_environment.OperatingSystem == PlatformOperatingSystem.OSX)
             {
                 // If we're on ARM and target is x64 we expect correct installation inside x64 folder
-                muxerPath = _environment.Architecture == PlatformArchitecture.Arm64 && targetArchitecture == PlatformArchitecture.X64
+                muxerPath = _environment.Architecture == PlatformArchitecture.ARM64 && targetArchitecture == PlatformArchitecture.X64
                     ? Path.Combine("/usr/local/share/dotnet/x64", _muxerName)
                     : Path.Combine("/usr/local/share/dotnet", _muxerName);
             }
@@ -366,9 +366,9 @@ public class DotnetHostHelper : IDotnetHostHelper
                 case Machine.IA64:
                     return PlatformArchitecture.X64;
                 case Machine.Arm64:
-                    return PlatformArchitecture.Arm64;
+                    return PlatformArchitecture.ARM64;
                 case Machine.Arm:
-                    return PlatformArchitecture.Arm;
+                    return PlatformArchitecture.ARM;
                 case Machine.I386:
                     return PlatformArchitecture.X86;
                 default:
@@ -399,7 +399,7 @@ public class DotnetHostHelper : IDotnetHostHelper
             var cpuInfo = BitConverter.ToUInt32(cpuInfoBytes, 0);
             PlatformArchitecture? architecture = (MacOsCpuType)cpuInfo switch
             {
-                MacOsCpuType.Arm64Magic or MacOsCpuType.Arm64Cigam => PlatformArchitecture.Arm64,
+                MacOsCpuType.Arm64Magic or MacOsCpuType.Arm64Cigam => PlatformArchitecture.ARM64,
                 MacOsCpuType.X64Magic or MacOsCpuType.X64Cigam => PlatformArchitecture.X64,
                 MacOsCpuType.X86Magic or MacOsCpuType.X86Cigam => PlatformArchitecture.X86,
                 _ => null,
@@ -433,7 +433,7 @@ public class DotnetHostHelper : IDotnetHostHelper
         {
             muxerPlatform = GetMuxerArchitectureByPEHeaderOnWin(path);
         }
-        else if (_environment.OperatingSystem == PlatformOperatingSystem.Osx)
+        else if (_environment.OperatingSystem == PlatformOperatingSystem.OSX)
         {
             muxerPlatform = GetMuxerArchitectureByMachoOnMac(path);
         }

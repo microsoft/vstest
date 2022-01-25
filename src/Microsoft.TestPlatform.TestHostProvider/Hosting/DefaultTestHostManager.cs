@@ -174,7 +174,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
         var launcherPath = testhostProcessPath;
         if (!_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
-            !_processHelper.GetCurrentProcessFileName().EndsWith(DotnetHostHelper.MonoExeName, StringComparison.OrdinalIgnoreCase))
+            !_processHelper.GetCurrentProcessFileName().EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
         {
             launcherPath = _dotnetHostHelper.GetMonoPath();
             argumentsString = testhostProcessPath.AddDoubleQuote() + " " + argumentsString;

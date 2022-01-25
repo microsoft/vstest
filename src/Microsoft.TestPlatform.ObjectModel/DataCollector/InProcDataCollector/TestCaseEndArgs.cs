@@ -8,7 +8,7 @@ using DataCollection;
 /// <summary>
 /// The test case end args.
 /// </summary>
-public class TestCaseEndArgs : INProcDataCollectionArgs
+public class TestCaseEndArgs : InProcDataCollectionArgs
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="TestCaseEndArgs"/> class.

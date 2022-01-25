@@ -153,7 +153,7 @@ public static class Constants
 
     public const string EmptyRunSettings = @"<RunSettings></RunSettings>";
 
-    public static readonly Architecture DefaultPlatform = XmlRunSettingsUtilities.OsArchitecture;
+    public static readonly Architecture DefaultPlatform = XmlRunSettingsUtilities.OSArchitecture;
 
     /// <summary>
     /// Adding this for compatibility
@@ -206,10 +206,10 @@ public static class Constants
     [CLSCompliant(false)]
 #if NETFRAMEWORK
     // Keeping default STA thread for desktop tests for UI/Functional test scenarios
-    public static readonly PlatformApartmentState DefaultExecutionThreadApartmentState = PlatformApartmentState.Sta;
+    public static readonly PlatformApartmentState DefaultExecutionThreadApartmentState = PlatformApartmentState.STA;
 #else
     // STA threads are not supported for net core, default to MTA
-    public static readonly PlatformApartmentState DefaultExecutionThreadApartmentState = PlatformApartmentState.Mta;
+    public static readonly PlatformApartmentState DefaultExecutionThreadApartmentState = PlatformApartmentState.MTA;
 #endif
 
     /// <summary>

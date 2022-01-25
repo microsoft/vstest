@@ -195,7 +195,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// <summary>
     /// Raises a test result event to the enabled loggers.
     /// </summary>
-    /// <param name="args">Arguments to to be raised.</param>
+    /// <param name="args">Arguments to be raised.</param>
     internal void RaiseTestResult(TestResultEventArgs args)
     {
         ValidateArg.NotNull(args, nameof(args));

@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
 /// <summary>
 /// The InProcDataCollectionArgs interface.
 /// </summary>
-public interface INProcDataCollectionArgs
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Interface is part of the public API.")]
+public interface InProcDataCollectionArgs
 {
 }

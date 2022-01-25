@@ -3,11 +3,8 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-using VisualStudio.TestTools.UnitTesting;
-
-using System;
-
-using static AcceptanceTestBase;
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 public class MultitargetingTestHostTests : AcceptanceTestBase
@@ -16,18 +13,17 @@ public class MultitargetingTestHostTests : AcceptanceTestBase
     [TestCategory("Windows-Review")]
     // the underlying test is using xUnit to avoid AppDomain enhancements in MSTest that make this pass even without multitargetting
     // xUnit supports net452 onwards, so that is why this starts at net452, I also don't test all framework versions
-    [NetCoreRunner(Netfx45248)]
-    [NetFrameworkRunner(Netfx45248)]
+    [NetCoreRunner(NETFX452_48)]
+    [NetFrameworkRunner(NETFX452_48)]
     public void RunningTestWithAFailingDebugAssertDoesNotCrashTheHostingProcess(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var resultsDir = GetResultsDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
-        var assemblyPath = BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll").Trim('\"');
-        var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
-        InvokeVsTest(arguments);
+        var assemblyPath = this.BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll").Trim('\"');
+        var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+        this.InvokeVsTest(arguments);
 
-        ValidateSummaryStatus(passedTestsCount: 1, failedTestsCount: 0, 0);
-        TryRemoveDirectory(resultsDir);
+        this.ValidateSummaryStatus(passedTestsCount: 1, failedTestsCount: 0, 0);
     }
 }

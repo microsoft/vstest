@@ -6,28 +6,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 
-using global::TestPlatform.TestUtilities;
-
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 // monitoring the processes does not work correctly
 [TestCategory("Windows-Review")]
 public class RunsettingsTests : AcceptanceTestBase
 {
-    private readonly string _runsettingsPath = Path.Combine(Path.GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
-
-    [TestCleanup]
-    public void TestCleanup()
-    {
-        if (File.Exists(_runsettingsPath))
-        {
-            File.Delete(_runsettingsPath);
-        }
-    }
-
     #region Runsettings precedence tests
     /// <summary>
     /// Command line run settings should have high precedence among settings file, cli runsettings and cli switches
@@ -37,11 +24,11 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void CommandLineRunSettingsShouldWinAmongAllOptions(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
         var targetPlatform = "x86";
-        var testhostProcessName = new[] { "testhost.x86", "dotnet" };
-        var expectedNumOfProcessCreated = GetExpectedNumOfProcessCreatedForWithoutParallel();
+        var testhostProcessName = new[] { "testhost.x86" };
+        var expectedNumOfProcessCreated = 1;
 
         // passing parallel
         var runConfigurationDictionary = new Dictionary<string, string>
@@ -67,18 +54,18 @@ public class RunsettingsTests : AcceptanceTestBase
     }
 
     /// <summary>
-    /// Command line run settings should have high precedence btween cli runsettings and cli switches.
+    /// Command line run settings should have high precedence between cli runsettings and cli switches.
     /// </summary>
     [TestMethod]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
-    public void CliRunsettingsShouldWinBetweenCliSwitchesAndCliRunsettings(RunnerInfo runnerInfo)
+    public void CLIRunsettingsShouldWinBetweenCLISwitchesAndCLIRunsettings(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
         var targetPlatform = "x86";
-        var testhostProcessName = new[] { "testhost.x86", "dotnet" };
-        var expectedNumOfProcessCreated = GetExpectedNumOfProcessCreatedForWithoutParallel();
+        var testhostProcessName = new[] { "testhost.x86" };
+        var expectedNumOfProcessCreated = 1;
 
         // Pass parallel
         var additionalArgs = "/Parallel";
@@ -110,8 +97,8 @@ public class RunsettingsTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var testhostProcessName = new[] { "testhost.x86", "dotnet" };
-        var expectedNumOfProcessCreated = GetExpectedNumOfProcessCreatedForWithoutParallel();
+        var testhostProcessName = new[] { "testhost.x86" };
+        var expectedNumOfProcessCreated = 1;
 
         // passing different platform
         var runConfigurationDictionary = new Dictionary<string, string>
@@ -212,14 +199,8 @@ public class RunsettingsTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var targetPlatform = "x64";
-        var testhostProcessName = new[] { "testhost", "dotnet" };
+        var testhostProcessName = new[] { "testhost" };
         var expectedProcessCreated = 2;
-        if (!IsDesktopRunner())
-        {
-            // this creates dotnet hosted vstest console and 2 testhosts one of which is hosted
-            // in dotnet, so we have two dotnet + 1 testhost.exe
-            expectedProcessCreated = 3;
-        }
 
         var runConfigurationDictionary = new Dictionary<string, string>
         {
@@ -236,22 +217,21 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSettingsWithInvalidValueShouldLogError(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var resultsDir = GetResultsDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
         var runConfigurationDictionary = new Dictionary<string, string>
-        {
-            { "TargetPlatform", "123" }
-        };
-        var runsettingsFilePath = GetRunsettingsFilePath(runConfigurationDictionary);
+                                                 {
+                                                         { "TargetPlatform", "123" }
+                                                 };
+        var runsettingsFilePath = this.GetRunsettingsFilePath(runConfigurationDictionary, tempDir);
         var arguments = PrepareArguments(
-            GetSampleTestAssembly(),
+            this.GetSampleTestAssembly(),
             string.Empty,
-            runsettingsFilePath, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
-        InvokeVsTest(arguments);
-        StdErrorContains(@"Settings file provided does not conform to required format. An error occurred while loading the settings. Error: Invalid setting 'RunConfiguration'. Invalid value '123' specified for 'TargetPlatform'.");
-        TryRemoveDirectory(resultsDir);
+            runsettingsFilePath, this.FrameworkArgValue,
+            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+        this.InvokeVsTest(arguments);
+        this.StdErrorContains(@"Settings file provided does not conform to required format. An error occurred while loading the settings. Error: Invalid setting 'RunConfiguration'. Invalid value '123' specified for 'TargetPlatform'.");
     }
 
     [TestMethod]
@@ -259,22 +239,21 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void TestAdapterPathFromRunSettings(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var resultsDir = GetResultsDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
         var runConfigurationDictionary = new Dictionary<string, string>
-        {
-            { "TestAdaptersPaths", GetTestAdapterPath() }
-        };
-        var runsettingsFilePath = GetRunsettingsFilePath(runConfigurationDictionary);
+                                                 {
+                                                         { "TestAdaptersPaths", this.GetTestAdapterPath() }
+                                                 };
+        var runsettingsFilePath = this.GetRunsettingsFilePath(runConfigurationDictionary, tempDir);
         var arguments = PrepareArguments(
-            GetSampleTestAssembly(),
+            this.GetSampleTestAssembly(),
             string.Empty,
-            runsettingsFilePath, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(1, 1, 1);
-        TryRemoveDirectory(resultsDir);
+            runsettingsFilePath, this.FrameworkArgValue,
+            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+        this.InvokeVsTest(arguments);
+        this.ValidateSummaryStatus(1, 1, 1);
     }
 
     #region LegacySettings Tests
@@ -284,8 +263,8 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsWithPlatform(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var resultsDir = GetResultsDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
         var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
         _ = Path.GetDirectoryName(testAssemblyPath);
@@ -300,15 +279,15 @@ public class RunsettingsTests : AcceptanceTestBase
                                     </LegacySettings>
                                    </RunSettings>";
 
-        File.WriteAllText(_runsettingsPath, runsettingsXml);
+        var runsettingsFilePath = this.GetRunsettingsFilePath(null, tempDir);
+        File.WriteAllText(runsettingsFilePath, runsettingsXml);
 
         var arguments = PrepareArguments(
-            testAssemblyPath,
-            string.Empty,
-            _runsettingsPath, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(0, 0, 0);
-        TryRemoveDirectory(resultsDir);
+           testAssemblyPath,
+           string.Empty,
+           runsettingsFilePath, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+        this.InvokeVsTest(arguments);
+        this.ValidateSummaryStatus(0, 0, 0);
     }
 
     [TestMethod]
@@ -316,20 +295,19 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsWithScripts(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var resultsDir = GetResultsDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
-        var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
-        _ = Path.GetDirectoryName(testAssemblyPath);
+        var testAssemblyPath = this.GetAssetFullPath("LegacySettingsUnitTestProject.dll");
 
         // Create the script files
         var guid = Guid.NewGuid();
         var setupScriptName = "setupScript_" + guid + ".bat";
-        var setupScriptPath = Path.Combine(Path.GetTempPath(), setupScriptName);
+        var setupScriptPath = Path.Combine(tempDir.Path, setupScriptName);
         File.WriteAllText(setupScriptPath, @"echo > %temp%\ScriptTestingFile.txt");
 
         var cleanupScriptName = "cleanupScript_" + guid + ".bat";
-        var cleanupScriptPath = Path.Combine(Path.GetTempPath(), cleanupScriptName);
+        var cleanupScriptPath = Path.Combine(tempDir.Path, cleanupScriptName);
         File.WriteAllText(cleanupScriptPath, @"del %temp%\ScriptTestingFile.txt");
 
         var runsettingsFormat = @"<RunSettings>
@@ -343,25 +321,20 @@ public class RunsettingsTests : AcceptanceTestBase
 
         // Scripts have relative paths to temp directory where the runsettings is created.
         var runsettingsXml = string.Format(runsettingsFormat, setupScriptName, cleanupScriptName);
-
-        File.WriteAllText(_runsettingsPath, runsettingsXml);
+        var runsettingsPath = GetRunsettingsFilePath(null, tempDir);
+        File.WriteAllText(runsettingsPath, runsettingsXml);
 
         var arguments = PrepareArguments(
-            testAssemblyPath,
-            string.Empty,
-            _runsettingsPath, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+           testAssemblyPath,
+           string.Empty,
+           runsettingsPath, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /testcasefilter:Name=ScriptsTest");
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(1, 0, 0);
+        this.InvokeVsTest(arguments);
+        this.ValidateSummaryStatus(1, 0, 0);
 
         // Validate cleanup script ran
-        var scriptPath = Path.Combine(Path.GetTempPath(), "ScriptTestingFile.txt");
+        var scriptPath = Path.Combine(tempDir.Path, "ScriptTestingFile.txt");
         Assert.IsFalse(File.Exists(scriptPath));
-
-        // Cleanup script files
-        File.Delete(setupScriptPath);
-        File.Delete(cleanupScriptPath);
-        TryRemoveDirectory(resultsDir);
     }
 
     [TestMethod]
@@ -369,8 +342,8 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsWithDeploymentItem(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var resultsDir = GetResultsDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
         var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
         var testAssemblyDirectory = Path.GetDirectoryName(testAssemblyPath);
@@ -389,16 +362,16 @@ public class RunsettingsTests : AcceptanceTestBase
                                    </RunSettings>";
 
         var runsettingsXml = string.Format(runsettingsFormat, deploymentItem);
-        File.WriteAllText(_runsettingsPath, runsettingsXml);
+        var runsettingsPath = GetRunsettingsFilePath(null, tempDir);
+        File.WriteAllText(runsettingsPath, runsettingsXml);
 
         var arguments = PrepareArguments(
-            testAssemblyPath,
-            string.Empty,
-            _runsettingsPath, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+           testAssemblyPath,
+           string.Empty,
+           runsettingsPath, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /testcasefilter:Name=DeploymentItemTest");
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(1, 0, 0);
-        TryRemoveDirectory(resultsDir);
+        this.InvokeVsTest(arguments);
+        this.ValidateSummaryStatus(1, 0, 0);
     }
 
     [TestMethod]
@@ -406,8 +379,8 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsTestTimeout(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var resultsDir = GetResultsDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
         var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
         var runsettingsXml = @"<RunSettings>
@@ -419,14 +392,14 @@ public class RunsettingsTests : AcceptanceTestBase
                                         </Execution>
                                     </LegacySettings>
                                    </RunSettings>";
-        File.WriteAllText(_runsettingsPath, runsettingsXml);
-        var arguments = PrepareArguments(testAssemblyPath, string.Empty, _runsettingsPath, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+        var runsettingsPath = GetRunsettingsFilePath(null, tempDir);
+        File.WriteAllText(runsettingsPath, runsettingsXml);
+        var arguments = PrepareArguments(testAssemblyPath, string.Empty, runsettingsPath, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /testcasefilter:Name~TimeTest");
 
         InvokeVsTest(arguments);
 
-        ValidateSummaryStatus(1, 1, 0);
-        TryRemoveDirectory(resultsDir);
+        this.ValidateSummaryStatus(1, 1, 0);
     }
 
     [TestMethod]
@@ -434,8 +407,8 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsAssemblyResolution(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var resultsDir = GetResultsDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
         var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
         var runsettingsFormat = @"<RunSettings>
@@ -456,17 +429,16 @@ public class RunsettingsTests : AcceptanceTestBase
                                     </LegacySettings>
                                    </RunSettings>";
 
-        var testAssemblyDirectory = Path.Combine(_testEnvironment.TestAssetsPath, "LegacySettingsUnitTestProject", "DependencyAssembly");
+        var testAssemblyDirectory = Path.Combine(this.testEnvironment.TestAssetsPath, "LegacySettingsUnitTestProject", "DependencyAssembly");
         var runsettingsXml = string.Format(runsettingsFormat, testAssemblyDirectory);
-
-        File.WriteAllText(_runsettingsPath, runsettingsXml);
-        var arguments = PrepareArguments(testAssemblyPath, string.Empty, _runsettingsPath, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+        var runsettingsPath = GetRunsettingsFilePath(null, tempDir);
+        File.WriteAllText(runsettingsPath, runsettingsXml);
+        var arguments = PrepareArguments(testAssemblyPath, string.Empty, runsettingsPath, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /testcasefilter:Name=DependencyTest");
 
         InvokeVsTest(arguments);
 
-        ValidateSummaryStatus(1, 0, 0);
-        TryRemoveDirectory(resultsDir);
+        this.ValidateSummaryStatus(1, 0, 0);
     }
 
     #endregion
@@ -478,8 +450,8 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void EnvironmentVariablesSettingsShouldSetEnvironmentVariables(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        var resultsDir = GetResultsDirectory();
+        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
         var testAssemblyPath = GetAssetFullPath("EnvironmentVariablesTestProject.dll");
 
@@ -491,15 +463,15 @@ public class RunsettingsTests : AcceptanceTestBase
                                     </RunConfiguration>
                                    </RunSettings>";
 
-        File.WriteAllText(_runsettingsPath, runsettingsXml);
+        var runsettingsPath = GetRunsettingsFilePath(null, tempDir);
+        File.WriteAllText(runsettingsPath, runsettingsXml);
 
         var arguments = PrepareArguments(
-            testAssemblyPath,
-            string.Empty,
-            _runsettingsPath, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(1, 0, 0);
-        TryRemoveDirectory(resultsDir);
+           testAssemblyPath,
+           string.Empty,
+           runsettingsPath, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+        this.InvokeVsTest(arguments);
+        this.ValidateSummaryStatus(1, 0, 0);
     }
 
     #endregion
@@ -537,19 +509,21 @@ public class RunsettingsTests : AcceptanceTestBase
 
     #endregion
 
-    private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary)
+    private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary, TempDirectory tempDirectory)
     {
-        var runsettingsPath = Path.Combine(
-            Path.GetTempPath(),
-            "test_" + Guid.NewGuid() + ".runsettings");
-        CreateRunSettingsFile(runsettingsPath, runConfigurationDictionary);
+        var runsettingsPath = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
+        if (runConfigurationDictionary != null)
+        {
+            CreateRunSettingsFile(runsettingsPath, runConfigurationDictionary);
+        }
+
         return runsettingsPath;
     }
 
     private void RunTestWithRunSettings(Dictionary<string, string> runConfigurationDictionary,
         string runSettingsArgs, string additionalArgs, IEnumerable<string> testhostProcessNames, int expectedNumOfProcessCreated)
     {
-        var resultsDir = GetResultsDirectory();
+        using var tempDir = new TempDirectory();
 
         var assemblyPaths =
             BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
@@ -558,10 +532,11 @@ public class RunsettingsTests : AcceptanceTestBase
 
         if (runConfigurationDictionary != null)
         {
-            runsettingsPath = GetRunsettingsFilePath(runConfigurationDictionary);
+            runsettingsPath = this.GetRunsettingsFilePath(runConfigurationDictionary, tempDir);
         }
 
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), runsettingsPath, FrameworkArgValue, _testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
+        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runsettingsPath, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: tempDir.Path);
+        arguments += GetDiagArg(tempDir.Path);
 
         if (!string.IsNullOrWhiteSpace(additionalArgs))
         {
@@ -573,62 +548,16 @@ public class RunsettingsTests : AcceptanceTestBase
             arguments = string.Concat(arguments, " -- ", runSettingsArgs);
         }
 
-        var cts = new CancellationTokenSource();
-        var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
-            cts,
-            testhostProcessNames);
+        this.InvokeVsTest(arguments);
 
-        InvokeVsTest(arguments);
-        cts.Cancel();
-
-        var processesCreated = numOfProcessCreatedTask.Result;
         // assert
-        Assert.AreEqual(
-            expectedNumOfProcessCreated,
-            processesCreated.Count,
-            $"Number of { string.Join(", ", testhostProcessNames) } process created, expected: {expectedNumOfProcessCreated} actual: {processesCreated.Count} ({ string.Join(", ", processesCreated) }) args: {arguments} runner path: {GetConsoleRunnerPath()}");
-        ValidateSummaryStatus(2, 2, 2);
+        AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, tempDir.Path, testhostProcessNames, arguments, this.GetConsoleRunnerPath());
+        this.ValidateSummaryStatus(2, 2, 2);
 
         //cleanup
         if (!string.IsNullOrWhiteSpace(runsettingsPath))
         {
             File.Delete(runsettingsPath);
         }
-        TryRemoveDirectory(resultsDir);
-    }
-
-    private int GetExpectedNumOfProcessCreatedForWithoutParallel()
-    {
-        if (IsDesktopRunner() && IsDesktopTargetFramework())
-        {
-            // we create just testhost.exe
-            return 1;
-        }
-
-        if (IsDesktopRunner() && !IsDesktopTargetFramework())
-        {
-            // we create dotnet testhost and testhost.exe
-            return 2;
-        }
-
-        if (!IsDesktopRunner() && IsDesktopTargetFramework())
-        {
-            // we create testhost and testhost
-            return 2;
-        }
-
-        if (!IsDesktopRunner() && IsDesktopTargetFramework() && _testEnvironment.InIsolationValue == "InProcess")
-        {
-            // we create just testhost
-            return 1;
-        }
-
-        if (!IsDesktopRunner() && !IsDesktopTargetFramework())
-        {
-            // we create dotnet vsconsole, and 2 dotnet test hosts
-            return 3;
-        }
-
-        return -10;
     }
 }

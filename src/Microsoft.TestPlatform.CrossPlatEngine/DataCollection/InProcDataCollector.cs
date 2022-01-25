@@ -111,7 +111,7 @@ internal class InProcDataCollector : IInProcDataCollector
     /// </summary>
     /// <param name="methodName">Name of the method to trigger</param>
     /// <param name="methodArg">Arguments for the method</param>
-    public void TriggerInProcDataCollectionMethod(string methodName, INProcDataCollectionArgs methodArg)
+    public void TriggerInProcDataCollectionMethod(string methodName, InProcDataCollectionArgs methodArg)
     {
         var methodInfo = GetMethodInfoFromType(_dataCollectorObject.GetType(), methodName, new[] { methodArg.GetType() });
 

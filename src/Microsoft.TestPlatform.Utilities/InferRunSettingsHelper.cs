@@ -564,7 +564,7 @@ public class InferRunSettingsHelper
     /// <param name="architecture"></param>
     private static void VerifyCompatibilityWithOsArchitecture(Architecture architecture)
     {
-        var osArchitecture = XmlRunSettingsUtilities.OsArchitecture;
+        var osArchitecture = XmlRunSettingsUtilities.OSArchitecture;
 
         if (architecture == Architecture.X86 && osArchitecture == Architecture.X64)
         {

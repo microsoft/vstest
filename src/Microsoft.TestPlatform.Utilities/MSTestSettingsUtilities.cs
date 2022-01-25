@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Xml;
@@ -16,7 +15,7 @@ using UtilitiesResources = Resources.Resources;
 /// <summary>
 /// The legacy mstest.exe settings utilities.
 /// </summary>
-public static class MsTestSettingsUtilities
+public static class MSTestSettingsUtilities
 {
     /// <summary>
     /// Imports the parameter settings file in the default runsettings.
@@ -62,8 +61,8 @@ public static class MsTestSettingsUtilities
     public static bool IsLegacyTestSettingsFile(string settingsFile)
     {
         return string.Equals(Path.GetExtension(settingsFile), ".testSettings", StringComparison.OrdinalIgnoreCase)
-               || string.Equals(Path.GetExtension(settingsFile), ".testrunConfig", StringComparison.OrdinalIgnoreCase)
-               || string.Equals(Path.GetExtension(settingsFile), ".vsmdi", StringComparison.OrdinalIgnoreCase);
+            || string.Equals(Path.GetExtension(settingsFile), ".testrunConfig", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(Path.GetExtension(settingsFile), ".vsmdi", StringComparison.OrdinalIgnoreCase);
     }
 
     private static XmlElement GenerateMsTestXml(string settingsFile)

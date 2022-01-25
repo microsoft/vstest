@@ -179,8 +179,8 @@ public class EnableBlameArgumentProcessorTests
 
         var unsupportedPlatforms = new List<Tuple<PlatformOperatingSystem, PlatformArchitecture>>()
         {
-            Tuple.Create(PlatformOperatingSystem.Windows, PlatformArchitecture.Arm),
-            Tuple.Create(PlatformOperatingSystem.Windows, PlatformArchitecture.Arm64)
+            Tuple.Create(PlatformOperatingSystem.Windows, PlatformArchitecture.ARM),
+            Tuple.Create(PlatformOperatingSystem.Windows, PlatformArchitecture.ARM64)
         };
 
         foreach (var tuple in unsupportedPlatforms)

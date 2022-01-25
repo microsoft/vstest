@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
 /// <summary>
 /// The test case start args.
 /// </summary>
-public class TestCaseStartArgs : INProcDataCollectionArgs
+public class TestCaseStartArgs : InProcDataCollectionArgs
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="TestCaseStartArgs"/> class.

@@ -3,7 +3,8 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System;
 using System.Collections.Generic;
@@ -51,26 +52,20 @@ public class DisableAppdomainTests : AcceptanceTestBase
             { "DisableAppDomain", "true" }
         };
 
-        var resultsDir = GetResultsDirectory();
-        _ = _testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", "net451");
-        _ = _testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", "net451");
+        using var tempDir = new TempDirectory();
         var arguments = PrepareArguments(
             testAssembly,
             string.Empty,
-            GetRunsettingsFilePath(runConfigurationDictionary),
-            FrameworkArgValue, resultsDirectory: resultsDir);
+            GetRunsettingsFilePath(tempDir, runConfigurationDictionary),
+            this.FrameworkArgValue, resultsDirectory: tempDir.Path);
 
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(passedTestCount, 0, 0);
-
-        TryRemoveDirectory(resultsDir);
+        this.InvokeVsTest(arguments);
+        this.ValidateSummaryStatus(passedTestCount, 0, 0);
     }
 
-    private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary)
+    private string GetRunsettingsFilePath(TempDirectory tempDir, Dictionary<string, string> runConfigurationDictionary)
     {
-        var runsettingsPath = Path.Combine(
-            Path.GetTempPath(),
-            "test_" + Guid.NewGuid() + ".runsettings");
+        var runsettingsPath = Path.Combine(tempDir.Path, "test_" + Guid.NewGuid() + ".runsettings");
         CreateRunSettingsFile(runsettingsPath, runConfigurationDictionary);
         return runsettingsPath;
     }

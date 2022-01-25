@@ -141,7 +141,7 @@ internal class FrameworkArgumentExecutor : IArgumentExecutor
 
         if (_commandLineOptions.TargetFrameworkVersion != Framework.DefaultFramework
             && !string.IsNullOrWhiteSpace(_commandLineOptions.SettingsFile)
-            && MsTestSettingsUtilities.IsLegacyTestSettingsFile(_commandLineOptions.SettingsFile))
+            && MSTestSettingsUtilities.IsLegacyTestSettingsFile(_commandLineOptions.SettingsFile))
         {
             // Legacy testsettings file support only default target framework.
             IOutput output = ConsoleOutput.Instance;

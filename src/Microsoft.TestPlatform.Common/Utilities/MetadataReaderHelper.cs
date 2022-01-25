@@ -42,16 +42,19 @@ using ObjectModel;
 internal class MetadataReaderExtensionsHelper
 {
     private const string TestExtensionTypesAttributeV2 = "Microsoft.VisualStudio.TestPlatform.TestExtensionTypesV2Attribute";
-    private static readonly ConcurrentDictionary<string, Assembly> AssemblyCache = new();
-    private static readonly Type[] EmptyTypeArray = new Type[0];
+    private static readonly ConcurrentDictionary<string, Type[]> assemblyCache = new ConcurrentDictionary<string, Type[]>();
+    private static readonly Type[] emptyTypeArray = new Type[0];
 
     public Type[] DiscoverTestExtensionTypesV2Attribute(Assembly loadedAssembly, string assemblyFilePath)
+        => assemblyCache.GetOrAdd(assemblyFilePath, DiscoverTestExtensionTypesV2AttributeInternal(loadedAssembly, assemblyFilePath));
+
+    private Type[] DiscoverTestExtensionTypesV2AttributeInternal(Assembly loadedAssembly, string assemblyFilePath)
     {
         EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Discovering extensions inside assembly '{loadedAssembly.FullName}' file path '{assemblyFilePath}'");
 
 #if !NETSTANDARD1_3
-        // Cache assembly, in VS scenario vstest.console is not unloaded so we don't want to load same asm more times.
-        Assembly assemblyToAnalyze = AssemblyCache.GetOrAdd(assemblyFilePath, Assembly.LoadFile(assemblyFilePath));
+        // We don't cache the load because this method is used by DiscoverTestExtensionTypesV2Attribute that caches the outcome Type[]
+        Assembly assemblyToAnalyze = Assembly.LoadFile(assemblyFilePath);
 #else
         Assembly assemblyToAnalyze = loadedAssembly;
 #endif
@@ -171,7 +174,7 @@ internal class MetadataReaderExtensionsHelper
             }
         }
 
-        return extensions?.OrderByDescending(t => t.Item1).Select(t => t.Item2).ToArray() ?? EmptyTypeArray;
+        return extensions?.OrderByDescending(t => t.Item1).Select(t => t.Item2).ToArray() ?? emptyTypeArray;
     }
 
     private string FormatException(Exception ex)
