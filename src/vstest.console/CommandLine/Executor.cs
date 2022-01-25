@@ -92,6 +92,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             this.testPlatformEventSource.VsTestConsoleStart();
 
+            var isDiag = args != null && args.Any(arg => arg.StartsWith("--diag", StringComparison.OrdinalIgnoreCase));
+
             // If User specifies --nologo via dotnet, do not print splat screen
             if (args != null && args.Length !=0 && args.Contains("--nologo"))
             {
@@ -100,7 +102,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
             else
             {
-                var isDiag = args != null && args.Any(arg => arg.StartsWith("--diag", StringComparison.OrdinalIgnoreCase));
                 this.PrintSplashScreen(isDiag);
             }
 
@@ -112,6 +113,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 this.Output.Error(true, CommandLineResources.NoArgumentsProvided);
                 args = new string[] { HelpArgumentProcessor.CommandName };
                 exitCode = 1;
+            }
+
+            if (!isDiag)
+            {
+                // This takes a path to log directory and log.txt file. Same as the --diag parameter, e.g. VSTEST_DIAG="logs\log.txt"
+                var diag = Environment.GetEnvironmentVariable("VSTEST_DIAG");
+                // This takes Verbose, Info (not Information), Warning, and Error.
+                var diagVerbosity = Environment.GetEnvironmentVariable("VSTEST_DIAG_VERBOSITY");
+                if (!string.IsNullOrWhiteSpace(diag))
+                {
+                    var verbosity = TraceLevel.Verbose;
+                    if (diagVerbosity != null)
+                    {
+                        if (Enum.TryParse<TraceLevel>(diagVerbosity, ignoreCase: true, out var parsedVerbosity))
+                        {
+                            verbosity = parsedVerbosity;
+                        }
+                    }
+
+                    args = args.Concat(new[] { $"--diag:{diag};TraceLevel={verbosity}" }).ToArray();
+                }
             }
 
             // Flatten arguments and process response files.
