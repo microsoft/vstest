@@ -70,7 +70,7 @@ public class TestPluginCache
     {
         get
         {
-            return s_instance ?? (s_instance = new TestPluginCache());
+            return s_instance ??= new TestPluginCache();
         }
 
         internal set

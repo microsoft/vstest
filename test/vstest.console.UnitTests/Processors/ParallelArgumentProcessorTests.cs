@@ -9,7 +9,6 @@ using vstest.console.UnitTests.Processors;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
 using ExceptionUtilities = ExceptionUtilities;
-using System;
 
 [TestClass]
 public class ParallelArgumentProcessorTests

@@ -11,8 +11,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
-using System.IO;
-
 using Interfaces;
 
 using TestTools.UnitTesting;

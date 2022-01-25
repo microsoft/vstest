@@ -3,7 +3,9 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
+#if !NETSTANDARD1_0
 using System.Xml;
+#endif
 
 /// <summary>
 /// Stores information about a test settings.

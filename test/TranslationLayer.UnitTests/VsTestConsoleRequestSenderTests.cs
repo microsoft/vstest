@@ -28,7 +28,6 @@ using Newtonsoft.Json.Linq;
 
 using TestResult = VisualStudio.TestPlatform.ObjectModel.TestResult;
 using Payloads = VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
-using NuGet.Frameworks;
 
 [TestClass]
 public class VsTestConsoleRequestSenderTests

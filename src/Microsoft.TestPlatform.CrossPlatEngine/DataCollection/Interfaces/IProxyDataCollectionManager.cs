@@ -5,9 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
-using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>

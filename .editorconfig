@@ -9,6 +9,25 @@ root = true
 indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
+dotnet_style_operator_placement_when_wrapping = beginning_of_line
+tab_width = 4
+indent_size = 4
+end_of_line = crlf
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
+dotnet_style_prefer_auto_properties = true:suggestion
+dotnet_style_object_initializer = false:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
+dotnet_style_prefer_conditional_expression_over_return = true:suggestion
+dotnet_style_explicit_tuple_names = true:suggestion
+dotnet_style_prefer_inferred_tuple_names = true:suggestion
+dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
+dotnet_style_prefer_compound_assignment = true:suggestion
+dotnet_style_prefer_simplified_interpolation = true:suggestion
+dotnet_style_namespace_match_folder = true:suggestion
 
 # Xml files
 [*.xml]
@@ -413,3 +432,17 @@ end_of_line = crlf
 
 # CA1822: Mark members as static
 dotnet_diagnostic.CA1822.severity = suggestion
+
+# IDE0032: Use auto property
+dotnet_diagnostic.IDE0032.severity = warning
+
+# IDE0090: Use 'new(...)'
+dotnet_diagnostic.IDE0090.severity = warning
+
+# IDE0065: Misplaced using directive
+dotnet_diagnostic.IDE0065.severity = none
+dotnet_diagnostic.IDE0005.severity = warning
+dotnet_diagnostic.IDE0063.severity = warning
+
+# IDE0074: Use compound assignment
+dotnet_diagnostic.IDE0074.severity = warning

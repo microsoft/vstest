@@ -7,7 +7,6 @@ using System;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
-using System.Collections;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;

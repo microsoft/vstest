@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-using System.Diagnostics.CodeAnalysis;
-
 /// <summary>
 /// Basic metadata for ITestPlaform.
 /// </summary>

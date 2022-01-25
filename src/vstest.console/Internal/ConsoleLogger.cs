@@ -11,7 +11,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Xml.XPath;
 
 using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;

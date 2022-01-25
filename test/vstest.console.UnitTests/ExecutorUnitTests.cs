@@ -21,7 +21,6 @@ using Moq;
 using Utilities;
 
 using CommandLineResources = Resources.Resources;
-using System;
 
 [TestClass]
 public class ExecutorUnitTests

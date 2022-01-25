@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 #if NETFRAMEWORK
 using System.Security;
 #endif

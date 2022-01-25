@@ -59,7 +59,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
 
     protected XmlDocument GetXmlCoverage(string coverageResult, TempDirectory tempDirectory)
     {
-        XmlDocument coverage = new XmlDocument();
+        var coverage = new XmlDocument();
 
         if (coverageResult.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
         {

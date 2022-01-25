@@ -10,7 +10,6 @@ using TestTools.UnitTesting;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using System.Text.RegularExpressions;
 
 [TestClass]
 public class RunSettingsProviderExtensionsTests

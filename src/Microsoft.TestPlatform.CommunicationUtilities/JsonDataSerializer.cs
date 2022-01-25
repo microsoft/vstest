@@ -45,25 +45,19 @@ public class JsonDataSerializer : IDataSerializer
         s_payloadSerializer2.ContractResolver = new DefaultTestPlatformContractResolver();
 
 #if TRACE_JSON_SERIALIZATION
-            // MemoryTraceWriter can help diagnose serialization issues. Enable it for
-            // debug builds only.
-            // Note that MemoryTraceWriter is not thread safe, please don't use it in parallel
-            // test runs. See https://github.com/JamesNK/Newtonsoft.Json/issues/1279
-            payloadSerializer.TraceWriter = new MemoryTraceWriter();
-            payloadSerializer2.TraceWriter = new MemoryTraceWriter();
+        // MemoryTraceWriter can help diagnose serialization issues. Enable it for
+        // debug builds only.
+        // Note that MemoryTraceWriter is not thread safe, please don't use it in parallel
+        // test runs. See https://github.com/JamesNK/Newtonsoft.Json/issues/1279
+        payloadSerializer.TraceWriter = new MemoryTraceWriter();
+        payloadSerializer2.TraceWriter = new MemoryTraceWriter();
 #endif
     }
 
     /// <summary>
     /// Gets the JSON Serializer instance.
     /// </summary>
-    public static JsonDataSerializer Instance
-    {
-        get
-        {
-            return s_instance ?? (s_instance = new JsonDataSerializer());
-        }
-    }
+    public static JsonDataSerializer Instance => s_instance ??= new JsonDataSerializer();
 
     /// <summary>
     /// Deserialize a <see cref="Message"/> from raw JSON text.
@@ -212,24 +206,17 @@ public class JsonDataSerializer : IDataSerializer
             version = 1;
         }
 
-        switch (version)
+        return version switch
         {
-            // 0 is used during negotiation
-            case 0:
-            case 1:
+            // 0 is used during negotiation.
             // Protocol version 3 was accidentally used with serializer v1 and not
             // serializer v2, we downgrade to protocol 2 when 3 would be negotiated
             // unless this is disabled by VSTEST_DISABLE_PROTOCOL_3_VERSION_DOWNGRADE
             // env variable.
-            case 3:
-                return s_payloadSerializer;
-            case 2:
-            case 4:
-            case 5:
-                return s_payloadSerializer2;
-            default:
-                throw new NotSupportedException($"Protocol version {version} is not supported. " +
-                                                "Ensure it is compatible with the latest serializer or add a new one.");
-        }
+            0 or 1 or 3 => s_payloadSerializer,
+            2 or 4 or 5 => s_payloadSerializer2,
+            _ => throw new NotSupportedException($"Protocol version {version} is not supported. " +
+                "Ensure it is compatible with the latest serializer or add a new one."),
+        };
     }
 }

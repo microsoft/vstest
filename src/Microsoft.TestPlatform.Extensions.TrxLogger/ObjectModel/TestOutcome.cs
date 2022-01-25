@@ -2,9 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
-using System.Diagnostics.CodeAnalysis;
-
 /// <summary>
 /// Outcome of a test or a run.
 /// If a new successful state needs to be added you will need to modify

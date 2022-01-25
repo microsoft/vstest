@@ -26,7 +26,7 @@ public class DotnetArchitectureSwitchTests : AcceptanceTestBase
     private static string s_privateX64Installation;
 
     [ClassInitialize]
-    public static void ClassInitialize(TestContext context)
+    public static void ClassInitialize(TestContext _)
     {
         s_privateX64Installation = Path.Combine(new TempDirectory().Path, "x64");
         CopyAll(new DirectoryInfo(GetX64InstallationFolder), new DirectoryInfo(s_privateX64Installation));

@@ -7,7 +7,9 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System;
 using System.Diagnostics;
 using System.IO;
+#if !NETCOREAPP1_0
 using System.Reflection;
+#endif
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -89,9 +91,9 @@ internal static class DebuggerBreakpoint
 
     private static string FindAttachVs()
     {
-# if NETCOREAPP1_0 || !DEBUG
+#if NETCOREAPP1_0 || !DEBUG
         return null;
-# else
+#else
 
         var fromPath = FindOnPath("AttachVS.exe");
         if (fromPath != null)

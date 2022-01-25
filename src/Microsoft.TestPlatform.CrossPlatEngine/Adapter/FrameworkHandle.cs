@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 using Execution;
 

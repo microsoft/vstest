@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 using Common;
 using Common.ExtensionFramework;

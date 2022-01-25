@@ -428,8 +428,7 @@ public class EventLogDataCollector : DataCollector
     {
         lock (ContextMap)
         {
-            EventLogSessionContext eventLogSessionContext =
-                new EventLogSessionContext(_eventLogContainerMap);
+            var eventLogSessionContext = new EventLogSessionContext(_eventLogContainerMap);
             ContextMap.Add(dataCollectionContext, eventLogSessionContext);
         }
     }

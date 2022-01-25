@@ -11,8 +11,6 @@ using System.Globalization;
 /// </summary>
 internal sealed class TestListCategoryId
 {
-    private static readonly TestListCategoryId All = new(new Guid("19431567-8539-422a-85D7-44EE4E166BDA"));
-
     private Guid _id;
 
     /// <summary>
@@ -66,10 +64,7 @@ internal sealed class TestListCategoryId
         get { return _id; }
     }
 
-    public static TestListCategoryId AllItems
-    {
-        get { return All; }
-    }
+    public static TestListCategoryId AllItems { get; } = new(new Guid("19431567-8539-422a-85D7-44EE4E166BDA"));
 
 
     /// <summary>

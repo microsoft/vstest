@@ -16,8 +16,5 @@ public class TestPlatformFactory
     /// Gets an instance of the test platform.
     /// </summary>
     /// <returns> The <see cref="ITestPlatform"/> instance. </returns>
-    public static ITestPlatform GetTestPlatform()
-    {
-        return s_testPlatform ?? (s_testPlatform = new TestPlatform());
-    }
+    public static ITestPlatform GetTestPlatform() => s_testPlatform ??= new TestPlatform();
 }

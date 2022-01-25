@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
-using System;
-
 using Execution;
 
 using Utilities;

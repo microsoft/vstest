@@ -5,7 +5,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 
 using ObjectModel;
 
+#if !NETSTANDARD1_0
 using System;
+#endif
 
 public class EnvironmentHelper
 {

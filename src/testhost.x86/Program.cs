@@ -5,10 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 using CoreUtilities.Helpers;
 using CoreUtilities.Tracing;
@@ -16,8 +12,6 @@ using CoreUtilities.Tracing;
 using Execution;
 
 using ObjectModel;
-
-using PlatformAbstractions;
 
 /// <summary>
 /// The program.

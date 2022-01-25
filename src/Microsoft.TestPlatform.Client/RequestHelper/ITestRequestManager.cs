@@ -6,8 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 using System;
 using System.Collections.Generic;
 
-using Client;
-
 using Common.Interfaces;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;

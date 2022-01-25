@@ -4,7 +4,9 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 using System;
+#if NETFRAMEWORK
 using System.Runtime.Serialization;
+#endif
 
 /// <summary>
 /// Exception thrown on parsing error in user provided filter expression.

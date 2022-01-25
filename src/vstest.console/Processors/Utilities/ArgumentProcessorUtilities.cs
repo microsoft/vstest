@@ -6,9 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-
-using CommandLineResources = Resources.Resources;
 
 internal class ArgumentProcessorUtilities
 {

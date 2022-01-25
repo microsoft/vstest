@@ -38,7 +38,7 @@ internal class TestSessionMessageLogger : IMessageLogger
     {
         get
         {
-            return s_instance ?? (s_instance = new TestSessionMessageLogger());
+            return s_instance ??= new TestSessionMessageLogger();
         }
         set
         {

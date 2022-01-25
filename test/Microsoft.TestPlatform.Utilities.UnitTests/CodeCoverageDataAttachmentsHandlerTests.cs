@@ -8,7 +8,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+#if !NETFRAMEWORK
 using System.Runtime.InteropServices;
+#endif
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;

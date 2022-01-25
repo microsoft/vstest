@@ -6,8 +6,6 @@ namespace TestPlatform.Common.UnitTests;
 using System;
 using System.Xml;
 
-using ExtensionFramework;
-
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;

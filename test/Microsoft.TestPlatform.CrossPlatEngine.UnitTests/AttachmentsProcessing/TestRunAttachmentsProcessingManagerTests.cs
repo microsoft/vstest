@@ -5,7 +5,6 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -823,7 +822,7 @@ public class TestRunAttachmentsProcessingManagerTests
     public async Task ProcessTestRunAttachmentsAsync_ShouldSkipAttachmentProcessorIfDoesNotSupportIncrementalProcessing()
     {
         // arrange
-        List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+        var inputAttachments = new List<AttachmentSet>
         {
             new AttachmentSet(new Uri(Uri1), "uri1_input"),
             new AttachmentSet(new Uri(Uri2), "uri2_input")

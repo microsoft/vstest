@@ -11,8 +11,6 @@ using System.Linq;
 
 using Interfaces;
 using ExtensionFramework;
-using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Logging;
 using Utilities;
 using ObjectModel;

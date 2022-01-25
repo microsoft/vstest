@@ -5,11 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-
-#if !NETSTANDARD1_0
-using System.Security.Cryptography;
-#endif
 
 /// <summary>
 /// Wrapper class for cryptographic hashing.

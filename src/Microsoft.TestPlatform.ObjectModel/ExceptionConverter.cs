@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// Base exception for all Rocksteady service exceptions

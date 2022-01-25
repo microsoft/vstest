@@ -2,13 +2,16 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
+#if NETFRAMEWORK
 using Adapter;
+#endif
 
 using System;
 using System.Collections.Generic;
+#if NETFRAMEWORK
 using System.Diagnostics;
 using System.IO;
+#endif
 using System.Linq;
 using System.Reflection;
 
@@ -122,26 +125,13 @@ public static class AssemblyHelper
             worker.GetPlatformAndFrameworkSettings(testSource, out var procArchType, out var frameworkVersion);
 
             Architecture targetPlatform = (Architecture)Enum.Parse(typeof(Architecture), procArchType);
-            FrameworkVersion targetFramework = FrameworkVersion.Framework45;
-            switch (frameworkVersion.ToUpperInvariant())
+            var targetFramework = frameworkVersion.ToUpperInvariant() switch
             {
-                case "V4.5":
-                    targetFramework = FrameworkVersion.Framework45;
-                    break;
-
-                case "V4.0":
-                    targetFramework = FrameworkVersion.Framework40;
-                    break;
-
-                case "V3.5":
-                case "V2.0":
-                    targetFramework = FrameworkVersion.Framework35;
-                    break;
-
-                default:
-                    targetFramework = FrameworkVersion.None;
-                    break;
-            }
+                "V4.5" => FrameworkVersion.Framework45,
+                "V4.0" => FrameworkVersion.Framework40,
+                "V3.5" or "V2.0" => FrameworkVersion.Framework35,
+                _ => FrameworkVersion.None,
+            };
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("Inferred Multi-Targeting settings:{0} Platform:{1} FrameworkVersion:{2}", testSource, targetPlatform, targetFramework);

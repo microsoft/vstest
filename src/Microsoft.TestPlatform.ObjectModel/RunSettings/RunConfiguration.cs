@@ -8,7 +8,6 @@ using PlatformAbstractions;
 
 using System;
 using System.Globalization;
-using System.IO;
 using System.Xml;
 
 /// <summary>
@@ -285,24 +284,15 @@ public class RunConfiguration : TestRunSettings
     [Obsolete("Use TargetFramework instead")]
     public FrameworkVersion TargetFrameworkVersion
     {
-        get
+        get => (_framework?.Name) switch
         {
-            switch (_framework?.Name)
-            {
-                case Constants.DotNetFramework35:
-                    return FrameworkVersion.Framework35;
-                case Constants.DotNetFramework40:
-                    return FrameworkVersion.Framework40;
-                case Constants.DotNetFramework45:
-                    return FrameworkVersion.Framework45;
-                case Constants.DotNetFrameworkCore10:
-                    return FrameworkVersion.FrameworkCore10;
-                case Constants.DotNetFrameworkUap10:
-                    return FrameworkVersion.FrameworkUap10;
-                default:
-                    return Constants.DefaultFramework;
-            }
-        }
+            Constants.DotNetFramework35 => FrameworkVersion.Framework35,
+            Constants.DotNetFramework40 => FrameworkVersion.Framework40,
+            Constants.DotNetFramework45 => FrameworkVersion.Framework45,
+            Constants.DotNetFrameworkCore10 => FrameworkVersion.FrameworkCore10,
+            Constants.DotNetFrameworkUap10 => FrameworkVersion.FrameworkUap10,
+            _ => Constants.DefaultFramework,
+        };
 
         set
         {
@@ -815,7 +805,7 @@ public class RunConfiguration : TestRunSettings
 
                         if (string.IsNullOrEmpty(solutionDirectory)
 #if !NETSTANDARD1_0
-                            || !Directory.Exists(solutionDirectory)
+                            || !System.IO.Directory.Exists(solutionDirectory)
 #endif
                            )
                         {

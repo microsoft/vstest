@@ -7,8 +7,6 @@ using System;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 
-using CommandLineResources = Resources.Resources;
-
 /// <summary>
 //  An argument processor to provide path to the file for listing fully qualified tests.
 /// To be used only with ListFullyQualifiedTests

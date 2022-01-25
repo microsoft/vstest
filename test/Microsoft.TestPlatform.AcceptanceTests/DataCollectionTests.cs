@@ -154,8 +154,8 @@ public class DataCollectionTests : AcceptanceTestBase
         this.ValidateSummaryStatus(2, 2, 2);
 
         string mergedFile = Directory.GetFiles(tempDir.Path, "MergedFile.txt", SearchOption.AllDirectories).Single();
-        List<string> fileContent = new List<string>();
-        using (StreamReader streamReader = new StreamReader(mergedFile))
+        var fileContent = new List<string>();
+        using (var streamReader = new StreamReader(mergedFile))
         {
             while (!streamReader.EndOfStream)
             {

@@ -15,7 +15,6 @@ using Utilities;
 using Logging;
 using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using CommonResources = Resources.Resources;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 

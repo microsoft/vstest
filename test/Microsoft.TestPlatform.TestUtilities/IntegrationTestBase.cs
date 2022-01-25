@@ -34,8 +34,6 @@ public class IntegrationTestBase
     private const string TestSummaryStatusMessageFormat = "Total tests: {0} Passed: {1} Failed: {2} Skipped: {3}";
     private string standardTestOutput = string.Empty;
     private string standardTestError = string.Empty;
-    private string standardTestOutputWithWhiteSpace = string.Empty;
-    private string standardTestErrorWithWhiteSpace = string.Empty;
     private int runnerExitCode = -1;
 
     private string arguments = string.Empty;
@@ -60,10 +58,10 @@ public class IntegrationTestBase
     }
 
     public string StdOut => this.standardTestOutput;
-    public string StdOutWithWhiteSpace => this.standardTestOutputWithWhiteSpace;
+    public string StdOutWithWhiteSpace { get; private set; } = string.Empty;
 
     public string StdErr => this.standardTestError;
-    public string StdErrWithWhiteSpace => this.standardTestErrorWithWhiteSpace;
+    public string StdErrWithWhiteSpace { get; private set; } = string.Empty;
 
     /// <summary>
     /// Prepare arguments for <c>vstest.console.exe</c>.
@@ -524,16 +522,9 @@ public class IntegrationTestBase
 
         Console.WriteLine($"Logging diagnostics in {logFilePath}");
 
-        string consoleRunnerPath;
-
-        if (this.IsNetCoreRunner())
-        {
-            consoleRunnerPath = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll");
-        }
-        else
-        {
-            consoleRunnerPath = this.GetConsoleRunnerPath();
-        }
+        var consoleRunnerPath = this.IsNetCoreRunner()
+            ? Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll")
+            : this.GetConsoleRunnerPath();
         var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
         var dotnetPath = Path.Combine(this.testEnvironment.ToolsDirectory, executablePath);
 
@@ -651,7 +642,7 @@ public class IntegrationTestBase
         Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", process.StartInfo.FileName);
         Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", process.StartInfo.Arguments);
 
-        Stopwatch stopwatch = new Stopwatch();
+        var stopwatch = new Stopwatch();
         stopwatch.Start();
 
         process.Start();
@@ -683,10 +674,10 @@ public class IntegrationTestBase
 
     private void FormatStandardOutCome()
     {
-        this.standardTestErrorWithWhiteSpace = this.standardTestError;
+        this.StdErrWithWhiteSpace = this.standardTestError;
         this.standardTestError = Regex.Replace(this.standardTestError, @"\s+", " ");
 
-        this.standardTestOutputWithWhiteSpace = this.standardTestOutput;
+        this.StdOutWithWhiteSpace = this.standardTestOutput;
         this.standardTestOutput = Regex.Replace(this.standardTestOutput, @"\s+", " ");
     }
 

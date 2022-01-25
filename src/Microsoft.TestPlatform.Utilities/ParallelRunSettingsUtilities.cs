@@ -2,8 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
-
-using System.Diagnostics.CodeAnalysis;
 using System.Xml.XPath;
 
 /// <summary>

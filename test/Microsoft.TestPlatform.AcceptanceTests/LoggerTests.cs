@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Xml;
-using System;
 using Microsoft.TestPlatform.TestUtilities;
 
 [TestClass]

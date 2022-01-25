@@ -21,7 +21,6 @@ using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using ObjectModel.Engine;
 using ObjectModel.Logging;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
 /// ParallelProxyExecutionManager that manages parallel execution

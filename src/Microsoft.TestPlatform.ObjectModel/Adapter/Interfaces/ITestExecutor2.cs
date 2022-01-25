@@ -3,15 +3,14 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
-using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// Defines the test executor which provides capability to run tests.  
-/// 
-/// A class that implements this interface will be available for use if its containing 
-//  assembly is either placed in the Extensions folder or is marked as a 'UnitTestExtension' type 
-//  in the vsix package.
+/// Defines the test executor which provides capability to run tests.
+///
+/// A class that implements this interface will be available for use if its containing
+///  assembly is either placed in the Extensions folder or is marked as a 'UnitTestExtension' type
+///  in the vsix package.
 /// </summary>
 public interface ITestExecutor2 : ITestExecutor
 {

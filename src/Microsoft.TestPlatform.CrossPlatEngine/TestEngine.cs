@@ -102,7 +102,7 @@ public class TestEngine : ITestEngine
                         // If the proxy creation process based on test session info failed, then
                         // we'll proceed with the normal creation process as if no test session
                         // info was passed in in the first place.
-                        // 
+                        //
                         // WARNING: This should not normally happen and it raises questions
                         // regarding the test session pool operation and consistency.
                         EqtTrace.Warning("ProxyDiscoveryManager creation with test session failed.");
@@ -170,7 +170,7 @@ public class TestEngine : ITestEngine
         }
 
         // SetupChannel ProxyExecutionManager with data collection if data collectors are
-        // specififed in run settings.
+        // specified in run settings.
         Func<IProxyExecutionManager> proxyExecutionManagerCreator = () =>
         {
             // Create a new host manager, to be associated with individual
@@ -204,7 +204,7 @@ public class TestEngine : ITestEngine
                             // If the proxy creation process based on test session info failed, then
                             // we'll proceed with the normal creation process as if no test session
                             // info was passed in in the first place.
-                            // 
+                            //
                             // WARNING: This should not normally happen and it raises questions
                             // regarding the test session pool operation and consistency.
                             EqtTrace.Warning("ProxyExecutionManager creation with test session failed.");
@@ -309,7 +309,7 @@ public class TestEngine : ITestEngine
 
             // TODO (copoiena): For now we don't support data collection alongside test
             // sessions.
-            // 
+            //
             // The reason for this is that, in the case of Code Coverage for example, the
             // data collector needs to pass some environment variables to the testhost process
             // before the testhost process is started. This means that the data collector must
@@ -346,11 +346,7 @@ public class TestEngine : ITestEngine
     }
 
     /// <inheritdoc/>
-    public ITestExtensionManager GetExtensionManager()
-    {
-        return _testExtensionManager
-               ?? (_testExtensionManager = new TestExtensionManager());
-    }
+    public ITestExtensionManager GetExtensionManager() => _testExtensionManager ??= new TestExtensionManager();
 
     /// <inheritdoc/>
     public ITestLoggerManager GetLoggerManager(IRequestData requestData)
@@ -377,10 +373,10 @@ public class TestEngine : ITestEngine
     /// <summary>
     /// Verifies parallel setting and returns parallel level to use based on the run criteria.
     /// </summary>
-    /// 
+    ///
     /// <param name="sourceCount">The source count.</param>
     /// <param name="runSettings">The run settings.</param>
-    /// 
+    ///
     /// <returns>The parallel level to use.</returns>
     private int VerifyParallelSettingAndCalculateParallelLevel(
         int sourceCount,
@@ -491,9 +487,9 @@ public class TestEngine : ITestEngine
     /// <summary>
     /// Get request data on basis of telemetry opted in or not.
     /// </summary>
-    /// 
+    ///
     /// <param name="isTelemetryOptedIn">A flag indicating if telemetry is opted in.</param>
-    /// 
+    ///
     /// <returns>The request data.</returns>
     private IRequestData GetRequestData(bool isTelemetryOptedIn)
     {
@@ -509,7 +505,7 @@ public class TestEngine : ITestEngine
     /// <summary>
     /// Gets test sources from test run criteria.
     /// </summary>
-    /// 
+    ///
     /// <returns>The test sources.</returns>
     private IEnumerable<string> GetSourcesFromTestRunCriteria(TestRunCriteria testRunCriteria)
     {

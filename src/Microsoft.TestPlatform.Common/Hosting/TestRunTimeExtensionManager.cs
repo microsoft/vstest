@@ -52,7 +52,6 @@ internal class TestRuntimeExtensionManager : TestExtensionManager<ITestRuntimePr
     /// </returns>
     public static TestRuntimeExtensionManager Create(IMessageLogger messageLogger)
     {
-
         TestPluginManager.Instance.GetSpecificTestExtensions<TestRuntimePluginInformation, ITestRuntimeProvider, ITestRuntimeCapabilities, TestRuntimeMetadata>(
             TestPlatformConstants.RunTimeEndsWithPattern,
             out IEnumerable<LazyExtension<ITestRuntimeProvider, Dictionary<string, object>>> unfilteredTestExtensions,

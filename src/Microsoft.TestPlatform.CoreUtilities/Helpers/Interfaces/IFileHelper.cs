@@ -4,15 +4,17 @@
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using System;
+#if !NETSTANDARD1_0
 using System.Collections.Generic;
 using System.IO;
+#endif
 
 /// <summary>
 /// The FileHelper interface.
 /// </summary>
 public interface IFileHelper
 {
-#if !NETSTANDARD1_0 
+#if !NETSTANDARD1_0
     /// <summary>
     /// Creates a directory.
     /// </summary>

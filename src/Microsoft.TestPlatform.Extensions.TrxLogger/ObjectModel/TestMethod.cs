@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Xml;
 
 using XML;
-using System;
 /// <summary>
 /// TestMethod contains information about a unit test method that needs to be executed
 /// </summary>

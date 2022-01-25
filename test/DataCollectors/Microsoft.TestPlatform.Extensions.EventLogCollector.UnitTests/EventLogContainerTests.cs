@@ -12,9 +12,6 @@ using VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using Resource = Resources.Resources;
-using System.Globalization;
-
 [TestClass]
 public class EventLogContainerTests
 {

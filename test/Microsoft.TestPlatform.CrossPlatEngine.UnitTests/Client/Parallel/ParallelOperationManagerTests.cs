@@ -6,12 +6,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Moq;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 [TestClass]
 public class ParallelOperationManagerTests

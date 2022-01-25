@@ -4,7 +4,6 @@
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// Additional data needed to describe a field for automatic xml storage

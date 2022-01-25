@@ -42,7 +42,7 @@ using ObjectModel;
 internal class MetadataReaderExtensionsHelper
 {
     private const string TestExtensionTypesAttributeV2 = "Microsoft.VisualStudio.TestPlatform.TestExtensionTypesV2Attribute";
-    private static readonly ConcurrentDictionary<string, Type[]> assemblyCache = new ConcurrentDictionary<string, Type[]>();
+    private static readonly ConcurrentDictionary<string, Type[]> assemblyCache = new();
     private static readonly Type[] emptyTypeArray = new Type[0];
 
     public Type[] DiscoverTestExtensionTypesV2Attribute(Assembly loadedAssembly, string assemblyFilePath)

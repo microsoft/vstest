@@ -24,8 +24,6 @@ internal sealed class TestResultId : IXmlTestStore
 
     private Guid _runId;
     private Guid _executionId;
-    private readonly Guid _parentExecutionId;
-    private readonly Guid _testId;
 
     #endregion
 
@@ -50,8 +48,8 @@ internal sealed class TestResultId : IXmlTestStore
     {
         _runId = runId;
         _executionId = executionId;
-        _parentExecutionId = parentExecutionId;
-        _testId = testId;
+        ParentExecutionId = parentExecutionId;
+        TestId = testId;
     }
 
     #endregion
@@ -69,18 +67,12 @@ internal sealed class TestResultId : IXmlTestStore
     /// <summary>
     /// Gets the parent execution id.
     /// </summary>
-    public Guid ParentExecutionId
-    {
-        get { return _parentExecutionId; }
-    }
+    public Guid ParentExecutionId { get; }
 
     /// <summary>
     /// Gets the test id.
     /// </summary>
-    public Guid TestId
-    {
-        get { return _testId; }
-    }
+    public Guid TestId { get; }
 
     #endregion
 
@@ -140,10 +132,10 @@ internal sealed class TestResultId : IXmlTestStore
 
         if (_executionId != Guid.Empty)
             helper.SaveGuid(element, "@executionId", _executionId);
-        if (_parentExecutionId != Guid.Empty)
-            helper.SaveGuid(element, "@parentExecutionId", _parentExecutionId);
+        if (ParentExecutionId != Guid.Empty)
+            helper.SaveGuid(element, "@parentExecutionId", ParentExecutionId);
 
-        helper.SaveGuid(element, "@testId", _testId);
+        helper.SaveGuid(element, "@testId", TestId);
     }
 
     #endregion

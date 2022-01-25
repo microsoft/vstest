@@ -7,9 +7,7 @@ using System;
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

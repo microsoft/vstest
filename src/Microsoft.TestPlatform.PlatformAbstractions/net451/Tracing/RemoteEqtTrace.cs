@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// A class used to expose EqtTrace functionality across AppDomains.

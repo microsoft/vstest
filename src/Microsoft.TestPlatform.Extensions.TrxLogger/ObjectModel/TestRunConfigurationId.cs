@@ -10,21 +10,16 @@ using System;
 /// </summary>
 internal sealed class TestRunConfigurationId
 {
-    private readonly Guid _id;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRunConfigurationId"/> class.
     /// </summary>
     public TestRunConfigurationId()
     {
-        _id = Guid.NewGuid();
+        Id = Guid.NewGuid();
     }
 
     /// <summary>
     /// Gets the id.
     /// </summary>
-    public Guid Id
-    {
-        get { return _id; }
-    }
+    public Guid Id { get; }
 }

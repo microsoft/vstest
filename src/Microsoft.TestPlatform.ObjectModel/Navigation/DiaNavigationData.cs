@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-using System.Diagnostics.CodeAnalysis;
-
 using Navigation;
 
 /// <summary>

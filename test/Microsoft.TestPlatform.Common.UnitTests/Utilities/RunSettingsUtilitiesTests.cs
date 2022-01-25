@@ -2,15 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace TestPlatform.Common.UnitTests.Utilities;
-
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using System.Xml;
-using ExtensionFramework;
-using System.Collections.Generic;
 using Microsoft.TestPlatform.TestUtilities;
 
 [TestClass]

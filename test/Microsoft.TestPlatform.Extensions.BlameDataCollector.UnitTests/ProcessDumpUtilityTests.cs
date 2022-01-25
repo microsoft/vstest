@@ -2,9 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests;
-
-using System;
-using System.Diagnostics;
 using System.IO;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;

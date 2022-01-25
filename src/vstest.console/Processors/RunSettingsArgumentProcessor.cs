@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
@@ -14,7 +13,6 @@ using System.Xml;
 using Common;
 using Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using CoreUtilities.Helpers;
 using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities;

@@ -10,7 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 public class BlameTestObject
 {
     private Guid _id;
-    private string _displayName;
 
     #region Constructor
 
@@ -109,18 +108,7 @@ public class BlameTestObject
     /// <summary>
     /// Gets or sets the display name of the test case
     /// </summary>
-    public string DisplayName
-    {
-        get
-        {
-            return _displayName;
-        }
-
-        set
-        {
-            _displayName = value;
-        }
-    }
+    public string DisplayName { get; set; }
 
     #endregion
 }

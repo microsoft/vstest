@@ -21,7 +21,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
 using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Constants;
-using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
 [TestClass]
 public class InProcDataCollectionExtensionManagerTests

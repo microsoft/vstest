@@ -92,13 +92,9 @@ public static class ArgumentEscaper
     }
 
     internal static bool IsSurroundedWithQuotes(string argument)
-    {
-        return argument.StartsWith("\"", StringComparison.Ordinal) &&
-               argument.EndsWith("\"", StringComparison.Ordinal);
-    }
+        => argument.StartsWith("\"", StringComparison.Ordinal)
+        && argument.EndsWith("\"", StringComparison.Ordinal);
 
     internal static bool ArgumentContainsWhitespace(string argument)
-    {
-        return argument.Contains(" ") || argument.Contains("\t") || argument.Contains("\n");
-    }
+        => argument.Contains(" ") || argument.Contains("\t") || argument.Contains("\n");
 }

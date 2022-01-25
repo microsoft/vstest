@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading;
 
 using CommunicationUtilities;

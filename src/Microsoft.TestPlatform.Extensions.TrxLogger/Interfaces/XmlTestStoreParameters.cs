@@ -4,7 +4,6 @@
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// Optional parameters to the persistence process. A class implementing IPersistable can 

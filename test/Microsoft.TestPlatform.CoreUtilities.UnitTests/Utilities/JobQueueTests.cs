@@ -5,7 +5,6 @@ namespace TestPlatform.CoreUtilities.UnitTests;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities;

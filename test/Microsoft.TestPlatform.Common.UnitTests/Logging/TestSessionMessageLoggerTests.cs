@@ -3,8 +3,6 @@
 
 namespace Microsoft.TestPlatform.Common.UnitTests.Logging;
 
-using System;
-
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 

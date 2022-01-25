@@ -19,7 +19,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using VisualStudio.TestTools.UnitTesting;
 using Moq;
 using VisualStudio.TestPlatform.CoreUtilities.Helpers;
-using CommunicationUtilitiesResources = VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
 [TestClass]
 public class TestRequestSenderTests

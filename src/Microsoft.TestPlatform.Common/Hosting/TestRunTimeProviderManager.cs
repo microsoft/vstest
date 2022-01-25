@@ -39,8 +39,8 @@ public class TestRuntimeProviderManager
     /// <summary>
     /// Gets the instance of TestRuntimeProviderManager
     /// </summary>
-    public static TestRuntimeProviderManager Instance => s_testHostManager
-                                                         ?? (s_testHostManager = new TestRuntimeProviderManager(TestSessionMessageLogger.Instance));
+    public static TestRuntimeProviderManager Instance
+        => s_testHostManager ??= new TestRuntimeProviderManager(TestSessionMessageLogger.Instance);
 
     #endregion
 

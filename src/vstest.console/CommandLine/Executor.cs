@@ -38,7 +38,6 @@ using Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using CoreUtilities.Tracing;
 using CoreUtilities.Tracing.Interfaces;
-using Execution;
 using ObjectModel;
 using Utilities;
 

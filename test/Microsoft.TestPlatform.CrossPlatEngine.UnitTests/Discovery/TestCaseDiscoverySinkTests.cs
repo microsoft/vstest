@@ -9,8 +9,6 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Moq;
-
 [TestClass]
 public class TestCaseDiscoverySinkTests
 {

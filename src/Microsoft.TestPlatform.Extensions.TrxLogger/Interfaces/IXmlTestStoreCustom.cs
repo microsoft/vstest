@@ -2,9 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-
-using System.Diagnostics.CodeAnalysis;
-
 /// <summary>
 /// Implementing this interface allows you to customize XmlStore persistence.
 /// </summary>

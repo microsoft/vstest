@@ -15,7 +15,6 @@ using CoreUtilities.Tracing.Interfaces;
 
 using Extensions.FileSystemGlobbing;
 using Client;
-using Client.Discovery;
 using Client.RequestHelper;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 using Publisher;

@@ -7,10 +7,7 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using MSTest.TestFramework.AssertExtensions;
 
 [TestClass]
 public class RunContextTests

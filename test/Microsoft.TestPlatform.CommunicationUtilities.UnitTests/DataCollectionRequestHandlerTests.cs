@@ -5,7 +5,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests;
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -19,8 +18,6 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -30,9 +27,6 @@ using VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json.Linq;
 using VisualStudio.TestPlatform.CoreUtilities.Helpers;
-
-using CommunicationUtilitiesResources = VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
-using CoreUtilitiesConstants = VisualStudio.TestPlatform.CoreUtilities.Constants;
 
 [TestClass]
 public class DataCollectionRequestHandlerTests

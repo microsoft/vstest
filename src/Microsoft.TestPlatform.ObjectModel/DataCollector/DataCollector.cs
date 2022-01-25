@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 /// <summary>
