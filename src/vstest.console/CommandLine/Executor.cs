@@ -117,7 +117,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             if (!isDiag)
             {
+                // This takes a path to log directory and log.txt file. Same as the --diag parameter, e.g. VSTEST_DIAG="logs\log.txt"
                 var diag = Environment.GetEnvironmentVariable("VSTEST_DIAG");
+                // This takes Verbose, Info (not Information), Warning, and Error.
                 var diagVerbosity = Environment.GetEnvironmentVariable("VSTEST_DIAG_VERBOSITY");
                 if (!string.IsNullOrWhiteSpace(diag))
                 {
