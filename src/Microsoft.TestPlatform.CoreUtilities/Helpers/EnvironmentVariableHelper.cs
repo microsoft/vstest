@@ -4,6 +4,7 @@
 #if !NETSTANDARD1_0
 
 using System;
+
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers

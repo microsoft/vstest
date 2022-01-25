@@ -1,139 +1,138 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
+namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
+using Resource = Resources.Resources;
+using System.Globalization;
+
+[TestClass]
+public class EventLogContainerTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
+    private readonly HashSet<string> _eventSources;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    private readonly HashSet<EventLogEntryType> _entryTypes;
 
-    using Moq;
+    private readonly Mock<DataCollectionLogger> _logger;
 
-    using Resource = Resources.Resources;
-    using System.Globalization;
+    private readonly DataCollectionContext _dataCollectionContext;
 
-    [TestClass]
-    public class EventLogContainerTests
+    private readonly EventLog _eventLog;
+
+    private EventLogContainer _eventLogContainer;
+
+    private readonly EntryWrittenEventArgs _entryWrittenEventArgs;
+
+
+    private readonly string _eventLogName = "Application";
+
+
+    public EventLogContainerTests()
     {
-        private readonly HashSet<string> eventSources;
-
-        private readonly HashSet<EventLogEntryType> entryTypes;
-
-        private readonly Mock<DataCollectionLogger> logger;
-
-        private readonly DataCollectionContext dataCollectionContext;
-
-        private readonly EventLog eventLog;
-
-        private EventLogContainer eventLogContainer;
-
-        private readonly EntryWrittenEventArgs entryWrittenEventArgs;
-
-
-        private readonly string eventLogName = "Application";
-
-
-        public EventLogContainerTests()
+        _eventSources = new HashSet<string>
         {
-            eventSources = new HashSet<string>
-            {
-                "Application"
-            };
-            entryTypes = new HashSet<EventLogEntryType>
-            {
-                EventLogEntryType.Error
-            };
-
-            logger = new Mock<DataCollectionLogger>();
-            eventLog = new EventLog("Application");
-            entryWrittenEventArgs = new EntryWrittenEventArgs(eventLog.Entries[eventLog.Entries.Count - 1]);
-
-            dataCollectionContext = new DataCollectionContext(new SessionId(Guid.NewGuid()));
-
-            eventLogContainer = new EventLogContainer(
-                eventLogName,
-                eventSources,
-                entryTypes,
-                int.MaxValue,
-                logger.Object,
-                dataCollectionContext);
-        }
-
-        [TestMethod]
-        [Ignore]
-        public void OnEventLogEntryWrittenShouldAddLogs()
+            "Application"
+        };
+        _entryTypes = new HashSet<EventLogEntryType>
         {
-            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 234);
-            eventLogContainer.OnEventLogEntryWritten(eventLog, entryWrittenEventArgs);
-            var newCount = eventLogContainer.EventLogEntries.Count;
+            EventLogEntryType.Error
+        };
 
-            Assert.IsTrue(newCount > 0);
-        }
+        _logger = new Mock<DataCollectionLogger>();
+        _eventLog = new EventLog("Application");
+        _entryWrittenEventArgs = new EntryWrittenEventArgs(_eventLog.Entries[_eventLog.Entries.Count - 1]);
 
-        [TestMethod]
-        public void OnEventLogEntryWrittenShouldNotAddLogsIfNoNewEntryIsPresent()
-        {
-            eventLogContainer.OnEventLogEntryWritten(eventLog, entryWrittenEventArgs);
-            var newCount = eventLogContainer.EventLogEntries.Count;
+        _dataCollectionContext = new DataCollectionContext(new SessionId(Guid.NewGuid()));
 
-            Assert.AreEqual(0, newCount);
-        }
+        _eventLogContainer = new EventLogContainer(
+            _eventLogName,
+            _eventSources,
+            _entryTypes,
+            int.MaxValue,
+            _logger.Object,
+            _dataCollectionContext);
+    }
 
-        [TestMethod]
-        public void OnEventLogEntryWrittenShoulFilterLogsBasedOnEventTypeAndEventSource()
-        {
-            entryTypes.Add(EventLogEntryType.Warning);
-            eventSources.Add("Application");
+    [TestMethod]
+    [Ignore]
+    public void OnEventLogEntryWrittenShouldAddLogs()
+    {
+        EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 234);
+        _eventLogContainer.OnEventLogEntryWritten(_eventLog, _entryWrittenEventArgs);
+        var newCount = _eventLogContainer.EventLogEntries.Count;
 
-            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Warning, 234);
-            eventLogContainer.OnEventLogEntryWritten(eventLog, entryWrittenEventArgs);
-            var newCount = eventLogContainer.EventLogEntries.Count;
+        Assert.IsTrue(newCount > 0);
+    }
 
-            Assert.AreEqual(1, newCount);
-        }
+    [TestMethod]
+    public void OnEventLogEntryWrittenShouldNotAddLogsIfNoNewEntryIsPresent()
+    {
+        _eventLogContainer.OnEventLogEntryWritten(_eventLog, _entryWrittenEventArgs);
+        var newCount = _eventLogContainer.EventLogEntries.Count;
 
-        [TestMethod]
-        public void OnEventLogEntryWrittenShoulNotAddLogsIfEventSourceIsDifferent()
-        {
-            eventSources.Clear();
-            eventSources.Add("Application1");
-            eventLogContainer = new EventLogContainer(
-                eventLogName,
-                eventSources,
-                entryTypes,
-                int.MaxValue,
-                logger.Object,
-                dataCollectionContext);
-            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Warning, 234);
-            eventLogContainer.OnEventLogEntryWritten(eventLog, entryWrittenEventArgs);
-            var newCount = eventLogContainer.EventLogEntries.Count;
+        Assert.AreEqual(0, newCount);
+    }
 
-            Assert.AreEqual(0, newCount);
-        }
+    [TestMethod]
+    public void OnEventLogEntryWrittenShoulFilterLogsBasedOnEventTypeAndEventSource()
+    {
+        _entryTypes.Add(EventLogEntryType.Warning);
+        _eventSources.Add("Application");
 
-        [TestMethod]
-        public void OnEventLogEntryWrittenShoulNotAddLogsIfEventTypeIsDifferent()
-        {
-            entryTypes.Clear();
-            entryTypes.Add(EventLogEntryType.FailureAudit);
+        EventLog.WriteEntry("Application", "Application", EventLogEntryType.Warning, 234);
+        _eventLogContainer.OnEventLogEntryWritten(_eventLog, _entryWrittenEventArgs);
+        var newCount = _eventLogContainer.EventLogEntries.Count;
 
-            eventSources.Add("Application1");
-            eventLogContainer = new EventLogContainer(
-                eventLogName,
-                eventSources,
-                entryTypes,
-                int.MaxValue,
-                logger.Object,
-                dataCollectionContext);
+        Assert.AreEqual(1, newCount);
+    }
 
-            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Warning, 234);
-            eventLogContainer.OnEventLogEntryWritten(eventLog, entryWrittenEventArgs);
-            var newCount = eventLogContainer.EventLogEntries.Count;
+    [TestMethod]
+    public void OnEventLogEntryWrittenShoulNotAddLogsIfEventSourceIsDifferent()
+    {
+        _eventSources.Clear();
+        _eventSources.Add("Application1");
+        _eventLogContainer = new EventLogContainer(
+            _eventLogName,
+            _eventSources,
+            _entryTypes,
+            int.MaxValue,
+            _logger.Object,
+            _dataCollectionContext);
+        EventLog.WriteEntry("Application", "Application", EventLogEntryType.Warning, 234);
+        _eventLogContainer.OnEventLogEntryWritten(_eventLog, _entryWrittenEventArgs);
+        var newCount = _eventLogContainer.EventLogEntries.Count;
 
-            Assert.AreEqual(0, newCount);
-        }
+        Assert.AreEqual(0, newCount);
+    }
+
+    [TestMethod]
+    public void OnEventLogEntryWrittenShoulNotAddLogsIfEventTypeIsDifferent()
+    {
+        _entryTypes.Clear();
+        _entryTypes.Add(EventLogEntryType.FailureAudit);
+
+        _eventSources.Add("Application1");
+        _eventLogContainer = new EventLogContainer(
+            _eventLogName,
+            _eventSources,
+            _entryTypes,
+            int.MaxValue,
+            _logger.Object,
+            _dataCollectionContext);
+
+        EventLog.WriteEntry("Application", "Application", EventLogEntryType.Warning, 234);
+        _eventLogContainer.OnEventLogEntryWritten(_eventLog, _entryWrittenEventArgs);
+        var newCount = _eventLogContainer.EventLogEntries.Count;
+
+        Assert.AreEqual(0, newCount);
     }
 }

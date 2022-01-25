@@ -7,7 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
     using System;
     using System.IO;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+    using Interfaces;
 
     /// <inheritdoc/>
     public class PlatformStream : IStream

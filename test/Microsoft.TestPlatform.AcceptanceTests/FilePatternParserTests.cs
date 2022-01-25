@@ -1,110 +1,109 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.using Microsoft.VisualStudio.TestTools.UnitTesting;
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests
+namespace Microsoft.TestPlatform.AcceptanceTests;
+
+using VisualStudio.TestTools.UnitTesting;
+
+using System.IO;
+
+[TestClass]
+public class FilePatternParserTests : AcceptanceTestBase
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using System.IO;
-
-    [TestClass]
-    public class FilePatternParserTests : AcceptanceTestBase
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void WildCardPatternShouldCorrectlyWorkOnFiles(RunnerInfo runnerInfo)
     {
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void WildCardPatternShouldCorrectlyWorkOnFiles(RunnerInfo runnerInfo)
-        {
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            var resultsDir = GetResultsDirectory();
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        var resultsDir = GetResultsDirectory();
 
-            var testAssembly = GetSampleTestAssembly();
-            testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
+        var testAssembly = GetSampleTestAssembly();
+        testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
 
-            var arguments = PrepareArguments(
-               testAssembly,
-               GetTestAdapterPath(),
-               string.Empty, FrameworkArgValue,
-               runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+        var arguments = PrepareArguments(
+            testAssembly,
+            GetTestAdapterPath(),
+            string.Empty, FrameworkArgValue,
+            runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
 
-            InvokeVsTest(arguments);
-            ValidateSummaryStatus(1, 1, 1);
-            TryRemoveDirectory(resultsDir);
-        }
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 1);
+        TryRemoveDirectory(resultsDir);
+    }
 
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void WildCardPatternShouldCorrectlyWorkOnArbitraryDepthDirectories(RunnerInfo runnerInfo)
-        {
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            var resultsDir = GetResultsDirectory();
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void WildCardPatternShouldCorrectlyWorkOnArbitraryDepthDirectories(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        var resultsDir = GetResultsDirectory();
 
-            var testAssembly = GetSampleTestAssembly();
-            var oldAssemblyPath = Path.Combine("Debug", testEnvironment.TargetFramework, "SimpleTestProject.dll");
-            var newAssemblyPath = Path.Combine("**", testEnvironment.TargetFramework, "*TestProj*.dll");
-            testAssembly = testAssembly.Replace(oldAssemblyPath, newAssemblyPath);
+        var testAssembly = GetSampleTestAssembly();
+        var oldAssemblyPath = Path.Combine("Debug", _testEnvironment.TargetFramework, "SimpleTestProject.dll");
+        var newAssemblyPath = Path.Combine("**", _testEnvironment.TargetFramework, "*TestProj*.dll");
+        testAssembly = testAssembly.Replace(oldAssemblyPath, newAssemblyPath);
 
-            var arguments = PrepareArguments(
-               testAssembly,
-               GetTestAdapterPath(),
-               string.Empty, string.Empty,
-               runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+        var arguments = PrepareArguments(
+            testAssembly,
+            GetTestAdapterPath(),
+            string.Empty, string.Empty,
+            runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
 
-            InvokeVsTest(arguments);
-            ValidateSummaryStatus(1, 1, 1);
-            TryRemoveDirectory(resultsDir);
-        }
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 1);
+        TryRemoveDirectory(resultsDir);
+    }
 
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void WildCardPatternShouldCorrectlyWorkForRelativeAssemblyPath(RunnerInfo runnerInfo)
-        {
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            var resultsDir = GetResultsDirectory();
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void WildCardPatternShouldCorrectlyWorkForRelativeAssemblyPath(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        var resultsDir = GetResultsDirectory();
 
-            var testAssembly = GetSampleTestAssembly();
-            testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
+        var testAssembly = GetSampleTestAssembly();
+        testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
 
-            var wildCardIndex = testAssembly.IndexOfAny(new char[] { '*' });
-            var testAssemblyDirectory = testAssembly.Substring(0, wildCardIndex);
-            testAssembly = testAssembly.Substring(wildCardIndex);
+        var wildCardIndex = testAssembly.IndexOfAny(new char[] { '*' });
+        var testAssemblyDirectory = testAssembly.Substring(0, wildCardIndex);
+        testAssembly = testAssembly.Substring(wildCardIndex);
 
-            Directory.SetCurrentDirectory(testAssemblyDirectory);
+        Directory.SetCurrentDirectory(testAssemblyDirectory);
 
-            var arguments = PrepareArguments(
-               testAssembly,
-               GetTestAdapterPath(),
-               string.Empty, string.Empty,
-               runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+        var arguments = PrepareArguments(
+            testAssembly,
+            GetTestAdapterPath(),
+            string.Empty, string.Empty,
+            runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
 
-            InvokeVsTest(arguments);
-            ValidateSummaryStatus(1, 1, 1);
-            TryRemoveDirectory(resultsDir);
-        }
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 1);
+        TryRemoveDirectory(resultsDir);
+    }
 
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void WildCardPatternShouldCorrectlyWorkOnMultipleFiles(RunnerInfo runnerInfo)
-        {
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            var resultsDir = GetResultsDirectory();
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void WildCardPatternShouldCorrectlyWorkOnMultipleFiles(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        var resultsDir = GetResultsDirectory();
 
-            var testAssembly = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
-            testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
-            testAssembly = testAssembly.Replace("SimpleTestProject2.dll", "*TestProj*.dll");
+        var testAssembly = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+        testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
+        testAssembly = testAssembly.Replace("SimpleTestProject2.dll", "*TestProj*.dll");
 
-            var arguments = PrepareArguments(
-               testAssembly,
-               GetTestAdapterPath(),
-               string.Empty, FrameworkArgValue,
-               runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+        var arguments = PrepareArguments(
+            testAssembly,
+            GetTestAdapterPath(),
+            string.Empty, FrameworkArgValue,
+            runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
 
-            InvokeVsTest(arguments);
-            ValidateSummaryStatus(2, 2, 2);
-            TryRemoveDirectory(resultsDir);
-        }
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(2, 2, 2);
+        TryRemoveDirectory(resultsDir);
     }
 }

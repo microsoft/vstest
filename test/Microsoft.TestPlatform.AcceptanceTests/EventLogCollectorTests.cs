@@ -1,78 +1,78 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests
+namespace Microsoft.TestPlatform.AcceptanceTests;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+using VisualStudio.TestTools.UnitTesting;
+
+
+[TestClass]
+[TestCategory("Windows-Review")]
+public class EventLogCollectorTests : AcceptanceTestBase
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
+    private readonly string _resultsDir;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-
-    [TestClass]
-    [TestCategory("Windows-Review")]
-    public class EventLogCollectorTests : AcceptanceTestBase
+    public EventLogCollectorTests()
     {
-        private readonly string resultsDir;
+        _resultsDir = GetResultsDirectory();
+    }
 
-        public EventLogCollectorTests()
-        {
-            resultsDir = GetResultsDirectory();
-        }
+    // Fails randomly https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Release_prtest/2084/console
+    // https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Debug_prtest/2085/console
+    [Ignore]
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [NetFullTargetFrameworkDataSource]
+    public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        var assemblyPaths = _testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
 
-        // Fails randomly https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Release_prtest/2084/console
-        // https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Debug_prtest/2085/console
-        [Ignore]
-        [TestMethod]
-        [TestCategory("Windows-Review")]
-        [NetFullTargetFrameworkDataSource]
-        public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
-        {
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            var assemblyPaths = testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
+        string runSettings = GetRunsettingsFilePath();
+        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), runSettings, FrameworkArgValue, resultsDirectory: _resultsDir);
 
-            string runSettings = GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), runSettings, FrameworkArgValue, resultsDirectory: resultsDir);
+        InvokeVsTest(arguments);
 
-            InvokeVsTest(arguments);
+        ValidateSummaryStatus(3, 0, 0);
+        VaildateDataCollectorOutput();
+        StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
+        StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
+        StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
+        StdErrorDoesNotContains("Unable to read event log");
+    }
 
-            ValidateSummaryStatus(3, 0, 0);
-            VaildateDataCollectorOutput();
-            StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
-            StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
-            StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
-            StdErrorDoesNotContains("Unable to read event log");
-        }
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [NetFullTargetFrameworkDataSource]
+    public void EventLogDataCollectorShoudCreateLogFileWithoutEventsIfEventsAreNotLogged(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        var assemblyPaths = _testEnvironment.GetTestAsset("SimpleTestProject.dll");
 
-        [TestMethod]
-        [TestCategory("Windows-Review")]
-        [NetFullTargetFrameworkDataSource]
-        public void EventLogDataCollectorShoudCreateLogFileWithoutEventsIfEventsAreNotLogged(RunnerInfo runnerInfo)
-        {
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            var assemblyPaths = testEnvironment.GetTestAsset("SimpleTestProject.dll");
+        string runSettings = GetRunsettingsFilePath();
+        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), runSettings, FrameworkArgValue, resultsDirectory: _resultsDir);
 
-            string runSettings = GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), runSettings, FrameworkArgValue, resultsDirectory: resultsDir);
+        InvokeVsTest(arguments);
 
-            InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 1);
+        StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
+        StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
+        StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
+        StdErrorDoesNotContains("Unable to read event log");
+    }
 
-            ValidateSummaryStatus(1, 1, 1);
-            StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
-            StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
-            StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
-            StdErrorDoesNotContains("Unable to read event log");
-        }
+    private string GetRunsettingsFilePath()
+    {
+        var runsettingsPath = Path.Combine(
+            Path.GetTempPath(),
+            "test_" + Guid.NewGuid() + ".runsettings");
 
-        private string GetRunsettingsFilePath()
-        {
-            var runsettingsPath = Path.Combine(
-                Path.GetTempPath(),
-                "test_" + Guid.NewGuid() + ".runsettings");
-
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+        string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
     <RunSettings>
       <RunConfiguration>
         <MaxCpuCount>0</MaxCpuCount>
@@ -88,17 +88,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
       </DataCollectionRunSettings>
     </RunSettings> ";
 
-            File.WriteAllText(runsettingsPath, runSettingsXml);
-            return runsettingsPath;
-        }
+        File.WriteAllText(runsettingsPath, runSettingsXml);
+        return runsettingsPath;
+    }
 
-        private string GetRunsettingsFilePathWithCustomSource()
-        {
-            var runsettingsPath = Path.Combine(
-                Path.GetTempPath(),
-                "test_" + Guid.NewGuid() + ".runsettings");
+    private string GetRunsettingsFilePathWithCustomSource()
+    {
+        var runsettingsPath = Path.Combine(
+            Path.GetTempPath(),
+            "test_" + Guid.NewGuid() + ".runsettings");
 
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+        string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
     <RunSettings>
       <RunConfiguration>
         <MaxCpuCount>0</MaxCpuCount>
@@ -114,71 +114,70 @@ namespace Microsoft.TestPlatform.AcceptanceTests
       </DataCollectionRunSettings>
     </RunSettings> ";
 
-            File.WriteAllText(runsettingsPath, runSettingsXml);
-            return runsettingsPath;
-        }
+        File.WriteAllText(runsettingsPath, runSettingsXml);
+        return runsettingsPath;
+    }
 
-        private void VaildateDataCollectorOutput()
+    private void VaildateDataCollectorOutput()
+    {
+        // Verify attachments
+        var di = new DirectoryInfo(_resultsDir);
+        var resultFiles = di.EnumerateFiles("Event Log.xml", SearchOption.AllDirectories)
+            .OrderBy(d => d.CreationTime)
+            .Select(d => d.FullName)
+            .ToList();
+
+        Assert.AreEqual(4, resultFiles.Count);
+        StdOutputContains("Event Log.xml");
+
+        var fileContent1 = File.ReadAllText(resultFiles[0]);
+        var fileContent2 = File.ReadAllText(resultFiles[1]);
+        var fileContent3 = File.ReadAllText(resultFiles[2]);
+        var fileContent4 = File.ReadAllText(resultFiles[3]);
+
+        var eventIdsDics = new Dictionary<string[], bool>
         {
-            // Verify attachments
-            var di = new DirectoryInfo(resultsDir);
-            var resultFiles = di.EnumerateFiles("Event Log.xml", SearchOption.AllDirectories)
-                .OrderBy(d => d.CreationTime)
-                .Select(d => d.FullName)
-                .ToList();
+            { new[] { "110", "111", "112" }, false },
+            { new[] { "220", "221", "222", "223" }, false },
+            { new[] { "330", "331", "332" }, false }
+        };
 
-            Assert.AreEqual(4, resultFiles.Count);
-            StdOutputContains("Event Log.xml");
+        // Since there is no guaranty that test will run in a particular order, we will check file for all available list of ids
+        Assert.IsTrue(VerifyOrder2(fileContent1, eventIdsDics), string.Format("Event log file content: {0}", fileContent1));
+        Assert.IsTrue(VerifyOrder2(fileContent2, eventIdsDics), string.Format("Event log file content: {0}", fileContent2));
+        Assert.IsTrue(VerifyOrder2(fileContent3, eventIdsDics), string.Format("Event log file content: {0}", fileContent3));
 
-            var fileContent1 = File.ReadAllText(resultFiles[0]);
-            var fileContent2 = File.ReadAllText(resultFiles[1]);
-            var fileContent3 = File.ReadAllText(resultFiles[2]);
-            var fileContent4 = File.ReadAllText(resultFiles[3]);
+        Assert.IsTrue(VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }), string.Format("Event log file content: {0}", fileContent4));
+    }
 
-            var eventIdsDics = new Dictionary<string[], bool>
-            {
-                { new[] { "110", "111", "112" }, false },
-                { new[] { "220", "221", "222", "223" }, false },
-                { new[] { "330", "331", "332" }, false }
-            };
-
-            // Since there is no guaranty that test will run in a particular order, we will check file for all available list of ids
-            Assert.IsTrue(VerifyOrder2(fileContent1, eventIdsDics), string.Format("Event log file content: {0}", fileContent1));
-            Assert.IsTrue(VerifyOrder2(fileContent2, eventIdsDics), string.Format("Event log file content: {0}", fileContent2));
-            Assert.IsTrue(VerifyOrder2(fileContent3, eventIdsDics), string.Format("Event log file content: {0}", fileContent3));
-
-            Assert.IsTrue(VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }), string.Format("Event log file content: {0}", fileContent4));
-        }
-
-        private bool VerifyOrder2(string content, Dictionary<string[], bool> eventIdsDics)
+    private bool VerifyOrder2(string content, Dictionary<string[], bool> eventIdsDics)
+    {
+        foreach (var eventIds in eventIdsDics)
         {
-            foreach (var eventIds in eventIdsDics)
+            if (eventIds.Value == false)
             {
-                if (eventIds.Value == false)
+                if (VerifyOrder(content, eventIds.Key))
                 {
-                    if (VerifyOrder(content, eventIds.Key))
-                    {
-                        eventIdsDics[eventIds.Key] = true;
-                        return true;
-                    }
+                    eventIdsDics[eventIds.Key] = true;
+                    return true;
                 }
             }
-            return false;
         }
+        return false;
+    }
 
-        private bool VerifyOrder(string content, string[] eventIds)
+    private bool VerifyOrder(string content, string[] eventIds)
+    {
+        for (int i = 0; i < eventIds.Length; i++)
         {
-            for (int i = 0; i < eventIds.Length; i++)
+            int currentIndex = 0;
+            currentIndex = content.IndexOf(eventIds[i], currentIndex);
+            if (currentIndex == -1)
             {
-                int currentIndex = 0;
-                currentIndex = content.IndexOf(eventIds[i], currentIndex);
-                if (currentIndex == -1)
-                {
-                    return false;
-                }
+                return false;
             }
-
-            return true;
         }
+
+        return true;
     }
 }

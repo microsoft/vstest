@@ -3,43 +3,42 @@
 
 #if WINDOWS_UWP
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+using System.Diagnostics.Tracing;
+
+internal sealed class UnitTestEventSource : EventSource
 {
-    using System.Diagnostics.Tracing;
+    public static UnitTestEventSource Log { get; } = new UnitTestEventSource();
 
-    internal sealed class UnitTestEventSource : EventSource
+    [Event(1, Level = EventLevel.Verbose)]
+    public void Verbose(string message)
     {
-        public static UnitTestEventSource Log { get; } = new UnitTestEventSource();
+        WriteEvent(1, message);
+    }
 
-        [Event(1, Level = EventLevel.Verbose)]
-        public void Verbose(string message)
-        {
-            WriteEvent(1, message);
-        }
+    [Event(2, Level = EventLevel.Informational)]
+    public void Info(string message)
+    {
+        WriteEvent(2, message);
+    }
 
-        [Event(2, Level = EventLevel.Informational)]
-        public void Info(string message)
-        {
-            WriteEvent(2, message);
-        }
+    [Event(3, Level = EventLevel.Warning)]
+    public void Warn(string message)
+    {
+        WriteEvent(3, message);
+    }
 
-        [Event(3, Level = EventLevel.Warning)]
-        public void Warn(string message)
-        {
-            WriteEvent(3, message);
-        }
+    [Event(4, Level = EventLevel.Error)]
+    public void Error(string message)
+    {
+        WriteEvent(4, message);
+    }
 
-        [Event(4, Level = EventLevel.Error)]
-        public void Error(string message)
-        {
-            WriteEvent(4, message);
-        }
-
-        [Event(5, Level = EventLevel.Critical)]
-        public void Critical(string message)
-        {
-            WriteEvent(5, message);
-        }
+    [Event(5, Level = EventLevel.Critical)]
+    public void Critical(string message)
+    {
+        WriteEvent(5, message);
     }
 }
 

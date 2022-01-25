@@ -1,59 +1,58 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CrossPlatEngine.UnitTests
+namespace TestPlatform.CrossPlatEngine.UnitTests;
+
+using System;
+
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
+[TestClass]
+public class TestHostManagerFactoryTests
 {
-    using System;
+    private readonly TestHostManagerFactory _testHostManagerFactory;
+    private readonly Mock<IRequestData> _mockRequestData;
+    private readonly Mock<IMetricsCollection> _mockMetricsCollection;
 
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using Moq;
-
-    [TestClass]
-    public class TestHostManagerFactoryTests
+    public TestHostManagerFactoryTests()
     {
-        private readonly TestHostManagerFactory testHostManagerFactory;
-        private readonly Mock<IRequestData> mockRequestData;
-        private readonly Mock<IMetricsCollection> mockMetricsCollection;
+        _mockMetricsCollection = new Mock<IMetricsCollection>();
+        _mockRequestData = new Mock<IRequestData>();
+        _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
+        _testHostManagerFactory = new TestHostManagerFactory(_mockRequestData.Object);
+    }
 
-        public TestHostManagerFactoryTests()
-        {
-            mockMetricsCollection = new Mock<IMetricsCollection>();
-            mockRequestData = new Mock<IRequestData>();
-            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
-            testHostManagerFactory = new TestHostManagerFactory(mockRequestData.Object);
-        }
+    [TestMethod]
+    public void ConstructorShouldThrowIfRequestDataIsNull()
+    {
+        Assert.ThrowsException<ArgumentNullException>(() => new TestHostManagerFactory(null));
+    }
 
-        [TestMethod]
-        public void ConstructorShouldThrowIfRequestDataIsNull()
-        {
-            Assert.ThrowsException<ArgumentNullException>(() => new TestHostManagerFactory(null));
-        }
+    [TestMethod]
+    public void GetDiscoveryManagerShouldReturnADiscoveryManagerInstance()
+    {
+        Assert.IsNotNull(_testHostManagerFactory.GetDiscoveryManager());
+    }
 
-        [TestMethod]
-        public void GetDiscoveryManagerShouldReturnADiscoveryManagerInstance()
-        {
-            Assert.IsNotNull(testHostManagerFactory.GetDiscoveryManager());
-        }
+    [TestMethod]
+    public void GetDiscoveryManagerShouldCacheTheDiscoveryManagerInstance()
+    {
+        Assert.AreEqual(_testHostManagerFactory.GetDiscoveryManager(), _testHostManagerFactory.GetDiscoveryManager());
+    }
 
-        [TestMethod]
-        public void GetDiscoveryManagerShouldCacheTheDiscoveryManagerInstance()
-        {
-            Assert.AreEqual(testHostManagerFactory.GetDiscoveryManager(), testHostManagerFactory.GetDiscoveryManager());
-        }
+    [TestMethod]
+    public void GetDiscoveryManagerShouldReturnAnExecutionManagerInstance()
+    {
+        Assert.IsNotNull(_testHostManagerFactory.GetExecutionManager());
+    }
 
-        [TestMethod]
-        public void GetDiscoveryManagerShouldReturnAnExecutionManagerInstance()
-        {
-            Assert.IsNotNull(testHostManagerFactory.GetExecutionManager());
-        }
-
-        [TestMethod]
-        public void GetDiscoveryManagerShouldCacheTheExecutionManagerInstance()
-        {
-            Assert.AreEqual(testHostManagerFactory.GetExecutionManager(), testHostManagerFactory.GetExecutionManager());
-        }
+    [TestMethod]
+    public void GetDiscoveryManagerShouldCacheTheExecutionManagerInstance()
+    {
+        Assert.AreEqual(_testHostManagerFactory.GetExecutionManager(), _testHostManagerFactory.GetExecutionManager());
     }
 }

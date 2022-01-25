@@ -16,7 +16,7 @@ namespace Coverlet.Collector.DataCollection
     // This class MUST have the same full name as
     // https://github.com/tonerdo/coverlet/blob/master/src/coverlet.collector/InProcDataCollection/CoverletInProcDataCollector.cs
     // to mimic real behavior
-    public class CoverletInProcDataCollector : InProcDataCollection
+    public class CoverletInProcDataCollector : INProcDataCollection
     {
         public void Initialize(IDataCollectionSink dataCollectionSink)
         {

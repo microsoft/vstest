@@ -10,7 +10,8 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using System.IO;
     using System.Reflection;
     using System.Runtime.InteropServices;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+    using Interfaces;
 
     public partial class ProcessHelper : IProcessHelper
     {
@@ -37,15 +38,15 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                 case Architecture.X64:
                     return PlatformArchitecture.X64;
                 case Architecture.Arm:
-                    return PlatformArchitecture.ARM;
+                    return PlatformArchitecture.Arm;
                 case Architecture.Arm64:
-                    return PlatformArchitecture.ARM64;
+                    return PlatformArchitecture.Arm64;
 
                 // The symbolic value is only available with .NET 6
                 // preview 6 or later, so use the numerical value for now.
                 // case System.Runtime.InteropServices.Architecture.S390x:
                 case (Architecture)5:
-                    return PlatformArchitecture.S390x;
+                    return PlatformArchitecture.S390X;
                 default:
                     throw new NotSupportedException();
             }

@@ -8,7 +8,8 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using System;
     using System.Reflection;
     using System.Runtime.Loader;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+    using Interfaces;
 
     /// <inheritdoc/>
     public class PlatformAssemblyResolver : IAssemblyResolver
@@ -16,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <summary>
         /// Specifies whether the resolver is disposed or not
         /// </summary>
-        private bool disposed;
+        private bool _disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PlatformAssemblyResolver"/> class.
@@ -46,14 +47,14 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
         protected void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (!_disposed)
             {
                 if (disposing)
                 {
                     AssemblyLoadContext.Default.Resolving -= AssemblyResolverEvent;
                 }
 
-                disposed = true;
+                _disposed = true;
             }
         }
 

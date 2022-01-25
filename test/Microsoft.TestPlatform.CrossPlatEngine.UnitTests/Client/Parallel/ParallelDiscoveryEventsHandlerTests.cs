@@ -1,206 +1,205 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CrossPlatEngine.UnitTests.Client
+namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
+
+using System.Collections.Generic;
+
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
+[TestClass]
+public class ParallelDiscoveryEventsHandlerTests
 {
-    using System.Collections.Generic;
+    private ParallelDiscoveryEventsHandler _parallelDiscoveryEventsHandler;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    private Mock<IProxyDiscoveryManager> _mockProxyDiscoveryManager;
 
-    using Moq;
+    private Mock<ITestDiscoveryEventsHandler2> _mockTestDiscoveryEventsHandler;
 
-    [TestClass]
-    public class ParallelDiscoveryEventsHandlerTests
+    private Mock<IParallelProxyDiscoveryManager> _mockParallelProxyDiscoveryManager;
+
+    private Mock<IDataSerializer> _mockDataSerializer;
+
+    private Mock<IRequestData> _mockRequestData;
+
+    [TestInitialize]
+    public void TestInit()
     {
-        private ParallelDiscoveryEventsHandler parallelDiscoveryEventsHandler;
+        _mockProxyDiscoveryManager = new Mock<IProxyDiscoveryManager>();
+        _mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
+        _mockParallelProxyDiscoveryManager = new Mock<IParallelProxyDiscoveryManager>();
+        _mockDataSerializer = new Mock<IDataSerializer>();
+        _mockRequestData = new Mock<IRequestData>();
+        _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
 
-        private Mock<IProxyDiscoveryManager> mockProxyDiscoveryManager;
+        _parallelDiscoveryEventsHandler = new ParallelDiscoveryEventsHandler(_mockRequestData.Object, _mockProxyDiscoveryManager.Object,
+            _mockTestDiscoveryEventsHandler.Object, _mockParallelProxyDiscoveryManager.Object,
+            new ParallelDiscoveryDataAggregator(), _mockDataSerializer.Object);
+    }
 
-        private Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler;
+    [TestMethod]
+    public void HandleDiscoveryCompleteShouldNotCallLastChunkResultsIfNotPresent()
+    {
+        int totalTests = 10;
+        bool aborted = false;
+        _mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
+            _mockProxyDiscoveryManager.Object, totalTests, null, aborted)).Returns(false);
 
-        private Mock<IParallelProxyDiscoveryManager> mockParallelProxyDiscoveryManager;
+        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
 
-        private Mock<IDataSerializer> mockDataSerializer;
+        _parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
 
-        private Mock<IRequestData> mockRequestData;
+        // Raw message must be sent 
+        _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Never);
 
-        [TestInitialize]
-        public void TestInit()
-        {
-            mockProxyDiscoveryManager = new Mock<IProxyDiscoveryManager>();
-            mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
-            mockParallelProxyDiscoveryManager = new Mock<IParallelProxyDiscoveryManager>();
-            mockDataSerializer = new Mock<IDataSerializer>();
-            mockRequestData = new Mock<IRequestData>();
-            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+        _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleDiscoveredTests(null), Times.Never);
 
-            parallelDiscoveryEventsHandler = new ParallelDiscoveryEventsHandler(mockRequestData.Object, mockProxyDiscoveryManager.Object,
-                mockTestDiscoveryEventsHandler.Object, mockParallelProxyDiscoveryManager.Object,
-                new ParallelDiscoveryDataAggregator(), mockDataSerializer.Object);
-        }
+        _mockParallelProxyDiscoveryManager.Verify(mp => mp.HandlePartialDiscoveryComplete(
+            _mockProxyDiscoveryManager.Object, totalTests, null, aborted), Times.Once);
+    }
 
-        [TestMethod]
-        public void HandleDiscoveryCompleteShouldNotCallLastChunkResultsIfNotPresent()
-        {
-            int totalTests = 10;
-            bool aborted = false;
-            mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
-                   mockProxyDiscoveryManager.Object, totalTests, null, aborted)).Returns(false);
+    [TestMethod]
+    public void HandleDiscoveryCompleteShouldCallLastChunkResultsIfPresent()
+    {
+        string payload = "Tests";
+        int totalTests = 10;
+        bool aborted = false;
+        var lastChunk = new List<TestCase>();
 
-            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
+        _mockDataSerializer.Setup(mds => mds.SerializePayload(MessageType.TestCasesFound, lastChunk))
+            .Returns(payload);
 
-            parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
+        _mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
+            _mockProxyDiscoveryManager.Object, totalTests, lastChunk, aborted)).Returns(false);
 
-            // Raw message must be sent 
-            mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Never);
+        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
 
-            mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleDiscoveredTests(null), Times.Never);
+        _parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, lastChunk);
 
-            mockParallelProxyDiscoveryManager.Verify(mp => mp.HandlePartialDiscoveryComplete(
-                mockProxyDiscoveryManager.Object, totalTests, null, aborted), Times.Once);
-        }
+        // Raw message must be sent
+        _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
 
-        [TestMethod]
-        public void HandleDiscoveryCompleteShouldCallLastChunkResultsIfPresent()
-        {
-            string payload = "Tests";
-            int totalTests = 10;
-            bool aborted = false;
-            var lastChunk = new List<TestCase>();
+        _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleDiscoveredTests(lastChunk), Times.Once);
 
-            mockDataSerializer.Setup(mds => mds.SerializePayload(MessageType.TestCasesFound, lastChunk))
-                .Returns(payload);
+        _mockParallelProxyDiscoveryManager.Verify(mp => mp.HandlePartialDiscoveryComplete(
+            _mockProxyDiscoveryManager.Object, totalTests, null, aborted), Times.Once);
+    }
 
-            mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
-                    mockProxyDiscoveryManager.Object, totalTests, lastChunk, aborted)).Returns(false);
+    [TestMethod]
+    public void HandleDiscoveryCompleteShouldCollectMetrics()
+    {
+        string payload = "DiscoveryComplete";
+        int totalTests = 10;
+        bool aborted = false;
 
-            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
+        _mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
+            _mockProxyDiscoveryManager.Object, totalTests, null, aborted)).Returns(true);
 
-            parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, lastChunk);
+        _mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.DiscoveryComplete)).Returns(payload);
 
-            // Raw message must be sent
-            mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
+        var mockMetricsCollector = new Mock<IMetricsCollection>();
+        _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
-            mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleDiscoveredTests(lastChunk), Times.Once);
+        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
 
-            mockParallelProxyDiscoveryManager.Verify(mp => mp.HandlePartialDiscoveryComplete(
-                mockProxyDiscoveryManager.Object, totalTests, null, aborted), Times.Once);
-        }
+        // Act.
+        _parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
 
-        [TestMethod]
-        public void HandleDiscoveryCompleteShouldCollectMetrics()
-        {
-            string payload = "DiscoveryComplete";
-            int totalTests = 10;
-            bool aborted = false;
+        // Verify.
+        mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.DiscoveryState, It.IsAny<string>()), Times.Once);
+    }
 
-            mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
-                mockProxyDiscoveryManager.Object, totalTests, null, aborted)).Returns(true);
+    [TestMethod]
+    public void HandleDiscoveryCompleteShouldCallTestDiscoveryCompleteOnActualHandlerIfParallelManagerReturnsCompleteAsTrue()
+    {
+        string payload = "DiscoveryComplete";
+        int totalTests = 10;
+        bool aborted = false;
 
-            mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.DiscoveryComplete)).Returns(payload);
+        _mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
+            _mockProxyDiscoveryManager.Object, totalTests, null, aborted)).Returns(true);
 
-            var mockMetricsCollector = new Mock<IMetricsCollection>();
-            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
+        _mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.DiscoveryComplete)).Returns(payload);
 
-            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
+        // Act
+        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
 
-            // Act.
-            parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
+        _parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
 
-            // Verify.
-            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.DiscoveryState, It.IsAny<string>()), Times.Once);
-        }
+        // Verify
+        _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleDiscoveredTests(null), Times.Never);
 
-        [TestMethod]
-        public void HandleDiscoveryCompleteShouldCallTestDiscoveryCompleteOnActualHandlerIfParallelManagerReturnsCompleteAsTrue()
-        {
-            string payload = "DiscoveryComplete";
-            int totalTests = 10;
-            bool aborted = false;
+        _mockParallelProxyDiscoveryManager.Verify(mp => mp.HandlePartialDiscoveryComplete(
+            _mockProxyDiscoveryManager.Object, totalTests, null, aborted), Times.Once);
 
-            mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
-                    mockProxyDiscoveryManager.Object, totalTests, null, aborted)).Returns(true);
+        _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Once);
 
-            mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.DiscoveryComplete)).Returns(payload);
+        _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once);
+    }
 
-            // Act
-            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
+    [TestMethod]
+    public void HandleDiscoveryTestsShouldJustPassOnTheEventToDiscoveryEventsHandler()
+    {
+        var tests = new List<TestCase>();
+        _parallelDiscoveryEventsHandler.HandleDiscoveredTests(tests);
 
-            parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
+        _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleDiscoveredTests(tests), Times.Once);
+    }
 
-            // Verify
-            mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleDiscoveredTests(null), Times.Never);
+    [TestMethod]
+    public void HandleRawMessageShouldSendTestCasesFoundRawMessageToDiscoveryEventsHandler()
+    {
+        string payload = "Tests";
+        _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
+            .Returns(new Message() { MessageType = MessageType.TestCasesFound, Payload = payload });
 
-            mockParallelProxyDiscoveryManager.Verify(mp => mp.HandlePartialDiscoveryComplete(
-                mockProxyDiscoveryManager.Object, totalTests, null, aborted), Times.Once);
+        _parallelDiscoveryEventsHandler.HandleRawMessage(payload);
 
-            mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Once);
+        _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
+    }
 
-            mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once);
-        }
+    [TestMethod]
+    public void HandleRawMessageShouldNotSendDiscoveryCompleteEventRawMessageToDiscoveryEventsHandler()
+    {
+        string payload = "DiscoveryComplete";
+        _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
+            .Returns(new Message() { MessageType = MessageType.DiscoveryComplete, Payload = payload });
 
-        [TestMethod]
-        public void HandleDiscoveryTestsShouldJustPassOnTheEventToDiscoveryEventsHandler()
-        {
-            var tests = new List<TestCase>();
-            parallelDiscoveryEventsHandler.HandleDiscoveredTests(tests);
+        _parallelDiscoveryEventsHandler.HandleRawMessage(payload);
 
-            mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleDiscoveredTests(tests), Times.Once);
-        }
+        _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Never);
+    }
 
-        [TestMethod]
-        public void HandleRawMessageShouldSendTestCasesFoundRawMessageToDiscoveryEventsHandler()
-        {
-            string payload = "Tests";
-            mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
-                .Returns(new Message() { MessageType = MessageType.TestCasesFound, Payload = payload });
+    [TestMethod]
+    public void HandleRawMessageShouldSendLoggerRawMessageToDiscoveryEventsHandler()
+    {
+        string payload = "LogMessage";
+        _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
+            .Returns(new Message() { MessageType = MessageType.TestMessage, Payload = payload });
 
-            parallelDiscoveryEventsHandler.HandleRawMessage(payload);
+        _parallelDiscoveryEventsHandler.HandleRawMessage(payload);
 
-            mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
-        }
+        _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
+    }
 
-        [TestMethod]
-        public void HandleRawMessageShouldNotSendDiscoveryCompleteEventRawMessageToDiscoveryEventsHandler()
-        {
-            string payload = "DiscoveryComplete";
-            mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
-                .Returns(new Message() { MessageType = MessageType.DiscoveryComplete, Payload = payload });
+    [TestMethod]
+    public void HandleLogMessageShouldJustPassOnTheEventToDiscoveryEventsHandler()
+    {
+        string log = "Hello";
+        _parallelDiscoveryEventsHandler.HandleLogMessage(TestMessageLevel.Error, log);
 
-            parallelDiscoveryEventsHandler.HandleRawMessage(payload);
-
-            mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Never);
-        }
-
-        [TestMethod]
-        public void HandleRawMessageShouldSendLoggerRawMessageToDiscoveryEventsHandler()
-        {
-            string payload = "LogMessage";
-            mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
-                .Returns(new Message() { MessageType = MessageType.TestMessage, Payload = payload });
-
-            parallelDiscoveryEventsHandler.HandleRawMessage(payload);
-
-            mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
-        }
-
-        [TestMethod]
-        public void HandleLogMessageShouldJustPassOnTheEventToDiscoveryEventsHandler()
-        {
-            string log = "Hello";
-            parallelDiscoveryEventsHandler.HandleLogMessage(TestMessageLevel.Error, log);
-
-            mockTestDiscoveryEventsHandler.Verify(mt =>
-                mt.HandleLogMessage(TestMessageLevel.Error, log), Times.Once);
-        }
+        _mockTestDiscoveryEventsHandler.Verify(mt =>
+            mt.HandleLogMessage(TestMessageLevel.Error, log), Times.Once);
     }
 }

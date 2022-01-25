@@ -1,66 +1,67 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Common.UnitTests.Logging
+namespace Microsoft.TestPlatform.Common.UnitTests.Logging;
+
+using System;
+
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+using VisualStudio.TestTools.UnitTesting;
+
+[TestClass]
+public class TestSessionMessageLoggerTests
 {
-    using System;
-    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    private TestSessionMessageLogger _testSessionMessageLogger;
 
-    [TestClass]
-    public class TestSessionMessageLoggerTests
+    private TestRunMessageEventArgs _currentEventArgs;
+
+    [TestInitialize]
+    public void TestInit()
     {
-        private TestSessionMessageLogger testSessionMessageLogger;
+        _testSessionMessageLogger = TestSessionMessageLogger.Instance;
+    }
 
-        private TestRunMessageEventArgs currentEventArgs;
+    [TestCleanup]
+    public void TestCleanup()
+    {
+        TestSessionMessageLogger.Instance = null;
+    }
 
-        [TestInitialize]
-        public void TestInit()
-        {
-            testSessionMessageLogger = TestSessionMessageLogger.Instance;
-        }
+    [TestMethod]
+    public void InstanceShouldReturnALoggerInstance()
+    {
+        Assert.IsNotNull(_testSessionMessageLogger);
+    }
 
-        [TestCleanup]
-        public void TestCleanup()
-        {
-            TestSessionMessageLogger.Instance = null;
-        }
+    [TestMethod]
+    public void SendMessageShouldLogErrorMessages()
+    {
+        _testSessionMessageLogger.TestRunMessage += OnMessage;
 
-        [TestMethod]
-        public void InstanceShouldReturnALoggerInstance()
-        {
-            Assert.IsNotNull(testSessionMessageLogger);
-        }
+        var message = "Alert";
+        _testSessionMessageLogger.SendMessage(TestMessageLevel.Error, message);
 
-        [TestMethod]
-        public void SendMessageShouldLogErrorMessages()
-        {
-            testSessionMessageLogger.TestRunMessage += OnMessage;
+        Assert.AreEqual(TestMessageLevel.Error, _currentEventArgs.Level);
+        Assert.AreEqual(message, _currentEventArgs.Message);
+    }
 
-            var message = "Alert";
-            testSessionMessageLogger.SendMessage(TestMessageLevel.Error, message);
+    [TestMethod]
+    public void SendMessageShouldLogErrorAsWarningIfSpecifiedSo()
+    {
+        _testSessionMessageLogger.TestRunMessage += OnMessage;
+        _testSessionMessageLogger.TreatTestAdapterErrorsAsWarnings = true;
 
-            Assert.AreEqual(TestMessageLevel.Error, currentEventArgs.Level);
-            Assert.AreEqual(message, currentEventArgs.Message);
-        }
+        var message = "Alert";
+        _testSessionMessageLogger.SendMessage(TestMessageLevel.Error, message);
 
-        [TestMethod]
-        public void SendMessageShouldLogErrorAsWarningIfSpecifiedSo()
-        {
-            testSessionMessageLogger.TestRunMessage += OnMessage;
-            testSessionMessageLogger.TreatTestAdapterErrorsAsWarnings = true;
+        Assert.AreEqual(TestMessageLevel.Warning, _currentEventArgs.Level);
+        Assert.AreEqual(message, _currentEventArgs.Message);
+    }
 
-            var message = "Alert";
-            testSessionMessageLogger.SendMessage(TestMessageLevel.Error, message);
-
-            Assert.AreEqual(TestMessageLevel.Warning, currentEventArgs.Level);
-            Assert.AreEqual(message, currentEventArgs.Message);
-        }
-
-        private void OnMessage(object sender, TestRunMessageEventArgs e)
-        {
-            currentEventArgs = e;
-        }
+    private void OnMessage(object sender, TestRunMessageEventArgs e)
+    {
+        _currentEventArgs = e;
     }
 }

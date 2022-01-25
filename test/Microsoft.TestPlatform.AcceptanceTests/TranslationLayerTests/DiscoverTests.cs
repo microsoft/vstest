@@ -1,219 +1,220 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
+namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+using TestUtilities;
+using VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
+[TestClass]
+public class DiscoverTests : AcceptanceTestBase
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Microsoft.TestPlatform.TestUtilities;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Moq;
+    private IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private DiscoveryEventHandler _discoveryEventHandler;
+    private DiscoveryEventHandler2 _discoveryEventHandler2;
 
-    [TestClass]
-    public class DiscoverTests : AcceptanceTestBase
+    public void Setup()
     {
-        private IVsTestConsoleWrapper vstestConsoleWrapper;
-        private DiscoveryEventHandler discoveryEventHandler;
-        private DiscoveryEventHandler2 discoveryEventHandler2;
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _discoveryEventHandler = new DiscoveryEventHandler();
+        _discoveryEventHandler2 = new DiscoveryEventHandler2();
+    }
 
-        public void Setup()
-        {
-            vstestConsoleWrapper = GetVsTestConsoleWrapper();
-            discoveryEventHandler = new DiscoveryEventHandler();
-            discoveryEventHandler2 = new DiscoveryEventHandler2();
-        }
+    [TestCleanup]
+    public void Cleanup()
+    {
+        _vstestConsoleWrapper?.EndSession();
+    }
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            vstestConsoleWrapper?.EndSession();
-        }
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo)
-        {
-            SetTestEnvironment(testEnvironment, runnerInfo);
+        Setup();
 
-            Setup();
+        _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), _discoveryEventHandler);
 
-            vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), discoveryEventHandler);
+        // Assert.
+        Assert.AreEqual(6, _discoveryEventHandler.DiscoveredTestCases.Count);
+    }
 
-            // Assert.
-            Assert.AreEqual(6, discoveryEventHandler.DiscoveredTestCases.Count);
-        }
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        Setup();
 
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
-        {
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            Setup();
+        _vstestConsoleWrapper.DiscoverTests(
+            GetTestAssemblies(),
+            GetDefaultRunSettings(),
+            new TestPlatformOptions() { CollectMetrics = false },
+            _discoveryEventHandler2);
 
-            vstestConsoleWrapper.DiscoverTests(
-               GetTestAssemblies(),
-                GetDefaultRunSettings(),
-                new TestPlatformOptions() { CollectMetrics = false },
-                discoveryEventHandler2);
+        // Assert.
+        Assert.AreEqual(6, _discoveryEventHandler2.DiscoveredTestCases.Count);
+        Assert.AreEqual(0, _discoveryEventHandler2.Metrics.Count);
+    }
 
-            // Assert.
-            Assert.AreEqual(6, discoveryEventHandler2.DiscoveredTestCases.Count);
-            Assert.AreEqual(0, discoveryEventHandler2.Metrics.Count);
-        }
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        Setup();
 
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn(RunnerInfo runnerInfo)
-        {
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            Setup();
+        _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _discoveryEventHandler2);
 
-            vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, discoveryEventHandler2);
+        // Assert.
+        Assert.AreEqual(6, _discoveryEventHandler2.DiscoveredTestCases.Count);
+        Assert.IsTrue(_discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TargetDevice));
+        Assert.IsTrue(_discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests));
+        Assert.IsTrue(_discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecByAllAdapters));
+        Assert.IsTrue(_discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForDiscovery));
+        Assert.IsTrue(_discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.DiscoveryState));
+    }
 
-            // Assert.
-            Assert.AreEqual(6, discoveryEventHandler2.DiscoveredTestCases.Count);
-            Assert.IsTrue(discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TargetDevice));
-            Assert.IsTrue(discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests));
-            Assert.IsTrue(discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecByAllAdapters));
-            Assert.IsTrue(discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForDiscovery));
-            Assert.IsTrue(discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.DiscoveryState));
-        }
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void DiscoverTestsUsingEventHandler2AndBatchSize(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        Setup();
 
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void DiscoverTestsUsingEventHandler2AndBatchSize(RunnerInfo runnerInfo)
-        {
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            Setup();
+        var discoveryEventHandlerForBatchSize = new DiscoveryEventHandlerForBatchSize();
 
-            var discoveryEventHandlerForBatchSize = new DiscoveryEventHandlerForBatchSize();
-
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+        string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
                                         <RunConfiguration>
                                         <BatchSize>3</BatchSize>
                                         </RunConfiguration>
                                     </RunSettings>";
 
-            vstestConsoleWrapper.DiscoverTests(
-               GetTestAssemblies(),
-                runSettingsXml,
-                null,
-                discoveryEventHandlerForBatchSize);
+        _vstestConsoleWrapper.DiscoverTests(
+            GetTestAssemblies(),
+            runSettingsXml,
+            null,
+            discoveryEventHandlerForBatchSize);
 
-            // Assert.
-            Assert.AreEqual(6, discoveryEventHandlerForBatchSize.DiscoveredTestCases.Count);
-            Assert.AreEqual(3, discoveryEventHandlerForBatchSize.BatchSize);
-        }
+        // Assert.
+        Assert.AreEqual(6, discoveryEventHandlerForBatchSize.DiscoveredTestCases.Count);
+        Assert.AreEqual(3, discoveryEventHandlerForBatchSize.BatchSize);
+    }
 
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void DiscoverTestsUsingEventHandler1AndBatchSize(RunnerInfo runnerInfo)
-        {
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            Setup();
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void DiscoverTestsUsingEventHandler1AndBatchSize(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        Setup();
 
-            var discoveryEventHandlerForBatchSize = new DiscoveryEventHandlerForBatchSize();
+        var discoveryEventHandlerForBatchSize = new DiscoveryEventHandlerForBatchSize();
 
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+        string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
                                         <RunConfiguration>
                                         <BatchSize>3</BatchSize>
                                         </RunConfiguration>
                                     </RunSettings>";
 
-            vstestConsoleWrapper.DiscoverTests(
-               GetTestAssemblies(),
-                runSettingsXml,
-                discoveryEventHandlerForBatchSize);
+        _vstestConsoleWrapper.DiscoverTests(
+            GetTestAssemblies(),
+            runSettingsXml,
+            discoveryEventHandlerForBatchSize);
 
-            // Assert.
-            Assert.AreEqual(6, discoveryEventHandlerForBatchSize.DiscoveredTestCases.Count);
-            Assert.AreEqual(3, discoveryEventHandlerForBatchSize.BatchSize);
-        }
+        // Assert.
+        Assert.AreEqual(6, discoveryEventHandlerForBatchSize.DiscoveredTestCases.Count);
+        Assert.AreEqual(3, discoveryEventHandlerForBatchSize.BatchSize);
+    }
 
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void DiscoverTestsUsingSourceNavigation(RunnerInfo runnerInfo)
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void DiscoverTestsUsingSourceNavigation(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        Setup();
+
+        _vstestConsoleWrapper.DiscoverTests(
+            GetTestAssemblies(),
+            GetDefaultRunSettings(),
+            _discoveryEventHandler);
+
+        // Assert.
+        var testCase =
+            _discoveryEventHandler.DiscoveredTestCases.Where(dt => dt.FullyQualifiedName.Equals("SampleUnitTestProject.UnitTest1.PassingTest"));
+
+        // Release builds optimize code, hence line numbers are different.
+        if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
         {
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            Setup();
-
-            vstestConsoleWrapper.DiscoverTests(
-               GetTestAssemblies(),
-                GetDefaultRunSettings(),
-                discoveryEventHandler);
-
-            // Assert.
-            var testCase =
-                discoveryEventHandler.DiscoveredTestCases.Where(dt => dt.FullyQualifiedName.Equals("SampleUnitTestProject.UnitTest1.PassingTest"));
-
-            // Release builds optimize code, hence line numbers are different.
-            if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
-            {
-                Assert.AreEqual(23, testCase.FirstOrDefault().LineNumber);
-            }
-            else
-            {
-                Assert.AreEqual(22, testCase.FirstOrDefault().LineNumber);
-            }
+            Assert.AreEqual(23, testCase.FirstOrDefault().LineNumber);
         }
-
-        [TestMethod]
-        // flaky on the desktop runner, desktop framework combo
-        [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
-        [NetCoreTargetFrameworkDataSource]
-        public void CancelTestDiscovery(RunnerInfo runnerInfo)
+        else
         {
-            // Setup
-            var testAssemblies = new List<string>
-                                     {
-                                         GetAssetFullPath("DiscoveryTestProject.dll"),
-                                         GetAssetFullPath("SimpleTestProject.dll"),
-                                         GetAssetFullPath("SimpleTestProject2.dll")
-                                     };
-
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            Setup();
-
-            var discoveredTests = new List<TestCase>();
-            var discoveryEvents = new Mock<ITestDiscoveryEventsHandler>();
-            discoveryEvents.Setup((events) => events.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback
-                ((IEnumerable<TestCase> testcases) => discoveredTests.AddRange(testcases));
-
-            // Act
-            var discoveryTask = Task.Run(() => vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), discoveryEvents.Object));
-
-            Task.Delay(2000).Wait();
-            vstestConsoleWrapper.CancelDiscovery();
-            discoveryTask.Wait();
-
-            // Assert.
-            int discoveredSources = discoveredTests.Select((testcase) => testcase.Source).Distinct().Count();
-            Assert.AreNotEqual(testAssemblies.Count, discoveredSources, "All test assemblies discovered");
+            Assert.AreEqual(22, testCase.FirstOrDefault().LineNumber);
         }
+    }
 
-        private IList<string> GetTestAssemblies()
+    [TestMethod]
+    // flaky on the desktop runner, desktop framework combo
+    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSource]
+    public void CancelTestDiscovery(RunnerInfo runnerInfo)
+    {
+        // Setup
+        var testAssemblies = new List<string>
         {
-            var testAssemblies = new List<string>
-                                     {
-                                         GetAssetFullPath("SimpleTestProject.dll"),
-                                         GetAssetFullPath("SimpleTestProject2.dll")
-                                     };
+            GetAssetFullPath("DiscoveryTestProject.dll"),
+            GetAssetFullPath("SimpleTestProject.dll"),
+            GetAssetFullPath("SimpleTestProject2.dll")
+        };
 
-            return testAssemblies;
-        }
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        Setup();
+
+        var discoveredTests = new List<TestCase>();
+        var discoveryEvents = new Mock<ITestDiscoveryEventsHandler>();
+        discoveryEvents.Setup((events) => events.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback
+            ((IEnumerable<TestCase> testcases) => discoveredTests.AddRange(testcases));
+
+        // Act
+        var discoveryTask = Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), discoveryEvents.Object));
+
+        Task.Delay(2000).Wait();
+        _vstestConsoleWrapper.CancelDiscovery();
+        discoveryTask.Wait();
+
+        // Assert.
+        int discoveredSources = discoveredTests.Select((testcase) => testcase.Source).Distinct().Count();
+        Assert.AreNotEqual(testAssemblies.Count, discoveredSources, "All test assemblies discovered");
+    }
+
+    private IList<string> GetTestAssemblies()
+    {
+        var testAssemblies = new List<string>
+        {
+            GetAssetFullPath("SimpleTestProject.dll"),
+            GetAssetFullPath("SimpleTestProject2.dll")
+        };
+
+        return testAssemblies;
     }
 }

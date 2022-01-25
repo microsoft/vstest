@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD1_0 
+#if !NETSTANDARD1_0
 
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.Win32;
@@ -19,30 +19,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
 
     internal class RegistryKeyWrapper : IRegistryKey
     {
-        private readonly RegistryKey registryKey;
+        private readonly RegistryKey _registryKey;
 
         public RegistryKeyWrapper(RegistryKey registryKey)
         {
-            this.registryKey = registryKey;
+            _registryKey = registryKey;
         }
 
         public object GetValue(string name)
         {
-            return registryKey?.GetValue(name)?.ToString();
+            return _registryKey?.GetValue(name)?.ToString();
         }
 
         public IRegistryKey OpenSubKey(string name)
         {
-            var keyRegistry = registryKey.OpenSubKey(name);
+            var keyRegistry = _registryKey.OpenSubKey(name);
             return keyRegistry is null ? null : new RegistryKeyWrapper(keyRegistry);
         }
 
         public string[] GetSubKeyNames()
-            => registryKey?.GetSubKeyNames();
+            => _registryKey?.GetSubKeyNames();
 
         public void Dispose()
         {
-            registryKey?.Dispose();
+            _registryKey?.Dispose();
         }
     }
 }

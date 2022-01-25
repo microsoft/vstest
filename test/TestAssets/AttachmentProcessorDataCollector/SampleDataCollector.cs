@@ -12,6 +12,7 @@ namespace AttachmentProcessorDataCollector
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -31,9 +32,9 @@ namespace AttachmentProcessorDataCollector
     [DataCollectorTypeUri(ExtensionInfo.ExtensionIdentifier)]
     public class SampleDataCollectorV1 : DataCollector
     {
-        private DataCollectionSink dataCollectionSink;
-        private DataCollectionEnvironmentContext context;
-        private readonly string tempDirectoryPath = Path.GetTempPath();
+        private DataCollectionSink _dataCollectionSink;
+        private DataCollectionEnvironmentContext _context;
+        private readonly string _tempDirectoryPath = Path.GetTempPath();
 
         public override void Initialize(
             XmlElement configurationElement,
@@ -43,16 +44,16 @@ namespace AttachmentProcessorDataCollector
             DataCollectionEnvironmentContext environmentContext)
         {
             events.SessionEnd += SessionEnded_Handler;
-            dataCollectionSink = dataSink;
-            context = environmentContext;
+            _dataCollectionSink = dataSink;
+            _context = environmentContext;
         }
 
         private void SessionEnded_Handler(object sender, SessionEndEventArgs e)
         {
-            string tmpAttachment = Path.Combine(tempDirectoryPath, Guid.NewGuid().ToString("N"), "DataCollectorAttachmentProcessor_1.txt");
+            string tmpAttachment = Path.Combine(_tempDirectoryPath, Guid.NewGuid().ToString("N"), "DataCollectorAttachmentProcessor_1.txt");
             Directory.CreateDirectory(Path.GetDirectoryName(tmpAttachment));
             File.WriteAllText(tmpAttachment, $"SessionEnded_Handler_{Guid.NewGuid().ToString("N")}");
-            dataCollectionSink.SendFileAsync(context.SessionDataCollectionContext, tmpAttachment, true);
+            _dataCollectionSink.SendFileAsync(_context.SessionDataCollectionContext, tmpAttachment, true);
         }
     }
 

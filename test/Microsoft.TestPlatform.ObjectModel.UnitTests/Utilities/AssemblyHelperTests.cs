@@ -7,60 +7,60 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using VisualStudio.TestTools.UnitTesting;
     using Moq;
     using System;
 
     [TestClass]
     public class AssemblyHelperTests
     {
-        private readonly Mock<IRunContext> runContext;
-        private readonly Mock<IRunSettings> runSettings;
+        private readonly Mock<IRunContext> _runContext;
+        private readonly Mock<IRunSettings> _runSettings;
 
         public AssemblyHelperTests()
         {
-            runContext = new Mock<IRunContext>();
-            runSettings = new Mock<IRunSettings>();
+            _runContext = new Mock<IRunContext>();
+            _runSettings = new Mock<IRunSettings>();
         }
 
         [TestMethod]
-        public void SetNETFrameworkCompatiblityModeShouldSetAppDomainTargetFrameWorkWhenFramework40()
+        public void SetNetFrameworkCompatiblityModeShouldSetAppDomainTargetFrameWorkWhenFramework40()
         {
-            runSettings.Setup(rs => rs.SettingsXml).Returns(@"<RunSettings> <RunConfiguration> <TargetFrameworkVersion>Framework40</TargetFrameworkVersion> </RunConfiguration> </RunSettings>");
-            runContext.Setup(rc => rc.RunSettings).Returns(runSettings.Object);
+            _runSettings.Setup(rs => rs.SettingsXml).Returns(@"<RunSettings> <RunConfiguration> <TargetFrameworkVersion>Framework40</TargetFrameworkVersion> </RunConfiguration> </RunSettings>");
+            _runContext.Setup(rc => rc.RunSettings).Returns(_runSettings.Object);
             AppDomainSetup appDomainSetup = new();
 
-            AssemblyHelper.SetNETFrameworkCompatiblityMode(appDomainSetup, runContext.Object);
+            AssemblyHelper.SetNetFrameworkCompatiblityMode(appDomainSetup, _runContext.Object);
 
             Assert.AreEqual(".NETFramework,Version=v4.0", appDomainSetup.TargetFrameworkName);
         }
 
         [TestMethod]
-        public void SetNETFrameworkCompatiblityModeShouldSetAppDomainTargetFrameWorkWhenNETFrameworkVersionv40()
+        public void SetNetFrameworkCompatiblityModeShouldSetAppDomainTargetFrameWorkWhenNetFrameworkVersionv40()
         {
-            runSettings.Setup(rs => rs.SettingsXml).Returns(@"<RunSettings> <RunConfiguration> <TargetFrameworkVersion>.NETFramework,Version=v4.0</TargetFrameworkVersion> </RunConfiguration> </RunSettings>");
-            runContext.Setup(rc => rc.RunSettings).Returns(runSettings.Object);
+            _runSettings.Setup(rs => rs.SettingsXml).Returns(@"<RunSettings> <RunConfiguration> <TargetFrameworkVersion>.NETFramework,Version=v4.0</TargetFrameworkVersion> </RunConfiguration> </RunSettings>");
+            _runContext.Setup(rc => rc.RunSettings).Returns(_runSettings.Object);
             AppDomainSetup appDomainSetup = new();
 
-            AssemblyHelper.SetNETFrameworkCompatiblityMode(appDomainSetup, runContext.Object);
+            AssemblyHelper.SetNetFrameworkCompatiblityMode(appDomainSetup, _runContext.Object);
 
             Assert.AreEqual(".NETFramework,Version=v4.0", appDomainSetup.TargetFrameworkName);
         }
 
         [TestMethod]
-        public void SetNETFrameworkCompatiblityModeShouldNotSetAppDomainTargetFrameWorkWhenFramework45()
+        public void SetNetFrameworkCompatiblityModeShouldNotSetAppDomainTargetFrameWorkWhenFramework45()
         {
-            runSettings.Setup(rs => rs.SettingsXml).Returns(@"<RunSettings> <RunConfiguration> <TargetFrameworkVersion>Framework45</TargetFrameworkVersion> </RunConfiguration> </RunSettings>");
-            runContext.Setup(rc => rc.RunSettings).Returns(runSettings.Object);
+            _runSettings.Setup(rs => rs.SettingsXml).Returns(@"<RunSettings> <RunConfiguration> <TargetFrameworkVersion>Framework45</TargetFrameworkVersion> </RunConfiguration> </RunSettings>");
+            _runContext.Setup(rc => rc.RunSettings).Returns(_runSettings.Object);
             AppDomainSetup appDomainSetup = new();
 
-            AssemblyHelper.SetNETFrameworkCompatiblityMode(appDomainSetup, runContext.Object);
+            AssemblyHelper.SetNetFrameworkCompatiblityMode(appDomainSetup, _runContext.Object);
 
             Assert.IsNull(appDomainSetup.TargetFrameworkName);
         }
 
         [TestMethod]
-        public void SetNETFrameworkCompatiblityModeShouldNotSetAppDomainTargetFrameWorkWhenNETFrameworkVersionv45()
+        public void SetNetFrameworkCompatiblityModeShouldNotSetAppDomainTargetFrameWorkWhenNetFrameworkVersionv45()
         {
             Mock<IRunContext> runContext = new();
             Mock<IRunSettings> runSettings = new();
@@ -68,7 +68,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
             runContext.Setup(rc => rc.RunSettings).Returns(runSettings.Object);
             AppDomainSetup appDomainSetup = new();
 
-            AssemblyHelper.SetNETFrameworkCompatiblityMode(appDomainSetup, runContext.Object);
+            AssemblyHelper.SetNetFrameworkCompatiblityMode(appDomainSetup, runContext.Object);
 
             Assert.IsNull(appDomainSetup.TargetFrameworkName);
         }

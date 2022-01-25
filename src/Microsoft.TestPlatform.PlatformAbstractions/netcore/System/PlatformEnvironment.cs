@@ -8,7 +8,8 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using System;
     using System.Runtime.InteropServices;
     using System.Threading;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+    using Interfaces;
 
     /// <inheritdoc />
     public class PlatformEnvironment : IEnvironment
@@ -25,15 +26,15 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                     case System.Runtime.InteropServices.Architecture.X64:
                         return PlatformArchitecture.X64;
                     case System.Runtime.InteropServices.Architecture.Arm:
-                        return PlatformArchitecture.ARM;
+                        return PlatformArchitecture.Arm;
                     case System.Runtime.InteropServices.Architecture.Arm64:
-                        return PlatformArchitecture.ARM64;
+                        return PlatformArchitecture.Arm64;
 
                     // The symbolic value is only available with .NET 6
                     // preview 6 or later, so use the numerical value for now.
                     // case System.Runtime.InteropServices.Architecture.S390x:
                     case (Architecture)5:
-                        return PlatformArchitecture.S390x;
+                        return PlatformArchitecture.S390X;
                     default:
                         throw new NotSupportedException();
                 }
@@ -50,7 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                     return PlatformOperatingSystem.Windows;
                 }
 
-                return RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? PlatformOperatingSystem.OSX : PlatformOperatingSystem.Unix;
+                return RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? PlatformOperatingSystem.Osx : PlatformOperatingSystem.Unix;
             }
         }
 

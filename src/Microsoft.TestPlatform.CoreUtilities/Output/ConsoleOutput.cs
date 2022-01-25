@@ -13,19 +13,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     /// </summary>
     public class ConsoleOutput : IOutput
     {
-        private static readonly object lockObject = new();
-        private static ConsoleOutput consoleOutput = null;
+        private static readonly object LockObject = new();
+        private static ConsoleOutput s_consoleOutput = null;
 
-        private readonly TextWriter standardOutput = null;
-        private readonly TextWriter standardError = null;
+        private readonly TextWriter _standardOutput = null;
+        private readonly TextWriter _standardError = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleOutput"/> class.
         /// </summary>
         internal ConsoleOutput()
         {
-            standardOutput = Console.Out;
-            standardError = Console.Error;
+            _standardOutput = Console.Out;
+            _standardError = Console.Error;
         }
 
         /// <summary>
@@ -35,20 +35,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             get
             {
-                if (consoleOutput != null)
+                if (s_consoleOutput != null)
                 {
-                    return consoleOutput;
+                    return s_consoleOutput;
                 }
 
-                lock (lockObject)
+                lock (LockObject)
                 {
-                    if (consoleOutput == null)
+                    if (s_consoleOutput == null)
                     {
-                        consoleOutput = new ConsoleOutput();
+                        s_consoleOutput = new ConsoleOutput();
                     }
                 }
 
-                return consoleOutput;
+                return s_consoleOutput;
             }
         }
 
@@ -74,15 +74,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 case OutputLevel.Information:
                 case OutputLevel.Warning:
-                    standardOutput.Write(message);
+                    _standardOutput.Write(message);
                     break;
 
                 case OutputLevel.Error:
-                    standardError.Write(message);
+                    _standardError.Write(message);
                     break;
 
                 default:
-                    standardOutput.Write("ConsoleOutput.WriteLine: The output level is unrecognized: {0}", level);
+                    _standardOutput.Write("ConsoleOutput.WriteLine: The output level is unrecognized: {0}", level);
                     break;
             }
         }

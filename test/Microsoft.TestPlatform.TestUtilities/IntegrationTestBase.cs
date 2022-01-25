@@ -1,788 +1,787 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.TestUtilities
-{
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+namespace Microsoft.TestPlatform.TestUtilities;
 
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Text.RegularExpressions;
-    using System.Xml;
+using VsTestConsole.TranslationLayer;
+using VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using VisualStudio.TestTools.UnitTesting;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml;
+
+/// <summary>
+/// Base class for integration tests.
+/// </summary>
+public class IntegrationTestBase
+{
+    public const string DesktopRunnerFramework = "net451";
+    public const string CoreRunnerFramework = "netcoreapp2.1";
+
+    private const string TotalTestsMessage = "Total tests: {0}";
+    private const string PassedTestsMessage = " Passed: {0}";
+    private const string FailedTestsMessage = " Failed: {0}";
+    private const string SkippedTestsMessage = " Skipped: {0}";
+    private const string TestSummaryStatusMessageFormat = "Total tests: {0} Passed: {1} Failed: {2} Skipped: {3}";
+    private string _standardTestOutput = string.Empty;
+    private string _standardTestError = string.Empty;
+    private int _runnerExitCode = -1;
+
+    private string _arguments = string.Empty;
+
+    protected readonly IntegrationTestEnvironment _testEnvironment;
+
+    private readonly string _testAdapterRelativePath = @"mstest.testadapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
+    private readonly string _nUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build".Replace('\\', Path.DirectorySeparatorChar);
+    private readonly string _xUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
+    private readonly string _chutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools".Replace('\\', Path.DirectorySeparatorChar);
+
+    protected static readonly bool IsWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
+
+    public enum UnitTestFramework
+    {
+        NUnit, XUnit, MsTest, Cpp, Chutzpah
+    }
+
+    public IntegrationTestBase()
+    {
+        _testEnvironment = new IntegrationTestEnvironment();
+    }
+
+    public string StdOut => _standardTestOutput;
+    public string StdOutWithWhiteSpace { get; private set; } = string.Empty;
+
+    public string StdErr => _standardTestError;
+    public string StdErrWithWhiteSpace { get; private set; } = string.Empty;
 
     /// <summary>
-    /// Base class for integration tests.
+    /// Prepare arguments for <c>vstest.console.exe</c>.
     /// </summary>
-    public class IntegrationTestBase
+    /// <param name="testAssemblies">List of test assemblies.</param>
+    /// <param name="testAdapterPath">Path to test adapter.</param>
+    /// <param name="runSettings">Text of run settings.</param>
+    /// <param name="framework"></param>
+    /// <param name="inIsolation"></param>
+    /// <returns>Command line arguments string.</returns>
+    public static string PrepareArguments(string[] testAssemblies, string testAdapterPath, string runSettings,
+        string framework, string inIsolation = "", string resultsDirectory = null)
     {
-        public const string DesktopRunnerFramework = "net451";
-        public const string CoreRunnerFramework = "netcoreapp2.1";
-
-        private const string TotalTestsMessage = "Total tests: {0}";
-        private const string PassedTestsMessage = " Passed: {0}";
-        private const string FailedTestsMessage = " Failed: {0}";
-        private const string SkippedTestsMessage = " Skipped: {0}";
-        private const string TestSummaryStatusMessageFormat = "Total tests: {0} Passed: {1} Failed: {2} Skipped: {3}";
-        private string standardTestOutput = string.Empty;
-        private string standardTestError = string.Empty;
-        private int runnerExitCode = -1;
-
-        private string arguments = string.Empty;
-
-        protected readonly IntegrationTestEnvironment testEnvironment;
-
-        private readonly string TestAdapterRelativePath = @"mstest.testadapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
-        private readonly string NUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build".Replace('\\', Path.DirectorySeparatorChar);
-        private readonly string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
-        private readonly string ChutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools".Replace('\\', Path.DirectorySeparatorChar);
-
-        protected static readonly bool IsWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
-
-        public enum UnitTestFramework
+        var arguments = "";
+        foreach (var path in testAssemblies)
         {
-            NUnit, XUnit, MSTest, CPP, Chutzpah
+            arguments += path.AddDoubleQuote() + " ";
         }
 
-        public IntegrationTestBase()
+        arguments = arguments.Trim();
+
+        if (!string.IsNullOrWhiteSpace(testAdapterPath))
         {
-            testEnvironment = new IntegrationTestEnvironment();
+            // Append adapter path
+            arguments = string.Concat(arguments, " /testadapterpath:", testAdapterPath.AddDoubleQuote());
         }
 
-        public string StdOut => standardTestOutput;
-        public string StdOutWithWhiteSpace { get; private set; } = string.Empty;
-
-        public string StdErr => standardTestError;
-        public string StdErrWithWhiteSpace { get; private set; } = string.Empty;
-
-        /// <summary>
-        /// Prepare arguments for <c>vstest.console.exe</c>.
-        /// </summary>
-        /// <param name="testAssemblies">List of test assemblies.</param>
-        /// <param name="testAdapterPath">Path to test adapter.</param>
-        /// <param name="runSettings">Text of run settings.</param>
-        /// <param name="framework"></param>
-        /// <param name="inIsolation"></param>
-        /// <returns>Command line arguments string.</returns>
-        public static string PrepareArguments(string[] testAssemblies, string testAdapterPath, string runSettings,
-            string framework, string inIsolation = "", string resultsDirectory = null)
+        if (!string.IsNullOrWhiteSpace(runSettings))
         {
-            var arguments = "";
-            foreach (var path in testAssemblies)
-            {
-                arguments += path.AddDoubleQuote() + " ";
-            }
-
-            arguments = arguments.Trim();
-
-            if (!string.IsNullOrWhiteSpace(testAdapterPath))
-            {
-                // Append adapter path
-                arguments = string.Concat(arguments, " /testadapterpath:", testAdapterPath.AddDoubleQuote());
-            }
-
-            if (!string.IsNullOrWhiteSpace(runSettings))
-            {
-                // Append run settings
-                arguments = string.Concat(arguments, " /settings:", runSettings.AddDoubleQuote());
-            }
-
-            if (!string.IsNullOrWhiteSpace(framework))
-            {
-                // Append run settings
-                arguments = string.Concat(arguments, " /framework:", framework.AddDoubleQuote());
-            }
-
-            arguments = string.Concat(arguments, " /logger:", "console;verbosity=normal".AddDoubleQuote());
-
-            if (!string.IsNullOrWhiteSpace(inIsolation))
-            {
-                arguments = string.Concat(arguments, " ", inIsolation);
-            }
-
-            if (!string.IsNullOrWhiteSpace(resultsDirectory))
-            {
-                // Append results directory
-                arguments = string.Concat(arguments, " /ResultsDirectory:", resultsDirectory.AddDoubleQuote());
-            }
-
-            return arguments;
+            // Append run settings
+            arguments = string.Concat(arguments, " /settings:", runSettings.AddDoubleQuote());
         }
 
-        /// <summary>
-        /// Prepare arguments for <c>vstest.console.exe</c>.
-        /// </summary>
-        /// <param name="testAssembly">Name of the test assembly.</param>
-        /// <param name="testAdapterPath">Path to test adapter.</param>
-        /// <param name="runSettings">Text of run settings.</param>
-        /// <param name="framework"></param>
-        /// <param name="inIsolation"></param>
-        /// <returns>Command line arguments string.</returns>
-        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings,
-            string framework, string inIsolation = "", string resultsDirectory = null)
-            => PrepareArguments(new string[] { testAssembly }, testAdapterPath, runSettings, framework, inIsolation, resultsDirectory);
-
-
-        /// <summary>
-        /// Invokes <c>vstest.console</c> with specified arguments.
-        /// </summary>
-        /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
-        public void InvokeVsTest(string arguments)
+        if (!string.IsNullOrWhiteSpace(framework))
         {
-            ExecuteVsTestConsole(arguments, out standardTestOutput, out standardTestError, out runnerExitCode);
+            // Append run settings
+            arguments = string.Concat(arguments, " /framework:", framework.AddDoubleQuote());
+        }
+
+        arguments = string.Concat(arguments, " /logger:", "console;verbosity=normal".AddDoubleQuote());
+
+        if (!string.IsNullOrWhiteSpace(inIsolation))
+        {
+            arguments = string.Concat(arguments, " ", inIsolation);
+        }
+
+        if (!string.IsNullOrWhiteSpace(resultsDirectory))
+        {
+            // Append results directory
+            arguments = string.Concat(arguments, " /ResultsDirectory:", resultsDirectory.AddDoubleQuote());
+        }
+
+        return arguments;
+    }
+
+    /// <summary>
+    /// Prepare arguments for <c>vstest.console.exe</c>.
+    /// </summary>
+    /// <param name="testAssembly">Name of the test assembly.</param>
+    /// <param name="testAdapterPath">Path to test adapter.</param>
+    /// <param name="runSettings">Text of run settings.</param>
+    /// <param name="framework"></param>
+    /// <param name="inIsolation"></param>
+    /// <returns>Command line arguments string.</returns>
+    public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings,
+        string framework, string inIsolation = "", string resultsDirectory = null)
+        => PrepareArguments(new string[] { testAssembly }, testAdapterPath, runSettings, framework, inIsolation, resultsDirectory);
+
+
+    /// <summary>
+    /// Invokes <c>vstest.console</c> with specified arguments.
+    /// </summary>
+    /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
+    public void InvokeVsTest(string arguments)
+    {
+        ExecuteVsTestConsole(arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode);
+        FormatStandardOutCome();
+    }
+
+    /// <summary>
+    /// Invokes our local copy of dotnet that is patched with artifacts from the build with specified arguments.
+    /// </summary>
+    /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
+    public void InvokeDotnetTest(string arguments)
+    {
+        var vstestConsolePath = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
+        var env = "VSTEST_CONSOLE_PATH";
+        var originalVstestConsolePath = Environment.GetEnvironmentVariable(env);
+
+        try
+        {
+            Environment.SetEnvironmentVariable(env, vstestConsolePath);
+            if (arguments.Contains(".csproj"))
+            {
+                arguments = $@"-p:VsTestConsolePath=""{vstestConsolePath}"" " + arguments;
+            }
+
+            ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode);
             FormatStandardOutCome();
         }
-
-        /// <summary>
-        /// Invokes our local copy of dotnet that is patched with artifacts from the build with specified arguments.
-        /// </summary>
-        /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
-        public void InvokeDotnetTest(string arguments)
+        finally
         {
-            var vstestConsolePath = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
-            var env = "VSTEST_CONSOLE_PATH";
-            var originalVstestConsolePath = Environment.GetEnvironmentVariable(env);
+            Environment.SetEnvironmentVariable(env, originalVstestConsolePath);
+        }
+    }
 
-            try
+    /// <summary>
+    /// Invokes <c>vstest.console</c> to execute tests in a test assembly.
+    /// </summary>
+    /// <param name="testAssembly">A test assembly.</param>
+    /// <param name="testAdapterPath">Path to test adapters.</param>
+    /// <param name="framework">Dotnet Framework of test assembly.</param>
+    /// <param name="runSettings">Run settings for execution.</param>
+    public void InvokeVsTestForExecution(string testAssembly,
+        string testAdapterPath,
+        string framework,
+        string runSettings = "")
+    {
+        var resultsDir = GetResultsDirectory();
+
+        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
+        InvokeVsTest(arguments);
+        TryRemoveDirectory(resultsDir);
+    }
+
+    /// <summary>
+    /// Invokes <c>vstest.console</c> to discover tests in a test assembly. "/listTests" is appended to the arguments.
+    /// </summary>
+    /// <param name="testAssembly">A test assembly.</param>
+    /// <param name="testAdapterPath">Path to test adapters.</param>
+    /// <param name="runSettings">Run settings for execution.</param>
+    public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "")
+    {
+        var resultsDir = GetResultsDirectory();
+        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, _testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
+        arguments = string.Concat(arguments, " /listtests");
+        InvokeVsTest(arguments);
+        TryRemoveDirectory(resultsDir);
+    }
+
+    /// <summary>
+    /// Execute Tests that are not supported with given Runner framework.
+    /// </summary>
+    /// <param name="runnerFramework">Runner Framework</param>
+    /// <param name="framework">Framework for which Tests are not supported</param>
+    /// <param name="message">Message to be shown</param>
+    public void ExecuteNotSupportedRunnerFrameworkTests(string runnerFramework, string framework, string message)
+    {
+        if (runnerFramework.StartsWith(framework))
+        {
+            Assert.Inconclusive(message);
+        }
+    }
+
+    /// <summary>
+    /// Validate if the overall test count and results are matching.
+    /// </summary>
+    /// <param name="passedTestsCount">Passed test count</param>
+    /// <param name="failedTestsCount">Failed test count</param>
+    /// <param name="skippedTestsCount">Skipped test count</param>
+    public void ValidateSummaryStatus(int passedTestsCount, int failedTestsCount, int skippedTestsCount)
+    {
+        var totalTestCount = passedTestsCount + failedTestsCount + skippedTestsCount;
+        if (totalTestCount == 0)
+        {
+            // No test should be found/run
+            var summaryStatus = string.Format(
+                TestSummaryStatusMessageFormat,
+                @"\d+",
+                @"\d+",
+                @"\d+",
+                @"\d+");
+            StringAssert.DoesNotMatch(
+                _standardTestOutput,
+                new Regex(summaryStatus),
+                "Excepted: There should not be test summary{2}Actual: {0}{2}Standard Error: {1}{2}Arguments: {3}{2}",
+                _standardTestOutput,
+                _standardTestError,
+                Environment.NewLine,
+                _arguments);
+        }
+        else
+        {
+            var summaryStatus = string.Format(TotalTestsMessage, totalTestCount);
+            if (passedTestsCount != 0)
             {
-                Environment.SetEnvironmentVariable(env, vstestConsolePath);
-                if (arguments.Contains(".csproj"))
-                {
-                    arguments = $@"-p:VsTestConsolePath=""{vstestConsolePath}"" " + arguments;
-                }
-
-                ExecutePatchedDotnet("test", arguments, out standardTestOutput, out standardTestError, out runnerExitCode);
-                FormatStandardOutCome();
-            }
-            finally
-            {
-                Environment.SetEnvironmentVariable(env, originalVstestConsolePath);
-            }
-        }
-
-        /// <summary>
-        /// Invokes <c>vstest.console</c> to execute tests in a test assembly.
-        /// </summary>
-        /// <param name="testAssembly">A test assembly.</param>
-        /// <param name="testAdapterPath">Path to test adapters.</param>
-        /// <param name="framework">Dotnet Framework of test assembly.</param>
-        /// <param name="runSettings">Run settings for execution.</param>
-        public void InvokeVsTestForExecution(string testAssembly,
-            string testAdapterPath,
-            string framework,
-            string runSettings = "")
-        {
-            var resultsDir = GetResultsDirectory();
-
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
-            InvokeVsTest(arguments);
-            TryRemoveDirectory(resultsDir);
-        }
-
-        /// <summary>
-        /// Invokes <c>vstest.console</c> to discover tests in a test assembly. "/listTests" is appended to the arguments.
-        /// </summary>
-        /// <param name="testAssembly">A test assembly.</param>
-        /// <param name="testAdapterPath">Path to test adapters.</param>
-        /// <param name="runSettings">Run settings for execution.</param>
-        public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "")
-        {
-            var resultsDir = GetResultsDirectory();
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
-            arguments = string.Concat(arguments, " /listtests");
-            InvokeVsTest(arguments);
-            TryRemoveDirectory(resultsDir);
-        }
-
-        /// <summary>
-        /// Execute Tests that are not supported with given Runner framework.
-        /// </summary>
-        /// <param name="runnerFramework">Runner Framework</param>
-        /// <param name="framework">Framework for which Tests are not supported</param>
-        /// <param name="message">Message to be shown</param>
-        public void ExecuteNotSupportedRunnerFrameworkTests(string runnerFramework, string framework, string message)
-        {
-            if (runnerFramework.StartsWith(framework))
-            {
-                Assert.Inconclusive(message);
-            }
-        }
-
-        /// <summary>
-        /// Validate if the overall test count and results are matching.
-        /// </summary>
-        /// <param name="passedTestsCount">Passed test count</param>
-        /// <param name="failedTestsCount">Failed test count</param>
-        /// <param name="skippedTestsCount">Skipped test count</param>
-        public void ValidateSummaryStatus(int passedTestsCount, int failedTestsCount, int skippedTestsCount)
-        {
-            var totalTestCount = passedTestsCount + failedTestsCount + skippedTestsCount;
-            if (totalTestCount == 0)
-            {
-                // No test should be found/run
-                var summaryStatus = string.Format(
-                    TestSummaryStatusMessageFormat,
-                    @"\d+",
-                    @"\d+",
-                    @"\d+",
-                    @"\d+");
-                StringAssert.DoesNotMatch(
-                    standardTestOutput,
-                    new Regex(summaryStatus),
-                    "Excepted: There should not be test summary{2}Actual: {0}{2}Standard Error: {1}{2}Arguments: {3}{2}",
-                    standardTestOutput,
-                    standardTestError,
-                    Environment.NewLine,
-                    arguments);
-            }
-            else
-            {
-                var summaryStatus = string.Format(TotalTestsMessage, totalTestCount);
-                if (passedTestsCount != 0)
-                {
-                    summaryStatus += string.Format(PassedTestsMessage, passedTestsCount);
-                }
-
-                if (failedTestsCount != 0)
-                {
-                    summaryStatus += string.Format(FailedTestsMessage, failedTestsCount);
-                }
-
-                if (skippedTestsCount != 0)
-                {
-                    summaryStatus += string.Format(SkippedTestsMessage, skippedTestsCount);
-                }
-
-                Assert.IsTrue(
-                    standardTestOutput.Contains(summaryStatus),
-                    "The Test summary does not match.{3}Expected summary: {1}{3}Test Output: {0}{3}Standard Error: {2}{3}Arguments: {4}{3}",
-                    standardTestOutput,
-                    summaryStatus,
-                    standardTestError,
-                    Environment.NewLine,
-                    arguments);
-            }
-        }
-
-        public void StdErrorContains(string substring)
-        {
-            Assert.IsTrue(standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", standardTestError, substring);
-        }
-
-        public void StdErrorDoesNotContains(string substring)
-        {
-            Assert.IsFalse(standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", standardTestError, substring);
-        }
-
-        public void StdOutputContains(string substring)
-        {
-            Assert.IsTrue(standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Expected substring: {substring}{Environment.NewLine}Actual string: {standardTestOutput}");
-        }
-
-        public void StdOutputDoesNotContains(string substring)
-        {
-            Assert.IsFalse(standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Not expected substring: {substring}{Environment.NewLine}Actual string: {standardTestOutput}");
-        }
-
-        public void ExitCodeEquals(int exitCode)
-        {
-            Assert.AreEqual(exitCode, runnerExitCode, $"ExitCode - [{runnerExitCode}] doesn't match expected '{exitCode}'.");
-        }
-
-        /// <summary>
-        /// Validates if the test results have the specified set of passed tests.
-        /// </summary>
-        /// <param name="passedTests">Set of passed tests.</param>
-        /// <remarks>Provide the full test name similar to this format SampleTest.TestCode.TestMethodPass.</remarks>
-        public void ValidatePassedTests(params string[] passedTests)
-        {
-            // Convert the unicode character to its unicode value for assertion
-            standardTestOutput = Regex.Replace(standardTestOutput, @"[^\x00-\x7F]", c => string.Format(@"\u{0:x4}", (int)c.Value[0]));
-            foreach (var test in passedTests)
-            {
-                // Check for tick or ? both, in some cases as unicode character for tick is not available
-                // in std out and gets replaced by ?
-                var flag = standardTestOutput.Contains("Passed " + test)
-                           || standardTestOutput.Contains("Passed " + GetTestMethodName(test))
-                           || standardTestOutput.Contains("\\ufffd " + test)
-                           || standardTestOutput.Contains("\\ufffd " + GetTestMethodName(test));
-                Assert.IsTrue(flag, "Test {0} does not appear in passed tests list.", test);
-            }
-        }
-
-        /// <summary>
-        /// Validates if the test results have the specified set of failed tests.
-        /// </summary>
-        /// <param name="failedTests">Set of failed tests.</param>
-        /// <remarks>
-        /// Provide the full test name similar to this format SampleTest.TestCode.TestMethodFailed.
-        /// Also validates whether these tests have stack trace info.
-        /// </remarks>
-        public void ValidateFailedTests(params string[] failedTests)
-        {
-            foreach (var test in failedTests)
-            {
-                var flag = standardTestOutput.Contains("Failed " + test)
-                           || standardTestOutput.Contains("Failed " + GetTestMethodName(test));
-                Assert.IsTrue(flag, "Test {0} does not appear in failed tests list.", test);
-
-                // Verify stack information as well.
-                Assert.IsTrue(standardTestOutput.Contains(GetTestMethodName(test)), "No stack trace for failed test: {0}", test);
-            }
-        }
-
-        /// <summary>
-        /// Validates if the test results have the specified set of skipped tests.
-        /// </summary>
-        /// <param name="skippedTests">The set of skipped tests.</param>
-        /// <remarks>Provide the full test name similar to this format SampleTest.TestCode.TestMethodSkipped.</remarks>
-        public void ValidateSkippedTests(params string[] skippedTests)
-        {
-            foreach (var test in skippedTests)
-            {
-                var flag = standardTestOutput.Contains("Skipped " + test)
-                           || standardTestOutput.Contains("Skipped " + GetTestMethodName(test));
-                Assert.IsTrue(flag, "Test {0} does not appear in skipped tests list.", test);
-            }
-        }
-
-        /// <summary>
-        /// Validate if the discovered tests list contains provided tests.
-        /// </summary>
-        /// <param name="discoveredTestsList">List of tests expected to be discovered.</param>
-        public void ValidateDiscoveredTests(params string[] discoveredTestsList)
-        {
-            foreach (var test in discoveredTestsList)
-            {
-                var flag = standardTestOutput.Contains(test)
-                           || standardTestOutput.Contains(GetTestMethodName(test));
-                Assert.IsTrue(flag, $"Test {test} does not appear in discovered tests list." +
-                                    $"{Environment.NewLine}Std Output: {standardTestOutput}" +
-                                    $"{Environment.NewLine}Std Error: { standardTestError}");
-            }
-        }
-
-        /// <summary>
-        /// Validate that the discovered tests list doesn't contain specified tests.
-        /// </summary>
-        /// <param name="testsList">List of tests expected not to be discovered.</param>
-        public void ValidateTestsNotDiscovered(params string[] testsList)
-        {
-            foreach (var test in testsList)
-            {
-                var flag = standardTestOutput.Contains(test)
-                           || standardTestOutput.Contains(GetTestMethodName(test));
-                Assert.IsFalse(flag, $"Test {test} should not appear in discovered tests list." +
-                                    $"{Environment.NewLine}Std Output: {standardTestOutput}" +
-                                    $"{Environment.NewLine}Std Error: { standardTestError}");
-            }
-        }
-
-        public void ValidateFullyQualifiedDiscoveredTests(string filePath, params string[] discoveredTestsList)
-        {
-            var fileOutput = File.ReadAllLines(filePath);
-            Assert.IsTrue(fileOutput.Length == 3);
-
-            foreach (var test in discoveredTestsList)
-            {
-                var flag = fileOutput.Contains(test)
-                           || fileOutput.Contains(GetTestMethodName(test));
-                Assert.IsTrue(flag, $"Test {test} does not appear in discovered tests list." +
-                                    $"{Environment.NewLine}Std Output: {standardTestOutput}" +
-                                    $"{Environment.NewLine}Std Error: { standardTestError}");
-            }
-        }
-
-        protected string GetSampleTestAssembly()
-        {
-            return GetAssetFullPath("SimpleTestProject.dll");
-        }
-
-        protected string GetAssetFullPath(string assetName)
-        {
-            return testEnvironment.GetTestAsset(assetName);
-        }
-
-        protected string GetAssetFullPath(string assetName, string targetFramework)
-        {
-            return testEnvironment.GetTestAsset(assetName, targetFramework);
-        }
-
-        protected string GetProjectFullPath(string projectName)
-        {
-            return testEnvironment.GetTestProject(projectName);
-        }
-
-        protected string GetProjectAssetFullPath(string projectName, string assetName)
-        {
-            var projectPath = testEnvironment.GetTestProject(projectName);
-            return Path.Combine(Path.GetDirectoryName(projectPath), assetName);
-        }
-
-        protected string GetTestAdapterPath(UnitTestFramework testFramework = UnitTestFramework.MSTest)
-        {
-            string adapterRelativePath = string.Empty;
-
-            if (testFramework == UnitTestFramework.MSTest)
-            {
-                adapterRelativePath = string.Format(TestAdapterRelativePath, testEnvironment.DependencyVersions["MSTestAdapterVersion"]);
-            }
-            else if (testFramework == UnitTestFramework.NUnit)
-            {
-                adapterRelativePath = string.Format(NUnitTestAdapterRelativePath, testEnvironment.DependencyVersions["NUnit3AdapterVersion"]);
-            }
-            else if (testFramework == UnitTestFramework.XUnit)
-            {
-                adapterRelativePath = string.Format(XUnitTestAdapterRelativePath, testEnvironment.DependencyVersions["XUnitAdapterVersion"]);
-            }
-            else if (testFramework == UnitTestFramework.Chutzpah)
-            {
-                adapterRelativePath = string.Format(ChutzpahTestAdapterRelativePath, testEnvironment.DependencyVersions["ChutzpahAdapterVersion"]);
+                summaryStatus += string.Format(PassedTestsMessage, passedTestsCount);
             }
 
-            return testEnvironment.GetNugetPackage(adapterRelativePath);
-        }
-
-        protected bool IsDesktopRunner()
-        {
-            return testEnvironment.RunnerFramework == DesktopRunnerFramework;
-        }
-
-        protected bool IsNetCoreRunner()
-        {
-            return testEnvironment.RunnerFramework == CoreRunnerFramework;
-        }
-
-        /// <summary>
-        /// Gets the path to <c>vstest.console.exe</c>.
-        /// </summary>
-        /// <returns>
-        /// Full path to test runner
-        /// </returns>
-        public virtual string GetConsoleRunnerPath()
-        {
-            string consoleRunnerPath = string.Empty;
-
-            if (IsDesktopRunner())
+            if (failedTestsCount != 0)
             {
-                consoleRunnerPath = Path.Combine(testEnvironment.PublishDirectory, "vstest.console.exe");
-            }
-            else if (IsNetCoreRunner())
-            {
-                var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
-                consoleRunnerPath = Path.Combine(testEnvironment.ToolsDirectory, executablePath);
-            }
-            else
-            {
-                Assert.Fail("Unknown Runner framework - [{0}]", testEnvironment.RunnerFramework);
+                summaryStatus += string.Format(FailedTestsMessage, failedTestsCount);
             }
 
-            Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
-            return consoleRunnerPath;
-        }
-
-        protected virtual string SetVSTestConsoleDLLPathInArgs(string args)
-        {
-            var vstestConsoleDll = Path.Combine(testEnvironment.PublishDirectory, "vstest.console.dll");
-            vstestConsoleDll = vstestConsoleDll.AddDoubleQuote();
-            args = string.Concat(
-                vstestConsoleDll,
-                " ",
-                args);
-            return args;
-        }
-
-        /// <summary>
-        /// Returns the VsTestConsole Wrapper.
-        /// </summary>
-        /// <returns></returns>
-        public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
-        {
-            var logFileName = Path.GetFileName(Path.GetTempFileName());
-            var logFileDir = Path.Combine(Path.GetTempPath(), "VSTestConsoleWrapperLogs");
-
-            if (!Directory.Exists(logFileDir))
+            if (skippedTestsCount != 0)
             {
-                Directory.CreateDirectory(logFileDir);
+                summaryStatus += string.Format(SkippedTestsMessage, skippedTestsCount);
             }
 
-            var logFilePath = Path.Combine(logFileDir, logFileName);
+            Assert.IsTrue(
+                _standardTestOutput.Contains(summaryStatus),
+                "The Test summary does not match.{3}Expected summary: {1}{3}Test Output: {0}{3}Standard Error: {2}{3}Arguments: {4}{3}",
+                _standardTestOutput,
+                summaryStatus,
+                _standardTestError,
+                Environment.NewLine,
+                _arguments);
+        }
+    }
 
-            Console.WriteLine($"Logging diagnostics in {logFilePath}");
+    public void StdErrorContains(string substring)
+    {
+        Assert.IsTrue(_standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", _standardTestError, substring);
+    }
 
-            string consoleRunnerPath = IsNetCoreRunner() ? Path.Combine(testEnvironment.PublishDirectory, "vstest.console.dll") : GetConsoleRunnerPath();
+    public void StdErrorDoesNotContains(string substring)
+    {
+        Assert.IsFalse(_standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", _standardTestError, substring);
+    }
+
+    public void StdOutputContains(string substring)
+    {
+        Assert.IsTrue(_standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Expected substring: {substring}{Environment.NewLine}Actual string: {_standardTestOutput}");
+    }
+
+    public void StdOutputDoesNotContains(string substring)
+    {
+        Assert.IsFalse(_standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Not expected substring: {substring}{Environment.NewLine}Actual string: {_standardTestOutput}");
+    }
+
+    public void ExitCodeEquals(int exitCode)
+    {
+        Assert.AreEqual(exitCode, _runnerExitCode, $"ExitCode - [{_runnerExitCode}] doesn't match expected '{exitCode}'.");
+    }
+
+    /// <summary>
+    /// Validates if the test results have the specified set of passed tests.
+    /// </summary>
+    /// <param name="passedTests">Set of passed tests.</param>
+    /// <remarks>Provide the full test name similar to this format SampleTest.TestCode.TestMethodPass.</remarks>
+    public void ValidatePassedTests(params string[] passedTests)
+    {
+        // Convert the unicode character to its unicode value for assertion
+        _standardTestOutput = Regex.Replace(_standardTestOutput, @"[^\x00-\x7F]", c => string.Format(@"\u{0:x4}", (int)c.Value[0]));
+        foreach (var test in passedTests)
+        {
+            // Check for tick or ? both, in some cases as unicode character for tick is not available
+            // in std out and gets replaced by ?
+            var flag = _standardTestOutput.Contains("Passed " + test)
+                       || _standardTestOutput.Contains("Passed " + GetTestMethodName(test))
+                       || _standardTestOutput.Contains("\\ufffd " + test)
+                       || _standardTestOutput.Contains("\\ufffd " + GetTestMethodName(test));
+            Assert.IsTrue(flag, "Test {0} does not appear in passed tests list.", test);
+        }
+    }
+
+    /// <summary>
+    /// Validates if the test results have the specified set of failed tests.
+    /// </summary>
+    /// <param name="failedTests">Set of failed tests.</param>
+    /// <remarks>
+    /// Provide the full test name similar to this format SampleTest.TestCode.TestMethodFailed.
+    /// Also validates whether these tests have stack trace info.
+    /// </remarks>
+    public void ValidateFailedTests(params string[] failedTests)
+    {
+        foreach (var test in failedTests)
+        {
+            var flag = _standardTestOutput.Contains("Failed " + test)
+                       || _standardTestOutput.Contains("Failed " + GetTestMethodName(test));
+            Assert.IsTrue(flag, "Test {0} does not appear in failed tests list.", test);
+
+            // Verify stack information as well.
+            Assert.IsTrue(_standardTestOutput.Contains(GetTestMethodName(test)), "No stack trace for failed test: {0}", test);
+        }
+    }
+
+    /// <summary>
+    /// Validates if the test results have the specified set of skipped tests.
+    /// </summary>
+    /// <param name="skippedTests">The set of skipped tests.</param>
+    /// <remarks>Provide the full test name similar to this format SampleTest.TestCode.TestMethodSkipped.</remarks>
+    public void ValidateSkippedTests(params string[] skippedTests)
+    {
+        foreach (var test in skippedTests)
+        {
+            var flag = _standardTestOutput.Contains("Skipped " + test)
+                       || _standardTestOutput.Contains("Skipped " + GetTestMethodName(test));
+            Assert.IsTrue(flag, "Test {0} does not appear in skipped tests list.", test);
+        }
+    }
+
+    /// <summary>
+    /// Validate if the discovered tests list contains provided tests.
+    /// </summary>
+    /// <param name="discoveredTestsList">List of tests expected to be discovered.</param>
+    public void ValidateDiscoveredTests(params string[] discoveredTestsList)
+    {
+        foreach (var test in discoveredTestsList)
+        {
+            var flag = _standardTestOutput.Contains(test)
+                       || _standardTestOutput.Contains(GetTestMethodName(test));
+            Assert.IsTrue(flag, $"Test {test} does not appear in discovered tests list." +
+                                $"{Environment.NewLine}Std Output: {_standardTestOutput}" +
+                                $"{Environment.NewLine}Std Error: { _standardTestError}");
+        }
+    }
+
+    /// <summary>
+    /// Validate that the discovered tests list doesn't contain specified tests.
+    /// </summary>
+    /// <param name="testsList">List of tests expected not to be discovered.</param>
+    public void ValidateTestsNotDiscovered(params string[] testsList)
+    {
+        foreach (var test in testsList)
+        {
+            var flag = _standardTestOutput.Contains(test)
+                       || _standardTestOutput.Contains(GetTestMethodName(test));
+            Assert.IsFalse(flag, $"Test {test} should not appear in discovered tests list." +
+                                 $"{Environment.NewLine}Std Output: {_standardTestOutput}" +
+                                 $"{Environment.NewLine}Std Error: { _standardTestError}");
+        }
+    }
+
+    public void ValidateFullyQualifiedDiscoveredTests(string filePath, params string[] discoveredTestsList)
+    {
+        var fileOutput = File.ReadAllLines(filePath);
+        Assert.IsTrue(fileOutput.Length == 3);
+
+        foreach (var test in discoveredTestsList)
+        {
+            var flag = fileOutput.Contains(test)
+                       || fileOutput.Contains(GetTestMethodName(test));
+            Assert.IsTrue(flag, $"Test {test} does not appear in discovered tests list." +
+                                $"{Environment.NewLine}Std Output: {_standardTestOutput}" +
+                                $"{Environment.NewLine}Std Error: { _standardTestError}");
+        }
+    }
+
+    protected string GetSampleTestAssembly()
+    {
+        return GetAssetFullPath("SimpleTestProject.dll");
+    }
+
+    protected string GetAssetFullPath(string assetName)
+    {
+        return _testEnvironment.GetTestAsset(assetName);
+    }
+
+    protected string GetAssetFullPath(string assetName, string targetFramework)
+    {
+        return _testEnvironment.GetTestAsset(assetName, targetFramework);
+    }
+
+    protected string GetProjectFullPath(string projectName)
+    {
+        return _testEnvironment.GetTestProject(projectName);
+    }
+
+    protected string GetProjectAssetFullPath(string projectName, string assetName)
+    {
+        var projectPath = _testEnvironment.GetTestProject(projectName);
+        return Path.Combine(Path.GetDirectoryName(projectPath), assetName);
+    }
+
+    protected string GetTestAdapterPath(UnitTestFramework testFramework = UnitTestFramework.MsTest)
+    {
+        string adapterRelativePath = string.Empty;
+
+        if (testFramework == UnitTestFramework.MsTest)
+        {
+            adapterRelativePath = string.Format(_testAdapterRelativePath, _testEnvironment.DependencyVersions["MSTestAdapterVersion"]);
+        }
+        else if (testFramework == UnitTestFramework.NUnit)
+        {
+            adapterRelativePath = string.Format(_nUnitTestAdapterRelativePath, _testEnvironment.DependencyVersions["NUnit3AdapterVersion"]);
+        }
+        else if (testFramework == UnitTestFramework.XUnit)
+        {
+            adapterRelativePath = string.Format(_xUnitTestAdapterRelativePath, _testEnvironment.DependencyVersions["XUnitAdapterVersion"]);
+        }
+        else if (testFramework == UnitTestFramework.Chutzpah)
+        {
+            adapterRelativePath = string.Format(_chutzpahTestAdapterRelativePath, _testEnvironment.DependencyVersions["ChutzpahAdapterVersion"]);
+        }
+
+        return _testEnvironment.GetNugetPackage(adapterRelativePath);
+    }
+
+    protected bool IsDesktopRunner()
+    {
+        return _testEnvironment.RunnerFramework == DesktopRunnerFramework;
+    }
+
+    protected bool IsNetCoreRunner()
+    {
+        return _testEnvironment.RunnerFramework == CoreRunnerFramework;
+    }
+
+    /// <summary>
+    /// Gets the path to <c>vstest.console.exe</c>.
+    /// </summary>
+    /// <returns>
+    /// Full path to test runner
+    /// </returns>
+    public virtual string GetConsoleRunnerPath()
+    {
+        string consoleRunnerPath = string.Empty;
+
+        if (IsDesktopRunner())
+        {
+            consoleRunnerPath = Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.exe");
+        }
+        else if (IsNetCoreRunner())
+        {
             var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
-            var dotnetPath = Path.Combine(testEnvironment.ToolsDirectory, executablePath);
-
-            if (!File.Exists(dotnetPath))
-            {
-                throw new FileNotFoundException($"File '{dotnetPath}' was not found.");
-            }
-
-            var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath });
-            vstestConsoleWrapper.StartSession();
-
-            return vstestConsoleWrapper;
+            consoleRunnerPath = Path.Combine(_testEnvironment.ToolsDirectory, executablePath);
+        }
+        else
+        {
+            Assert.Fail("Unknown Runner framework - [{0}]", _testEnvironment.RunnerFramework);
         }
 
-        /// <summary>
-        /// Gets the test method name from full name.
-        /// </summary>
-        /// <param name="testFullName">Fully qualified name of the test.</param>
-        /// <returns>Simple name of the test.</returns>
-        private static string GetTestMethodName(string testFullName)
+        Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
+        return consoleRunnerPath;
+    }
+
+    protected virtual string SetVsTestConsoleDllPathInArgs(string args)
+    {
+        var vstestConsoleDll = Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll");
+        vstestConsoleDll = vstestConsoleDll.AddDoubleQuote();
+        args = string.Concat(
+            vstestConsoleDll,
+            " ",
+            args);
+        return args;
+    }
+
+    /// <summary>
+    /// Returns the VsTestConsole Wrapper.
+    /// </summary>
+    /// <returns></returns>
+    public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
+    {
+        var logFileName = Path.GetFileName(Path.GetTempFileName());
+        var logFileDir = Path.Combine(Path.GetTempPath(), "VSTestConsoleWrapperLogs");
+
+        if (!Directory.Exists(logFileDir))
         {
-            string testMethodName = string.Empty;
-
-            var splits = testFullName.Split('.');
-            if (splits.Length >= 3)
-            {
-                testMethodName = testFullName.Split('.')[2];
-            }
-
-            return testMethodName;
+            Directory.CreateDirectory(logFileDir);
         }
 
-        private void ExecuteVsTestConsole(string args, out string stdOut, out string stdError, out int exitCode)
+        var logFilePath = Path.Combine(logFileDir, logFileName);
+
+        Console.WriteLine($"Logging diagnostics in {logFilePath}");
+
+        string consoleRunnerPath = IsNetCoreRunner() ? Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll") : GetConsoleRunnerPath();
+        var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
+        var dotnetPath = Path.Combine(_testEnvironment.ToolsDirectory, executablePath);
+
+        if (!File.Exists(dotnetPath))
         {
-            if (IsNetCoreRunner())
-            {
-                args = SetVSTestConsoleDLLPathInArgs(args);
-            }
-
-            arguments = args;
-
-            ExecuteApplication(GetConsoleRunnerPath(), args, out stdOut, out stdError, out exitCode);
+            throw new FileNotFoundException($"File '{dotnetPath}' was not found.");
         }
 
-        /// <summary>
-        /// Executes a local copy of dotnet that has VSTest task installed and possibly other modifications. Do not use this to
-        /// do your builds or to run general tests, unless you want your changes to be reflected.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="args"></param>
-        /// <param name="stdOut"></param>
-        /// <param name="stdError"></param>
-        /// <param name="exitCode"></param>
-        private void ExecutePatchedDotnet(string command, string args, out string stdOut, out string stdError, out int exitCode)
-        {
-            var environmentVariables = new Dictionary<string, string>
-            {
-                ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
-            };
+        var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath });
+        vstestConsoleWrapper.StartSession();
 
-            var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
-            var patchedDotnetPath = Path.Combine(testEnvironment.TestArtifactsDirectory, executablePath);
-            ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
+        return vstestConsoleWrapper;
+    }
+
+    /// <summary>
+    /// Gets the test method name from full name.
+    /// </summary>
+    /// <param name="testFullName">Fully qualified name of the test.</param>
+    /// <returns>Simple name of the test.</returns>
+    private static string GetTestMethodName(string testFullName)
+    {
+        string testMethodName = string.Empty;
+
+        var splits = testFullName.Split('.');
+        if (splits.Length >= 3)
+        {
+            testMethodName = testFullName.Split('.')[2];
         }
 
-        protected void ExecuteApplication(string path, string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null, string workingDirectory = null)
+        return testMethodName;
+    }
+
+    private void ExecuteVsTestConsole(string args, out string stdOut, out string stdError, out int exitCode)
+    {
+        if (IsNetCoreRunner())
         {
-            if (string.IsNullOrWhiteSpace(path))
+            args = SetVsTestConsoleDllPathInArgs(args);
+        }
+
+        _arguments = args;
+
+        ExecuteApplication(GetConsoleRunnerPath(), args, out stdOut, out stdError, out exitCode);
+    }
+
+    /// <summary>
+    /// Executes a local copy of dotnet that has VSTest task installed and possibly other modifications. Do not use this to
+    /// do your builds or to run general tests, unless you want your changes to be reflected.
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="args"></param>
+    /// <param name="stdOut"></param>
+    /// <param name="stdError"></param>
+    /// <param name="exitCode"></param>
+    private void ExecutePatchedDotnet(string command, string args, out string stdOut, out string stdError, out int exitCode)
+    {
+        var environmentVariables = new Dictionary<string, string>
+        {
+            ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
+        };
+
+        var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
+        var patchedDotnetPath = Path.Combine(_testEnvironment.TestArtifactsDirectory, executablePath);
+        ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
+    }
+
+    protected void ExecuteApplication(string path, string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null, string workingDirectory = null)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            throw new ArgumentException("Executable path must not be null or whitespace.", nameof(path));
+        }
+
+        var executableName = Path.GetFileName(path);
+
+        using Process process = new();
+        Console.WriteLine($"IntegrationTestBase.Execute: Starting {executableName}");
+        process.StartInfo.FileName = path;
+        process.StartInfo.Arguments = args;
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.RedirectStandardError = true;
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.CreateNoWindow = true;
+        process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+        process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
+
+        if (workingDirectory != null)
+        {
+            process.StartInfo.WorkingDirectory = workingDirectory;
+        }
+
+        if (environmentVariables != null)
+        {
+            foreach (var variable in environmentVariables)
             {
-                throw new ArgumentException("Executable path must not be null or whitespace.", nameof(path));
-            }
-
-            var executableName = Path.GetFileName(path);
-
-            using Process process = new();
-            Console.WriteLine($"IntegrationTestBase.Execute: Starting {executableName}");
-            process.StartInfo.FileName = path;
-            process.StartInfo.Arguments = args;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
-            process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
-
-            if (workingDirectory != null)
-            {
-                process.StartInfo.WorkingDirectory = workingDirectory;
-            }
-
-            if (environmentVariables != null)
-            {
-                foreach (var variable in environmentVariables)
+                if (process.StartInfo.EnvironmentVariables.ContainsKey(variable.Key))
                 {
-                    if (process.StartInfo.EnvironmentVariables.ContainsKey(variable.Key))
-                    {
-                        process.StartInfo.EnvironmentVariables[variable.Key] = variable.Value;
-                    }
-                    else
-                    {
-                        process.StartInfo.EnvironmentVariables.Add(variable.Key, variable.Value);
-                    }
+                    process.StartInfo.EnvironmentVariables[variable.Key] = variable.Value;
+                }
+                else
+                {
+                    process.StartInfo.EnvironmentVariables.Add(variable.Key, variable.Value);
                 }
             }
-
-            var stdoutBuffer = new StringBuilder();
-            var stderrBuffer = new StringBuilder();
-            process.OutputDataReceived += (sender, eventArgs) => stdoutBuffer.AppendLine(eventArgs.Data);
-
-            process.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.AppendLine(eventArgs.Data);
-
-            Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", process.StartInfo.FileName);
-            Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", process.StartInfo.Arguments);
-
-            Stopwatch stopwatch = new();
-            stopwatch.Start();
-
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-            if (!process.WaitForExit(5 * 60 * 1000)) // 5 minutes
-            {
-                Console.WriteLine($"IntegrationTestBase.Execute: Timed out waiting for {executableName}. Terminating the process.");
-                process.Kill();
-            }
-            else
-            {
-                // Ensure async buffers are flushed
-                process.WaitForExit();
-            }
-
-            stopwatch.Stop();
-
-            Console.WriteLine($"IntegrationTestBase.Execute: Total execution time: {stopwatch.Elapsed.Duration()}");
-
-            stdError = stderrBuffer.ToString();
-            stdOut = stdoutBuffer.ToString();
-            exitCode = process.ExitCode;
-
-            Console.WriteLine("IntegrationTestBase.Execute: stdError = {0}", stdError);
-            Console.WriteLine("IntegrationTestBase.Execute: stdOut = {0}", stdOut);
-            Console.WriteLine($"IntegrationTestBase.Execute: Stopped {executableName}. Exit code = {0}", exitCode);
         }
 
-        private void FormatStandardOutCome()
-        {
-            StdErrWithWhiteSpace = standardTestError;
-            standardTestError = Regex.Replace(standardTestError, @"\s+", " ");
+        var stdoutBuffer = new StringBuilder();
+        var stderrBuffer = new StringBuilder();
+        process.OutputDataReceived += (sender, eventArgs) => stdoutBuffer.AppendLine(eventArgs.Data);
 
-            StdOutWithWhiteSpace = standardTestOutput;
-            standardTestOutput = Regex.Replace(standardTestOutput, @"\s+", " ");
+        process.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.AppendLine(eventArgs.Data);
+
+        Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", process.StartInfo.FileName);
+        Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", process.StartInfo.Arguments);
+
+        Stopwatch stopwatch = new();
+        stopwatch.Start();
+
+        process.Start();
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+        if (!process.WaitForExit(5 * 60 * 1000)) // 5 minutes
+        {
+            Console.WriteLine($"IntegrationTestBase.Execute: Timed out waiting for {executableName}. Terminating the process.");
+            process.Kill();
+        }
+        else
+        {
+            // Ensure async buffers are flushed
+            process.WaitForExit();
         }
 
-        /// <summary>
-        /// Create runsettings file from runConfigurationDictionary at destinationRunsettingsPath
-        /// </summary>
-        /// <param name="destinationRunsettingsPath">
-        /// Destination runsettings path where resulted file saves
-        /// </param>
-        /// <param name="runConfigurationDictionary">
-        /// Contains run configuration settings
-        /// </param>
-        public static void CreateRunSettingsFile(string destinationRunsettingsPath, IDictionary<string, string> runConfigurationDictionary)
+        stopwatch.Stop();
+
+        Console.WriteLine($"IntegrationTestBase.Execute: Total execution time: {stopwatch.Elapsed.Duration()}");
+
+        stdError = stderrBuffer.ToString();
+        stdOut = stdoutBuffer.ToString();
+        exitCode = process.ExitCode;
+
+        Console.WriteLine("IntegrationTestBase.Execute: stdError = {0}", stdError);
+        Console.WriteLine("IntegrationTestBase.Execute: stdOut = {0}", stdOut);
+        Console.WriteLine($"IntegrationTestBase.Execute: Stopped {executableName}. Exit code = {0}", exitCode);
+    }
+
+    private void FormatStandardOutCome()
+    {
+        StdErrWithWhiteSpace = _standardTestError;
+        _standardTestError = Regex.Replace(_standardTestError, @"\s+", " ");
+
+        StdOutWithWhiteSpace = _standardTestOutput;
+        _standardTestOutput = Regex.Replace(_standardTestOutput, @"\s+", " ");
+    }
+
+    /// <summary>
+    /// Create runsettings file from runConfigurationDictionary at destinationRunsettingsPath
+    /// </summary>
+    /// <param name="destinationRunsettingsPath">
+    /// Destination runsettings path where resulted file saves
+    /// </param>
+    /// <param name="runConfigurationDictionary">
+    /// Contains run configuration settings
+    /// </param>
+    public static void CreateRunSettingsFile(string destinationRunsettingsPath, IDictionary<string, string> runConfigurationDictionary)
+    {
+        var doc = new XmlDocument();
+        var xmlDeclaration = doc.CreateNode(XmlNodeType.XmlDeclaration, string.Empty, string.Empty);
+
+        doc.AppendChild(xmlDeclaration);
+        var runSettingsNode = doc.CreateElement(Constants.RunSettingsName);
+        doc.AppendChild(runSettingsNode);
+        var runConfigNode = doc.CreateElement(Constants.RunConfigurationSettingsName);
+        runSettingsNode.AppendChild(runConfigNode);
+
+        foreach (var settingsEntry in runConfigurationDictionary)
         {
-            var doc = new XmlDocument();
-            var xmlDeclaration = doc.CreateNode(XmlNodeType.XmlDeclaration, string.Empty, string.Empty);
-
-            doc.AppendChild(xmlDeclaration);
-            var runSettingsNode = doc.CreateElement(Constants.RunSettingsName);
-            doc.AppendChild(runSettingsNode);
-            var runConfigNode = doc.CreateElement(Constants.RunConfigurationSettingsName);
-            runSettingsNode.AppendChild(runConfigNode);
-
-            foreach (var settingsEntry in runConfigurationDictionary)
-            {
-                var childNode = doc.CreateElement(settingsEntry.Key);
-                childNode.InnerText = settingsEntry.Value;
-                runConfigNode.AppendChild(childNode);
-            }
-
-            Stream stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create);
-            doc.Save(stream);
-            stream.Dispose();
+            var childNode = doc.CreateElement(settingsEntry.Key);
+            childNode.InnerText = settingsEntry.Value;
+            runConfigNode.AppendChild(childNode);
         }
 
-        /// <summary>
-        /// Create runsettings file at destinationRunsettingsPath with the content from xmlString
-        /// </summary>
-        /// <param name="destinationRunsettingsPath">
-        /// Destination runsettings path where resulted file is saved
-        /// </param>
-        /// <param name="runSettingsXml">
-        /// Run settings xml string
-        /// </param>
-        public static void CreateRunSettingsFile(string destinationRunsettingsPath, string runSettingsXml)
+        Stream stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create);
+        doc.Save(stream);
+        stream.Dispose();
+    }
+
+    /// <summary>
+    /// Create runsettings file at destinationRunsettingsPath with the content from xmlString
+    /// </summary>
+    /// <param name="destinationRunsettingsPath">
+    /// Destination runsettings path where resulted file is saved
+    /// </param>
+    /// <param name="runSettingsXml">
+    /// Run settings xml string
+    /// </param>
+    public static void CreateRunSettingsFile(string destinationRunsettingsPath, string runSettingsXml)
+    {
+        var doc = new XmlDocument();
+        doc.LoadXml(runSettingsXml);
+        var stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create);
+        doc.Save(stream);
+        stream.Dispose();
+    }
+
+    protected string BuildMultipleAssemblyPath(params string[] assetNames)
+    {
+        var assertFullPaths = new string[assetNames.Length];
+        for (var i = 0; i < assetNames.Length; i++)
         {
-            var doc = new XmlDocument();
-            doc.LoadXml(runSettingsXml);
-            var stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create);
-            doc.Save(stream);
-            stream.Dispose();
+            assertFullPaths[i] = GetAssetFullPath(assetNames[i]).AddDoubleQuote();
         }
 
-        protected string BuildMultipleAssemblyPath(params string[] assetNames)
-        {
-            var assertFullPaths = new string[assetNames.Length];
-            for (var i = 0; i < assetNames.Length; i++)
-            {
-                assertFullPaths[i] = GetAssetFullPath(assetNames[i]).AddDoubleQuote();
-            }
+        return string.Join(" ", assertFullPaths);
+    }
 
-            return string.Join(" ", assertFullPaths);
+    /// <summary>
+    /// Creates an unique temporary directory for storing test results.
+    /// </summary>
+    /// <returns>
+    /// Path of the created directory.
+    /// </returns>
+    protected static string GetResultsDirectory()
+    {
+        // AGENT_TEMPDIRECTORY is AzureDevops variable, which is set to path 
+        // that is cleaned up after every job. This is preferable to use over 
+        // just the normal temp. 
+        var temp = GetTempPath();
+        var directoryPath = Path.Combine(temp, Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directoryPath);
+
+        return directoryPath;
+    }
+
+    protected static string GetTempPath() => Environment.GetEnvironmentVariable("AGENT_TEMPDIRECTORY") ?? Path.GetTempPath();
+
+    protected static string GetDownloadedDotnetMuxerFromTools(string architecture)
+    {
+        if (architecture != "X86" && architecture != "X64")
+        {
+            throw new NotSupportedException(nameof(architecture));
         }
 
-        /// <summary>
-        /// Creates an unique temporary directory for storing test results.
-        /// </summary>
-        /// <returns>
-        /// Path of the created directory.
-        /// </returns>
-        protected static string GetResultsDirectory()
-        {
-            // AGENT_TEMPDIRECTORY is AzureDevops variable, which is set to path 
-            // that is cleaned up after every job. This is preferable to use over 
-            // just the normal temp. 
-            var temp = GetTempPath();
-            var directoryPath = Path.Combine(temp, Guid.NewGuid().ToString("n"));
-            Directory.CreateDirectory(directoryPath);
-
-            return directoryPath;
-        }
-
-        protected static string GetTempPath() => Environment.GetEnvironmentVariable("AGENT_TEMPDIRECTORY") ?? Path.GetTempPath();
-
-        protected static string GetDownloadedDotnetMuxerFromTools(string architecture)
-        {
-            if (architecture != "X86" && architecture != "X64")
-            {
-                throw new NotSupportedException(nameof(architecture));
-            }
-
-            string path = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "tools",
-                architecture == "X86" ?
+        string path = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "tools",
+            architecture == "X86" ?
                 "dotnet_x86" :
                 $"dotnet",
-                $"dotnet{(IsWindows ? ".exe" : "")}");
+            $"dotnet{(IsWindows ? ".exe" : "")}");
 
-            Assert.IsTrue(File.Exists(path));
+        Assert.IsTrue(File.Exists(path));
 
-            return path;
-        }
+        return path;
+    }
 
-        protected static string GetDotnetRunnerPath() => Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
+    protected static string GetDotnetRunnerPath() => Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
 
-        protected static void TryRemoveDirectory(string directory)
+    protected static void TryRemoveDirectory(string directory)
+    {
+        if (Directory.Exists(directory))
         {
-            if (Directory.Exists(directory))
+            try
             {
-                try
-                {
-                    Directory.Delete(directory, true);
-                }
-                catch { }
+                Directory.Delete(directory, true);
             }
+            catch { }
         }
     }
 }

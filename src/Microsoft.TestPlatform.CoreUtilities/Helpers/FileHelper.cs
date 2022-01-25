@@ -5,7 +5,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
 {
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using Interfaces;
 
     using System;
     using System.Collections.Generic;

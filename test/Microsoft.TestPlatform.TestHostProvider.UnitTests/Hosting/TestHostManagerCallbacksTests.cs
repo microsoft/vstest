@@ -1,97 +1,97 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.TestHostProvider.Hosting.UnitTests
+namespace TestPlatform.TestHostProvider.Hosting.UnitTests;
+
+using System;
+using System.Text;
+
+using Microsoft.TestPlatform.TestHostProvider.Hosting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+[TestClass]
+public class TestHostManagerCallbacksTests
 {
-    using System;
-    using System.Text;
-    using Microsoft.TestPlatform.TestHostProvider.Hosting;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    private StringBuilder _testHostProcessStdError;
 
-    [TestClass]
-    public class TestHostManagerCallbacksTests
+    public TestHostManagerCallbacksTests()
     {
-        private StringBuilder testHostProcessStdError;
+        _testHostProcessStdError = new StringBuilder(0, Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants.StandardErrorMaxLength);
+    }
 
-        public TestHostManagerCallbacksTests()
-        {
-            testHostProcessStdError = new StringBuilder(0, Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants.StandardErrorMaxLength);
-        }
+    [TestMethod]
+    public void ErrorReceivedCallbackShouldAppendNoDataOnNullDataReceived()
+    {
+        _testHostProcessStdError.Append("NoDataShouldAppend");
+        TestHostManagerCallbacks.ErrorReceivedCallback(_testHostProcessStdError, null);
 
-        [TestMethod]
-        public void ErrorReceivedCallbackShouldAppendNoDataOnNullDataReceived()
-        {
-            testHostProcessStdError.Append("NoDataShouldAppend");
-            TestHostManagerCallbacks.ErrorReceivedCallback(testHostProcessStdError, null);
+        Assert.AreEqual("NoDataShouldAppend", _testHostProcessStdError.ToString());
+    }
 
-            Assert.AreEqual("NoDataShouldAppend", testHostProcessStdError.ToString());
-        }
+    [TestMethod]
+    public void ErrorReceivedCallbackShouldAppendNoDataOnEmptyDataReceived()
+    {
+        _testHostProcessStdError.Append("NoDataShouldAppend");
+        TestHostManagerCallbacks.ErrorReceivedCallback(_testHostProcessStdError, string.Empty);
 
-        [TestMethod]
-        public void ErrorReceivedCallbackShouldAppendNoDataOnEmptyDataReceived()
-        {
-            testHostProcessStdError.Append("NoDataShouldAppend");
-            TestHostManagerCallbacks.ErrorReceivedCallback(testHostProcessStdError, string.Empty);
+        Assert.AreEqual("NoDataShouldAppend", _testHostProcessStdError.ToString());
+    }
 
-            Assert.AreEqual("NoDataShouldAppend", testHostProcessStdError.ToString());
-        }
+    [TestMethod]
+    public void ErrorReceivedCallbackShouldAppendWhiteSpaceString()
+    {
+        _testHostProcessStdError.Append("OldData");
+        TestHostManagerCallbacks.ErrorReceivedCallback(_testHostProcessStdError, " ");
 
-        [TestMethod]
-        public void ErrorReceivedCallbackShouldAppendWhiteSpaceString()
-        {
-            testHostProcessStdError.Append("OldData");
-            TestHostManagerCallbacks.ErrorReceivedCallback(testHostProcessStdError, " ");
+        Assert.AreEqual("OldData " + Environment.NewLine, _testHostProcessStdError.ToString());
+    }
 
-            Assert.AreEqual("OldData " + Environment.NewLine, testHostProcessStdError.ToString());
-        }
+    [TestMethod]
+    public void ErrorReceivedCallbackShouldAppendGivenData()
+    {
+        _testHostProcessStdError.Append("NoDataShouldAppend");
+        TestHostManagerCallbacks.ErrorReceivedCallback(_testHostProcessStdError, "new data");
 
-        [TestMethod]
-        public void ErrorReceivedCallbackShouldAppendGivenData()
-        {
-            testHostProcessStdError.Append("NoDataShouldAppend");
-            TestHostManagerCallbacks.ErrorReceivedCallback(testHostProcessStdError, "new data");
+        Assert.AreEqual("NoDataShouldAppendnew data" + Environment.NewLine, _testHostProcessStdError.ToString());
+    }
 
-            Assert.AreEqual("NoDataShouldAppendnew data" + Environment.NewLine, testHostProcessStdError.ToString());
-        }
+    [TestMethod]
+    public void ErrorReceivedCallbackShouldNotAppendNewDataIfErrorMessageAlreadyReachedMaxLength()
+    {
+        _testHostProcessStdError = new StringBuilder(0, 5);
+        _testHostProcessStdError.Append("12345");
+        TestHostManagerCallbacks.ErrorReceivedCallback(_testHostProcessStdError, "678");
 
-        [TestMethod]
-        public void ErrorReceivedCallbackShouldNotAppendNewDataIfErrorMessageAlreadyReachedMaxLength()
-        {
-            testHostProcessStdError = new StringBuilder(0, 5);
-            testHostProcessStdError.Append("12345");
-            TestHostManagerCallbacks.ErrorReceivedCallback(testHostProcessStdError, "678");
+        Assert.AreEqual("12345", _testHostProcessStdError.ToString());
+    }
 
-            Assert.AreEqual("12345", testHostProcessStdError.ToString());
-        }
+    [TestMethod]
+    public void ErrorReceivedCallbackShouldAppendSubStringOfDataIfErrorMessageReachedMaxLength()
+    {
+        _testHostProcessStdError = new StringBuilder(0, 5);
+        _testHostProcessStdError.Append("1234");
+        TestHostManagerCallbacks.ErrorReceivedCallback(_testHostProcessStdError, "5678");
 
-        [TestMethod]
-        public void ErrorReceivedCallbackShouldAppendSubStringOfDataIfErrorMessageReachedMaxLength()
-        {
-            testHostProcessStdError = new StringBuilder(0, 5);
-            testHostProcessStdError.Append("1234");
-            TestHostManagerCallbacks.ErrorReceivedCallback(testHostProcessStdError, "5678");
+        Assert.AreEqual("12345", _testHostProcessStdError.ToString());
+    }
 
-            Assert.AreEqual("12345", testHostProcessStdError.ToString());
-        }
+    [TestMethod]
+    public void ErrorReceivedCallbackShouldAppendEntireStringEvenItReachesToMaxLength()
+    {
+        _testHostProcessStdError = new StringBuilder(0, 5);
+        _testHostProcessStdError.Append("12");
+        TestHostManagerCallbacks.ErrorReceivedCallback(_testHostProcessStdError, "3");
 
-        [TestMethod]
-        public void ErrorReceivedCallbackShouldAppendEntireStringEvenItReachesToMaxLength()
-        {
-            testHostProcessStdError = new StringBuilder(0, 5);
-            testHostProcessStdError.Append("12");
-            TestHostManagerCallbacks.ErrorReceivedCallback(testHostProcessStdError, "3");
+        Assert.AreEqual("123" + Environment.NewLine, _testHostProcessStdError.ToString());
+    }
 
-            Assert.AreEqual("123" + Environment.NewLine, testHostProcessStdError.ToString());
-        }
+    [TestMethod]
+    public void ErrorReceivedCallbackShouldAppendNewLineApproprioritlyWhenReachingMaxLength()
+    {
+        _testHostProcessStdError = new StringBuilder(0, 5);
+        _testHostProcessStdError.Append("123");
+        TestHostManagerCallbacks.ErrorReceivedCallback(_testHostProcessStdError, "4");
 
-        [TestMethod]
-        public void ErrorReceivedCallbackShouldAppendNewLineApproprioritlyWhenReachingMaxLength()
-        {
-            testHostProcessStdError = new StringBuilder(0, 5);
-            testHostProcessStdError.Append("123");
-            TestHostManagerCallbacks.ErrorReceivedCallback(testHostProcessStdError, "4");
-
-            Assert.AreEqual("1234" + Environment.NewLine.Substring(0, 1), testHostProcessStdError.ToString());
-        }
+        Assert.AreEqual("1234" + Environment.NewLine.Substring(0, 1), _testHostProcessStdError.ToString());
     }
 }

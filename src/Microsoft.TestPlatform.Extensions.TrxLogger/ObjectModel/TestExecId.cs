@@ -1,86 +1,85 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+
+using System;
+using System.Globalization;
+
+/// <summary>
+/// Class identifying test execution id.
+/// Execution ID is assigned to test at run creation time and is guaranteed to be unique within that run.
+/// </summary>
+internal sealed class TestExecId
 {
-    using System;
-    using System.Globalization;
+    private Guid _execId;
 
     /// <summary>
-    /// Class identifying test execution id.
-    /// Execution ID is assigned to test at run creation time and is guaranteed to be unique within that run.
+    /// Initializes a new instance of the <see cref="TestExecId"/> class.
     /// </summary>
-    internal sealed class TestExecId
+    public TestExecId()
     {
-        private Guid _execId;
+        _execId = Guid.NewGuid();
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TestExecId"/> class.
-        /// </summary>
-        public TestExecId()
-        {
-            _execId = Guid.NewGuid();
-        }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TestExecId"/> class.
+    /// </summary>
+    /// <param name="id">
+    /// The id.
+    /// </param>
+    public TestExecId(Guid id)
+    {
+        _execId = id;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TestExecId"/> class.
-        /// </summary>
-        /// <param name="id">
-        /// The id.
-        /// </param>
-        public TestExecId(Guid id)
-        {
-            _execId = id;
-        }
+    /// <summary>
+    /// Gets an object of <see cref="TestExecId"/> class which empty GUID
+    /// </summary>
+    public static TestExecId Empty { get; } = new TestExecId(Guid.Empty);
 
-        /// <summary>
-        /// Gets an object of <see cref="TestExecId"/> class which empty GUID
-        /// </summary>
-        public static TestExecId Empty { get; } = new TestExecId(Guid.Empty);
+    /// <summary>
+    /// Gets the id.
+    /// </summary>
+    public Guid Id
+    {
+        get { return _execId; }
+    }
 
-        /// <summary>
-        /// Gets the id.
-        /// </summary>
-        public Guid Id
-        {
-            get { return _execId; }
-        }
+    /// <summary>
+    /// Override function of Equals.
+    /// </summary>
+    /// <param name="obj">
+    /// The object to compare.
+    /// </param>
+    /// <returns>
+    /// The <see cref="bool"/>.
+    /// </returns>
+    public override bool Equals(object obj)
+    {
+        return obj is TestExecId id && _execId.Equals(id._execId);
+    }
 
-        /// <summary>
-        /// Override function of Equals.
-        /// </summary>
-        /// <param name="obj">
-        /// The object to compare.
-        /// </param>
-        /// <returns>
-        /// The <see cref="bool"/>.
-        /// </returns>
-        public override bool Equals(object obj)
-        {
-            return obj is TestExecId id && _execId.Equals(id._execId);
-        }
+    /// <summary>
+    /// Override function of GetHashCode
+    /// </summary>
+    /// <returns>
+    /// The <see cref="int"/>.
+    /// </returns>
+    public override int GetHashCode()
+    {
+        return _execId.GetHashCode();
+    }
 
-        /// <summary>
-        /// Override function of GetHashCode
-        /// </summary>
-        /// <returns>
-        /// The <see cref="int"/>.
-        /// </returns>
-        public override int GetHashCode()
-        {
-            return _execId.GetHashCode();
-        }
-
-        /// <summary>
-        /// Override function of ToString.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
-        public override string ToString()
-        {
-            string s = _execId.ToString("B");
-            return string.Format(CultureInfo.InvariantCulture, s);
-        }
+    /// <summary>
+    /// Override function of ToString.
+    /// </summary>
+    /// <returns>
+    /// The <see cref="string"/>.
+    /// </returns>
+    public override string ToString()
+    {
+        string s = _execId.ToString("B");
+        return string.Format(CultureInfo.InvariantCulture, s);
     }
 }

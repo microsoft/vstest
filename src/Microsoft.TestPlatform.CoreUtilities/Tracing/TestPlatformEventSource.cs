@@ -5,7 +5,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
 {
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+    using Interfaces;
 
     using System.Diagnostics.Tracing;
 

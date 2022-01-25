@@ -1,315 +1,317 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.TestHostProvider.UnitTests.Hosting
+namespace TestPlatform.TestHostProvider.UnitTests.Hosting;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
+[TestClass]
+public class DotnetTestHostManagerTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Moq;
+    private const string DefaultDotnetPath = "c:\\tmp\\dotnet.exe";
 
-    [TestClass]
-    public class DotnetTestHostManagerTests
+    private readonly Mock<ITestHostLauncher> _mockTestHostLauncher;
+
+    private readonly Mock<IProcessHelper> _mockProcessHelper;
+
+    private readonly Mock<IFileHelper> _mockFileHelper;
+
+    private readonly Mock<IWindowsRegistryHelper> _mockWindowsRegistry;
+
+    private readonly Mock<IMessageLogger> _mockMessageLogger;
+
+    private readonly Mock<IEnvironment> _mockEnvironment;
+
+    private readonly Mock<IRunSettingsHelper> _mockRunsettingHelper;
+
+    private readonly TestRunnerConnectionInfo _defaultConnectionInfo;
+
+    private readonly string[] _testSource = { "test.dll" };
+
+    private readonly string _defaultTestHostPath;
+
+    private readonly TestProcessStartInfo _defaultTestProcessStartInfo;
+
+    private readonly TestableDotnetTestHostManager _dotnetHostManager;
+
+    private readonly Mock<IEnvironmentVariableHelper> _mockEnvironmentVariable;
+
+    private string _errorMessage;
+
+    private int _exitCode;
+
+    private int _testHostId;
+
+    private readonly string _temp = Path.GetTempPath();
+
+    public DotnetTestHostManagerTests()
     {
-        private const string DefaultDotnetPath = "c:\\tmp\\dotnet.exe";
+        _mockTestHostLauncher = new Mock<ITestHostLauncher>();
+        _mockProcessHelper = new Mock<IProcessHelper>();
+        _mockFileHelper = new Mock<IFileHelper>();
+        _mockMessageLogger = new Mock<IMessageLogger>();
+        _mockEnvironment = new Mock<IEnvironment>();
+        _mockWindowsRegistry = new Mock<IWindowsRegistryHelper>();
+        _mockEnvironmentVariable = new Mock<IEnvironmentVariableHelper>();
+        _mockRunsettingHelper = new Mock<IRunSettingsHelper>();
+        _defaultConnectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.1:123", Role = ConnectionRole.Client }, RunnerProcessId = 0 };
+
+        _mockEnvironment.SetupGet(e => e.Architecture).Returns((PlatformArchitecture)Enum.Parse(typeof(PlatformArchitecture), Constants.DefaultPlatform.ToString()));
+        _mockRunsettingHelper.SetupGet(r => r.IsDefaultTargetArchitecture).Returns(true);
+        string defaultSourcePath = Path.Combine(_temp, "test.dll");
+        _defaultTestHostPath = Path.Combine(_temp, "testhost.dll");
+        _dotnetHostManager = new TestableDotnetTestHostManager(
+            _mockProcessHelper.Object,
+            _mockFileHelper.Object,
+            new DotnetHostHelper(_mockFileHelper.Object, _mockEnvironment.Object, _mockWindowsRegistry.Object, _mockEnvironmentVariable.Object, _mockProcessHelper.Object),
+            _mockEnvironment.Object,
+            _mockRunsettingHelper.Object,
+            _mockWindowsRegistry.Object,
+            _mockEnvironmentVariable.Object);
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object, string.Empty);
+
+        _dotnetHostManager.HostExited += DotnetHostManagerHostExited;
+
+        // Setup a dummy current process for tests
+        _mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns(DefaultDotnetPath);
+        _mockProcessHelper.Setup(ph => ph.GetTestEngineDirectory()).Returns(DefaultDotnetPath);
+        _mockProcessHelper.Setup(ph => ph.GetCurrentProcessArchitecture()).Returns(PlatformArchitecture.X64);
+        _mockEnvironmentVariable.Setup(ev => ev.GetEnvironmentVariable(It.IsAny<string>())).Returns(Path.GetDirectoryName(DefaultDotnetPath));
+        _mockFileHelper.Setup(ph => ph.Exists(_defaultTestHostPath)).Returns(true);
+        _mockFileHelper.Setup(ph => ph.Exists(DefaultDotnetPath)).Returns(true);
+
+        _mockTestHostLauncher
+            .Setup(th => th.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
+            .Returns(Process.GetCurrentProcess().Id);
+
+        _mockTestHostLauncher
+            .Setup(th => th.LaunchTestHost(It.IsAny<TestProcessStartInfo>()))
+            .Returns(Process.GetCurrentProcess().Id);
+
+        _defaultTestProcessStartInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { defaultSourcePath }, null, _defaultConnectionInfo);
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldThrowIfSourceIsNull()
+    {
+        Action action = () => _dotnetHostManager.GetTestHostProcessStartInfo(null, null, _defaultConnectionInfo);
+
+        Assert.ThrowsException<ArgumentNullException>(action);
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldThrowIfMultipleSourcesAreProvided()
+    {
+        var sources = new[] { "test1.dll", "test2.dll" };
+        Action action = () => _dotnetHostManager.GetTestHostProcessStartInfo(sources, null, _defaultConnectionInfo);
+
+        Assert.ThrowsException<InvalidOperationException>(action);
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldInvokeDotnetCommandline()
+    {
+        _mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns(DefaultDotnetPath);
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+
+        var startInfo = GetDefaultStartInfo();
+
+        Assert.AreEqual(DefaultDotnetPath, startInfo.FileName);
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldInvokeDotnetXPlatOnLinux()
+    {
+        _mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("/tmp/dotnet");
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+
+        var startInfo = GetDefaultStartInfo();
+
+        Assert.AreEqual("/tmp/dotnet", startInfo.FileName);
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldInvokeDotnetExec()
+    {
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+        var startInfo = GetDefaultStartInfo();
+
+        StringAssert.StartsWith(startInfo.Arguments, "exec");
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldAddRuntimeConfigJsonIfExists()
+    {
+        _mockFileHelper.Setup(fh => fh.Exists("test.runtimeconfig.json")).Returns(true);
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+
+        var startInfo = GetDefaultStartInfo();
+
+        StringAssert.Contains(startInfo.Arguments, "--runtimeconfig \"test.runtimeconfig.json\"");
+    }
 
-        private readonly Mock<ITestHostLauncher> mockTestHostLauncher;
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldNotAddRuntimeConfigJsonIfNotExists()
+    {
+        _mockFileHelper.Setup(fh => fh.Exists("test.runtimeconfig.json")).Returns(false);
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
 
-        private readonly Mock<IProcessHelper> mockProcessHelper;
+        var startInfo = GetDefaultStartInfo();
 
-        private readonly Mock<IFileHelper> mockFileHelper;
+        Assert.IsFalse(startInfo.Arguments.Contains("--runtimeconfig \"test.runtimeconfig.json\""));
+    }
 
-        private readonly Mock<IWindowsRegistryHelper> mockWindowsRegistry;
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldAddDepsFileJsonIfExists()
+    {
+        _mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(true);
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
 
-        private readonly Mock<IMessageLogger> mockMessageLogger;
+        var startInfo = GetDefaultStartInfo();
 
-        private readonly Mock<IEnvironment> mockEnvironment;
+        StringAssert.Contains(startInfo.Arguments, "--depsfile \"test.deps.json\"");
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldNotAddDepsFileJsonIfNotExists()
+    {
+        _mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(false);
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
 
-        private readonly Mock<IRunSettingsHelper> mockRunsettingHelper;
-
-        private readonly TestRunnerConnectionInfo defaultConnectionInfo;
-
-        private readonly string[] testSource = { "test.dll" };
-
-        private readonly string defaultTestHostPath;
-
-        private readonly TestProcessStartInfo defaultTestProcessStartInfo;
-
-        private readonly TestableDotnetTestHostManager dotnetHostManager;
-
-        private readonly Mock<IEnvironmentVariableHelper> mockEnvironmentVariable;
-
-        private string errorMessage;
-
-        private int exitCode;
-
-        private int testHostId;
-
-        private readonly string temp = Path.GetTempPath();
-
-        public DotnetTestHostManagerTests()
-        {
-            mockTestHostLauncher = new Mock<ITestHostLauncher>();
-            mockProcessHelper = new Mock<IProcessHelper>();
-            mockFileHelper = new Mock<IFileHelper>();
-            mockMessageLogger = new Mock<IMessageLogger>();
-            mockEnvironment = new Mock<IEnvironment>();
-            mockWindowsRegistry = new Mock<IWindowsRegistryHelper>();
-            mockEnvironmentVariable = new Mock<IEnvironmentVariableHelper>();
-            mockRunsettingHelper = new Mock<IRunSettingsHelper>();
-            defaultConnectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.1:123", Role = ConnectionRole.Client }, RunnerProcessId = 0 };
-
-            mockEnvironment.SetupGet(e => e.Architecture).Returns((PlatformArchitecture)Enum.Parse(typeof(PlatformArchitecture), Constants.DefaultPlatform.ToString()));
-            mockRunsettingHelper.SetupGet(r => r.IsDefaultTargetArchitecture).Returns(true);
-            string defaultSourcePath = Path.Combine(temp, "test.dll");
-            defaultTestHostPath = Path.Combine(temp, "testhost.dll");
-            dotnetHostManager = new TestableDotnetTestHostManager(
-                                         mockProcessHelper.Object,
-                                         mockFileHelper.Object,
-                                         new DotnetHostHelper(mockFileHelper.Object, mockEnvironment.Object, mockWindowsRegistry.Object, mockEnvironmentVariable.Object, mockProcessHelper.Object),
-                                         mockEnvironment.Object,
-                                         mockRunsettingHelper.Object,
-                                         mockWindowsRegistry.Object,
-                                         mockEnvironmentVariable.Object);
-            dotnetHostManager.Initialize(mockMessageLogger.Object, string.Empty);
-
-            dotnetHostManager.HostExited += DotnetHostManagerHostExited;
-
-            // Setup a dummy current process for tests
-            mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns(DefaultDotnetPath);
-            mockProcessHelper.Setup(ph => ph.GetTestEngineDirectory()).Returns(DefaultDotnetPath);
-            mockProcessHelper.Setup(ph => ph.GetCurrentProcessArchitecture()).Returns(PlatformArchitecture.X64);
-            mockEnvironmentVariable.Setup(ev => ev.GetEnvironmentVariable(It.IsAny<string>())).Returns(Path.GetDirectoryName(DefaultDotnetPath));
-            mockFileHelper.Setup(ph => ph.Exists(defaultTestHostPath)).Returns(true);
-            mockFileHelper.Setup(ph => ph.Exists(DefaultDotnetPath)).Returns(true);
-
-            mockTestHostLauncher
-                .Setup(th => th.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
-                .Returns(Process.GetCurrentProcess().Id);
-
-            mockTestHostLauncher
-                .Setup(th => th.LaunchTestHost(It.IsAny<TestProcessStartInfo>()))
-                .Returns(Process.GetCurrentProcess().Id);
-
-            defaultTestProcessStartInfo = dotnetHostManager.GetTestHostProcessStartInfo(new[] { defaultSourcePath }, null, defaultConnectionInfo);
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldThrowIfSourceIsNull()
-        {
-            Action action = () => dotnetHostManager.GetTestHostProcessStartInfo(null, null, defaultConnectionInfo);
-
-            Assert.ThrowsException<ArgumentNullException>(action);
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldThrowIfMultipleSourcesAreProvided()
-        {
-            var sources = new[] { "test1.dll", "test2.dll" };
-            Action action = () => dotnetHostManager.GetTestHostProcessStartInfo(sources, null, defaultConnectionInfo);
-
-            Assert.ThrowsException<InvalidOperationException>(action);
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldInvokeDotnetCommandline()
-        {
-            mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns(DefaultDotnetPath);
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-
-            var startInfo = GetDefaultStartInfo();
-
-            Assert.AreEqual(DefaultDotnetPath, startInfo.FileName);
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldInvokeDotnetXPlatOnLinux()
-        {
-            mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("/tmp/dotnet");
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-
-            var startInfo = GetDefaultStartInfo();
-
-            Assert.AreEqual("/tmp/dotnet", startInfo.FileName);
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldInvokeDotnetExec()
-        {
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-            var startInfo = GetDefaultStartInfo();
-
-            StringAssert.StartsWith(startInfo.Arguments, "exec");
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldAddRuntimeConfigJsonIfExists()
-        {
-            mockFileHelper.Setup(fh => fh.Exists("test.runtimeconfig.json")).Returns(true);
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-
-            var startInfo = GetDefaultStartInfo();
-
-            StringAssert.Contains(startInfo.Arguments, "--runtimeconfig \"test.runtimeconfig.json\"");
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldNotAddRuntimeConfigJsonIfNotExists()
-        {
-            mockFileHelper.Setup(fh => fh.Exists("test.runtimeconfig.json")).Returns(false);
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-
-            var startInfo = GetDefaultStartInfo();
-
-            Assert.IsFalse(startInfo.Arguments.Contains("--runtimeconfig \"test.runtimeconfig.json\""));
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldAddDepsFileJsonIfExists()
-        {
-            mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(true);
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-
-            var startInfo = GetDefaultStartInfo();
-
-            StringAssert.Contains(startInfo.Arguments, "--depsfile \"test.deps.json\"");
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldNotAddDepsFileJsonIfNotExists()
-        {
-            mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(false);
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-
-            var startInfo = GetDefaultStartInfo();
-
-            Assert.IsFalse(startInfo.Arguments.Contains("--depsfile \"test.deps.json\""));
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo()
-        {
-            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Transport = Transport.Sockets }, RunnerProcessId = 101 };
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-
-            var startInfo = dotnetHostManager.GetTestHostProcessStartInfo(testSource, null, connectionInfo);
-
-            StringAssert.Contains(startInfo.Arguments, "--port " + connectionInfo.Port + " --endpoint " + connectionInfo.ConnectionInfo.Endpoint + " --role client --parentprocessid 101");
-        }
-
-        [TestMethod]
-        public void GetTestHostConnectionInfoShouldIncludeEndpointRoleAndChannelType()
-        {
-            var connectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.1:0", Role = ConnectionRole.Client, Transport = Transport.Sockets };
-
-            var info = dotnetHostManager.GetTestHostConnectionInfo();
-
-            Assert.AreEqual(connectionInfo, info);
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldIncludeEnvironmentVariables()
-        {
-            var environmentVariables = new Dictionary<string, string> { { "k1", "v1" }, { "k2", "v2" } };
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-
-            var startInfo = dotnetHostManager.GetTestHostProcessStartInfo(testSource, environmentVariables, defaultConnectionInfo);
-
-            Assert.AreEqual(environmentVariables, startInfo.EnvironmentVariables);
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartIfDepsFileNotFoundAndTestHostFoundShouldNotThrowException()
-        {
-            mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(false);
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-
-            var startInfo = GetDefaultStartInfo();
-            StringAssert.Contains(startInfo.Arguments, "testhost.dll");
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldUseTestHostX64ExePresentOnWindows()
-        {
-            var testhostExePath = "testhost.exe";
-            mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(true);
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-            mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
-
-            var startInfo = GetDefaultStartInfo();
-
-            StringAssert.Contains(startInfo.FileName, testhostExePath);
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldUseDotnetExeOnUnixWithTestHostDllPath()
-        {
-            mockFileHelper.Setup(ph => ph.Exists("testhost.x86.exe")).Returns(true);
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-            mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
-
-            var startInfo = GetDefaultStartInfo();
-
-            StringAssert.Contains(startInfo.FileName, "dotnet");
-            StringAssert.Contains(startInfo.Arguments, "testhost.dll");
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldUseTestHostExeIfPresentOnWindows()
-        {
-            var testhostExePath = "testhost.exe";
-            mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(true);
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-            mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
-
-            dotnetHostManager.Initialize(mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x64</TargetPlatform></RunConfiguration></RunSettings>");
-            var startInfo = GetDefaultStartInfo();
-
-            StringAssert.Contains(startInfo.FileName, testhostExePath);
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldUseDotnetHostPathFromRunsettings()
-        {
-            var dotnetHostPath = @"C:\dotnet.exe";
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-            mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
-            dotnetHostManager.Initialize(mockMessageLogger.Object, $"<RunSettings><RunConfiguration><DotNetHostPath>{dotnetHostPath}</DotNetHostPath></RunConfiguration></RunSettings>");
-            var startInfo = GetDefaultStartInfo();
-
-            StringAssert.Contains(startInfo.FileName, dotnetHostPath);
-        }
-
-        [TestMethod]
-        [TestCategory("Windows")]
-        public void GetTestHostProcessStartInfoShouldUseTestHostExeFromNugetIfNotFoundInSourceLocation()
-        {
-            var testhostExePath = "testhost.exe";
-            dotnetHostManager.Initialize(mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x64</TargetPlatform></RunConfiguration></RunSettings>");
-            mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(false);
-            mockFileHelper.Setup(ph => ph.Exists("C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp2.1\\x64\\testhost.exe")).Returns(true);
-            mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
-            var sourcePath = Path.Combine(temp, "test.dll");
-
-            string runtimeConfigFileContent =
-@"{
+        var startInfo = GetDefaultStartInfo();
+
+        Assert.IsFalse(startInfo.Arguments.Contains("--depsfile \"test.deps.json\""));
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo()
+    {
+        var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Transport = Transport.Sockets }, RunnerProcessId = 101 };
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, connectionInfo);
+
+        StringAssert.Contains(startInfo.Arguments, "--port " + connectionInfo.Port + " --endpoint " + connectionInfo.ConnectionInfo.Endpoint + " --role client --parentprocessid 101");
+    }
+
+    [TestMethod]
+    public void GetTestHostConnectionInfoShouldIncludeEndpointRoleAndChannelType()
+    {
+        var connectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.1:0", Role = ConnectionRole.Client, Transport = Transport.Sockets };
+
+        var info = _dotnetHostManager.GetTestHostConnectionInfo();
+
+        Assert.AreEqual(connectionInfo, info);
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldIncludeEnvironmentVariables()
+    {
+        var environmentVariables = new Dictionary<string, string> { { "k1", "v1" }, { "k2", "v2" } };
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, environmentVariables, _defaultConnectionInfo);
+
+        Assert.AreEqual(environmentVariables, startInfo.EnvironmentVariables);
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartIfDepsFileNotFoundAndTestHostFoundShouldNotThrowException()
+    {
+        _mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(false);
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+
+        var startInfo = GetDefaultStartInfo();
+        StringAssert.Contains(startInfo.Arguments, "testhost.dll");
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldUseTestHostX64ExePresentOnWindows()
+    {
+        var testhostExePath = "testhost.exe";
+        _mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(true);
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+
+        var startInfo = GetDefaultStartInfo();
+
+        StringAssert.Contains(startInfo.FileName, testhostExePath);
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldUseDotnetExeOnUnixWithTestHostDllPath()
+    {
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.x86.exe")).Returns(true);
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+
+        var startInfo = GetDefaultStartInfo();
+
+        StringAssert.Contains(startInfo.FileName, "dotnet");
+        StringAssert.Contains(startInfo.Arguments, "testhost.dll");
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldUseTestHostExeIfPresentOnWindows()
+    {
+        var testhostExePath = "testhost.exe";
+        _mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(true);
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x64</TargetPlatform></RunConfiguration></RunSettings>");
+        var startInfo = GetDefaultStartInfo();
+
+        StringAssert.Contains(startInfo.FileName, testhostExePath);
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldUseDotnetHostPathFromRunsettings()
+    {
+        var dotnetHostPath = @"C:\dotnet.exe";
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object, $"<RunSettings><RunConfiguration><DotNetHostPath>{dotnetHostPath}</DotNetHostPath></RunConfiguration></RunSettings>");
+        var startInfo = GetDefaultStartInfo();
+
+        StringAssert.Contains(startInfo.FileName, dotnetHostPath);
+    }
+
+    [TestMethod]
+    [TestCategory("Windows")]
+    public void GetTestHostProcessStartInfoShouldUseTestHostExeFromNugetIfNotFoundInSourceLocation()
+    {
+        var testhostExePath = "testhost.exe";
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x64</TargetPlatform></RunConfiguration></RunSettings>");
+        _mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(false);
+        _mockFileHelper.Setup(ph => ph.Exists("C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp2.1\\x64\\testhost.exe")).Returns(true);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        var sourcePath = Path.Combine(_temp, "test.dll");
+
+        string runtimeConfigFileContent =
+            @"{
     ""runtimeOptions"": {
         ""additionalProbingPaths"": [
             ""C:\\packages""
@@ -317,8 +319,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 }";
 
-            string depsFileContent =
-@"{
+        string depsFileContent =
+            @"{
     ""runtimeTarget"": {
         ""name"": "".NETCoreApp,Version=v1.0"",
         ""signature"": ""8f25843f8e35a3e80ef4ae98b95117ea5c468b3f""
@@ -351,35 +353,35 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     }
 }";
 
-            MemoryStream runtimeConfigStream = new(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
-            mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(temp, "test.runtimeconfig.dev.json"), FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
-            mockFileHelper.Setup(ph => ph.Exists(Path.Combine(temp, "test.runtimeconfig.dev.json"))).Returns(true);
+        MemoryStream runtimeConfigStream = new(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
+        _mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(_temp, "test.runtimeconfig.dev.json"), FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
+        _mockFileHelper.Setup(ph => ph.Exists(Path.Combine(_temp, "test.runtimeconfig.dev.json"))).Returns(true);
 
-            MemoryStream depsFileStream = new(Encoding.UTF8.GetBytes(depsFileContent));
-            mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
-            mockFileHelper.Setup(ph => ph.Exists(Path.Combine(temp, "test.deps.json"))).Returns(true);
+        MemoryStream depsFileStream = new(Encoding.UTF8.GetBytes(depsFileContent));
+        _mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(_temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
+        _mockFileHelper.Setup(ph => ph.Exists(Path.Combine(_temp, "test.deps.json"))).Returns(true);
 
-            string testHostFullPath = @"C:\packages\microsoft.testplatform.testhost/15.0.0-Dev\lib/netstandard1.5/testhost.dll";
-            mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(true);
+        string testHostFullPath = @"C:\packages\microsoft.testplatform.testhost/15.0.0-Dev\lib/netstandard1.5/testhost.dll";
+        _mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(true);
 
-            var startInfo = dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, defaultConnectionInfo);
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
-            StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp2.1\\x64\\testhost.exe");
-        }
+        StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp2.1\\x64\\testhost.exe");
+    }
 
-        [TestMethod]
-        [TestCategory("Windows")]
-        public void GetTestHostProcessStartInfoShouldUseTestHostX86ExeFromNugetIfNotFoundInSourceLocation()
-        {
-            var testhostExePath = "testhost.x86.exe";
-            dotnetHostManager.Initialize(mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>");
-            mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(false);
-            mockFileHelper.Setup(ph => ph.Exists($"C:\\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost\\15.0.0-Dev{Path.DirectorySeparatorChar}build\\netcoreapp2.1\\x86\\testhost.x86.exe")).Returns(true);
-            mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
-            var sourcePath = Path.Combine(temp, "test.dll");
+    [TestMethod]
+    [TestCategory("Windows")]
+    public void GetTestHostProcessStartInfoShouldUseTestHostX86ExeFromNugetIfNotFoundInSourceLocation()
+    {
+        var testhostExePath = "testhost.x86.exe";
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>");
+        _mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(false);
+        _mockFileHelper.Setup(ph => ph.Exists($"C:\\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost\\15.0.0-Dev{Path.DirectorySeparatorChar}build\\netcoreapp2.1\\x86\\testhost.x86.exe")).Returns(true);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        var sourcePath = Path.Combine(_temp, "test.dll");
 
-            string runtimeConfigFileContent =
-@"{
+        string runtimeConfigFileContent =
+            @"{
     ""runtimeOptions"": {
         ""additionalProbingPaths"": [
             ""C:\\packages""
@@ -387,8 +389,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 }";
 
-            string depsFileContent =
-@"{
+        string depsFileContent =
+            @"{
     ""runtimeTarget"": {
         ""name"": "".NETCoreApp,Version=v1.0"",
         ""signature"": ""8f25843f8e35a3e80ef4ae98b95117ea5c468b3f""
@@ -421,274 +423,274 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     }
 }";
 
-            MemoryStream runtimeConfigStream = new(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
-            mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(temp, "test.runtimeconfig.dev.json"), FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
-            mockFileHelper.Setup(ph => ph.Exists(Path.Combine(temp, "test.runtimeconfig.dev.json"))).Returns(true);
+        MemoryStream runtimeConfigStream = new(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
+        _mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(_temp, "test.runtimeconfig.dev.json"), FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
+        _mockFileHelper.Setup(ph => ph.Exists(Path.Combine(_temp, "test.runtimeconfig.dev.json"))).Returns(true);
 
-            MemoryStream depsFileStream = new(Encoding.UTF8.GetBytes(depsFileContent));
-            mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
-            mockFileHelper.Setup(ph => ph.Exists(Path.Combine(temp, "test.deps.json"))).Returns(true);
+        MemoryStream depsFileStream = new(Encoding.UTF8.GetBytes(depsFileContent));
+        _mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(_temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
+        _mockFileHelper.Setup(ph => ph.Exists(Path.Combine(_temp, "test.deps.json"))).Returns(true);
 
-            string testHostFullPath = $@"C:\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost/15.0.0-Dev{Path.DirectorySeparatorChar}lib/netstandard1.5/testhost.dll";
-            mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(true);
+        string testHostFullPath = $@"C:\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost/15.0.0-Dev{Path.DirectorySeparatorChar}lib/netstandard1.5/testhost.dll";
+        _mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(true);
 
-            var startInfo = dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, defaultConnectionInfo);
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
-            StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp2.1\\x86\\testhost.x86.exe");
+        StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp2.1\\x86\\testhost.x86.exe");
+    }
+
+    [TestMethod]
+    public void LaunchTestHostShouldLaunchProcessWithNullEnvironmentVariablesOrArgs()
+    {
+        var expectedProcessId = Process.GetCurrentProcess().Id;
+        _mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(expectedProcessId);
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+        var startInfo = GetDefaultStartInfo();
+        _dotnetHostManager.SetCustomLauncher(_mockTestHostLauncher.Object);
+
+        _dotnetHostManager.HostLaunched += DotnetHostManagerHostLaunched;
+
+        Task<bool> processId = _dotnetHostManager.LaunchTestHostAsync(startInfo, CancellationToken.None);
+        processId.Wait();
+
+        Assert.IsTrue(processId.Result);
+        Assert.AreEqual(expectedProcessId, _testHostId);
+    }
+
+    [TestMethod]
+    public void LaunchTestHostAsyncShouldNotStartHostProcessIfCancellationTokenIsSet()
+    {
+        var expectedProcessId = Process.GetCurrentProcess().Id;
+        _mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(expectedProcessId);
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+        var startInfo = GetDefaultStartInfo();
+
+        CancellationTokenSource cancellationTokenSource = new();
+        cancellationTokenSource.Cancel();
+
+        Assert.ThrowsException<AggregateException>(() => _dotnetHostManager.LaunchTestHostAsync(startInfo, cancellationTokenSource.Token).Wait());
+    }
+
+    [TestMethod]
+    public void LaunchTestHostShouldLaunchProcessWithEnvironmentVariables()
+    {
+        var variables = new Dictionary<string, string> { { "k1", "v1" }, { "k2", "v2" } };
+        var startInfo = new TestProcessStartInfo { EnvironmentVariables = variables };
+        _dotnetHostManager.SetCustomLauncher(_mockTestHostLauncher.Object);
+
+        _dotnetHostManager.HostLaunched += DotnetHostManagerHostLaunched;
+
+        Task<bool> processId = _dotnetHostManager.LaunchTestHostAsync(startInfo, CancellationToken.None);
+        processId.Wait();
+
+        Assert.IsTrue(processId.Result);
+        _mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.EnvironmentVariables.Equals(variables)), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [TestMethod]
+    public void DotnetTestHostManagerShouldNotBeShared()
+    {
+        Assert.IsFalse(_dotnetHostManager.Shared);
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldThrowExceptionWhenDotnetIsNotInstalled()
+    {
+        // To validate the else part, set current process to exe other than dotnet
+        _mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
+
+        // Reset the muxer
+        _mockEnvironmentVariable.Setup(ev => ev.GetEnvironmentVariable(It.IsAny<string>())).Returns(string.Empty);
+
+        char separator = ';';
+        var dotnetExeName = "dotnet.exe";
+        if (!Environment.OSVersion.Platform.ToString().StartsWith("Win"))
+        {
+            separator = ':';
+            dotnetExeName = "dotnet";
         }
 
-        [TestMethod]
-        public void LaunchTestHostShouldLaunchProcessWithNullEnvironmentVariablesOrArgs()
+        var paths = Environment.GetEnvironmentVariable("PATH").Split(separator);
+
+        foreach (string path in paths)
         {
-            var expectedProcessId = Process.GetCurrentProcess().Id;
-            mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(expectedProcessId);
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-            var startInfo = GetDefaultStartInfo();
-            dotnetHostManager.SetCustomLauncher(mockTestHostLauncher.Object);
-
-            dotnetHostManager.HostLaunched += DotnetHostManagerHostLaunched;
-
-            Task<bool> processId = dotnetHostManager.LaunchTestHostAsync(startInfo, CancellationToken.None);
-            processId.Wait();
-
-            Assert.IsTrue(processId.Result);
-            Assert.AreEqual(expectedProcessId, testHostId);
+            string dotnetExeFullPath = Path.Combine(path.Trim(), dotnetExeName);
+            _mockFileHelper.Setup(fh => fh.Exists(dotnetExeFullPath)).Returns(false);
         }
 
-        [TestMethod]
-        public void LaunchTestHostAsyncShouldNotStartHostProcessIfCancellationTokenIsSet()
-        {
-            var expectedProcessId = Process.GetCurrentProcess().Id;
-            mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(expectedProcessId);
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-            var startInfo = GetDefaultStartInfo();
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
 
-            CancellationTokenSource cancellationTokenSource = new();
-            cancellationTokenSource.Cancel();
+        Action action = () => GetDefaultStartInfo();
 
-            Assert.ThrowsException<AggregateException>(() => dotnetHostManager.LaunchTestHostAsync(startInfo, cancellationTokenSource.Token).Wait());
-        }
+        Assert.ThrowsException<TestPlatformException>(action);
+    }
 
-        [TestMethod]
-        public void LaunchTestHostShouldLaunchProcessWithEnvironmentVariables()
-        {
-            var variables = new Dictionary<string, string> { { "k1", "v1" }, { "k2", "v2" } };
-            var startInfo = new TestProcessStartInfo { EnvironmentVariables = variables };
-            dotnetHostManager.SetCustomLauncher(mockTestHostLauncher.Object);
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldIncludeSourceDirectoryAsWorkingDirectory()
+    {
+        // Absolute path to the source directory
+        var sourcePath = Path.Combine(_temp, "test.dll");
+        _mockFileHelper.Setup(ph => ph.Exists(Path.Combine(_temp, "testhost.dll"))).Returns(true);
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
-            dotnetHostManager.HostLaunched += DotnetHostManagerHostLaunched;
+        Assert.AreEqual(Path.GetDirectoryName(_temp), startInfo.WorkingDirectory);
+    }
 
-            Task<bool> processId = dotnetHostManager.LaunchTestHostAsync(startInfo, CancellationToken.None);
-            processId.Wait();
+    [TestMethod]
+    public void GetTestPlatformExtensionsShouldReturnEmptySetIfSourceDirectoryDoesNotExist()
+    {
+        _mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(false);
+        var extensions = _dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, Enumerable.Empty<string>());
 
-            Assert.IsTrue(processId.Result);
-            mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.EnvironmentVariables.Equals(variables)), It.IsAny<CancellationToken>()), Times.Once);
-        }
+        Assert.AreEqual(0, extensions.Count());
+    }
 
-        [TestMethod]
-        public void DotnetTestHostManagerShouldNotBeShared()
-        {
-            Assert.IsFalse(dotnetHostManager.Shared);
-        }
+    [TestMethod]
+    public void GetTestPlatformExtensionsShouldReturnLibariesFromSourceDirectory()
+    {
+        _mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
+        _mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(new[] { "foo.TestAdapter.dll" });
+        var extensions = _dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, Enumerable.Empty<string>());
 
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldThrowExceptionWhenDotnetIsNotInstalled()
-        {
-            // To validate the else part, set current process to exe other than dotnet
-            mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
+        CollectionAssert.AreEqual(new[] { "foo.TestAdapter.dll" }, extensions.ToArray());
+    }
 
-            // Reset the muxer
-            mockEnvironmentVariable.Setup(ev => ev.GetEnvironmentVariable(It.IsAny<string>())).Returns(string.Empty);
+    [TestMethod]
+    public void GetTestPlatformExtensionsShouldReturnEmptySetIfSourceDirectoryIsEmpty()
+    {
+        // Parent directory is empty since the input source is file "test.dll"
+        _mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
+        _mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(new[] { "foo.dll" });
+        var extensions = _dotnetHostManager.GetTestPlatformExtensions(_testSource, Enumerable.Empty<string>());
 
-            char separator = ';';
-            var dotnetExeName = "dotnet.exe";
-            if (!Environment.OSVersion.Platform.ToString().StartsWith("Win"))
-            {
-                separator = ':';
-                dotnetExeName = "dotnet";
-            }
+        Assert.AreEqual(0, extensions.Count());
+    }
 
-            var paths = Environment.GetEnvironmentVariable("PATH").Split(separator);
+    [TestMethod]
+    public void GetTestPlatformExtensionsShouldNotAddNonCoverletDataCollectorsExtensionsIfPresent()
+    {
+        _mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
+        _mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(new[] { "foo.dll" });
+        var extensions = _dotnetHostManager.GetTestPlatformExtensions(_testSource, new List<string> { "abc.dataollector.dll" });
 
-            foreach (string path in paths)
-            {
-                string dotnetExeFullPath = Path.Combine(path.Trim(), dotnetExeName);
-                mockFileHelper.Setup(fh => fh.Exists(dotnetExeFullPath)).Returns(false);
-            }
+        Assert.AreEqual(0, extensions.Count());
+    }
 
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+    [TestMethod]
+    public async Task LaunchTestHostShouldLaunchProcessWithConnectionInfo()
+    {
+        var expectedArgs = "exec \"" + _defaultTestHostPath + "\" --port 123 --endpoint 127.0.0.1:123 --role client --parentprocessid 0";
+        _dotnetHostManager.SetCustomLauncher(_mockTestHostLauncher.Object);
+        await _dotnetHostManager.LaunchTestHostAsync(_defaultTestProcessStartInfo, CancellationToken.None);
 
-            Action action = () => GetDefaultStartInfo();
+        _mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.Arguments.Equals(expectedArgs)), It.IsAny<CancellationToken>()), Times.Once);
+    }
 
-            Assert.ThrowsException<TestPlatformException>(action);
-        }
+    [TestMethod]
+    public void LaunchTestHostShouldSetExitCallBackInCaseCustomHost()
+    {
+        var expectedProcessId = Process.GetCurrentProcess().Id;
+        _mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(expectedProcessId);
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
 
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldIncludeSourceDirectoryAsWorkingDirectory()
-        {
-            // Absolute path to the source directory
-            var sourcePath = Path.Combine(temp, "test.dll");
-            mockFileHelper.Setup(ph => ph.Exists(Path.Combine(temp, "testhost.dll"))).Returns(true);
-            var startInfo = dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, defaultConnectionInfo);
+        var startInfo = GetDefaultStartInfo();
+        _dotnetHostManager.SetCustomLauncher(_mockTestHostLauncher.Object);
+        _dotnetHostManager.LaunchTestHostAsync(startInfo, CancellationToken.None).Wait();
 
-            Assert.AreEqual(Path.GetDirectoryName(temp), startInfo.WorkingDirectory);
-        }
+        _mockProcessHelper.Verify(ph => ph.SetExitCallback(expectedProcessId, It.IsAny<Action<object>>()));
+    }
 
-        [TestMethod]
-        public void GetTestPlatformExtensionsShouldReturnEmptySetIfSourceDirectoryDoesNotExist()
-        {
-            mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(false);
-            var extensions = dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, Enumerable.Empty<string>());
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromSourceDirectoryIfDepsFileNotFound()
+    {
+        // Absolute path to the source directory
+        var sourcePath = Path.Combine(_temp, "test.dll");
+        string expectedTestHostPath = Path.Combine(_temp, "testhost.dll");
+        _mockFileHelper.Setup(ph => ph.Exists(expectedTestHostPath)).Returns(true);
+        _mockFileHelper.Setup(ph => ph.Exists(Path.Combine(_temp, "test.runtimeconfig.dev.json"))).Returns(true);
 
-            Assert.AreEqual(0, extensions.Count());
-        }
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
-        [TestMethod]
-        public void GetTestPlatformExtensionsShouldReturnLibariesFromSourceDirectory()
-        {
-            mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
-            mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(new[] { "foo.TestAdapter.dll" });
-            var extensions = dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, Enumerable.Empty<string>());
+        StringAssert.Contains(startInfo.Arguments, expectedTestHostPath);
+    }
 
-            CollectionAssert.AreEqual(new[] { "foo.TestAdapter.dll" }, extensions.ToArray());
-        }
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldIncludeTestHostPathNextToTestRunnerIfTesthostDllIsNoFoundAndDepsFileNotFound()
+    {
+        // Absolute path to the source directory
+        var sourcePath = Path.Combine(_temp, "test.dll");
+        string testhostNextToTestDll = Path.Combine(_temp, "testhost.dll");
+        _mockFileHelper.Setup(ph => ph.Exists(testhostNextToTestDll)).Returns(false);
 
-        [TestMethod]
-        public void GetTestPlatformExtensionsShouldReturnEmptySetIfSourceDirectoryIsEmpty()
-        {
-            // Parent directory is empty since the input source is file "test.dll"
-            mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
-            mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(new[] { "foo.dll" });
-            var extensions = dotnetHostManager.GetTestPlatformExtensions(testSource, Enumerable.Empty<string>());
+        var here = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        var expectedTestHostPath = Path.Combine(here, "testhost.dll");
+        _mockFileHelper.Setup(ph => ph.Exists(expectedTestHostPath)).Returns(true);
 
-            Assert.AreEqual(0, extensions.Count());
-        }
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
-        [TestMethod]
-        public void GetTestPlatformExtensionsShouldNotAddNonCoverletDataCollectorsExtensionsIfPresent()
-        {
-            mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
-            mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(new[] { "foo.dll" });
-            var extensions = dotnetHostManager.GetTestPlatformExtensions(testSource, new List<string> { "abc.dataollector.dll" });
+        StringAssert.Contains(startInfo.Arguments, expectedTestHostPath);
+        var expectedAdditionalDepsPath = Path.Combine(here, "testhost.deps.json");
+        StringAssert.Contains(startInfo.Arguments, $"--additional-deps \"{expectedAdditionalDepsPath}\"");
+        var expectedAdditionalProbingPath = here;
+        StringAssert.Contains(startInfo.Arguments, $"--additionalprobingpath \"{expectedAdditionalProbingPath}\"");
+        var expectedRuntimeConfigPath = Path.Combine(here, "testhost-latest.runtimeconfig.json");
+        StringAssert.Contains(startInfo.Arguments, $"--runtimeconfig \"{expectedRuntimeConfigPath}\"");
+    }
 
-            Assert.AreEqual(0, extensions.Count());
-        }
+    [TestMethod]
 
-        [TestMethod]
-        public async Task LaunchTestHostShouldLaunchProcessWithConnectionInfo()
-        {
-            var expectedArgs = "exec \"" + defaultTestHostPath + "\" --port 123 --endpoint 127.0.0.1:123 --role client --parentprocessid 0";
-            dotnetHostManager.SetCustomLauncher(mockTestHostLauncher.Object);
-            await dotnetHostManager.LaunchTestHostAsync(defaultTestProcessStartInfo, CancellationToken.None);
+    // we can't put in a "default" value, and we don't have other way to determine if this provided value is the
+    // runtime default or the actual value that user provided, so right now the default will use the latest, instead
+    // or the more correct 1.0, it should be okay, as that version is not supported anymore anyway
+    [DataRow("netcoreapp1.0", "latest")]
+    [DataRow("netcoreapp2.1", "2.1")]
+    [DataRow("netcoreapp3.1", "3.1")]
+    [DataRow("net5.0", "5.0")]
 
-            mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.Arguments.Equals(expectedArgs)), It.IsAny<CancellationToken>()), Times.Once);
-        }
+    // net6.0 is currently the latest released version, but it still has it's own runtime config, it is not the same as
+    // "latest" which means the latest you have on system. So if you have only 5.0 SDK then net6.0 will fail because it can't find net6.0,
+    // but latest would use net5.0 because that is the latest one on your system.
+    [DataRow("net6.0", "6.0")]
+    public void GetTestHostProcessStartInfoShouldIncludeTestHostPathNextToTestRunnerIfTesthostDllIsNoFoundAndDepsFileNotFoundWithTheCorrectTfm(string tfm, string suffix)
+    {
+        // Absolute path to the source directory
+        var sourcePath = Path.Combine(_temp, "test.dll");
+        string testhostNextToTestDll = Path.Combine(_temp, "testhost.dll");
+        _mockFileHelper.Setup(ph => ph.Exists(testhostNextToTestDll)).Returns(false);
 
-        [TestMethod]
-        public void LaunchTestHostShouldSetExitCallBackInCaseCustomHost()
-        {
-            var expectedProcessId = Process.GetCurrentProcess().Id;
-            mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(expectedProcessId);
-            mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+        var here = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        var testhostNextToRunner = Path.Combine(here, "testhost.dll");
+        _mockFileHelper.Setup(ph => ph.Exists(testhostNextToRunner)).Returns(true);
 
-            var startInfo = GetDefaultStartInfo();
-            dotnetHostManager.SetCustomLauncher(mockTestHostLauncher.Object);
-            dotnetHostManager.LaunchTestHostAsync(startInfo, CancellationToken.None).Wait();
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object, $"<RunSettings><RunConfiguration><TargetFrameworkVersion>{tfm}</TargetFrameworkVersion></RunConfiguration></RunSettings>");
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
-            mockProcessHelper.Verify(ph => ph.SetExitCallback(expectedProcessId, It.IsAny<Action<object>>()));
-        }
+        var expectedRuntimeConfigPath = Path.Combine(here, $"testhost-{suffix}.runtimeconfig.json");
+        StringAssert.Contains(startInfo.Arguments, $"--runtimeconfig \"{expectedRuntimeConfigPath}\"");
+    }
 
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromSourceDirectoryIfDepsFileNotFound()
-        {
-            // Absolute path to the source directory
-            var sourcePath = Path.Combine(temp, "test.dll");
-            string expectedTestHostPath = Path.Combine(temp, "testhost.dll");
-            mockFileHelper.Setup(ph => ph.Exists(expectedTestHostPath)).Returns(true);
-            mockFileHelper.Setup(ph => ph.Exists(Path.Combine(temp, "test.runtimeconfig.dev.json"))).Returns(true);
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromSourceDirectoryIfRunConfigDevFileNotFound()
+    {
+        // Absolute path to the source directory
+        var sourcePath = Path.Combine(_temp, "test.dll");
+        string expectedTestHostPath = Path.Combine(_temp, "testhost.dll");
+        _mockFileHelper.Setup(ph => ph.Exists(expectedTestHostPath)).Returns(true);
+        _mockFileHelper.Setup(ph => ph.Exists(Path.Combine(_temp, "test.deps.json"))).Returns(true);
 
-            var startInfo = dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, defaultConnectionInfo);
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
-            StringAssert.Contains(startInfo.Arguments, expectedTestHostPath);
-        }
+        Assert.IsTrue(startInfo.Arguments.Contains(expectedTestHostPath));
+    }
 
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldIncludeTestHostPathNextToTestRunnerIfTesthostDllIsNoFoundAndDepsFileNotFound()
-        {
-            // Absolute path to the source directory
-            var sourcePath = Path.Combine(temp, "test.dll");
-            string testhostNextToTestDll = Path.Combine(temp, "testhost.dll");
-            mockFileHelper.Setup(ph => ph.Exists(testhostNextToTestDll)).Returns(false);
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromDepsFile()
+    {
+        // Absolute path to the source directory
+        var sourcePath = Path.Combine(_temp, "test.dll");
 
-            var here = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            var expectedTestHostPath = Path.Combine(here, "testhost.dll");
-            mockFileHelper.Setup(ph => ph.Exists(expectedTestHostPath)).Returns(true);
-
-            var startInfo = dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, defaultConnectionInfo);
-
-            StringAssert.Contains(startInfo.Arguments, expectedTestHostPath);
-            var expectedAdditionalDepsPath = Path.Combine(here, "testhost.deps.json");
-            StringAssert.Contains(startInfo.Arguments, $"--additional-deps \"{expectedAdditionalDepsPath}\"");
-            var expectedAdditionalProbingPath = here;
-            StringAssert.Contains(startInfo.Arguments, $"--additionalprobingpath \"{expectedAdditionalProbingPath}\"");
-            var expectedRuntimeConfigPath = Path.Combine(here, "testhost-latest.runtimeconfig.json");
-            StringAssert.Contains(startInfo.Arguments, $"--runtimeconfig \"{expectedRuntimeConfigPath}\"");
-        }
-
-        [TestMethod]
-
-        // we can't put in a "default" value, and we don't have other way to determine if this provided value is the
-        // runtime default or the actual value that user provided, so right now the default will use the latest, instead
-        // or the more correct 1.0, it should be okay, as that version is not supported anymore anyway
-        [DataRow("netcoreapp1.0", "latest")]
-        [DataRow("netcoreapp2.1", "2.1")]
-        [DataRow("netcoreapp3.1", "3.1")]
-        [DataRow("net5.0", "5.0")]
-
-        // net6.0 is currently the latest released version, but it still has it's own runtime config, it is not the same as
-        // "latest" which means the latest you have on system. So if you have only 5.0 SDK then net6.0 will fail because it can't find net6.0,
-        // but latest would use net5.0 because that is the latest one on your system.
-        [DataRow("net6.0", "6.0")]
-        public void GetTestHostProcessStartInfoShouldIncludeTestHostPathNextToTestRunnerIfTesthostDllIsNoFoundAndDepsFileNotFoundWithTheCorrectTfm(string tfm, string suffix)
-        {
-            // Absolute path to the source directory
-            var sourcePath = Path.Combine(temp, "test.dll");
-            string testhostNextToTestDll = Path.Combine(temp, "testhost.dll");
-            mockFileHelper.Setup(ph => ph.Exists(testhostNextToTestDll)).Returns(false);
-
-            var here = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            var testhostNextToRunner = Path.Combine(here, "testhost.dll");
-            mockFileHelper.Setup(ph => ph.Exists(testhostNextToRunner)).Returns(true);
-
-            dotnetHostManager.Initialize(mockMessageLogger.Object, $"<RunSettings><RunConfiguration><TargetFrameworkVersion>{tfm}</TargetFrameworkVersion></RunConfiguration></RunSettings>");
-            var startInfo = dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, defaultConnectionInfo);
-
-            var expectedRuntimeConfigPath = Path.Combine(here, $"testhost-{suffix}.runtimeconfig.json");
-            StringAssert.Contains(startInfo.Arguments, $"--runtimeconfig \"{expectedRuntimeConfigPath}\"");
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromSourceDirectoryIfRunConfigDevFileNotFound()
-        {
-            // Absolute path to the source directory
-            var sourcePath = Path.Combine(temp, "test.dll");
-            string expectedTestHostPath = Path.Combine(temp, "testhost.dll");
-            mockFileHelper.Setup(ph => ph.Exists(expectedTestHostPath)).Returns(true);
-            mockFileHelper.Setup(ph => ph.Exists(Path.Combine(temp, "test.deps.json"))).Returns(true);
-
-            var startInfo = dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, defaultConnectionInfo);
-
-            Assert.IsTrue(startInfo.Arguments.Contains(expectedTestHostPath));
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromDepsFile()
-        {
-            // Absolute path to the source directory
-            var sourcePath = Path.Combine(temp, "test.dll");
-
-            string runtimeConfigFileContent =
-@"{
+        string runtimeConfigFileContent =
+            @"{
     ""runtimeOptions"": {
         ""additionalProbingPaths"": [
             ""C:\\packages""
@@ -696,8 +698,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 }";
 
-            string depsFileContent =
-@"{
+        string depsFileContent =
+            @"{
     ""runtimeTarget"": {
         ""name"": "".NETCoreApp,Version=v1.0"",
         ""signature"": ""8f25843f8e35a3e80ef4ae98b95117ea5c468b3f""
@@ -730,30 +732,30 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     }
 }";
 
-            MemoryStream runtimeConfigStream = new(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
-            mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(temp, "test.runtimeconfig.dev.json"), FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
-            mockFileHelper.Setup(ph => ph.Exists(Path.Combine(temp, "test.runtimeconfig.dev.json"))).Returns(true);
+        MemoryStream runtimeConfigStream = new(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
+        _mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(_temp, "test.runtimeconfig.dev.json"), FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
+        _mockFileHelper.Setup(ph => ph.Exists(Path.Combine(_temp, "test.runtimeconfig.dev.json"))).Returns(true);
 
-            MemoryStream depsFileStream = new(Encoding.UTF8.GetBytes(depsFileContent));
-            mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
-            mockFileHelper.Setup(ph => ph.Exists(Path.Combine(temp, "test.deps.json"))).Returns(true);
+        MemoryStream depsFileStream = new(Encoding.UTF8.GetBytes(depsFileContent));
+        _mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(_temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
+        _mockFileHelper.Setup(ph => ph.Exists(Path.Combine(_temp, "test.deps.json"))).Returns(true);
 
-            string testHostFullPath = $@"C:\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost/15.0.0-Dev{Path.DirectorySeparatorChar}lib/netstandard1.5/testhost.dll";
-            mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(true);
+        string testHostFullPath = $@"C:\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost/15.0.0-Dev{Path.DirectorySeparatorChar}lib/netstandard1.5/testhost.dll";
+        _mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(true);
 
-            var startInfo = dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, defaultConnectionInfo);
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
-            Assert.IsTrue(startInfo.Arguments.Contains(testHostFullPath));
-        }
+        Assert.IsTrue(startInfo.Arguments.Contains(testHostFullPath));
+    }
 
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromSourceDirectoryIfNugetpathDoesntExist()
-        {
-            // Absolute path to the source directory
-            var sourcePath = Path.Combine(temp, "test.dll");
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromSourceDirectoryIfNugetpathDoesntExist()
+    {
+        // Absolute path to the source directory
+        var sourcePath = Path.Combine(_temp, "test.dll");
 
-            string runtimeConfigFileContent =
-@"{
+        string runtimeConfigFileContent =
+            @"{
     ""runtimeOptions"": {
         ""additionalProbingPaths"": [
             ""C:\\packages""
@@ -761,8 +763,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 }";
 
-            string depsFileContent =
-@"{
+        string depsFileContent =
+            @"{
     ""runtimeTarget"": {
         ""name"": "".NETCoreApp,Version=v1.0"",
         ""signature"": ""8f25843f8e35a3e80ef4ae98b95117ea5c468b3f""
@@ -795,32 +797,32 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     }
 }";
 
-            MemoryStream runtimeConfigStream = new(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
-            mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(temp, "test.runtimeconfig.dev.json"), FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
-            mockFileHelper.Setup(ph => ph.Exists(Path.Combine(temp, "test.runtimeconfig.dev.json"))).Returns(true);
+        MemoryStream runtimeConfigStream = new(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
+        _mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(_temp, "test.runtimeconfig.dev.json"), FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
+        _mockFileHelper.Setup(ph => ph.Exists(Path.Combine(_temp, "test.runtimeconfig.dev.json"))).Returns(true);
 
-            MemoryStream depsFileStream = new(Encoding.UTF8.GetBytes(depsFileContent));
-            mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
-            mockFileHelper.Setup(ph => ph.Exists(Path.Combine(temp, "test.deps.json"))).Returns(true);
+        MemoryStream depsFileStream = new(Encoding.UTF8.GetBytes(depsFileContent));
+        _mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(_temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
+        _mockFileHelper.Setup(ph => ph.Exists(Path.Combine(_temp, "test.deps.json"))).Returns(true);
 
-            string testHostFullPath = $@"C:\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost/15.0.0-Dev{Path.DirectorySeparatorChar}lib/netstandard1.5/testhost.dll";
-            mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(false);
+        string testHostFullPath = $@"C:\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost/15.0.0-Dev{Path.DirectorySeparatorChar}lib/netstandard1.5/testhost.dll";
+        _mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(false);
 
-            string testHostPath = Path.Combine(temp, "testhost.dll");
+        string testHostPath = Path.Combine(_temp, "testhost.dll");
 
-            var startInfo = dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, defaultConnectionInfo);
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
-            Assert.IsTrue(startInfo.Arguments.Contains(testHostPath));
-        }
+        Assert.IsTrue(startInfo.Arguments.Contains(testHostPath));
+    }
 
-        [TestMethod]
-        public void GetTestHostProcessStartInfoShouldSkipInvalidAdditionalProbingPaths()
-        {
-            // Absolute path to the source directory
-            var sourcePath = Path.Combine(temp, "test.dll");
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldSkipInvalidAdditionalProbingPaths()
+    {
+        // Absolute path to the source directory
+        var sourcePath = Path.Combine(_temp, "test.dll");
 
-            string runtimeConfigFileContent =
-@"{
+        string runtimeConfigFileContent =
+            @"{
     ""runtimeOptions"": {
         ""additionalProbingPaths"": [
             ""C:\\Users\\bob\\.dotnet\\store\\|arch|\\|tfm|"",
@@ -829,8 +831,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 }";
 
-            string depsFileContent =
-@"{
+        string depsFileContent =
+            @"{
     ""runtimeTarget"": {
         ""name"": "".NETCoreApp,Version=v1.0"",
         ""signature"": ""8f25843f8e35a3e80ef4ae98b95117ea5c468b3f""
@@ -863,216 +865,215 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     }
 }";
 
-            MemoryStream runtimeConfigStream = new(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
-            mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(temp, "test.runtimeconfig.dev.json"), FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
-            mockFileHelper.Setup(ph => ph.Exists(Path.Combine(temp, "test.runtimeconfig.dev.json"))).Returns(true);
+        MemoryStream runtimeConfigStream = new(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
+        _mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(_temp, "test.runtimeconfig.dev.json"), FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
+        _mockFileHelper.Setup(ph => ph.Exists(Path.Combine(_temp, "test.runtimeconfig.dev.json"))).Returns(true);
 
-            MemoryStream depsFileStream = new(Encoding.UTF8.GetBytes(depsFileContent));
-            mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
-            mockFileHelper.Setup(ph => ph.Exists(Path.Combine(temp, "test.deps.json"))).Returns(true);
+        MemoryStream depsFileStream = new(Encoding.UTF8.GetBytes(depsFileContent));
+        _mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(_temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
+        _mockFileHelper.Setup(ph => ph.Exists(Path.Combine(_temp, "test.deps.json"))).Returns(true);
 
-            string testHostFullPath = $@"C:\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost/15.0.0-Dev{Path.DirectorySeparatorChar}lib/netstandard1.5/testhost.dll";
-            mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(true);
+        string testHostFullPath = $@"C:\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost/15.0.0-Dev{Path.DirectorySeparatorChar}lib/netstandard1.5/testhost.dll";
+        _mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(true);
 
-            var startInfo = dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, defaultConnectionInfo);
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
-            Assert.IsTrue(startInfo.Arguments.Contains(testHostFullPath));
-        }
+        Assert.IsTrue(startInfo.Arguments.Contains(testHostFullPath));
+    }
 
-        [TestMethod]
-        [DataRow("DOTNET_ROOT(x86)", "x86")]
-        [DataRow("DOTNET_ROOT", "x64")]
-        [DataRow("DOTNET_ROOT_WRONG", "")]
-        [TestCategory("Windows")]
-        public void GetTestHostProcessStartInfoShouldForwardDOTNET_ROOTEnvVarsForAppHost(string envVar, string expectedValue)
+    [TestMethod]
+    [DataRow("DOTNET_ROOT(x86)", "x86")]
+    [DataRow("DOTNET_ROOT", "x64")]
+    [DataRow("DOTNET_ROOT_WRONG", "")]
+    [TestCategory("Windows")]
+    public void GetTestHostProcessStartInfoShouldForwardDOTNET_ROOTEnvVarsForAppHost(string envVar, string expectedValue)
+    {
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.exe")).Returns(true);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable($"VSTEST_WINAPPHOST_{envVar}")).Returns(expectedValue);
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
+        if (!string.IsNullOrEmpty(expectedValue))
         {
-            mockFileHelper.Setup(ph => ph.Exists("testhost.exe")).Returns(true);
-            mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
-            mockEnvironmentVariable.Reset();
-            mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable($"VSTEST_WINAPPHOST_{envVar}")).Returns(expectedValue);
-
-            var startInfo = dotnetHostManager.GetTestHostProcessStartInfo(testSource, null, defaultConnectionInfo);
-            if (!string.IsNullOrEmpty(expectedValue))
-            {
-                Assert.AreEqual(1, startInfo.EnvironmentVariables.Count);
-                Assert.IsNotNull(startInfo.EnvironmentVariables[envVar]);
-                Assert.AreEqual(startInfo.EnvironmentVariables[envVar], expectedValue);
-            }
-            else
-            {
-                Assert.AreEqual(0, startInfo.EnvironmentVariables.Count);
-            }
+            Assert.AreEqual(1, startInfo.EnvironmentVariables.Count);
+            Assert.IsNotNull(startInfo.EnvironmentVariables[envVar]);
+            Assert.AreEqual(startInfo.EnvironmentVariables[envVar], expectedValue);
         }
-
-        [TestMethod]
-        public async Task DotNetCoreErrorMessageShouldBeReadAsynchronouslyAsync()
+        else
         {
-            var errorData = "Custom Error Strings";
-            ErrorCallBackTestHelper(errorData, -1);
-
-            await dotnetHostManager.LaunchTestHostAsync(defaultTestProcessStartInfo, CancellationToken.None);
-
-            Assert.AreEqual(errorData, errorMessage);
+            Assert.AreEqual(0, startInfo.EnvironmentVariables.Count);
         }
+    }
 
-        [TestMethod]
-        public async Task DotNetCoreNoErrorMessageIfExitCodeZero()
+    [TestMethod]
+    public async Task DotNetCoreErrorMessageShouldBeReadAsynchronouslyAsync()
+    {
+        var errorData = "Custom Error Strings";
+        ErrorCallBackTestHelper(errorData, -1);
+
+        await _dotnetHostManager.LaunchTestHostAsync(_defaultTestProcessStartInfo, CancellationToken.None);
+
+        Assert.AreEqual(errorData, _errorMessage);
+    }
+
+    [TestMethod]
+    public async Task DotNetCoreNoErrorMessageIfExitCodeZero()
+    {
+        string errorData = string.Empty;
+        ErrorCallBackTestHelper(errorData, 0);
+
+        await _dotnetHostManager.LaunchTestHostAsync(_defaultTestProcessStartInfo, CancellationToken.None);
+
+        Assert.IsNull(_errorMessage);
+    }
+
+    [TestMethod]
+    [DataRow(null)]
+    [DataRow("")]
+    public async Task DotNetCoreErrorReceivedCallbackShouldNotLogNullOrEmptyData(string errorData)
+    {
+        ErrorCallBackTestHelper(errorData, -1);
+
+        await _dotnetHostManager.LaunchTestHostAsync(_defaultTestProcessStartInfo, CancellationToken.None);
+
+        Assert.AreEqual(_errorMessage, string.Empty);
+    }
+
+    [TestMethod]
+    [DataRow(0)]
+    [DataRow(-1)]
+    public async Task DotNetCoreProcessExitedButNoErrorMessageIfNoDataWritten(int exitCode)
+    {
+        var errorData = string.Empty;
+        ExitCallBackTestHelper(exitCode);
+
+        // override event listener
+        _dotnetHostManager.HostExited += DotnetHostManagerExitCodeTesterHostExited;
+
+        await _dotnetHostManager.LaunchTestHostAsync(_defaultTestProcessStartInfo, CancellationToken.None);
+
+        Assert.AreEqual(_errorMessage, string.Empty);
+        Assert.AreEqual(_exitCode, exitCode);
+    }
+
+    [TestMethod]
+    public async Task CleanTestHostAsyncShouldKillTestHostProcess()
+    {
+        var pid = Process.GetCurrentProcess().Id;
+        bool isVerified = false;
+        _mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>()))
+            .Callback<object>(p => isVerified = ((Process)p).Id == pid);
+
+        ExitCallBackTestHelper(0);
+        await _dotnetHostManager.LaunchTestHostAsync(_defaultTestProcessStartInfo, CancellationToken.None);
+
+        await _dotnetHostManager.CleanTestHostAsync(CancellationToken.None);
+
+        Assert.IsTrue(isVerified);
+    }
+
+    [TestMethod]
+    public async Task CleanTestHostAsyncShouldNotThrowIfTestHostIsNotStarted()
+    {
+        var pid = Process.GetCurrentProcess().Id;
+        bool isVerified = false;
+        _mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>())).Callback<object>(p => isVerified = ((Process)p).Id == pid).Throws<Exception>();
+
+        ExitCallBackTestHelper(0);
+        await _dotnetHostManager.LaunchTestHostAsync(_defaultTestProcessStartInfo, CancellationToken.None);
+
+        await _dotnetHostManager.CleanTestHostAsync(CancellationToken.None);
+
+        Assert.IsTrue(isVerified);
+    }
+
+    private void DotnetHostManagerExitCodeTesterHostExited(object sender, HostProviderEventArgs e)
+    {
+        _errorMessage = e.Data.TrimEnd(Environment.NewLine.ToCharArray());
+        _exitCode = e.ErrroCode;
+    }
+
+    private void DotnetHostManagerHostExited(object sender, HostProviderEventArgs e)
+    {
+        if (e.ErrroCode != 0)
         {
-            string errorData = string.Empty;
-            ErrorCallBackTestHelper(errorData, 0);
-
-            await dotnetHostManager.LaunchTestHostAsync(defaultTestProcessStartInfo, CancellationToken.None);
-
-            Assert.IsNull(errorMessage);
+            _errorMessage = e.Data.TrimEnd(Environment.NewLine.ToCharArray());
         }
+    }
 
-        [TestMethod]
-        [DataRow(null)]
-        [DataRow("")]
-        public async Task DotNetCoreErrorReceivedCallbackShouldNotLogNullOrEmptyData(string errorData)
+    private void DotnetHostManagerHostLaunched(object sender, HostProviderEventArgs e)
+    {
+        _testHostId = e.ProcessId;
+    }
+
+    private void ErrorCallBackTestHelper(string errorMessage, int exitCode)
+    {
+        _mockProcessHelper.Setup(
+                ph =>
+                    ph.LaunchProcess(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<IDictionary<string, string>>(),
+                        It.IsAny<Action<object, string>>(),
+                        It.IsAny<Action<object>>(),
+                        It.IsAny<Action<object, string>>()))
+            .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>, Action<object, string>>(
+                (var1, var2, var3, dictionary, errorCallback, exitCallback, outputCallback) =>
+                {
+                    var process = Process.GetCurrentProcess();
+
+                    errorCallback(process, errorMessage);
+                    exitCallback(process);
+                }).Returns(Process.GetCurrentProcess());
+
+        _mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<object>(), out exitCode)).Returns(true);
+    }
+
+    private void ExitCallBackTestHelper(int exitCode)
+    {
+        _mockProcessHelper.Setup(
+                ph =>
+                    ph.LaunchProcess(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<IDictionary<string, string>>(),
+                        It.IsAny<Action<object, string>>(),
+                        It.IsAny<Action<object>>(),
+                        It.IsAny<Action<object, string>>()))
+            .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>, Action<object, string>>(
+                (var1, var2, var3, dictionary, errorCallback, exitCallback, outputCallback) =>
+                {
+                    var process = Process.GetCurrentProcess();
+                    exitCallback(process);
+                }).Returns(Process.GetCurrentProcess());
+
+        _mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<object>(), out exitCode)).Returns(true);
+    }
+
+    private TestProcessStartInfo GetDefaultStartInfo()
+    {
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(
+            _testSource,
+            null,
+            _defaultConnectionInfo);
+        return startInfo;
+    }
+
+    internal class TestableDotnetTestHostManager : DotnetTestHostManager
+    {
+        public TestableDotnetTestHostManager(
+            IProcessHelper processHelper,
+            IFileHelper fileHelper,
+            IDotnetHostHelper dotnetTestHostHelper,
+            IEnvironment environment,
+            IRunSettingsHelper runsettingsHelper,
+            IWindowsRegistryHelper windowsRegistryHelper,
+            IEnvironmentVariableHelper environmentVariableHelper)
+            : base(processHelper, fileHelper, dotnetTestHostHelper, environment, runsettingsHelper, windowsRegistryHelper, environmentVariableHelper)
         {
-            ErrorCallBackTestHelper(errorData, -1);
-
-            await dotnetHostManager.LaunchTestHostAsync(defaultTestProcessStartInfo, CancellationToken.None);
-
-            Assert.AreEqual(errorMessage, string.Empty);
-        }
-
-        [TestMethod]
-        [DataRow(0)]
-        [DataRow(-1)]
-        public async Task DotNetCoreProcessExitedButNoErrorMessageIfNoDataWritten(int exitCode)
-        {
-            var errorData = string.Empty;
-            ExitCallBackTestHelper(exitCode);
-
-            // override event listener
-            dotnetHostManager.HostExited += DotnetHostManagerExitCodeTesterHostExited;
-
-            await dotnetHostManager.LaunchTestHostAsync(defaultTestProcessStartInfo, CancellationToken.None);
-
-            Assert.AreEqual(errorMessage, string.Empty);
-            Assert.AreEqual(this.exitCode, exitCode);
-        }
-
-        [TestMethod]
-        public async Task CleanTestHostAsyncShouldKillTestHostProcess()
-        {
-            var pid = Process.GetCurrentProcess().Id;
-            bool isVerified = false;
-            mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>()))
-                .Callback<object>(p => isVerified = ((Process)p).Id == pid);
-
-            ExitCallBackTestHelper(0);
-            await dotnetHostManager.LaunchTestHostAsync(defaultTestProcessStartInfo, CancellationToken.None);
-
-            await dotnetHostManager.CleanTestHostAsync(CancellationToken.None);
-
-            Assert.IsTrue(isVerified);
-        }
-
-        [TestMethod]
-        public async Task CleanTestHostAsyncShouldNotThrowIfTestHostIsNotStarted()
-        {
-            var pid = Process.GetCurrentProcess().Id;
-            bool isVerified = false;
-            mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>())).Callback<object>(p => isVerified = ((Process)p).Id == pid).Throws<Exception>();
-
-            ExitCallBackTestHelper(0);
-            await dotnetHostManager.LaunchTestHostAsync(defaultTestProcessStartInfo, CancellationToken.None);
-
-            await dotnetHostManager.CleanTestHostAsync(CancellationToken.None);
-
-            Assert.IsTrue(isVerified);
-        }
-
-        private void DotnetHostManagerExitCodeTesterHostExited(object sender, HostProviderEventArgs e)
-        {
-            errorMessage = e.Data.TrimEnd(Environment.NewLine.ToCharArray());
-            exitCode = e.ErrroCode;
-        }
-
-        private void DotnetHostManagerHostExited(object sender, HostProviderEventArgs e)
-        {
-            if (e.ErrroCode != 0)
-            {
-                errorMessage = e.Data.TrimEnd(Environment.NewLine.ToCharArray());
-            }
-        }
-
-        private void DotnetHostManagerHostLaunched(object sender, HostProviderEventArgs e)
-        {
-            testHostId = e.ProcessId;
-        }
-
-        private void ErrorCallBackTestHelper(string errorMessage, int exitCode)
-        {
-            mockProcessHelper.Setup(
-                    ph =>
-                        ph.LaunchProcess(
-                            It.IsAny<string>(),
-                            It.IsAny<string>(),
-                            It.IsAny<string>(),
-                            It.IsAny<IDictionary<string, string>>(),
-                            It.IsAny<Action<object, string>>(),
-                            It.IsAny<Action<object>>(),
-                            It.IsAny<Action<object, string>>()))
-                .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>, Action<object, string>>(
-                    (var1, var2, var3, dictionary, errorCallback, exitCallback, outputCallback) =>
-                    {
-                        var process = Process.GetCurrentProcess();
-
-                        errorCallback(process, errorMessage);
-                        exitCallback(process);
-                    }).Returns(Process.GetCurrentProcess());
-
-            mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<object>(), out exitCode)).Returns(true);
-        }
-
-        private void ExitCallBackTestHelper(int exitCode)
-        {
-            mockProcessHelper.Setup(
-                    ph =>
-                        ph.LaunchProcess(
-                            It.IsAny<string>(),
-                            It.IsAny<string>(),
-                            It.IsAny<string>(),
-                            It.IsAny<IDictionary<string, string>>(),
-                            It.IsAny<Action<object, string>>(),
-                            It.IsAny<Action<object>>(),
-                            It.IsAny<Action<object, string>>()))
-                .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>, Action<object, string>>(
-                    (var1, var2, var3, dictionary, errorCallback, exitCallback, outputCallback) =>
-                    {
-                        var process = Process.GetCurrentProcess();
-                        exitCallback(process);
-                    }).Returns(Process.GetCurrentProcess());
-
-            mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<object>(), out exitCode)).Returns(true);
-        }
-
-        private TestProcessStartInfo GetDefaultStartInfo()
-        {
-            var startInfo = dotnetHostManager.GetTestHostProcessStartInfo(
-                testSource,
-                null,
-                defaultConnectionInfo);
-            return startInfo;
-        }
-
-        internal class TestableDotnetTestHostManager : DotnetTestHostManager
-        {
-            public TestableDotnetTestHostManager(
-                IProcessHelper processHelper,
-                IFileHelper fileHelper,
-                IDotnetHostHelper dotnetTestHostHelper,
-                IEnvironment environment,
-                IRunSettingsHelper runsettingsHelper,
-                IWindowsRegistryHelper windowsRegistryHelper,
-                IEnvironmentVariableHelper environmentVariableHelper)
-                : base(processHelper, fileHelper, dotnetTestHostHelper, environment, runsettingsHelper, windowsRegistryHelper, environmentVariableHelper)
-            {
-            }
         }
     }
 }

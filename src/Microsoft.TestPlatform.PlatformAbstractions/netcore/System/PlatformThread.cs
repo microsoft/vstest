@@ -8,14 +8,15 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using System;
     using System.Runtime.ExceptionServices;
     using System.Threading;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+    using Interfaces;
 
     public class PlatformThread : IThread
     {
         /// <inheritdoc/>
         public void Run(Action action, PlatformApartmentState apartmentState, bool waitForCompletion)
         {
-            if (apartmentState == PlatformApartmentState.STA)
+            if (apartmentState == PlatformApartmentState.Sta)
             {
                 throw new ThreadApartmentStateNotSupportedException();
             }

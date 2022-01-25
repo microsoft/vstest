@@ -5,9 +5,11 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
-    using Microsoft.TestPlatform.TestUtilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using TestUtilities;
+    using VisualStudio.TestTools.UnitTesting;
+
     using Newtonsoft.Json.Linq;
+
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;

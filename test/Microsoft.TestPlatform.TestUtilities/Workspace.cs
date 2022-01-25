@@ -4,52 +4,51 @@
 using System;
 using System.IO;
 
-namespace Microsoft.TestPlatform.TestUtilities
+namespace Microsoft.TestPlatform.TestUtilities;
+
+public class Workspace : IDisposable
 {
-    public class Workspace : IDisposable
+    public Workspace(string path)
     {
-        public Workspace(string path)
-        {
-            Path = path;
-        }
+        Path = path;
+    }
 
-        public string Path { get; }
+    public string Path { get; }
 
-        public void Dispose()
+    public void Dispose()
+    {
+        if (!string.IsNullOrEmpty(Path))
         {
-            if (!string.IsNullOrEmpty(Path))
+            try
             {
-                try
-                {
-                    if (Directory.Exists(Path))
-                        Directory.Delete(Path, true);
-                }
-                catch
-                {
-                    // ignore
-                }
+                if (Directory.Exists(Path))
+                    Directory.Delete(Path, true);
+            }
+            catch
+            {
+                // ignore
             }
         }
+    }
 
-        public DirectoryInfo CreateDirectory(string dir) => Directory.CreateDirectory(System.IO.Path.Combine(Path, dir));
+    public DirectoryInfo CreateDirectory(string dir) => Directory.CreateDirectory(System.IO.Path.Combine(Path, dir));
 
-        public void CopyAll(DirectoryInfo source, DirectoryInfo target)
+    public void CopyAll(DirectoryInfo source, DirectoryInfo target)
+    {
+        Directory.CreateDirectory(target.FullName);
+
+        // Copy each file into the new directory.
+        foreach (FileInfo fi in source.GetFiles())
         {
-            Directory.CreateDirectory(target.FullName);
+            fi.CopyTo(System.IO.Path.Combine(target.FullName, fi.Name), true);
+        }
 
-            // Copy each file into the new directory.
-            foreach (FileInfo fi in source.GetFiles())
-            {
-                fi.CopyTo(System.IO.Path.Combine(target.FullName, fi.Name), true);
-            }
-
-            // Copy each subdirectory using recursion.
-            foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
-            {
-                DirectoryInfo nextTargetSubDir =
-                    target.CreateSubdirectory(diSourceSubDir.Name);
-                CopyAll(diSourceSubDir, nextTargetSubDir);
-            }
+        // Copy each subdirectory using recursion.
+        foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
+        {
+            DirectoryInfo nextTargetSubDir =
+                target.CreateSubdirectory(diSourceSubDir.Name);
+            CopyAll(diSourceSubDir, nextTargetSubDir);
         }
     }
 }

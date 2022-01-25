@@ -3,30 +3,29 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
+/// <summary>
+/// Interface contract for handling test run attachments processing events
+/// </summary>
+public interface ITestRunAttachmentsProcessingEventsHandler : ITestMessageEventHandler
 {
     /// <summary>
-    /// Interface contract for handling test run attachments processing events
+    /// Dispatch TestRunAttachmentsProcessingComplete event to listeners.
     /// </summary>
-    public interface ITestRunAttachmentsProcessingEventsHandler : ITestMessageEventHandler
-    {
-        /// <summary>
-        /// Dispatch TestRunAttachmentsProcessingComplete event to listeners.
-        /// </summary>
-        /// <param name="attachmentsProcessingCompleteEventArgs">AttachmentsProcessing Complete event args.</param>
-        /// <param name="attachments">Last set of processed attachment sets.</param>
-        void HandleTestRunAttachmentsProcessingComplete(TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk);
+    /// <param name="attachmentsProcessingCompleteEventArgs">AttachmentsProcessing Complete event args.</param>
+    /// <param name="attachments">Last set of processed attachment sets.</param>
+    void HandleTestRunAttachmentsProcessingComplete(TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk);
 
-        /// <summary>
-        /// Dispatch ProcessedAttachmentsChunk event to listeners.
-        /// </summary>
-        /// <param name="attachments">Processed attachment sets.</param>
-        void HandleProcessedAttachmentsChunk(IEnumerable<AttachmentSet> attachments);
+    /// <summary>
+    /// Dispatch ProcessedAttachmentsChunk event to listeners.
+    /// </summary>
+    /// <param name="attachments">Processed attachment sets.</param>
+    void HandleProcessedAttachmentsChunk(IEnumerable<AttachmentSet> attachments);
 
-        /// <summary>
-        /// Dispatch TestRunAttachmentsProcessingProgress event to listeners.
-        /// </summary>
-        /// <param name="AttachmentsProcessingProgressEventArgs">AttachmentsProcessing Progress event args.</param>
-        void HandleTestRunAttachmentsProcessingProgress(TestRunAttachmentsProcessingProgressEventArgs AttachmentsProcessingProgressEventArgs);
-    }
+    /// <summary>
+    /// Dispatch TestRunAttachmentsProcessingProgress event to listeners.
+    /// </summary>
+    /// <param name="attachmentsProcessingProgressEventArgs">AttachmentsProcessing Progress event args.</param>
+    void HandleTestRunAttachmentsProcessingProgress(TestRunAttachmentsProcessingProgressEventArgs attachmentsProcessingProgressEventArgs);
 }

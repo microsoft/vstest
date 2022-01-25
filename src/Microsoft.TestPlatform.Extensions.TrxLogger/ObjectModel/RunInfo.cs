@@ -1,85 +1,84 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
-{
-    using System;
-    using System.Diagnostics;
-    using System.Xml;
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
-    using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+using System;
+using System.Diagnostics;
+using System.Xml;
+
+using XML;
+
+/// <summary>
+/// This is a record about one run-level event that happened at run execution or around it.
+/// </summary>
+internal sealed class RunInfo : IXmlTestStore
+{
+    #region Fields
+
+    [StoreXmlSimpleField("Text", "")]
+    private readonly string _text;
+
+    private readonly Exception _exception;
+
+    [StoreXmlSimpleField("@computerName", "")]
+    private readonly string _computer;
+
+    [StoreXmlSimpleField("@outcome")]
+    private readonly TestOutcome _outcome;
+
+    [StoreXmlSimpleField]
+    private readonly DateTime _timestamp;
+
+    #endregion
+
+    #region Constructors
 
     /// <summary>
-    /// This is a record about one run-level event that happened at run execution or around it.
+    /// Initializes a new instance of the <see cref="RunInfo"/> class.
     /// </summary>
-    internal sealed class RunInfo : IXmlTestStore
+    /// <param name="textMessage">
+    /// The text message.
+    /// </param>
+    /// <param name="ex">
+    /// The exception
+    /// </param>
+    /// <param name="computer">
+    /// The computer.
+    /// </param>
+    /// <param name="outcome">
+    /// The outcome.
+    /// </param>
+    public RunInfo(string textMessage, Exception ex, string computer, TestOutcome outcome)
     {
-        #region Fields
+        Debug.Assert(computer != null, "computer is null");
 
-        [StoreXmlSimpleField("Text", "")]
-        private readonly string _text;
-
-        private readonly Exception _exception;
-
-        [StoreXmlSimpleField("@computerName", "")]
-        private readonly string _computer;
-
-        [StoreXmlSimpleField("@outcome")]
-        private readonly TestOutcome _outcome;
-
-        [StoreXmlSimpleField]
-        private readonly DateTime _timestamp;
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RunInfo"/> class.
-        /// </summary>
-        /// <param name="textMessage">
-        /// The text message.
-        /// </param>
-        /// <param name="ex">
-        /// The exception
-        /// </param>
-        /// <param name="computer">
-        /// The computer.
-        /// </param>
-        /// <param name="outcome">
-        /// The outcome.
-        /// </param>
-        public RunInfo(string textMessage, Exception ex, string computer, TestOutcome outcome)
-        {
-            Debug.Assert(computer != null, "computer is null");
-
-            _text = textMessage;
-            _exception = ex;
-            this._computer = computer;
-            this._outcome = outcome;
-            _timestamp = DateTime.UtcNow;
-        }
-
-        #endregion
-
-        #region IXmlTestStore Members
-
-        /// <summary>
-        /// Saves the class under the XmlElement..
-        /// </summary>
-        /// <param name="element">
-        /// The parent xml.
-        /// </param>
-        /// <param name="parameters">
-        /// The parameters.
-        /// </param>
-        public void Save(XmlElement element, XmlTestStoreParameters parameters)
-        {
-            XmlPersistence helper = new();
-            helper.SaveSingleFields(element, this, parameters);
-            helper.SaveSimpleField(element, "Exception", _exception, null);
-        }
-
-        #endregion
+        _text = textMessage;
+        _exception = ex;
+        _computer = computer;
+        _outcome = outcome;
+        _timestamp = DateTime.UtcNow;
     }
+
+    #endregion
+
+    #region IXmlTestStore Members
+
+    /// <summary>
+    /// Saves the class under the XmlElement..
+    /// </summary>
+    /// <param name="element">
+    /// The parent xml.
+    /// </param>
+    /// <param name="parameters">
+    /// The parameters.
+    /// </param>
+    public void Save(XmlElement element, XmlTestStoreParameters parameters)
+    {
+        XmlPersistence helper = new();
+        helper.SaveSingleFields(element, this, parameters);
+        helper.SaveSimpleField(element, "Exception", _exception, null);
+    }
+
+    #endregion
 }

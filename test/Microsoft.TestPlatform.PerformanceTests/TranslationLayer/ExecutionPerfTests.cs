@@ -1,104 +1,107 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System.Collections.Generic;
+
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
+namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
+
+[TestClass]
+public class ExecutionPerfTests : TelemetryPerfTestbase
 {
-    [TestClass]
-    public class ExecutionPerfTests : TelemetryPerfTestbase
+    private readonly IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private readonly RunEventHandler _runEventHandler;
+
+    public ExecutionPerfTests()
     {
-        private readonly IVsTestConsoleWrapper vstestConsoleWrapper;
-        private readonly RunEventHandler runEventHandler;
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _runEventHandler = new RunEventHandler();
+    }
 
-        public ExecutionPerfTests()
+    [TestMethod]
+    [TestCategory("TelemetryPerf")]
+    public void RunMsTest10K()
+    {
+        var testAssemblies = new List<string>
         {
-            vstestConsoleWrapper = GetVsTestConsoleWrapper();
-            runEventHandler = new RunEventHandler();
-        }
+            GetPerfAssetFullPath("MSTestAdapterPerfTestProject", "MSTestAdapterPerfTestProject.dll"),
+        };
 
-        [TestMethod]
-        [TestCategory("TelemetryPerf")]
-        public void RunMsTest10K()
+        _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _runEventHandler);
+
+        PostTelemetry("RunMsTest10K", _runEventHandler.Metrics);
+    }
+
+    [TestMethod]
+    [TestCategory("TelemetryPerf")]
+    public void RunXunit10K()
+    {
+        var testAssemblies = new List<string>
         {
-            var testAssemblies = new List<string>
-                                     {
-                                         GetPerfAssetFullPath("MSTestAdapterPerfTestProject", "MSTestAdapterPerfTestProject.dll"),
-                                     };
+            GetPerfAssetFullPath("XunitAdapterPerfTestProject", "XunitAdapterPerfTestProject.dll"),
+        };
 
-            vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, runEventHandler);
+        _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _runEventHandler);
 
-            PostTelemetry("RunMsTest10K", runEventHandler.Metrics);
-        }
+        PostTelemetry("RunXunit10K", _runEventHandler.Metrics);
+    }
 
-        [TestMethod]
-        [TestCategory("TelemetryPerf")]
-        public void RunXunit10K()
+    [TestMethod]
+    [TestCategory("TelemetryPerf")]
+    public void RunNunit10K()
+    {
+        var testAssemblies = new List<string>
         {
-            var testAssemblies = new List<string>
-                                     {
-                                         GetPerfAssetFullPath("XunitAdapterPerfTestProject", "XunitAdapterPerfTestProject.dll"),
-                                     };
+            GetPerfAssetFullPath("NunitAdapterPerfTestProject", "NunitAdapterPerfTestProject.dll"),
+        };
 
-            vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, runEventHandler);
+        _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _runEventHandler);
 
-            PostTelemetry("RunXunit10K", runEventHandler.Metrics);
-        }
+        PostTelemetry("RunNunit10K", _runEventHandler.Metrics);
+    }
 
-        [TestMethod]
-        [TestCategory("TelemetryPerf")]
-        public void RunNunit10K()
+    [TestMethod]
+    [TestCategory("TelemetryPerf")]
+    public void RunMsTest10KWithDefaultAdaptersSkipped()
+    {
+        var testAssemblies = new List<string>
         {
-            var testAssemblies = new List<string>
-                                     {
-                                         GetPerfAssetFullPath("NunitAdapterPerfTestProject", "NunitAdapterPerfTestProject.dll"),
-                                     };
+            GetPerfAssetFullPath("MSTestAdapterPerfTestProject", "MSTestAdapterPerfTestProject.dll"),
+        };
 
-            vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, runEventHandler);
+        _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, _runEventHandler);
 
-            PostTelemetry("RunNunit10K", runEventHandler.Metrics);
-        }
+        PostTelemetry("RunMsTest10KWithDefaultAdaptersSkipped", _runEventHandler.Metrics);
+    }
 
-        [TestMethod]
-        [TestCategory("TelemetryPerf")]
-        public void RunMsTest10KWithDefaultAdaptersSkipped()
+    [TestMethod]
+    [TestCategory("TelemetryPerf")]
+    public void RunXunit10KWithDefaultAdaptersSkipped()
+    {
+        var testAssemblies = new List<string>
         {
-            var testAssemblies = new List<string>
-                                     {
-                                         GetPerfAssetFullPath("MSTestAdapterPerfTestProject", "MSTestAdapterPerfTestProject.dll"),
-                                     };
+            GetPerfAssetFullPath("XunitAdapterPerfTestProject", "XunitAdapterPerfTestProject.dll"),
+        };
 
-            vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, runEventHandler);
+        _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, _runEventHandler);
 
-            PostTelemetry("RunMsTest10KWithDefaultAdaptersSkipped", runEventHandler.Metrics);
-        }
+        PostTelemetry("RunXunit10KWithDefaultAdaptersSkipped", _runEventHandler.Metrics);
+    }
 
-        [TestMethod]
-        [TestCategory("TelemetryPerf")]
-        public void RunXunit10KWithDefaultAdaptersSkipped()
+    [TestMethod]
+    [TestCategory("TelemetryPerf")]
+    public void RunNunit10KWithDefaultAdaptersSkipped()
+    {
+        var testAssemblies = new List<string>
         {
-            var testAssemblies = new List<string>
-                                     {
-                                         GetPerfAssetFullPath("XunitAdapterPerfTestProject", "XunitAdapterPerfTestProject.dll"),
-                                     };
+            GetPerfAssetFullPath("NunitAdapterPerfTestProject", "NunitAdapterPerfTestProject.dll"),
+        };
 
-            vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, runEventHandler);
+        _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, _runEventHandler);
 
-            PostTelemetry("RunXunit10KWithDefaultAdaptersSkipped", runEventHandler.Metrics);
-        }
-
-        [TestMethod]
-        [TestCategory("TelemetryPerf")]
-        public void RunNunit10KWithDefaultAdaptersSkipped()
-        {
-            var testAssemblies = new List<string>
-                                     {
-                                         GetPerfAssetFullPath("NunitAdapterPerfTestProject", "NunitAdapterPerfTestProject.dll"),
-                                     };
-
-            vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, runEventHandler);
-
-            PostTelemetry("RunNunit10KWithDefaultAdaptersSkipped", runEventHandler.Metrics);
-        }
+        PostTelemetry("RunNunit10KWithDefaultAdaptersSkipped", _runEventHandler.Metrics);
     }
 }

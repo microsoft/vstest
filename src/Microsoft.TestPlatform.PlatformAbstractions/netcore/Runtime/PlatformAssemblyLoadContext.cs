@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using System.Reflection;
     using System.Runtime.Loader;
 
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Interfaces;
 
     /// <inheritdoc/>
     public class PlatformAssemblyLoadContext : IAssemblyLoadContext

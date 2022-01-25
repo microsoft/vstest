@@ -1,75 +1,77 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
+namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
+
+using global::TestPlatform.TestUtilities;
+
+using VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using VisualStudio.TestTools.UnitTesting;
+
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+
+/// <summary>
+/// The Run Tests using VsTestConsoleWrapper API's
+/// </summary>
+[TestClass]
+public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
 {
-    using global::TestPlatform.TestUtilities;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Threading;
+    private const string Netcoreapp = "netcoreapp";
+    private const string Message = "VsTestConsoleWrapper does not support .Net Core Runner";
 
-    /// <summary>
-    /// The Run Tests using VsTestConsoleWrapper API's
-    /// </summary>
-    [TestClass]
-    public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
+    private IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private RunEventHandler _runEventHandler;
+
+    private void Setup()
     {
-        private const string Netcoreapp = "netcoreapp";
-        private const string Message = "VsTestConsoleWrapper does not support .Net Core Runner";
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _runEventHandler = new RunEventHandler();
+    }
 
-        private IVsTestConsoleWrapper vstestConsoleWrapper;
-        private RunEventHandler runEventHandler;
+    [TestCleanup]
+    public void Cleanup()
+    {
+        _vstestConsoleWrapper?.EndSession();
+    }
 
-        private void Setup()
-        {
-            vstestConsoleWrapper = GetVsTestConsoleWrapper();
-            runEventHandler = new RunEventHandler();
-        }
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void RunTestsWithTestAdapterPath(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        Setup();
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            vstestConsoleWrapper?.EndSession();
-        }
+        var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(), "*.TestAdapter.dll").ToList();
+        _vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
 
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void RunTestsWithTestAdapterPath(RunnerInfo runnerInfo)
-        {
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            Setup();
+        _vstestConsoleWrapper.RunTests(
+            GetTestAssemblies(),
+            GetDefaultRunSettings(),
+            _runEventHandler);
 
-            var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(), "*.TestAdapter.dll").ToList();
-            vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
+        // Assert
+        Assert.AreEqual(6, _runEventHandler.TestResults.Count);
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+    }
 
-            vstestConsoleWrapper.RunTests(
-                GetTestAssemblies(),
-                GetDefaultRunSettings(),
-                runEventHandler);
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void RunTestsWithRunSettingsWithParallel(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        Setup();
 
-            // Assert
-            Assert.AreEqual(6, runEventHandler.TestResults.Count);
-            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
-        }
-
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void RunTestsWithRunSettingsWithParallel(RunnerInfo runnerInfo)
-        {
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            Setup();
-
-            string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
+        string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
                                         <RunConfiguration>
                                         <TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion>
@@ -77,114 +79,113 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                         </RunConfiguration>
                                     </RunSettings>";
 
-            var testHostNames = new[] { "testhost", "testhost.x86", "dotnet" };
-            int expectedNumOfProcessCreated = 2;
+        var testHostNames = new[] { "testhost", "testhost.x86", "dotnet" };
+        int expectedNumOfProcessCreated = 2;
 
-            var cts = new CancellationTokenSource();
-            var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
-                cts,
-                testHostNames);
+        var cts = new CancellationTokenSource();
+        var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
+            cts,
+            testHostNames);
 
-            vstestConsoleWrapper.RunTests(
-                GetTestAssemblies(),
-                runSettingsXml,
-                runEventHandler);
+        _vstestConsoleWrapper.RunTests(
+            GetTestAssemblies(),
+            runSettingsXml,
+            _runEventHandler);
 
-            cts.Cancel();
+        cts.Cancel();
 
-            // Assert
-            runEventHandler.EnsureSuccess();
-            Assert.AreEqual(6, runEventHandler.TestResults.Count);
-            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
-            Assert.AreEqual(
-                expectedNumOfProcessCreated,
-                numOfProcessCreatedTask.Result.Count,
-                $"Number of '{ string.Join(", ", testHostNames) }' process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) })");
-        }
+        // Assert
+        _runEventHandler.EnsureSuccess();
+        Assert.AreEqual(6, _runEventHandler.TestResults.Count);
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+        Assert.AreEqual(
+            expectedNumOfProcessCreated,
+            numOfProcessCreatedTask.Result.Count,
+            $"Number of '{ string.Join(", ", testHostNames) }' process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) })");
+    }
 
-        [TestMethod]
-        [TestCategory("Windows-Review")]
-        [NetFullTargetFrameworkDataSource]
-        public void RunTestsWithTestSettings(RunnerInfo runnerInfo)
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [NetFullTargetFrameworkDataSource]
+    public void RunTestsWithTestSettings(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+        Setup();
+
+        var testsettingsFile = Path.Combine(Path.GetTempPath(), "tempsettings.testsettings");
+        string testSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?><TestSettings></TestSettings>";
+
+        File.WriteAllText(testsettingsFile, testSettingsXml, Encoding.UTF8);
+        var runSettings = $"<RunSettings><RunConfiguration><TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion></RunConfiguration><MSTest><SettingsFile>" + testsettingsFile + "</SettingsFile></MSTest></RunSettings>";
+        var sources = new List<string>
         {
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
-            Setup();
+            GetAssetFullPath("MstestV1UnitTestProject.dll")
+        };
 
-            var testsettingsFile = Path.Combine(Path.GetTempPath(), "tempsettings.testsettings");
-            string testSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?><TestSettings></TestSettings>";
+        _vstestConsoleWrapper.RunTests(
+            sources,
+            runSettings,
+            _runEventHandler);
 
-            File.WriteAllText(testsettingsFile, testSettingsXml, Encoding.UTF8);
-            var runSettings = $"<RunSettings><RunConfiguration><TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion></RunConfiguration><MSTest><SettingsFile>" + testsettingsFile + "</SettingsFile></MSTest></RunSettings>";
-            var sources = new List<string>
-                              {
-                                  GetAssetFullPath("MstestV1UnitTestProject.dll")
-                              };
+        // Assert
+        Assert.AreEqual(5, _runEventHandler.TestResults.Count);
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
 
-            vstestConsoleWrapper.RunTests(
-                sources,
-                runSettings,
-                runEventHandler);
+        File.Delete(testsettingsFile);
+    }
 
-            // Assert
-            Assert.AreEqual(5, runEventHandler.TestResults.Count);
-            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-            Assert.AreEqual(1, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void RunTestsWithX64Source(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        Setup();
 
-            File.Delete(testsettingsFile);
-        }
-
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void RunTestsWithX64Source(RunnerInfo runnerInfo)
+        var sources = new List<string>
         {
-            SetTestEnvironment(testEnvironment, runnerInfo);
-            Setup();
-
-            var sources = new List<string>
-                              {
-                                  GetAssetFullPath("SimpleTestProject3.dll")
-                              };
+            GetAssetFullPath("SimpleTestProject3.dll")
+        };
 
 
-            int expectedNumOfProcessCreated = 1;
-            var testhostProcessNames = new[] { "testhost", "dotnet" };
+        int expectedNumOfProcessCreated = 1;
+        var testhostProcessNames = new[] { "testhost", "dotnet" };
 
-            var cts = new CancellationTokenSource();
-            var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
-                cts, testhostProcessNames);
+        var cts = new CancellationTokenSource();
+        var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
+            cts, testhostProcessNames);
 
-            vstestConsoleWrapper.RunTests(
-                sources,
-                GetDefaultRunSettings(),
-                new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName = SampleUnitTestProject3.UnitTest1.WorkingDirectoryTest" },
-                runEventHandler);
+        _vstestConsoleWrapper.RunTests(
+            sources,
+            GetDefaultRunSettings(),
+            new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName = SampleUnitTestProject3.UnitTest1.WorkingDirectoryTest" },
+            _runEventHandler);
 
-            cts.Cancel();
+        cts.Cancel();
 
-            // Assert
-            Assert.AreEqual(1, runEventHandler.TestResults.Count);
-            Assert.AreEqual(1, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            var numberOfProcessCreated = numOfProcessCreatedTask.Result;
-            Assert.AreEqual(
-                expectedNumOfProcessCreated,
-                numberOfProcessCreated.Count,
-                $"Number of { string.Join(" ,", testhostProcessNames) } process created, expected: {expectedNumOfProcessCreated} actual: {numberOfProcessCreated.Count} ({ string.Join(", ", numberOfProcessCreated) })");
-        }
+        // Assert
+        Assert.AreEqual(1, _runEventHandler.TestResults.Count);
+        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        var numberOfProcessCreated = numOfProcessCreatedTask.Result;
+        Assert.AreEqual(
+            expectedNumOfProcessCreated,
+            numberOfProcessCreated.Count,
+            $"Number of { string.Join(" ,", testhostProcessNames) } process created, expected: {expectedNumOfProcessCreated} actual: {numberOfProcessCreated.Count} ({ string.Join(", ", numberOfProcessCreated) })");
+    }
 
-        private IList<string> GetTestAssemblies()
+    private IList<string> GetTestAssemblies()
+    {
+        var testAssemblies = new List<string>
         {
-            var testAssemblies = new List<string>
-                                     {
-                                         GetAssetFullPath("SimpleTestProject.dll"),
-                                         GetAssetFullPath("SimpleTestProject2.dll")
-                                     };
+            GetAssetFullPath("SimpleTestProject.dll"),
+            GetAssetFullPath("SimpleTestProject2.dll")
+        };
 
-            return testAssemblies;
-        }
+        return testAssemblies;
     }
 }

@@ -6,7 +6,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
     using System;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+    using Interfaces;
 
     /// <inheritdoc />
     public class PlatformEnvironment : IEnvironment
