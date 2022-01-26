@@ -9,9 +9,8 @@ using System.Collections.ObjectModel;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
@@ -21,8 +20,6 @@ using Moq;
 [TestClass]
 public class BlameLoggerTests
 {
-    private readonly Mock<ITestRunRequest> _testRunRequest;
-    private readonly Mock<TestLoggerEvents> _events;
     private readonly Mock<IOutput> _mockOutput;
     private readonly Mock<IBlameReaderWriter> _mockBlameReaderWriter;
     private readonly BlameLogger _blameLogger;
@@ -33,8 +30,6 @@ public class BlameLoggerTests
     public BlameLoggerTests()
     {
         // Mock for ITestRunRequest
-        _testRunRequest = new Mock<ITestRunRequest>();
-        _events = new Mock<TestLoggerEvents>();
         _mockOutput = new Mock<IOutput>();
         _mockBlameReaderWriter = new Mock<IBlameReaderWriter>();
         _blameLogger = new TestableBlameLogger(_mockOutput.Object, _mockBlameReaderWriter.Object);
@@ -132,12 +127,11 @@ public class BlameLoggerTests
         loggerEvents.EnableEvents();
         _blameLogger.Initialize(loggerEvents, (string)null);
 
-        var testCaseList =
-            new List<BlameTestObject>
-            {
-                new BlameTestObject(new TestCase("ABC.UnitTestMethod1", new Uri("test://uri"), "C://test/filepath")),
-                new BlameTestObject(new TestCase("ABC.UnitTestMethod2", new Uri("test://uri"), "C://test/filepath"))
-            };
+        var testCaseList = new List<BlameTestObject>
+        {
+            new BlameTestObject(new TestCase("ABC.UnitTestMethod1", new Uri("test://uri"), "C://test/filepath")),
+            new BlameTestObject(new TestCase("ABC.UnitTestMethod2", new Uri("test://uri"), "C://test/filepath"))
+        };
 
         // Setup and Raise event
         _mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>())).Returns(testCaseList);

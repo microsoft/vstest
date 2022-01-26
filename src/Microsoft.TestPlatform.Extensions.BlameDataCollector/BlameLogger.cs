@@ -15,8 +15,8 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 /// <summary>
 /// The blame logger.
 /// </summary>
-[FriendlyName(FriendlyName)]
-[ExtensionUri(ExtensionUri)]
+[FriendlyName(BlameLogger.FriendlyName)]
+[ExtensionUri(BlameLogger.ExtensionUri)]
 public class BlameLogger : ITestLogger
 {
     #region Constants
@@ -96,8 +96,8 @@ public class BlameLogger : ITestLogger
             throw new ArgumentNullException(nameof(sender));
         }
 
-        ValidateArg.NotNull(sender, nameof(sender));
-        ValidateArg.NotNull(e, nameof(e));
+        ValidateArg.NotNull<object>(sender, nameof(sender));
+        ValidateArg.NotNull<TestRunCompleteEventArgs>(e, nameof(e));
 
         if (!e.IsAborted)
         {
@@ -113,7 +113,7 @@ public class BlameLogger : ITestLogger
             return;
         }
 
-        StringBuilder sb = new();
+        var sb = new StringBuilder();
         foreach (var tcn in testCaseNames)
         {
             sb.Append(tcn).Append(Environment.NewLine);

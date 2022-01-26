@@ -26,7 +26,7 @@ public class DataCollectorInformationTests
         _envVarList = new List<KeyValuePair<string, string>>();
         _mockDataCollector = new Mock<DataCollector2>();
         _mockDataCollector.As<ITestExecutionEnvironmentSpecifier>().Setup(x => x.GetTestExecutionEnvironmentVariables()).Returns(_envVarList);
-        _mockDataCollector.Protected().Setup("Dispose", true);
+        _mockDataCollector.Protected().Setup("Dispose", false, true);
         var mockMessageSink = new Mock<IMessageSink>();
         _dataCollectorInfo = new DataCollectorInformation(
             _mockDataCollector.Object,
@@ -56,6 +56,6 @@ public class DataCollectorInformationTests
         _dataCollectorInfo.InitializeDataCollector();
         _dataCollectorInfo.DisposeDataCollector();
 
-        _mockDataCollector.Protected().Verify("Dispose", Times.Once(), true);
+        _mockDataCollector.Protected().Verify("Dispose", Times.Once(), false, true);
     }
 }

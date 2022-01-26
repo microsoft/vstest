@@ -301,9 +301,9 @@ public static class AssemblyHelper
 
     /// <summary>
     /// When test run is targeted for .Net4.0, set target framework of test appdomain to be v4.0.
-    /// With this done tests would be executed in 4.0 compatibility mode even when  .Net4.5 is installed.
+    /// With this done tests would be executed in 4.0 compatibility mode even when .Net4.5 is installed.
     /// </summary>
-    internal static void SetNetFrameworkCompatiblityMode(AppDomainSetup setup, IRunContext runContext)
+    internal static void SetNETFrameworkCompatiblityMode(AppDomainSetup setup, IRunContext runContext)
     {
         try
         {

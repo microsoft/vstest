@@ -30,7 +30,7 @@ public class AssemblyHelperTests
         _runContext.Setup(rc => rc.RunSettings).Returns(_runSettings.Object);
         AppDomainSetup appDomainSetup = new();
 
-        AssemblyHelper.SetNetFrameworkCompatiblityMode(appDomainSetup, _runContext.Object);
+        AssemblyHelper.SetNETFrameworkCompatiblityMode(appDomainSetup, _runContext.Object);
 
         Assert.AreEqual(".NETFramework,Version=v4.0", appDomainSetup.TargetFrameworkName);
     }
@@ -42,7 +42,7 @@ public class AssemblyHelperTests
         _runContext.Setup(rc => rc.RunSettings).Returns(_runSettings.Object);
         AppDomainSetup appDomainSetup = new();
 
-        AssemblyHelper.SetNetFrameworkCompatiblityMode(appDomainSetup, _runContext.Object);
+        AssemblyHelper.SetNETFrameworkCompatiblityMode(appDomainSetup, _runContext.Object);
 
         Assert.AreEqual(".NETFramework,Version=v4.0", appDomainSetup.TargetFrameworkName);
     }
@@ -54,7 +54,7 @@ public class AssemblyHelperTests
         _runContext.Setup(rc => rc.RunSettings).Returns(_runSettings.Object);
         AppDomainSetup appDomainSetup = new();
 
-        AssemblyHelper.SetNetFrameworkCompatiblityMode(appDomainSetup, _runContext.Object);
+        AssemblyHelper.SetNETFrameworkCompatiblityMode(appDomainSetup, _runContext.Object);
 
         Assert.IsNull(appDomainSetup.TargetFrameworkName);
     }
@@ -68,7 +68,7 @@ public class AssemblyHelperTests
         runContext.Setup(rc => rc.RunSettings).Returns(runSettings.Object);
         AppDomainSetup appDomainSetup = new();
 
-        AssemblyHelper.SetNetFrameworkCompatiblityMode(appDomainSetup, runContext.Object);
+        AssemblyHelper.SetNETFrameworkCompatiblityMode(appDomainSetup, runContext.Object);
 
         Assert.IsNull(appDomainSetup.TargetFrameworkName);
     }

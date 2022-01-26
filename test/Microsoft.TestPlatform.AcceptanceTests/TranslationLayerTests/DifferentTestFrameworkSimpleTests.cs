@@ -64,11 +64,11 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         // Release builds optimize code, hence line numbers are different.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
         {
-            Assert.AreEqual(11, testCase.FirstOrDefault().TestCase.LineNumber);
+            Assert.AreEqual(14, testCase.FirstOrDefault().TestCase.LineNumber);
         }
         else
         {
-            Assert.AreEqual(10, testCase.FirstOrDefault().TestCase.LineNumber);
+            Assert.AreEqual(13, testCase.FirstOrDefault().TestCase.LineNumber);
         }
     }
 
@@ -106,11 +106,11 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         // Release builds optimize code, hence line numbers are different.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
         {
-            Assert.AreEqual(16, testCase.FirstOrDefault().TestCase.LineNumber);
+            Assert.AreEqual(15, testCase.FirstOrDefault().TestCase.LineNumber);
         }
         else
         {
-            Assert.AreEqual(15, testCase.FirstOrDefault().TestCase.LineNumber);
+            Assert.AreEqual(14, testCase.FirstOrDefault().TestCase.LineNumber);
         }
     }
 

@@ -3,11 +3,11 @@
 
 namespace TestClasses;
 
-#pragma warning disable IDE0060 // Remove unused parameter
-
 using System;
 using System.Collections.Generic;
 
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable CA1822 // Mark members as static
 internal class Outer
 {
     public void Method0() { }
@@ -18,8 +18,8 @@ internal class Outer
     {
         public void Method0() { }
         public void Method1(int i) { }
-        public void Method2<TU>(int i) { }
-        public void Method3<TU, T>(int i) { }
+        public void Method2<U>(int i) { }
+        public void Method3<U, T>(int i) { }
     }
 }
 
@@ -29,28 +29,28 @@ internal class Outer<T>
 {
     public void Method0() { }
     public void Method1(T t) { }
-    public void Method2<TU>(TU[] u) { }
-    public void Method3<TU>(T t, TU u) { }
+    public void Method2<U>(U[] u) { }
+    public void Method3<U>(T t, U u) { }
 
-    internal class Inner<TV>
+    internal class Inner<V>
     {
         public void Method0() { }
         public void Method1(T t) { }
-        public void Method2(TV v) { }
-        public void Method3<TU>(T t, TU u, TV v) { }
-        public void Method4<TU, TX>(TX x, TU u) { }
-        public void Method5<TU, TX>(List<TX> x, TU u) { }
+        public void Method2(V v) { }
+        public void Method3<U>(T t, U u, V v) { }
+        public void Method4<U, X>(X x, U u) { }
+        public void Method5<U, X>(List<X> x, U u) { }
 
         internal class MoreInner<I>
         {
-            public void Method0<TU>(T t, TV v, I i, TU u) { }
+            public void Method0<U>(T t, V v, I i, U u) { }
         }
     }
 }
 
-internal class OuterPrime<TZ> : Outer<TZ> { }
+internal class OuterPrime<Z> : Outer<Z> { }
 
-internal class OuterPrime<TY, TZ> : Outer<TZ> { }
+internal class OuterPrime<Y, Z> : Outer<Z> { }
 
 internal class OuterString : Outer<string> { }
 
@@ -70,14 +70,14 @@ internal interface IImplementation<T>
 {
     void ImplMethod0();
     void ImplMethod1(T t);
-    void ImplMethod2<TU>(T t, TU u, string s);
+    void ImplMethod2<U>(T t, U u, string s);
 }
 
 internal class Impl<T> : IImplementation<T>
 {
     void IImplementation<T>.ImplMethod0() { }
     void IImplementation<T>.ImplMethod1(T t) { }
-    void IImplementation<T>.ImplMethod2<TU>(T t, TU u, string s) { }
+    void IImplementation<T>.ImplMethod2<U>(T t, U u, string s) { }
 }
 
 internal class Overloads
@@ -87,18 +87,19 @@ internal class Overloads
     public void Overload0(int i, Overloads c) { }
     public unsafe void Overload0(int* p) { }
     public void Overload0(dynamic d) { }
-    public void Overload0<TU>(TU u) { }
-    public void Overload0<TU>() { }
-    public void Overload0<TU, T>() { }
-    public void Overload0<TU>(TU[] u) { }
-    public void Overload0<TU>(TU[][] u) { }
-    public void Overload0<TU>(TU[,] u) { }
-    public void Overload0<TU>(TU[,,] u) { }
-    public void Overload0<TU>(List<int> l) { }
-    public void Overload0<TU>(List<TU> l) { }
-    public void Overload0<TU, TV>(Tuple<TU, TV> t0, Tuple<TV, TU> t1) { }
+    public void Overload0<U>(U u) { }
+    public void Overload0<U>() { }
+    public void Overload0<U, T>() { }
+    public void Overload0<U>(U[] u) { }
+    public void Overload0<U>(U[][] u) { }
+    public void Overload0<U>(U[,] u) { }
+    public void Overload0<U>(U[,,] u) { }
+    public void Overload0<U>(List<int> l) { }
+    public void Overload0<U>(List<U> l) { }
+    public void Overload0<U, V>(Tuple<U, V> t0, Tuple<V, U> t1) { }
     public void Overload0(Tuple<Tuple<string[,], int>> t0) { }
     public void Overload0(Tuple<Tuple<string>, Tuple<int>> t) { }
-    public void Overload0<TU>(Tuple<Tuple<Outer<TU>.Inner<TU>>> t) { }
+    public void Overload0<U>(Tuple<Tuple<Outer<U>.Inner<U>>> t) { }
 }
 #pragma warning restore IDE0060 // Remove unused parameter
+#pragma warning restore CA1822 // Mark members as static

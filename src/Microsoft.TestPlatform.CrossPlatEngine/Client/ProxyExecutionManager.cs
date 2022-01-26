@@ -9,20 +9,20 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 
-using Common;
-using Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using CommunicationUtilities;
-using CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using CrossPlatEngine;
-using Utilities;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
-using ObjectModel.Engine.ClientProtocol;
-using ObjectModel.Host;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
@@ -32,10 +32,9 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITestRunEventsHandler2
 {
     private readonly TestSessionInfo _testSessionInfo = null;
-    readonly Func<string, ProxyExecutionManager, ProxyOperationManager> _proxyOperationManagerCreator;
+    private readonly Func<string, ProxyExecutionManager, ProxyOperationManager> _proxyOperationManagerCreator;
 
     private ITestRuntimeProvider _testHostManager;
-    private IRequestData _requestData;
 
     private readonly IFileHelper _fileHelper;
     private readonly IDataSerializer _dataSerializer;
@@ -80,7 +79,6 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
         // This should be set to enable debugging when we have test session info available.
         _debugEnabledForTestSession = debugEnabledForTestSession;
 
-        _requestData = null;
         _testHostManager = null;
         _dataSerializer = JsonDataSerializer.Instance;
         _fileHelper = new FileHelper();
@@ -132,7 +130,6 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
         _testHostManager = testHostManager;
         _dataSerializer = dataSerializer;
         _isCommunicationEstablished = false;
-        _requestData = requestData;
         _fileHelper = fileHelper;
 
         // Create a new proxy operation manager.
@@ -166,7 +163,6 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
                 this);
 
             _testHostManager = _proxyOperationManager.TestHostManager;
-            _requestData = _proxyOperationManager.RequestData;
         }
 
         _baseTestRunEventsHandler = eventHandler;
@@ -179,9 +175,9 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
 
             var testSources = new List<string>(
                 testRunCriteria.HasSpecificSources
-                    ? testRunCriteria.Sources
-                    // If the test execution is with a test filter, group them by sources.
-                    : testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
+                ? testRunCriteria.Sources
+                // If the test execution is with a test filter, group them by sources.
+                : testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
 
             _isCommunicationEstablished = _proxyOperationManager.SetupChannel(
                 testSources,
@@ -207,15 +203,15 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
                     // and is in debugging mode, or if the debugging is enabled in case the
                     // test session info is present.
                     isDebug:
-                    (testRunCriteria.TestHostLauncher != null && testRunCriteria.TestHostLauncher.IsDebug)
-                    || _debugEnabledForTestSession,
+                        (testRunCriteria.TestHostLauncher != null && testRunCriteria.TestHostLauncher.IsDebug)
+                        || _debugEnabledForTestSession,
                     testCaseFilter: testRunCriteria.TestCaseFilter,
                     filterOptions: testRunCriteria.FilterOptions);
 
                 // This is workaround for the bug https://github.com/Microsoft/vstest/issues/970
                 var runsettings = _proxyOperationManager.RemoveNodesFromRunsettingsIfRequired(
                     testRunCriteria.TestRunSettings,
-                    (testMessageLevel, message) => LogMessage(testMessageLevel, message));
+                    (testMessageLevel, message) => { LogMessage(testMessageLevel, message); });
 
                 if (testRunCriteria.HasSpecificSources)
                 {
