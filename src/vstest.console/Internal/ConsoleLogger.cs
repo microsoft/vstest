@@ -104,14 +104,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
     #region Fields
 
-    /// <summary>
-    /// Level of verbosity
-    /// </summary>
-#if NETFRAMEWORK
-#else
-    // Keep default verbosity for x-plat command line as minimal
-#endif
-
     private bool _testRunHasErrorMessages = false;
 
     /// <summary>
@@ -160,7 +152,13 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// Get the verbosity level for the console logger
     /// </summary>
 
-    public Verbosity VerbosityLevel { get; private set; } = Verbosity.Minimal;
+    public Verbosity VerbosityLevel { get; private set; } =
+#if NETFRAMEWORK
+        Verbosity.Normal;
+#else
+        // Keep default verbosity for x-plat command line as minimal
+        Verbosity.Minimal;
+#endif
 
     /// <summary>
     /// Tracks leaf test outcomes per source. This is needed to correctly count hierarchical tests as well as 

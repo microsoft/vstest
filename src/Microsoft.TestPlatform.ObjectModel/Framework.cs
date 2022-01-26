@@ -21,13 +21,13 @@ public class Framework
     /// <summary>
     /// Default .Net target framework.
     /// </summary>
-    public static Framework DefaultFramework =>
+    public static Framework DefaultFramework { get; } =
 #if NETFRAMEWORK
-            FromString(".NETFramework,Version=v4.0");
+        Framework.FromString(".NETFramework,Version=v4.0");
 #elif NETSTANDARD1_0
         null;
 #else
-        FromString(".NETCoreApp,Version=v1.0");
+        Framework.FromString(".NETCoreApp,Version=v1.0");
 #endif
 
     /// <summary>
@@ -50,6 +50,7 @@ public class Framework
 #if NETSTANDARD1_0
 #pragma warning disable IDE1006 // Naming Styles
         var CommonFrameworks = new
+#pragma warning restore IDE1006 // Naming Styles
         {
             Net35 = new { DotNetFrameworkName = Constants.DotNetFramework35, Version = "3.5.0.0" },
             Net4 = new { DotNetFrameworkName = Constants.DotNetFramework40, Version = "4.0.0.0" },
@@ -57,7 +58,6 @@ public class Framework
             NetCoreApp10 = new { DotNetFrameworkName = Constants.DotNetFrameworkCore10, Version = "1.0.0.0" },
             UAP10 = new { DotNetFrameworkName = Constants.DotNetFrameworkUap10, Version = "10.0.0.0" },
         };
-#pragma warning restore IDE1006 // Naming Styles
 #endif
 
         if (string.IsNullOrWhiteSpace(frameworkString))

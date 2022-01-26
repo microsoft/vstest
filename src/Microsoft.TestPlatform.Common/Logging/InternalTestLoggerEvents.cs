@@ -400,10 +400,11 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     private static bool IsBoundsEnabledOnLoggerEventQueue()
     {
         bool enableBounds;
+        string enableBoundsOnEventQueueIsDefined =
 #if NETFRAMEWORK
-        string enableBoundsOnEventQueueIsDefined = ConfigurationManager.AppSettings[TestPlatformDefaults.EnableBoundsOnLoggerEventQueue];
+            ConfigurationManager.AppSettings[TestPlatformDefaults.EnableBoundsOnLoggerEventQueue];
 #else
-        string enableBoundsOnEventQueueIsDefined = null;
+            null;
 #endif
         if (string.IsNullOrEmpty(enableBoundsOnEventQueueIsDefined))
         {
@@ -446,10 +447,11 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     private int GetSetting(string appSettingKey, int defaultValue)
     {
         int value;
+        string appSettingValue =
 #if NETFRAMEWORK
-        string appSettingValue = ConfigurationManager.AppSettings[appSettingKey];
+            ConfigurationManager.AppSettings[appSettingKey];
 #else
-        string appSettingValue = null;
+            null;
 #endif
         if (string.IsNullOrEmpty(appSettingValue))
         {

@@ -1,19 +1,19 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
+
 using System.Collections.Generic;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
-
 [TestClass]
 public class ExecutionPerfTests : TelemetryPerfTestbase
 {
-    private readonly IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private readonly RunEventHandler _runEventHandler;
+    private IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private RunEventHandler _runEventHandler;
 
     public ExecutionPerfTests()
     {

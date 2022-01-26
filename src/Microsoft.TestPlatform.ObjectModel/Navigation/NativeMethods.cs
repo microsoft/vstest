@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-// ReSharper disable StyleCop.SA1602
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
 using System;
@@ -28,7 +27,7 @@ internal static class HResult
 /// </summary>
 internal static class Guids
 {
-    internal static Guid ClsidDiaSource = new("79F1BB5F-B66E-48E5-B6A9-1545C323CA3D");
+    internal static Guid CLSID_DiaSource = new("79F1BB5F-B66E-48E5-B6A9-1545C323CA3D");
 }
 
 /// <summary>
@@ -192,7 +191,7 @@ internal enum SymTagEnum : uint
     SymTagAnnotation,
     SymTagLabel,
     SymTagPublicSymbol,
-    SymTagUdt,
+    SymTagUDT,
     SymTagEnum,
     SymTagFunctionType,
     SymTagPointerType,
@@ -539,9 +538,8 @@ internal interface IDiaSymbol
 // The definition for DiaSource COM object is present InternalApis\vctools\inc\dia2.h
 // The GUID here must match what is present in dia2.h
 [ComImport, CoClass(typeof(DiaSourceClass)), Guid("79F1BB5F-B66E-48E5-B6A9-1545C323CA3D")]
-#pragma warning disable IDE1006 // Naming Styles
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "COM interface.")]
 internal interface DiaSource : IDiaDataSource
-#pragma warning restore IDE1006 // Naming Styles
 {
 }
 

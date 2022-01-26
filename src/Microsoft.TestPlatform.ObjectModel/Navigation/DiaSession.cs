@@ -3,13 +3,17 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-using Navigation;
+using System.Diagnostics.CodeAnalysis;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 using System.IO;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 /// <summary>
 /// The class that enables us to get debug information from both managed and native binaries.
 /// </summary>
+[SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly",
+     Justification = "Dia is a specific name.")]
 public class DiaSession : INavigationSession
 {
     /// <summary>
@@ -96,6 +100,11 @@ public class DiaSession : INavigationSession
         // The alternate search path should be an input from Adapters, but since it is not so currently adding a HACK
         pdbFilePath = !File.Exists(pdbFilePath) ? Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(pdbFilePath)) : pdbFilePath;
         using var stream = new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read);
-        return PortablePdbReader.IsPortable(stream) ? new PortableSymbolReader() : new FullSymbolReader();
+        if (PortablePdbReader.IsPortable(stream))
+        {
+            return new PortableSymbolReader();
+        }
+
+        return new FullSymbolReader();
     }
 }

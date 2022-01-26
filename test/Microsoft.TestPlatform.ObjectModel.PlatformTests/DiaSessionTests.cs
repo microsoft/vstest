@@ -6,23 +6,24 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests;
 using System;
 using System.Diagnostics;
 
-using TestUtilities;
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 public class DiaSessionTests : IntegrationTestBase
 {
-    private const string Net451 = "net451";
-    private const string Netcoreapp21 = "netcoreapp2.1";
+    private const string NET451 = "net451";
+    private const string NETCOREAPP21 = "netcoreapp2.1";
 
     public static string GetAndSetTargetFrameWork(IntegrationTestEnvironment testEnvironment)
     {
         var currentTargetFrameWork = testEnvironment.TargetFramework;
+        testEnvironment.TargetFramework =
 #if NETFRAMEWORK
-        testEnvironment.TargetFramework = Net451;
+            NET451;
 #else
-        testEnvironment.TargetFramework = Netcoreapp21;
+            NETCOREAPP21;
 #endif
         return currentTargetFrameWork;
     }
@@ -33,7 +34,7 @@ public class DiaSessionTests : IntegrationTestBase
         var currentTargetFrameWork = GetAndSetTargetFrameWork(_testEnvironment);
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
-        DiaSession diaSession = new(assemblyPath);
+        var diaSession = new DiaSession(assemblyPath);
         DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "PassingTest");
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
@@ -51,7 +52,7 @@ public class DiaSessionTests : IntegrationTestBase
         var currentTargetFrameWork = GetAndSetTargetFrameWork(_testEnvironment);
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
-        DiaSession diaSession = new(assemblyPath);
+        var diaSession = new DiaSession(assemblyPath);
         DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1+<AsyncTestMethod>d__1", "MoveNext");
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
@@ -69,7 +70,7 @@ public class DiaSessionTests : IntegrationTestBase
         var currentTargetFrameWork = GetAndSetTargetFrameWork(_testEnvironment);
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
-        DiaSession diaSession = new(assemblyPath);
+        var diaSession = new DiaSession(assemblyPath);
         DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "OverLoadedMethod");
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
@@ -88,7 +89,7 @@ public class DiaSessionTests : IntegrationTestBase
         var currentTargetFrameWork = GetAndSetTargetFrameWork(_testEnvironment);
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
-        DiaSession diaSession = new(assemblyPath);
+        var diaSession = new DiaSession(assemblyPath);
 
         // Not exist method name
         DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "NotExistMethod");
@@ -108,7 +109,7 @@ public class DiaSessionTests : IntegrationTestBase
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         var watch = Stopwatch.StartNew();
-        DiaSession diaSession = new(assemblyPath);
+        var diaSession = new DiaSession(assemblyPath);
         DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.HugeMethodSet", "MSTest_D1_01");
         watch.Stop();
 

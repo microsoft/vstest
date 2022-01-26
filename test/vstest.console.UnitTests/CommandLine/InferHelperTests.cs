@@ -1,14 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine;
+
 using System.Collections.Generic;
 using System.Runtime.Versioning;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine;
-
 using CommandLineUtilities;
 using TestTools.UnitTesting;
 using Moq;

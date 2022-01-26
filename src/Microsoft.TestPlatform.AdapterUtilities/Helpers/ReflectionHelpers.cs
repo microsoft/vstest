@@ -3,9 +3,8 @@
 
 namespace Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
-using ManagedNameUtilities;
-
-using Resources;
+using Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
+using Microsoft.TestPlatform.AdapterUtilities.Resources;
 
 using System;
 using System.Globalization;

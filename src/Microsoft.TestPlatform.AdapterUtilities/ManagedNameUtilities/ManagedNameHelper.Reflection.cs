@@ -3,8 +3,8 @@
 
 namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
 
-using Resources;
-using Helpers;
+using Microsoft.TestPlatform.AdapterUtilities.Resources;
+using Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
 using System;
 using System.Globalization;
@@ -148,9 +148,9 @@ public static partial class ManagedNameHelper
         managedTypeName = typeBuilder.ToString();
         managedMethodName = methodBuilder.ToString();
         hierarchyValues = new[] {
-            managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]),
-            managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1),
-        };
+                managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]),
+                managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1),
+            };
     }
 
     /// <summary>
@@ -208,7 +208,7 @@ public static partial class ManagedNameHelper
         ManagedNameParser.ParseManagedMethodName(managedMethodName, out var methodName, out var methodArity, out var parameterTypes);
 
 #if NET20 || NET35
-            if (!IsNullOrWhiteSpace(methodName))
+        if (!IsNullOrWhiteSpace(methodName))
 #else
         if (!string.IsNullOrWhiteSpace(methodName))
 #endif
@@ -433,10 +433,10 @@ public static partial class ManagedNameHelper
 
         var info = type.GetTypeInfo();
         var arity = !info.IsGenericType
-            ? 0
-            : info.GenericTypeParameters.Length > 0
-                ? info.GenericTypeParameters.Length
-                : info.GenericTypeArguments.Length;
+                  ? 0
+                  : info.GenericTypeParameters.Length > 0
+                    ? info.GenericTypeParameters.Length
+                    : info.GenericTypeArguments.Length;
 
         AppendMethodString(b, typeName, arity - outerArity);
         b.Append('*', stars);
@@ -488,16 +488,21 @@ public static partial class ManagedNameHelper
 
         if (c == '_'
             || char.IsLetterOrDigit(c) // Lu, Ll, Lt, Lm, Lo, or Nl
-           )
+            )
         {
             return false;
         }
 
         var category = CharUnicodeInfo.GetUnicodeCategory(c);
-        return category != UnicodeCategory.NonSpacingMark        // Mn
-               && category != UnicodeCategory.SpacingCombiningMark  // Mc
-               && category != UnicodeCategory.ConnectorPunctuation  // Pc
-               && category != UnicodeCategory.Format;
+        if (category == UnicodeCategory.NonSpacingMark        // Mn
+            || category == UnicodeCategory.SpacingCombiningMark  // Mc
+            || category == UnicodeCategory.ConnectorPunctuation  // Pc
+            || category == UnicodeCategory.Format)               // Cf
+        {
+            return false;
+        }
+
+        return true;
     }
 
     private static string GetTypeString(Type type, bool closedType)
@@ -508,61 +513,60 @@ public static partial class ManagedNameHelper
     }
 
 #if NET20
-
-        // the method is mostly copied from
-        // https://github.com/dotnet/runtime/blob/c0840723b382bcfa67b35839af8572fcd38f1d13/src/libraries/System.Linq/src/System/Linq/Single.cs#L86
-        public static TSource SingleOrDefault<TSource>(System.Collections.Generic.IEnumerable<TSource> source)
+    // the method is mostly copied from
+    // https://github.com/dotnet/runtime/blob/c0840723b382bcfa67b35839af8572fcd38f1d13/src/libraries/System.Linq/src/System/Linq/Single.cs#L86
+    public static TSource SingleOrDefault<TSource>(System.Collections.Generic.IEnumerable<TSource> source)
+    {
+        if (source == null)
         {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            if (source is System.Collections.Generic.IList<TSource> list)
-            {
-                switch (list.Count)
-                {
-                    case 0:
-                        return default;
-                    case 1:
-                        return list[0];
-                }
-            }
-            else
-            {
-                using (System.Collections.Generic.IEnumerator<TSource> e = source.GetEnumerator())
-                {
-                    if (!e.MoveNext())
-                    {
-                        return default;
-                    }
-
-                    TSource result = e.Current;
-                    if (!e.MoveNext())
-                    {
-                        return result;
-                    }
-                }
-            }
-
-            throw new InvalidOperationException("MoreThanOneElement");
+            throw new ArgumentNullException(nameof(source));
         }
+
+        if (source is System.Collections.Generic.IList<TSource> list)
+        {
+            switch (list.Count)
+            {
+                case 0:
+                    return default;
+                case 1:
+                    return list[0];
+            }
+        }
+        else
+        {
+            using (System.Collections.Generic.IEnumerator<TSource> e = source.GetEnumerator())
+            {
+                if (!e.MoveNext())
+                {
+                    return default;
+                }
+
+                TSource result = e.Current;
+                if (!e.MoveNext())
+                {
+                    return result;
+                }
+            }
+        }
+
+        throw new InvalidOperationException("MoreThanOneElement");
+    }
 #endif
 
 #if NET20 || NET35
-        public static bool IsNullOrWhiteSpace(string value)
+    public static bool IsNullOrWhiteSpace(string value)
+    {
+        if (value is null) return true;
+
+        for (int i = 0; i < value.Length; i++)
         {
-            if (value is null) return true;
-
-            for (int i = 0; i < value.Length; i++)
+            if (!char.IsWhiteSpace(value[i]))
             {
-                if (!char.IsWhiteSpace(value[i]))
-                {
-                    return false;
-                }
+                return false;
             }
-
-            return true;
         }
+
+        return true;
+    }
 #endif
 }

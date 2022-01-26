@@ -17,7 +17,6 @@ using System.Collections.Generic;
 [TestClass]
 public class UseVsixExtensionsArgumentProcessorTests
 {
-    private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
     private const string DeprecationMessage = @"/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.";
     private readonly Mock<ITestRequestManager> _testRequestManager;
     private readonly Mock<IVSExtensionManager> _extensionManager;

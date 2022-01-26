@@ -32,7 +32,6 @@ using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
 using Moq;
 
 using TestDoubles;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
@@ -42,7 +41,6 @@ public class TestRequestManagerTests
     private DummyLoggerEvents _mockLoggerEvents;
     private readonly CommandLineOptions _commandLineOptions;
     private readonly Mock<ITestPlatform> _mockTestPlatform;
-    private readonly Mock<IOutput> _mockOutput;
     private readonly Mock<IDiscoveryRequest> _mockDiscoveryRequest;
     private readonly Mock<ITestRunRequest> _mockRunRequest;
     private readonly Mock<IAssemblyMetadataProvider> _mockAssemblyMetadataProvider;
@@ -56,16 +54,15 @@ public class TestRequestManagerTests
     private readonly Mock<ITestRunAttachmentsProcessingManager> _mockAttachmentsProcessingManager;
 
     private const string DefaultRunsettings = @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					 </RunConfiguration>
-				</RunSettings>";
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>";
 
     public TestRequestManagerTests()
     {
         _mockLoggerEvents = new DummyLoggerEvents(TestSessionMessageLogger.Instance);
         _commandLineOptions = new DummyCommandLineOptions();
-        _mockOutput = new Mock<IOutput>();
         _mockTestPlatform = new Mock<ITestPlatform>();
         _mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
         _mockRunRequest = new Mock<ITestRunRequest>();
@@ -155,11 +152,11 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					   <BatchSize>15</BatchSize>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                       <BatchSize>15</BatchSize>
+                     </RunConfiguration>
+                </RunSettings>"
         };
 
         DiscoveryCriteria actualDiscoveryCriteria = null;
@@ -271,16 +268,16 @@ public class TestRequestManagerTests
         {
             Sources = new List<string>() { "a.dll", "b.dll" },
             RunSettings = @"<RunSettings>
-								<RunConfiguration>
-									<MaxCpuCount>2</MaxCpuCount>
-									<TargetPlatform>x86</TargetPlatform>
-									<TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
-									<DisableAppDomain>True</DisableAppDomain>
-								</RunConfiguration>
-								<MSPhoneTest>
-								  <TargetDevice>169.254.193.190</TargetDevice>
-								</MSPhoneTest>
-							</RunSettings>"
+                                <RunConfiguration>
+                                    <MaxCpuCount>2</MaxCpuCount>
+                                    <TargetPlatform>x86</TargetPlatform>
+                                    <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
+                                    <DisableAppDomain>True</DisableAppDomain>
+                                </RunConfiguration>
+                                <MSPhoneTest>
+                                  <TargetDevice>169.254.193.190</TargetDevice>
+                                </MSPhoneTest>
+                            </RunSettings>"
         };
 
         var mockProtocolConfig = new ProtocolConfig { Version = 5 };
@@ -326,10 +323,10 @@ public class TestRequestManagerTests
         {
             Sources = new List<string>() { "a", "b" },
             RunSettings = @"<RunSettings>
-								<RunConfiguration>
-									<TargetDevice></TargetDevice>
-								</RunConfiguration>
-							</RunSettings>"
+                                <RunConfiguration>
+                                    <TargetDevice></TargetDevice>
+                                </RunConfiguration>
+                            </RunSettings>"
         };
 
         var mockProtocolConfig = new ProtocolConfig { Version = 5 };
@@ -369,10 +366,10 @@ public class TestRequestManagerTests
         {
             Sources = new List<string>() { "a", "b" },
             RunSettings = @"<RunSettings>
-								<RunConfiguration>
-									<TargetDevice>Device</TargetDevice>
-								</RunConfiguration>
-							</RunSettings>"
+                                <RunConfiguration>
+                                    <TargetDevice>Device</TargetDevice>
+                                </RunConfiguration>
+                            </RunSettings>"
         };
 
         var mockProtocolConfig = new ProtocolConfig { Version = 5 };
@@ -412,10 +409,10 @@ public class TestRequestManagerTests
         {
             Sources = new List<string>() { "a", "b" },
             RunSettings = @"<RunSettings>
-								<RunConfiguration>
-									<TargetDevice>Emulator 8.1 U1 WVGA 4 inch 512MB</TargetDevice>
-								</RunConfiguration>
-							</RunSettings>"
+                                <RunConfiguration>
+                                    <TargetDevice>Emulator 8.1 U1 WVGA 4 inch 512MB</TargetDevice>
+                                </RunConfiguration>
+                            </RunSettings>"
         };
 
         var mockProtocolConfig = new ProtocolConfig { Version = 5 };
@@ -455,10 +452,10 @@ public class TestRequestManagerTests
         {
             Sources = new List<string>() { "a", "b" },
             RunSettings = @"<RunSettings>
-								<RunConfiguration>
-									<TargetDevice>Device</TargetDevice>
-								</RunConfiguration>
-							</RunSettings>"
+                                <RunConfiguration>
+                                    <TargetDevice>Device</TargetDevice>
+                                </RunConfiguration>
+                            </RunSettings>"
         };
 
         var mockProtocolConfig = new ProtocolConfig { Version = 5 };
@@ -510,10 +507,10 @@ public class TestRequestManagerTests
         {
             Sources = new List<string>() { "a", "b" },
             RunSettings = @"<RunSettings>
-								<RunConfiguration>
-									<TargetDevice>Device</TargetDevice>
-								</RunConfiguration>
-							</RunSettings>"
+                                <RunConfiguration>
+                                    <TargetDevice>Device</TargetDevice>
+                                </RunConfiguration>
+                            </RunSettings>"
         };
 
         var mockProtocolConfig = new ProtocolConfig { Version = 5 };
@@ -557,10 +554,10 @@ public class TestRequestManagerTests
         {
             Sources = new List<string>() { "a", "b" },
             RunSettings = @"<RunSettings>
-								<RunConfiguration>
-									<TargetDevice>Device</TargetDevice>
-								</RunConfiguration>
-							</RunSettings>"
+                                <RunConfiguration>
+                                    <TargetDevice>Device</TargetDevice>
+                                </RunConfiguration>
+                            </RunSettings>"
         };
 
         var mockProtocolConfig = new ProtocolConfig { Version = 5 };
@@ -604,10 +601,10 @@ public class TestRequestManagerTests
         {
             Sources = new List<string>() { "a", "b" },
             RunSettings = @"<RunSettings>
-								<RunConfiguration>
-									<TargetDevice>Device</TargetDevice>
-								</RunConfiguration>
-							</RunSettings>"
+                                <RunConfiguration>
+                                    <TargetDevice>Device</TargetDevice>
+                                </RunConfiguration>
+                            </RunSettings>"
         };
 
         var mockProtocolConfig = new ProtocolConfig { Version = 5 };
@@ -649,10 +646,10 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
         };
         _commandLineOptions.IsDesignMode = true;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
@@ -681,12 +678,12 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a" },
             RunSettings =
                 $@"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					 <TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion>
-					 <TargetPlatform>{Architecture.ARM}</TargetPlatform>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                     <TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion>
+                     <TargetPlatform>{Architecture.ARM}</TargetPlatform>
+                     </RunConfiguration>
+                </RunSettings>"
         };
         _commandLineOptions.IsDesignMode = true;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
@@ -715,10 +712,10 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
         };
         _commandLineOptions.IsDesignMode = false;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
@@ -746,10 +743,10 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
         };
         _commandLineOptions.IsDesignMode = false;
         _commandLineOptions.TargetFrameworkVersion = Framework.DefaultFramework;
@@ -831,11 +828,11 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					   <BatchSize>15</BatchSize>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                       <BatchSize>15</BatchSize>
+                     </RunConfiguration>
+                </RunSettings>"
         };
 
         TestRunCriteria actualTestRunCriteria = null;
@@ -855,11 +852,11 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					   <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                       <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
+                     </RunConfiguration>
+                </RunSettings>"
         };
 
         TestRunCriteria actualTestRunCriteria = null;
@@ -957,22 +954,22 @@ public class TestRequestManagerTests
         {
             Sources = new List<string>() { "a" },
             RunSettings = @"<RunSettings>
-									<LegacySettings>
-										<Deployment enabled=""true"" deploySatelliteAssemblies=""true"" >
-											<DeploymentItem filename="".\test.txt"" />
-										</Deployment>
-										<Scripts setupScript="".\setup.bat"" cleanupScript="".\cleanup.bat"" />
-										<Execution hostProcessPlatform=""MSIL"" parallelTestCount=""4"">
-											<Timeouts testTimeout=""120"" />
-											<TestTypeSpecific>
-												<UnitTestRunConfig>
-													<AssemblyResolution />
-												</UnitTestRunConfig>
-											</TestTypeSpecific>
-											<Hosts />
-										</Execution>
-									</LegacySettings>
-							   </RunSettings>"
+                                    <LegacySettings>
+                                        <Deployment enabled=""true"" deploySatelliteAssemblies=""true"" >
+                                            <DeploymentItem filename="".\test.txt"" />
+                                        </Deployment>
+                                        <Scripts setupScript="".\setup.bat"" cleanupScript="".\cleanup.bat"" />
+                                        <Execution hostProcessPlatform=""MSIL"" parallelTestCount=""4"">
+                                            <Timeouts testTimeout=""120"" />
+                                            <TestTypeSpecific>
+                                                <UnitTestRunConfig>
+                                                    <AssemblyResolution />
+                                                </UnitTestRunConfig>
+                                            </TestTypeSpecific>
+                                            <Hosts />
+                                        </Execution>
+                                    </LegacySettings>
+                               </RunSettings>"
         };
         var mockProtocolConfig = new ProtocolConfig { Version = 5 };
         IRequestData actualRequestData = null;
@@ -1015,11 +1012,11 @@ public class TestRequestManagerTests
         {
             Sources = new List<string>() { "a" },
             RunSettings = @"<RunSettings>
-									   <MSTest>
-											<ForcedLegacyMode>true</ForcedLegacyMode>
-											<SettingsFile>..\..\Foo.testsettings</SettingsFile>
-									   </MSTest>
-							   </RunSettings>"
+                                       <MSTest>
+                                            <ForcedLegacyMode>true</ForcedLegacyMode>
+                                            <SettingsFile>..\..\Foo.testsettings</SettingsFile>
+                                       </MSTest>
+                               </RunSettings>"
         };
         var mockProtocolConfig = new ProtocolConfig { Version = 5 };
         IRequestData actualRequestData = null;
@@ -1055,16 +1052,16 @@ public class TestRequestManagerTests
         {
             Sources = new List<string>() { "a.dll" },
             RunSettings = @"<RunSettings>
-								<RunConfiguration>
-									<MaxCpuCount>2</MaxCpuCount>
-									<TargetPlatform>x86</TargetPlatform>
-									<TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
-									<DisableAppDomain>True</DisableAppDomain>
-								</RunConfiguration>
-								<MSPhoneTest>
-								  <TargetDevice>169.254.193.190</TargetDevice>
-								</MSPhoneTest>
-							</RunSettings>"
+                                <RunConfiguration>
+                                    <MaxCpuCount>2</MaxCpuCount>
+                                    <TargetPlatform>x86</TargetPlatform>
+                                    <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
+                                    <DisableAppDomain>True</DisableAppDomain>
+                                </RunConfiguration>
+                                <MSPhoneTest>
+                                  <TargetDevice>169.254.193.190</TargetDevice>
+                                </MSPhoneTest>
+                            </RunSettings>"
         };
         var mockProtocolConfig = new ProtocolConfig { Version = 5 };
         IRequestData actualRequestData = null;
@@ -1368,10 +1365,10 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
         };
 
         _commandLineOptions.IsDesignMode = true;
@@ -1402,12 +1399,12 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 $@"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-						 <TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion>
-						 <TargetPlatform>{Architecture.ARM}</TargetPlatform>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                         <TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion>
+                         <TargetPlatform>{Architecture.ARM}</TargetPlatform>
+                     </RunConfiguration>
+                </RunSettings>"
         };
 
         _commandLineOptions.IsDesignMode = true;
@@ -1441,11 +1438,11 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 $@"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-						 <TargetPlatform>{targetPlatform}</TargetPlatform>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                         <TargetPlatform>{targetPlatform}</TargetPlatform>
+                     </RunConfiguration>
+                </RunSettings>"
         };
 
         _commandLineOptions.IsDesignMode = true;
@@ -1474,10 +1471,10 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
         };
 
         _commandLineOptions.IsDesignMode = false;
@@ -1507,10 +1504,10 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
         };
 
         _commandLineOptions.IsDesignMode = false;
@@ -1547,10 +1544,10 @@ public class TestRequestManagerTests
             },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
         };
 
         List<string> archSources = new(), fxSources = new();
@@ -1580,19 +1577,19 @@ public class TestRequestManagerTests
     public void RunTestShouldThrowExceptionIfRunSettingWithDcHasTestSettingsInIt()
     {
         var settingXml = @"<RunSettings>
-									<MSTest>
-										<SettingsFile>C:\temp.testsettings</SettingsFile>
-										<ForcedLegacyMode>true</ForcedLegacyMode>
-									</MSTest>
-									<DataCollectionRunSettings>
-										<DataCollectors>
-											<DataCollector friendlyName=""DummyDataCollector1"">
-											</DataCollector>
-											<DataCollector friendlyName=""DummyDataCollector2"">
-											</DataCollector>
-										</DataCollectors>
-									</DataCollectionRunSettings>
-								</RunSettings>";
+                                    <MSTest>
+                                        <SettingsFile>C:\temp.testsettings</SettingsFile>
+                                        <ForcedLegacyMode>true</ForcedLegacyMode>
+                                    </MSTest>
+                                    <DataCollectionRunSettings>
+                                        <DataCollectors>
+                                            <DataCollector friendlyName=""DummyDataCollector1"">
+                                            </DataCollector>
+                                            <DataCollector friendlyName=""DummyDataCollector2"">
+                                            </DataCollector>
+                                        </DataCollectors>
+                                    </DataCollectionRunSettings>
+                                </RunSettings>";
 
         var payload = new TestRunRequestPayload()
         {
@@ -1620,19 +1617,19 @@ public class TestRequestManagerTests
     public void RunTestShouldThrowExceptionIfRunSettingWithDcHasTestSettingsAndEnableCodeCoverageTrue()
     {
         var settingXml = @"<RunSettings>
-									<MSTest>
-										<SettingsFile>C:\temp.testsettings</SettingsFile>
-										<ForcedLegacyMode>true</ForcedLegacyMode>
-									</MSTest>
-									<DataCollectionRunSettings>
-										<DataCollectors>
-											<DataCollector friendlyName=""DummyDataCollector1"">
-											</DataCollector>
-											<DataCollector friendlyName=""DummyDataCollector2"">
-											</DataCollector>
-										</DataCollectors>
-									</DataCollectionRunSettings>
-								</RunSettings>";
+                                    <MSTest>
+                                        <SettingsFile>C:\temp.testsettings</SettingsFile>
+                                        <ForcedLegacyMode>true</ForcedLegacyMode>
+                                    </MSTest>
+                                    <DataCollectionRunSettings>
+                                        <DataCollectors>
+                                            <DataCollector friendlyName=""DummyDataCollector1"">
+                                            </DataCollector>
+                                            <DataCollector friendlyName=""DummyDataCollector2"">
+                                            </DataCollector>
+                                        </DataCollectors>
+                                    </DataCollectionRunSettings>
+                                </RunSettings>";
 
         var payload = new TestRunRequestPayload()
         {
@@ -1663,17 +1660,17 @@ public class TestRequestManagerTests
         {
             Sources = new List<string>() { "a.dll" },
             RunSettings = @"<RunSettings>
-									<MSTest>
-										<SettingsFile>C:\temp.testsettings</SettingsFile>
-										<ForcedLegacyMode>true</ForcedLegacyMode>
-									</MSTest>
-									<DataCollectionRunSettings>
-										<DataCollectors>
-											<DataCollector friendlyName=""Code Coverage"">
-											</DataCollector>
-										</DataCollectors>
-									</DataCollectionRunSettings>
-								</RunSettings>"
+                                    <MSTest>
+                                        <SettingsFile>C:\temp.testsettings</SettingsFile>
+                                        <ForcedLegacyMode>true</ForcedLegacyMode>
+                                    </MSTest>
+                                    <DataCollectionRunSettings>
+                                        <DataCollectors>
+                                            <DataCollector friendlyName=""Code Coverage"">
+                                            </DataCollector>
+                                        </DataCollectors>
+                                    </DataCollectionRunSettings>
+                                </RunSettings>"
         };
 
         _commandLineOptions.EnableCodeCoverage = true;
@@ -1688,10 +1685,10 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
         };
 
         _commandLineOptions.IsDesignMode = false;
@@ -1717,20 +1714,20 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					   <DesignMode>False</DesignMode>
-					 </RunConfiguration>
-					 <LoggerRunSettings>
-					   <Loggers>
-						 <Logger friendlyName=""blabla"">
-						   <Configuration>
-							 <Key1>Value1</Key1>
-						   </Configuration>
-						 </Logger>
-					   </Loggers>
-					 </LoggerRunSettings>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>False</DesignMode>
+                     </RunConfiguration>
+                     <LoggerRunSettings>
+                       <Loggers>
+                         <Logger friendlyName=""blabla"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                       </Loggers>
+                     </LoggerRunSettings>
+                </RunSettings>"
         };
 
         _commandLineOptions.IsDesignMode = true;
@@ -1757,20 +1754,20 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					   <DesignMode>False</DesignMode>
-					 </RunConfiguration>
-					 <LoggerRunSettings>
-					   <Loggers>
-						 <Logger friendlyName=""blabla"">
-						   <Configuration>
-							 <Key1>Value1</Key1>
-						   </Configuration>
-						 </Logger>
-					   </Loggers>
-					 </LoggerRunSettings>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>False</DesignMode>
+                     </RunConfiguration>
+                     <LoggerRunSettings>
+                       <Loggers>
+                         <Logger friendlyName=""blabla"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                       </Loggers>
+                     </LoggerRunSettings>
+                </RunSettings>"
         };
         _commandLineOptions.IsDesignMode = true;
         DiscoveryCriteria actualDiscoveryCriteria = null;
@@ -1800,11 +1797,11 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					   <DesignMode>True</DesignMode>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>True</DesignMode>
+                     </RunConfiguration>
+                </RunSettings>"
         };
 
         _commandLineOptions.IsDesignMode = false;
@@ -1825,10 +1822,10 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
         };
         _commandLineOptions.IsDesignMode = false;
         DiscoveryCriteria actualDiscoveryCriteria = null;
@@ -1856,11 +1853,11 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					   <DesignMode>True</DesignMode>
-					 </RunConfiguration>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>True</DesignMode>
+                     </RunConfiguration>
+                </RunSettings>"
         };
         _commandLineOptions.IsDesignMode = false;
         DiscoveryCriteria actualDiscoveryCriteria = null;
@@ -1884,25 +1881,25 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					   <DesignMode>False</DesignMode>
-					 </RunConfiguration>
-					 <LoggerRunSettings>
-					   <Loggers>
-						 <Logger friendlyName=""blabla"">
-						   <Configuration>
-							 <Key1>Value1</Key1>
-						   </Configuration>
-						 </Logger>
-						 <Logger friendlyName=""console"" uri=""logger://tempconsoleUri"" assemblyQualifiedName=""tempAssemblyName"" codeBase=""tempCodeBase"">
-						   <Configuration>
-							 <Key1>Value1</Key1>
-						   </Configuration>
-						 </Logger>
-					   </Loggers>
-					 </LoggerRunSettings>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>False</DesignMode>
+                     </RunConfiguration>
+                     <LoggerRunSettings>
+                       <Loggers>
+                         <Logger friendlyName=""blabla"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                         <Logger friendlyName=""console"" uri=""logger://tempconsoleUri"" assemblyQualifiedName=""tempAssemblyName"" codeBase=""tempCodeBase"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                       </Loggers>
+                     </LoggerRunSettings>
+                </RunSettings>"
         };
 
         _commandLineOptions.IsDesignMode = false;
@@ -1933,25 +1930,25 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					   <DesignMode>False</DesignMode>
-					 </RunConfiguration>
-					 <LoggerRunSettings>
-					   <Loggers>
-						 <Logger friendlyName=""blabla"">
-						   <Configuration>
-							 <Key1>Value1</Key1>
-						   </Configuration>
-						 </Logger>
-						 <Logger friendlyName=""consoleTemp"" uri=""logger://Microsoft/TestPlatform/ConsoleLogger/v1"" assemblyQualifiedName=""tempAssemblyName"">
-						   <Configuration>
-							 <Key1>Value1</Key1>
-						   </Configuration>
-						 </Logger>
-					   </Loggers>
-					 </LoggerRunSettings>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>False</DesignMode>
+                     </RunConfiguration>
+                     <LoggerRunSettings>
+                       <Loggers>
+                         <Logger friendlyName=""blabla"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                         <Logger friendlyName=""consoleTemp"" uri=""logger://Microsoft/TestPlatform/ConsoleLogger/v1"" assemblyQualifiedName=""tempAssemblyName"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                       </Loggers>
+                     </LoggerRunSettings>
+                </RunSettings>"
         };
         _commandLineOptions.IsDesignMode = false;
         DiscoveryCriteria actualDiscoveryCriteria = null;
@@ -1985,25 +1982,25 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					   <DesignMode>True</DesignMode>
-					 </RunConfiguration>
-					 <LoggerRunSettings>
-					   <Loggers>
-						 <Logger friendlyName=""blabla"">
-						   <Configuration>
-							 <Key1>Value1</Key1>
-						   </Configuration>
-						 </Logger>
-						 <Logger friendlyName=""console"" uri=""logger://tempconsoleUri"" assemblyQualifiedName=""tempAssemblyName"" codeBase=""tempCodeBase"">
-						   <Configuration>
-							 <Key1>Value1</Key1>
-						   </Configuration>
-						 </Logger>
-					   </Loggers>
-					 </LoggerRunSettings>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>True</DesignMode>
+                     </RunConfiguration>
+                     <LoggerRunSettings>
+                       <Loggers>
+                         <Logger friendlyName=""blabla"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                         <Logger friendlyName=""console"" uri=""logger://tempconsoleUri"" assemblyQualifiedName=""tempAssemblyName"" codeBase=""tempCodeBase"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                       </Loggers>
+                     </LoggerRunSettings>
+                </RunSettings>"
         };
 
         _commandLineOptions.IsDesignMode = false;
@@ -2034,25 +2031,25 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-				<RunSettings>
-					 <RunConfiguration>
-					   <DesignMode>True</DesignMode>
-					 </RunConfiguration>
-					 <LoggerRunSettings>
-					   <Loggers>
-						 <Logger friendlyName=""blabla"">
-						   <Configuration>
-							 <Key1>Value1</Key1>
-						   </Configuration>
-						 </Logger>
-						 <Logger friendlyName=""consoleTemp"" uri=""logger://Microsoft/TestPlatform/ConsoleLogger/v1"" assemblyQualifiedName=""tempAssemblyName"">
-						   <Configuration>
-							 <Key1>Value1</Key1>
-						   </Configuration>
-						 </Logger>
-					   </Loggers>
-					 </LoggerRunSettings>
-				</RunSettings>"
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>True</DesignMode>
+                     </RunConfiguration>
+                     <LoggerRunSettings>
+                       <Loggers>
+                         <Logger friendlyName=""blabla"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                         <Logger friendlyName=""consoleTemp"" uri=""logger://Microsoft/TestPlatform/ConsoleLogger/v1"" assemblyQualifiedName=""tempAssemblyName"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                       </Loggers>
+                     </LoggerRunSettings>
+                </RunSettings>"
         };
         _commandLineOptions.IsDesignMode = false;
         DiscoveryCriteria actualDiscoveryCriteria = null;
@@ -2215,10 +2212,10 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a.dll" },
             RunSettings =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-					<RunSettings>
-						<RunConfiguration>
-						</RunConfiguration>
-					</RunSettings>"
+                    <RunSettings>
+                        <RunConfiguration>
+                        </RunConfiguration>
+                    </RunSettings>"
         };
         _commandLineOptions.IsDesignMode = true;
 
@@ -2256,19 +2253,19 @@ public class TestRequestManagerTests
     public void StartTestSessionShouldThrowSettingsExceptionWhenFindingIncompatibleDataCollectorsInTestSettings()
     {
         var settingXml = @"<RunSettings>
-									<MSTest>
-										<SettingsFile>C:\temp.testsettings</SettingsFile>
-										<ForcedLegacyMode>true</ForcedLegacyMode>
-									</MSTest>
-									<DataCollectionRunSettings>
-										<DataCollectors>
-											<DataCollector friendlyName=""DummyDataCollector1"">
-											</DataCollector>
-											<DataCollector friendlyName=""DummyDataCollector2"">
-											</DataCollector>
-										</DataCollectors>
-									</DataCollectionRunSettings>
-								</RunSettings>";
+                                    <MSTest>
+                                        <SettingsFile>C:\temp.testsettings</SettingsFile>
+                                        <ForcedLegacyMode>true</ForcedLegacyMode>
+                                    </MSTest>
+                                    <DataCollectionRunSettings>
+                                        <DataCollectors>
+                                            <DataCollector friendlyName=""DummyDataCollector1"">
+                                            </DataCollector>
+                                            <DataCollector friendlyName=""DummyDataCollector2"">
+                                            </DataCollector>
+                                        </DataCollectors>
+                                    </DataCollectionRunSettings>
+                                </RunSettings>";
 
         var payload = new StartTestSessionPayload()
         {

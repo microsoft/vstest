@@ -3,9 +3,8 @@
 
 namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
 
-using Helpers;
-
-using Resources;
+using Microsoft.TestPlatform.AdapterUtilities.Helpers;
+using Microsoft.TestPlatform.AdapterUtilities.Resources;
 
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -59,7 +58,7 @@ public class ManagedNameParser
     /// This parameter is passed uninitialized; any value originally supplied in result will be overwritten.
     /// </param>
     /// <param name="parameterTypes">
-    /// When this method returns, contains the parsed parameter types of the <paramref name="managedMethodName"/>.
+    /// When this method returns, contains the parsed parameter types of the <paramref name="managedMethodName"/>. 
     /// If there are no parameter types in <paramref name="managedMethodName"/>, <paramref name="parameterTypes"/> is set to <c>null</c>.
     /// This parameter is passed uninitialized; any value originally supplied in result will be overwritten.
     /// </param>

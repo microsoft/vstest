@@ -5,20 +5,21 @@ namespace Microsoft.TestPlatform.PerformanceTests;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using System;
 using System.Diagnostics;
 using System.IO;
 
-using TestResult = VisualStudio.TestPlatform.ObjectModel.TestResult;
+using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
 [TestClass]
 public class ProtocolV1Tests
 {
     private static readonly TestCase TestCase = new(
-        "sampleTestClass.sampleTestCase",
-        new Uri("executor://sampleTestExecutor"),
-        "sampleTest.dll")
+                                          "sampleTestClass.sampleTestCase",
+                                          new Uri("executor://sampleTestExecutor"),
+                                          "sampleTest.dll")
     {
         CodeFilePath = "/user/src/testFile.cs",
         DisplayName = "sampleTestCase",
@@ -27,7 +28,7 @@ public class ProtocolV1Tests
         Traits = { new Trait("Priority", "0"), new Trait("Category", "unit") }
     };
 
-    private static readonly DateTimeOffset StartTime = new(new DateTime(2007, 3, 10, 0, 0, 0, DateTimeKind.Utc));
+    private static DateTimeOffset s_startTime = new(new DateTime(2007, 3, 10, 0, 0, 0, DateTimeKind.Utc));
 
     private static readonly TestResult TestResult = new(TestCase)
     {
@@ -39,7 +40,7 @@ public class ProtocolV1Tests
         DisplayName = "sampleTestResult",
         ComputerName = "sampleComputerName",
         Duration = TimeSpan.MaxValue,
-        StartTime = StartTime,
+        StartTime = s_startTime,
         EndTime = DateTimeOffset.MaxValue
     };
 

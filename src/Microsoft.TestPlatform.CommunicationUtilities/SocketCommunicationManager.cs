@@ -11,10 +11,10 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Interfaces;
-using CoreUtilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <summary>
 /// Facilitates communication using sockets
@@ -24,7 +24,7 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <summary>
     /// The server stream read timeout constant (in microseconds).
     /// </summary>
-    private const int StreamReadTimeout = 1000 * 1000;
+    private const int STREAMREADTIMEOUT = 1000 * 1000;
 
     /// <summary>
     /// TCP Listener to host TCP channel and listen
@@ -286,7 +286,12 @@ public class SocketCommunicationManager : ICommunicationManager
     public Message ReceiveMessage()
     {
         var rawMessage = ReceiveRawMessage();
-        return !string.IsNullOrEmpty(rawMessage) ? _dataSerializer.DeserializeMessage(rawMessage) : null;
+        if (!string.IsNullOrEmpty(rawMessage))
+        {
+            return _dataSerializer.DeserializeMessage(rawMessage);
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -301,7 +306,12 @@ public class SocketCommunicationManager : ICommunicationManager
     public async Task<Message> ReceiveMessageAsync(CancellationToken cancellationToken)
     {
         var rawMessage = await ReceiveRawMessageAsync(cancellationToken);
-        return !string.IsNullOrEmpty(rawMessage) ? _dataSerializer.DeserializeMessage(rawMessage) : null;
+        if (!string.IsNullOrEmpty(rawMessage))
+        {
+            return _dataSerializer.DeserializeMessage(rawMessage);
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -353,7 +363,7 @@ public class SocketCommunicationManager : ICommunicationManager
         {
             try
             {
-                if (_socket.Poll(StreamReadTimeout, SelectMode.SelectRead))
+                if (_socket.Poll(STREAMREADTIMEOUT, SelectMode.SelectRead))
                 {
                     str = ReceiveRawMessage();
                     success = true;
