@@ -4,7 +4,9 @@
 // define trace and debug to trigger the Debug.Assert calls even when we build in Release
 #define DEBUG
 
+#pragma warning disable IDE1006 // Naming Styles
 namespace testhost.UnitTests;
+#pragma warning restore IDE1006 // Naming Styles
 
 #if NETCOREAPP
 using Microsoft.VisualStudio.TestPlatform.TestHost;

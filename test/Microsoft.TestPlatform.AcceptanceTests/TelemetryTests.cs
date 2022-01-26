@@ -24,7 +24,7 @@ public class TelemetryTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsShouldPublishMetrics(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
 
         RunTests(runnerInfo.RunnerFramework);
     }
@@ -34,7 +34,7 @@ public class TelemetryTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsShouldPublishMetrics(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         DiscoverTests(runnerInfo.RunnerFramework);
     }
@@ -57,8 +57,8 @@ public class TelemetryTests : AcceptanceTestBase
             [LOG_TELEMETRY] = "1",
         };
 
-        this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), this.FrameworkArgValue, string.Empty, env);
-        this.ValidateOutput("Execution", tempDir);
+        InvokeVsTestForExecution(assemblyPaths, GetTestAdapterPath(), FrameworkArgValue, string.Empty, env);
+        ValidateOutput("Execution", tempDir);
     }
 
     private void DiscoverTests(string runnerFramework)
@@ -79,8 +79,8 @@ public class TelemetryTests : AcceptanceTestBase
             [LOG_TELEMETRY] = "1",
         };
 
-        this.InvokeVsTestForDiscovery(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, env);
-        this.ValidateOutput("Discovery", tempDir);
+        InvokeVsTestForDiscovery(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, env);
+        ValidateOutput("Discovery", tempDir);
     }
 
     private void ValidateOutput(string command, TempDirectory tempDir)

@@ -15,7 +15,7 @@ public class CuitTest : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void CuitRunAllTests(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         CuitRunAll(runnerInfo.RunnerFramework);
     }
 
@@ -27,11 +27,11 @@ public class CuitTest : AcceptanceTestBase
             return;
         }
 
-        var assemblyAbsolutePath = testEnvironment.GetTestAsset("CUITTestProject.dll", "net451");
+        var assemblyAbsolutePath = _testEnvironment.GetTestAsset("CUITTestProject.dll", "net451");
         using var tempDir = new TempDirectory();
-        var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: tempDir.Path);
 
-        this.InvokeVsTest(arguments);
-        this.ValidateSummaryStatus(1, 0, 0);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 0, 0);
     }
 }

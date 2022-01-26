@@ -14,44 +14,44 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 [TestClass]
 public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
 {
-    private static string nugetPackageFolder;
-    private TempDirectory resultsDirectory;
+    private static string s_nugetPackageFolder;
+    private TempDirectory _resultsDirectory;
 
     [ClassInitialize]
     public static void ClassInit(TestContext _)
     {
         var packageLocation = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "packages");
         var nugetPackage = Directory.EnumerateFiles(packageLocation, "Microsoft.TestPlatform.*.nupkg").OrderBy(a => a).FirstOrDefault();
-        nugetPackageFolder = Path.Combine(new TempDirectory().Path, Path.GetFileNameWithoutExtension(nugetPackage));
-        ZipFile.ExtractToDirectory(nugetPackage, nugetPackageFolder);
+        s_nugetPackageFolder = Path.Combine(new TempDirectory().Path, Path.GetFileNameWithoutExtension(nugetPackage));
+        ZipFile.ExtractToDirectory(nugetPackage, s_nugetPackageFolder);
 
         TryMoveDirectory(
-            sourceDirName: Path.Combine(nugetPackageFolder, "tools", "net451", "Team%20Tools"),
-            destDirName: Path.Combine(nugetPackageFolder, "tools", "net451", "Team Tools")
+            sourceDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team%20Tools"),
+            destDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team Tools")
         );
 
         TryMoveDirectory(
-            sourceDirName: Path.Combine(nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic%20Code%20Coverage%20Tools"),
-            destDirName: Path.Combine(nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic Code Coverage Tools")
+            sourceDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic%20Code%20Coverage%20Tools"),
+            destDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic Code Coverage Tools")
         );
     }
 
     [ClassCleanup]
     public static void ClassCleanup()
     {
-        Directory.Delete(nugetPackageFolder, true);
+        Directory.Delete(s_nugetPackageFolder, true);
     }
 
     [TestInitialize]
     public void SetUp()
     {
-        this.resultsDirectory = new TempDirectory();
+        _resultsDirectory = new TempDirectory();
     }
 
     [TestCleanup]
     public void CleanUp()
     {
-        this.resultsDirectory.Dispose();
+        _resultsDirectory.Dispose();
     }
 
     [TestMethod]
@@ -60,17 +60,17 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
     [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
     public void RunMultipleTestAssembliesWithCodeCoverage(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
 
         var arguments = CreateCodeCoverageArguments(runnerInfo, assemblyPaths, out var trxFilePath);
-        this.InvokeVsTest(arguments);
+        InvokeVsTest(arguments);
 
-        this.ExitCodeEquals(1); // failing tests
+        ExitCodeEquals(1); // failing tests
 
-        var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory.Path);
-        Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
+        var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, _resultsDirectory.Path);
+        Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {_resultsDirectory} trxfile: {trxFilePath}");
         Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
     }
 
@@ -78,9 +78,9 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
     {
         string consoleRunnerPath = string.Empty;
 
-        if (this.IsDesktopRunner())
+        if (IsDesktopRunner())
         {
-            consoleRunnerPath = Path.Combine(nugetPackageFolder, "tools", "net451", "Common7", "IDE", "Extensions", "TestPlatform", "vstest.console.exe");
+            consoleRunnerPath = Path.Combine(s_nugetPackageFolder, "tools", "net451", "Common7", "IDE", "Extensions", "TestPlatform", "vstest.console.exe");
         }
 
         Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
@@ -92,14 +92,14 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
         string assemblyPaths,
         out string trxFilePath)
     {
-        string diagFileName = Path.Combine(this.resultsDirectory.Path, "diaglog.txt");
+        string diagFileName = Path.Combine(_resultsDirectory.Path, "diaglog.txt");
 
-        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty,
-            this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDirectory.Path);
+        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty,
+            FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: _resultsDirectory.Path);
 
         arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /EnableCodeCoverage");
 
-        trxFilePath = Path.Combine(this.resultsDirectory.Path, Guid.NewGuid() + ".trx");
+        trxFilePath = Path.Combine(_resultsDirectory.Path, Guid.NewGuid() + ".trx");
         arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
 
         return arguments;

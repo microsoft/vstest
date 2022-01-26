@@ -21,8 +21,8 @@ public class CustomTestHostTests : AcceptanceTestBase
 
     private void Setup()
     {
-        this._vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
-        this._runEventHandler = new RunEventHandler();
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _);
+        _runEventHandler = new RunEventHandler();
     }
 
     [TestCleanup]
@@ -37,7 +37,7 @@ public class CustomTestHostTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithCustomTestHostLaunch(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         var customTestHostLauncher = new CustomTestHostLauncher();

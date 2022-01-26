@@ -16,7 +16,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkOnFiles(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
@@ -24,12 +24,12 @@ public class FilePatternParserTests : AcceptanceTestBase
 
         var arguments = PrepareArguments(
            testAssembly,
-           this.GetTestAdapterPath(),
-           string.Empty, this.FrameworkArgValue,
+           GetTestAdapterPath(),
+           string.Empty, FrameworkArgValue,
            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
-        this.InvokeVsTest(arguments);
-        this.ValidateSummaryStatus(1, 1, 1);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 1);
     }
 
     [TestMethod]
@@ -37,22 +37,22 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkOnArbitraryDepthDirectories(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
-        var oldAssemblyPath = Path.Combine("Debug", testEnvironment.TargetFramework, "SimpleTestProject.dll");
-        var newAssemblyPath = Path.Combine("**", testEnvironment.TargetFramework, "*TestProj*.dll");
+        var oldAssemblyPath = Path.Combine("Debug", _testEnvironment.TargetFramework, "SimpleTestProject.dll");
+        var newAssemblyPath = Path.Combine("**", _testEnvironment.TargetFramework, "*TestProj*.dll");
         testAssembly = testAssembly.Replace(oldAssemblyPath, newAssemblyPath);
 
         var arguments = PrepareArguments(
            testAssembly,
-           this.GetTestAdapterPath(),
+           GetTestAdapterPath(),
            string.Empty, string.Empty,
            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
-        this.InvokeVsTest(arguments);
-        this.ValidateSummaryStatus(1, 1, 1);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 1);
     }
 
     [TestMethod]
@@ -60,7 +60,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkForRelativeAssemblyPath(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
@@ -74,12 +74,12 @@ public class FilePatternParserTests : AcceptanceTestBase
 
         var arguments = PrepareArguments(
            testAssembly,
-           this.GetTestAdapterPath(),
+           GetTestAdapterPath(),
            string.Empty, string.Empty,
            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
-        this.InvokeVsTest(arguments);
-        this.ValidateSummaryStatus(1, 1, 1);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 1);
     }
 
     [TestMethod]
@@ -87,7 +87,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkOnMultipleFiles(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssembly = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
@@ -96,11 +96,11 @@ public class FilePatternParserTests : AcceptanceTestBase
 
         var arguments = PrepareArguments(
            testAssembly,
-           this.GetTestAdapterPath(),
-           string.Empty, this.FrameworkArgValue,
+           GetTestAdapterPath(),
+           string.Empty, FrameworkArgValue,
            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
-        this.InvokeVsTest(arguments);
-        this.ValidateSummaryStatus(2, 2, 2);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(2, 2, 2);
     }
 }

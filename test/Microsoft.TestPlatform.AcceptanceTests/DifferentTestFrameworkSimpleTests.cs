@@ -17,13 +17,13 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void ChutzpahRunAllTestExecution(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
-        var testJSFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "test.js");
-        var arguments = PrepareArguments(testJSFileAbsolutePath, this.GetTestAdapterPath(UnitTestFramework.Chutzpah), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+        var testJSFileAbsolutePath = Path.Combine(_testEnvironment.TestAssetsPath, "test.js");
+        var arguments = PrepareArguments(testJSFileAbsolutePath, GetTestAdapterPath(UnitTestFramework.Chutzpah), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
-        this.InvokeVsTest(arguments);
-        this.ValidateSummaryStatus(1, 1, 0);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 0);
     }
 
     [TestMethod]
@@ -32,7 +32,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useCoreRunner: false)]
     public void CPPRunAllTestExecutionNetFramework(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
         CppRunAllTests(runnerInfo.RunnerFramework, "x86");
     }
 
@@ -44,7 +44,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useCoreRunner: false)]
     public void CPPRunAllTestExecutionPlatformx64NetFramework(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
         CppRunAllTests(runnerInfo.RunnerFramework, "x64");
     }
 
@@ -55,7 +55,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false, useCoreRunner: true, useNetCore21Target: false, useNetCore31Target: true)]
     public void CPPRunAllTestExecutionPlatformx64Net(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
         CppRunAllTests(runnerInfo.RunnerFramework, "x64");
     }
 
@@ -65,7 +65,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     public void WebTestRunAllTestsWithRunSettings(RunnerInfo runnerInfo)
     {
         using var tempDir = new TempDirectory();
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
         var runSettingsFilePath = Path.Combine(tempDir.Path, Guid.NewGuid() + ".runsettings");
 
         //test the iterationCount setting for WebTestRunConfiguration in run settings
@@ -89,7 +89,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void CodedWebTestRunAllTests(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
         CodedWebTestRunAllTests(runnerInfo.RunnerFramework);
     }
 
@@ -98,16 +98,16 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void NUnitRunAllTestExecution(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
         var arguments = PrepareArguments(
-            this.GetAssetFullPath("NUTestProject.dll"),
-            this.GetTestAdapterPath(UnitTestFramework.NUnit),
-            string.Empty, this.FrameworkArgValue,
+            GetAssetFullPath("NUTestProject.dll"),
+            GetTestAdapterPath(UnitTestFramework.NUnit),
+            string.Empty, FrameworkArgValue,
             runnerInfo.InIsolationValue, tempDir.Path);
-        this.InvokeVsTest(arguments);
-        this.ValidateSummaryStatus(1, 1, 0);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 0);
     }
 
     [TestMethod]
@@ -115,27 +115,27 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void XUnitRunAllTestExecution(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         string testAssemblyPath;
         // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
-        if (this.testEnvironment.TargetFramework.Equals("net451"))
+        if (_testEnvironment.TargetFramework.Equals("net451"))
         {
-            testAssemblyPath = testEnvironment.GetTestAsset("XUTestProject.dll", "net46");
+            testAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll", "net46");
         }
         else
         {
-            testAssemblyPath = testEnvironment.GetTestAsset("XUTestProject.dll");
+            testAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll");
         }
 
         var arguments = PrepareArguments(
             testAssemblyPath,
-            this.GetTestAdapterPath(UnitTestFramework.XUnit),
-            string.Empty, this.FrameworkArgValue,
+            GetTestAdapterPath(UnitTestFramework.XUnit),
+            string.Empty, FrameworkArgValue,
             runnerInfo.InIsolationValue, tempDir.Path);
-        this.InvokeVsTest(arguments);
-        this.ValidateSummaryStatus(1, 1, 0);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 0);
     }
 
     private void CppRunAllTests(string runnerFramework, string platform)
@@ -146,11 +146,11 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         var assemblyRelativePath = platform.Equals("x64", StringComparison.OrdinalIgnoreCase)
             ? string.Format(assemblyRelativePathFormat, platform)
             : string.Format(assemblyRelativePathFormat, "");
-        var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
-        var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: tempDir.Path);
+        var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
+        var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, FrameworkArgValue, _testEnvironment.InIsolationValue, resultsDirectory: tempDir.Path);
 
-        this.InvokeVsTest(arguments);
-        this.ValidateSummaryStatus(1, 1, 0);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 0);
     }
 
     private void WebTestRunAllTests(string runnerFramework, string runSettingsFilePath = null, int minWebTestResultFileSizeInKB = 0)
@@ -164,15 +164,15 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         string assemblyRelativePath =
             @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\WebTest1.webtest";
 
-        var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
+        var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
         using var resultsDirectory = new TempDirectory();
         var arguments = PrepareArguments(
             assemblyAbsolutePath,
             string.Empty,
-            runSettingsFilePath, this.FrameworkArgValue, string.Empty, resultsDirectory.Path);
+            runSettingsFilePath, FrameworkArgValue, string.Empty, resultsDirectory.Path);
 
-        this.InvokeVsTest(arguments);
-        this.ValidateSummaryStatus(1, 0, 0);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 0, 0);
 
         if (minWebTestResultFileSizeInKB > 0)
         {
@@ -197,13 +197,13 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         using var tempDir = new TempDirectory();
         string assemblyRelativePath =
             @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\BingWebTest.dll";
-        var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
+        var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
         var arguments = PrepareArguments(
             assemblyAbsolutePath,
             string.Empty,
-            string.Empty, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
+            string.Empty, FrameworkArgValue, resultsDirectory: tempDir.Path);
 
-        this.InvokeVsTest(arguments);
-        this.ValidateSummaryStatus(1, 0, 0);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 0, 0);
     }
 }

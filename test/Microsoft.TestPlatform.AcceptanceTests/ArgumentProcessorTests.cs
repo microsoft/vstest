@@ -16,7 +16,7 @@ public class ArgumentProcessorTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void PassingNoArgumentsToVsTestConsoleShouldPrintHelpMessage(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         InvokeVsTest(null);
 
@@ -37,10 +37,10 @@ public class ArgumentProcessorTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void PassingInvalidArgumentsToVsTestConsoleShouldNotPrintHelpMessage(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
-        var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /badArgument");
 
         InvokeVsTest(arguments);
@@ -57,6 +57,6 @@ public class ArgumentProcessorTests : AcceptanceTestBase
         StdOutputDoesNotContains("To run tests: >vstest.console.exe tests.dll");
 
         //Check for message which guides using help option
-        this.StdErrorContains("Please use the /help option to check the list of valid arguments");
+        StdErrorContains("Please use the /help option to check the list of valid arguments");
     }
 }

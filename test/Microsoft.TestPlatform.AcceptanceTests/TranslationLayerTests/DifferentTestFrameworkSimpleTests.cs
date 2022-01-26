@@ -24,8 +24,8 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 
     private void Setup()
     {
-        this._vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
-        this._runEventHandler = new RunEventHandler();
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _);
+        _runEventHandler = new RunEventHandler();
     }
 
     [TestCleanup]
@@ -40,7 +40,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithNunitAdapter(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         var sources = new List<string>
@@ -79,13 +79,13 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithXunitAdapter(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
-        string testAssemblyPath = testEnvironment.TargetFramework.Equals("net451")
-            ? testEnvironment.GetTestAsset("XUTestProject.dll", "net46")
-            : testEnvironment.GetTestAsset("XUTestProject.dll");
+        string testAssemblyPath = _testEnvironment.TargetFramework.Equals("net451")
+            ? _testEnvironment.GetTestAsset("XUTestProject.dll", "net46")
+            : _testEnvironment.GetTestAsset("XUTestProject.dll");
         var sources = new List<string> { testAssemblyPath };
         var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(UnitTestFramework.XUnit), "*.TestAdapter.dll").ToList();
         _vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
@@ -119,12 +119,12 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void RunTestsWithChutzpahAdapter(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         var sources = new List<string>
         {
-            Path.Combine(testEnvironment.TestAssetsPath, "test.js")
+            Path.Combine(_testEnvironment.TestAssetsPath, "test.js")
         };
 
         var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(UnitTestFramework.Chutzpah), "*.TestAdapter.dll").ToList();

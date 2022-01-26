@@ -21,7 +21,7 @@ public class RunSelectedTests : AcceptanceTestBase
 
     private void Setup()
     {
-        _vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _);
         _runEventHandler = new RunEventHandler();
         _discoveryEventHandler = new DiscoveryEventHandler();
     }
@@ -37,7 +37,7 @@ public class RunSelectedTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithoutTestPlatformOptions(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), _discoveryEventHandler);
@@ -57,7 +57,7 @@ public class RunSelectedTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithTestPlatformOptions(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), _discoveryEventHandler);

@@ -24,19 +24,19 @@ public class DataCollectionTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void ExecuteTestsWithDataCollection(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
-        var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-        string runSettings = this.GetRunsettingsFilePath(tempDir.Path);
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+        string runSettings = GetRunsettingsFilePath(tempDir.Path);
         string diagFileName = Path.Combine(tempDir.Path, "diaglog.txt");
         var extensionsPath = Path.Combine(
-            this.testEnvironment.TestAssetsPath,
+            _testEnvironment.TestAssetsPath,
             Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
             "bin",
             IntegrationTestEnvironment.BuildConfiguration,
-            this.testEnvironment.RunnerFramework);
-        var arguments = PrepareArguments(assemblyPaths, null, runSettings, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+            _testEnvironment.RunnerFramework);
+        var arguments = PrepareArguments(assemblyPaths, null, runSettings, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
 
         var env = new Dictionary<string, string>
@@ -44,10 +44,10 @@ public class DataCollectionTests : AcceptanceTestBase
             ["TEST_ASSET_SAMPLE_COLLECTOR_PATH"] = tempDir.Path,
         };
 
-        this.InvokeVsTest(arguments, env);
+        InvokeVsTest(arguments, env);
 
-        this.ValidateSummaryStatus(1, 1, 1);
-        this.VaildateDataCollectorOutput(tempDir.Path);
+        ValidateSummaryStatus(1, 1, 1);
+        VaildateDataCollectorOutput(tempDir.Path);
     }
 
     [TestMethod]
@@ -55,19 +55,19 @@ public class DataCollectionTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void ExecuteTestsWithDataCollectionUsingCollectArgument(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
-        var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
         string diagFileName = Path.Combine(tempDir.Path, "diaglog.txt");
         var extensionsPath = Path.Combine(
-            this.testEnvironment.TestAssetsPath,
+            _testEnvironment.TestAssetsPath,
             Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
             "bin",
             IntegrationTestEnvironment.BuildConfiguration,
-            this.testEnvironment.RunnerFramework);
+            _testEnvironment.RunnerFramework);
 
-        var arguments = PrepareArguments(assemblyPaths, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
+        var arguments = PrepareArguments(assemblyPaths, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
         arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /Collect:SampleDataCollector", $" /TestAdapterPath:{extensionsPath}");
 
         var env = new Dictionary<string, string>
@@ -75,23 +75,23 @@ public class DataCollectionTests : AcceptanceTestBase
             ["TEST_ASSET_SAMPLE_COLLECTOR_PATH"] = tempDir.Path,
         };
 
-        this.InvokeVsTest(arguments, env);
+        InvokeVsTest(arguments, env);
 
-        this.ValidateSummaryStatus(1, 1, 1);
-        this.VaildateDataCollectorOutput(tempDir.Path);
+        ValidateSummaryStatus(1, 1, 1);
+        VaildateDataCollectorOutput(tempDir.Path);
     }
 
     [TestMethod]
     [NetCoreTargetFrameworkDataSource]
     public void DataCollectorAssemblyLoadingShouldNotThrowErrorForNetCore(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
-        var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.1"), string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.1"), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: tempDir.Path);
 
-        this.InvokeVsTest(arguments);
-        this.ValidateSummaryStatus(1, 0, 0);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 0, 0);
     }
 
     [TestMethod]
@@ -99,13 +99,13 @@ public class DataCollectionTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void DataCollectorAssemblyLoadingShouldNotThrowErrorForFullFramework(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
-        var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll"), string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll"), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: tempDir.Path);
 
-        this.InvokeVsTest(arguments);
-        this.ValidateSummaryStatus(1, 0, 0);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 0, 0);
     }
 
     [TestMethod]
@@ -113,20 +113,20 @@ public class DataCollectionTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DataCollectorAttachmentProcessor(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
-        var assemblyPath = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
-        var secondAssemblyPath = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-        string runSettings = this.GetRunsettingsFilePath(tempDir.Path);
+        var assemblyPath = BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
+        var secondAssemblyPath = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+        string runSettings = GetRunsettingsFilePath(tempDir.Path);
         string diagFileName = Path.Combine(tempDir.Path, "diaglog.txt");
         var extensionsPath = Path.Combine(
-            this.testEnvironment.TestAssetsPath,
+            _testEnvironment.TestAssetsPath,
             Path.GetFileNameWithoutExtension("AttachmentProcessorDataCollector"),
             "bin",
             IntegrationTestEnvironment.BuildConfiguration,
             "netstandard2.0");
-        var arguments = PrepareArguments(new string[] { assemblyPath, secondAssemblyPath }, null, runSettings, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(new string[] { assemblyPath, secondAssemblyPath }, null, runSettings, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
 
         XElement runSettingsXml = XElement.Load(runSettings);
@@ -149,9 +149,9 @@ public class DataCollectionTests : AcceptanceTestBase
             ["SampleDataCollectorTempPath"] = tempDir.Path,
         };
 
-        this.InvokeVsTest(arguments, env);
+        InvokeVsTest(arguments, env);
 
-        this.ValidateSummaryStatus(2, 2, 2);
+        ValidateSummaryStatus(2, 2, 2);
 
         string mergedFile = Directory.GetFiles(tempDir.Path, "MergedFile.txt", SearchOption.AllDirectories).Single();
         var fileContent = new List<string>();

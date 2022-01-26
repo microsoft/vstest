@@ -19,7 +19,7 @@ public class PlatformTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestExecutionWithPlatformx64(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var platformArg = " /Platform:x64";
         RunTestExecutionWithPlatform(platformArg, "testhost", 1);
@@ -33,7 +33,7 @@ public class PlatformTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestExecutionWithPlatformx86(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var platformArg = " /Platform:x86";
         RunTestExecutionWithPlatform(platformArg, "testhost.x86", 1);
@@ -44,15 +44,15 @@ public class PlatformTests : AcceptanceTestBase
         using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(
-            this.GetSampleTestAssembly(),
-            this.GetTestAdapterPath(),
-            string.Empty, this.FrameworkArgValue,
-            this.testEnvironment.InIsolationValue, resultsDirectory: tempDir.Path);
+            GetSampleTestAssembly(),
+            GetTestAdapterPath(),
+            string.Empty, FrameworkArgValue,
+            _testEnvironment.InIsolationValue, resultsDirectory: tempDir.Path);
 
         arguments = string.Concat(arguments, platformArg, GetDiagArg(tempDir.Path));
-        this.InvokeVsTest(arguments);
+        InvokeVsTest(arguments);
 
-        AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, tempDir.Path, new[] { testhostProcessName }, arguments, this.GetConsoleRunnerPath());
-        this.ValidateSummaryStatus(1, 1, 1);
+        AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, tempDir.Path, new[] { testhostProcessName }, arguments, GetConsoleRunnerPath());
+        ValidateSummaryStatus(1, 1, 1);
     }
 }

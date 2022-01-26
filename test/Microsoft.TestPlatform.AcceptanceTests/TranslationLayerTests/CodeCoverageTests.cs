@@ -32,9 +32,9 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
     private void Setup()
     {
-        this._vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _tempDirectory);
-        this._runEventHandler = new RunEventHandler();
-        this._testRunAttachmentsProcessingEventHandler = new TestRunAttachmentsProcessingEventHandler();
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _tempDirectory);
+        _runEventHandler = new RunEventHandler();
+        _testRunAttachmentsProcessingEventHandler = new TestRunAttachmentsProcessingEventHandler();
     }
 
     [TestCleanup]
@@ -49,7 +49,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     public void TestRunWithCodeCoverage(RunnerInfo runnerInfo)
     {
         // arrange
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         // act
@@ -73,7 +73,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     public void TestRunWithCodeCoverageUsingClrIe(RunnerInfo runnerInfo)
     {
         // arrange
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         // act
@@ -97,7 +97,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     public void TestRunWithCodeCoverageParallel(RunnerInfo runnerInfo)
     {
         // arrange
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         // act
@@ -128,7 +128,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     private async Task TestRunWithCodeCoverageAndAttachmentsProcessingInternal(RunnerInfo runnerInfo, bool withInvokedDataCollectors)
     {
         // arrange
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.RunTests(GetTestAssemblies().Take(1), GetCodeCoverageRunSettings(1), _runEventHandler);
@@ -184,7 +184,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingNoMetrics(RunnerInfo runnerInfo)
     {
         // arrange
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.RunTests(GetTestAssemblies().Take(1), GetCodeCoverageRunSettings(1), _runEventHandler);
@@ -204,7 +204,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             @"Microsoft\.VisualStudio\.Coverage\.DynamicCoverageDataCollectorWithAttachmentProcessor, Microsoft\.VisualStudio\.TraceDataCollector, Version=.*, Culture=neutral, PublicKeyToken=.*"));
 
         _testRunAttachmentsProcessingEventHandler.EnsureSuccess();
-        Assert.AreEqual(1, this._testRunAttachmentsProcessingEventHandler.Attachments.Count);
+        Assert.AreEqual(1, _testRunAttachmentsProcessingEventHandler.Attachments.Count);
 
         AssertCoverageResults(_testRunAttachmentsProcessingEventHandler.Attachments);
 
@@ -236,7 +236,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingModuleDuplicated(RunnerInfo runnerInfo)
     {
         // arrange
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.RunTests(GetTestAssemblies().Take(1), GetCodeCoverageRunSettings(1), _runEventHandler);
@@ -257,7 +257,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             @"Microsoft\.VisualStudio\.Coverage\.DynamicCoverageDataCollectorWithAttachmentProcessor, Microsoft\.VisualStudio\.TraceDataCollector, Version=.*, Culture=neutral, PublicKeyToken=.*"));
 
         _testRunAttachmentsProcessingEventHandler.EnsureSuccess();
-        Assert.AreEqual(1, this._testRunAttachmentsProcessingEventHandler.Attachments.Count);
+        Assert.AreEqual(1, _testRunAttachmentsProcessingEventHandler.Attachments.Count);
 
         AssertCoverageResults(_testRunAttachmentsProcessingEventHandler.Attachments);
 
@@ -292,7 +292,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingSameReportFormat(RunnerInfo runnerInfo)
     {
         // arrange
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.RunTests(GetTestAssemblies().Take(1), GetCodeCoverageRunSettings(1, outputFormat: "Coverage"), _runEventHandler);
@@ -312,9 +312,9 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             @"Microsoft\.VisualStudio\.Coverage\.DynamicCoverageDataCollectorWithAttachmentProcessor, Microsoft\.VisualStudio\.TraceDataCollector, Version=.*, Culture=neutral, PublicKeyToken=.*"));
 
         _testRunAttachmentsProcessingEventHandler.EnsureSuccess();
-        Assert.AreEqual(1, this._testRunAttachmentsProcessingEventHandler.Attachments.Count);
-        Assert.AreEqual(1, this._testRunAttachmentsProcessingEventHandler.Attachments[0].Attachments.Count);
-        Assert.IsTrue(this._testRunAttachmentsProcessingEventHandler.Attachments[0].Attachments[0].Uri.LocalPath.Contains(".coverage"));
+        Assert.AreEqual(1, _testRunAttachmentsProcessingEventHandler.Attachments.Count);
+        Assert.AreEqual(1, _testRunAttachmentsProcessingEventHandler.Attachments[0].Attachments.Count);
+        Assert.IsTrue(_testRunAttachmentsProcessingEventHandler.Attachments[0].Attachments[0].Uri.LocalPath.Contains(".coverage"));
 
         AssertCoverageResults(_testRunAttachmentsProcessingEventHandler.Attachments);
 
@@ -349,7 +349,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingDifferentReportFormats(RunnerInfo runnerInfo)
     {
         // arrange
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.RunTests(GetTestAssemblies().Take(1), GetCodeCoverageRunSettings(1, outputFormat: "Coverage"), _runEventHandler);
@@ -372,10 +372,10 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
 
         _testRunAttachmentsProcessingEventHandler.EnsureSuccess();
-        Assert.AreEqual(1, this._testRunAttachmentsProcessingEventHandler.Attachments.Count);
-        Assert.AreEqual(2, this._testRunAttachmentsProcessingEventHandler.Attachments[0].Attachments.Count);
-        Assert.IsTrue(this._testRunAttachmentsProcessingEventHandler.Attachments[0].Attachments[0].Uri.LocalPath.Contains(".cobertura.xml"));
-        Assert.IsTrue(this._testRunAttachmentsProcessingEventHandler.Attachments[0].Attachments[1].Uri.LocalPath.Contains(".coverage"));
+        Assert.AreEqual(1, _testRunAttachmentsProcessingEventHandler.Attachments.Count);
+        Assert.AreEqual(2, _testRunAttachmentsProcessingEventHandler.Attachments[0].Attachments.Count);
+        Assert.IsTrue(_testRunAttachmentsProcessingEventHandler.Attachments[0].Attachments[0].Uri.LocalPath.Contains(".cobertura.xml"));
+        Assert.IsTrue(_testRunAttachmentsProcessingEventHandler.Attachments[0].Attachments[1].Uri.LocalPath.Contains(".coverage"));
 
         AssertCoverageResults(_testRunAttachmentsProcessingEventHandler.Attachments);
 
@@ -414,7 +414,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     {
         var numOfProcesses = Process.GetProcessesByName("vstest.console").Length;
 
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.RunTests(GetTestAssemblies().Take(1), GetCodeCoverageRunSettings(1), _runEventHandler);
@@ -490,7 +490,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     {
         if (attachments.Count == 1)
         {
-            var xmlCoverage = this.GetXmlCoverage(attachments.First().Attachments.First().Uri.LocalPath, this._tempDirectory);
+            var xmlCoverage = GetXmlCoverage(attachments.First().Attachments.First().Uri.LocalPath, _tempDirectory);
 
             foreach (var project in GetProjects())
             {

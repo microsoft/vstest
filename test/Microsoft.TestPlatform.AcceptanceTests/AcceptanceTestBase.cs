@@ -55,7 +55,7 @@ public class AcceptanceTestBase : IntegrationTestBase
         return string.Join(";", left, right);
     }
 
-    protected string FrameworkArgValue => DeriveFrameworkArgValue(testEnvironment);
+    protected string FrameworkArgValue => DeriveFrameworkArgValue(_testEnvironment);
 
     protected static void SetTestEnvironment(IntegrationTestEnvironment testEnvironment, RunnerInfo runnerInfo)
     {
@@ -84,11 +84,11 @@ public class AcceptanceTestBase : IntegrationTestBase
         };
 
     protected bool IsDesktopTargetFramework()
-        => testEnvironment.TargetFramework == AcceptanceTestBase.DesktopTargetFramework;
+        => _testEnvironment.TargetFramework == AcceptanceTestBase.DesktopTargetFramework;
 
     protected string GetTargetFramworkForRunsettings()
     {
-        string targetFramework = testEnvironment.TargetFramework == DesktopTargetFramework ? "Framework45" : "FrameworkCore10";
+        string targetFramework = _testEnvironment.TargetFramework == DesktopTargetFramework ? "Framework45" : "FrameworkCore10";
 
         return targetFramework;
     }

@@ -23,7 +23,7 @@ public class AppDomainTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void RunTestExecutionWithDisableAppDomain(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
         var testAppDomainDetailFileName = Path.Combine(tempDir.Path, "appdomain_test.txt");
@@ -33,12 +33,12 @@ public class AppDomainTests : AcceptanceTestBase
         File.Delete(testAppDomainDetailFileName);
         File.Delete(dataCollectorAppDomainDetailFileName);
 
-        var runsettingsFilePath = this.GetInProcDataCollectionRunsettingsFile(true, tempDir);
+        var runsettingsFilePath = GetInProcDataCollectionRunsettingsFile(true, tempDir);
         var arguments = PrepareArguments(
-            this.GetSampleTestAssembly(),
-            this.GetTestAdapterPath(),
+            GetSampleTestAssembly(),
+            GetTestAdapterPath(),
             runsettingsFilePath,
-            this.FrameworkArgValue,
+            FrameworkArgValue,
             runnerInfo.InIsolationValue,
             tempDir.Path);
 
@@ -49,14 +49,14 @@ public class AppDomainTests : AcceptanceTestBase
             ["TEST_ASSET_APPDOMAIN_COLLECTOR_PATH"] = dataCollectorAppDomainDetailFileName,
         };
 
-        this.InvokeVsTest(arguments, env);
+        InvokeVsTest(arguments, env);
 
         Assert.IsTrue(
             IsFilesContentEqual(testAppDomainDetailFileName, dataCollectorAppDomainDetailFileName),
             "Different AppDomains, test: {0} datacollector: {1}",
             File.ReadAllText(testAppDomainDetailFileName),
             File.ReadAllText(dataCollectorAppDomainDetailFileName));
-        this.ValidateSummaryStatus(1, 1, 1);
+        ValidateSummaryStatus(1, 1, 1);
         File.Delete(runsettingsFilePath);
     }
 
@@ -73,7 +73,7 @@ public class AppDomainTests : AcceptanceTestBase
     private string GetInProcDataCollectionRunsettingsFile(bool disableAppDomain, TempDirectory tempDirectory)
     {
         var runSettings = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
-        var inprocasm = this.testEnvironment.GetTestAsset("SimpleDataCollector.dll");
+        var inprocasm = _testEnvironment.GetTestAsset("SimpleDataCollector.dll");
 #if !NET451
         var assemblyName = AssemblyLoadContext.GetAssemblyName(inprocasm);
 #else

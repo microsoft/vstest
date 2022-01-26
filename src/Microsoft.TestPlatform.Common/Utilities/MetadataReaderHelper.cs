@@ -42,11 +42,11 @@ using ObjectModel;
 internal class MetadataReaderExtensionsHelper
 {
     private const string TestExtensionTypesAttributeV2 = "Microsoft.VisualStudio.TestPlatform.TestExtensionTypesV2Attribute";
-    private static readonly ConcurrentDictionary<string, Type[]> assemblyCache = new();
-    private static readonly Type[] emptyTypeArray = new Type[0];
+    private static readonly ConcurrentDictionary<string, Type[]> AssemblyCache = new();
+    private static readonly Type[] EmptyTypeArray = new Type[0];
 
     public Type[] DiscoverTestExtensionTypesV2Attribute(Assembly loadedAssembly, string assemblyFilePath)
-        => assemblyCache.GetOrAdd(assemblyFilePath, DiscoverTestExtensionTypesV2AttributeInternal(loadedAssembly, assemblyFilePath));
+        => AssemblyCache.GetOrAdd(assemblyFilePath, DiscoverTestExtensionTypesV2AttributeInternal(loadedAssembly, assemblyFilePath));
 
     private Type[] DiscoverTestExtensionTypesV2AttributeInternal(Assembly loadedAssembly, string assemblyFilePath)
     {
@@ -174,7 +174,7 @@ internal class MetadataReaderExtensionsHelper
             }
         }
 
-        return extensions?.OrderByDescending(t => t.Item1).Select(t => t.Item2).ToArray() ?? emptyTypeArray;
+        return extensions?.OrderByDescending(t => t.Item1).Select(t => t.Item2).ToArray() ?? EmptyTypeArray;
     }
 
     private string FormatException(Exception ex)

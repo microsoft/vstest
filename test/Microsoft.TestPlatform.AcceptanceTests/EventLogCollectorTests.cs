@@ -24,21 +24,21 @@ public class EventLogCollectorTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(this.testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
-        var assemblyPaths = this.testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
+        var assemblyPaths = _testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
 
-        string runSettings = this.GetRunsettingsFilePath(tempDir);
-        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
+        string runSettings = GetRunsettingsFilePath(tempDir);
+        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), runSettings, FrameworkArgValue, resultsDirectory: tempDir.Path);
 
         InvokeVsTest(arguments);
 
-        this.ValidateSummaryStatus(3, 0, 0);
-        this.VaildateDataCollectorOutput(tempDir);
-        this.StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
-        this.StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
-        this.StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
-        this.StdErrorDoesNotContains("Unable to read event log");
+        ValidateSummaryStatus(3, 0, 0);
+        VaildateDataCollectorOutput(tempDir);
+        StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
+        StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
+        StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
+        StdErrorDoesNotContains("Unable to read event log");
     }
 
     [TestMethod]
@@ -46,12 +46,12 @@ public class EventLogCollectorTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void EventLogDataCollectorShoudCreateLogFileWithoutEventsIfEventsAreNotLogged(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(this.testEnvironment, runnerInfo);
-        var assemblyPaths = this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        var assemblyPaths = _testEnvironment.GetTestAsset("SimpleTestProject.dll");
         using var tempDir = new TempDirectory();
 
-        string runSettings = this.GetRunsettingsFilePath(tempDir);
-        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
+        string runSettings = GetRunsettingsFilePath(tempDir);
+        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), runSettings, FrameworkArgValue, resultsDirectory: tempDir.Path);
 
         InvokeVsTest(arguments);
 

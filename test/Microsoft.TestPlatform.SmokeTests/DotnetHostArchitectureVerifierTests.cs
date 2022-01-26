@@ -39,7 +39,7 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
             ["ExpectedArchitecture"] = architecture
         };
 
-        this.ExecuteApplication(dotnetPath, "new mstest", out string stdOut, out string stdError, out int exitCode, environmentVariables, workSpace.Path);
+        ExecuteApplication(dotnetPath, "new mstest", out string stdOut, out string stdError, out int exitCode, environmentVariables, workSpace.Path);
 
         // Patch test file
         File.WriteAllText(Path.Combine(workSpace.Path, "UnitTest1.cs"),

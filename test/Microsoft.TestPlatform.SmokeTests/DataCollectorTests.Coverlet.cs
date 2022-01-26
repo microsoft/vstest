@@ -17,23 +17,23 @@ public class DataCollectorTestsCoverlets : IntegrationTestBase
     public void RunCoverletCoverage()
     {
         // Collector is supported only for netcoreapp2.1, is compiled for netcoreapp2.1 and packaged as netstandard
-        if (testEnvironment.TargetFramework != CoreRunnerFramework)
+        if (_testEnvironment.TargetFramework != CoreRunnerFramework)
         {
             return;
         }
 
         // We use netcoreapp runner
         // "...\vstest\tools\dotnet\dotnet.exe "...\vstest\artifacts\Debug\netcoreapp2.1\vstest.console.dll" --collect:"XPlat Code Coverage" ...
-        this.testEnvironment.RunnerFramework = CoreRunnerFramework;
+        _testEnvironment.RunnerFramework = CoreRunnerFramework;
         var resultsDir = new TempDirectory();
 
-        string coverletAdapterPath = Path.GetDirectoryName(Directory.GetFiles(this.testEnvironment.GetNugetPackage("coverlet.collector"), "coverlet.collector.dll", SearchOption.AllDirectories).Single());
+        string coverletAdapterPath = Path.GetDirectoryName(Directory.GetFiles(_testEnvironment.GetNugetPackage("coverlet.collector"), "coverlet.collector.dll", SearchOption.AllDirectories).Single());
         string logId = Guid.NewGuid().ToString("N");
-        string assemblyPath = this.BuildMultipleAssemblyPath("CoverletCoverageTestProject.dll").Trim('\"');
+        string assemblyPath = BuildMultipleAssemblyPath("CoverletCoverageTestProject.dll").Trim('\"');
         string logPath = Path.Combine(Path.GetDirectoryName(assemblyPath), $"coverletcoverage.{logId}.log");
         string logPathDirectory = Path.GetDirectoryName(logPath);
         string argument = $"--collect:{"XPlat Code Coverage".AddDoubleQuote()} {PrepareArguments(assemblyPath, coverletAdapterPath, "", ".NETCoreApp,Version=v2.1", resultsDirectory: resultsDir.Path)} --diag:{logPath.AddDoubleQuote()}";
-        this.InvokeVsTest(argument);
+        InvokeVsTest(argument);
 
         // Verify vstest.console.dll CollectArgumentProcessor fix codeBase for coverlet package
         // This assert check that we're sure that we've updated collector setting code base with full path,
@@ -50,6 +50,6 @@ public class DataCollectorTestsCoverlets : IntegrationTestBase
         Assert.IsTrue(File.ReadAllText(hostLog).Contains("[coverlet]Initialize CoverletInProcDataCollector"));
 
         // Verify default coverage file is generated
-        this.StdOutputContains("coverage.cobertura.xml");
+        StdOutputContains("coverage.cobertura.xml");
     }
 }

@@ -19,9 +19,9 @@ public class LiveUnitTestingTests : AcceptanceTestBase
 
     public void Setup()
     {
-        this._vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
-        this._discoveryEventHandler = new DiscoveryEventHandler();
-        this._runEventHandler = new RunEventHandler();
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _);
+        _discoveryEventHandler = new DiscoveryEventHandler();
+        _runEventHandler = new RunEventHandler();
     }
 
     [TestCleanup]
@@ -36,7 +36,7 @@ public class LiveUnitTestingTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingLiveUnitTesting(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -61,7 +61,7 @@ public class LiveUnitTestingTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithLiveUnitTesting(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>

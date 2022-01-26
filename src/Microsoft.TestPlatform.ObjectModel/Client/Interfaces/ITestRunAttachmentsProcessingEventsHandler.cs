@@ -23,9 +23,11 @@ public interface ITestRunAttachmentsProcessingEventsHandler : ITestMessageEventH
     /// <param name="attachments">Processed attachment sets.</param>
     void HandleProcessedAttachmentsChunk(IEnumerable<AttachmentSet> attachments);
 
+
     /// <summary>
     /// Dispatch TestRunAttachmentsProcessingProgress event to listeners.
     /// </summary>
     /// <param name="AttachmentsProcessingProgressEventArgs">AttachmentsProcessing Progress event args.</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
     void HandleTestRunAttachmentsProcessingProgress(TestRunAttachmentsProcessingProgressEventArgs AttachmentsProcessingProgressEventArgs);
 }

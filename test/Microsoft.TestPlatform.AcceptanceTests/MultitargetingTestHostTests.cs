@@ -17,13 +17,13 @@ public class MultitargetingTestHostTests : AcceptanceTestBase
     [NetFrameworkRunner(NETFX452_48)]
     public void RunningTestWithAFailingDebugAssertDoesNotCrashTheHostingProcess(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
-        var assemblyPath = this.BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll").Trim('\"');
-        var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
-        this.InvokeVsTest(arguments);
+        var assemblyPath = BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll").Trim('\"');
+        var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+        InvokeVsTest(arguments);
 
-        this.ValidateSummaryStatus(passedTestsCount: 1, failedTestsCount: 0, 0);
+        ValidateSummaryStatus(passedTestsCount: 1, failedTestsCount: 0, 0);
     }
 }

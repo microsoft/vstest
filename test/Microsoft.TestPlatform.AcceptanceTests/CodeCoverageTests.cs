@@ -207,9 +207,9 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     private void CollectCodeCoverage(RunnerInfo runnerInfo, TestParameters testParameters)
     {
         using var tempDir = new TempDirectory();
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = this.CreateArguments(tempDir, runnerInfo, testParameters, out var trxFilePath);
+        var arguments = CreateArguments(tempDir, runnerInfo, testParameters, out var trxFilePath);
 
         InvokeVsTest(arguments);
 
@@ -235,13 +235,13 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             Assert.IsTrue(actualCoverageFile.EndsWith(".coverage", StringComparison.InvariantCultureIgnoreCase));
         }
 
-        var coverageDocument = this.GetXmlCoverage(actualCoverageFile, tempDir);
+        var coverageDocument = GetXmlCoverage(actualCoverageFile, tempDir);
         if (testParameters.CheckSkipped)
         {
-            this.AssertSkippedMethod(coverageDocument);
+            AssertSkippedMethod(coverageDocument);
         }
 
-        this.ValidateCoverageData(coverageDocument, testParameters.AssemblyName, testParameters.RunSettingsType != TestParameters.SettingsType.CoberturaOutput);
+        ValidateCoverageData(coverageDocument, testParameters.AssemblyName, testParameters.RunSettingsType != TestParameters.SettingsType.CoberturaOutput);
     }
 
     private string CreateArguments(
@@ -250,14 +250,14 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         TestParameters testParameters,
         out string trxFilePath)
     {
-        var assemblyPaths = this.GetAssetFullPath(testParameters.AssemblyName);
+        var assemblyPaths = GetAssetFullPath(testParameters.AssemblyName);
 
         string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
             "artifacts", IntegrationTestEnvironment.BuildConfiguration, "Microsoft.CodeCoverage");
 
         string diagFileName = Path.Combine(tempDir.Path, "diaglog.txt");
-        var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty,
-            this.FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
+        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty,
+            FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
         arguments = string.Concat(arguments, $" /Diag:{diagFileName}",
             $" /TestAdapterPath:{traceDataCollectorDir}");
         arguments = string.Concat(arguments, $" /Platform:{testParameters.TargetPlatform}");

@@ -43,7 +43,7 @@ public class RunTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunAllTests(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetDefaultRunSettings(), _runEventHandler);
@@ -63,7 +63,7 @@ public class RunTests : AcceptanceTestBase
     {
         var numOfProcesses = Process.GetProcessesByName("vstest.console").Length;
 
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetDefaultRunSettings(), _runEventHandler);
@@ -80,7 +80,7 @@ public class RunTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithTelemetryOptedIn(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.RunTests(
@@ -104,7 +104,7 @@ public class RunTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithTelemetryOptedOut(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.RunTests(
@@ -123,7 +123,7 @@ public class RunTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsShouldThrowOnStackOverflowException(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         if (IntegrationTestEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
@@ -154,7 +154,7 @@ public class RunTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
     public void RunTestsShouldShowProperWarningOnNoTestsForTestCaseFilter(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         var testAssemblyName = "SimpleTestProject2.dll";

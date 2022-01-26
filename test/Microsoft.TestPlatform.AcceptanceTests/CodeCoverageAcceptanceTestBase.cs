@@ -67,7 +67,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
             return coverage;
         }
 
-        var codeCoverageExe = this.GetCodeCoverageExePath();
+        var codeCoverageExe = GetCodeCoverageExePath();
         var output = Path.Combine(tempDirectory.Path, Guid.NewGuid().ToString() + ".xml");
 
         var watch = new Stopwatch();

@@ -23,7 +23,7 @@ public class AssemblyPropertiesTests : IntegrationTestBase
     [DataRow("netcoreapp2.1")]
     public void GetAssemblyTypeForManagedDll(string framework)
     {
-        var assemblyPath = testEnvironment.GetTestAsset("SimpleTestProject3.dll", framework);
+        var assemblyPath = _testEnvironment.GetTestAsset("SimpleTestProject3.dll", framework);
         var assemblyType = _assemblyProperties.GetAssemblyType(assemblyPath);
 
         Assert.AreEqual(AssemblyType.Managed, assemblyType);
@@ -32,7 +32,7 @@ public class AssemblyPropertiesTests : IntegrationTestBase
     [TestMethod]
     public void GetAssemblyTypeForNativeDll()
     {
-        var assemblyPath = $@"{testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
+        var assemblyPath = $@"{_testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
         var assemblyType = _assemblyProperties.GetAssemblyType(assemblyPath);
 
         Assert.AreEqual(AssemblyType.Native, assemblyType);
@@ -41,7 +41,7 @@ public class AssemblyPropertiesTests : IntegrationTestBase
     [TestMethod]
     public void GetAssemblyTypeForManagedExe()
     {
-        var assemblyPath = testEnvironment.GetTestAsset("ConsoleManagedApp.exe", "net451");
+        var assemblyPath = _testEnvironment.GetTestAsset("ConsoleManagedApp.exe", "net451");
         var assemblyType = _assemblyProperties.GetAssemblyType(assemblyPath);
 
         Assert.AreEqual(AssemblyType.Managed, assemblyType);
@@ -51,7 +51,7 @@ public class AssemblyPropertiesTests : IntegrationTestBase
     [DataRow("netcoreapp2.1")]
     public void GetAssemblyTypeForNetCoreManagedExe(string framework)
     {
-        var assemblyPath = testEnvironment.GetTestAsset("ConsoleManagedApp.dll", framework);
+        var assemblyPath = _testEnvironment.GetTestAsset("ConsoleManagedApp.dll", framework);
         var assemblyType = _assemblyProperties.GetAssemblyType(assemblyPath);
 
         Assert.AreEqual(AssemblyType.Managed, assemblyType);
@@ -60,7 +60,7 @@ public class AssemblyPropertiesTests : IntegrationTestBase
     [TestMethod]
     public void GetAssemblyTypeForNativeExe()
     {
-        var assemblyPath = $@"{testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.ConsoleNativeApp.exe";
+        var assemblyPath = $@"{_testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.ConsoleNativeApp.exe";
         var assemblyType = _assemblyProperties.GetAssemblyType(assemblyPath);
 
         Assert.AreEqual(AssemblyType.Native, assemblyType);

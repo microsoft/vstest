@@ -19,10 +19,10 @@ public class DisableAppdomainTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void DisableAppdomainTest(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var diableAppdomainTest1 = testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", "net451");
-        var diableAppdomainTest2 = testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", "net451");
+        var diableAppdomainTest1 = _testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", "net451");
+        var diableAppdomainTest2 = _testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", "net451");
 
         RunTests(runnerInfo.RunnerFramework, string.Format("{0}\" \"{1}", diableAppdomainTest1, diableAppdomainTest2), 2);
     }
@@ -32,9 +32,9 @@ public class DisableAppdomainTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void NewtonSoftDependencyWithDisableAppdomainTest(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var newtonSoftDependnecyTest = testEnvironment.GetTestAsset("NewtonSoftDependency.dll", "net451");
+        var newtonSoftDependnecyTest = _testEnvironment.GetTestAsset("NewtonSoftDependency.dll", "net451");
 
         RunTests(runnerInfo.RunnerFramework, newtonSoftDependnecyTest, 1);
     }
@@ -57,10 +57,10 @@ public class DisableAppdomainTests : AcceptanceTestBase
             testAssembly,
             string.Empty,
             GetRunsettingsFilePath(tempDir, runConfigurationDictionary),
-            this.FrameworkArgValue, resultsDirectory: tempDir.Path);
+            FrameworkArgValue, resultsDirectory: tempDir.Path);
 
-        this.InvokeVsTest(arguments);
-        this.ValidateSummaryStatus(passedTestCount, 0, 0);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(passedTestCount, 0, 0);
     }
 
     private string GetRunsettingsFilePath(TempDirectory tempDir, Dictionary<string, string> runConfigurationDictionary)

@@ -16,16 +16,16 @@ public class DebugAssertTests : AcceptanceTestBase
     {
         // when debugging this test in case it starts failing, be aware that the default behavior of Debug.Assert
         // is to not crash the process when we are running in debug, and debugger is attached
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
-        var assemblyPath = this.BuildMultipleAssemblyPath("CrashingOnDebugAssertTestProject.dll").Trim('\"');
-        var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
-        this.InvokeVsTest(arguments);
+        var assemblyPath = BuildMultipleAssemblyPath("CrashingOnDebugAssertTestProject.dll").Trim('\"');
+        var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+        InvokeVsTest(arguments);
 
         // this will have failed tests when our trace listener works and crash the testhost process when it does not
         // because crashing processes is what a failed Debug.Assert does by default, unless you have a debugger attached
-        this.ValidateSummaryStatus(passedTestsCount: 4, failedTestsCount: 4, 0);
-        StringAssert.Contains(this.StdOut, "threw exception: Microsoft.VisualStudio.TestPlatform.TestHost.DebugAssertException:");
+        ValidateSummaryStatus(passedTestsCount: 4, failedTestsCount: 4, 0);
+        StringAssert.Contains(StdOut, "threw exception: Microsoft.VisualStudio.TestPlatform.TestHost.DebugAssertException:");
     }
 }

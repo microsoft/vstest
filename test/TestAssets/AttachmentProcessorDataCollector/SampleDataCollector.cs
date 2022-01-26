@@ -52,7 +52,7 @@ namespace AttachmentProcessorDataCollector
         {
             string tmpAttachment = Path.Combine(_tempDirectoryPath, Guid.NewGuid().ToString("N"), "DataCollectorAttachmentProcessor_1.txt");
             Directory.CreateDirectory(Path.GetDirectoryName(tmpAttachment));
-            File.WriteAllText(tmpAttachment, $"SessionEnded_Handler_{Guid.NewGuid().ToString("N")}");
+            File.WriteAllText(tmpAttachment, $"SessionEnded_Handler_{Guid.NewGuid():N}");
             _dataCollectionSink.SendFileAsync(_context.SessionDataCollectionContext, tmpAttachment, true);
         }
     }

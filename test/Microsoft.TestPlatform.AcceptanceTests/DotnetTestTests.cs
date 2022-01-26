@@ -14,17 +14,17 @@ public class DotnetTestTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunDotnetTestWithCsproj(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectName = "SimpleTestProject.csproj";
         var projectPath = GetProjectFullPath(projectName);
 
-        this.InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal""");
+        InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal""");
 
         // ensure our dev version is used
-        this.StdOutputContains("-dev");
-        this.ValidateSummaryStatus(1, 1, 1);
-        this.ExitCodeEquals(1);
+        StdOutputContains("-dev");
+        ValidateSummaryStatus(1, 1, 1);
+        ExitCodeEquals(1);
     }
 
 
@@ -34,7 +34,7 @@ public class DotnetTestTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunDotnetTestWithDll(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPath = BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
         InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal""");
@@ -51,7 +51,7 @@ public class DotnetTestTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void PassInlineSettings(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectName = "ParametrizedTestProject.csproj";
         var projectPath = GetProjectFullPath(projectName);
@@ -66,7 +66,7 @@ public class DotnetTestTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void PassInlineSettingsToDll(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPath = BuildMultipleAssemblyPath("ParametrizedTestProject.dll").Trim('\"');
         InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name=\""weburl\"", value=\""http://localhost//def\"")");
