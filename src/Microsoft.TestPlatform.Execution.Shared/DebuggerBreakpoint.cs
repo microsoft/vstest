@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System;
 using System.Diagnostics;
 using System.IO;
-#if !NETCOREAPP1_0
+#if !NETCOREAPP1_0 && DEBUG
 using System.Reflection;
 #endif
 using System.Runtime.InteropServices;

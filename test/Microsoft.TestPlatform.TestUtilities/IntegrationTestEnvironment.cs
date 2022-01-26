@@ -17,8 +17,9 @@ using VisualStudio.TestTools.UnitTesting;
 /// </summary>
 public class IntegrationTestEnvironment
 {
-    public static string TestPlatformRootDirectory = Environment.GetEnvironmentVariable("TP_ROOT_DIR")
-                                                     ?? Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
+    public static string TestPlatformRootDirectory =
+        Environment.GetEnvironmentVariable("TP_ROOT_DIR")
+        ?? Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
 
     private static Dictionary<string, string> s_dependencyVersions;
 
@@ -64,7 +65,7 @@ public class IntegrationTestEnvironment
 #if DEBUG
             return "Debug";
 #else
-                return "Release";
+            return "Release";
 #endif
         }
     }
