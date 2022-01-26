@@ -10,6 +10,12 @@ indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
+# Shell scripts
+[*.sh]
+end_of_line = lf
+[*.{cmd,bat}]
+end_of_line = crlf
+
 # Xml files
 [*.xml]
 indent_size = 2
@@ -26,6 +32,7 @@ indent_size = 4
 # Visual Studio XML project files
 [*.{csproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
 indent_size = 2
+charset = utf-8
 
 # Visual Studio and .NET related XML config files
 [*.{props,targets,ruleset,config,nuspec,resx,vsixmanifest,vsct}]
@@ -45,7 +52,6 @@ indent_size = 4
 tab_width = 4
 
 # New line preferences
-end_of_line = crlf
 insert_final_newline = false
 
 #### .NET Coding Conventions ####
@@ -53,6 +59,8 @@ insert_final_newline = false
 # Organize usings
 dotnet_separate_import_directive_groups = true
 dotnet_sort_system_directives_first = true
+
+# License header
 file_header_template = Copyright (c) Microsoft Corporation. All rights reserved.\nLicensed under the MIT license. See LICENSE file in the project root for full license information.
 
 # this. and Me. preferences
