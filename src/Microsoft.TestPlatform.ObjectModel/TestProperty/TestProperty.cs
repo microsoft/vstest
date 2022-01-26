@@ -216,21 +216,21 @@ public class TestProperty : IEquatable<TestProperty>
         catch (Exception)
         {
 #if FullCLR
-                // Try to see if the typeName contains Windows Phone PKT in that case load it from
-                // desktop side
-                if (typeName.Contains(s_windowsPhonePKT))
-                {
-                    type = this.GetType(typeName.Replace(s_windowsPhonePKT, s_visualStudioPKT));
-                }
+            // Try to see if the typeName contains Windows Phone PKT in that case load it from
+            // desktop side
+            if (typeName.Contains(s_windowsPhonePKT))
+            {
+                type = GetType(typeName.Replace(s_windowsPhonePKT, s_visualStudioPKT));
+            }
 
-                if (type == null)
-                {
-                    System.Diagnostics.Debug.Fail("The test property type " + typeName + " of property " + this.id + "is not supported.");
+            if (type == null)
+            {
+                System.Diagnostics.Debug.Fail("The test property type " + typeName + " of property " + Id + "is not supported.");
 #else
             System.Diagnostics.Debug.WriteLine("The test property type " + typeName + " of property " + Id + "is not supported.");
 #endif
 #if FullCLR
-                }
+            }
 #endif
         }
         finally
@@ -252,8 +252,8 @@ public class TestProperty : IEquatable<TestProperty>
     private static readonly Dictionary<string, KeyValuePair<TestProperty, HashSet<Type>>> Properties = new();
 
 #if FullCLR
-        private static string s_visualStudioPKT = "b03f5f7f11d50a3a";
-        private static string s_windowsPhonePKT = "7cec85d7bea7798e";
+    private static string s_visualStudioPKT = "b03f5f7f11d50a3a";
+    private static string s_windowsPhonePKT = "7cec85d7bea7798e";
 #endif
 
     #endregion Static Fields

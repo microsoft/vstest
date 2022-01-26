@@ -87,7 +87,7 @@ internal class Executor
     /// Arguments provided to perform execution with.
     /// </param>
     /// <returns>
-    /// Exit Codes - Zero (for successful command execution), One (for bad command) 
+    /// Exit Codes - Zero (for successful command execution), One (for bad command)
     /// </returns>
     internal int Execute(params string[] args)
     {
@@ -96,14 +96,14 @@ internal class Executor
         var isDiag = args != null && args.Any(arg => arg.StartsWith("--diag", StringComparison.OrdinalIgnoreCase));
 
         // If User specifies --nologo via dotnet, do not print splat screen
-        if (args != null && args.Length !=0 && args.Contains("--nologo"))
+        if (args != null && args.Length != 0 && args.Contains("--nologo"))
         {
             // Sanitizing this list, as I don't think we should write Argument processor for this.
             args = args.Where(val => val != "--nologo").ToArray();
         }
         else
         {
-            this.PrintSplashScreen(isDiag);
+            PrintSplashScreen(isDiag);
         }
 
         int exitCode = 0;
@@ -138,8 +138,7 @@ internal class Executor
         }
 
         // Flatten arguments and process response files.
-        string[] flattenedArguments;
-        exitCode |= this.FlattenArguments(args, out flattenedArguments);
+        exitCode |= FlattenArguments(args, out var flattenedArguments);
 
         // Get the argument processors for the arguments.
         exitCode |= GetArgumentProcessors(flattenedArguments, out List<IArgumentProcessor> argumentProcessors);
@@ -274,7 +273,7 @@ internal class Executor
             }
         }
 
-        // If some argument was invalid, add help argument processor in beginning(i.e. at highest priority) 
+        // If some argument was invalid, add help argument processor in beginning(i.e. at highest priority)
         if (result == 1 && _showHelp && processors.First().Metadata.Value.CommandName != HelpArgumentProcessor.CommandName)
         {
             processors.Insert(0, processorFactory.CreateArgumentProcessor(HelpArgumentProcessor.CommandName));

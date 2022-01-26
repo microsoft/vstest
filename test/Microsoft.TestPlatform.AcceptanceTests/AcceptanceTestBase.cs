@@ -55,7 +55,7 @@ public class AcceptanceTestBase : IntegrationTestBase
         return string.Join(";", left, right);
     }
 
-    protected string FrameworkArgValue => DeriveFrameworkArgValue(this.testEnvironment);
+    protected string FrameworkArgValue => DeriveFrameworkArgValue(testEnvironment);
 
     protected static void SetTestEnvironment(IntegrationTestEnvironment testEnvironment, RunnerInfo runnerInfo)
     {
@@ -84,7 +84,7 @@ public class AcceptanceTestBase : IntegrationTestBase
         };
 
     protected bool IsDesktopTargetFramework()
-        => this.testEnvironment.TargetFramework == AcceptanceTestBase.DesktopTargetFramework;
+        => testEnvironment.TargetFramework == AcceptanceTestBase.DesktopTargetFramework;
 
     protected string GetTargetFramworkForRunsettings()
     {
