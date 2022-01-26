@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
-
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -130,25 +131,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
+
             if (this.proxyOperationManager == null)
             {
                 this.proxyOperationManager = this.proxyOperationManagerCreator(
                     discoveryCriteria.Sources.First(),
                     this);
-
+                //TODO: here or below wrap the testhost manager to return sources that use the correct remote path
                 this.testHostManager = this.proxyOperationManager.TestHostManager;
                 this.requestData = this.proxyOperationManager.RequestData;
             }
 
-            this.baseTestDiscoveryEventsHandler = eventHandler;
+            if (this.testHostManager.GetType().Name.Contains("Uwp"))
+            {
+                this.baseTestDiscoveryEventsHandler = new ReflectionBasedRemoteTestDiscoveryEventHandler(eventHandler, this.dataSerializer);
+            }
+            else
+            {
+                //TODO: here wrap the handler to translate remote paths here and back
+                this.baseTestDiscoveryEventsHandler = eventHandler;
+            }
+
             try
             {
                 this.isCommunicationEstablished = this.proxyOperationManager.SetupChannel(discoveryCriteria.Sources, discoveryCriteria.RunSettings);
 
                 if (this.isCommunicationEstablished)
                 {
+                    var thm = this.testHostManager.GetType().Name.Contains("Uwp")
+                        ? new ReflectionBasedRemoteTestHostManagerAdapter(this.testHostManager)
+                        : this.testHostManager;
                     this.InitializeExtensions(discoveryCriteria.Sources);
-                    discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
+                    discoveryCriteria.UpdateDiscoveryCriteria(thm);
 
                     this.proxyOperationManager.RequestSender.DiscoverTests(discoveryCriteria, this);
                 }
@@ -293,6 +307,158 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             // Log to vstest.console layer.
             this.HandleLogMessage(testMessageLevel, message);
+        }
+
+        private class ReflectionBasedRemoteTestDiscoveryEventHandler : ITestDiscoveryEventsHandler2
+        {
+            private ITestDiscoveryEventsHandler2 eventHandler;
+            private readonly IDataSerializer dataSerializer;
+
+            public ReflectionBasedRemoteTestDiscoveryEventHandler(ITestDiscoveryEventsHandler2 eventHandler, IDataSerializer dataSerializer)
+            {
+                this.eventHandler = eventHandler;
+                this.dataSerializer = dataSerializer;
+            }
+
+            public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+            {
+                foreach (var testCase in discoveredTestCases)
+                {
+                    testCase.Source = "C:\\p\\WinUI-Samples\\x64\\Debug\\UITests\\UITests.build.appxrecipe";
+                }
+
+                eventHandler.HandleDiscoveredTests(discoveredTestCases);
+            }
+
+            public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+            {
+                foreach (var testCase in lastChunk)
+                {
+                    testCase.Source = "C:\\p\\WinUI-Samples\\x64\\Debug\\UITests\\UITests.build.appxrecipe";
+                }
+
+                eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, lastChunk);
+            }
+
+            public void HandleLogMessage(TestMessageLevel level, string message)
+            {
+                eventHandler.HandleLogMessage(level, message);
+            }
+
+            public void HandleRawMessage(string rawMessage)
+            {
+                var message = this.dataSerializer.DeserializeMessage(rawMessage);
+                string newRawMessage = null;
+                if (string.Equals(message.MessageType, MessageType.DiscoveryComplete))
+                {
+                    // rewrite paths and serialize
+                    var payload = this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
+                    foreach (var testCase in payload.LastDiscoveredTests)
+                    {
+                        testCase.Source = "C:\\p\\WinUI-Samples\\x64\\Debug\\UITests\\UITests.build.appxrecipe";
+                    }
+
+                    newRawMessage = this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, payload);
+                }
+
+                if (string.Equals(message.MessageType, MessageType.TestCasesFound))
+                {
+                    // rewrite paths and serialize
+                    var payload = this.dataSerializer.DeserializePayload<IEnumerable<TestCase>>(message);
+                    foreach (var testCase in payload)
+                    {
+                        testCase.Source = "C:\\p\\WinUI-Samples\\x64\\Debug\\UITests\\UITests.build.appxrecipe";
+                    }
+
+                    newRawMessage = this.dataSerializer.SerializePayload(MessageType.TestCasesFound, payload);
+                }
+
+                eventHandler.HandleRawMessage(newRawMessage ?? rawMessage);
+            }
+        }
+
+        private class ReflectionBasedRemoteTestHostManagerAdapter : ITestRuntimeProvider
+        {
+            private ITestRuntimeProvider testHostManager;
+
+            public ReflectionBasedRemoteTestHostManagerAdapter(ITestRuntimeProvider testHostManager)
+            {
+                this.testHostManager = testHostManager;
+            }
+
+            public bool Shared => testHostManager.Shared;
+
+            public event EventHandler<HostProviderEventArgs> HostLaunched
+            {
+                add
+                {
+                    testHostManager.HostLaunched += value;
+                }
+
+                remove
+                {
+                    testHostManager.HostLaunched -= value;
+                }
+            }
+
+            public event EventHandler<HostProviderEventArgs> HostExited
+            {
+                add
+                {
+                    testHostManager.HostExited += value;
+                }
+
+                remove
+                {
+                    testHostManager.HostExited -= value;
+                }
+            }
+
+            public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
+            {
+                return testHostManager.CanExecuteCurrentRunConfiguration(runsettingsXml);
+            }
+
+            public Task CleanTestHostAsync(CancellationToken cancellationToken)
+            {
+                return testHostManager.CleanTestHostAsync(cancellationToken);
+            }
+
+            public TestHostConnectionInfo GetTestHostConnectionInfo()
+            {
+                return testHostManager.GetTestHostConnectionInfo();
+            }
+
+            public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
+            {
+                return testHostManager.GetTestHostProcessStartInfo(sources, environmentVariables, connectionInfo);
+            }
+
+            public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions)
+            {
+                return testHostManager.GetTestPlatformExtensions(sources, extensions);
+            }
+
+            public IEnumerable<string> GetTestSources(IEnumerable<string> sources)
+            {
+                // return testHostManager.GetTestSources(sources).Select(s => s.Replace(@"", @"C:\ProgramData\DeveloperTools\WinUI-Samples-UITestsVS.Debug_x64.jajares"));
+                return new[] { @"C:\ProgramData\DeveloperTools\WinUI-Samples-UITestsVS.Debug_x64.jajares\UITests.build.appxrecipe" };
+            }
+
+            public void Initialize(IMessageLogger logger, string runsettingsXml)
+            {
+                testHostManager.Initialize(logger, runsettingsXml);
+            }
+
+            public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
+            {
+                return testHostManager.LaunchTestHostAsync(testHostStartInfo, cancellationToken);
+            }
+
+            public void SetCustomLauncher(ITestHostLauncher customLauncher)
+            {
+                testHostManager.SetCustomLauncher(customLauncher);
+            }
         }
     }
 }

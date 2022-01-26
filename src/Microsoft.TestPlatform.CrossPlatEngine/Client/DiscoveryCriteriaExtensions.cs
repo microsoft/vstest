@@ -13,13 +13,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         public static void UpdateDiscoveryCriteria(this DiscoveryCriteria discoveryCriteria, ITestRuntimeProvider testRuntimeProvider)
         {
-            var actualTestSources = testRuntimeProvider.GetTestSources(discoveryCriteria.Sources);
+            var actualTestSources = new[] { @"UITests.exe" }; // testRuntimeProvider.GetTestSources(discoveryCriteria.Sources);
 
             // If the actual testSources, & input test sources do differ it means that the User(IDE) actually sent a package.
             // We are limiting that only one package can be sent per session, so picking the first entry in sources
             if (discoveryCriteria.Sources.Except(actualTestSources).Any())
             {
-                discoveryCriteria.Package = discoveryCriteria.Sources.FirstOrDefault();
+                discoveryCriteria.Package = @"C:\ProgramData\DeveloperTools\WinUI-Samples-UITestsVS.Debug_x64.jajares\UITests.build.appxrecipe"; // discoveryCriteria.Sources.FirstOrDefault();
 
                 // Allow TestRuntimeProvider to update source map, this is required for remote scenarios.
                 // If we run for specific tests, then we expect the test case object to contain correct source path for remote scenario as well
@@ -36,6 +36,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             adapterSourceMap.Clear();
             adapterSourceMap.Add(Constants.UnspecifiedAdapterPath, sources);
+        }
+
+        private interface IRemoteSourceProvider
+        {
+
+        }
+
+        private class RemoteSourceProviderAdapter : IRemoteSourceProvider
+        {
+            private readonly ITestRuntimeProvider testRuntimeProvider;
+
+            public RemoteSourceProviderAdapter(ITestRuntimeProvider testRuntimeProvider)
+            {
+                this.testRuntimeProvider = testRuntimeProvider;
+            }
+
+
         }
     }
 }
