@@ -93,16 +93,17 @@ internal class Executor
     {
         _testPlatformEventSource.VsTestConsoleStart();
 
+        var isDiag = args != null && args.Any(arg => arg.StartsWith("--diag", StringComparison.OrdinalIgnoreCase));
+
         // If User specifies --nologo via dotnet, do not print splat screen
-        if (args != null && args.Length != 0 && args.Contains("--nologo"))
+        if (args != null && args.Length !=0 && args.Contains("--nologo"))
         {
             // Sanitizing this list, as I don't think we should write Argument processor for this.
             args = args.Where(val => val != "--nologo").ToArray();
         }
         else
         {
-            var isDiag = args != null && args.Any(arg => arg.StartsWith("--diag", StringComparison.OrdinalIgnoreCase));
-            PrintSplashScreen(isDiag);
+            this.PrintSplashScreen(isDiag);
         }
 
         int exitCode = 0;
@@ -115,8 +116,30 @@ internal class Executor
             exitCode = 1;
         }
 
+        if (!isDiag)
+        {
+            // This takes a path to log directory and log.txt file. Same as the --diag parameter, e.g. VSTEST_DIAG="logs\log.txt"
+            var diag = Environment.GetEnvironmentVariable("VSTEST_DIAG");
+            // This takes Verbose, Info (not Information), Warning, and Error.
+            var diagVerbosity = Environment.GetEnvironmentVariable("VSTEST_DIAG_VERBOSITY");
+            if (!string.IsNullOrWhiteSpace(diag))
+            {
+                var verbosity = TraceLevel.Verbose;
+                if (diagVerbosity != null)
+                {
+                    if (Enum.TryParse<TraceLevel>(diagVerbosity, ignoreCase: true, out var parsedVerbosity))
+                    {
+                        verbosity = parsedVerbosity;
+                    }
+                }
+
+                args = args.Concat(new[] { $"--diag:{diag};TraceLevel={verbosity}" }).ToArray();
+            }
+        }
+
         // Flatten arguments and process response files.
-        exitCode |= FlattenArguments(args, out string[] flattenedArguments);
+        string[] flattenedArguments;
+        exitCode |= this.FlattenArguments(args, out flattenedArguments);
 
         // Get the argument processors for the arguments.
         exitCode |= GetArgumentProcessors(flattenedArguments, out List<IArgumentProcessor> argumentProcessors);

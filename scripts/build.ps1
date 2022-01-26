@@ -110,7 +110,9 @@ $language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr
 $dependenciesPath = "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props"
 $dependencies = Get-Content -Raw -Encoding UTF8 $dependenciesPath
 $updatedDependencies = $dependencies -replace "<NETTestSdkVersion>.*?</NETTestSdkVersion>", "<NETTestSdkVersion>$TPB_Version</NETTestSdkVersion>"
-$updatedDependencies | Set-Content -Encoding UTF8 $dependenciesPath -NoNewline
+# PS7 considers utf8 to not have BOM, and utf8BOM needs to be used instead, while earlier versions use BOM with utf8 encoding
+$encoding = if ($PSVersionTable.PSVersion.Major -ge 7) { "utf8BOM" } else { "utf8" }
+$updatedDependencies | Set-Content -Encoding $encoding $dependenciesPath -NoNewline
 
 $attachVsPath = "$env:TP_ROOT_DIR\src\AttachVS\bin\Debug\net472"
 
