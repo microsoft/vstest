@@ -29,6 +29,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="$(JsonNetVersion)" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="$(MicrosoftExtensionsDependencyModelPackageVersion)" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" Condition=" '$(DotNetBuildFromSource)' != 'true' " />
+    <PackageReference Include="System.Reflection.Metadata" Version="1.6.0" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
