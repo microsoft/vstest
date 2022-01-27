@@ -443,67 +443,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
                     startInfo.FileName = muxerPath;
 
-                    // Check if the testhost.dll is compatible with the chosen muxer, if not update with the one close to it.
-                    // This cover the scenario where we're switching to a different architecture than the sdk self(current process) and
-                    // we end to pick up testhost.dll from the sdk folder.
-                    // testhost.dll is compiled with the architecture metadata and will fail if used from a muxer with different architecture.
-                    // By default compatibility is true, in case of unknown architecture we'll fail.
-                    bool isCompatibleTestHostDll = true;
-                    using (Stream stream = this.fileHelper.GetStream(testHostPath, FileMode.Open, FileAccess.Read))
-                    using (PEReader peReader = new PEReader(stream))
-                    {
-                        switch (peReader.PEHeaders.CoffHeader.Machine)
-                        {
-                            case Machine.IA64:
-                            case Machine.Amd64:
-                                isCompatibleTestHostDll = targetArchitecture == PlatformArchitecture.X64;
-                                break;
-                            case Machine.Arm64:
-                                isCompatibleTestHostDll = targetArchitecture == PlatformArchitecture.ARM64;
-                                break;
-                            case Machine.Arm:
-                                isCompatibleTestHostDll = targetArchitecture == PlatformArchitecture.ARM;
-                                break;
-                            case Machine.I386:
-                                isCompatibleTestHostDll = targetArchitecture == PlatformArchitecture.X86;
-                                break;
-                            default:
-                                EqtTrace.Error("DotnetTestHostmanager: Unknown architecture {0}", peReader.PEHeaders.CoffHeader.Machine);
-                                break;
-                        }
-
-                        if (!isCompatibleTestHostDll)
-                        {
-                            EqtTrace.Verbose("DotnetTestHostmanager: Incompatible architecture for testhost.dll '{0}', {1}", testHostPath, peReader.PEHeaders.CoffHeader.Machine);
-                        }
-                    }
-
-                    if (!isCompatibleTestHostDll)
-                    {
-                        string sdkFolder = Path.Combine(Path.GetDirectoryName(muxerPath), "sdk");
-
-                        EqtTrace.Verbose("DotnetTestHostmanager: Incompatible architecture for testhost.dll '{0}', looking inside the chosen muxer folder '{1}'", testHostPath, sdkFolder);
-
-                        string expectedTestHostDllPathInsideSdkDir = this.fileHelper
-                            .EnumerateFiles(sdkFolder, SearchOption.AllDirectories, "testhost.dll")
-                            .OrderByDescending(x => x)
-                            .Where(x => x.EndsWith($"{Path.DirectorySeparatorChar}testhost.dll"))
-                            .FirstOrDefault();
-
-                        if (expectedTestHostDllPathInsideSdkDir != null)
-                        {
-                            EqtTrace.Verbose("DotnetTestHostmanager: Found compatible testhost.dll {0}", expectedTestHostDllPathInsideSdkDir);
-                            if (this.fileHelper.Exists(expectedTestHostDllPathInsideSdkDir))
-                            {
-                                EqtTrace.Verbose("DotnetTestHostmanager: New full path of testhost.dll is {0}", expectedTestHostDllPathInsideSdkDir);
-                                testHostPath = expectedTestHostDllPathInsideSdkDir;
-                            }
-                        }
-                        else
-                        {
-                            EqtTrace.Verbose("DotnetTestHostmanager: testhost.dll not found close to chosen muxer");
-                        }
-                    }
+                    testHostPath = this.CheckTestHostDllArchitecture(testHostPath, muxerPath, targetArchitecture);
                 }
 
                 EqtTrace.Verbose("DotnetTestHostmanager: Full path of testhost.dll is {0}", testHostPath);
@@ -725,6 +665,92 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private void OnHostLaunched(HostProviderEventArgs e)
         {
             this.HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
+        }
+
+        /// <summary>
+        /// Check if the testhost.dll is compatible with the chosen muxer, if not update with the one close to it.
+        /// This cover the scenario where we're switching to a different architecture than the sdk self(current process) and
+        /// we end to pick up testhost.dll from the sdk folder.
+        /// testhost.dll is compiled with the architecture metadata and will fail if used from a muxer with different architecture.
+        /// </summary>
+        /// <param name="testHostPath">Path of the testhost.dll</param>
+        /// <param name="muxerPath">Path of the muxer</param>
+        /// <param name="targetArchitecture">target architecture</param>
+        /// <returns>return the path of testhost.dll to use</returns>
+        private string CheckTestHostDllArchitecture(string testHostPath, string muxerPath, PlatformArchitecture targetArchitecture)
+        {
+            // By default compatibility is true, in case of unknown architecture we'll fail.
+            bool isCompatibleTestHostDll = true;
+            using (Stream stream = this.fileHelper.GetStream(testHostPath, FileMode.Open, FileAccess.Read))
+            using (PEReader peReader = new PEReader(stream))
+            {
+                switch (peReader.PEHeaders.CoffHeader.Machine)
+                {
+                    case Machine.IA64:
+                    case Machine.Amd64:
+                        isCompatibleTestHostDll = targetArchitecture == PlatformArchitecture.X64;
+                        break;
+                    case Machine.Arm64:
+                        isCompatibleTestHostDll = targetArchitecture == PlatformArchitecture.ARM64;
+                        break;
+                    case Machine.Arm:
+                        isCompatibleTestHostDll = targetArchitecture == PlatformArchitecture.ARM;
+                        break;
+                    case Machine.I386:
+                        var headers = peReader.PEHeaders;
+                        var characteristics = headers.CoffHeader.Characteristics;
+                        var corflags = headers.CorHeader.Flags;
+
+                        // If requires 32bit or if R2R
+                        if ((corflags & CorFlags.Requires32Bit) != 0 || ((corflags & CorFlags.ILOnly) == 0))
+                        {
+                            isCompatibleTestHostDll = targetArchitecture == PlatformArchitecture.X86;
+                        }
+                        else
+                        {
+                            EqtTrace.Error("DotnetTestHostmanager: AnyCPU testhost.dll provided {0}", testHostPath);
+                            return testHostPath;
+                        }
+
+                        break;
+                    default:
+                        EqtTrace.Error("DotnetTestHostmanager: Unknown architecture {0}", peReader.PEHeaders.CoffHeader.Machine);
+                        break;
+                }
+
+                if (!isCompatibleTestHostDll)
+                {
+                    EqtTrace.Verbose("DotnetTestHostmanager: Incompatible architecture for testhost.dll '{0}', {1}", testHostPath, peReader.PEHeaders.CoffHeader.Machine);
+                }
+            }
+
+            if (!isCompatibleTestHostDll)
+            {
+                string sdkFolder = Path.Combine(Path.GetDirectoryName(muxerPath), "sdk");
+                EqtTrace.Verbose("DotnetTestHostmanager: Incompatible architecture for testhost.dll '{0}', looking inside the chosen muxer folder '{1}'", testHostPath, sdkFolder);
+
+                string expectedTestHostDllPathInsideSdkDir = this.fileHelper
+                    .EnumerateFiles(sdkFolder, SearchOption.AllDirectories, "testhost.dll")
+                    .OrderByDescending(x => x)
+                    .Where(x => x.EndsWith($"{Path.DirectorySeparatorChar}testhost.dll"))
+                    .FirstOrDefault();
+
+                if (expectedTestHostDllPathInsideSdkDir != null)
+                {
+                    EqtTrace.Verbose("DotnetTestHostmanager: Found compatible testhost.dll {0}", expectedTestHostDllPathInsideSdkDir);
+                    if (this.fileHelper.Exists(expectedTestHostDllPathInsideSdkDir))
+                    {
+                        EqtTrace.Verbose("DotnetTestHostmanager: New full path of testhost.dll is {0}", expectedTestHostDllPathInsideSdkDir);
+                        return expectedTestHostDllPathInsideSdkDir;
+                    }
+                }
+                else
+                {
+                    EqtTrace.Verbose("DotnetTestHostmanager: testhost.dll not found close to chosen muxer");
+                }
+            }
+
+            return testHostPath;
         }
 
         /// <summary>
