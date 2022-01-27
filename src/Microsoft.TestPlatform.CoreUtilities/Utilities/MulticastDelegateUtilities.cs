@@ -4,8 +4,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
     using System;
+    using System.Diagnostics;
     using System.Reflection;
-
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -22,39 +22,63 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="sender">Sender to use when raising the event.</param>
         /// <param name="args">Arguments to provide.</param>
         /// <param name="traceDisplayName">Name to use when tracing out errors.</param>
+        // Using [CallerMemberName] for the traceDisplayName is a possibility, but in few places we call through other
+        // methods until we reach here. And it would change the public API.
         public static void SafeInvoke(this Delegate delegates, object sender, EventArgs args, string traceDisplayName)
         {
             if (args == null)
             {
-                throw new ArgumentNullException(Resources.CannotBeNullOrEmpty, "args");
+                throw new ArgumentNullException(Resources.CannotBeNullOrEmpty, nameof(args));
             }
 
             if (string.IsNullOrWhiteSpace(traceDisplayName))
             {
-                throw new ArgumentException(Resources.CannotBeNullOrEmpty, traceDisplayName);
+                throw new ArgumentException(Resources.CannotBeNullOrEmpty, nameof(traceDisplayName));
             }
 
             if (delegates != null)
             {
-                foreach (Delegate handler in delegates.GetInvocationList())
+                var invocationList = delegates.GetInvocationList();
+                var i = 0;
+                foreach (Delegate handler in invocationList)
                 {
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+
                     try
                     {
                         handler.DynamicInvoke(sender, args);
+                        if (EqtTrace.IsVerboseEnabled)
+                        {
+                            stopwatch = Stopwatch.StartNew();
+                            EqtTrace.Verbose("MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, took {5} ms.",
+                                    traceDisplayName,
+                                    ++i,
+                                    invocationList.Length,
+                                    handler.Target ?? "static",
+                                    handler.Method.Name,
+                                    stopwatch.ElapsedMilliseconds);
+                        }
                     }
-                    catch (TargetInvocationException e)
+                    catch (TargetInvocationException exception)
                     {
                         if (EqtTrace.IsErrorEnabled)
                         {
                             EqtTrace.Error(
-                                "{0}: Exception occurred while calling handler of type {1} for {2}: {3}",
+                                "MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, failed after {5} ms with: {6}",
+                                ++i,
+                                invocationList.Length,
+                                handler.Target ?? "static",
+                                handler.Method.Name,
                                 traceDisplayName,
-                                handler.Target.GetType().FullName,
-                                args.GetType().Name,
-                                e);
+                                stopwatch.ElapsedMilliseconds,
+                                exception);
                         }
                     }
                 }
+            }
+            else
+            {
+                EqtTrace.Verbose("MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callbacks was skipped because there are no subscribers.", traceDisplayName);
             }
         }
     }

@@ -138,7 +138,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>True if Client is connected, false otherwise</returns>
         public bool WaitForClientConnection(int clientConnectionTimeout)
         {
-            return this.clientConnectedEvent.WaitOne(clientConnectionTimeout);
+            Stopwatch stopWatch = Stopwatch.StartNew();
+            var result = this.clientConnectedEvent.WaitOne(clientConnectionTimeout);
+            EqtTrace.Verbose("SocketCommunicationManager.WaitForClientConnection took: {0} ms, with {1} ms timeout, and finished with {2}", stopWatch.ElapsedMilliseconds, clientConnectionTimeout, result);
+
+            return result;
         }
 
         /// <summary>
@@ -214,7 +218,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>True, if Server got a connection from client</returns>
         public bool WaitForServerConnection(int connectionTimeout)
         {
-            return this.clientConnectionAcceptedEvent.WaitOne(connectionTimeout);
+            Stopwatch stopWatch = Stopwatch.StartNew();
+            var result = this.clientConnectionAcceptedEvent.WaitOne(connectionTimeout);
+            EqtTrace.Verbose("SocketCommunicationManager.WaitForServerConnection took: {0} ms, with {1} ms timeout, and finished with {2}", stopWatch.ElapsedMilliseconds, connectionTimeout, result);
+
+            return result;
         }
 
         /// <summary>

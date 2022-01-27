@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Globalization;
     using System.Threading;
     using CoreUtilities.Helpers;
@@ -163,6 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public bool WaitForRequestHandlerConnection(int connectionTimeout, CancellationToken cancellationToken)
         {
+            var sw = Stopwatch.StartNew();
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting for connection with timeout: {0}", connectionTimeout);
@@ -172,6 +174,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // or operation is canceled, handled by cancellationToken.WaitHandle
             // or testhost exits unexpectedly, handled by clientExited.WaitHandle
             var waitIndex = WaitHandle.WaitAny(new WaitHandle[] { this.connected.WaitHandle, cancellationToken.WaitHandle, this.clientExited.WaitHandle }, connectionTimeout);
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting took {0} ms, with timeout {1} ms, and result {2}, which is {3}", sw.ElapsedMilliseconds, connectionTimeout, waitIndex, waitIndex == 0 ? "success" : "failure");
+            }
 
             // Return true if connection was successful.
             return waitIndex == 0;

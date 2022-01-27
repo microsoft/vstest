@@ -63,6 +63,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public Task NotifyDataAvailable()
         {
+            // TODO: Review the comment below, because it says something different than what is
+            // actually happening, and doing what it suggests would potentially lose messages.
+            // For example in the case where we start testhost process, send it version, and
+            // it responds, we then replace the handler with a new one, and there is quite a long time
+            // (tens of milliseconds) when there is no handler present, which would pump the message
+            // and dump it.
+            //
             // Try read data even if no one is listening to the data stream. Some server
             // implementations (like Sockets) depend on the read operation to determine if a
             // connection is closed.
@@ -70,6 +77,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 var data = this.reader.ReadString();
                 this.MessageReceived.SafeInvoke(this, new MessageReceivedEventArgs { Data = data }, "LengthPrefixCommunicationChannel: MessageReceived");
+            }
+            else
+            {
+                EqtTrace.Verbose("LengthPrefixCommunicationChannel.NotifyDataAvailable: New data are waiting to be received, but there is no subscriber to be notified. Not reading them from the stream.");
             }
 
             return Task.FromResult(0);
