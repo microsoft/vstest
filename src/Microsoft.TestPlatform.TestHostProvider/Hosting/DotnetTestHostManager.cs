@@ -726,8 +726,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             if (!isCompatibleTestHostDll)
             {
+                string runningSdkVersionPathName = Path.GetFileName(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+
+                if (!SemanticVersioning.TryParse(runningSdkVersionPathName, out SemanticVersioning runningSdkVersion))
+                {
+                    EqtTrace.Verbose($"DotnetTestHostmanager: Invalid sdk location, expected a valid semver version but found '{runningSdkVersionPathName}'");
+                    return testHostPath;
+                }
+
                 string sdkFolder = Path.Combine(Path.GetDirectoryName(muxerPath), "sdk");
                 EqtTrace.Verbose("DotnetTestHostmanager: Incompatible architecture for testhost.dll '{0}', looking inside the chosen muxer folder '{1}'", testHostPath, sdkFolder);
+                List<Tuple<string, SemanticVersioning>> availableSdks = new List<Tuple<string, SemanticVersioning>>();
+                foreach (var testHostDllLocation in this.fileHelper
+                    .EnumerateFiles(sdkFolder, SearchOption.AllDirectories, "testhost.dll")
+                    .OrderByDescending(x => x)
+                    .Where(x => x.EndsWith($"{Path.DirectorySeparatorChar}testhost.dll")))
+                {
+                    if (SemanticVersioning.TryParse(Path.GetFileName(Path.GetDirectoryName(testHostDllLocation)), out SemanticVersioning availableSdk))
+                    {
+                        EqtTrace.Verbose($"DotnetTestHostmanager: Found available sdk for testhost.dll '{testHostDllLocation}' version '{availableSdk}'");
+                        availableSdks.Add(new Tuple<string, SemanticVersioning>(testHostDllLocation, availableSdk));
+                    }
+                }
 
                 string expectedTestHostDllPathInsideSdkDir = this.fileHelper
                     .EnumerateFiles(sdkFolder, SearchOption.AllDirectories, "testhost.dll")
