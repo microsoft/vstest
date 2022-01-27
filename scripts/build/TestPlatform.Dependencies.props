@@ -51,6 +51,7 @@
 
     <CoverletCoverageVersion>1.2.0</CoverletCoverageVersion>
     <SystemNetHttpVersion>4.3.4</SystemNetHttpVersion>
+    <SystemServiceModelVersion>4.3.3</SystemServiceModelVersion>
 
     <DependencyVersionsImported>true</DependencyVersionsImported>
 
