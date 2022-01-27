@@ -17,10 +17,10 @@ public sealed class InvokedDataCollector : IEquatable<InvokedDataCollector>
     /// <param name="hasAttachmentProcessor">True if data collector registers an attachment processor</param>
     public InvokedDataCollector(Uri uri, string friendlyName, string assemblyQualifiedName, string filePath, bool hasAttachmentProcessor)
     {
-        Uri = uri ?? throw new ArgumentException(nameof(uri));
-        FriendlyName = friendlyName ?? throw new ArgumentException(nameof(friendlyName));
-        AssemblyQualifiedName = assemblyQualifiedName ?? throw new ArgumentException(nameof(assemblyQualifiedName)); ;
-        FilePath = filePath ?? throw new ArgumentException(nameof(filePath)); ;
+        Uri = uri ?? throw new ArgumentNullException(nameof(uri));
+        FriendlyName = friendlyName ?? throw new ArgumentNullException(nameof(friendlyName));
+        AssemblyQualifiedName = assemblyQualifiedName ?? throw new ArgumentNullException(nameof(assemblyQualifiedName)); ;
+        FilePath = filePath ?? throw new ArgumentNullException(nameof(filePath)); ;
         HasAttachmentProcessor = hasAttachmentProcessor;
     }
 
