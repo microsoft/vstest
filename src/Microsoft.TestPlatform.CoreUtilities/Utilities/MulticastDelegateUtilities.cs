@@ -69,8 +69,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                                     traceDisplayName,
                                     ++i,
                                     invocationList.Length,
-                                    handler.Target ?? "static",
-                                    handler.Method.Name,
+                                    handler.GetTargetName(),
+                                    handler.GetMethodName(),
                                     stopwatch.ElapsedMilliseconds);
                         }
                     }
@@ -82,8 +82,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                                 "MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, failed after {5} ms with: {6}",
                                 ++i,
                                 invocationList.Length,
-                                handler.Target ?? "static",
-                                handler.Method.Name,
+                                handler.GetTargetName(),
+                                handler.GetMethodName(),
                                 traceDisplayName,
                                 stopwatch.ElapsedMilliseconds,
                                 exception);
@@ -95,6 +95,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 EqtTrace.Verbose("MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callbacks was skipped because there are no subscribers.", traceDisplayName);
             }
+        }
+
+        internal static string GetMethodName(this Delegate @delegate)
+        {
+#if NETSTANDARD2_0
+            return @delegate.Method.Name;
+#else
+            return null;
+#endif
+        }
+
+        internal static string GetTargetName(this Delegate @delegate)
+        {
+            return @delegate.Target?.ToString() ?? "static";
         }
     }
 }
