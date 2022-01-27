@@ -130,6 +130,9 @@ dotnet_diagnostic.IDE0065.severity = none
 # Keep this in sync with th related C# rule: csharp_prefer_simple_using_statement
 dotnet_diagnostic.IDE0063.severity = warning
 
+# CA2208: Instantiate argument exceptions correctly
+dotnet_diagnostic.CA2208.severity = warning # not default, increased severity to ensure it is always applied
+
 #### C# Coding Conventions ####
 
 # var preferences
