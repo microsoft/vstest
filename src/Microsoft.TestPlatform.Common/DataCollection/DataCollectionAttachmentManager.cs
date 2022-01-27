@@ -333,7 +333,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                             }
                         }
 
-                        sendFileCompletedCallback?.Invoke(this, new AsyncCompletedEventArgs(t.Exception, false, fileTransferInfo.UserToken));
+                        sendFileCompletedCallback?.SafeInvoke(this, new AsyncCompletedEventArgs(t.Exception, false, fileTransferInfo.UserToken), "DataCollectionManager.AddNewFileTransfer");
                     }
                     catch (Exception e)
                     {

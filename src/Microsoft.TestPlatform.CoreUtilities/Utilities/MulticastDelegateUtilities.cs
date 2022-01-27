@@ -26,6 +26,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         // methods until we reach here. And it would change the public API.
         public static void SafeInvoke(this Delegate delegates, object sender, EventArgs args, string traceDisplayName)
         {
+            SafeInvoke(delegates, sender, (object)args, traceDisplayName);
+        }
+
+        /// <summary>
+        /// Invokes each of the subscribers of the event and handles exceptions which are thrown
+        /// ensuring that each handler is invoked even if one throws.
+        /// </summary>
+        /// <param name="delegates">Event handler to invoke.</param>
+        /// <param name="sender">Sender to use when raising the event.</param>
+        /// <param name="args">Arguments to provide.</param>
+        /// <param name="traceDisplayName">Name to use when tracing out errors.</param>
+        // Using [CallerMemberName] for the traceDisplayName is a possibility, but in few places we call through other
+        // methods until we reach here. And it would change the public API.
+        public static void SafeInvoke(this Delegate delegates, object sender, object args, string traceDisplayName)
+        {
             if (args == null)
             {
                 throw new ArgumentNullException(Resources.CannotBeNullOrEmpty, nameof(args));

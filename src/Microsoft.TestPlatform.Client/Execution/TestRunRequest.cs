@@ -561,7 +561,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 HandleLoggerManagerTestRunComplete(testRunCompletePayload);
             }
 
-            this.OnRawMessageReceived?.Invoke(this, rawMessage);
+            this.OnRawMessageReceived?.SafeInvoke(this, rawMessage, "TestRunRequest.RawMessageReceived");
         }
 
         /// <summary>

@@ -406,7 +406,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 HandleLoggerManagerDiscoveryComplete(discoveryCompletePayload);
             }
 
-            this.OnRawMessageReceived?.Invoke(this, rawMessage);
+            this.OnRawMessageReceived?.SafeInvoke(this, rawMessage, "DiscoveryRequest.RawMessageReceived");
         }
 
         /// <summary>
