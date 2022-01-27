@@ -170,6 +170,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             bool handleLogMessageCalled = false;
             bool handleRawMessageCalled = false;
 
+            this.mockDataSerializer
+                .Setup(s => s.SerializePayload(It.IsAny<string>(), It.IsAny<Object>()))
+                .Returns("non-empty rawMessage");
+
             this.testRunRequest.TestRunMessage += (object sender, TestRunMessageEventArgs e) =>
                 {
                     handleLogMessageCalled = true;
