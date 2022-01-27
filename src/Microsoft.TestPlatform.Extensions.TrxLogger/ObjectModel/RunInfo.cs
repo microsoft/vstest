@@ -27,7 +27,7 @@ internal sealed class RunInfo : IXmlTestStore
     [StoreXmlSimpleField("@outcome")]
     private readonly TestOutcome _outcome;
 
-    [StoreXmlSimpleField]
+    [StoreXmlSimpleField("@timestamp")]
     private readonly DateTime _timestamp;
 
     #endregion

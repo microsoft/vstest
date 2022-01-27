@@ -230,6 +230,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     public void StartTestRunShouldIntializeTestHost()
     {
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+        _mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null);
 

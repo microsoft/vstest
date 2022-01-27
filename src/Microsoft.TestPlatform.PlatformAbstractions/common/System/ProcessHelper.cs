@@ -23,8 +23,29 @@ public partial class ProcessHelper : IProcessHelper
     /// <inheritdoc/>
     public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<object, string> errorCallback, Action<object> exitCallBack, Action<object, string> outputCallBack)
     {
+        if (!File.Exists(processPath))
+        {
+            throw new FileNotFoundException("Path does not exist: " + processPath, processPath);
+        }
+
         var process = new Process();
         try
+        {
+            InitializeAndStart();
+        }
+        catch (Exception)
+        {
+            process.Dispose();
+            process = null;
+
+            //EqtTrace.Error("TestHost Object {0} failed to launch with the following exception: {1}", processPath, exception.Message);
+            throw;
+        }
+
+        return process;
+
+        // Local functions
+        void InitializeAndStart()
         {
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
@@ -89,16 +110,6 @@ public partial class ProcessHelper : IProcessHelper
                 process.BeginOutputReadLine();
             }
         }
-        catch (Exception)
-        {
-            process.Dispose();
-            process = null;
-
-            // EqtTrace.Error("TestHost Object {0} failed to launch with the following exception: {1}", processPath, exception.Message);
-            throw;
-        }
-
-        return process as object;
     }
 
     /// <inheritdoc/>

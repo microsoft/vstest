@@ -23,7 +23,7 @@ internal class TestListCategory : IXmlTestStore
     private static TestListCategory s_allResults;
 
     private static readonly object ReservedCategoryLock = new();
-    [StoreXmlSimpleField(DefaultValue = "")]
+    [StoreXmlSimpleField("@name", DefaultValue = "")]
     private readonly string _name = string.Empty;
 
     private TestListCategoryId _parentCategoryId;

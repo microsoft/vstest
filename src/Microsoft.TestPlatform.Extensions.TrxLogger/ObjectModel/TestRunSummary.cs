@@ -48,7 +48,7 @@ internal class TestRunSummary : IXmlTestStore
     private readonly int _inProgress;
     [StoreXmlSimpleField("Counters/@pending")]
     private readonly int _pending;
-    [StoreXmlSimpleField]
+    [StoreXmlSimpleField("@outcome")]
     private readonly TestOutcome _outcome = TestOutcome.Pending;
     [StoreXmlSimpleField("Output/StdOut", "")]
     private readonly string _stdOut = string.Empty;

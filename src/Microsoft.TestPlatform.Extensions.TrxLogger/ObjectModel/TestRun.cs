@@ -34,10 +34,10 @@ internal sealed class TestRun
     // placed before the last non-initialized field.
     //
     // The summary parsing code is in XmlTestReader.ReadTestRunSummary.
-    [StoreXmlSimpleField]
+    [StoreXmlSimpleField("@id")]
     private Guid _id;
 
-    [StoreXmlSimpleField]
+    [StoreXmlSimpleField("@name")]
     private string _name;
 
     [StoreXmlSimpleField("@runUser", "")]

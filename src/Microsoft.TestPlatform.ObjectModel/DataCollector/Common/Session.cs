@@ -12,39 +12,34 @@ using System.Runtime.Serialization;
 [DataContract]
 public sealed class SessionId
 {
-    private Guid _sessionId;
-
     public SessionId()
     {
-        _sessionId = Guid.NewGuid();
+        Id = Guid.NewGuid();
     }
 
     public SessionId(Guid id)
     {
-        _sessionId = id;
+        Id = id;
     }
 
     [DataMember]
     public static SessionId Empty { get; } = new SessionId(Guid.Empty);
 
     [DataMember]
-    public Guid Id
-    {
-        get { return _sessionId; }
-    }
+    public Guid Id { get; }
 
     public override bool Equals(object obj)
     {
-        return obj is SessionId id && _sessionId.Equals(id._sessionId);
+        return obj is SessionId sessionId && Id.Equals(sessionId.Id);
     }
 
     public override int GetHashCode()
     {
-        return _sessionId.GetHashCode();
+        return Id.GetHashCode();
     }
 
     public override string ToString()
     {
-        return _sessionId.ToString("B");
+        return Id.ToString("B");
     }
 }

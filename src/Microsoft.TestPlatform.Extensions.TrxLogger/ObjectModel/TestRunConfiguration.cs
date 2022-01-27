@@ -23,7 +23,7 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
     private readonly TestRunConfigurationId _id;
     private readonly TrxFileHelper _trxFileHelper;
 
-    [StoreXmlSimpleField(DefaultValue = "")]
+    [StoreXmlSimpleField("@name", DefaultValue = "")]
     private readonly string _name;
 
     private string _runDeploymentRoot;

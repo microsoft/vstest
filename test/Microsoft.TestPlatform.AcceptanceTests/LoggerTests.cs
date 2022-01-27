@@ -3,11 +3,12 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Text;
 using System.IO;
 using System.Xml;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.TestPlatform.TestUtilities;
 
 [TestClass]
@@ -151,11 +152,12 @@ public class LoggerTests : AcceptanceTestBase
     public void TrxLoggerResultSummaryOutcomeValueShouldNotChangeIfNoTestsExecutedAndTreatNoTestsAsErrorIsFalse(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
-        var trxFileName = "TrxLogger.trx";
+        var trxFilePath = Path.Combine(tempDir.Path, "TrxLogger.trx");
 
-        arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
+        arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFilePath}\"");
 
         // Setting /TestCaseFilter to the test name, which does not exists in the assembly, so we will have 0 tests executed
         arguments = string.Concat(arguments, " /TestCaseFilter:TestNameThatMatchesNoTestInTheAssembly");
@@ -163,8 +165,7 @@ public class LoggerTests : AcceptanceTestBase
 
         InvokeVsTest(arguments);
 
-        var trxLogFilePath = Path.Combine(Directory.GetCurrentDirectory(), "TestResults", trxFileName);
-        string outcomeValue = GetElementAtributeValueFromTrx(trxLogFilePath, "ResultSummary", "outcome");
+        string outcomeValue = GetElementAtributeValueFromTrx(trxFilePath, "ResultSummary", "outcome");
 
         Assert.AreEqual("Completed", outcomeValue);
     }

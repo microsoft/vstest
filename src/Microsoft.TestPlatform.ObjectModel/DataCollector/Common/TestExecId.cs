@@ -13,39 +13,34 @@ using System.Runtime.Serialization;
 [DataContract]
 public sealed class TestExecId
 {
-    private Guid _execId;
-
     public TestExecId()
     {
-        _execId = Guid.NewGuid();
+        Id = Guid.NewGuid();
     }
 
     public TestExecId(Guid id)
     {
-        _execId = id;
+        Id = id;
     }
 
     [DataMember]
     public static TestExecId Empty { get; } = new TestExecId(Guid.Empty);
 
     [DataMember]
-    public Guid Id
-    {
-        get { return _execId; }
-    }
+    public Guid Id { get; }
 
     public override bool Equals(object obj)
     {
-        return obj is TestExecId id && _execId.Equals(id._execId);
+        return obj is TestExecId testExecId && Id.Equals(testExecId.Id);
     }
 
     public override int GetHashCode()
     {
-        return _execId.GetHashCode();
+        return Id.GetHashCode();
     }
 
     public override string ToString()
     {
-        return _execId.ToString("B");
+        return Id.ToString("B");
     }
 }

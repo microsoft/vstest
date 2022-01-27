@@ -378,6 +378,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
     {
         // Setup mocks.
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+        _mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
 
         // Act.
         _testDiscoveryManager.DiscoverTests(_discoveryCriteria, null);
