@@ -40,7 +40,7 @@ public class DiaSessionTests : IntegrationTestBase
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
         StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
 
-        ValidateMinLineNumber(12, diaNavigationData.MinLineNumber);
+        ValidateMinLineNumber(11, diaNavigationData.MinLineNumber);
         Assert.AreEqual(14, diaNavigationData.MaxLineNumber, "Incorrect max line number");
 
         _testEnvironment.TargetFramework = currentTargetFrameWork;
@@ -58,7 +58,7 @@ public class DiaSessionTests : IntegrationTestBase
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
         StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
 
-        ValidateMinLineNumber(17, diaNavigationData.MinLineNumber);
+        ValidateMinLineNumber(16, diaNavigationData.MinLineNumber);
         Assert.AreEqual(19, diaNavigationData.MaxLineNumber, "Incorrect max line number");
 
         _testEnvironment.TargetFramework = currentTargetFrameWork;
