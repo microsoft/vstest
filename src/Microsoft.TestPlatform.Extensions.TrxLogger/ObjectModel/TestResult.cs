@@ -23,7 +23,6 @@ internal sealed class TestResultId : IXmlTestStore
     #region Fields
 
     private Guid _runId;
-    private Guid _executionId;
 
     #endregion
 
@@ -47,7 +46,7 @@ internal sealed class TestResultId : IXmlTestStore
     public TestResultId(Guid runId, Guid executionId, Guid parentExecutionId, Guid testId)
     {
         _runId = runId;
-        _executionId = executionId;
+        ExecutionId = executionId;
         ParentExecutionId = parentExecutionId;
         TestId = testId;
     }
@@ -59,10 +58,7 @@ internal sealed class TestResultId : IXmlTestStore
     /// <summary>
     /// Gets the execution id.
     /// </summary>
-    public Guid ExecutionId
-    {
-        get { return _executionId; }
-    }
+    public Guid ExecutionId { get; }
 
     /// <summary>
     /// Gets the parent execution id.
@@ -89,7 +85,7 @@ internal sealed class TestResultId : IXmlTestStore
     /// </returns>
     public override bool Equals(object obj)
     {
-        return obj is TestResultId tmpId && _runId.Equals(tmpId._runId) && _executionId.Equals((object)tmpId._executionId);
+        return obj is TestResultId tmpId && _runId.Equals(tmpId._runId) && ExecutionId.Equals((object)tmpId.ExecutionId);
     }
 
     /// <summary>
@@ -100,7 +96,7 @@ internal sealed class TestResultId : IXmlTestStore
     /// </returns>
     public override int GetHashCode()
     {
-        return _runId.GetHashCode() ^ _executionId.GetHashCode();
+        return _runId.GetHashCode() ^ ExecutionId.GetHashCode();
     }
 
     /// <summary>
@@ -111,7 +107,7 @@ internal sealed class TestResultId : IXmlTestStore
     /// </returns>
     public override string ToString()
     {
-        return _executionId.ToString("B");
+        return ExecutionId.ToString("B");
     }
     #endregion
 
@@ -130,8 +126,8 @@ internal sealed class TestResultId : IXmlTestStore
     {
         XmlPersistence helper = new();
 
-        if (_executionId != Guid.Empty)
-            helper.SaveGuid(element, "@executionId", _executionId);
+        if (ExecutionId != Guid.Empty)
+            helper.SaveGuid(element, "@executionId", ExecutionId);
         if (ParentExecutionId != Guid.Empty)
             helper.SaveGuid(element, "@parentExecutionId", ParentExecutionId);
 

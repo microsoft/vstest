@@ -11,14 +11,12 @@ using System.Globalization;
 /// </summary>
 internal sealed class TestListCategoryId
 {
-    private Guid _id;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TestListCategoryId"/> class.
     /// </summary>
     public TestListCategoryId()
     {
-        _id = Guid.NewGuid();
+        Id = Guid.NewGuid();
     }
 
     /// <summary>
@@ -29,7 +27,7 @@ internal sealed class TestListCategoryId
     /// </param>
     public TestListCategoryId(Guid id)
     {
-        _id = id;
+        Id = id;
     }
 
 
@@ -59,10 +57,7 @@ internal sealed class TestListCategoryId
     /// <summary>
     /// Gets the id.
     /// </summary>
-    public Guid Id
-    {
-        get { return _id; }
-    }
+    public Guid Id { get; }
 
     public static TestListCategoryId AllItems { get; } = new(new Guid("19431567-8539-422a-85D7-44EE4E166BDA"));
 
@@ -78,7 +73,7 @@ internal sealed class TestListCategoryId
     /// </returns>
     public override bool Equals(object other)
     {
-        return other is TestListCategoryId testListCategoryId && _id.Equals(testListCategoryId._id);
+        return other is TestListCategoryId testListCategoryId && Id.Equals(testListCategoryId.Id);
     }
 
     /// <summary>
@@ -89,7 +84,7 @@ internal sealed class TestListCategoryId
     /// </returns>
     public override int GetHashCode()
     {
-        return _id.GetHashCode();
+        return Id.GetHashCode();
     }
 
     /// <summary>
@@ -101,7 +96,7 @@ internal sealed class TestListCategoryId
     public override string ToString()
     {
         // "B" adds curly braces around guid
-        string s = _id.ToString("B");
+        string s = Id.ToString("B");
         return string.Format(CultureInfo.InvariantCulture, s);
     }
 }

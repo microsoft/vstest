@@ -30,15 +30,6 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
 
     #endregion
 
-    #region Fields
-
-    /// <summary>
-    /// The test ID
-    /// </summary>
-    private Guid _id;
-
-    #endregion
-
     #region Constructors
 
     /// <summary>
@@ -55,7 +46,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// <param name="id">GUID of the test</param>
     public TestId(Guid id)
     {
-        _id = id;
+        Id = id;
     }
 
     #endregion
@@ -70,10 +61,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// <summary>
     /// Gets test ID
     /// </summary>
-    public Guid Id
-    {
-        get { return _id; }
-    }
+    public Guid Id { get; }
 
     #endregion
 
@@ -91,7 +79,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
         GetIdLocation(parameters, out string idLocation);
 
         XmlPersistence helper = new();
-        helper.SaveGuid(element, idLocation, _id);
+        helper.SaveGuid(element, idLocation, Id);
     }
 
     /// <summary>
@@ -143,7 +131,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     private bool ValueEquals(TestId other)
     {
         // Avoid calling of "!= null", as the != operator has been overloaded.
-        return other is not null && _id == other._id;
+        return other is not null && Id == other.Id;
     }
 
     #endregion
@@ -166,7 +154,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// <returns>The hash code</returns>
     public override int GetHashCode()
     {
-        return _id.GetHashCode();
+        return Id.GetHashCode();
     }
 
     #endregion
@@ -215,7 +203,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// </returns>
     public int CompareTo(TestId other)
     {
-        return other == null ? throw new ArgumentNullException(nameof(other)) : _id.CompareTo(other._id);
+        return other == null ? throw new ArgumentNullException(nameof(other)) : Id.CompareTo(other.Id);
     }
 
     #endregion
@@ -250,7 +238,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     public override string ToString()
     {
         // "B" adds curly braces around guid
-        string s = _id.ToString("B");
+        string s = Id.ToString("B");
         return string.Format(CultureInfo.InvariantCulture, s);
     }
 

@@ -15,8 +15,6 @@ using XML;
 /// </summary>
 internal sealed class TestLink : IXmlTestStore
 {
-    private Guid _id;
-
     public TestLink(Guid id, string name, string storage)
     {
         if (id == Guid.Empty)
@@ -27,7 +25,7 @@ internal sealed class TestLink : IXmlTestStore
         EqtAssert.StringNotNullOrEmpty(name, nameof(name));
         EqtAssert.ParameterNotNull(storage, nameof(storage));
 
-        _id = id;
+        Id = id;
         Name = name;
         Storage = storage;
     }
@@ -35,10 +33,7 @@ internal sealed class TestLink : IXmlTestStore
     /// <summary>
     /// Gets the id.
     /// </summary>
-    public Guid Id
-    {
-        get { return _id; }
-    }
+    public Guid Id { get; }
 
     /// <summary>
     /// Gets the name.
@@ -55,7 +50,7 @@ internal sealed class TestLink : IXmlTestStore
     /// </summary>
     public override bool Equals(object other)
     {
-        return other is TestLink link && _id.Equals(link._id);
+        return other is TestLink link && Id.Equals(link.Id);
     }
 
     /// <summary>
@@ -64,7 +59,7 @@ internal sealed class TestLink : IXmlTestStore
     public bool IsSame(TestLink other)
     {
         return other != null
-               && _id.Equals(other._id) &&
+               && Id.Equals(other.Id) &&
                Name.Equals(other.Name) &&
                Storage.Equals(other.Storage);
     }
@@ -75,7 +70,7 @@ internal sealed class TestLink : IXmlTestStore
     /// <returns></returns>
     public override int GetHashCode()
     {
-        return _id.GetHashCode();
+        return Id.GetHashCode();
     }
 
     /// <summary>
@@ -88,7 +83,7 @@ internal sealed class TestLink : IXmlTestStore
             CultureInfo.InvariantCulture,
             "Link to '{0}' {1} '{2}'.",
             Name ?? "(null)",
-            _id.ToString("B"),
+            Id.ToString("B"),
             Storage ?? "(null)");
     }
 

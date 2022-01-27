@@ -12,14 +12,12 @@ using System.Globalization;
 /// </summary>
 internal sealed class TestExecId
 {
-    private Guid _execId;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TestExecId"/> class.
     /// </summary>
     public TestExecId()
     {
-        _execId = Guid.NewGuid();
+        Id = Guid.NewGuid();
     }
 
     /// <summary>
@@ -30,7 +28,7 @@ internal sealed class TestExecId
     /// </param>
     public TestExecId(Guid id)
     {
-        _execId = id;
+        Id = id;
     }
 
     /// <summary>
@@ -41,10 +39,7 @@ internal sealed class TestExecId
     /// <summary>
     /// Gets the id.
     /// </summary>
-    public Guid Id
-    {
-        get { return _execId; }
-    }
+    public Guid Id { get; }
 
     /// <summary>
     /// Override function of Equals.
@@ -57,7 +52,7 @@ internal sealed class TestExecId
     /// </returns>
     public override bool Equals(object obj)
     {
-        return obj is TestExecId id && _execId.Equals(id._execId);
+        return obj is TestExecId id && Id.Equals(id.Id);
     }
 
     /// <summary>
@@ -68,7 +63,7 @@ internal sealed class TestExecId
     /// </returns>
     public override int GetHashCode()
     {
-        return _execId.GetHashCode();
+        return Id.GetHashCode();
     }
 
     /// <summary>
@@ -79,7 +74,7 @@ internal sealed class TestExecId
     /// </returns>
     public override string ToString()
     {
-        string s = _execId.ToString("B");
+        string s = Id.ToString("B");
         return string.Format(CultureInfo.InvariantCulture, s);
     }
 }

@@ -9,8 +9,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 public class BlameTestObject
 {
-    private Guid _id;
-
     #region Constructor
 
     /// <summary>
@@ -69,18 +67,7 @@ public class BlameTestObject
     /// <summary>
     /// Gets or sets the id of the test case.
     /// </summary>
-    public Guid Id
-    {
-        get
-        {
-            return _id;
-        }
-
-        set
-        {
-            _id = value;
-        }
-    }
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the fully qualified name of the test case.
@@ -90,10 +77,7 @@ public class BlameTestObject
     /// <summary>
     /// Gets or sets the Uri of the Executor to use for running this test.
     /// </summary>
-    public Uri ExecutorUri
-    {
-        get; set;
-    }
+    public Uri ExecutorUri { get; set; }
 
     /// <summary>
     /// Gets or sets the test container source from which the test is discovered.

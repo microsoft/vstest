@@ -17,8 +17,6 @@ internal sealed class TestEntry : IXmlTestStore
     #region Fields
 
     private readonly TestId _testId;
-    private Guid _executionId;
-    private Guid _parentExecutionId;
     private readonly TestListCategoryId _categoryId;
     private List<TestEntry> _testEntries;
 
@@ -46,28 +44,12 @@ internal sealed class TestEntry : IXmlTestStore
     /// <summary>
     /// Gets or sets the exec id.
     /// </summary>
-    public Guid ExecutionId
-    {
-        get { return _executionId; }
-
-        set
-        {
-            _executionId = value;
-        }
-    }
+    public Guid ExecutionId { get; set; }
 
     /// <summary>
     /// Gets or sets the parent exec id.
     /// </summary>
-    public Guid ParentExecutionId
-    {
-        get { return _parentExecutionId; }
-
-        set
-        {
-            _parentExecutionId = value;
-        }
-    }
+    public Guid ParentExecutionId { get; set; }
 
     public List<TestEntry> TestEntries
     {
@@ -102,7 +84,7 @@ internal sealed class TestEntry : IXmlTestStore
             return false;
         }
 
-        if (!_executionId.Equals(e._executionId))
+        if (!ExecutionId.Equals(e.ExecutionId))
         {
             return false;
         }
@@ -120,7 +102,7 @@ internal sealed class TestEntry : IXmlTestStore
     /// </returns>
     public override int GetHashCode()
     {
-        return _executionId.GetHashCode();
+        return ExecutionId.GetHashCode();
     }
 
     #endregion
@@ -142,9 +124,9 @@ internal sealed class TestEntry : IXmlTestStore
         helper.SaveSingleFields(element, this, parameters);
 
         helper.SaveObject(_testId, element, null);
-        helper.SaveGuid(element, "@executionId", _executionId);
-        if (_parentExecutionId != Guid.Empty)
-            helper.SaveGuid(element, "@parentExecutionId", _parentExecutionId);
+        helper.SaveGuid(element, "@executionId", ExecutionId);
+        if (ParentExecutionId != Guid.Empty)
+            helper.SaveGuid(element, "@parentExecutionId", ParentExecutionId);
         helper.SaveGuid(element, "@testListId", _categoryId.Id);
         if (TestEntries.Count > 0)
             helper.SaveIEnumerable(TestEntries, element, "TestEntries", ".", "TestEntry", parameters);
