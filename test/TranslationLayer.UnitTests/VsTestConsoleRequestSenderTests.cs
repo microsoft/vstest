@@ -676,7 +676,7 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Callback(
             (CancellationToken c) =>
             {
-                Task.Run(() => _requestSender.OnProcessExited()).Wait();
+                Task.Run(() => _requestSender.OnProcessExited(), c).Wait(c);
 
                 Assert.IsTrue(c.IsCancellationRequested);
             }).Returns(Task.FromResult((Message)null));
@@ -703,7 +703,7 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Callback(
             (CancellationToken c) =>
             {
-                Task.Run(() => _requestSender.OnProcessExited()).Wait();
+                Task.Run(() => _requestSender.OnProcessExited(), c).Wait(c);
 
                 Assert.IsTrue(c.IsCancellationRequested);
             }).Returns(Task.FromResult((Message)null));
@@ -1815,7 +1815,7 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
             .Callback((CancellationToken c) =>
             {
-                Task.Run(() => _requestSender.OnProcessExited()).Wait();
+                Task.Run(() => _requestSender.OnProcessExited(), c).Wait(c);
 
                 Assert.IsTrue(c.IsCancellationRequested);
             }).Returns(Task.FromResult((Message)null));
@@ -1846,7 +1846,7 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
             .Callback((CancellationToken c) =>
             {
-                Task.Run(() => _requestSender.OnProcessExited()).Wait();
+                Task.Run(() => _requestSender.OnProcessExited(), c).Wait(c);
 
                 Assert.IsTrue(c.IsCancellationRequested);
             }).Returns(Task.FromResult((Message)null));

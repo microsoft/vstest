@@ -2085,7 +2085,7 @@ public class TestRequestManagerTests
             {
                 r.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsSentForProcessing, 5);
                 r.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsAfterProcessing, 1);
-            }));
+            }, token));
 
         var payload = new TestRunAttachmentsProcessingPayload()
         {
@@ -2147,7 +2147,7 @@ public class TestRequestManagerTests
                 }
 
                 r.MetricsCollection.Add(TelemetryDataConstants.AttachmentsProcessingState, "Canceled");
-            }));
+            }, token));
 
         var payload = new TestRunAttachmentsProcessingPayload()
         {
