@@ -664,11 +664,13 @@ internal class TestRequestManager : ITestRequestManager
                     return Architecture.ARM;
                 case PlatformArchitecture.ARM64:
                     return Architecture.ARM64;
+                case PlatformArchitecture.S390x:
+                    return Architecture.S390x;
                 default:
                     break;
             }
 
-            throw new TestPlatformException($"Invalid target architecture '{targetArchitecture}'");
+            return Architecture.Default;
         }
 #endif
     }
