@@ -148,6 +148,9 @@ dotnet_diagnostic.CA1847.severity = warning # not default, increased severity to
 # CA2249: Consider using 'string.Contains' instead of 'string.IndexOf'
 dotnet_diagnostic.CA2249.severity = warning # not default, increased severity to ensure it is applied
 
+# CA2016: Forward the 'CancellationToken' parameter to methods
+dotnet_diagnostic.CA2016.severity = warning
+
 #### C# Coding Conventions ####
 
 # var preferences
