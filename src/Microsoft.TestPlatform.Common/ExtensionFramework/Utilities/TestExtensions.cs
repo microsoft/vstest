@@ -149,31 +149,31 @@ public class TestExtensions
         var testExtensions = new TestExtensions();
 
         testExtensions.TestDiscoverers =
-            TestExtensions.GetExtensionsDiscoveredFromAssembly(
+            GetExtensionsDiscoveredFromAssembly(
                 TestDiscoverers,
                 extensionAssembly);
         testExtensions.TestExecutors =
-            TestExtensions.GetExtensionsDiscoveredFromAssembly(
+            GetExtensionsDiscoveredFromAssembly(
                 TestExecutors,
                 extensionAssembly);
         testExtensions.TestExecutors2 =
-            TestExtensions.GetExtensionsDiscoveredFromAssembly(
+            GetExtensionsDiscoveredFromAssembly(
                 TestExecutors2,
                 extensionAssembly);
         testExtensions.TestSettingsProviders =
-            TestExtensions.GetExtensionsDiscoveredFromAssembly(
+            GetExtensionsDiscoveredFromAssembly(
                 TestSettingsProviders,
                 extensionAssembly);
         testExtensions.TestLoggers =
-            TestExtensions.GetExtensionsDiscoveredFromAssembly(
+            GetExtensionsDiscoveredFromAssembly(
                 TestLoggers,
                 extensionAssembly);
         testExtensions.TestHosts =
-            TestExtensions.GetExtensionsDiscoveredFromAssembly(
+            GetExtensionsDiscoveredFromAssembly(
                 TestHosts,
                 extensionAssembly);
         testExtensions.DataCollectors =
-            TestExtensions.GetExtensionsDiscoveredFromAssembly(
+            GetExtensionsDiscoveredFromAssembly(
                 DataCollectors,
                 extensionAssembly);
 

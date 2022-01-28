@@ -37,7 +37,7 @@ public class InferRunSettingsHelperTests
     public void UpdateRunSettingsShouldThrowIfRunSettingsNodeDoesNotExist()
     {
         var settings = @"<RandomSettings></RandomSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X86, Framework.DefaultFramework, "temp");
 
@@ -50,7 +50,7 @@ public class InferRunSettingsHelperTests
     public void UpdateRunSettingsShouldThrowIfPlatformNodeIsInvalid()
     {
         var settings = @"<RunSettings><RunConfiguration><TargetPlatform>foo</TargetPlatform></RunConfiguration></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X86, Framework.DefaultFramework, "temp");
 
@@ -66,7 +66,7 @@ public class InferRunSettingsHelperTests
     public void UpdateRunSettingsShouldThrowIfFrameworkNodeIsInvalid()
     {
         var settings = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>foo</TargetFrameworkVersion></RunConfiguration></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X86, Framework.DefaultFramework, "temp");
 
@@ -82,7 +82,7 @@ public class InferRunSettingsHelperTests
     public void UpdateRunSettingsShouldUpdateWithPlatformSettings()
     {
         var settings = @"<RunSettings></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X86, Framework.DefaultFramework, "temp");
 
@@ -95,7 +95,7 @@ public class InferRunSettingsHelperTests
     public void UpdateRunSettingsShouldUpdateWithFrameworkSettings()
     {
         var settings = @"<RunSettings></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X86, Framework.DefaultFramework, "temp");
 
@@ -108,7 +108,7 @@ public class InferRunSettingsHelperTests
     public void UpdateRunSettingsShouldUpdateWithResultsDirectorySettings()
     {
         var settings = @"<RunSettings></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X86, Framework.DefaultFramework, "temp");
 
@@ -121,7 +121,7 @@ public class InferRunSettingsHelperTests
     public void UpdateRunSettingsShouldNotUpdatePlatformIfRunSettingsAlreadyHasIt()
     {
         var settings = @"<RunSettings><RunConfiguration><TargetPlatform>X86</TargetPlatform></RunConfiguration></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X64, Framework.DefaultFramework, "temp");
 
@@ -134,7 +134,7 @@ public class InferRunSettingsHelperTests
     public void UpdateRunSettingsShouldNotUpdateFrameworkIfRunSettingsAlreadyHasIt()
     {
         var settings = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>Framework40</TargetFrameworkVersion></RunConfiguration></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X64, Framework.DefaultFramework, "temp");
 
@@ -149,7 +149,7 @@ public class InferRunSettingsHelperTests
     {
 
         var settings = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>.NETFramework,Version=v4.0</TargetFrameworkVersion></RunConfiguration></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X64, Framework.DefaultFramework, "temp");
 
@@ -162,7 +162,7 @@ public class InferRunSettingsHelperTests
     public void UpdateRunSettingsShouldNotUpdateResultsDirectoryIfRunSettingsAlreadyHasIt()
     {
         var settings = @"<RunSettings><RunConfiguration><ResultsDirectory>someplace</ResultsDirectory></RunConfiguration></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X64, Framework.DefaultFramework, "temp");
 
@@ -175,7 +175,7 @@ public class InferRunSettingsHelperTests
     public void UpdateRunSettingsShouldNotUpdatePlatformOrFrameworkOrResultsDirectoryIfRunSettingsAlreadyHasIt()
     {
         var settings = @"<RunSettings><RunConfiguration><TargetPlatform>X86</TargetPlatform><TargetFrameworkVersion>Framework40</TargetFrameworkVersion><ResultsDirectory>someplace</ResultsDirectory></RunConfiguration></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X64, Framework.DefaultFramework, "temp");
 
@@ -190,7 +190,7 @@ public class InferRunSettingsHelperTests
     public void UpdateRunSettingsWithAnEmptyRunSettingsShouldAddValuesSpecifiedInRunConfiguration()
     {
         var settings = @"<RunSettings></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X64, Framework.DefaultFramework, "temp");
 
@@ -205,7 +205,7 @@ public class InferRunSettingsHelperTests
     public void UpdateRunSettingsShouldReturnBackACompleteRunSettings()
     {
         var settings = @"<RunSettings></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X64, Framework.DefaultFramework, "temp");
 
@@ -219,7 +219,7 @@ public class InferRunSettingsHelperTests
     public void UpdateRunSettingsShouldThrowIfArchitectureSetIsIncompatibleWithCurrentSystemArchitecture()
     {
         var settings = @"<RunSettings></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.ARM, Framework.DefaultFramework, "temp");
 
@@ -234,13 +234,13 @@ public class InferRunSettingsHelperTests
     public void UpdateDesignModeOrCsiShouldNotModifyXmlIfNodeIsAlreadyPresent()
     {
         var settings = @"<RunSettings><RunConfiguration><DesignMode>False</DesignMode><CollectSourceInformation>False</CollectSourceInformation></RunConfiguration></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateDesignMode(xmlDocument, true);
         InferRunSettingsHelper.UpdateCollectSourceInformation(xmlDocument, true);
 
-        Assert.AreEqual("False", InferRunSettingsHelperTests.GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/DesignMode"));
-        Assert.AreEqual("False", InferRunSettingsHelperTests.GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/CollectSourceInformation"));
+        Assert.AreEqual("False", GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/DesignMode"));
+        Assert.AreEqual("False", GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/CollectSourceInformation"));
     }
 
     [DataTestMethod]
@@ -249,13 +249,13 @@ public class InferRunSettingsHelperTests
     public void UpdateDesignModeOrCsiShouldModifyXmlToValueProvided(bool val)
     {
         var settings = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateDesignMode(xmlDocument, val);
         InferRunSettingsHelper.UpdateCollectSourceInformation(xmlDocument, val);
 
-        Assert.AreEqual(val.ToString(), InferRunSettingsHelperTests.GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/DesignMode"));
-        Assert.AreEqual(val.ToString(), InferRunSettingsHelperTests.GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/CollectSourceInformation"));
+        Assert.AreEqual(val.ToString(), GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/DesignMode"));
+        Assert.AreEqual(val.ToString(), GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/CollectSourceInformation"));
     }
 
     [TestMethod]
@@ -312,79 +312,79 @@ public class InferRunSettingsHelperTests
 								</MSPhoneTest>
 							</RunSettings>";
 
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         var result = InferRunSettingsHelper.TryGetDeviceXml(xmlDocument.CreateNavigator(), out string deviceXml);
         Assert.IsTrue(result);
 
         InferRunSettingsHelper.UpdateTargetDevice(xmlDocument, deviceXml);
-        Assert.AreEqual(deviceXml.ToString(), InferRunSettingsHelperTests.GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/TargetDevice"));
+        Assert.AreEqual(deviceXml.ToString(), GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/TargetDevice"));
     }
 
     [TestMethod]
     public void UpdateTargetPlatformShouldNotModifyXmlIfNodeIsAlreadyPresentForOverwriteFalse()
     {
         var settings = @"<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateTargetPlatform(xmlDocument, "X64", overwrite: false);
 
-        Assert.AreEqual("x86", InferRunSettingsHelperTests.GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/TargetPlatform"));
+        Assert.AreEqual("x86", GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/TargetPlatform"));
     }
 
     [TestMethod]
     public void UpdateTargetPlatformShouldModifyXmlIfNodeIsAlreadyPresentForOverwriteTrue()
     {
         var settings = @"<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateTargetPlatform(xmlDocument, "X64", overwrite: true);
 
-        Assert.AreEqual("X64", InferRunSettingsHelperTests.GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/TargetPlatform"));
+        Assert.AreEqual("X64", GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/TargetPlatform"));
     }
 
     [TestMethod]
     public void UpdateTargetPlatformShouldAddPlatformXmlNodeIfNotPresent()
     {
         var settings = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateTargetPlatform(xmlDocument, "X64");
 
-        Assert.AreEqual("X64", InferRunSettingsHelperTests.GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/TargetPlatform"));
+        Assert.AreEqual("X64", GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/TargetPlatform"));
     }
 
     [TestMethod]
     public void UpdateTargetFrameworkShouldNotModifyXmlIfNodeIsAlreadyPresentForOverwriteFalse()
     {
         var settings = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>.NETFramework,Version=v4.5</TargetFrameworkVersion></RunConfiguration></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateTargetFramework(xmlDocument, ".NETCoreApp,Version=v1.0", overwrite: false);
 
-        Assert.AreEqual(".NETFramework,Version=v4.5", InferRunSettingsHelperTests.GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/TargetFrameworkVersion"));
+        Assert.AreEqual(".NETFramework,Version=v4.5", GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/TargetFrameworkVersion"));
     }
 
     [TestMethod]
     public void UpdateTargetFrameworkShouldModifyXmlIfNodeIsAlreadyPresentForOverwriteTrue()
     {
         var settings = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>.NETFramework,Version=v4.5</TargetFrameworkVersion></RunConfiguration></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateTargetFramework(xmlDocument, ".NETCoreApp,Version=v1.0", overwrite: true);
 
-        Assert.AreEqual(".NETCoreApp,Version=v1.0", InferRunSettingsHelperTests.GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/TargetFrameworkVersion"));
+        Assert.AreEqual(".NETCoreApp,Version=v1.0", GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/TargetFrameworkVersion"));
     }
 
     [TestMethod]
     public void UpdateTargetFrameworkShouldAddFrameworkXmlNodeIfNotPresent()
     {
         var settings = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-        var xmlDocument = InferRunSettingsHelperTests.GetXmlDocument(settings);
+        var xmlDocument = GetXmlDocument(settings);
 
         InferRunSettingsHelper.UpdateTargetFramework(xmlDocument, ".NETCoreApp,Version=v1.0");
 
-        Assert.AreEqual(".NETCoreApp,Version=v1.0", InferRunSettingsHelperTests.GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/TargetFrameworkVersion"));
+        Assert.AreEqual(".NETCoreApp,Version=v1.0", GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/TargetFrameworkVersion"));
     }
 
     [TestMethod]
@@ -663,7 +663,7 @@ public class InferRunSettingsHelperTests
         Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
             runSettingsWithCodeCoverageAndInlineTestSettingsXml), "Invalid response");
         Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
-            InferRunSettingsHelperTests.ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithCodeCoverageAndInlineTestSettingsXml)), "Invalid response");
+            ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithCodeCoverageAndInlineTestSettingsXml)), "Invalid response");
     }
 
     [TestMethod]
@@ -696,7 +696,7 @@ public class InferRunSettingsHelperTests
         Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
             runSettingsWithFakesAndCodeCoverageAndInlineTestSettingsXml), "Invalid response");
         Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
-            InferRunSettingsHelperTests.ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithFakesAndCodeCoverageAndInlineTestSettingsXml)), "Invalid response");
+            ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithFakesAndCodeCoverageAndInlineTestSettingsXml)), "Invalid response");
     }
 
     [TestMethod]
@@ -726,7 +726,7 @@ public class InferRunSettingsHelperTests
         Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
             runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml), "Invalid response");
         Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
-            InferRunSettingsHelperTests.ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml)), "Invalid response");
+            ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml)), "Invalid response");
     }
 
     [TestMethod]
@@ -761,7 +761,7 @@ public class InferRunSettingsHelperTests
         Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
             runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml), "Invalid response");
         Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
-            InferRunSettingsHelperTests.ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml)), "Invalid response");
+            ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml)), "Invalid response");
     }
 
     [TestMethod]
@@ -796,7 +796,7 @@ public class InferRunSettingsHelperTests
         Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
             runSettingsWithDisabledCollectionSettingsAndInlineTestSettingsXml), "Invalid response");
         Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
-            InferRunSettingsHelperTests.ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithDisabledCollectionSettingsAndInlineTestSettingsXml)), "Invalid response");
+            ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithDisabledCollectionSettingsAndInlineTestSettingsXml)), "Invalid response");
     }
 
     #endregion

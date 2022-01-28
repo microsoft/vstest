@@ -56,7 +56,7 @@ public class DisableAppdomainTests : AcceptanceTestBase
         var arguments = PrepareArguments(
             testAssembly,
             string.Empty,
-            DisableAppdomainTests.GetRunsettingsFilePath(tempDir, runConfigurationDictionary),
+            GetRunsettingsFilePath(tempDir, runConfigurationDictionary),
             FrameworkArgValue, resultsDirectory: tempDir.Path);
 
         InvokeVsTest(arguments);

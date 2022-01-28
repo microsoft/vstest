@@ -103,7 +103,7 @@ internal class InProcDataCollector : IInProcDataCollector
     public void LoadDataCollector(IDataCollectionSink inProcDataCollectionSink)
     {
         _dataCollectorObject = CreateObjectFromType(_dataCollectorType);
-        InProcDataCollector.InitializeDataCollector(_dataCollectorObject, inProcDataCollectionSink);
+        InitializeDataCollector(_dataCollectorObject, inProcDataCollectionSink);
     }
 
     /// <summary>

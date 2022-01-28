@@ -65,8 +65,8 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
         _loggerEventQueue = new JobQueue<Action>(
             ProcessQueuedJob,
             "Test Logger",
-            InternalTestLoggerEvents.GetMaxNumberOfJobsInQueue(),
-            InternalTestLoggerEvents.GetMaxBytesQueueCanHold(),
+            GetMaxNumberOfJobsInQueue(),
+            GetMaxBytesQueueCanHold(),
             _isBoundsOnLoggerEventQueueEnabled,
             (message) => EqtTrace.Error(message));
         _loggerEventQueue.Pause();
@@ -380,7 +380,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// </summary>
     private static int GetMaxNumberOfJobsInQueue()
     {
-        return InternalTestLoggerEvents.GetSetting(TestPlatformDefaults.MaxNumberOfEventsLoggerEventQueueCanHold,
+        return GetSetting(TestPlatformDefaults.MaxNumberOfEventsLoggerEventQueueCanHold,
             TestPlatformDefaults.DefaultMaxNumberOfEventsLoggerEventQueueCanHold);
     }
 
@@ -390,7 +390,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// </summary>
     private static int GetMaxBytesQueueCanHold()
     {
-        return InternalTestLoggerEvents.GetSetting(TestPlatformDefaults.MaxBytesLoggerEventQueueCanHold,
+        return GetSetting(TestPlatformDefaults.MaxBytesLoggerEventQueueCanHold,
             TestPlatformDefaults.DefaultMaxBytesLoggerEventQueueCanHold);
     }
 

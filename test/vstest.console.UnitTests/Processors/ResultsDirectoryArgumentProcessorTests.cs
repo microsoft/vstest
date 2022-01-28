@@ -93,7 +93,7 @@ public class ResultsDirectoryArgumentProcessorTests
         // so we need to convert the path, and use char that is invalid on the current platform
         var invalidChar = Path.GetInvalidPathChars()[0];
 
-        var folder = ResultsDirectoryArgumentProcessorTests.TranslatePath($@"c:\som{invalidChar}\illegal\path\");
+        var folder = TranslatePath($@"c:\som{invalidChar}\illegal\path\");
         // The error varies based on the runtime and OS, just checking that we detect 
         // incorrect path should be enough and not so flaky
         // you might get
@@ -127,7 +127,7 @@ public class ResultsDirectoryArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldSetCommandLineOptionsAndRunSettingsForRelativePathValue()
     {
-        var relativePath = ResultsDirectoryArgumentProcessorTests.TranslatePath(@".\relative\path");
+        var relativePath = TranslatePath(@".\relative\path");
         var absolutePath = Path.GetFullPath(relativePath);
         _executor.Initialize(relativePath);
         Assert.AreEqual(absolutePath, CommandLineOptions.Instance.ResultsDirectory);
@@ -137,7 +137,7 @@ public class ResultsDirectoryArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldSetCommandLineOptionsAndRunSettingsForAbsolutePathValue()
     {
-        var absolutePath = ResultsDirectoryArgumentProcessorTests.TranslatePath(@"c:\random\someone\testresults");
+        var absolutePath = TranslatePath(@"c:\random\someone\testresults");
         _executor.Initialize(absolutePath);
         Assert.AreEqual(absolutePath, CommandLineOptions.Instance.ResultsDirectory);
         Assert.AreEqual(absolutePath, _runSettingsProvider.QueryRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath));

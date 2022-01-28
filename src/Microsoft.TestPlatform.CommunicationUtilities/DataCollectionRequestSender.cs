@@ -138,7 +138,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
             if (message.MessageType == MessageType.DataCollectionMessage)
             {
                 var dataCollectionMessageEventArgs = _dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
-                DataCollectionRequestSender.LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
+                LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
             }
             else if (message.MessageType == MessageType.BeforeTestRunStartResult)
             {
@@ -177,7 +177,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
             if (message.MessageType == MessageType.DataCollectionMessage)
             {
                 var dataCollectionMessageEventArgs = _dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
-                DataCollectionRequestSender.LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
+                LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
             }
             else if (message.MessageType == MessageType.AfterTestRunEndResult)
             {

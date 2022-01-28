@@ -70,7 +70,7 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
 
         if (coverageReportFilePaths.Count > 1)
         {
-            var mergedCoverageReports = await CodeCoverageDataAttachmentsHandler.MergeCodeCoverageFilesAsync(coverageReportFilePaths, progressReporter, cancellationToken).ConfigureAwait(false);
+            var mergedCoverageReports = await MergeCodeCoverageFilesAsync(coverageReportFilePaths, progressReporter, cancellationToken).ConfigureAwait(false);
             var resultAttachmentSet = new AttachmentSet(CodeCoverageDataCollectorUri, CoverageFriendlyName);
 
             foreach (var coverageReport in mergedCoverageReports)
@@ -98,7 +98,7 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
             // We took a dependency on Coverage.CoreLib.Net. In the unlikely case it cannot be
             // resolved, this method call will throw an exception that will be caught and
             // absorbed here.
-            var result = await CodeCoverageDataAttachmentsHandler.MergeCodeCoverageFilesAsync(files, cancellationToken).ConfigureAwait(false);
+            var result = await MergeCodeCoverageFilesAsync(files, cancellationToken).ConfigureAwait(false);
             progressReporter?.Report(100);
             return result;
         }
@@ -122,7 +122,7 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
         cancellationToken.ThrowIfCancellationRequested();
 
         // Invoke methods
-        CodeCoverageDataAttachmentsHandler.LoadCodeCoverageAssembly();
+        LoadCodeCoverageAssembly();
         var task = (Task)s_mergeMethodInfo.Invoke(s_classInstance, new object[] { files[0], files, s_mergeOperationEnumValues.GetValue(0), true, cancellationToken });
         await task.ConfigureAwait(false);
         var coverageData = task.GetType().GetProperty("Result").GetValue(task, null);

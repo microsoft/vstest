@@ -37,7 +37,7 @@ internal sealed class TestCategoryItem : IXmlTestStore
         }
 
 
-        _category = TestCategoryItem.StripIllegalChars(category);
+        _category = StripIllegalChars(category);
     }
 
     #endregion

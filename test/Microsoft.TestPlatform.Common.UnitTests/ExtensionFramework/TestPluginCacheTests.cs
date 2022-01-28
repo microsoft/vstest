@@ -188,7 +188,7 @@ public class TestPluginCacheTests
     public void GetExtensionPathsShouldSkipDefaultExtensionsIfSetTrue()
     {
         var expectedExtensions = new[] { "filter.dll", "unfilter.dll" }.Select(Path.GetFullPath).ToList();
-        TestPluginCacheTests.InvokeGetExtensionPaths(expectedExtensions, true);
+        InvokeGetExtensionPaths(expectedExtensions, true);
     }
 
     [TestMethod]
@@ -196,7 +196,7 @@ public class TestPluginCacheTests
     {
         var expectedExtensions = new[] { "filter.dll", "unfilter.dll" }.Select(Path.GetFullPath).ToList();
         expectedExtensions.Add("default.dll");
-        TestPluginCacheTests.InvokeGetExtensionPaths(expectedExtensions, false);
+        InvokeGetExtensionPaths(expectedExtensions, false);
     }
 
     #endregion

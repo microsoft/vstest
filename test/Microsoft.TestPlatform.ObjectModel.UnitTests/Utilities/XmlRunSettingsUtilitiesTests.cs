@@ -352,13 +352,13 @@ public class XmlRunSettingsUtilitiesTests
     [TestMethod]
     public void IsInProcDataCollectionEnabledShouldReturnFalseIfDataCollectionIsDisabled()
     {
-        Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(XmlRunSettingsUtilitiesTests.ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(_runSettingsXmlWithDataCollectorsDisabled)));
+        Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(_runSettingsXmlWithDataCollectorsDisabled)));
     }
 
     [TestMethod]
     public void IsInProcDataCollectionEnabledShouldReturnTrueIfDataCollectionIsEnabled()
     {
-        Assert.IsTrue(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(XmlRunSettingsUtilitiesTests.ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(_runSettingsXmlWithDataCollectors)));
+        Assert.IsTrue(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(_runSettingsXmlWithDataCollectors)));
     }
 
     #endregion

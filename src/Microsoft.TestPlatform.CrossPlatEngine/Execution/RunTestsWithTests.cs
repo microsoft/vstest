@@ -58,7 +58,7 @@ internal class RunTestsWithTests : BaseRunTests
 
     protected override IEnumerable<Tuple<Uri, string>> GetExecutorUriExtensionMap(IFrameworkHandle testExecutorFrameworkHandle, RunContext runContext)
     {
-        _executorUriVsTestList = RunTestsWithTests.GetExecutorVsTestCaseList(_testCases);
+        _executorUriVsTestList = GetExecutorVsTestCaseList(_testCases);
 
         Debug.Assert(TestExecutionContext.TestCaseFilter == null, "TestCaseFilter should be null for specific tests.");
         runContext.FilterExpressionWrapper = null;

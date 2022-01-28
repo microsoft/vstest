@@ -46,7 +46,7 @@ internal class MetadataReaderExtensionsHelper
     private static readonly Type[] EmptyTypeArray = new Type[0];
 
     public static Type[] DiscoverTestExtensionTypesV2Attribute(Assembly loadedAssembly, string assemblyFilePath)
-        => AssemblyCache.GetOrAdd(assemblyFilePath, MetadataReaderExtensionsHelper.DiscoverTestExtensionTypesV2AttributeInternal(loadedAssembly, assemblyFilePath));
+        => AssemblyCache.GetOrAdd(assemblyFilePath, DiscoverTestExtensionTypesV2AttributeInternal(loadedAssembly, assemblyFilePath));
 
     private static Type[] DiscoverTestExtensionTypesV2AttributeInternal(Assembly loadedAssembly, string assemblyFilePath)
     {
@@ -162,14 +162,14 @@ internal class MetadataReaderExtensionsHelper
                             }
                             catch (Exception ex)
                             {
-                                EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Failure during type creation, extension full name: '{extensionImplementation}'\n{MetadataReaderExtensionsHelper.FormatException(ex)}");
+                                EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Failure during type creation, extension full name: '{extensionImplementation}'\n{FormatException(ex)}");
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Failure during custom attribute analysis, attribute full name: {attributeFullName}\n{MetadataReaderExtensionsHelper.FormatException(ex)}");
+                    EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Failure during custom attribute analysis, attribute full name: {attributeFullName}\n{FormatException(ex)}");
                 }
             }
         }

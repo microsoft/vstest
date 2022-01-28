@@ -147,7 +147,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
     public DataCollectionResult AfterTestRunEnd(bool isCanceled, ITestMessageEventHandler runEventsHandler)
     {
         AfterTestRunEndResult afterTestRunEnd = null;
-        ProxyDataCollectionManager.InvokeDataCollectionServiceAction(
+        InvokeDataCollectionServiceAction(
             () =>
             {
                 EqtTrace.Info("ProxyDataCollectionManager.AfterTestRunEnd: Get attachment set and invoked data collectors processId: {0} port: {1}", _dataCollectionProcessId, _dataCollectionPort);
@@ -190,7 +190,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         IDictionary<string, string> environmentVariables = new Dictionary<string, string>();
 
         var dataCollectionEventsPort = 0;
-        ProxyDataCollectionManager.InvokeDataCollectionServiceAction(
+        InvokeDataCollectionServiceAction(
             () =>
             {
                 EqtTrace.Info("ProxyDataCollectionManager.BeforeTestRunStart: Get environment variable and port for datacollector processId: {0} port: {1}", _dataCollectionProcessId, _dataCollectionPort);
@@ -300,7 +300,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
                 EqtTrace.Warning("ProxyDataCollectionManager.InvokeDataCollectionServiceAction: TestPlatformException = {0}.", ex);
             }
 
-            ProxyDataCollectionManager.HandleExceptionMessage(runEventsHandler, ex);
+            HandleExceptionMessage(runEventsHandler, ex);
         }
     }
 
@@ -328,7 +328,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         if (!string.IsNullOrEmpty(EqtTrace.LogFile))
         {
             commandlineArguments.Add(DiagOption);
-            commandlineArguments.Add(ProxyDataCollectionManager.GetTimestampedLogFile(EqtTrace.LogFile));
+            commandlineArguments.Add(GetTimestampedLogFile(EqtTrace.LogFile));
 
             commandlineArguments.Add(TraceLevelOption);
             commandlineArguments.Add(((int)EqtTrace.TraceLevel).ToString());

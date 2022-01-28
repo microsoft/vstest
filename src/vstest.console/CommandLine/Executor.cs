@@ -236,7 +236,7 @@ internal class Executor
         RunSettingsManager.Instance.AddDefaultRunSettings();
 
         // Ensure we have an action argument.
-        Executor.EnsureActionArgumentIsPresent(processors, processorFactory);
+        EnsureActionArgumentIsPresent(processors, processorFactory);
 
         // Instantiate and initialize the processors in priority order.
         processors.Sort((p1, p2) => Comparer<ArgumentProcessorPriority>.Default.Compare(p1.Metadata.Value.Priority, p2.Metadata.Value.Priority));

@@ -35,7 +35,7 @@ internal class InferHelper
                 foreach (string source in sources)
                 {
                     Architecture arch;
-                    if (InferHelper.IsDotNetAssembly(source))
+                    if (IsDotNetAssembly(source))
                     {
                         arch = _assemblyMetadataProvider.GetArchitecture(source);
                     }
@@ -127,7 +127,7 @@ internal class InferHelper
         foreach (string source in sources)
         {
             FrameworkName fx;
-            if (InferHelper.IsDotNetAssembly(source))
+            if (IsDotNetAssembly(source))
             {
                 fx = _assemblyMetadataProvider.GetFrameWork(source);
             }

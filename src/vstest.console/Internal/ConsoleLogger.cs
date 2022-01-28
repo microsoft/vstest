@@ -522,14 +522,14 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             testDisplayName = e.Result.TestCase.DisplayName;
         }
 
-        string formattedDuration = ConsoleLogger.GetFormattedDurationString(e.Result.Duration);
+        string formattedDuration = GetFormattedDurationString(e.Result.Duration);
         if (!string.IsNullOrEmpty(formattedDuration))
         {
             testDisplayName = string.Format("{0} [{1}]", testDisplayName, formattedDuration);
         }
 
-        var executionId = ConsoleLogger.GetExecutionId(e.Result);
-        var parentExecutionId = ConsoleLogger.GetParentExecutionId(e.Result);
+        var executionId = GetExecutionId(e.Result);
+        var parentExecutionId = GetParentExecutionId(e.Result);
 
         if (parentExecutionId != Guid.Empty)
         {
@@ -774,7 +774,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     ? string.Empty
                     : $"({_targetFramework})";
 
-                var duration = ConsoleLogger.GetFormattedDurationString(sourceSummary.Duration);
+                var duration = GetFormattedDurationString(sourceSummary.Duration);
                 var sourceName = sd.Key.Split('\\').Last();
 
                 var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,

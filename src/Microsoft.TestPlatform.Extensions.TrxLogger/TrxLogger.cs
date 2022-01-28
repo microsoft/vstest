@@ -270,7 +270,7 @@ public class TrxLogger : ITestLoggerWithParameters
         var testElement = GetOrCreateTestElement(executionId, parentExecutionId, testType, parentTestElement, e.Result);
 
         // Update test links. Test Links are updated in case of Ordered test.
-        TrxLogger.UpdateTestLinks(testElement, parentTestElement);
+        UpdateTestLinks(testElement, parentTestElement);
 
         // Convert the rocksteady result to trx test result
         var testResult = CreateTestResult(executionId, parentExecutionId, testType, testElement, parentTestElement, parentTestResult, e.Result);

@@ -154,7 +154,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         var diagParameters = ArgumentProcessorUtilities.GetArgumentParameters(diagParameterArgs, ArgumentProcessorUtilities.EqualNameValueSeparator, exceptionMessage);
 
         // Initialize diag logging.
-        EnableDiagArgumentExecutor.InitializeDiagLogging(diagFilePath, diagParameters);
+        InitializeDiagLogging(diagFilePath, diagParameters);
 
         // Write version to the log here, because that is the 
         // first place where we know if we log or not.
@@ -179,7 +179,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
     private static void InitializeDiagLogging(string diagFilePath, Dictionary<string, string> diagParameters)
     {
         // Get trace level from diag parameters.
-        var traceLevel = EnableDiagArgumentExecutor.GetDiagTraceLevel(diagParameters);
+        var traceLevel = GetDiagTraceLevel(diagParameters);
 
         // Initialize trace.
         // Trace initialized is false in case of any exception at time of initialization like Catch exception(UnauthorizedAccessException, PathTooLongException...)

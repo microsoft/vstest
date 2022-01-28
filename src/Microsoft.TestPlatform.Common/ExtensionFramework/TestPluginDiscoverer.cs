@@ -73,10 +73,10 @@ internal class TestPluginDiscoverer
         // C++ UWP adapters do not follow TestAdapater naming convention, so making this exception
         if (!extensionPaths.Any())
         {
-            TestPluginDiscoverer.AddKnownExtensions(ref extensionPaths);
+            AddKnownExtensions(ref extensionPaths);
         }
 
-        TestPluginDiscoverer.GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), pluginInfos);
+        GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), pluginInfos);
 
         return pluginInfos;
     }
@@ -129,7 +129,7 @@ internal class TestPluginDiscoverer
                 assembly = Assembly.Load(new AssemblyName(assemblyName));
                 if (assembly != null)
                 {
-                    TestPluginDiscoverer.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos, file);
+                    GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos, file);
                 }
             }
             catch (FileLoadException e)
@@ -213,7 +213,7 @@ internal class TestPluginDiscoverer
         {
             foreach (var type in types)
             {
-                TestPluginDiscoverer.GetTestExtensionFromType(type, extension, pluginInfos, filePath);
+                GetTestExtensionFromType(type, extension, pluginInfos, filePath);
             }
         }
     }

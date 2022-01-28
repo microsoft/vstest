@@ -204,13 +204,13 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
                 }
                 else
                 {
-                    ParallelOperationManager<T, TU>.DoManagerAction(() => action(client));
+                    DoManagerAction(() => action(client));
                 }
             }
 
             if (doActionsInParallel)
             {
-                ParallelOperationManager<T, TU>.DoManagerAction(() => Task.WaitAll(actionTasks));
+                DoManagerAction(() => Task.WaitAll(actionTasks));
             }
         }
     }

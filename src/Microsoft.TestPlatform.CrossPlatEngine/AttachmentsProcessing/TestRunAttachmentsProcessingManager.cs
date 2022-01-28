@@ -103,7 +103,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
         if (attachments == null || !attachments.Any()) return attachments;
         var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(runSettingsXml);
 
-        var logger = TestRunAttachmentsProcessingManager.CreateMessageLogger(eventsHandler);
+        var logger = CreateMessageLogger(eventsHandler);
         var dataCollectorAttachmentsProcessors = _dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollector?.ToArray(), logger);
         for (int i = 0; i < dataCollectorAttachmentsProcessors.Length; i++)
         {

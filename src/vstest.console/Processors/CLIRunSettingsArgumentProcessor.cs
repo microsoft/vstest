@@ -194,7 +194,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
         {
             var arg = mergedArgs[index];
 
-            if (CliRunSettingsArgumentExecutor.UpdateTestRunParameterNode(runSettingsProvider, arg))
+            if (UpdateTestRunParameterNode(runSettingsProvider, arg))
             {
                 continue;
             }

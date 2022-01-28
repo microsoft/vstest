@@ -503,7 +503,7 @@ public class TestPluginCache
 
     protected void SetupAssemblyResolver(string extensionAssembly)
     {
-        IList<string> resolutionPaths = string.IsNullOrEmpty(extensionAssembly) ? GetDefaultResolutionPaths() : TestPluginCache.GetResolutionPaths(extensionAssembly);
+        IList<string> resolutionPaths = string.IsNullOrEmpty(extensionAssembly) ? GetDefaultResolutionPaths() : GetResolutionPaths(extensionAssembly);
 
         // Add assembly resolver which can resolve the extensions from the specified directory.
         if (_assemblyResolver == null)

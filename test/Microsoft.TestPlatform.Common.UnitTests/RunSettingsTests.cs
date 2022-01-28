@@ -44,7 +44,7 @@ public class RunSettingsTests
     public void LoadSettingsXmlShoulLoadAndInitializeSettingsXml()
     {
         var runSettings = new RunSettings();
-        var emptyRunSettings = RunSettingsTests.GetEmptyRunSettings();
+        var emptyRunSettings = GetEmptyRunSettings();
 
         runSettings.LoadSettingsXml(emptyRunSettings);
 
@@ -61,7 +61,7 @@ public class RunSettingsTests
     public void LoadSettingsXmlShouldThrowOnInvalidSettings()
     {
         var runSettings = new RunSettings();
-        var invalidSettings = RunSettingsTests.GetInvalidRunSettings();
+        var invalidSettings = GetInvalidRunSettings();
 
         Assert.ThrowsException<SettingsException>(
             () => runSettings.LoadSettingsXml(invalidSettings),
@@ -84,7 +84,7 @@ public class RunSettingsTests
     {
         var runSettings = new RunSettings();
 
-        runSettings.InitializeSettingsProviders(RunSettingsTests.GetEmptyRunSettings());
+        runSettings.InitializeSettingsProviders(GetEmptyRunSettings());
 
         Assert.IsNull(runSettings.GetSettings("RunSettings"));
     }
@@ -95,7 +95,7 @@ public class RunSettingsTests
         TestPluginCacheHelper.SetupMockExtensions(typeof(RunSettingsTests));
 
         var runSettings = new RunSettings();
-        runSettings.InitializeSettingsProviders(RunSettingsTests.GetRunSettingsWithUndefinedSettingsNodes());
+        runSettings.InitializeSettingsProviders(GetRunSettingsWithUndefinedSettingsNodes());
 
         Action action =
             () => runSettings.GetSettings("OrphanNode");
@@ -112,7 +112,7 @@ public class RunSettingsTests
         TestPluginCacheHelper.SetupMockExtensions(typeof(RunSettingsTests));
 
         var runSettings = new RunSettings();
-        runSettings.InitializeSettingsProviders(RunSettingsTests.GetRunSettingsWithBadSettingsNodes());
+        runSettings.InitializeSettingsProviders(GetRunSettingsWithBadSettingsNodes());
 
         Action action =
             () => runSettings.GetSettings("BadSettings");
@@ -128,7 +128,7 @@ public class RunSettingsTests
     {
         var runSettings = new RunSettings();
         Assert.ThrowsException<SettingsException>(
-            () => runSettings.InitializeSettingsProviders(RunSettingsTests.GetInvalidRunSettings()),
+            () => runSettings.InitializeSettingsProviders(GetInvalidRunSettings()),
             "An error occurred while loading the run settings.");
     }
 
@@ -136,9 +136,9 @@ public class RunSettingsTests
     public void InitializeSettingsProvidersMultipleTimesShouldThrowInvalidOperationException()
     {
         var runSettings = new RunSettings();
-        runSettings.InitializeSettingsProviders(RunSettingsTests.GetEmptyRunSettings());
+        runSettings.InitializeSettingsProviders(GetEmptyRunSettings());
         Assert.ThrowsException<InvalidOperationException>(
-            () => runSettings.InitializeSettingsProviders(RunSettingsTests.GetEmptyRunSettings()),
+            () => runSettings.InitializeSettingsProviders(GetEmptyRunSettings()),
             "The Run Settings have already been loaded.");
     }
 
@@ -148,7 +148,7 @@ public class RunSettingsTests
         TestPluginCacheHelper.SetupMockExtensions(typeof(RunSettingsTests));
 
         var runSettings = new RunSettings();
-        runSettings.InitializeSettingsProviders(RunSettingsTests.GetRunSettingsWithRunConfigurationNode());
+        runSettings.InitializeSettingsProviders(GetRunSettingsWithRunConfigurationNode());
 
         var settingsProvider = runSettings.GetSettings("RunConfiguration");
 
@@ -167,7 +167,7 @@ public class RunSettingsTests
         TestPluginCacheHelper.SetupMockExtensions(typeof(RunSettingsTests));
 
         var runSettings = new RunSettings();
-        runSettings.InitializeSettingsProviders(RunSettingsTests.GetRunSettingsWithRunConfigurationAndMsTestNode());
+        runSettings.InitializeSettingsProviders(GetRunSettingsWithRunConfigurationAndMsTestNode());
 
         var rcSettingsProvider = runSettings.GetSettings("RunConfiguration");
         var mstestSettingsProvider = runSettings.GetSettings("MSTest");
@@ -194,7 +194,7 @@ public class RunSettingsTests
         TestSessionMessageLogger.Instance.TestRunMessage += (object sender, TestRunMessageEventArgs e) => receivedWarningMessage = e.Message;
 
         var runSettings = new RunSettings();
-        runSettings.InitializeSettingsProviders(RunSettingsTests.GetRunSettingsWithDuplicateSettingsNodes());
+        runSettings.InitializeSettingsProviders(GetRunSettingsWithDuplicateSettingsNodes());
 
         Assert.IsNotNull(receivedWarningMessage);
         Assert.AreEqual(

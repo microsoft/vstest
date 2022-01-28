@@ -70,7 +70,7 @@ public class EnvironmentArgumentProcessorTests
         executor.Initialize("VARIABLE=VALUE");
 
         // Assert
-        var result = EnvironmentArgumentProcessorTests.ParseSettingsXml(_settingsProvider);
+        var result = ParseSettingsXml(_settingsProvider);
         var environmentVariables = result.Variables;
         var inIsolation = result.InIsolation;
         var variables = environmentVariables?.Elements()?.ToArray();
@@ -99,7 +99,7 @@ public class EnvironmentArgumentProcessorTests
         executor3.Initialize("VARIABLE_THREE=VALUE WITH SPACE;AND SEMICOLON");
 
         // Assert
-        var result = EnvironmentArgumentProcessorTests.ParseSettingsXml(_settingsProvider);
+        var result = ParseSettingsXml(_settingsProvider);
         var environmentVariables = result.Variables;
         var inIsolation = result.InIsolation;
         var variables = environmentVariables?.Elements()?.ToArray();
@@ -132,7 +132,7 @@ public class EnvironmentArgumentProcessorTests
         executor.Initialize("VARIABLE=VALUE");
 
         // Assert
-        var result = EnvironmentArgumentProcessorTests.ParseSettingsXml(_settingsProvider);
+        var result = ParseSettingsXml(_settingsProvider);
         var environmentVariables = result.Variables;
         var inIsolation = result.InIsolation;
         var variables = environmentVariables?.Elements()?.ToArray();

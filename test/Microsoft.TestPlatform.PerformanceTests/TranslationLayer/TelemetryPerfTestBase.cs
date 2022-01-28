@@ -92,7 +92,7 @@ public class TelemetryPerfTestbase
         // Find the root
         var root = _currentDirectory.Parent.Parent.Parent;
         // Path to artifacts vstest.console
-        return Path.Combine(root.FullName, TelemetryPerfTestbase.BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
+        return Path.Combine(root.FullName, BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
     }
 
     /// <summary>

@@ -149,9 +149,9 @@ internal class TestLoggerManager : ITestLoggerManager
         EnableLogging();
 
         // Store test run directory. This runsettings is the final runsettings merging CLI args and runsettings.
-        _testRunDirectory = TestLoggerManager.GetResultsDirectory(runSettings);
-        _targetFramework = TestLoggerManager.GetTargetFramework(runSettings)?.Name;
-        _treatNoTestsAsError = TestLoggerManager.GetTreatNoTestsAsError(runSettings);
+        _testRunDirectory = GetResultsDirectory(runSettings);
+        _targetFramework = GetTargetFramework(runSettings)?.Name;
+        _treatNoTestsAsError = GetTreatNoTestsAsError(runSettings);
 
         var loggers = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettings);
 
@@ -163,7 +163,7 @@ internal class TestLoggerManager : ITestLoggerManager
                 continue;
             }
 
-            var parameters = TestLoggerManager.GetParametersFromConfigurationElement(logger.Configuration);
+            var parameters = GetParametersFromConfigurationElement(logger.Configuration);
             var loggerInitialized = false;
 
             // Try initializing logger by type.

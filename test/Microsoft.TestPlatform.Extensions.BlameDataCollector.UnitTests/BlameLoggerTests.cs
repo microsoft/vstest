@@ -119,7 +119,7 @@ public class BlameLoggerTests
 
         for (int i = 0; i < count; i++)
         {
-            attachmentSetList.Add(BlameLoggerTests.GetAttachmentSet());
+            attachmentSetList.Add(GetAttachmentSet());
         }
 
         // Initialize Blame Logger

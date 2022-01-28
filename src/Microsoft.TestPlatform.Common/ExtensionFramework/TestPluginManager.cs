@@ -132,7 +132,7 @@ internal class TestPluginManager
         out IEnumerable<LazyExtension<TExtension, IMetadata>> filtered) where TMetadata : IMetadata where TPluginInfo : TestPluginInformation
     {
         var extensions = TestPluginCache.Instance.DiscoverTestExtensions<TPluginInfo, TExtension>(endsWithPattern);
-        TestPluginManager.GetExtensions<TPluginInfo, TExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
+        GetExtensions<TPluginInfo, TExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
     }
 
     /// <summary>
@@ -169,7 +169,7 @@ internal class TestPluginManager
         bool skipCache = false) where TMetadata : IMetadata where TPluginInfo : TestPluginInformation
     {
         var extensions = TestPluginCache.Instance.GetTestExtensions<TPluginInfo, TExtension>(extensionAssembly, skipCache);
-        TestPluginManager.GetExtensions<TPluginInfo, TExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
+        GetExtensions<TPluginInfo, TExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
     }
 
     #endregion
@@ -225,7 +225,7 @@ internal class TestPluginManager
         var unfilteredExtensions = new List<LazyExtension<TExtension, Dictionary<string, object>>>();
         var filteredExtensions = new List<LazyExtension<TExtension, IMetadata>>();
 
-        var testPlugins = TestPluginManager.GetValuesFromDictionary(testPluginInfo);
+        var testPlugins = GetValuesFromDictionary(testPluginInfo);
         foreach (var plugin in testPlugins)
         {
             if (!string.IsNullOrEmpty(plugin.IdentifierData))

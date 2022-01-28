@@ -24,9 +24,9 @@ public class CommandLineUtilitiesTest
     [TestMethod]
     public void TestCommandLineSplitter()
     {
-        CommandLineUtilitiesTest.VerifyCommandLineSplitter("", new string[0]);
-        CommandLineUtilitiesTest.VerifyCommandLineSplitter("/testadapterpath:\"c:\\Path\"", new[] { @"/testadapterpath:c:\Path" });
-        CommandLineUtilitiesTest.VerifyCommandLineSplitter("/testadapterpath:\"c:\\Path\" /logger:\"trx\"", new[] { @"/testadapterpath:c:\Path", "/logger:trx" });
-        CommandLineUtilitiesTest.VerifyCommandLineSplitter("/testadapterpath:\"c:\\Path\" /logger:\"trx\" /diag:\"log.txt\"", new[] { @"/testadapterpath:c:\Path", "/logger:trx", "/diag:log.txt" });
+        VerifyCommandLineSplitter("", new string[0]);
+        VerifyCommandLineSplitter("/testadapterpath:\"c:\\Path\"", new[] { @"/testadapterpath:c:\Path" });
+        VerifyCommandLineSplitter("/testadapterpath:\"c:\\Path\" /logger:\"trx\"", new[] { @"/testadapterpath:c:\Path", "/logger:trx" });
+        VerifyCommandLineSplitter("/testadapterpath:\"c:\\Path\" /logger:\"trx\" /diag:\"log.txt\"", new[] { @"/testadapterpath:c:\Path", "/logger:trx", "/diag:log.txt" });
     }
 }

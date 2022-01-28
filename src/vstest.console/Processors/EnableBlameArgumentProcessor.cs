@@ -214,7 +214,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
         var settings = _runSettingsManager.ActiveRunSettings?.SettingsXml;
 
         // Get results directory from RunSettingsManager
-        var resultsDirectory = EnableBlameArgumentExecutor.GetResultsDirectory(settings);
+        var resultsDirectory = GetResultsDirectory(settings);
 
         // Get data collection run settings. Create if not present.
         var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings);
@@ -242,7 +242,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
                 dumpParameters.Add("DumpType", "Full");
             }
 
-            EnableBlameArgumentExecutor.AddCollectDumpNode(dumpParameters, xmlDocument, outernode);
+            AddCollectDumpNode(dumpParameters, xmlDocument, outernode);
         }
 
         // Add collect hang dump node in configuration element.
@@ -262,7 +262,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
                 hangDumpParameters.Add("HangDumpType", "Full");
             }
 
-            EnableBlameArgumentExecutor.AddCollectHangDumpNode(hangDumpParameters, xmlDocument, outernode);
+            AddCollectHangDumpNode(hangDumpParameters, xmlDocument, outernode);
         }
 
         // Add blame configuration element to blame collector.

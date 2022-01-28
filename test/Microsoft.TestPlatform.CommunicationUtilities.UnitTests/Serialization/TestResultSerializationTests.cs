@@ -177,7 +177,7 @@ public class TestResultSerializationTests
                    "{\"Key\":{\"Id\":\"TestResult.EndTime\",\"Label\":\"End Time\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.DateTimeOffset\"},\"Value\":\"0001-01-01T00:00:00+00:00\"}]}";
         _ = Deserialize<TestResult>(json, version);
 
-        TestResultSerializationTests.VerifyDummyPropertyIsRegistered();
+        VerifyDummyPropertyIsRegistered();
     }
 
     #endregion
@@ -269,7 +269,7 @@ public class TestResultSerializationTests
                    "\"Properties\":[{\"Key\":{\"Id\":\"DummyProperty\",\"Label\":\"DummyPropertyLabel\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.String\"},\"Value\":\"dummyString\"},]}";
         _ = Deserialize<TestResult>(json, version);
 
-        TestResultSerializationTests.VerifyDummyPropertyIsRegistered();
+        VerifyDummyPropertyIsRegistered();
     }
 
     #endregion

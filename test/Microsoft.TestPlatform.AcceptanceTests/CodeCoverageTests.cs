@@ -207,7 +207,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     private void CollectCodeCoverage(RunnerInfo runnerInfo, TestParameters testParameters)
     {
         using var tempDir = new TempDirectory();
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = CreateArguments(tempDir, runnerInfo, testParameters, out var trxFilePath);
 
@@ -218,7 +218,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             testParameters.ExpectedSkippedTests,
             testParameters.ExpectedFailedTests);
 
-        var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, tempDir.Path);
+        var actualCoverageFile = GetCoverageFileNameFromTrx(trxFilePath, tempDir.Path);
         Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {tempDir.Path} trxfile: {trxFilePath}");
         Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
 
@@ -235,13 +235,13 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             Assert.IsTrue(actualCoverageFile.EndsWith(".coverage", StringComparison.InvariantCultureIgnoreCase));
         }
 
-        var coverageDocument = CodeCoverageAcceptanceTestBase.GetXmlCoverage(actualCoverageFile, tempDir);
+        var coverageDocument = GetXmlCoverage(actualCoverageFile, tempDir);
         if (testParameters.CheckSkipped)
         {
-            CodeCoverageTests.AssertSkippedMethod(coverageDocument);
+            AssertSkippedMethod(coverageDocument);
         }
 
-        CodeCoverageTests.ValidateCoverageData(coverageDocument, testParameters.AssemblyName, testParameters.RunSettingsType != TestParameters.SettingsType.CoberturaOutput);
+        ValidateCoverageData(coverageDocument, testParameters.AssemblyName, testParameters.RunSettingsType != TestParameters.SettingsType.CoberturaOutput);
     }
 
     private string CreateArguments(
@@ -304,40 +304,40 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
     private static void AssertSkippedMethod(XmlDocument document)
     {
-        var module = CodeCoverageAcceptanceTestBase.GetModuleNode(document.DocumentElement, "codecoveragetest.dll");
+        var module = GetModuleNode(document.DocumentElement, "codecoveragetest.dll");
         Assert.IsNotNull(module);
 
         var coverage = double.Parse(module.Attributes["block_coverage"].Value);
         Assert.IsTrue(coverage > ExpectedMinimalModuleCoverage);
 
-        var testSignFunction = CodeCoverageAcceptanceTestBase.GetNode(module, "skipped_function", "TestSign()");
+        var testSignFunction = GetNode(module, "skipped_function", "TestSign()");
         Assert.IsNotNull(testSignFunction);
         Assert.AreEqual("name_excluded", testSignFunction.Attributes["reason"].Value);
 
-        var skippedTestMethod = CodeCoverageAcceptanceTestBase.GetNode(module, "skipped_function", "__CxxPureMSILEntry_Test()");
+        var skippedTestMethod = GetNode(module, "skipped_function", "__CxxPureMSILEntry_Test()");
         Assert.IsNotNull(skippedTestMethod);
         Assert.AreEqual("name_excluded", skippedTestMethod.Attributes["reason"].Value);
 
-        var testAbsFunction = CodeCoverageAcceptanceTestBase.GetNode(module, "function", "TestAbs()");
+        var testAbsFunction = GetNode(module, "function", "TestAbs()");
         Assert.IsNotNull(testAbsFunction);
     }
 
     private static void ValidateCoverageData(XmlDocument document, string moduleName, bool validateSourceFileNames)
     {
-        var module = CodeCoverageAcceptanceTestBase.GetModuleNode(document.DocumentElement, moduleName.ToLower());
+        var module = GetModuleNode(document.DocumentElement, moduleName.ToLower());
 
         if (module == null)
         {
-            module = CodeCoverageAcceptanceTestBase.GetModuleNode(document.DocumentElement, moduleName);
+            module = GetModuleNode(document.DocumentElement, moduleName);
         }
         Assert.IsNotNull(module);
 
-        CodeCoverageAcceptanceTestBase.AssertCoverage(module, ExpectedMinimalModuleCoverage);
+        AssertCoverage(module, ExpectedMinimalModuleCoverage);
 
         // In case of cobertura report. Cobertura report has different format.
         if (validateSourceFileNames)
         {
-            CodeCoverageTests.AssertSourceFileName(module);
+            AssertSourceFileName(module);
         }
     }
 

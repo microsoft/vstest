@@ -437,7 +437,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
     private IList<string> GetTestAssemblies()
     {
-        return CodeCoverageTests.GetProjects().Select(p => GetAssetFullPath(p)).ToList();
+        return GetProjects().Select(p => GetAssetFullPath(p)).ToList();
     }
 
     private static IList<string> GetProjects()
@@ -455,7 +455,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
                                     <RunSettings>
                                         <RunConfiguration>
                                             <TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion>
-                                            <TestAdaptersPaths>{CodeCoverageAcceptanceTestBase.GetNetStandardAdapterPath()}</TestAdaptersPaths>
+                                            <TestAdaptersPaths>{GetNetStandardAdapterPath()}</TestAdaptersPaths>
                                             <MaxCpuCount>{cpuCount}</MaxCpuCount>
                                         </RunConfiguration>
                                         <DataCollectionRunSettings>
@@ -490,12 +490,12 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     {
         if (attachments.Count == 1)
         {
-            var xmlCoverage = CodeCoverageAcceptanceTestBase.GetXmlCoverage(attachments.First().Attachments.First().Uri.LocalPath, _tempDirectory);
+            var xmlCoverage = GetXmlCoverage(attachments.First().Attachments.First().Uri.LocalPath, _tempDirectory);
 
-            foreach (var project in CodeCoverageTests.GetProjects())
+            foreach (var project in GetProjects())
             {
-                var moduleNode = CodeCoverageAcceptanceTestBase.GetModuleNode(xmlCoverage.DocumentElement, project.ToLower());
-                CodeCoverageAcceptanceTestBase.AssertCoverage(moduleNode, ExpectedMinimalModuleCoverage);
+                var moduleNode = GetModuleNode(xmlCoverage.DocumentElement, project.ToLower());
+                AssertCoverage(moduleNode, ExpectedMinimalModuleCoverage);
             }
         }
     }

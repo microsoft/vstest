@@ -32,20 +32,20 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
 
     protected static string GetCodeCoverageExePath()
     {
-        return Path.Combine(CodeCoverageAcceptanceTestBase.GetNetStandardAdapterPath(), "CodeCoverage", "CodeCoverage.exe");
+        return Path.Combine(GetNetStandardAdapterPath(), "CodeCoverage", "CodeCoverage.exe");
     }
 
     protected static XmlNode GetModuleNode(XmlNode node, string name)
     {
-        var moduleNode = CodeCoverageAcceptanceTestBase.GetNode(node, "module", name);
+        var moduleNode = GetNode(node, "module", name);
 
         if (moduleNode == null)
         {
-            moduleNode = CodeCoverageAcceptanceTestBase.GetNode(node, "package", name);
+            moduleNode = GetNode(node, "package", name);
 
             if (moduleNode == null)
             {
-                moduleNode = CodeCoverageAcceptanceTestBase.GetNode(node, "package", Path.GetFileNameWithoutExtension(name));
+                moduleNode = GetNode(node, "package", Path.GetFileNameWithoutExtension(name));
             }
         }
 
@@ -67,7 +67,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
             return coverage;
         }
 
-        var codeCoverageExe = CodeCoverageAcceptanceTestBase.GetCodeCoverageExePath();
+        var codeCoverageExe = GetCodeCoverageExePath();
         var output = Path.Combine(tempDirectory.Path, Guid.NewGuid().ToString() + ".xml");
 
         var watch = new Stopwatch();

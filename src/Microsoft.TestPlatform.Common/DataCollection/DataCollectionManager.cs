@@ -252,7 +252,7 @@ internal class DataCollectionManager : IDataCollectionManager
 
         if (EqtTrace.IsVerboseEnabled)
         {
-            DataCollectionManager.LogAttachments(result);
+            LogAttachments(result);
         }
 
         return new Collection<AttachmentSet>(result);
@@ -346,7 +346,7 @@ internal class DataCollectionManager : IDataCollectionManager
 
         if (EqtTrace.IsVerboseEnabled)
         {
-            DataCollectionManager.LogAttachments(result);
+            LogAttachments(result);
         }
 
         return new Collection<AttachmentSet>(result);

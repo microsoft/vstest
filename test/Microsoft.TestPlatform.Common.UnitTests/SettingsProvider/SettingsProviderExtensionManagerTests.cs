@@ -33,7 +33,7 @@ public class SettingsProviderExtensionManagerTests
     [TestMethod]
     public void ConstructorShouldPopulateSettingsProviderMap()
     {
-        var extensions = SettingsProviderExtensionManagerTests.GetMockExtensions("TestableSettings");
+        var extensions = GetMockExtensions("TestableSettings");
         var unfilteredExtensions = new List<LazyExtension<ISettingsProvider, Dictionary<string, object>>>
         {
             new LazyExtension<ISettingsProvider,Dictionary<string,object>>
@@ -50,7 +50,7 @@ public class SettingsProviderExtensionManagerTests
     [TestMethod]
     public void ConstructorShouldLogWarningOnDuplicateSettingsProviderNames()
     {
-        var extensions = SettingsProviderExtensionManagerTests.GetMockExtensions("TestableSettings", "TestableSettings");
+        var extensions = GetMockExtensions("TestableSettings", "TestableSettings");
         var unfilteredExtensions = new List<LazyExtension<ISettingsProvider, Dictionary<string, object>>>
         {
             new LazyExtension<ISettingsProvider,Dictionary<string,object>>
@@ -125,7 +125,7 @@ public class SettingsProviderExtensionManagerTests
     [TestMethod]
     public void GetSettingsProviderShouldThrowIfSettingsNameIsNullOrEmpty()
     {
-        var extensions = SettingsProviderExtensionManagerTests.GetMockExtensions("TestableSettings");
+        var extensions = GetMockExtensions("TestableSettings");
         var unfilteredExtensions = new List<LazyExtension<ISettingsProvider, Dictionary<string, object>>>
         {
             new LazyExtension<ISettingsProvider,Dictionary<string,object>>
@@ -142,7 +142,7 @@ public class SettingsProviderExtensionManagerTests
     [TestMethod]
     public void GetSettingsProviderShouldReturnNullIfSettingsProviderWithSpecifiedNameIsNotFound()
     {
-        var extensions = SettingsProviderExtensionManagerTests.GetMockExtensions("TestableSettings");
+        var extensions = GetMockExtensions("TestableSettings");
         var unfilteredExtensions = new List<LazyExtension<ISettingsProvider, Dictionary<string, object>>>
         {
             new LazyExtension<ISettingsProvider,Dictionary<string,object>>
@@ -160,7 +160,7 @@ public class SettingsProviderExtensionManagerTests
     [TestMethod]
     public void GetSettingsProviderShouldReturnSettingsProviderInstance()
     {
-        var extensions = SettingsProviderExtensionManagerTests.GetMockExtensions("TestableSettings");
+        var extensions = GetMockExtensions("TestableSettings");
         var unfilteredExtensions = new List<LazyExtension<ISettingsProvider, Dictionary<string, object>>>
         {
             new LazyExtension<ISettingsProvider,Dictionary<string,object>>

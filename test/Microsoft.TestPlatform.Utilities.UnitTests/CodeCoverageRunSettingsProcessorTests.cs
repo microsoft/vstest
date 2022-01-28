@@ -25,7 +25,7 @@ public class CodeCoverageRunSettingsProcessorTests
     #region Constructors
     public CodeCoverageRunSettingsProcessorTests()
     {
-        _defaultSettings = CodeCoverageRunSettingsProcessorTests.GetDefaultConfiguration();
+        _defaultSettings = GetDefaultConfiguration();
         _processor = new CodeCoverageRunSettingsProcessor(_defaultSettings);
     }
     #endregion
@@ -58,12 +58,12 @@ public class CodeCoverageRunSettingsProcessorTests
         var processedNode = _processor.Process(settings);
         Assert.IsNotNull(processedNode);
 
-        var codeCoverageNodes = CodeCoverageRunSettingsProcessorTests.ExtractNodes(processedNode, _defaultSettings, "./CodeCoverage");
+        var codeCoverageNodes = ExtractNodes(processedNode, _defaultSettings, "./CodeCoverage");
 
-        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./ModulePaths/Exclude");
-        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Functions/Exclude");
-        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Attributes/Exclude");
-        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Sources/Exclude");
+        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./ModulePaths/Exclude");
+        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Functions/Exclude");
+        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Attributes/Exclude");
+        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Sources/Exclude");
     }
 
     [TestMethod]
@@ -207,12 +207,12 @@ public class CodeCoverageRunSettingsProcessorTests
         var processedNode = _processor.Process(settings);
         Assert.IsNotNull(processedNode);
 
-        var codeCoverageNodes = CodeCoverageRunSettingsProcessorTests.ExtractNodes(processedNode, expectedResultDocument.DocumentElement, "./CodeCoverage");
+        var codeCoverageNodes = ExtractNodes(processedNode, expectedResultDocument.DocumentElement, "./CodeCoverage");
 
-        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./ModulePaths/Exclude");
-        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Functions/Exclude");
-        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Attributes/Exclude");
-        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Sources/Exclude");
+        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./ModulePaths/Exclude");
+        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Functions/Exclude");
+        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Attributes/Exclude");
+        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Sources/Exclude");
     }
     #endregion
 
@@ -245,8 +245,8 @@ public class CodeCoverageRunSettingsProcessorTests
 
     private static Tuple<XmlNode, XmlNode> ExtractNodes(XmlNode currentSettingsRoot, XmlNode defaultSettingsRoot, string path)
     {
-        var currentNode = CodeCoverageRunSettingsProcessorTests.ExtractNode(currentSettingsRoot, path);
-        var defaultNode = CodeCoverageRunSettingsProcessorTests.ExtractNode(defaultSettingsRoot, path);
+        var currentNode = ExtractNode(currentSettingsRoot, path);
+        var defaultNode = ExtractNode(defaultSettingsRoot, path);
         Assert.IsNotNull(currentNode);
         Assert.IsNotNull(defaultNode);
 
@@ -255,7 +255,7 @@ public class CodeCoverageRunSettingsProcessorTests
 
     private static void CompareResults(XmlNode currentSettingsRoot, XmlNode defaultSettingsRoot, string path)
     {
-        var nodes = CodeCoverageRunSettingsProcessorTests.ExtractNodes(currentSettingsRoot, defaultSettingsRoot, path);
+        var nodes = ExtractNodes(currentSettingsRoot, defaultSettingsRoot, path);
 
         Assert.AreEqual(nodes.Item1.ChildNodes.Count, nodes.Item2.ChildNodes.Count);
 

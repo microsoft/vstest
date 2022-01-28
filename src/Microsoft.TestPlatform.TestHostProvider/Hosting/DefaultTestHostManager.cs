@@ -221,7 +221,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             List<string> actualSources = new();
             foreach (var uwpSource in uwpSources)
             {
-                actualSources.Add(Path.Combine(Path.GetDirectoryName(uwpSource), DefaultTestHostManager.GetUwpSources(uwpSource)));
+                actualSources.Add(Path.Combine(Path.GetDirectoryName(uwpSource), GetUwpSources(uwpSource)));
             }
 
             return actualSources;

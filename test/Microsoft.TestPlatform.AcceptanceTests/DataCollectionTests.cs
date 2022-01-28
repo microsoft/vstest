@@ -24,11 +24,11 @@ public class DataCollectionTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void ExecuteTestsWithDataCollection(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-        string runSettings = DataCollectionTests.GetRunsettingsFilePath(tempDir.Path);
+        string runSettings = GetRunsettingsFilePath(tempDir.Path);
         string diagFileName = Path.Combine(tempDir.Path, "diaglog.txt");
         var extensionsPath = Path.Combine(
             _testEnvironment.TestAssetsPath,
@@ -118,7 +118,7 @@ public class DataCollectionTests : AcceptanceTestBase
         using var tempDir = new TempDirectory();
         var assemblyPath = BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
         var secondAssemblyPath = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-        string runSettings = DataCollectionTests.GetRunsettingsFilePath(tempDir.Path);
+        string runSettings = GetRunsettingsFilePath(tempDir.Path);
         string diagFileName = Path.Combine(tempDir.Path, "diaglog.txt");
         var extensionsPath = Path.Combine(
             _testEnvironment.TestAssetsPath,

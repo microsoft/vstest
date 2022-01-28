@@ -19,7 +19,7 @@ public class LoggerTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void TrxLoggerWithFriendlyNameShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
@@ -33,7 +33,7 @@ public class LoggerTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var trxFilePath = Path.Combine(tempDir.Path, trxFileName);
-        Assert.IsTrue(LoggerTests.IsValidXml(trxFilePath), "Invalid content in Trx log file");
+        Assert.IsTrue(IsValidXml(trxFilePath), "Invalid content in Trx log file");
     }
 
     [TestMethod]
@@ -41,7 +41,7 @@ public class LoggerTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void HtmlLoggerWithFriendlyNameShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
@@ -55,14 +55,14 @@ public class LoggerTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var htmlLogFilePath = Path.Combine(tempDir.Path, htmlFileName);
-        LoggerTests.IsFileAndContentEqual(htmlLogFilePath);
+        IsFileAndContentEqual(htmlLogFilePath);
     }
 
     [TestMethod]
     [NetCoreTargetFrameworkDataSource]
     public void TrxLoggerWithExecutorUriShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
@@ -76,7 +76,7 @@ public class LoggerTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var trxLogFilePath = Path.Combine(tempDir.Path, trxFileName);
-        Assert.IsTrue(LoggerTests.IsValidXml(trxLogFilePath), "Invalid content in Trx log file");
+        Assert.IsTrue(IsValidXml(trxLogFilePath), "Invalid content in Trx log file");
     }
 
     [TestMethod]
@@ -84,7 +84,7 @@ public class LoggerTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void TrxLoggerWithLogFilePrefixShouldGenerateMultipleTrx(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
         var trxFileNamePattern = "TestResults";
 
@@ -105,7 +105,7 @@ public class LoggerTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void HtmlLoggerWithExecutorUriShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
@@ -119,7 +119,7 @@ public class LoggerTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var htmlLogFilePath = Path.Combine(tempDir.Path, htmlFileName);
-        LoggerTests.IsFileAndContentEqual(htmlLogFilePath);
+        IsFileAndContentEqual(htmlLogFilePath);
     }
 
     [TestMethod]

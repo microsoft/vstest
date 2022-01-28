@@ -27,7 +27,7 @@ public class XmlUtilitiesTests
     public void GetNodeXmlShouldThrowIfXPathIsNull()
     {
         var settingsXml = @"<RunSettings></RunSettings>";
-        var xmlDocument = XmlUtilitiesTests.GetXmlDocument(settingsXml);
+        var xmlDocument = GetXmlDocument(settingsXml);
 
         Assert.ThrowsException<XPathException>(() => XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator(), null));
     }
@@ -36,7 +36,7 @@ public class XmlUtilitiesTests
     public void GetNodeXmlShouldThrowIfXPathIsInvalid()
     {
         var settingsXml = @"<RunSettings></RunSettings>";
-        var xmlDocument = XmlUtilitiesTests.GetXmlDocument(settingsXml);
+        var xmlDocument = GetXmlDocument(settingsXml);
 
         Assert.ThrowsException<XPathException>(() => XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator(), @"Rs\r"));
     }
@@ -45,7 +45,7 @@ public class XmlUtilitiesTests
     public void GetNodeXmlShouldReturnNullIfNodeDoesNotExist()
     {
         var settingsXml = @"<RunSettings></RunSettings>";
-        var xmlDocument = XmlUtilitiesTests.GetXmlDocument(settingsXml);
+        var xmlDocument = GetXmlDocument(settingsXml);
 
         Assert.IsNull(XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator(), @"/RunSettings/RunConfiguration"));
     }
@@ -54,7 +54,7 @@ public class XmlUtilitiesTests
     public void GetNodeXmlShouldReturnNodeValue()
     {
         var settingsXml = @"<RunSettings><RC>abc</RC></RunSettings>";
-        var xmlDocument = XmlUtilitiesTests.GetXmlDocument(settingsXml);
+        var xmlDocument = GetXmlDocument(settingsXml);
 
         Assert.AreEqual("abc", XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator(), @"/RunSettings/RC"));
     }
@@ -99,7 +99,7 @@ public class XmlUtilitiesTests
     public void AppendOrModifyChildShouldModifyExistingNode()
     {
         var settingsXml = @"<RunSettings><RC>abc</RC></RunSettings>";
-        var xmlDocument = XmlUtilitiesTests.GetXmlDocument(settingsXml);
+        var xmlDocument = GetXmlDocument(settingsXml);
 
         XmlUtilities.AppendOrModifyChild(xmlDocument, @"/RunSettings/RC", "RC", "ab");
 
@@ -112,7 +112,7 @@ public class XmlUtilitiesTests
     public void AppendOrModifyChildShouldAppendANewNode()
     {
         var settingsXml = @"<RunSettings></RunSettings>";
-        var xmlDocument = XmlUtilitiesTests.GetXmlDocument(settingsXml);
+        var xmlDocument = GetXmlDocument(settingsXml);
 
         XmlUtilities.AppendOrModifyChild(xmlDocument, @"/RunSettings/RC", "RC", "abc");
 
@@ -125,7 +125,7 @@ public class XmlUtilitiesTests
     public void AppendOrModifyChildShouldNotModifyExistingXmlIfInnerXmlPassedInIsNull()
     {
         var settingsXml = @"<RunSettings><RC>abc</RC></RunSettings>";
-        var xmlDocument = XmlUtilitiesTests.GetXmlDocument(settingsXml);
+        var xmlDocument = GetXmlDocument(settingsXml);
 
         XmlUtilities.AppendOrModifyChild(xmlDocument, @"/RunSettings/RC", "RC", null);
 
@@ -138,7 +138,7 @@ public class XmlUtilitiesTests
     public void AppendOrModifyChildShouldCreateAnEmptyNewNodeIfInnerXmlPassedInIsNull()
     {
         var settingsXml = @"<RunSettings></RunSettings>";
-        var xmlDocument = XmlUtilitiesTests.GetXmlDocument(settingsXml);
+        var xmlDocument = GetXmlDocument(settingsXml);
 
         XmlUtilities.AppendOrModifyChild(xmlDocument, @"/RunSettings/RC", "RC", null);
 
@@ -151,7 +151,7 @@ public class XmlUtilitiesTests
     public void AppendOrModifyChildShouldNotModifyIfParentNodeDoesNotExist()
     {
         var settingsXml = @"<RunSettings></RunSettings>";
-        var xmlDocument = XmlUtilitiesTests.GetXmlDocument(settingsXml);
+        var xmlDocument = GetXmlDocument(settingsXml);
 
         XmlUtilities.AppendOrModifyChild(xmlDocument, @"/RunSettings/RC/RD", "RD", null);
 
@@ -162,7 +162,7 @@ public class XmlUtilitiesTests
     public void AppendOrModifyChildShouldAppendANewNodeWithEscapingSpecialChars()
     {
         var settingsXml = @"<RunSettings></RunSettings>";
-        var xmlDocument = XmlUtilitiesTests.GetXmlDocument(settingsXml);
+        var xmlDocument = GetXmlDocument(settingsXml);
 
         XmlUtilities.AppendOrModifyChild(xmlDocument, @"/RunSettings/RC", "RC", "a&b<c>d\"e'f");
 
@@ -180,7 +180,7 @@ public class XmlUtilitiesTests
     public void RemoveChildNodeShouldNotModifyExistingXmlIfNodeDoesnotExist()
     {
         var settingsXml = @"<RunSettings></RunSettings>";
-        var xmlDocument = XmlUtilitiesTests.GetXmlDocument(settingsXml);
+        var xmlDocument = GetXmlDocument(settingsXml);
 
         XmlUtilities.RemoveChildNode(xmlDocument.CreateNavigator(), @"/RunSettings/RC", "RC");
 
@@ -191,7 +191,7 @@ public class XmlUtilitiesTests
     public void RemoveChildNodeShouldRemoveXmlIfExist()
     {
         var settingsXml = @"<RunSettings><RC>abc</RC></RunSettings>";
-        var xmlDocument = XmlUtilitiesTests.GetXmlDocument(settingsXml);
+        var xmlDocument = GetXmlDocument(settingsXml);
         var navigator = xmlDocument.CreateNavigator();
         navigator.MoveToChild("RunSettings", string.Empty);
         XmlUtilities.RemoveChildNode(navigator, @"/RunSettings/RC", "RC");

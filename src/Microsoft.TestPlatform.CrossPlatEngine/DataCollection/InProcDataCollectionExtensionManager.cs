@@ -127,7 +127,7 @@ internal class InProcDataCollectionExtensionManager
     /// </param>
     private void TriggerTestSessionStart(object sender, SessionStartEventArgs e)
     {
-        TestSessionStartArgs testSessionStartArgs = new(InProcDataCollectionExtensionManager.GetSessionStartProperties(e));
+        TestSessionStartArgs testSessionStartArgs = new(GetSessionStartProperties(e));
         TriggerInProcDataCollectionMethods(Constants.TestSessionStartMethodName, testSessionStartArgs);
     }
 

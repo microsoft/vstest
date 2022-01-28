@@ -29,7 +29,7 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
         {
             FileExtensions = GetFileExtensions(testDiscovererType);
             DefaultExecutorUri = GetDefaultExecutorUri(testDiscovererType);
-            AssemblyType = TestDiscovererPluginInformation.GetAssemblyType(testDiscovererType);
+            AssemblyType = GetAssemblyType(testDiscovererType);
         }
     }
 

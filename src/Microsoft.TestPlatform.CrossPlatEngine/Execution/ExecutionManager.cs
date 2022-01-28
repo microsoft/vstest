@@ -71,7 +71,7 @@ public class ExecutionManager : IExecutionManager
             TestPluginCache.Instance.DefaultExtensionPaths = pathToAdditionalExtensions;
         }
 
-        ExecutionManager.LoadExtensions();
+        LoadExtensions();
 
         //unsubscribe session logger
         _sessionMessageLogger.TestRunMessage -= TestSessionMessageHandler;
@@ -98,7 +98,7 @@ public class ExecutionManager : IExecutionManager
     {
         try
         {
-            ExecutionManager.InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap));
+            InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap));
 
             _activeTestRun = new RunTestsWithSources(_requestData, adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
@@ -134,7 +134,7 @@ public class ExecutionManager : IExecutionManager
     {
         try
         {
-            ExecutionManager.InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(tests));
+            InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(tests));
 
             _activeTestRun = new RunTestsWithTests(_requestData, tests, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 

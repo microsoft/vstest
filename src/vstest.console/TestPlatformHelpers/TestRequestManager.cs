@@ -190,7 +190,7 @@ internal class TestRequestManager : ITestRequestManager
         if (requestData.IsTelemetryOptedIn)
         {
             // Collect metrics.
-            TestRequestManager.CollectMetrics(requestData, runConfiguration);
+            CollectMetrics(requestData, runConfiguration);
 
             // Collect commands.
             LogCommandsTelemetryPoints(requestData);
@@ -268,7 +268,7 @@ internal class TestRequestManager : ITestRequestManager
         var requestData = GetRequestData(protocolConfig);
 
         // Get sources to auto detect fx and arch for both run selected or run all scenario.
-        var sources = TestRequestManager.GetSources(testRunRequestPayload);
+        var sources = GetSources(testRunRequestPayload);
 
         if (UpdateRunSettingsIfRequired(
                 runsettings,
@@ -293,13 +293,13 @@ internal class TestRequestManager : ITestRequestManager
         if (requestData.IsTelemetryOptedIn)
         {
             // Collect metrics.
-            TestRequestManager.CollectMetrics(requestData, runConfiguration);
+            CollectMetrics(requestData, runConfiguration);
 
             // Collect commands.
             LogCommandsTelemetryPoints(requestData);
 
             // Collect data for legacy settings.
-            TestRequestManager.LogTelemetryForLegacySettings(requestData, runsettings);
+            LogTelemetryForLegacySettings(requestData, runsettings);
         }
 
         // Get Fakes data collector settings.
@@ -634,7 +634,7 @@ internal class TestRequestManager : ITestRequestManager
                 sourcePlatforms,
                 defaultArchitecture,
                 out Architecture chosenPlatform);
-            TestRequestManager.CheckSourcesForCompatibility(
+            CheckSourcesForCompatibility(
                 chosenFramework,
                 chosenPlatform,
                 defaultArchitecture,
@@ -643,7 +643,7 @@ internal class TestRequestManager : ITestRequestManager
                 registrar);
             settingsUpdated |= UpdateDesignMode(document, runConfiguration);
             settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
-            settingsUpdated |= TestRequestManager.UpdateTargetDevice(navigator, document, runConfiguration);
+            settingsUpdated |= UpdateTargetDevice(navigator, document, runConfiguration);
             settingsUpdated |= AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
 
             updatedRunSettingsXml = navigator.OuterXml;
@@ -679,7 +679,7 @@ internal class TestRequestManager : ITestRequestManager
         LoggerRunSettings loggerRunSettings)
     {
         // Update console logger settings.
-        bool consoleLoggerUpdated = TestRequestManager.UpdateConsoleLoggerIfExists(document, loggerRunSettings);
+        bool consoleLoggerUpdated = UpdateConsoleLoggerIfExists(document, loggerRunSettings);
 
         // In case of CLI, add console logger if not already present.
         bool designMode = runConfiguration.DesignModeSet
@@ -687,7 +687,7 @@ internal class TestRequestManager : ITestRequestManager
             : _commandLineOptions.IsDesignMode;
         if (!designMode && !consoleLoggerUpdated)
         {
-            TestRequestManager.AddConsoleLogger(document, loggerRunSettings);
+            AddConsoleLogger(document, loggerRunSettings);
         }
 
         // Update is required:

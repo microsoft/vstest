@@ -253,7 +253,7 @@ internal class XmlPersistence
             }
 
             XmlNode xmlNode = EnsureLocationExists(parentXml, location, nameSpaceUri);
-            XmlPersistence.SaveObject(objectToSave, xmlNode, parameters);
+            SaveObject(objectToSave, xmlNode, parameters);
 
             if (xmlNode is XmlElement element &&
                 !element.HasAttributes &&
@@ -279,7 +279,7 @@ internal class XmlPersistence
     /// </param>
     public static void SaveObject(object objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters parameters)
     {
-        XmlPersistence.SaveObject(objectToSave, nodeToSaveAt, parameters, null);
+        SaveObject(objectToSave, nodeToSaveAt, parameters, null);
     }
 
     /// <summary>
@@ -307,7 +307,7 @@ internal class XmlPersistence
             }
             else
             {
-                XmlPersistence.SaveSimpleData(objectToSave, nodeToSaveAt, defaultValue);
+                SaveSimpleData(objectToSave, nodeToSaveAt, defaultValue);
             }
         }
     }
@@ -335,7 +335,7 @@ internal class XmlPersistence
         }
 
         XmlNode saveTarget = EnsureLocationExists(xml, location);
-        XmlPersistence.SaveSimpleData(value, saveTarget, defaultValue);
+        SaveSimpleData(value, saveTarget, defaultValue);
     }
 
     /// <summary>

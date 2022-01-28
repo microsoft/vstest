@@ -19,7 +19,7 @@ public class MetadataReaderHelperTests
     [TestMethod]
     public void MetadataReaderHelper_GetCollectorExtensionTypes()
     {
-        string testAssetsPath = MetadataReaderHelperTests.GetTestAssetsFolder();
+        string testAssetsPath = GetTestAssetsFolder();
         var dataCollectorFilePath = Directory.GetFiles(testAssetsPath, "AttachmentProcessorDataCollector.dll", SearchOption.AllDirectories).Where(x => x.Contains("bin")).Single();
         var types = MetadataReaderExtensionsHelper.DiscoverTestExtensionTypesV2Attribute(Assembly.LoadFile(dataCollectorFilePath), dataCollectorFilePath);
         Assert.IsTrue(types.Any(), $"File {dataCollectorFilePath}");

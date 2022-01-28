@@ -40,7 +40,7 @@ public class ExceptionUtilitiesTests
     [TestMethod]
     public void GetExceptionMessageShouldReturnExceptionMessageContainingStackTrace()
     {
-        var message = ExceptionUtilities.GetExceptionMessage(ExceptionUtilitiesTests.GetExceptionWithStackTrace());
+        var message = ExceptionUtilities.GetExceptionMessage(GetExceptionWithStackTrace());
         StringAssert.Contains(message, "Stack trace:");
         // this test is where it or
         StringAssert.Contains(message, "ExceptionUtilitiesTests.GetExceptionWithStackTrace");

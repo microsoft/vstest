@@ -105,7 +105,7 @@ internal class TestPlatform : ITestPlatform
         loggerManager.Initialize(discoveryCriteria.RunSettings);
 
         var testHostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
-        TestPlatform.ThrowExceptionIfTestHostManagerIsNull(testHostManager, discoveryCriteria.RunSettings);
+        ThrowExceptionIfTestHostManagerIsNull(testHostManager, discoveryCriteria.RunSettings);
 
         testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
@@ -141,7 +141,7 @@ internal class TestPlatform : ITestPlatform
         loggerManager.Initialize(testRunCriteria.TestRunSettings);
 
         var testHostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
-        TestPlatform.ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
+        ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
 
         testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
 

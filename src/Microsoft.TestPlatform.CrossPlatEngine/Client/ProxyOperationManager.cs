@@ -193,7 +193,7 @@ public class ProxyOperationManager
             Port = portNumber,
             ConnectionInfo = testHostConnectionInfo,
             RunnerProcessId = processId,
-            LogFile = ProxyOperationManager.GetTimestampedLogFile(EqtTrace.LogFile),
+            LogFile = GetTimestampedLogFile(EqtTrace.LogFile),
             TraceLevel = (int)EqtTrace.TraceLevel
         };
 

@@ -76,7 +76,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     {
         Debug.Assert(element != null, "element is null");
 
-        TestId.GetIdLocation(parameters, out string idLocation);
+        GetIdLocation(parameters, out string idLocation);
 
         XmlPersistence helper = new();
         helper.SaveGuid(element, idLocation, Id);

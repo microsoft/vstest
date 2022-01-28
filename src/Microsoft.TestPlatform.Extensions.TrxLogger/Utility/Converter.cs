@@ -54,11 +54,11 @@ internal class Converter
         TestType testType,
         TestCase rockSteadyTestCase)
     {
-        var testElement = Converter.CreateTestElement(testId, testName, rockSteadyTestCase.FullyQualifiedName, rockSteadyTestCase.ExecutorUri.ToString(), rockSteadyTestCase.Source, testType);
+        var testElement = CreateTestElement(testId, testName, rockSteadyTestCase.FullyQualifiedName, rockSteadyTestCase.ExecutorUri.ToString(), rockSteadyTestCase.Source, testType);
 
         testElement.Storage = rockSteadyTestCase.Source;
-        testElement.Priority = Converter.GetPriority(rockSteadyTestCase);
-        testElement.Owner = Converter.GetOwner(rockSteadyTestCase);
+        testElement.Priority = GetPriority(rockSteadyTestCase);
+        testElement.Owner = GetOwner(rockSteadyTestCase);
         testElement.ExecutionId = new TestExecId(executionId);
         testElement.ParentExecutionId = new TestExecId(parentExecutionId);
 
@@ -124,7 +124,7 @@ internal class Converter
 
         // Clear existing messages and store rocksteady result messages.
         testResult.TextMessages = null;
-        Converter.UpdateResultMessages(testResult, rockSteadyTestResult);
+        UpdateResultMessages(testResult, rockSteadyTestResult);
 
         // Save result attachments to target location.
         UpdateTestResultAttachments(rockSteadyTestResult, testResult, testRun, trxFileDirectory, true);
@@ -688,7 +688,7 @@ internal class Converter
         else
         {
             var codeBase = source;
-            var className = Converter.GetTestClassName(name, fullyQualifiedName, source);
+            var className = GetTestClassName(name, fullyQualifiedName, source);
             var testMethodName = fullyQualifiedName.StartsWith($"{className}.") ? fullyQualifiedName.Remove(0, $"{className}.".Length) : fullyQualifiedName;
             var testMethod = new TestMethod(testMethodName, className);
 

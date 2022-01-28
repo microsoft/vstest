@@ -264,9 +264,9 @@ internal abstract class BaseRunTests
             return;
         }
 
-        if (NotRequiredStaThread() || !TryToRunInStaThread(() => BaseRunTests.CancelTestRunInternal(_activeExecutor), false))
+        if (NotRequiredStaThread() || !TryToRunInStaThread(() => CancelTestRunInternal(_activeExecutor), false))
         {
-            Task.Run(() => BaseRunTests.CancelTestRunInternal(_activeExecutor));
+            Task.Run(() => CancelTestRunInternal(_activeExecutor));
         }
     }
 
@@ -358,7 +358,7 @@ internal abstract class BaseRunTests
         var executorUriExtensionMap = GetExecutorUriExtensionMap(FrameworkHandle, RunContext);
 
         // Set on the logger the TreatAdapterErrorAsWarning setting from runsettings.
-        BaseRunTests.SetAdapterLoggingSettings();
+        SetAdapterLoggingSettings();
 
         var stopwatch = new Stopwatch();
         stopwatch.Start();
@@ -389,7 +389,7 @@ internal abstract class BaseRunTests
             }
 
             // Get the extension manager.
-            var extensionManager = BaseRunTests.GetExecutorExtensionManager(executorUriExtensionTuple.Item2);
+            var extensionManager = GetExecutorExtensionManager(executorUriExtensionTuple.Item2);
 
             // Look up the executor.
             var executor = extensionManager.TryGetTestExtension(executorUriExtensionTuple.Item1);

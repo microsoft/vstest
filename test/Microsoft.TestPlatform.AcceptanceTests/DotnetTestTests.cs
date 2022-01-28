@@ -66,7 +66,7 @@ public class DotnetTestTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void PassInlineSettingsToDll(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPath = BuildMultipleAssemblyPath("ParametrizedTestProject.dll").Trim('\"');
         InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name=\""weburl\"", value=\""http://localhost//def\"")");

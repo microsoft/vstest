@@ -26,7 +26,7 @@ public class TextFileTelemetryPublisher : IMetricsPublisher
     public void PublishMetrics(string eventName, IDictionary<string, object> metrics)
     {
         // Log to Text File
-        TextFileTelemetryPublisher.LogToFile(eventName, metrics, new FileHelper());
+        LogToFile(eventName, metrics, new FileHelper());
     }
 
     /// <summary>

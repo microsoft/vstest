@@ -31,7 +31,7 @@ public sealed class SocketTransport : ITransport
     /// <inheritdoc/>
     public IPEndPoint Initialize()
     {
-        var endpoint = SocketTransport.GetIpEndPoint(_connectionInfo.Endpoint);
+        var endpoint = GetIpEndPoint(_connectionInfo.Endpoint);
         switch (_connectionInfo.Role)
         {
             case ConnectionRole.Host:
@@ -45,7 +45,7 @@ public sealed class SocketTransport : ITransport
 
             case ConnectionRole.Client:
                 {
-                    _communicationManager.SetupClientAsync(SocketTransport.GetIpEndPoint(_connectionInfo.Endpoint));
+                    _communicationManager.SetupClientAsync(GetIpEndPoint(_connectionInfo.Endpoint));
                     return endpoint;
                 }
 
