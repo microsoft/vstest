@@ -293,6 +293,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
 
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
         public void Initialize(string filterString)
         {
             ValidateFilter(filterString);
@@ -301,6 +302,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
         /// <summary>
         /// Filter tests
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
         public IEnumerable<TestCase> FilterTests(IEnumerable<TestCase> testCases)
         {
             EqtTrace.Verbose("TestCaseFilter.FilterTests : Test Filtering invoked.");

@@ -214,7 +214,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
         var settings = _runSettingsManager.ActiveRunSettings?.SettingsXml;
 
         // Get results directory from RunSettingsManager
-        var resultsDirectory = GetResultsDirectory(settings);
+        var resultsDirectory = EnableBlameArgumentExecutor.GetResultsDirectory(settings);
 
         // Get data collection run settings. Create if not present.
         var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings);
@@ -242,7 +242,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
                 dumpParameters.Add("DumpType", "Full");
             }
 
-            AddCollectDumpNode(dumpParameters, xmlDocument, outernode);
+            EnableBlameArgumentExecutor.AddCollectDumpNode(dumpParameters, xmlDocument, outernode);
         }
 
         // Add collect hang dump node in configuration element.
@@ -262,7 +262,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
                 hangDumpParameters.Add("HangDumpType", "Full");
             }
 
-            AddCollectHangDumpNode(hangDumpParameters, xmlDocument, outernode);
+            EnableBlameArgumentExecutor.AddCollectHangDumpNode(hangDumpParameters, xmlDocument, outernode);
         }
 
         // Add blame configuration element to blame collector.
@@ -283,7 +283,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="settings">Settings xml.</param>
     /// <returns>Results directory.</returns>
-    private string GetResultsDirectory(string settings)
+    private static string GetResultsDirectory(string settings)
     {
         string resultsDirectory = null;
         if (settings != null)
@@ -348,7 +348,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// <param name="parameters">Parameters.</param>
     /// <param name="xmlDocument">Xml document.</param>
     /// <param name="outernode">Outer node.</param>
-    private void AddCollectDumpNode(Dictionary<string, string> parameters, XmlDocument xmlDocument, XmlElement outernode)
+    private static void AddCollectDumpNode(Dictionary<string, string> parameters, XmlDocument xmlDocument, XmlElement outernode)
     {
         var dumpNode = xmlDocument.CreateElement(Constants.BlameCollectDumpKey);
         if (parameters != null && parameters.Count > 0)
@@ -369,7 +369,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// <param name="parameters">Parameters.</param>
     /// <param name="xmlDocument">Xml document.</param>
     /// <param name="outernode">Outer node.</param>
-    private void AddCollectHangDumpNode(Dictionary<string, string> parameters, XmlDocument xmlDocument, XmlElement outernode)
+    private static void AddCollectHangDumpNode(Dictionary<string, string> parameters, XmlDocument xmlDocument, XmlElement outernode)
     {
         var dumpNode = xmlDocument.CreateElement(Constants.CollectDumpOnTestSessionHang);
         if (parameters != null && parameters.Count > 0)

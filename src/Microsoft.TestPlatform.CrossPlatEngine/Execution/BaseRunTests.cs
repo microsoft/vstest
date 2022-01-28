@@ -264,9 +264,9 @@ internal abstract class BaseRunTests
             return;
         }
 
-        if (NotRequiredStaThread() || !TryToRunInStaThread(() => CancelTestRunInternal(_activeExecutor), false))
+        if (NotRequiredStaThread() || !TryToRunInStaThread(() => BaseRunTests.CancelTestRunInternal(_activeExecutor), false))
         {
-            Task.Run(() => CancelTestRunInternal(_activeExecutor));
+            Task.Run(() => BaseRunTests.CancelTestRunInternal(_activeExecutor));
         }
     }
 
@@ -305,7 +305,7 @@ internal abstract class BaseRunTests
 
     #endregion
 
-    private void CancelTestRunInternal(ITestExecutor executor)
+    private static void CancelTestRunInternal(ITestExecutor executor)
     {
         try
         {
@@ -358,7 +358,7 @@ internal abstract class BaseRunTests
         var executorUriExtensionMap = GetExecutorUriExtensionMap(FrameworkHandle, RunContext);
 
         // Set on the logger the TreatAdapterErrorAsWarning setting from runsettings.
-        SetAdapterLoggingSettings();
+        BaseRunTests.SetAdapterLoggingSettings();
 
         var stopwatch = new Stopwatch();
         stopwatch.Start();
@@ -389,7 +389,7 @@ internal abstract class BaseRunTests
             }
 
             // Get the extension manager.
-            var extensionManager = GetExecutorExtensionManager(executorUriExtensionTuple.Item2);
+            var extensionManager = BaseRunTests.GetExecutorExtensionManager(executorUriExtensionTuple.Item2);
 
             // Look up the executor.
             var executor = extensionManager.TryGetTestExtension(executorUriExtensionTuple.Item1);
@@ -579,7 +579,7 @@ internal abstract class BaseRunTests
         return _runConfiguration.ExecutionThreadApartmentState != PlatformApartmentState.STA;
     }
 
-    private TestExecutorExtensionManager GetExecutorExtensionManager(string extensionAssembly)
+    private static TestExecutorExtensionManager GetExecutorExtensionManager(string extensionAssembly)
     {
         try
         {
@@ -604,7 +604,7 @@ internal abstract class BaseRunTests
         }
     }
 
-    private void SetAdapterLoggingSettings()
+    private static void SetAdapterLoggingSettings()
     {
         // TODO: enable the below once runsettings is in.
         // var sessionMessageLogger = testExecutorFrameworkHandle as TestSessionMessageLogger;

@@ -90,7 +90,7 @@ public class CodeCoverageRunSettingsProcessor
         // particular component down the path just add the default values for that component
         // from the default settings document and return since there's nothing else to be done.
         var codeCoveragePathComponents = new List<string>() { "CodeCoverage" };
-        var currentCodeCoverageNode = SelectNodeOrAddDefaults(
+        var currentCodeCoverageNode = CodeCoverageRunSettingsProcessor.SelectNodeOrAddDefaults(
             currentSettingsRootNode,
             _defaultSettingsRootNode,
             codeCoveragePathComponents);
@@ -104,9 +104,9 @@ public class CodeCoverageRunSettingsProcessor
         }
 
         // Get the code coverage node from the default settings.
-        var defaultCodeCoverageNode = ExtractNode(
+        var defaultCodeCoverageNode = CodeCoverageRunSettingsProcessor.ExtractNode(
             _defaultSettingsRootNode,
-            BuildPath(codeCoveragePathComponents));
+            CodeCoverageRunSettingsProcessor.BuildPath(codeCoveragePathComponents));
 
         // Create the exclusion type list.
         var exclusions = new List<IList<string>>
@@ -123,7 +123,7 @@ public class CodeCoverageRunSettingsProcessor
             // particular component down the path just add the default values for that
             // component from the default settings document and continue since there's nothing
             // else to be done.
-            var currentNode = SelectNodeOrAddDefaults(
+            var currentNode = CodeCoverageRunSettingsProcessor.SelectNodeOrAddDefaults(
                 currentCodeCoverageNode,
                 defaultCodeCoverageNode,
                 exclusion);
@@ -136,12 +136,12 @@ public class CodeCoverageRunSettingsProcessor
             }
 
             // Extract the <Exclude> node from the default settings.
-            var defaultNode = ExtractNode(
+            var defaultNode = CodeCoverageRunSettingsProcessor.ExtractNode(
                 defaultCodeCoverageNode,
-                BuildPath(exclusion));
+                CodeCoverageRunSettingsProcessor.BuildPath(exclusion));
 
             // Merge the current and default settings for the current exclusion rule.
-            MergeNodes(currentNode, defaultNode);
+            CodeCoverageRunSettingsProcessor.MergeNodes(currentNode, defaultNode);
         }
 
         return currentSettingsRootNode;
@@ -164,7 +164,7 @@ public class CodeCoverageRunSettingsProcessor
     /// <param name="pathComponents">The path components.</param>
     ///
     /// <returns>The requested node if successful, <see cref="null"/> otherwise.</returns>
-    private XmlNode SelectNodeOrAddDefaults(
+    private static XmlNode SelectNodeOrAddDefaults(
         XmlNode currentRootNode,
         XmlNode defaultRootNode,
         IList<string> pathComponents)
@@ -182,10 +182,10 @@ public class CodeCoverageRunSettingsProcessor
             partialPath.Append(currentPathComponent);
 
             // Extract the node corresponding to the latest path component.
-            var tempNode = ExtractNode(currentNode, "." + currentPathComponent);
+            var tempNode = CodeCoverageRunSettingsProcessor.ExtractNode(currentNode, "." + currentPathComponent);
 
             // Extraction is pruned here because we shouldn't be processing the current node.
-            if (tempNode != null && !ShouldProcessCurrentExclusion(tempNode))
+            if (tempNode != null && !CodeCoverageRunSettingsProcessor.ShouldProcessCurrentExclusion(tempNode))
             {
                 return null;
             }
@@ -194,7 +194,7 @@ public class CodeCoverageRunSettingsProcessor
             // default settings node and bail out.
             if (tempNode == null)
             {
-                var defaultNode = ExtractNode(
+                var defaultNode = CodeCoverageRunSettingsProcessor.ExtractNode(
                     defaultRootNode,
                     partialPath.ToString());
 
@@ -221,7 +221,7 @@ public class CodeCoverageRunSettingsProcessor
     /// <returns>
     /// <see cref="true"/> if the node should be processed, <see cref="false"/> otherwise.
     /// </returns>
-    private bool ShouldProcessCurrentExclusion(XmlNode node)
+    private static bool ShouldProcessCurrentExclusion(XmlNode node)
     {
         const string attributeName = "mergeDefaults";
 
@@ -245,7 +245,7 @@ public class CodeCoverageRunSettingsProcessor
     /// </summary>
     ///
     /// <returns>A relative path built from path components.</returns>
-    private string BuildPath(IList<string> pathComponents)
+    private static string BuildPath(IList<string> pathComponents)
     {
         return string.Join("/", new[] { "." }.Concat(pathComponents));
     }
@@ -258,7 +258,7 @@ public class CodeCoverageRunSettingsProcessor
     /// <param name="path">The path used to specify the requested node.</param>
     ///
     /// <returns>The extracted node if successful, <see cref="null"/> otherwise.</returns>
-    private XmlNode ExtractNode(XmlNode node, string path)
+    private static XmlNode ExtractNode(XmlNode node, string path)
     {
         try
         {
@@ -280,7 +280,7 @@ public class CodeCoverageRunSettingsProcessor
     ///
     /// <param name="currentNode">The current settings root node.</param>
     /// <param name="defaultNode">The default settings root node.</param>
-    private void MergeNodes(XmlNode currentNode, XmlNode defaultNode)
+    private static void MergeNodes(XmlNode currentNode, XmlNode defaultNode)
     {
         var exclusionCache = new HashSet<string>();
 

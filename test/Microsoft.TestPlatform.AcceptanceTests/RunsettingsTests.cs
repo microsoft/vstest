@@ -224,7 +224,7 @@ public class RunsettingsTests : AcceptanceTestBase
                                                  {
                                                          { "TargetPlatform", "123" }
                                                  };
-        var runsettingsFilePath = GetRunsettingsFilePath(runConfigurationDictionary, tempDir);
+        var runsettingsFilePath = RunsettingsTests.GetRunsettingsFilePath(runConfigurationDictionary, tempDir);
         var arguments = PrepareArguments(
             GetSampleTestAssembly(),
             string.Empty,
@@ -246,7 +246,7 @@ public class RunsettingsTests : AcceptanceTestBase
                                                  {
                                                          { "TestAdaptersPaths", GetTestAdapterPath() }
                                                  };
-        var runsettingsFilePath = GetRunsettingsFilePath(runConfigurationDictionary, tempDir);
+        var runsettingsFilePath = RunsettingsTests.GetRunsettingsFilePath(runConfigurationDictionary, tempDir);
         var arguments = PrepareArguments(
             GetSampleTestAssembly(),
             string.Empty,
@@ -279,7 +279,7 @@ public class RunsettingsTests : AcceptanceTestBase
                                     </LegacySettings>
                                    </RunSettings>";
 
-        var runsettingsFilePath = GetRunsettingsFilePath(null, tempDir);
+        var runsettingsFilePath = RunsettingsTests.GetRunsettingsFilePath(null, tempDir);
         File.WriteAllText(runsettingsFilePath, runsettingsXml);
 
         var arguments = PrepareArguments(
@@ -321,7 +321,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
         // Scripts have relative paths to temp directory where the runsettings is created.
         var runsettingsXml = string.Format(runsettingsFormat, setupScriptName, cleanupScriptName);
-        var runsettingsPath = GetRunsettingsFilePath(null, tempDir);
+        var runsettingsPath = RunsettingsTests.GetRunsettingsFilePath(null, tempDir);
         File.WriteAllText(runsettingsPath, runsettingsXml);
 
         var arguments = PrepareArguments(
@@ -362,7 +362,7 @@ public class RunsettingsTests : AcceptanceTestBase
                                    </RunSettings>";
 
         var runsettingsXml = string.Format(runsettingsFormat, deploymentItem);
-        var runsettingsPath = GetRunsettingsFilePath(null, tempDir);
+        var runsettingsPath = RunsettingsTests.GetRunsettingsFilePath(null, tempDir);
         File.WriteAllText(runsettingsPath, runsettingsXml);
 
         var arguments = PrepareArguments(
@@ -392,7 +392,7 @@ public class RunsettingsTests : AcceptanceTestBase
                                         </Execution>
                                     </LegacySettings>
                                    </RunSettings>";
-        var runsettingsPath = GetRunsettingsFilePath(null, tempDir);
+        var runsettingsPath = RunsettingsTests.GetRunsettingsFilePath(null, tempDir);
         File.WriteAllText(runsettingsPath, runsettingsXml);
         var arguments = PrepareArguments(testAssemblyPath, string.Empty, runsettingsPath, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /testcasefilter:Name~TimeTest");
@@ -431,7 +431,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
         var testAssemblyDirectory = Path.Combine(_testEnvironment.TestAssetsPath, "LegacySettingsUnitTestProject", "DependencyAssembly");
         var runsettingsXml = string.Format(runsettingsFormat, testAssemblyDirectory);
-        var runsettingsPath = GetRunsettingsFilePath(null, tempDir);
+        var runsettingsPath = RunsettingsTests.GetRunsettingsFilePath(null, tempDir);
         File.WriteAllText(runsettingsPath, runsettingsXml);
         var arguments = PrepareArguments(testAssemblyPath, string.Empty, runsettingsPath, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /testcasefilter:Name=DependencyTest");
@@ -463,7 +463,7 @@ public class RunsettingsTests : AcceptanceTestBase
                                     </RunConfiguration>
                                    </RunSettings>";
 
-        var runsettingsPath = GetRunsettingsFilePath(null, tempDir);
+        var runsettingsPath = RunsettingsTests.GetRunsettingsFilePath(null, tempDir);
         File.WriteAllText(runsettingsPath, runsettingsXml);
 
         var arguments = PrepareArguments(
@@ -509,7 +509,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
     #endregion
 
-    private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary, TempDirectory tempDirectory)
+    private static string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary, TempDirectory tempDirectory)
     {
         var runsettingsPath = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
         if (runConfigurationDictionary != null)
@@ -532,7 +532,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
         if (runConfigurationDictionary != null)
         {
-            runsettingsPath = GetRunsettingsFilePath(runConfigurationDictionary, tempDir);
+            runsettingsPath = RunsettingsTests.GetRunsettingsFilePath(runConfigurationDictionary, tempDir);
         }
 
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), runsettingsPath, FrameworkArgValue, _testEnvironment.InIsolationValue, resultsDirectory: tempDir.Path);

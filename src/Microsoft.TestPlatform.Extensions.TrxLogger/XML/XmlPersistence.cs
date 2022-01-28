@@ -253,7 +253,7 @@ internal class XmlPersistence
             }
 
             XmlNode xmlNode = EnsureLocationExists(parentXml, location, nameSpaceUri);
-            SaveObject(objectToSave, xmlNode, parameters);
+            XmlPersistence.SaveObject(objectToSave, xmlNode, parameters);
 
             if (xmlNode is XmlElement element &&
                 !element.HasAttributes &&
@@ -277,9 +277,9 @@ internal class XmlPersistence
     /// <param name="parameters">
     /// The parameters.
     /// </param>
-    public void SaveObject(object objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters parameters)
+    public static void SaveObject(object objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters parameters)
     {
-        SaveObject(objectToSave, nodeToSaveAt, parameters, null);
+        XmlPersistence.SaveObject(objectToSave, nodeToSaveAt, parameters, null);
     }
 
     /// <summary>
@@ -297,7 +297,7 @@ internal class XmlPersistence
     /// <param name="defaultValue">
     /// The default value.
     /// </param>
-    public void SaveObject(object objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters parameters, object defaultValue)
+    public static void SaveObject(object objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters parameters, object defaultValue)
     {
         if (objectToSave != null)
         {
@@ -307,7 +307,7 @@ internal class XmlPersistence
             }
             else
             {
-                SaveSimpleData(objectToSave, nodeToSaveAt, defaultValue);
+                XmlPersistence.SaveSimpleData(objectToSave, nodeToSaveAt, defaultValue);
             }
         }
     }
@@ -335,7 +335,7 @@ internal class XmlPersistence
         }
 
         XmlNode saveTarget = EnsureLocationExists(xml, location);
-        SaveSimpleData(value, saveTarget, defaultValue);
+        XmlPersistence.SaveSimpleData(value, saveTarget, defaultValue);
     }
 
     /// <summary>
@@ -606,7 +606,7 @@ internal class XmlPersistence
         return attributes.Length > 0 ? (T)attributes[0] : default;
     }
 
-    private void SaveSimpleData(object value, XmlNode nodeToSaveAt, object defaultValue)
+    private static void SaveSimpleData(object value, XmlNode nodeToSaveAt, object defaultValue)
     {
         if (value == null || value.Equals(defaultValue))
         {

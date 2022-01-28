@@ -169,7 +169,7 @@ public class SocketCommunicationManagerTests : IDisposable
         _communicationManager.StopClient();
 
         // Attempt to write on client socket should throw since it should have disconnected.
-        Assert.ThrowsException<SocketException>(() => WriteOnSocket(client.Client));
+        Assert.ThrowsException<SocketException>(() => SocketCommunicationManagerTests.WriteOnSocket(client.Client));
     }
 
     #endregion
@@ -183,7 +183,7 @@ public class SocketCommunicationManagerTests : IDisposable
 
         _communicationManager.SendMessage(MessageType.StartDiscovery);
 
-        Assert.AreEqual(TestDiscoveryStartMessageWithNullPayload, ReadFromStream(client.GetStream()));
+        Assert.AreEqual(TestDiscoveryStartMessageWithNullPayload, SocketCommunicationManagerTests.ReadFromStream(client.GetStream()));
     }
 
     [TestMethod]
@@ -193,7 +193,7 @@ public class SocketCommunicationManagerTests : IDisposable
 
         _communicationManager.SendMessage(MessageType.StartDiscovery, DummyPayload);
 
-        Assert.AreEqual(TestDiscoveryStartMessageWithDummyPayload, ReadFromStream(client.GetStream()));
+        Assert.AreEqual(TestDiscoveryStartMessageWithDummyPayload, SocketCommunicationManagerTests.ReadFromStream(client.GetStream()));
     }
 
     [TestMethod]
@@ -203,7 +203,7 @@ public class SocketCommunicationManagerTests : IDisposable
 
         _communicationManager.SendMessage(MessageType.StartDiscovery, DummyPayload, 2);
 
-        Assert.AreEqual(TestDiscoveryStartMessageWithVersionAndPayload, ReadFromStream(client.GetStream()));
+        Assert.AreEqual(TestDiscoveryStartMessageWithVersionAndPayload, SocketCommunicationManagerTests.ReadFromStream(client.GetStream()));
     }
 
     [TestMethod]
@@ -213,7 +213,7 @@ public class SocketCommunicationManagerTests : IDisposable
 
         _communicationManager.SendRawMessage(DummyPayload);
 
-        Assert.AreEqual(DummyPayload, ReadFromStream(client.GetStream()));
+        Assert.AreEqual(DummyPayload, SocketCommunicationManagerTests.ReadFromStream(client.GetStream()));
     }
 
     #endregion
@@ -224,7 +224,7 @@ public class SocketCommunicationManagerTests : IDisposable
     public async Task ReceiveMessageShouldReceiveDeserializedMessage()
     {
         var client = await StartServerAndWaitForConnection();
-        WriteToStream(client.GetStream(), TestDiscoveryStartMessageWithDummyPayload);
+        SocketCommunicationManagerTests.WriteToStream(client.GetStream(), TestDiscoveryStartMessageWithDummyPayload);
 
         var message = _communicationManager.ReceiveMessage();
 
@@ -236,7 +236,7 @@ public class SocketCommunicationManagerTests : IDisposable
     public async Task ReceiveMessageAsyncShouldReceiveDeserializedMessage()
     {
         var client = await StartServerAndWaitForConnection();
-        WriteToStream(client.GetStream(), TestDiscoveryStartMessageWithVersionAndPayload);
+        SocketCommunicationManagerTests.WriteToStream(client.GetStream(), TestDiscoveryStartMessageWithVersionAndPayload);
 
         var message = await _communicationManager.ReceiveMessageAsync(CancellationToken.None);
         var versionedMessage = message as VersionedMessage;
@@ -249,7 +249,7 @@ public class SocketCommunicationManagerTests : IDisposable
     public async Task ReceiveRawMessageShouldNotDeserializeThePayload()
     {
         var client = await StartServerAndWaitForConnection();
-        WriteToStream(client.GetStream(), DummyPayload);
+        SocketCommunicationManagerTests.WriteToStream(client.GetStream(), DummyPayload);
 
         var message = _communicationManager.ReceiveRawMessage();
 
@@ -260,7 +260,7 @@ public class SocketCommunicationManagerTests : IDisposable
     public async Task ReceiveRawMessageAsyncShouldNotDeserializeThePayload()
     {
         var client = await StartServerAndWaitForConnection();
-        WriteToStream(client.GetStream(), DummyPayload);
+        SocketCommunicationManagerTests.WriteToStream(client.GetStream(), DummyPayload);
 
         var message = await _communicationManager.ReceiveRawMessageAsync(CancellationToken.None);
 
@@ -348,7 +348,7 @@ public class SocketCommunicationManagerTests : IDisposable
         return client;
     }
 
-    private void WriteOnSocket(Socket socket)
+    private static void WriteOnSocket(Socket socket)
     {
         for (int i = 0; i < 10; i++)
         {
@@ -356,13 +356,13 @@ public class SocketCommunicationManagerTests : IDisposable
         }
     }
 
-    private string ReadFromStream(Stream stream)
+    private static string ReadFromStream(Stream stream)
     {
         using var reader = new BinaryReader(stream, Encoding.UTF8, true);
         return reader.ReadString();
     }
 
-    private void WriteToStream(Stream stream, string data)
+    private static void WriteToStream(Stream stream, string data)
     {
         using var writer = new BinaryWriter(stream, Encoding.UTF8, true);
         writer.Write(data);

@@ -454,10 +454,10 @@ public class TestRunAttachmentsProcessingManagerTests
         // assert
         VerifyCompleteEvent(true, false, inputAttachments[0]);
         _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.IsAny<TestRunAttachmentsProcessingProgressEventArgs>()), Times.Exactly(4));
-        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgs(a, 1))));
-        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgs(a, 2))));
-        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgs(a, 3))));
-        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgs(a, 4))));
+        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => TestRunAttachmentsProcessingManagerTests.VerifyProgressArgs(a, 1))));
+        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => TestRunAttachmentsProcessingManagerTests.VerifyProgressArgs(a, 2))));
+        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => TestRunAttachmentsProcessingManagerTests.VerifyProgressArgs(a, 3))));
+        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => TestRunAttachmentsProcessingManagerTests.VerifyProgressArgs(a, 4))));
         _mockEventsHandler.Verify(h => h.HandleLogMessage(TestMessageLevel.Informational, "Attachments processing was cancelled."));
         _mockAttachmentHandler1.Verify(h => h.GetExtensionUris());
         _mockAttachmentHandler2.Verify(h => h.GetExtensionUris(), Times.Never);
@@ -587,12 +587,12 @@ public class TestRunAttachmentsProcessingManagerTests
         await innerTaskCompletionSource.Task;
         VerifyCompleteEvent(false, false, outputAttachments1.First(), outputAttachments2.First());
         _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.IsAny<TestRunAttachmentsProcessingProgressEventArgs>()), Times.Exactly(6));
-        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 1, 25, Uri1))));
-        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 1, 50, Uri1))));
-        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 1, 75, Uri1))));
-        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 1, 100, Uri1))));
-        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 2, 50, Uri2))));
-        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 2, 100, Uri2))));
+        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => TestRunAttachmentsProcessingManagerTests.VerifyProgressArgsForTwoHandlers(a, 1, 25, Uri1))));
+        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => TestRunAttachmentsProcessingManagerTests.VerifyProgressArgsForTwoHandlers(a, 1, 50, Uri1))));
+        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => TestRunAttachmentsProcessingManagerTests.VerifyProgressArgsForTwoHandlers(a, 1, 75, Uri1))));
+        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => TestRunAttachmentsProcessingManagerTests.VerifyProgressArgsForTwoHandlers(a, 1, 100, Uri1))));
+        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => TestRunAttachmentsProcessingManagerTests.VerifyProgressArgsForTwoHandlers(a, 2, 50, Uri2))));
+        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => TestRunAttachmentsProcessingManagerTests.VerifyProgressArgsForTwoHandlers(a, 2, 100, Uri2))));
         _mockAttachmentHandler1.Verify(h => h.GetExtensionUris());
         _mockAttachmentHandler2.Verify(h => h.GetExtensionUris());
         _mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), CancellationToken.None));
@@ -862,7 +862,7 @@ public class TestRunAttachmentsProcessingManagerTests
             It.Is<ICollection<AttachmentSet>>(c => c.Count == expectedSets.Length && expectedSets.All(e => c.Contains(e)))));
     }
 
-    private bool VerifyProgressArgs(TestRunAttachmentsProcessingProgressEventArgs args, int progress)
+    private static bool VerifyProgressArgs(TestRunAttachmentsProcessingProgressEventArgs args, int progress)
     {
         Assert.AreEqual(1, args.CurrentAttachmentProcessorIndex);
         Assert.AreEqual(2, args.AttachmentProcessorsCount);
@@ -871,7 +871,7 @@ public class TestRunAttachmentsProcessingManagerTests
         return progress == args.CurrentAttachmentProcessorProgress;
     }
 
-    private bool VerifyProgressArgsForTwoHandlers(TestRunAttachmentsProcessingProgressEventArgs args, long handlerIndex, long progress, string uri)
+    private static bool VerifyProgressArgsForTwoHandlers(TestRunAttachmentsProcessingProgressEventArgs args, long handlerIndex, long progress, string uri)
     {
         return progress == args.CurrentAttachmentProcessorProgress &&
                args.CurrentAttachmentProcessorIndex == handlerIndex &&

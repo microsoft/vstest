@@ -49,6 +49,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
         _nativeMethodsHelper = nativeMethodsHelper;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     protected Action<object, string> OutputReceivedCallback => (process, data) =>
     {
         // useful for visibility when debugging this tool

@@ -35,7 +35,7 @@ internal class InferHelper
                 foreach (string source in sources)
                 {
                     Architecture arch;
-                    if (IsDotNetAssembly(source))
+                    if (InferHelper.IsDotNetAssembly(source))
                     {
                         arch = _assemblyMetadataProvider.GetArchitecture(source);
                     }
@@ -127,7 +127,7 @@ internal class InferHelper
         foreach (string source in sources)
         {
             FrameworkName fx;
-            if (IsDotNetAssembly(source))
+            if (InferHelper.IsDotNetAssembly(source))
             {
                 fx = _assemblyMetadataProvider.GetFrameWork(source);
             }
@@ -175,7 +175,7 @@ internal class InferHelper
         return finalFx;
     }
 
-    private bool IsDotNetAssembly(string filePath)
+    private static bool IsDotNetAssembly(string filePath)
     {
         var extType = Path.GetExtension(filePath);
         return extType != null && (extType.Equals(".dll", StringComparison.OrdinalIgnoreCase) ||

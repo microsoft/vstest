@@ -557,7 +557,7 @@ public class ConsoleLoggerTests
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
-        foreach (var testResult in GetTestResultsObject())
+        foreach (var testResult in ConsoleLoggerTests.GetTestResultsObject())
         {
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
         }
@@ -589,12 +589,12 @@ public class ConsoleLoggerTests
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
-        foreach (var testResult in GetTestResultsObject())
+        foreach (var testResult in ConsoleLoggerTests.GetTestResultsObject())
         {
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
         }
 
-        foreach (var testResult in GetPassedTestResultsObject())
+        foreach (var testResult in ConsoleLoggerTests.GetPassedTestResultsObject())
         {
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
         }
@@ -641,12 +641,12 @@ public class ConsoleLoggerTests
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
-        foreach (var testResult in GetTestResultsObject())
+        foreach (var testResult in ConsoleLoggerTests.GetTestResultsObject())
         {
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
         }
 
-        foreach (var testResult in GetPassedTestResultsObject())
+        foreach (var testResult in ConsoleLoggerTests.GetPassedTestResultsObject())
         {
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
         }
@@ -724,7 +724,7 @@ public class ConsoleLoggerTests
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
-        foreach (var testResult in GetTestResultsObject())
+        foreach (var testResult in ConsoleLoggerTests.GetTestResultsObject())
         {
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
         }
@@ -750,7 +750,7 @@ public class ConsoleLoggerTests
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
-        foreach (var testResult in GetTestResultsObject())
+        foreach (var testResult in ConsoleLoggerTests.GetTestResultsObject())
         {
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
         }
@@ -826,7 +826,7 @@ public class ConsoleLoggerTests
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
-        foreach (var testResult in GetTestResultObject(TestOutcome.Passed))
+        foreach (var testResult in ConsoleLoggerTests.GetTestResultObject(TestOutcome.Passed))
         {
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
         }
@@ -851,7 +851,7 @@ public class ConsoleLoggerTests
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
-        foreach (var testResult in GetTestResultObject(TestOutcome.Failed))
+        foreach (var testResult in ConsoleLoggerTests.GetTestResultObject(TestOutcome.Failed))
         {
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
         }
@@ -875,7 +875,7 @@ public class ConsoleLoggerTests
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
-        foreach (var testResult in GetTestResultObject(TestOutcome.Failed))
+        foreach (var testResult in ConsoleLoggerTests.GetTestResultObject(TestOutcome.Failed))
         {
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
         }
@@ -915,7 +915,7 @@ public class ConsoleLoggerTests
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
-        foreach (var testResult in GetTestResultObject(TestOutcome.Failed))
+        foreach (var testResult in ConsoleLoggerTests.GetTestResultObject(TestOutcome.Failed))
         {
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
         }
@@ -948,7 +948,7 @@ public class ConsoleLoggerTests
         loggerEvents.EnableEvents();
 
         var fileHelper = new Mock<IFileHelper>();
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         CommandLineOptions.Instance.FileHelper = fileHelper.Object;
         CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object);
         string testFilePath = Path.Combine(Path.GetTempPath(), "DmmyTestFile.dll");
@@ -976,7 +976,7 @@ public class ConsoleLoggerTests
         loggerEvents.EnableEvents();
 
         var fileHelper = new Mock<IFileHelper>();
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         CommandLineOptions.Instance.FileHelper = fileHelper.Object;
         CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object);
         var temp = Path.GetTempPath();
@@ -1010,7 +1010,7 @@ public class ConsoleLoggerTests
         loggerEvents.EnableEvents();
 
         var fileHelper = new Mock<IFileHelper>();
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         CommandLineOptions.Instance.FileHelper = fileHelper.Object;
         CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object);
         var temp = Path.GetTempPath();
@@ -1048,7 +1048,7 @@ public class ConsoleLoggerTests
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
-        foreach (var testResult in GetTestResultObject(TestOutcome.Passed))
+        foreach (var testResult in ConsoleLoggerTests.GetTestResultObject(TestOutcome.Passed))
         {
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
         }
@@ -1075,7 +1075,7 @@ public class ConsoleLoggerTests
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
-        var testresults = GetTestResultObject(TestOutcome.Failed);
+        var testresults = ConsoleLoggerTests.GetTestResultObject(TestOutcome.Failed);
         testresults[0].ErrorMessage = "ErrorMessage";
         testresults[0].ErrorStackTrace = "ErrorStackTrace";
         foreach (var testResult in testresults)
@@ -1101,7 +1101,7 @@ public class ConsoleLoggerTests
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
-        var testresults = GetTestResultObject(TestOutcome.Passed);
+        var testresults = ConsoleLoggerTests.GetTestResultObject(TestOutcome.Passed);
         testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, "Hello"));
 
         foreach (var testResult in testresults)
@@ -1127,7 +1127,7 @@ public class ConsoleLoggerTests
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
-        var testresults = GetTestResultObject(TestOutcome.Failed);
+        var testresults = ConsoleLoggerTests.GetTestResultObject(TestOutcome.Failed);
         testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, "StandardOutCategory"));
         testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, "StandardErrorCategory"));
         testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, "AdditionalInfoCategory"));
@@ -1190,9 +1190,9 @@ public class ConsoleLoggerTests
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
-        TestCase testCase1 = CreateTestCase("TestCase1");
-        TestCase testCase2 = CreateTestCase("TestCase2");
-        TestCase testCase3 = CreateTestCase("TestCase3");
+        TestCase testCase1 = ConsoleLoggerTests.CreateTestCase("TestCase1");
+        TestCase testCase2 = ConsoleLoggerTests.CreateTestCase("TestCase2");
+        TestCase testCase3 = ConsoleLoggerTests.CreateTestCase("TestCase3");
 
         Guid parentExecutionId = Guid.NewGuid();
         TestProperty parentExecIdProperty = TestProperty.Register("ParentExecId", "ParentExecId", typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
@@ -1221,7 +1221,7 @@ public class ConsoleLoggerTests
         _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryTotalTests, 2), OutputLevel.Information), Times.Once());
     }
 
-    private TestCase CreateTestCase(string testCaseName)
+    private static TestCase CreateTestCase(string testCaseName)
     {
         return new TestCase(testCaseName, new Uri("some://uri"), "DummySourceFileName");
     }
@@ -1237,7 +1237,7 @@ public class ConsoleLoggerTests
         _consoleLogger = new ConsoleLogger(_mockOutput.Object, _mockProgressIndicator.Object);
     }
 
-    private List<ObjectModel.TestResult> GetTestResultsObject()
+    private static List<ObjectModel.TestResult> GetTestResultsObject()
     {
         var testcase = new TestCase("DymmyNamespace.DummyClass.TestName", new Uri("some://uri"), "TestSource")
         {
@@ -1282,7 +1282,7 @@ public class ConsoleLoggerTests
         return testresultList;
     }
 
-    private List<ObjectModel.TestResult> GetPassedTestResultsObject()
+    private static List<ObjectModel.TestResult> GetPassedTestResultsObject()
     {
         var testcase = new TestCase("DymmyNamespace.DummyClass.TestName", new Uri("some://uri"), "TestSourcePassed")
         {
@@ -1309,7 +1309,7 @@ public class ConsoleLoggerTests
     }
 
 
-    private List<ObjectModel.TestResult> GetTestResultObject(TestOutcome outcome)
+    private static List<ObjectModel.TestResult> GetTestResultObject(TestOutcome outcome)
     {
         var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
         var testresult = new ObjectModel.TestResult(testcase)

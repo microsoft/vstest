@@ -62,7 +62,7 @@ public class CliRunSettingsArgumentProcessorTests
     [TestCleanup]
     public void Cleanup()
     {
-        _commandLineOptions.Reset();
+        CommandLineOptions.Reset();
     }
 
     [TestMethod]

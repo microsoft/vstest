@@ -45,10 +45,10 @@ internal class MetadataReaderExtensionsHelper
     private static readonly ConcurrentDictionary<string, Type[]> AssemblyCache = new();
     private static readonly Type[] EmptyTypeArray = new Type[0];
 
-    public Type[] DiscoverTestExtensionTypesV2Attribute(Assembly loadedAssembly, string assemblyFilePath)
-        => AssemblyCache.GetOrAdd(assemblyFilePath, DiscoverTestExtensionTypesV2AttributeInternal(loadedAssembly, assemblyFilePath));
+    public static Type[] DiscoverTestExtensionTypesV2Attribute(Assembly loadedAssembly, string assemblyFilePath)
+        => AssemblyCache.GetOrAdd(assemblyFilePath, MetadataReaderExtensionsHelper.DiscoverTestExtensionTypesV2AttributeInternal(loadedAssembly, assemblyFilePath));
 
-    private Type[] DiscoverTestExtensionTypesV2AttributeInternal(Assembly loadedAssembly, string assemblyFilePath)
+    private static Type[] DiscoverTestExtensionTypesV2AttributeInternal(Assembly loadedAssembly, string assemblyFilePath)
     {
         EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Discovering extensions inside assembly '{loadedAssembly.FullName}' file path '{assemblyFilePath}'");
 
@@ -162,14 +162,14 @@ internal class MetadataReaderExtensionsHelper
                             }
                             catch (Exception ex)
                             {
-                                EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Failure during type creation, extension full name: '{extensionImplementation}'\n{FormatException(ex)}");
+                                EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Failure during type creation, extension full name: '{extensionImplementation}'\n{MetadataReaderExtensionsHelper.FormatException(ex)}");
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Failure during custom attribute analysis, attribute full name: {attributeFullName}\n{FormatException(ex)}");
+                    EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Failure during custom attribute analysis, attribute full name: {attributeFullName}\n{MetadataReaderExtensionsHelper.FormatException(ex)}");
                 }
             }
         }
@@ -177,7 +177,7 @@ internal class MetadataReaderExtensionsHelper
         return extensions?.OrderByDescending(t => t.Item1).Select(t => t.Item2).ToArray() ?? EmptyTypeArray;
     }
 
-    private string FormatException(Exception ex)
+    private static string FormatException(Exception ex)
     {
         StringBuilder log = new();
         Exception current = ex;

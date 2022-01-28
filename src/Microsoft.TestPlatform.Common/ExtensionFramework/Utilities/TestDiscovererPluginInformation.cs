@@ -29,7 +29,7 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
         {
             FileExtensions = GetFileExtensions(testDiscovererType);
             DefaultExecutorUri = GetDefaultExecutorUri(testDiscovererType);
-            AssemblyType = GetAssemblyType(testDiscovererType);
+            AssemblyType = TestDiscovererPluginInformation.GetAssemblyType(testDiscovererType);
         }
     }
 
@@ -124,7 +124,7 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
     /// </summary>
     /// <param name="testDiscovererType"> The test discoverer Type. </param>
     /// <returns> Supported assembly type. </returns>
-    private AssemblyType GetAssemblyType(Type testDiscovererType)
+    private static AssemblyType GetAssemblyType(Type testDiscovererType)
     {
 
         // Get Category

@@ -156,7 +156,7 @@ internal static class Sha1Helper
             ValidateArg.NotNull(message, nameof(message));
 
             Reset();
-            PadMessage(ref message);
+            Sha1Implementation.PadMessage(ref message);
 
             var messageCount = message.Length / BlockBytes;
             for (var i = 0; i < messageCount; ++i)
@@ -176,7 +176,7 @@ internal static class Sha1Helper
             return digest;
         }
 
-        private void PadMessage(ref byte[] message)
+        private static void PadMessage(ref byte[] message)
         {
             var length = message.Length;
             var paddingBytes = BlockBytes - (length % BlockBytes);

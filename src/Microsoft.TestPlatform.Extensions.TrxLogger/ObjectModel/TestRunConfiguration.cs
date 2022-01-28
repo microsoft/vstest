@@ -145,7 +145,7 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
             helper.SaveSimpleField(
                 element,
                 "Deployment/@runDeploymentRoot",
-                _trxFileHelper.MakePathRelative(_runDeploymentRoot, Path.GetDirectoryName(_runDeploymentRoot)),
+                TrxFileHelper.MakePathRelative(_runDeploymentRoot, Path.GetDirectoryName(_runDeploymentRoot)),
                 string.Empty);
         }
         else

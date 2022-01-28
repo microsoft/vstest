@@ -204,12 +204,12 @@ public class HtmlLogger : ITestLoggerWithParameters
             ErrorStackTrace = e.Result.ErrorStackTrace,
             ErrorMessage = e.Result.ErrorMessage,
             TestResultId = e.Result.TestCase.Id,
-            Duration = GetFormattedDurationString(e.Result.Duration),
+            Duration = HtmlLogger.GetFormattedDurationString(e.Result.Duration),
             ResultOutcome = e.Result.Outcome
         };
 
-        var executionId = GetExecutionId(e.Result);
-        var parentExecutionId = GetParentExecutionId(e.Result);
+        var executionId = HtmlLogger.GetExecutionId(e.Result);
+        var parentExecutionId = HtmlLogger.GetParentExecutionId(e.Result);
 
         ResultCollectionDictionary.TryGetValue(e.Result.TestCase.Source, out var testResultCollection);
         if (testResultCollection == null)
@@ -282,7 +282,7 @@ public class HtmlLogger : ITestLoggerWithParameters
             TotalTests = TotalTests,
             SkippedTests = SkippedTests,
             PassPercentage = TotalTests == 0 ? 0 : PassedTests * 100 / TotalTests,
-            TotalRunTime = GetFormattedDurationString(e.ElapsedTimeInRunningTests),
+            TotalRunTime = HtmlLogger.GetFormattedDurationString(e.ElapsedTimeInRunningTests),
         };
         if (_parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && !string.IsNullOrWhiteSpace(logFilePrefixValue))
         {
@@ -313,7 +313,7 @@ public class HtmlLogger : ITestLoggerWithParameters
         {
             var fileName = string.Format(CultureInfo.CurrentCulture, "{0}_{1}_{2}",
                 Environment.GetEnvironmentVariable("UserName"), Environment.MachineName,
-                FormatDateTimeForRunName(DateTime.Now));
+                HtmlLogger.FormatDateTimeForRunName(DateTime.Now));
 
             XmlFilePath = GetFilePath(HtmlLoggerConstants.XmlFileExtension, fileName);
 
@@ -355,7 +355,7 @@ public class HtmlLogger : ITestLoggerWithParameters
         return Path.Combine(TestResultsDirPath, string.Concat("TestResult_", fileName, fullFileFormat));
     }
 
-    private string FormatDateTimeForRunName(DateTime timeStamp)
+    private static string FormatDateTimeForRunName(DateTime timeStamp)
     {
         return timeStamp.ToString("yyyyMMdd_HHmmss", DateTimeFormatInfo.InvariantInfo);
     }
@@ -365,7 +365,7 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="testResult"></param>
     /// <returns></returns>
-    private Guid GetParentExecutionId(TestPlatform.ObjectModel.TestResult testResult)
+    private static Guid GetParentExecutionId(TestPlatform.ObjectModel.TestResult testResult)
     {
         var parentExecutionIdProperty = testResult.Properties.FirstOrDefault(property =>
             property.Id.Equals(HtmlLoggerConstants.ParentExecutionIdPropertyIdentifier));
@@ -379,7 +379,7 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="testResult"></param>
     /// <returns></returns>
-    private Guid GetExecutionId(TestPlatform.ObjectModel.TestResult testResult)
+    private static Guid GetExecutionId(TestPlatform.ObjectModel.TestResult testResult)
     {
         var executionIdProperty = testResult.Properties.FirstOrDefault(property =>
             property.Id.Equals(HtmlLoggerConstants.ExecutionIdPropertyIdentifier));
@@ -398,7 +398,7 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="duration"></param>
     /// <returns></returns>
-    internal string GetFormattedDurationString(TimeSpan duration)
+    internal static string GetFormattedDurationString(TimeSpan duration)
     {
         if (duration == default)
         {

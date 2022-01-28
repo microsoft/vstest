@@ -60,7 +60,7 @@ public class TestEngine : ITestEngine
         ITestRuntimeProvider testHostManager,
         DiscoveryCriteria discoveryCriteria)
     {
-        var parallelLevel = VerifyParallelSettingAndCalculateParallelLevel(
+        var parallelLevel = TestEngine.VerifyParallelSettingAndCalculateParallelLevel(
             discoveryCriteria.Sources.Count(),
             discoveryCriteria.RunSettings);
 
@@ -72,7 +72,7 @@ public class TestEngine : ITestEngine
         if (ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
         {
             var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
-            var newRequestData = GetRequestData(isTelemetryOptedIn);
+            var newRequestData = TestEngine.GetRequestData(isTelemetryOptedIn);
             return new InProcessProxyDiscoveryManager(
                 testHostManager,
                 new TestHostManagerFactory(newRequestData));
@@ -145,7 +145,7 @@ public class TestEngine : ITestEngine
         TestRunCriteria testRunCriteria)
     {
         var distinctSources = GetDistinctNumberOfSources(testRunCriteria);
-        var parallelLevel = VerifyParallelSettingAndCalculateParallelLevel(
+        var parallelLevel = TestEngine.VerifyParallelSettingAndCalculateParallelLevel(
             distinctSources,
             testRunCriteria.TestRunSettings);
 
@@ -163,7 +163,7 @@ public class TestEngine : ITestEngine
                 isDataCollectorEnabled || isInProcDataCollectorEnabled))
         {
             var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
-            var newRequestData = GetRequestData(isTelemetryOptedIn);
+            var newRequestData = TestEngine.GetRequestData(isTelemetryOptedIn);
             return new InProcessProxyExecutionManager(
                 testHostManager,
                 new TestHostManagerFactory(newRequestData));
@@ -237,7 +237,7 @@ public class TestEngine : ITestEngine
                     new ProxyDataCollectionManager(
                         requestData,
                         testRunCriteria.TestRunSettings,
-                        GetSourcesFromTestRunCriteria(testRunCriteria)))
+                        TestEngine.GetSourcesFromTestRunCriteria(testRunCriteria)))
                 : new ProxyExecutionManager(
                     requestData,
                     requestSender,
@@ -263,7 +263,7 @@ public class TestEngine : ITestEngine
         IRequestData requestData,
         StartTestSessionCriteria testSessionCriteria)
     {
-        var parallelLevel = VerifyParallelSettingAndCalculateParallelLevel(
+        var parallelLevel = TestEngine.VerifyParallelSettingAndCalculateParallelLevel(
             testSessionCriteria.Sources.Count,
             testSessionCriteria.RunSettings);
 
@@ -378,7 +378,7 @@ public class TestEngine : ITestEngine
     /// <param name="runSettings">The run settings.</param>
     ///
     /// <returns>The parallel level to use.</returns>
-    private int VerifyParallelSettingAndCalculateParallelLevel(
+    private static int VerifyParallelSettingAndCalculateParallelLevel(
         int sourceCount,
         string runSettings)
     {
@@ -491,7 +491,7 @@ public class TestEngine : ITestEngine
     /// <param name="isTelemetryOptedIn">A flag indicating if telemetry is opted in.</param>
     ///
     /// <returns>The request data.</returns>
-    private IRequestData GetRequestData(bool isTelemetryOptedIn)
+    private static IRequestData GetRequestData(bool isTelemetryOptedIn)
     {
         return new RequestData
         {
@@ -507,7 +507,7 @@ public class TestEngine : ITestEngine
     /// </summary>
     ///
     /// <returns>The test sources.</returns>
-    private IEnumerable<string> GetSourcesFromTestRunCriteria(TestRunCriteria testRunCriteria)
+    private static IEnumerable<string> GetSourcesFromTestRunCriteria(TestRunCriteria testRunCriteria)
     {
         return testRunCriteria.HasSpecificTests
             ? TestSourcesUtility.GetSources(testRunCriteria.Tests)

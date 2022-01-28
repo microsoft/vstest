@@ -27,7 +27,7 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
         workSpace.CopyAll(new DirectoryInfo(Path.GetDirectoryName(vstestConsolePath)), dotnetRunnerPath);
 
         // Patch the runner
-        string sdkVersion = GetLatestSdkVersion(dotnetPath);
+        string sdkVersion = DotnetHostArchitectureVerifierTests.GetLatestSdkVersion(dotnetPath);
         string runtimeConfigFile = Path.Combine(dotnetRunnerPath.FullName, "vstest.console.runtimeconfig.json");
         JObject patchRuntimeConfig = JObject.Parse(File.ReadAllText(runtimeConfigFile));
         patchRuntimeConfig["runtimeOptions"]["framework"]["version"] = sdkVersion;
@@ -39,7 +39,7 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
             ["ExpectedArchitecture"] = architecture
         };
 
-        ExecuteApplication(dotnetPath, "new mstest", out string stdOut, out string stdError, out int exitCode, environmentVariables, workSpace.Path);
+        IntegrationTestBase.ExecuteApplication(dotnetPath, "new mstest", out string stdOut, out string stdError, out int exitCode, environmentVariables, workSpace.Path);
 
         // Patch test file
         File.WriteAllText(Path.Combine(workSpace.Path, "UnitTest1.cs"),
@@ -59,10 +59,10 @@ public class UnitTest1
     }
 }");
 
-        ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\"", out stdOut, out stdError, out exitCode, environmentVariables, workSpace.Path);
+        IntegrationTestBase.ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\"", out stdOut, out stdError, out exitCode, environmentVariables, workSpace.Path);
         Assert.AreEqual(0, exitCode, stdOut);
     }
 
-    private string GetLatestSdkVersion(string dotnetPath)
+    private static string GetLatestSdkVersion(string dotnetPath)
         => Path.GetFileName(Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(dotnetPath), @"shared/Microsoft.NETCore.App")).OrderByDescending(x => x).First());
 }

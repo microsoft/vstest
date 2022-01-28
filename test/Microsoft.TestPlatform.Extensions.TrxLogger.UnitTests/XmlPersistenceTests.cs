@@ -26,7 +26,7 @@ public class XmlPersistenceTests
         invalidXmlCharacterArray[6] = (char)0x0;
 
         string strWithInvalidCharForXml = new(invalidXmlCharacterArray);
-        xmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
+        XmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
 
         string expectedResult = "\\u0005\\u000b\\u000f\\ud800\\udc00\\ufffe\\u0000";
         Assert.AreEqual(0, string.Compare(expectedResult, node.InnerXml));
@@ -51,7 +51,7 @@ public class XmlPersistenceTests
 
         string strWithValidCharForXml = new(validXmlCharacterArray);
 
-        xmlPersistence.SaveObject(strWithValidCharForXml, node, null, "dummy");
+        XmlPersistence.SaveObject(strWithValidCharForXml, node, null, "dummy");
 
         string expectedResult = "\t\n\r 섣�";
         Assert.AreEqual(0, string.Compare(expectedResult, node.InnerXml));
@@ -63,7 +63,7 @@ public class XmlPersistenceTests
         XmlPersistence xmlPersistence = new();
         var node = xmlPersistence.CreateRootElement("TestRun");
         string strWithInvalidCharForXml = "This string has these \0 \v invalid characters";
-        xmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
+        XmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
         string expectedResult = "This string has these \\u0000 \\u000b invalid characters";
         Assert.AreEqual(0, string.Compare(expectedResult, node.InnerXml));
     }

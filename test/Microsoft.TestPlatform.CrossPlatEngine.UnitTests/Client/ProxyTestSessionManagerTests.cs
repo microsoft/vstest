@@ -49,8 +49,8 @@ public class ProxyTestSessionManagerTests
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
 
-        var testSessionCriteria = CreateTestSession(_fakeTestSources, _fakeRunSettings);
-        var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+        var testSessionCriteria = ProxyTestSessionManagerTests.CreateTestSession(_fakeTestSources, _fakeRunSettings);
+        var proxyManager = ProxyTestSessionManagerTests.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
         // First call to StartSession should succeed.
         Assert.IsTrue(proxyManager.StartSession(_mockEventsHandler.Object));
@@ -80,8 +80,8 @@ public class ProxyTestSessionManagerTests
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
 
-        var testSessionCriteria = CreateTestSession(_fakeTestMultipleSources, _fakeRunSettings);
-        var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+        var testSessionCriteria = ProxyTestSessionManagerTests.CreateTestSession(_fakeTestMultipleSources, _fakeRunSettings);
+        var proxyManager = ProxyTestSessionManagerTests.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
         // First call to StartSession should succeed.
         Assert.IsTrue(proxyManager.StartSession(_mockEventsHandler.Object));
@@ -97,8 +97,8 @@ public class ProxyTestSessionManagerTests
     [TestMethod]
     public void StartSessionShouldFailIfProxyCreatorIsNull()
     {
-        var testSessionCriteria = CreateTestSession(_fakeTestSources, _fakeRunSettings);
-        var proxyManager = CreateProxy(testSessionCriteria, null);
+        var testSessionCriteria = ProxyTestSessionManagerTests.CreateTestSession(_fakeTestSources, _fakeRunSettings);
+        var proxyManager = ProxyTestSessionManagerTests.CreateProxy(testSessionCriteria, null);
 
         Assert.IsFalse(proxyManager.StartSession(_mockEventsHandler.Object));
         _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
@@ -114,8 +114,8 @@ public class ProxyTestSessionManagerTests
             .Returns(false);
         mockProxyOperationManager.Setup(pom => pom.Close()).Callback(() => { });
 
-        var testSessionCriteria = CreateTestSession(_fakeTestSources, _fakeRunSettings);
-        var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+        var testSessionCriteria = ProxyTestSessionManagerTests.CreateTestSession(_fakeTestSources, _fakeRunSettings);
+        var proxyManager = ProxyTestSessionManagerTests.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
         // Call fails because SetupChannel returns false.
         Assert.IsFalse(proxyManager.StartSession(_mockEventsHandler.Object));
@@ -137,8 +137,8 @@ public class ProxyTestSessionManagerTests
             .Throws(new TestPlatformException("Dummy exception."));
         mockProxyOperationManager.Setup(pom => pom.Close()).Callback(() => { });
 
-        var testSessionCriteria = CreateTestSession(_fakeTestSources, _fakeRunSettings);
-        var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+        var testSessionCriteria = ProxyTestSessionManagerTests.CreateTestSession(_fakeTestSources, _fakeRunSettings);
+        var proxyManager = ProxyTestSessionManagerTests.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
         // Call fails because SetupChannel returns false.
         Assert.IsFalse(proxyManager.StartSession(_mockEventsHandler.Object));
@@ -165,8 +165,8 @@ public class ProxyTestSessionManagerTests
             .Returns(true);
         mockProxyOperationManager.Setup(pom => pom.Close()).Callback(() => { });
 
-        var testSessionCriteria = CreateTestSession(_fakeTestSources, _fakeRunSettings);
-        var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+        var testSessionCriteria = ProxyTestSessionManagerTests.CreateTestSession(_fakeTestSources, _fakeRunSettings);
+        var proxyManager = ProxyTestSessionManagerTests.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
         // Call to StartSession should fail because AddSession fails.
         Assert.IsFalse(proxyManager.StartSession(_mockEventsHandler.Object));
@@ -188,8 +188,8 @@ public class ProxyTestSessionManagerTests
             .Returns(true);
         mockProxyOperationManager.Setup(pom => pom.Close()).Callback(() => { });
 
-        var testSessionCriteria = CreateTestSession(_fakeTestSources, _fakeRunSettings);
-        var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+        var testSessionCriteria = ProxyTestSessionManagerTests.CreateTestSession(_fakeTestSources, _fakeRunSettings);
+        var proxyManager = ProxyTestSessionManagerTests.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
         // StartSession should succeed.
         Assert.IsTrue(proxyManager.StartSession(_mockEventsHandler.Object));
@@ -218,8 +218,8 @@ public class ProxyTestSessionManagerTests
             .Returns(true);
         mockProxyOperationManager.Setup(pom => pom.Close()).Callback(() => { });
 
-        var testSessionCriteria = CreateTestSession(_fakeTestMultipleSources, _fakeRunSettings);
-        var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+        var testSessionCriteria = ProxyTestSessionManagerTests.CreateTestSession(_fakeTestMultipleSources, _fakeRunSettings);
+        var proxyManager = ProxyTestSessionManagerTests.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
         // StartSession should succeed.
         Assert.IsTrue(proxyManager.StartSession(_mockEventsHandler.Object));
@@ -243,8 +243,8 @@ public class ProxyTestSessionManagerTests
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
 
-        var testSessionCriteria = CreateTestSession(_fakeTestSources, _fakeRunSettings);
-        var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+        var testSessionCriteria = ProxyTestSessionManagerTests.CreateTestSession(_fakeTestSources, _fakeRunSettings);
+        var proxyManager = ProxyTestSessionManagerTests.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
         // StartSession should succeed.
         Assert.IsTrue(proxyManager.StartSession(_mockEventsHandler.Object));
@@ -285,8 +285,8 @@ public class ProxyTestSessionManagerTests
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
 
-        var testSessionCriteria = CreateTestSession(_fakeTestSources, _fakeRunSettings);
-        var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+        var testSessionCriteria = ProxyTestSessionManagerTests.CreateTestSession(_fakeTestSources, _fakeRunSettings);
+        var proxyManager = ProxyTestSessionManagerTests.CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
         // Validate sanity checks.
         Assert.ThrowsException<ArgumentException>(() => proxyManager.EnqueueProxy(-1));
@@ -313,7 +313,7 @@ public class ProxyTestSessionManagerTests
         Assert.IsTrue(proxyManager.EnqueueProxy(0));
     }
 
-    private StartTestSessionCriteria CreateTestSession(IList<string> sources, string runSettings)
+    private static StartTestSessionCriteria CreateTestSession(IList<string> sources, string runSettings)
     {
         return new StartTestSessionCriteria()
         {
@@ -322,7 +322,7 @@ public class ProxyTestSessionManagerTests
         };
     }
 
-    private ProxyTestSessionManager CreateProxy(
+    private static ProxyTestSessionManager CreateProxy(
         StartTestSessionCriteria testSessionCriteria,
         ProxyOperationManager proxyOperationManager)
     {

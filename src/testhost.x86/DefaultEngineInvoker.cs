@@ -127,7 +127,7 @@ internal class DefaultEngineInvoker :
         EqtTrace.Info("DefaultEngineInvoker.Invoke: Start Request Processing.");
         try
         {
-            StartProcessingAsync(_requestHandler, new TestHostManagerFactory(requestData)).Wait();
+            DefaultEngineInvoker.StartProcessingAsync(_requestHandler, new TestHostManagerFactory(requestData)).Wait();
         }
         finally
         {
@@ -280,7 +280,7 @@ internal class DefaultEngineInvoker :
         }
     }
 
-    private Task StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
+    private static Task StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
     {
         var task = new Task(
             () =>

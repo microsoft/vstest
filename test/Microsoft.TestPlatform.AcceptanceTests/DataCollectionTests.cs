@@ -28,7 +28,7 @@ public class DataCollectionTests : AcceptanceTestBase
         using var tempDir = new TempDirectory();
 
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-        string runSettings = GetRunsettingsFilePath(tempDir.Path);
+        string runSettings = DataCollectionTests.GetRunsettingsFilePath(tempDir.Path);
         string diagFileName = Path.Combine(tempDir.Path, "diaglog.txt");
         var extensionsPath = Path.Combine(
             _testEnvironment.TestAssetsPath,
@@ -118,7 +118,7 @@ public class DataCollectionTests : AcceptanceTestBase
         using var tempDir = new TempDirectory();
         var assemblyPath = BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
         var secondAssemblyPath = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-        string runSettings = GetRunsettingsFilePath(tempDir.Path);
+        string runSettings = DataCollectionTests.GetRunsettingsFilePath(tempDir.Path);
         string diagFileName = Path.Combine(tempDir.Path, "diaglog.txt");
         var extensionsPath = Path.Combine(
             _testEnvironment.TestAssetsPath,
@@ -249,7 +249,7 @@ public class DataCollectionTests : AcceptanceTestBase
         Assert.AreEqual(3, diaglogsFileCount);
     }
 
-    private string GetRunsettingsFilePath(string resultsDir)
+    private static string GetRunsettingsFilePath(string resultsDir)
     {
         var runsettingsPath = Path.Combine(resultsDir, "test_" + Guid.NewGuid() + ".runsettings");
         var dataCollectionAttributes = new Dictionary<string, string>

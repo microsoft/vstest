@@ -39,11 +39,13 @@ public class InstallationContext
         return false;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public string GetVisualStudioPath(string visualStudioDirectory)
     {
         return Path.Combine(visualStudioDirectory, DevenvExe);
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public string[] GetVisualStudioCommonLocations(string visualStudioDirectory)
     {
         return new[]

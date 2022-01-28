@@ -58,7 +58,7 @@ internal class RunTestsWithTests : BaseRunTests
 
     protected override IEnumerable<Tuple<Uri, string>> GetExecutorUriExtensionMap(IFrameworkHandle testExecutorFrameworkHandle, RunContext runContext)
     {
-        _executorUriVsTestList = GetExecutorVsTestCaseList(_testCases);
+        _executorUriVsTestList = RunTestsWithTests.GetExecutorVsTestCaseList(_testCases);
 
         Debug.Assert(TestExecutionContext.TestCaseFilter == null, "TestCaseFilter should be null for specific tests.");
         runContext.FilterExpressionWrapper = null;
@@ -117,7 +117,7 @@ internal class RunTestsWithTests : BaseRunTests
     /// <summary>
     /// Returns the executor Vs TestCase list
     /// </summary>
-    private Dictionary<Tuple<Uri, string>, List<TestCase>> GetExecutorVsTestCaseList(IEnumerable<TestCase> tests)
+    private static Dictionary<Tuple<Uri, string>, List<TestCase>> GetExecutorVsTestCaseList(IEnumerable<TestCase> tests)
     {
         var result = new Dictionary<Tuple<Uri, string>, List<TestCase>>();
         foreach (var test in tests)

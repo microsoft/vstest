@@ -20,44 +20,44 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
      */
     protected const double ExpectedMinimalModuleCoverage = 30.0;
 
-    protected string GetNetStandardAdapterPath()
+    protected static string GetNetStandardAdapterPath()
     {
         return Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "Microsoft.CodeCoverage");
     }
 
-    protected string GetNetFrameworkAdapterPath()
+    protected static string GetNetFrameworkAdapterPath()
     {
         return Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "net451", "win7-x64", "Extensions");
     }
 
-    protected string GetCodeCoverageExePath()
+    protected static string GetCodeCoverageExePath()
     {
-        return Path.Combine(GetNetStandardAdapterPath(), "CodeCoverage", "CodeCoverage.exe");
+        return Path.Combine(CodeCoverageAcceptanceTestBase.GetNetStandardAdapterPath(), "CodeCoverage", "CodeCoverage.exe");
     }
 
-    protected XmlNode GetModuleNode(XmlNode node, string name)
+    protected static XmlNode GetModuleNode(XmlNode node, string name)
     {
-        var moduleNode = GetNode(node, "module", name);
+        var moduleNode = CodeCoverageAcceptanceTestBase.GetNode(node, "module", name);
 
         if (moduleNode == null)
         {
-            moduleNode = GetNode(node, "package", name);
+            moduleNode = CodeCoverageAcceptanceTestBase.GetNode(node, "package", name);
 
             if (moduleNode == null)
             {
-                moduleNode = GetNode(node, "package", Path.GetFileNameWithoutExtension(name));
+                moduleNode = CodeCoverageAcceptanceTestBase.GetNode(node, "package", Path.GetFileNameWithoutExtension(name));
             }
         }
 
         return moduleNode;
     }
 
-    protected XmlNode GetNode(XmlNode node, string type, string name)
+    protected static XmlNode GetNode(XmlNode node, string type, string name)
     {
         return node.SelectSingleNode($"//{type}[@name='{name}']");
     }
 
-    protected XmlDocument GetXmlCoverage(string coverageResult, TempDirectory tempDirectory)
+    protected static XmlDocument GetXmlCoverage(string coverageResult, TempDirectory tempDirectory)
     {
         var coverage = new XmlDocument();
 
@@ -67,7 +67,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
             return coverage;
         }
 
-        var codeCoverageExe = GetCodeCoverageExePath();
+        var codeCoverageExe = CodeCoverageAcceptanceTestBase.GetCodeCoverageExePath();
         var output = Path.Combine(tempDirectory.Path, Guid.NewGuid().ToString() + ".xml");
 
         var watch = new Stopwatch();
@@ -94,7 +94,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
         return coverage;
     }
 
-    protected void AssertCoverage(XmlNode node, double expectedCoverage)
+    protected static void AssertCoverage(XmlNode node, double expectedCoverage)
     {
         var coverage = node.Attributes["block_coverage"] != null
             ? double.Parse(node.Attributes["block_coverage"].Value)

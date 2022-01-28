@@ -70,7 +70,7 @@ public class IntegrationTestEnvironment
         }
     }
 
-    public Dictionary<string, string> DependencyVersions
+    public static Dictionary<string, string> DependencyVersions
     {
         get
         {

@@ -155,7 +155,7 @@ internal class TestRequestManager : ITestRequestManager
     /// <inheritdoc />
     public void ResetOptions()
     {
-        _commandLineOptions.Reset();
+        CommandLineOptions.Reset();
     }
 
     /// <inheritdoc />
@@ -190,7 +190,7 @@ internal class TestRequestManager : ITestRequestManager
         if (requestData.IsTelemetryOptedIn)
         {
             // Collect metrics.
-            CollectMetrics(requestData, runConfiguration);
+            TestRequestManager.CollectMetrics(requestData, runConfiguration);
 
             // Collect commands.
             LogCommandsTelemetryPoints(requestData);
@@ -268,7 +268,7 @@ internal class TestRequestManager : ITestRequestManager
         var requestData = GetRequestData(protocolConfig);
 
         // Get sources to auto detect fx and arch for both run selected or run all scenario.
-        var sources = GetSources(testRunRequestPayload);
+        var sources = TestRequestManager.GetSources(testRunRequestPayload);
 
         if (UpdateRunSettingsIfRequired(
                 runsettings,
@@ -293,13 +293,13 @@ internal class TestRequestManager : ITestRequestManager
         if (requestData.IsTelemetryOptedIn)
         {
             // Collect metrics.
-            CollectMetrics(requestData, runConfiguration);
+            TestRequestManager.CollectMetrics(requestData, runConfiguration);
 
             // Collect commands.
             LogCommandsTelemetryPoints(requestData);
 
             // Collect data for legacy settings.
-            LogTelemetryForLegacySettings(requestData, runsettings);
+            TestRequestManager.LogTelemetryForLegacySettings(requestData, runsettings);
         }
 
         // Get Fakes data collector settings.
@@ -486,7 +486,7 @@ internal class TestRequestManager : ITestRequestManager
         }
     }
 
-    private void LogTelemetryForLegacySettings(IRequestData requestData, string runsettings)
+    private static void LogTelemetryForLegacySettings(IRequestData requestData, string runsettings)
     {
         requestData.MetricsCollection.Add(
             TelemetryDataConstants.TestSettingsUsed,
@@ -634,7 +634,7 @@ internal class TestRequestManager : ITestRequestManager
                 sourcePlatforms,
                 defaultArchitecture,
                 out Architecture chosenPlatform);
-            CheckSourcesForCompatibility(
+            TestRequestManager.CheckSourcesForCompatibility(
                 chosenFramework,
                 chosenPlatform,
                 defaultArchitecture,
@@ -643,7 +643,7 @@ internal class TestRequestManager : ITestRequestManager
                 registrar);
             settingsUpdated |= UpdateDesignMode(document, runConfiguration);
             settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
-            settingsUpdated |= UpdateTargetDevice(navigator, document, runConfiguration);
+            settingsUpdated |= TestRequestManager.UpdateTargetDevice(navigator, document, runConfiguration);
             settingsUpdated |= AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
 
             updatedRunSettingsXml = navigator.OuterXml;
@@ -679,7 +679,7 @@ internal class TestRequestManager : ITestRequestManager
         LoggerRunSettings loggerRunSettings)
     {
         // Update console logger settings.
-        bool consoleLoggerUpdated = UpdateConsoleLoggerIfExists(document, loggerRunSettings);
+        bool consoleLoggerUpdated = TestRequestManager.UpdateConsoleLoggerIfExists(document, loggerRunSettings);
 
         // In case of CLI, add console logger if not already present.
         bool designMode = runConfiguration.DesignModeSet
@@ -687,7 +687,7 @@ internal class TestRequestManager : ITestRequestManager
             : _commandLineOptions.IsDesignMode;
         if (!designMode && !consoleLoggerUpdated)
         {
-            AddConsoleLogger(document, loggerRunSettings);
+            TestRequestManager.AddConsoleLogger(document, loggerRunSettings);
         }
 
         // Update is required:
@@ -696,7 +696,7 @@ internal class TestRequestManager : ITestRequestManager
         return !designMode || consoleLoggerUpdated;
     }
 
-    private bool UpdateTargetDevice(
+    private static bool UpdateTargetDevice(
         XPathNavigator navigator,
         XmlDocument document,
         RunConfiguration runConfiguration)
@@ -736,7 +736,7 @@ internal class TestRequestManager : ITestRequestManager
         return updateRequired;
     }
 
-    private void CheckSourcesForCompatibility(
+    private static void CheckSourcesForCompatibility(
         Framework chosenFramework,
         Architecture chosenPlatform,
         Architecture defaultArchitecture,
@@ -845,7 +845,7 @@ internal class TestRequestManager : ITestRequestManager
     /// </summary>
     /// <param name="document">Runsettings document.</param>
     /// <param name="loggerRunSettings">Logger run settings.</param>
-    private void AddConsoleLogger(XmlDocument document, LoggerRunSettings loggerRunSettings)
+    private static void AddConsoleLogger(XmlDocument document, LoggerRunSettings loggerRunSettings)
     {
         var consoleLogger = new LoggerSettings
         {
@@ -869,7 +869,7 @@ internal class TestRequestManager : ITestRequestManager
     /// <param name="document">Runsettings document.</param>
     /// <param name="loggerRunSettings">Logger run settings.</param>
     /// <returns>True if updated console logger in runsettings successfully.</returns>
-    private bool UpdateConsoleLoggerIfExists(
+    private static bool UpdateConsoleLoggerIfExists(
         XmlDocument document,
         LoggerRunSettings loggerRunSettings)
     {
@@ -1010,7 +1010,7 @@ internal class TestRequestManager : ITestRequestManager
     /// </summary>
     /// <param name="requestData">Request data for common Discovery/Execution services.</param>
     /// <param name="runConfiguration">Run configuration.</param>
-    private void CollectMetrics(IRequestData requestData, RunConfiguration runConfiguration)
+    private static void CollectMetrics(IRequestData requestData, RunConfiguration runConfiguration)
     {
         // Collecting Target Framework.
         requestData.MetricsCollection.Add(
@@ -1169,7 +1169,7 @@ internal class TestRequestManager : ITestRequestManager
         };
     }
 
-    private List<String> GetSources(TestRunRequestPayload testRunRequestPayload)
+    private static List<String> GetSources(TestRunRequestPayload testRunRequestPayload)
     {
         List<string> sources = new();
         if (testRunRequestPayload.Sources != null

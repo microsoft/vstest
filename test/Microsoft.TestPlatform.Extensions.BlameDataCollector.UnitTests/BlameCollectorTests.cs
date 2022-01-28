@@ -93,7 +93,7 @@ public class BlameCollectorTests
         _mockInactivityTimer.Setup(x => x.ResetTimer(It.Is<TimeSpan>(y => y.TotalMinutes == 1.0))).Callback(() => resetCalledCount++);
 
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(false, false, false),
+            BlameCollectorTests.GetDumpConfigurationElement(false, false, false),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
@@ -114,7 +114,7 @@ public class BlameCollectorTests
         _mockInactivityTimer.Setup(x => x.ResetTimer(It.Is<TimeSpan>(y => y.TotalMilliseconds == 1.0))).Callback(() => resetCalledCount++);
 
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(false, false, true, 1),
+            BlameCollectorTests.GetDumpConfigurationElement(false, false, true, 1),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
@@ -138,7 +138,7 @@ public class BlameCollectorTests
             .Returns(_filepath);
 
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(false, false, true, 1),
+            BlameCollectorTests.GetDumpConfigurationElement(false, false, true, 1),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
@@ -174,7 +174,7 @@ public class BlameCollectorTests
         _mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<FileTransferInformation>())).Callback(() => hangBasedDumpcollected.Set());
 
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(false, false, true, 0),
+            BlameCollectorTests.GetDumpConfigurationElement(false, false, true, 0),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
@@ -207,7 +207,7 @@ public class BlameCollectorTests
         _mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true, false)).Callback(() => hangBasedDumpcollected.Set()).Throws(new Exception("Some exception"));
 
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(false, false, true, 0),
+            BlameCollectorTests.GetDumpConfigurationElement(false, false, true, 0),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
@@ -241,7 +241,7 @@ public class BlameCollectorTests
         _mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<FileTransferInformation>())).Callback(() => hangBasedDumpcollected.Set()).Throws(new Exception("Some other exception"));
 
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(false, false, true, 0),
+            BlameCollectorTests.GetDumpConfigurationElement(false, false, true, 0),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
@@ -357,7 +357,7 @@ public class BlameCollectorTests
     {
         // Initializing Blame Data Collector
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(),
+            BlameCollectorTests.GetDumpConfigurationElement(),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
@@ -385,7 +385,7 @@ public class BlameCollectorTests
     {
         // Initializing Blame Data Collector
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(),
+            BlameCollectorTests.GetDumpConfigurationElement(),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
@@ -409,7 +409,7 @@ public class BlameCollectorTests
     {
         // Initializing Blame Data Collector
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(collectDumpOnExit: true),
+            BlameCollectorTests.GetDumpConfigurationElement(collectDumpOnExit: true),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
@@ -438,7 +438,7 @@ public class BlameCollectorTests
         // force it to collect dump on exit, which won't happen and we should see a warning
         // but we should not see warning if we tell it to create dump and there is no crash
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(false, collectDumpOnExit: true),
+            BlameCollectorTests.GetDumpConfigurationElement(false, collectDumpOnExit: true),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
@@ -464,7 +464,7 @@ public class BlameCollectorTests
     {
         // Initializing Blame Data Collector
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(),
+            BlameCollectorTests.GetDumpConfigurationElement(),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
@@ -485,7 +485,7 @@ public class BlameCollectorTests
     {
         // Initializing Blame Data Collector
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(isFullDump: true),
+            BlameCollectorTests.GetDumpConfigurationElement(isFullDump: true),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
@@ -504,7 +504,7 @@ public class BlameCollectorTests
     [TestMethod]
     public void TriggerTestHostLaunchedHandlerShouldStartProcDumpUtilityForFullDumpIfFullDumpEnabledCaseSensitivity()
     {
-        var dumpConfig = GetDumpConfigurationElement();
+        var dumpConfig = BlameCollectorTests.GetDumpConfigurationElement();
         var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("DuMpType");
         dumpTypeAttribute.Value = "FuLl";
         dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpTypeAttribute);
@@ -533,7 +533,7 @@ public class BlameCollectorTests
     [TestMethod]
     public void TriggerTestHostLaunchedHandlerShouldLogWarningForWrongCollectDumpKey()
     {
-        var dumpConfig = GetDumpConfigurationElement();
+        var dumpConfig = BlameCollectorTests.GetDumpConfigurationElement();
         var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("Xyz");
         dumpTypeAttribute.Value = "FuLl";
         dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpTypeAttribute);
@@ -559,7 +559,7 @@ public class BlameCollectorTests
     [TestMethod]
     public void TriggerTestHostLaunchedHandlerShouldLogWarningForWrongDumpType()
     {
-        var dumpConfig = GetDumpConfigurationElement();
+        var dumpConfig = BlameCollectorTests.GetDumpConfigurationElement();
         var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("DumpType");
         dumpTypeAttribute.Value = "random";
         dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpTypeAttribute);
@@ -585,7 +585,7 @@ public class BlameCollectorTests
     [TestMethod]
     public void TriggerTestHostLaunchedHandlerShouldLogWarningForNonBooleanCollectAlwaysValue()
     {
-        var dumpConfig = GetDumpConfigurationElement();
+        var dumpConfig = BlameCollectorTests.GetDumpConfigurationElement();
         var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("DumpType");
         dumpTypeAttribute.Value = "random";
         dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpTypeAttribute);
@@ -611,7 +611,7 @@ public class BlameCollectorTests
     [TestMethod]
     public void TriggerTestHostLaunchedHandlerShouldLogNoWarningWhenDumpTypeIsUsedWithHangDumpBecauseEitherHangDumpTypeOrDumpTypeCanBeSpecified()
     {
-        var dumpConfig = GetDumpConfigurationElement(isFullDump: true, false, colectDumpOnHang: true, 1800000);
+        var dumpConfig = BlameCollectorTests.GetDumpConfigurationElement(isFullDump: true, false, colectDumpOnHang: true, 1800000);
 
         // Initializing Blame Data Collector
         _blameDataCollector.Initialize(
@@ -636,7 +636,7 @@ public class BlameCollectorTests
     {
         // Initializing Blame Data Collector
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(),
+            BlameCollectorTests.GetDumpConfigurationElement(),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
@@ -662,7 +662,7 @@ public class BlameCollectorTests
     {
         // Initializing Blame Data Collector
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(),
+            BlameCollectorTests.GetDumpConfigurationElement(),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
@@ -686,7 +686,7 @@ public class BlameCollectorTests
         File.Delete(_filepath);
     }
 
-    private XmlElement GetDumpConfigurationElement(
+    private static XmlElement GetDumpConfigurationElement(
         bool isFullDump = false,
         bool collectDumpOnExit = false,
         bool colectDumpOnHang = false,

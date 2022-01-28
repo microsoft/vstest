@@ -138,7 +138,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
             if (message.MessageType == MessageType.DataCollectionMessage)
             {
                 var dataCollectionMessageEventArgs = _dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
-                LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
+                DataCollectionRequestSender.LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
             }
             else if (message.MessageType == MessageType.BeforeTestRunStartResult)
             {
@@ -177,7 +177,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
             if (message.MessageType == MessageType.DataCollectionMessage)
             {
                 var dataCollectionMessageEventArgs = _dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
-                LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
+                DataCollectionRequestSender.LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
             }
             else if (message.MessageType == MessageType.AfterTestRunEndResult)
             {
@@ -189,7 +189,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
         return result;
     }
 
-    private void LogDataCollectorMessage(DataCollectionMessageEventArgs dataCollectionMessageEventArgs, ITestMessageEventHandler requestHandler)
+    private static void LogDataCollectorMessage(DataCollectionMessageEventArgs dataCollectionMessageEventArgs, ITestMessageEventHandler requestHandler)
     {
         string logMessage;
         if (string.IsNullOrWhiteSpace(dataCollectionMessageEventArgs.FriendlyName))

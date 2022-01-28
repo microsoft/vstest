@@ -18,7 +18,7 @@ public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
     private IList<string> _adapterDependencies;
     private IList<string> _copiedFiles;
 
-    private string BuildConfiguration
+    private static string BuildConfiguration
     {
         get
         {
@@ -82,6 +82,6 @@ public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
     {
         DirectoryInfo currentDirectory = new DirectoryInfo(typeof(DeprecateExtensionsPathWarningTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent.Parent.Parent.Parent.Parent.Parent;
 
-        return Path.Combine(currentDirectory.FullName, "artifacts", BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
+        return Path.Combine(currentDirectory.FullName, "artifacts", DeprecateExtensionsPathWarningTests.BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
     }
 }

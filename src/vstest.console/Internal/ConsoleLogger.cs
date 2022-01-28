@@ -391,7 +391,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="testResult"></param>
     /// <returns></returns>
-    private Guid GetParentExecutionId(TestResult testResult)
+    private static Guid GetParentExecutionId(TestResult testResult)
     {
         var parentExecutionIdProperty = testResult.Properties.FirstOrDefault(property =>
             property.Id.Equals(ParentExecutionIdPropertyIdentifier));
@@ -405,7 +405,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="testResult"></param>
     /// <returns></returns>
-    private Guid GetExecutionId(TestResult testResult)
+    private static Guid GetExecutionId(TestResult testResult)
     {
         var executionIdProperty = testResult.Properties.FirstOrDefault(property =>
             property.Id.Equals(ExecutionIdPropertyIdentifier));
@@ -522,14 +522,14 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             testDisplayName = e.Result.TestCase.DisplayName;
         }
 
-        string formattedDuration = GetFormattedDurationString(e.Result.Duration);
+        string formattedDuration = ConsoleLogger.GetFormattedDurationString(e.Result.Duration);
         if (!string.IsNullOrEmpty(formattedDuration))
         {
             testDisplayName = string.Format("{0} [{1}]", testDisplayName, formattedDuration);
         }
 
-        var executionId = GetExecutionId(e.Result);
-        var parentExecutionId = GetParentExecutionId(e.Result);
+        var executionId = ConsoleLogger.GetExecutionId(e.Result);
+        var parentExecutionId = ConsoleLogger.GetParentExecutionId(e.Result);
 
         if (parentExecutionId != Guid.Empty)
         {
@@ -638,7 +638,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         }
     }
 
-    private string GetFormattedDurationString(TimeSpan duration)
+    private static string GetFormattedDurationString(TimeSpan duration)
     {
         if (duration == default)
         {
@@ -774,7 +774,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     ? string.Empty
                     : $"({_targetFramework})";
 
-                var duration = GetFormattedDurationString(sourceSummary.Duration);
+                var duration = ConsoleLogger.GetFormattedDurationString(sourceSummary.Duration);
                 var sourceName = sd.Key.Split('\\').Last();
 
                 var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,

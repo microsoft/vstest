@@ -154,7 +154,7 @@ internal class AssemblyResolver : IDisposable
 
                         AssemblyName foundName = _platformAssemblyLoadContext.GetAssemblyNameFromPath(assemblyPath);
 
-                        if (!RequestedAssemblyNameMatchesFound(requestedName, foundName))
+                        if (!AssemblyResolver.RequestedAssemblyNameMatchesFound(requestedName, foundName))
                         {
                             EqtTrace.Info("AssemblyResolver.OnResolve: {0}: File exists but version/public key is wrong. Try next extension.", args.Name);
                             continue;   // File exists but version/public key is wrong. Try next extension.
@@ -204,7 +204,7 @@ internal class AssemblyResolver : IDisposable
     /// <returns>
     /// The <see cref="bool"/>.
     /// </returns>
-    private bool RequestedAssemblyNameMatchesFound(AssemblyName requestedName, AssemblyName foundName)
+    private static bool RequestedAssemblyNameMatchesFound(AssemblyName requestedName, AssemblyName foundName)
     {
         Debug.Assert(requestedName != null);
         Debug.Assert(foundName != null);

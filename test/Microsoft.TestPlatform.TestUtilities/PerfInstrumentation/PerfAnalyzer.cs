@@ -44,6 +44,7 @@ public class PerfAnalyzer
     /// <summary>
     /// The enable provider.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "NETFRAMEWORK compilation uses fields.")]
     public void EnableProvider()
     {
 #if NETFRAMEWORK
@@ -55,6 +56,7 @@ public class PerfAnalyzer
     /// <summary>
     /// The disable provider.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "NETFRAMEWORK compilation uses fields.")]
     public void DisableProvider()
     {
 #if NETFRAMEWORK
@@ -65,6 +67,7 @@ public class PerfAnalyzer
     /// <summary>
     /// The analyze events data.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "NETFRAMEWORK compilation uses fields.")]
     public void AnalyzeEventsData()
     {
 #if NETFRAMEWORK
@@ -116,6 +119,7 @@ public class PerfAnalyzer
     /// <returns>
     /// The <see cref="double"/>.
     /// </returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "NETFRAMEWORK compilation uses fields.")]
     public double GetElapsedTimeByTaskName(string taskName)
     {
         var timeTaken = 0.0;
@@ -140,6 +144,7 @@ public class PerfAnalyzer
     /// <returns>
     /// The <see cref="IDictionary"/>.
     /// </returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "NETFRAMEWORK compilation uses fields.")]
     public IDictionary<string, string> GetEventDataByTaskName(string taskName)
     {
         IDictionary<string, string> properties = new Dictionary<string, string>();
@@ -154,6 +159,7 @@ public class PerfAnalyzer
         return properties;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "NETFRAMEWORK compilation uses fields.")]
     public double GetAdapterExecutionTime(string executorUri)
     {
         var timeTaken = 0.0;
@@ -169,6 +175,7 @@ public class PerfAnalyzer
         return timeTaken;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "NETFRAMEWORK compilation uses fields.")]
     public long GetAdapterExecutedTests(string executorUri)
     {
         long totalTestsExecuted = 0;

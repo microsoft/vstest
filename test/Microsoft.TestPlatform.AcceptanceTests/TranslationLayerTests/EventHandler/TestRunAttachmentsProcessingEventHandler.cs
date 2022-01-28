@@ -62,18 +62,6 @@ public class TestRunAttachmentsProcessingEventHandler : ITestRunAttachmentsProce
         // No op
     }
 
-    public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
-    {
-        // No op
-        return -1;
-    }
-
-    public bool AttachDebuggerToProcess(int pid)
-    {
-        // No op
-        return true;
-    }
-
     public void HandleTestRunAttachmentsProcessingComplete(ICollection<AttachmentSet> attachments)
     {
         if (attachments != null)

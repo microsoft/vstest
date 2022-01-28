@@ -351,7 +351,7 @@ public class TestPluginCache
         else
         {
             // Check if extensions from this assembly have already been discovered.
-            var extensions = TestExtensions?.GetExtensionsDiscoveredFromAssembly(
+            var extensions = TestExtensions.GetExtensionsDiscoveredFromAssembly(
                 TestExtensions.GetTestExtensionCache<TPluginInfo>(),
                 extensionAssembly);
 
@@ -378,7 +378,7 @@ public class TestPluginCache
     /// </summary>
     /// <param name="extensionAssembly">The extension assembly.</param>
     /// <returns>Resolution paths for the assembly.</returns>
-    internal IList<string> GetResolutionPaths(string extensionAssembly)
+    internal static IList<string> GetResolutionPaths(string extensionAssembly)
     {
         var resolutionPaths = new List<string>();
 
@@ -498,12 +498,12 @@ public class TestPluginCache
             SetupAssemblyResolver(extensionPath);
         }
 
-        return new TestPluginDiscoverer().GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths);
+        return TestPluginDiscoverer.GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths);
     }
 
     protected void SetupAssemblyResolver(string extensionAssembly)
     {
-        IList<string> resolutionPaths = string.IsNullOrEmpty(extensionAssembly) ? GetDefaultResolutionPaths() : GetResolutionPaths(extensionAssembly);
+        IList<string> resolutionPaths = string.IsNullOrEmpty(extensionAssembly) ? GetDefaultResolutionPaths() : TestPluginCache.GetResolutionPaths(extensionAssembly);
 
         // Add assembly resolver which can resolve the extensions from the specified directory.
         if (_assemblyResolver == null)

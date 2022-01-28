@@ -193,7 +193,7 @@ public class ProxyOperationManager
             Port = portNumber,
             ConnectionInfo = testHostConnectionInfo,
             RunnerProcessId = processId,
-            LogFile = GetTimestampedLogFile(EqtTrace.LogFile),
+            LogFile = ProxyOperationManager.GetTimestampedLogFile(EqtTrace.LogFile),
             TraceLevel = (int)EqtTrace.TraceLevel
         };
 
@@ -393,7 +393,7 @@ public class ProxyOperationManager
         return updatedRunSettingsXml;
     }
 
-    private string GetTimestampedLogFile(string logFile)
+    private static string GetTimestampedLogFile(string logFile)
     {
         return string.IsNullOrWhiteSpace(logFile)
             ? null

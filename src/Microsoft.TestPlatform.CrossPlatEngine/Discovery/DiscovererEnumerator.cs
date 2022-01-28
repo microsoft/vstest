@@ -149,7 +149,7 @@ internal class DiscovererEnumerator
             context.FilterExpressionWrapper = !string.IsNullOrEmpty(testCaseFilter) ? new FilterExpressionWrapper(testCaseFilter) : null;
 
             // Set on the logger the TreatAdapterErrorAsWarning setting from runsettings.
-            SetAdapterLoggingSettings(logger, settings);
+            DiscovererEnumerator.SetAdapterLoggingSettings(logger, settings);
 
             var discoverySink = new TestCaseDiscoverySink(_discoveryResultCache);
             foreach (var discoverer in discovererToSourcesMap.Keys)
@@ -157,7 +157,7 @@ internal class DiscovererEnumerator
                 if (_cancellationToken.IsCancellationRequested)
                 {
                     EqtTrace.Info("DiscovererEnumerator.LoadTestsFromAnExtension: Cancellation Requested. Aborting the discovery");
-                    LogTestsDiscoveryCancellation(logger);
+                    DiscovererEnumerator.LogTestsDiscoveryCancellation(logger);
                     return;
                 }
 
@@ -175,7 +175,7 @@ internal class DiscovererEnumerator
         }
     }
 
-    private void LogTestsDiscoveryCancellation(IMessageLogger logger)
+    private static void LogTestsDiscoveryCancellation(IMessageLogger logger)
     {
         logger.SendMessage(TestMessageLevel.Warning, CrossPlatEngineResources.TestDiscoveryCancelled);
     }
@@ -329,7 +329,7 @@ internal class DiscovererEnumerator
         }
     }
 
-    private void SetAdapterLoggingSettings(IMessageLogger messageLogger, IRunSettings runSettings)
+    private static void SetAdapterLoggingSettings(IMessageLogger messageLogger, IRunSettings runSettings)
     {
         if (messageLogger is TestSessionMessageLogger discoveryMessageLogger && runSettings != null)
         {

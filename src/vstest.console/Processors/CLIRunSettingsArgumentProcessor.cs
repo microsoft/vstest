@@ -194,7 +194,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
         {
             var arg = mergedArgs[index];
 
-            if (UpdateTestRunParameterNode(runSettingsProvider, arg))
+            if (CliRunSettingsArgumentExecutor.UpdateTestRunParameterNode(runSettingsProvider, arg))
             {
                 continue;
             }
@@ -221,7 +221,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
         }
     }
 
-    private bool UpdateTestRunParameterNode(IRunSettingsProvider runSettingsProvider, string node)
+    private static bool UpdateTestRunParameterNode(IRunSettingsProvider runSettingsProvider, string node)
     {
         if (!node.Contains(Constants.TestRunParametersName))
         {

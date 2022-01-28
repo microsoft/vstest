@@ -352,13 +352,13 @@ public class XmlRunSettingsUtilitiesTests
     [TestMethod]
     public void IsInProcDataCollectionEnabledShouldReturnFalseIfDataCollectionIsDisabled()
     {
-        Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(_runSettingsXmlWithDataCollectorsDisabled)));
+        Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(XmlRunSettingsUtilitiesTests.ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(_runSettingsXmlWithDataCollectorsDisabled)));
     }
 
     [TestMethod]
     public void IsInProcDataCollectionEnabledShouldReturnTrueIfDataCollectionIsEnabled()
     {
-        Assert.IsTrue(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(_runSettingsXmlWithDataCollectors)));
+        Assert.IsTrue(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(XmlRunSettingsUtilitiesTests.ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(_runSettingsXmlWithDataCollectors)));
     }
 
     #endregion
@@ -1195,7 +1195,7 @@ public class XmlRunSettingsUtilitiesTests
         CollectionAssert.AreEqual(friendlyNameList, new List<string> { "DummyDataCollector1", "DummyDataCollector2" });
     }
 
-    private string ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(string settings)
+    private static string ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(string settings)
     {
         return
             settings.Replace("DataCollectionRunSettings", "InProcDataCollectionRunSettings")

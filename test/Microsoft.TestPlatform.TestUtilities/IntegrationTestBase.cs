@@ -208,7 +208,7 @@ public class IntegrationTestBase
     /// <param name="runnerFramework">Runner Framework</param>
     /// <param name="framework">Framework for which Tests are not supported</param>
     /// <param name="message">Message to be shown</param>
-    public void ExecuteNotSupportedRunnerFrameworkTests(string runnerFramework, string framework, string message)
+    public static void ExecuteNotSupportedRunnerFrameworkTests(string runnerFramework, string framework, string message)
     {
         if (runnerFramework.StartsWith(framework))
         {
@@ -433,19 +433,19 @@ public class IntegrationTestBase
 
         if (testFramework == UnitTestFramework.MSTest)
         {
-            adapterRelativePath = string.Format(_testAdapterRelativePath, _testEnvironment.DependencyVersions["MSTestAdapterVersion"]);
+            adapterRelativePath = string.Format(_testAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["MSTestAdapterVersion"]);
         }
         else if (testFramework == UnitTestFramework.NUnit)
         {
-            adapterRelativePath = string.Format(_nUnitTestAdapterRelativePath, _testEnvironment.DependencyVersions["NUnit3AdapterVersion"]);
+            adapterRelativePath = string.Format(_nUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["NUnit3AdapterVersion"]);
         }
         else if (testFramework == UnitTestFramework.XUnit)
         {
-            adapterRelativePath = string.Format(_xUnitTestAdapterRelativePath, _testEnvironment.DependencyVersions["XUnitAdapterVersion"]);
+            adapterRelativePath = string.Format(_xUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["XUnitAdapterVersion"]);
         }
         else if (testFramework == UnitTestFramework.Chutzpah)
         {
-            adapterRelativePath = string.Format(_chutzpahTestAdapterRelativePath, _testEnvironment.DependencyVersions["ChutzpahAdapterVersion"]);
+            adapterRelativePath = string.Format(_chutzpahTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["ChutzpahAdapterVersion"]);
         }
 
         return _testEnvironment.GetNugetPackage(adapterRelativePath);
@@ -566,7 +566,7 @@ public class IntegrationTestBase
 
         _arguments = args;
 
-        ExecuteApplication(GetConsoleRunnerPath(), args, out stdOut, out stdError, out exitCode, environmentVariables);
+        IntegrationTestBase.ExecuteApplication(GetConsoleRunnerPath(), args, out stdOut, out stdError, out exitCode, environmentVariables);
     }
 
     /// <summary>
@@ -587,10 +587,10 @@ public class IntegrationTestBase
 
         var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
         var patchedDotnetPath = Path.Combine(_testEnvironment.TestArtifactsDirectory, executablePath);
-        ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
+        IntegrationTestBase.ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
     }
 
-    protected void ExecuteApplication(string path, string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null, string workingDirectory = null)
+    protected static void ExecuteApplication(string path, string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null, string workingDirectory = null)
     {
         if (string.IsNullOrWhiteSpace(path))
         {

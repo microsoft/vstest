@@ -103,7 +103,7 @@ internal class InProcDataCollector : IInProcDataCollector
     public void LoadDataCollector(IDataCollectionSink inProcDataCollectionSink)
     {
         _dataCollectorObject = CreateObjectFromType(_dataCollectorType);
-        InitializeDataCollector(_dataCollectorObject, inProcDataCollectionSink);
+        InProcDataCollector.InitializeDataCollector(_dataCollectorObject, inProcDataCollectionSink);
     }
 
     /// <summary>
@@ -129,7 +129,7 @@ internal class InProcDataCollector : IInProcDataCollector
 
     #region Private Methods
 
-    private void InitializeDataCollector(object obj, IDataCollectionSink inProcDataCollectionSink)
+    private static void InitializeDataCollector(object obj, IDataCollectionSink inProcDataCollectionSink)
     {
         var initializeMethodInfo = GetMethodInfoFromType(obj.GetType(), "Initialize", new Type[] { typeof(IDataCollectionSink) });
         initializeMethodInfo.Invoke(obj, new object[] { inProcDataCollectionSink });

@@ -115,7 +115,7 @@ public class DataCollectorAttachmentsProcessorsFactoryTests
     {
         // arrange
         // We cannot cleanup at the end because assembly will be copied into tmp directory and loaded
-        string testAssetsPath = GetTestAssetsFolder();
+        string testAssetsPath = DataCollectorAttachmentsProcessorsFactoryTests.GetTestAssetsFolder();
         var dataCollectorFilePath = Directory.GetFiles(testAssetsPath, "AttachmentProcessorDataCollector.dll", SearchOption.AllDirectories).Where(x => x.Contains("bin")).Single();
         string tmpDir = Path.Combine(Path.GetTempPath(), nameof(Create_ShouldLoadOrderingByFilePath));
         Directory.CreateDirectory(tmpDir);
@@ -142,7 +142,7 @@ public class DataCollectorAttachmentsProcessorsFactoryTests
         Assert.AreEqual(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[1].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
     }
 
-    private string GetTestAssetsFolder()
+    private static string GetTestAssetsFolder()
     {
         string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         while (true)

@@ -40,7 +40,7 @@ public class DiaSessionTests : IntegrationTestBase
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
         StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
 
-        ValidateMinLineNumber(11, diaNavigationData.MinLineNumber);
+        DiaSessionTests.ValidateMinLineNumber(11, diaNavigationData.MinLineNumber);
         Assert.AreEqual(13, diaNavigationData.MaxLineNumber, "Incorrect max line number");
 
         _testEnvironment.TargetFramework = currentTargetFrameWork;
@@ -58,7 +58,7 @@ public class DiaSessionTests : IntegrationTestBase
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
         StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
 
-        ValidateMinLineNumber(16, diaNavigationData.MinLineNumber);
+        DiaSessionTests.ValidateMinLineNumber(16, diaNavigationData.MinLineNumber);
         Assert.AreEqual(18, diaNavigationData.MaxLineNumber, "Incorrect max line number");
 
         _testEnvironment.TargetFramework = currentTargetFrameWork;
@@ -78,7 +78,7 @@ public class DiaSessionTests : IntegrationTestBase
 
         // Weird why DiaSession is now returning the first overloaded method
         // as compared to before when it used to return second method
-        ValidateLineNumbers(diaNavigationData.MinLineNumber, diaNavigationData.MaxLineNumber);
+        DiaSessionTests.ValidateLineNumbers(diaNavigationData.MinLineNumber, diaNavigationData.MaxLineNumber);
 
         _testEnvironment.TargetFramework = currentTargetFrameWork;
     }
@@ -115,7 +115,7 @@ public class DiaSessionTests : IntegrationTestBase
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
         StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\HugeMethodSet.cs");
-        ValidateMinLineNumber(9, diaNavigationData.MinLineNumber);
+        DiaSessionTests.ValidateMinLineNumber(9, diaNavigationData.MinLineNumber);
         Assert.AreEqual(10, diaNavigationData.MaxLineNumber);
         var expectedTime = 150;
         Assert.IsTrue(watch.Elapsed.Milliseconds < expectedTime, string.Format("DiaSession Perf test Actual time:{0} ms Expected time:{1} ms", watch.Elapsed.Milliseconds, expectedTime));
@@ -123,7 +123,7 @@ public class DiaSessionTests : IntegrationTestBase
         _testEnvironment.TargetFramework = currentTargetFrameWork;
     }
 
-    private void ValidateLineNumbers(int min, int max)
+    private static void ValidateLineNumbers(int min, int max)
     {
         // Release builds optimize code, hence min line numbers are different.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
@@ -147,7 +147,7 @@ public class DiaSessionTests : IntegrationTestBase
         }
     }
 
-    private void ValidateMinLineNumber(int expected, int actual)
+    private static void ValidateMinLineNumber(int expected, int actual)
     {
         // Release builds optimize code, hence min line numbers are different.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))

@@ -698,10 +698,10 @@ public class TrxLoggerTests
             trxLogger1.Initialize(_events.Object, _parameters);
             trxLogger2.Initialize(_events.Object, _parameters);
 
-            MakeTestRunComplete(trxLogger1);
+            TrxLoggerTests.MakeTestRunComplete(trxLogger1);
             files[0] = trxLogger1.TrxFile;
 
-            MakeTestRunComplete(trxLogger2);
+            TrxLoggerTests.MakeTestRunComplete(trxLogger2);
             files[1] = trxLogger2.TrxFile;
         }
         finally
@@ -791,7 +791,7 @@ public class TrxLoggerTests
 
         Assert.IsTrue(File.Exists(_testableTrxLogger.TrxFile), string.Format("TRX file: {0}, should have got created.", _testableTrxLogger.TrxFile));
 
-        string actualMessage = GetElementValueFromTrx(_testableTrxLogger.TrxFile, "StdOut");
+        string actualMessage = TrxLoggerTests.GetElementValueFromTrx(_testableTrxLogger.TrxFile, "StdOut");
 
         Assert.IsNotNull(actualMessage);
         Assert.IsTrue(string.Equals(message, actualMessage), string.Format("StdOut messages do not match. Expected:{0}, Actual:{1}", message, actualMessage));
@@ -801,20 +801,20 @@ public class TrxLoggerTests
     public void TestRunInformationShouldContainUtcDateTime()
     {
         MakeTestRunComplete();
-        ValidateDateTimeInTrx(_testableTrxLogger.TrxFile);
+        TrxLoggerTests.ValidateDateTimeInTrx(_testableTrxLogger.TrxFile);
     }
 
-    private void ValidateDateTimeInTrx(string trxFileName)
+    private static void ValidateDateTimeInTrx(string trxFileName)
     {
         using FileStream file = File.OpenRead(trxFileName);
         using XmlReader reader = XmlReader.Create(file);
         XDocument document = XDocument.Load(reader);
         var timesNode = document.Descendants(document.Root.GetDefaultNamespace() + "Times").FirstOrDefault();
-        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("creation").FirstOrDefault().Value));
-        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("start").FirstOrDefault().Value));
+        TrxLoggerTests.ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("creation").FirstOrDefault().Value));
+        TrxLoggerTests.ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("start").FirstOrDefault().Value));
         var resultNode = document.Descendants(document.Root.GetDefaultNamespace() + "UnitTestResult").FirstOrDefault();
-        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("endTime").FirstOrDefault().Value));
-        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("startTime").FirstOrDefault().Value));
+        TrxLoggerTests.ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("endTime").FirstOrDefault().Value));
+        TrxLoggerTests.ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("startTime").FirstOrDefault().Value));
     }
 
     [TestMethod]
@@ -881,10 +881,10 @@ public class TrxLoggerTests
         var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
         _testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
 
-        ValidateResultAttributesInTrx(_testableTrxLogger.TrxFile, testCase.Id, testCase.DisplayName, isMstestAdapter);
+        TrxLoggerTests.ValidateResultAttributesInTrx(_testableTrxLogger.TrxFile, testCase.Id, testCase.DisplayName, isMstestAdapter);
     }
 
-    private void ValidateResultAttributesInTrx(string trxFileName, Guid testId, string testName, bool isMstestAdapter)
+    private static void ValidateResultAttributesInTrx(string trxFileName, Guid testId, string testName, bool isMstestAdapter)
     {
         using FileStream file = File.OpenRead(trxFileName);
         using XmlReader reader = XmlReader.Create(file);
@@ -902,12 +902,12 @@ public class TrxLoggerTests
         }
     }
 
-    private void ValidateTimeWithinUtcLimits(DateTimeOffset dateTime)
+    private static void ValidateTimeWithinUtcLimits(DateTimeOffset dateTime)
     {
         Assert.IsTrue(dateTime.UtcDateTime.Subtract(DateTime.UtcNow) < new TimeSpan(0, 0, 0, 60));
     }
 
-    private string GetElementValueFromTrx(string trxFileName, string fieldName)
+    private static string GetElementValueFromTrx(string trxFileName, string fieldName)
     {
         using (FileStream file = File.OpenRead(trxFileName))
         using (XmlReader reader = XmlReader.Create(file))
@@ -953,9 +953,9 @@ public class TrxLoggerTests
         return new Mock<TestResultEventArgs>(passResult);
     }
 
-    private void MakeTestRunComplete() => MakeTestRunComplete(_testableTrxLogger);
+    private void MakeTestRunComplete() => TrxLoggerTests.MakeTestRunComplete(_testableTrxLogger);
 
-    private void MakeTestRunComplete(TestableTrxLogger testableTrxLogger)
+    private static void MakeTestRunComplete(TestableTrxLogger testableTrxLogger)
     {
         var pass = CreatePassTestResultEventArgsMock();
         testableTrxLogger.TestResultHandler(new object(), pass.Object);

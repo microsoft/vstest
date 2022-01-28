@@ -31,7 +31,7 @@ public sealed class SocketTransport : ITransport
     /// <inheritdoc/>
     public IPEndPoint Initialize()
     {
-        var endpoint = GetIpEndPoint(_connectionInfo.Endpoint);
+        var endpoint = SocketTransport.GetIpEndPoint(_connectionInfo.Endpoint);
         switch (_connectionInfo.Role)
         {
             case ConnectionRole.Host:
@@ -45,7 +45,7 @@ public sealed class SocketTransport : ITransport
 
             case ConnectionRole.Client:
                 {
-                    _communicationManager.SetupClientAsync(GetIpEndPoint(_connectionInfo.Endpoint));
+                    _communicationManager.SetupClientAsync(SocketTransport.GetIpEndPoint(_connectionInfo.Endpoint));
                     return endpoint;
                 }
 
@@ -90,7 +90,7 @@ public sealed class SocketTransport : ITransport
     /// </summary>
     /// <param name="endpointAddress">Input endpoint address</param>
     /// <returns>IPEndpoint from give string</returns>
-    private IPEndPoint GetIpEndPoint(string endpointAddress)
+    private static IPEndPoint GetIpEndPoint(string endpointAddress)
     {
         return Uri.TryCreate(string.Concat("tcp://", endpointAddress), UriKind.Absolute, out Uri uri)
             ? new IPEndPoint(IPAddress.Parse(uri.Host), uri.Port < 0 ? 0 : uri.Port)

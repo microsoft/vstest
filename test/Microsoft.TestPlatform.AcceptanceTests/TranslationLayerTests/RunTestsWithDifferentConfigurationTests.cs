@@ -103,7 +103,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     public void RunTestsWithTestSettings(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+        IntegrationTestBase.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
         Setup();
 
         using var tempDir = new TempDirectory();

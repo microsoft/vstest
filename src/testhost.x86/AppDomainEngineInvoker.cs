@@ -96,7 +96,7 @@ internal class AppDomainEngineInvoker<T> : IEngineInvoker where T : MarshalByRef
     /// <param name="testSourcePath">Test Source to run/discover tests for</param>
     /// <param name="mergedConfigFile">Merged config file if there is any merging of test config and test host config</param>
     /// <returns></returns>
-    private IEngineInvoker CreateInvokerInAppDomain(AppDomain appDomain)
+    private static IEngineInvoker CreateInvokerInAppDomain(AppDomain appDomain)
     {
         // Create CustomAssembly setup that sets a custom assembly resolver to be able to resolve TestPlatform assemblies
         // and also sets the correct UI culture to propagate the dotnet or VS culture to the adapters running in the app domain

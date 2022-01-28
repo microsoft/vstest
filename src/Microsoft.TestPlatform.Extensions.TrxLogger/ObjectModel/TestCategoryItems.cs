@@ -37,7 +37,7 @@ internal sealed class TestCategoryItem : IXmlTestStore
         }
 
 
-        _category = StripIllegalChars(category);
+        _category = TestCategoryItem.StripIllegalChars(category);
     }
 
     #endregion
@@ -54,7 +54,7 @@ internal sealed class TestCategoryItem : IXmlTestStore
         }
     }
 
-    private string StripIllegalChars(string category)
+    private static string StripIllegalChars(string category)
     {
         string ret = category.Trim();
         ret = ret.Replace("&", String.Empty);

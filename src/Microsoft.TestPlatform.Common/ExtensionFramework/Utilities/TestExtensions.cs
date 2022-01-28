@@ -149,31 +149,31 @@ public class TestExtensions
         var testExtensions = new TestExtensions();
 
         testExtensions.TestDiscoverers =
-            GetExtensionsDiscoveredFromAssembly(
+            TestExtensions.GetExtensionsDiscoveredFromAssembly(
                 TestDiscoverers,
                 extensionAssembly);
         testExtensions.TestExecutors =
-            GetExtensionsDiscoveredFromAssembly(
+            TestExtensions.GetExtensionsDiscoveredFromAssembly(
                 TestExecutors,
                 extensionAssembly);
         testExtensions.TestExecutors2 =
-            GetExtensionsDiscoveredFromAssembly(
+            TestExtensions.GetExtensionsDiscoveredFromAssembly(
                 TestExecutors2,
                 extensionAssembly);
         testExtensions.TestSettingsProviders =
-            GetExtensionsDiscoveredFromAssembly(
+            TestExtensions.GetExtensionsDiscoveredFromAssembly(
                 TestSettingsProviders,
                 extensionAssembly);
         testExtensions.TestLoggers =
-            GetExtensionsDiscoveredFromAssembly(
+            TestExtensions.GetExtensionsDiscoveredFromAssembly(
                 TestLoggers,
                 extensionAssembly);
         testExtensions.TestHosts =
-            GetExtensionsDiscoveredFromAssembly(
+            TestExtensions.GetExtensionsDiscoveredFromAssembly(
                 TestHosts,
                 extensionAssembly);
         testExtensions.DataCollectors =
-            GetExtensionsDiscoveredFromAssembly(
+            TestExtensions.GetExtensionsDiscoveredFromAssembly(
                 DataCollectors,
                 extensionAssembly);
 
@@ -339,7 +339,7 @@ public class TestExtensions
     /// <returns>
     /// The <see cref="Dictionary"/>. of extensions discovered in assembly
     /// </returns>
-    internal Dictionary<string, TPluginInfo> GetExtensionsDiscoveredFromAssembly<TPluginInfo>(
+    internal static Dictionary<string, TPluginInfo> GetExtensionsDiscoveredFromAssembly<TPluginInfo>(
         Dictionary<string, TPluginInfo> extensionCollection,
         string extensionAssembly)
     {

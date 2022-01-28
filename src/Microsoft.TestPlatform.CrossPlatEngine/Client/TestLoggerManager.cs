@@ -149,9 +149,9 @@ internal class TestLoggerManager : ITestLoggerManager
         EnableLogging();
 
         // Store test run directory. This runsettings is the final runsettings merging CLI args and runsettings.
-        _testRunDirectory = GetResultsDirectory(runSettings);
-        _targetFramework = GetTargetFramework(runSettings)?.Name;
-        _treatNoTestsAsError = GetTreatNoTestsAsError(runSettings);
+        _testRunDirectory = TestLoggerManager.GetResultsDirectory(runSettings);
+        _targetFramework = TestLoggerManager.GetTargetFramework(runSettings)?.Name;
+        _treatNoTestsAsError = TestLoggerManager.GetTreatNoTestsAsError(runSettings);
 
         var loggers = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettings);
 
@@ -163,7 +163,7 @@ internal class TestLoggerManager : ITestLoggerManager
                 continue;
             }
 
-            var parameters = GetParametersFromConfigurationElement(logger.Configuration);
+            var parameters = TestLoggerManager.GetParametersFromConfigurationElement(logger.Configuration);
             var loggerInitialized = false;
 
             // Try initializing logger by type.
@@ -444,7 +444,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     /// <param name="runSettings">Test run settings.</param>
     /// <returns>Test results directory</returns>
-    internal string GetResultsDirectory(string runSettings)
+    internal static string GetResultsDirectory(string runSettings)
     {
         string resultsDirectory = null;
         if (runSettings != null)
@@ -471,7 +471,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     /// <param name="runSettings">Test run settings.</param>
     /// <returns>Target framework</returns>
-    internal Framework GetTargetFramework(string runSettings)
+    internal static Framework GetTargetFramework(string runSettings)
     {
         Framework targetFramework = null;
         if (runSettings != null)
@@ -498,7 +498,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     /// <param name="runSettings"></param>
     /// <returns></returns>
-    internal bool GetTreatNoTestsAsError(string runSettings)
+    internal static bool GetTreatNoTestsAsError(string runSettings)
     {
         return RunSettingsUtilities.GetTreatNoTestsAsError(runSettings);
     }
@@ -542,7 +542,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     /// <param name="configuration"></param>
     /// <returns></returns>
-    private Dictionary<string, string> GetParametersFromConfigurationElement(XmlElement configuration)
+    private static Dictionary<string, string> GetParametersFromConfigurationElement(XmlElement configuration)
     {
         var configurationManager = new LoggerNameValueConfigurationManager(configuration);
         return configurationManager.NameValuePairs;

@@ -252,7 +252,7 @@ internal class DataCollectionManager : IDataCollectionManager
 
         if (EqtTrace.IsVerboseEnabled)
         {
-            LogAttachments(result);
+            DataCollectionManager.LogAttachments(result);
         }
 
         return new Collection<AttachmentSet>(result);
@@ -346,7 +346,7 @@ internal class DataCollectionManager : IDataCollectionManager
 
         if (EqtTrace.IsVerboseEnabled)
         {
-            LogAttachments(result);
+            DataCollectionManager.LogAttachments(result);
         }
 
         return new Collection<AttachmentSet>(result);
@@ -766,7 +766,7 @@ internal class DataCollectionManager : IDataCollectionManager
         }
     }
 
-    private void LogAttachments(List<AttachmentSet> attachmentSets)
+    private static void LogAttachments(List<AttachmentSet> attachmentSets)
     {
         foreach (var entry in attachmentSets)
         {

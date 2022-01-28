@@ -235,13 +235,13 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             Assert.IsTrue(actualCoverageFile.EndsWith(".coverage", StringComparison.InvariantCultureIgnoreCase));
         }
 
-        var coverageDocument = GetXmlCoverage(actualCoverageFile, tempDir);
+        var coverageDocument = CodeCoverageAcceptanceTestBase.GetXmlCoverage(actualCoverageFile, tempDir);
         if (testParameters.CheckSkipped)
         {
-            AssertSkippedMethod(coverageDocument);
+            CodeCoverageTests.AssertSkippedMethod(coverageDocument);
         }
 
-        ValidateCoverageData(coverageDocument, testParameters.AssemblyName, testParameters.RunSettingsType != TestParameters.SettingsType.CoberturaOutput);
+        CodeCoverageTests.ValidateCoverageData(coverageDocument, testParameters.AssemblyName, testParameters.RunSettingsType != TestParameters.SettingsType.CoberturaOutput);
     }
 
     private string CreateArguments(
@@ -302,46 +302,46 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         return arguments;
     }
 
-    private void AssertSkippedMethod(XmlDocument document)
+    private static void AssertSkippedMethod(XmlDocument document)
     {
-        var module = GetModuleNode(document.DocumentElement, "codecoveragetest.dll");
+        var module = CodeCoverageAcceptanceTestBase.GetModuleNode(document.DocumentElement, "codecoveragetest.dll");
         Assert.IsNotNull(module);
 
         var coverage = double.Parse(module.Attributes["block_coverage"].Value);
         Assert.IsTrue(coverage > ExpectedMinimalModuleCoverage);
 
-        var testSignFunction = GetNode(module, "skipped_function", "TestSign()");
+        var testSignFunction = CodeCoverageAcceptanceTestBase.GetNode(module, "skipped_function", "TestSign()");
         Assert.IsNotNull(testSignFunction);
         Assert.AreEqual("name_excluded", testSignFunction.Attributes["reason"].Value);
 
-        var skippedTestMethod = GetNode(module, "skipped_function", "__CxxPureMSILEntry_Test()");
+        var skippedTestMethod = CodeCoverageAcceptanceTestBase.GetNode(module, "skipped_function", "__CxxPureMSILEntry_Test()");
         Assert.IsNotNull(skippedTestMethod);
         Assert.AreEqual("name_excluded", skippedTestMethod.Attributes["reason"].Value);
 
-        var testAbsFunction = GetNode(module, "function", "TestAbs()");
+        var testAbsFunction = CodeCoverageAcceptanceTestBase.GetNode(module, "function", "TestAbs()");
         Assert.IsNotNull(testAbsFunction);
     }
 
-    private void ValidateCoverageData(XmlDocument document, string moduleName, bool validateSourceFileNames)
+    private static void ValidateCoverageData(XmlDocument document, string moduleName, bool validateSourceFileNames)
     {
-        var module = GetModuleNode(document.DocumentElement, moduleName.ToLower());
+        var module = CodeCoverageAcceptanceTestBase.GetModuleNode(document.DocumentElement, moduleName.ToLower());
 
         if (module == null)
         {
-            module = GetModuleNode(document.DocumentElement, moduleName);
+            module = CodeCoverageAcceptanceTestBase.GetModuleNode(document.DocumentElement, moduleName);
         }
         Assert.IsNotNull(module);
 
-        AssertCoverage(module, ExpectedMinimalModuleCoverage);
+        CodeCoverageAcceptanceTestBase.AssertCoverage(module, ExpectedMinimalModuleCoverage);
 
         // In case of cobertura report. Cobertura report has different format.
         if (validateSourceFileNames)
         {
-            AssertSourceFileName(module);
+            CodeCoverageTests.AssertSourceFileName(module);
         }
     }
 
-    private void AssertSourceFileName(XmlNode module)
+    private static void AssertSourceFileName(XmlNode module)
     {
         const string expectedFileName = "UnitTest1.cs";
 

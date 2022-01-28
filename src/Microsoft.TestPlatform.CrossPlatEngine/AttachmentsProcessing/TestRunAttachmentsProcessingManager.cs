@@ -103,7 +103,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
         if (attachments == null || !attachments.Any()) return attachments;
         var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(runSettingsXml);
 
-        var logger = CreateMessageLogger(eventsHandler);
+        var logger = TestRunAttachmentsProcessingManager.CreateMessageLogger(eventsHandler);
         var dataCollectorAttachmentsProcessors = _dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollector?.ToArray(), logger);
         for (int i = 0; i < dataCollectorAttachmentsProcessors.Length; i++)
         {
@@ -194,7 +194,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
         return attachments;
     }
 
-    private IMessageLogger CreateMessageLogger(ITestRunAttachmentsProcessingEventsHandler eventsHandler)
+    private static IMessageLogger CreateMessageLogger(ITestRunAttachmentsProcessingEventsHandler eventsHandler)
     {
         return eventsHandler != null ? (IMessageLogger)new AttachmentsProcessingMessageLogger(eventsHandler) : new NullMessageLogger();
     }

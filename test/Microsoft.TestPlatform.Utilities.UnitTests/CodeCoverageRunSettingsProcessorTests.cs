@@ -25,7 +25,7 @@ public class CodeCoverageRunSettingsProcessorTests
     #region Constructors
     public CodeCoverageRunSettingsProcessorTests()
     {
-        _defaultSettings = GetDefaultConfiguration();
+        _defaultSettings = CodeCoverageRunSettingsProcessorTests.GetDefaultConfiguration();
         _processor = new CodeCoverageRunSettingsProcessor(_defaultSettings);
     }
     #endregion
@@ -58,12 +58,12 @@ public class CodeCoverageRunSettingsProcessorTests
         var processedNode = _processor.Process(settings);
         Assert.IsNotNull(processedNode);
 
-        var codeCoverageNodes = ExtractNodes(processedNode, _defaultSettings, "./CodeCoverage");
+        var codeCoverageNodes = CodeCoverageRunSettingsProcessorTests.ExtractNodes(processedNode, _defaultSettings, "./CodeCoverage");
 
-        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./ModulePaths/Exclude");
-        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Functions/Exclude");
-        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Attributes/Exclude");
-        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Sources/Exclude");
+        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./ModulePaths/Exclude");
+        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Functions/Exclude");
+        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Attributes/Exclude");
+        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Sources/Exclude");
     }
 
     [TestMethod]
@@ -207,17 +207,17 @@ public class CodeCoverageRunSettingsProcessorTests
         var processedNode = _processor.Process(settings);
         Assert.IsNotNull(processedNode);
 
-        var codeCoverageNodes = ExtractNodes(processedNode, expectedResultDocument.DocumentElement, "./CodeCoverage");
+        var codeCoverageNodes = CodeCoverageRunSettingsProcessorTests.ExtractNodes(processedNode, expectedResultDocument.DocumentElement, "./CodeCoverage");
 
-        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./ModulePaths/Exclude");
-        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Functions/Exclude");
-        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Attributes/Exclude");
-        CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Sources/Exclude");
+        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./ModulePaths/Exclude");
+        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Functions/Exclude");
+        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Attributes/Exclude");
+        CodeCoverageRunSettingsProcessorTests.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Sources/Exclude");
     }
     #endregion
 
     #region Helpers
-    private XmlNode ExtractNode(XmlNode node, string path)
+    private static XmlNode ExtractNode(XmlNode node, string path)
     {
         try
         {
@@ -230,7 +230,7 @@ public class CodeCoverageRunSettingsProcessorTests
         return null;
     }
 
-    private XmlElement GetDefaultConfiguration()
+    private static XmlElement GetDefaultConfiguration()
     {
         var document = new XmlDocument();
         Assembly assembly = typeof(CodeCoverageRunSettingsProcessorTests).GetTypeInfo().Assembly;
@@ -243,19 +243,19 @@ public class CodeCoverageRunSettingsProcessorTests
         return document.DocumentElement;
     }
 
-    private Tuple<XmlNode, XmlNode> ExtractNodes(XmlNode currentSettingsRoot, XmlNode defaultSettingsRoot, string path)
+    private static Tuple<XmlNode, XmlNode> ExtractNodes(XmlNode currentSettingsRoot, XmlNode defaultSettingsRoot, string path)
     {
-        var currentNode = ExtractNode(currentSettingsRoot, path);
-        var defaultNode = ExtractNode(defaultSettingsRoot, path);
+        var currentNode = CodeCoverageRunSettingsProcessorTests.ExtractNode(currentSettingsRoot, path);
+        var defaultNode = CodeCoverageRunSettingsProcessorTests.ExtractNode(defaultSettingsRoot, path);
         Assert.IsNotNull(currentNode);
         Assert.IsNotNull(defaultNode);
 
         return new Tuple<XmlNode, XmlNode>(currentNode, defaultNode);
     }
 
-    private void CompareResults(XmlNode currentSettingsRoot, XmlNode defaultSettingsRoot, string path)
+    private static void CompareResults(XmlNode currentSettingsRoot, XmlNode defaultSettingsRoot, string path)
     {
-        var nodes = ExtractNodes(currentSettingsRoot, defaultSettingsRoot, path);
+        var nodes = CodeCoverageRunSettingsProcessorTests.ExtractNodes(currentSettingsRoot, defaultSettingsRoot, path);
 
         Assert.AreEqual(nodes.Item1.ChildNodes.Count, nodes.Item2.ChildNodes.Count);
 

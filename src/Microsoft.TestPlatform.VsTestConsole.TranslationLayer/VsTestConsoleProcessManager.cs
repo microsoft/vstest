@@ -241,15 +241,15 @@ internal class VsTestConsoleProcessManager : IProcessManager
 
         if (_isNetCoreRunner)
         {
-            args.Insert(0, GetEscapeSequencedPath(_vstestConsolePath));
+            args.Insert(0, VsTestConsoleProcessManager.GetEscapeSequencedPath(_vstestConsolePath));
         }
 
         return args.ToArray();
     }
 
     private string GetConsoleRunner()
-        => _isNetCoreRunner ? (string.IsNullOrEmpty(_dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : _dotnetExePath) : GetEscapeSequencedPath(_vstestConsolePath);
+        => _isNetCoreRunner ? (string.IsNullOrEmpty(_dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : _dotnetExePath) : VsTestConsoleProcessManager.GetEscapeSequencedPath(_vstestConsolePath);
 
-    private string GetEscapeSequencedPath(string path)
+    private static string GetEscapeSequencedPath(string path)
         => string.IsNullOrEmpty(path) ? path : $"\"{path.Trim('"')}\"";
 }

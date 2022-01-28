@@ -66,7 +66,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>A <see cref="Message"/> instance.</returns>
     public Message DeserializeMessage(string rawMessage)
     {
-        return Deserialize<VersionedMessage>(s_serializer, rawMessage);
+        return JsonDataSerializer.Deserialize<VersionedMessage>(s_serializer, rawMessage);
     }
 
     /// <summary>
@@ -78,8 +78,8 @@ public class JsonDataSerializer : IDataSerializer
     public T DeserializePayload<T>(Message message)
     {
         var versionedMessage = message as VersionedMessage;
-        var payloadSerializer = GetPayloadSerializer(versionedMessage?.Version);
-        return Deserialize<T>(payloadSerializer, message.Payload);
+        var payloadSerializer = JsonDataSerializer.GetPayloadSerializer(versionedMessage?.Version);
+        return JsonDataSerializer.Deserialize<T>(payloadSerializer, message.Payload);
     }
 
     /// <summary>
@@ -89,10 +89,11 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="version">Version of serializer to be used.</param>
     /// <typeparam name="T">Target type to deserialize.</typeparam>
     /// <returns>An instance of <see cref="T"/>.</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public T Deserialize<T>(string json, int version = 1)
     {
-        var payloadSerializer = GetPayloadSerializer(version);
-        return Deserialize<T>(payloadSerializer, json);
+        var payloadSerializer = JsonDataSerializer.GetPayloadSerializer(version);
+        return JsonDataSerializer.Deserialize<T>(payloadSerializer, json);
     }
 
     /// <summary>
@@ -102,7 +103,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>Serialized message.</returns>
     public string SerializeMessage(string messageType)
     {
-        return Serialize(s_serializer, new Message { MessageType = messageType });
+        return JsonDataSerializer.Serialize(s_serializer, new Message { MessageType = messageType });
     }
 
     /// <summary>
@@ -125,12 +126,12 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>Serialized message.</returns>
     public string SerializePayload(string messageType, object payload, int version)
     {
-        var payloadSerializer = GetPayloadSerializer(version);
+        var payloadSerializer = JsonDataSerializer.GetPayloadSerializer(version);
         var serializedPayload = JToken.FromObject(payload, payloadSerializer);
 
         return version > 1 ?
-            Serialize(s_serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
-            Serialize(s_serializer, new Message { MessageType = messageType, Payload = serializedPayload });
+            JsonDataSerializer.Serialize(s_serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
+            JsonDataSerializer.Serialize(s_serializer, new Message { MessageType = messageType, Payload = serializedPayload });
     }
 
     /// <summary>
@@ -140,10 +141,11 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="data">Instance of the object to serialize.</param>
     /// <param name="version">Version to be stamped.</param>
     /// <returns>JSON string.</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public string Serialize<T>(T data, int version = 1)
     {
-        var payloadSerializer = GetPayloadSerializer(version);
-        return Serialize(payloadSerializer, data);
+        var payloadSerializer = JsonDataSerializer.GetPayloadSerializer(version);
+        return JsonDataSerializer.Serialize(payloadSerializer, data);
     }
 
     /// <inheritdoc/>
@@ -165,7 +167,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="serializer">Serializer.</param>
     /// <param name="data">Data to be serialized.</param>
     /// <returns>Serialized data.</returns>
-    private string Serialize<T>(JsonSerializer serializer, T data)
+    private static string Serialize<T>(JsonSerializer serializer, T data)
     {
         using var stringWriter = new StringWriter();
         using var jsonWriter = new JsonTextWriter(stringWriter);
@@ -180,7 +182,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="serializer">Serializer.</param>
     /// <param name="data">Data to be deserialized.</param>
     /// <returns>Deserialized data.</returns>
-    private T Deserialize<T>(JsonSerializer serializer, string data)
+    private static T Deserialize<T>(JsonSerializer serializer, string data)
     {
         using var stringReader = new StringReader(data);
         using var jsonReader = new JsonTextReader(stringReader);
@@ -194,12 +196,12 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="serializer">Serializer.</param>
     /// <param name="jToken">JToken to be deserialized.</param>
     /// <returns>Deserialized data.</returns>
-    private T Deserialize<T>(JsonSerializer serializer, JToken jToken)
+    private static T Deserialize<T>(JsonSerializer serializer, JToken jToken)
     {
         return jToken.ToObject<T>(serializer);
     }
 
-    private JsonSerializer GetPayloadSerializer(int? version)
+    private static JsonSerializer GetPayloadSerializer(int? version)
     {
         if (version == null)
         {

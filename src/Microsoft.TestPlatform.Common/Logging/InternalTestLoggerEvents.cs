@@ -65,8 +65,8 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
         _loggerEventQueue = new JobQueue<Action>(
             ProcessQueuedJob,
             "Test Logger",
-            GetMaxNumberOfJobsInQueue(),
-            GetMaxBytesQueueCanHold(),
+            InternalTestLoggerEvents.GetMaxNumberOfJobsInQueue(),
+            InternalTestLoggerEvents.GetMaxBytesQueueCanHold(),
             _isBoundsOnLoggerEventQueueEnabled,
             (message) => EqtTrace.Error(message));
         _loggerEventQueue.Pause();
@@ -378,9 +378,9 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// The method parses the config file of vstest.console.exe to see if the Max Job Queue Length is defined.
     /// Return the Max Queue Length so defined or a default value specified by TestPlatformDefaults.DefaultMaxLoggerEventsToCache
     /// </summary>
-    private int GetMaxNumberOfJobsInQueue()
+    private static int GetMaxNumberOfJobsInQueue()
     {
-        return GetSetting(TestPlatformDefaults.MaxNumberOfEventsLoggerEventQueueCanHold,
+        return InternalTestLoggerEvents.GetSetting(TestPlatformDefaults.MaxNumberOfEventsLoggerEventQueueCanHold,
             TestPlatformDefaults.DefaultMaxNumberOfEventsLoggerEventQueueCanHold);
     }
 
@@ -388,9 +388,9 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// The method parses the config file of vstest.console.exe to see if the Max Job Queue size is defined.
     /// Return the Max Queue size so defined or a default value specified by TestPlatformDefaults.DefaultMaxJobQueueSize
     /// </summary>
-    private int GetMaxBytesQueueCanHold()
+    private static int GetMaxBytesQueueCanHold()
     {
-        return GetSetting(TestPlatformDefaults.MaxBytesLoggerEventQueueCanHold,
+        return InternalTestLoggerEvents.GetSetting(TestPlatformDefaults.MaxBytesLoggerEventQueueCanHold,
             TestPlatformDefaults.DefaultMaxBytesLoggerEventQueueCanHold);
     }
 
@@ -444,7 +444,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// Get the appsetting value for the parameter appSettingKey. Use the parameter defaultValue if
     /// value is not there or is invalid.
     /// </summary>
-    private int GetSetting(string appSettingKey, int defaultValue)
+    private static int GetSetting(string appSettingKey, int defaultValue)
     {
         int value;
         string appSettingValue =

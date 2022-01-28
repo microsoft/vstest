@@ -147,7 +147,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
     public DataCollectionResult AfterTestRunEnd(bool isCanceled, ITestMessageEventHandler runEventsHandler)
     {
         AfterTestRunEndResult afterTestRunEnd = null;
-        InvokeDataCollectionServiceAction(
+        ProxyDataCollectionManager.InvokeDataCollectionServiceAction(
             () =>
             {
                 EqtTrace.Info("ProxyDataCollectionManager.AfterTestRunEnd: Get attachment set and invoked data collectors processId: {0} port: {1}", _dataCollectionProcessId, _dataCollectionPort);
@@ -190,7 +190,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         IDictionary<string, string> environmentVariables = new Dictionary<string, string>();
 
         var dataCollectionEventsPort = 0;
-        InvokeDataCollectionServiceAction(
+        ProxyDataCollectionManager.InvokeDataCollectionServiceAction(
             () =>
             {
                 EqtTrace.Info("ProxyDataCollectionManager.BeforeTestRunStart: Get environment variable and port for datacollector processId: {0} port: {1}", _dataCollectionProcessId, _dataCollectionPort);
@@ -278,7 +278,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         return connectionTimeout;
     }
 
-    private void InvokeDataCollectionServiceAction(Action action, ITestMessageEventHandler runEventsHandler)
+    private static void InvokeDataCollectionServiceAction(Action action, ITestMessageEventHandler runEventsHandler)
     {
         try
         {
@@ -300,11 +300,11 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
                 EqtTrace.Warning("ProxyDataCollectionManager.InvokeDataCollectionServiceAction: TestPlatformException = {0}.", ex);
             }
 
-            HandleExceptionMessage(runEventsHandler, ex);
+            ProxyDataCollectionManager.HandleExceptionMessage(runEventsHandler, ex);
         }
     }
 
-    private void HandleExceptionMessage(ITestMessageEventHandler runEventsHandler, Exception exception)
+    private static void HandleExceptionMessage(ITestMessageEventHandler runEventsHandler, Exception exception)
     {
         if (EqtTrace.IsErrorEnabled)
         {
@@ -328,7 +328,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         if (!string.IsNullOrEmpty(EqtTrace.LogFile))
         {
             commandlineArguments.Add(DiagOption);
-            commandlineArguments.Add(GetTimestampedLogFile(EqtTrace.LogFile));
+            commandlineArguments.Add(ProxyDataCollectionManager.GetTimestampedLogFile(EqtTrace.LogFile));
 
             commandlineArguments.Add(TraceLevelOption);
             commandlineArguments.Add(((int)EqtTrace.TraceLevel).ToString());
@@ -337,7 +337,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         return commandlineArguments;
     }
 
-    private string GetTimestampedLogFile(string logFile)
+    private static string GetTimestampedLogFile(string logFile)
     {
         return Path.ChangeExtension(
             logFile,

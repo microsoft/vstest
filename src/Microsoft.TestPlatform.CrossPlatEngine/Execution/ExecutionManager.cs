@@ -71,7 +71,7 @@ public class ExecutionManager : IExecutionManager
             TestPluginCache.Instance.DefaultExtensionPaths = pathToAdditionalExtensions;
         }
 
-        LoadExtensions();
+        ExecutionManager.LoadExtensions();
 
         //unsubscribe session logger
         _sessionMessageLogger.TestRunMessage -= TestSessionMessageHandler;
@@ -98,7 +98,7 @@ public class ExecutionManager : IExecutionManager
     {
         try
         {
-            InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap));
+            ExecutionManager.InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap));
 
             _activeTestRun = new RunTestsWithSources(_requestData, adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
@@ -134,7 +134,7 @@ public class ExecutionManager : IExecutionManager
     {
         try
         {
-            InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(tests));
+            ExecutionManager.InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(tests));
 
             _activeTestRun = new RunTestsWithTests(_requestData, tests, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
@@ -187,7 +187,7 @@ public class ExecutionManager : IExecutionManager
 
     #region private methods
 
-    private void LoadExtensions()
+    private static void LoadExtensions()
     {
         try
         {
@@ -215,7 +215,7 @@ public class ExecutionManager : IExecutionManager
     /// <summary>
     /// Initializes out-proc and in-proc data collectors.
     /// </summary>
-    private void InitializeDataCollectors(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase)
+    private static void InitializeDataCollectors(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase)
     {
         // Initialize out-proc data collectors if declared in run settings.
         if (DataCollectionTestCaseEventSender.Instance != null && XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettings))

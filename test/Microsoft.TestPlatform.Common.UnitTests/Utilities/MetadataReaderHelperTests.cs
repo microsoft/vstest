@@ -19,9 +19,9 @@ public class MetadataReaderHelperTests
     [TestMethod]
     public void MetadataReaderHelper_GetCollectorExtensionTypes()
     {
-        string testAssetsPath = GetTestAssetsFolder();
+        string testAssetsPath = MetadataReaderHelperTests.GetTestAssetsFolder();
         var dataCollectorFilePath = Directory.GetFiles(testAssetsPath, "AttachmentProcessorDataCollector.dll", SearchOption.AllDirectories).Where(x => x.Contains("bin")).Single();
-        var types = _metadataReaderHelper.DiscoverTestExtensionTypesV2Attribute(Assembly.LoadFile(dataCollectorFilePath), dataCollectorFilePath);
+        var types = MetadataReaderExtensionsHelper.DiscoverTestExtensionTypesV2Attribute(Assembly.LoadFile(dataCollectorFilePath), dataCollectorFilePath);
         Assert.IsTrue(types.Any(), $"File {dataCollectorFilePath}");
         Assert.IsTrue(types[0].AssemblyQualifiedName.StartsWith("AttachmentProcessorDataCollector.SampleDataCollectorV2"), $"File {dataCollectorFilePath}");
         Assert.AreEqual(dataCollectorFilePath.Replace("/", @"\"), types[0].Assembly.Location.Replace("/", @"\"), $"File {dataCollectorFilePath}");
@@ -29,7 +29,7 @@ public class MetadataReaderHelperTests
         Assert.AreEqual(dataCollectorFilePath.Replace("/", @"\"), types[1].Assembly.Location.Replace("/", @"\"), $"File {dataCollectorFilePath}");
     }
 
-    private string GetTestAssetsFolder()
+    private static string GetTestAssetsFolder()
     {
         string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         while (true)

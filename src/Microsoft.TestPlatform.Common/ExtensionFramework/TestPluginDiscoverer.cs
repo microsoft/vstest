@@ -64,7 +64,7 @@ internal class TestPluginDiscoverer
     /// <returns>
     /// A dictionary of assembly qualified name and test plugin information.
     /// </returns>
-    public Dictionary<string, TPluginInfo> GetTestExtensionsInformation<TPluginInfo, TExtension>(IEnumerable<string> extensionPaths) where TPluginInfo : TestPluginInformation
+    public static Dictionary<string, TPluginInfo> GetTestExtensionsInformation<TPluginInfo, TExtension>(IEnumerable<string> extensionPaths) where TPluginInfo : TestPluginInformation
     {
         Debug.Assert(extensionPaths != null);
 
@@ -73,10 +73,10 @@ internal class TestPluginDiscoverer
         // C++ UWP adapters do not follow TestAdapater naming convention, so making this exception
         if (!extensionPaths.Any())
         {
-            AddKnownExtensions(ref extensionPaths);
+            TestPluginDiscoverer.AddKnownExtensions(ref extensionPaths);
         }
 
-        GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), pluginInfos);
+        TestPluginDiscoverer.GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), pluginInfos);
 
         return pluginInfos;
     }
@@ -85,7 +85,7 @@ internal class TestPluginDiscoverer
 
     #region Private Methods
 
-    private void AddKnownExtensions(ref IEnumerable<string> extensionPaths)
+    private static void AddKnownExtensions(ref IEnumerable<string> extensionPaths)
     {
         // For C++ UWP adapter, & OLD C# UWP(MSTest V1) adapter
         // In UWP .Net Native Compilation mode managed dll's are packaged differently, & File.Exists() fails.
@@ -108,7 +108,7 @@ internal class TestPluginDiscoverer
     /// <param name="pluginInfos">
     /// Test plugins collection to add to.
     /// </param>
-    private void GetTestExtensionsFromFiles<TPluginInfo, TExtension>(
+    private static void GetTestExtensionsFromFiles<TPluginInfo, TExtension>(
         string[] files,
         Dictionary<string, TPluginInfo> pluginInfos) where TPluginInfo : TestPluginInformation
     {
@@ -129,7 +129,7 @@ internal class TestPluginDiscoverer
                 assembly = Assembly.Load(new AssemblyName(assemblyName));
                 if (assembly != null)
                 {
-                    GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos, file);
+                    TestPluginDiscoverer.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos, file);
                 }
             }
             catch (FileLoadException e)
@@ -157,7 +157,7 @@ internal class TestPluginDiscoverer
     /// <typeparam name="TExtension">
     /// Type of Extensions.
     /// </typeparam>
-    private void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos, string filePath) where TPluginInfo : TestPluginInformation
+    private static void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos, string filePath) where TPluginInfo : TestPluginInformation
     {
         Debug.Assert(assembly != null, "null assembly");
         Debug.Assert(pluginInfos != null, "null pluginInfos");
@@ -167,7 +167,7 @@ internal class TestPluginDiscoverer
 
         try
         {
-            var discoveredExtensions = _extensionHelper.DiscoverTestExtensionTypesV2Attribute(assembly, filePath);
+            var discoveredExtensions = MetadataReaderExtensionsHelper.DiscoverTestExtensionTypesV2Attribute(assembly, filePath);
             if (discoveredExtensions?.Length > 0)
             {
                 types.AddRange(discoveredExtensions);
@@ -213,7 +213,7 @@ internal class TestPluginDiscoverer
         {
             foreach (var type in types)
             {
-                GetTestExtensionFromType(type, extension, pluginInfos, filePath);
+                TestPluginDiscoverer.GetTestExtensionFromType(type, extension, pluginInfos, filePath);
             }
         }
     }
@@ -233,7 +233,7 @@ internal class TestPluginDiscoverer
     /// <param name="extensionCollection">
     /// Test extensions collection to add to.
     /// </param>
-    private void GetTestExtensionFromType<TPluginInfo>(
+    private static void GetTestExtensionFromType<TPluginInfo>(
         Type type,
         Type extensionType,
         Dictionary<string, TPluginInfo> extensionCollection,

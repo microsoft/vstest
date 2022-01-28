@@ -76,7 +76,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     {
         Debug.Assert(element != null, "element is null");
 
-        GetIdLocation(parameters, out string idLocation);
+        TestId.GetIdLocation(parameters, out string idLocation);
 
         XmlPersistence helper = new();
         helper.SaveGuid(element, idLocation, Id);
@@ -91,7 +91,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// </summary>
     /// <param name="parameters">The parameters specifying the locations</param>
     /// <param name="idLocation">The test ID location</param>
-    private void GetIdLocation(XmlTestStoreParameters parameters, out string idLocation)
+    private static void GetIdLocation(XmlTestStoreParameters parameters, out string idLocation)
     {
         // Initialize to the default ID location
         idLocation = DefaultIdLocation;

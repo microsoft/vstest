@@ -476,7 +476,7 @@ internal class TestResult : ITestResult, IXmlTestStore
             Debug.Assert(!string.IsNullOrEmpty(resultFile), "'resultFile' is null or empty");
             Debug.Assert(resultFile.Trim() == resultFile, "'resultFile' has whitespace at the ends");
 
-            _resultFiles[_trxFileHelper.MakePathRelative(resultFile, testResultsDirectory)] = null;
+            _resultFiles[TrxFileHelper.MakePathRelative(resultFile, testResultsDirectory)] = null;
         }
     }
 

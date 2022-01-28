@@ -257,6 +257,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
         return (PlatformTraceLevel)SourceTraceLevelsMap[Source.Switch.Level];
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public TraceLevel MapPlatformTraceToTrace(PlatformTraceLevel traceLevel)
     {
         switch (traceLevel)

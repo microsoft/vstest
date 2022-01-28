@@ -42,7 +42,7 @@ public class EnvironmentArgumentProcessorTests
     [TestCleanup]
     public void Cleanup()
     {
-        _commandLineOptions.Reset();
+        CommandLineOptions.Reset();
     }
 
     [TestMethod]
@@ -70,7 +70,7 @@ public class EnvironmentArgumentProcessorTests
         executor.Initialize("VARIABLE=VALUE");
 
         // Assert
-        var result = ParseSettingsXml(_settingsProvider);
+        var result = EnvironmentArgumentProcessorTests.ParseSettingsXml(_settingsProvider);
         var environmentVariables = result.Variables;
         var inIsolation = result.InIsolation;
         var variables = environmentVariables?.Elements()?.ToArray();
@@ -99,7 +99,7 @@ public class EnvironmentArgumentProcessorTests
         executor3.Initialize("VARIABLE_THREE=VALUE WITH SPACE;AND SEMICOLON");
 
         // Assert
-        var result = ParseSettingsXml(_settingsProvider);
+        var result = EnvironmentArgumentProcessorTests.ParseSettingsXml(_settingsProvider);
         var environmentVariables = result.Variables;
         var inIsolation = result.InIsolation;
         var variables = environmentVariables?.Elements()?.ToArray();
@@ -132,7 +132,7 @@ public class EnvironmentArgumentProcessorTests
         executor.Initialize("VARIABLE=VALUE");
 
         // Assert
-        var result = ParseSettingsXml(_settingsProvider);
+        var result = EnvironmentArgumentProcessorTests.ParseSettingsXml(_settingsProvider);
         var environmentVariables = result.Variables;
         var inIsolation = result.InIsolation;
         var variables = environmentVariables?.Elements()?.ToArray();
@@ -171,7 +171,7 @@ public class EnvironmentArgumentProcessorTests
         _mockOutput.VerifyAll();
     }
 
-    private XmlParseResult ParseSettingsXml(IRunSettingsProvider provider)
+    private static XmlParseResult ParseSettingsXml(IRunSettingsProvider provider)
     {
         var document = XDocument.Parse(provider.ActiveRunSettings.SettingsXml);
 

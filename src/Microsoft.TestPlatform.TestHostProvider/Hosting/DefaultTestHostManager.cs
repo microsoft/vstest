@@ -95,6 +95,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <summary>
     /// Gets the properties of the test executor launcher. These could be the targetID for emulator/phone specific scenarios.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public IDictionary<string, string> Properties => new Dictionary<string, string>();
 
     /// <summary>
@@ -220,7 +221,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             List<string> actualSources = new();
             foreach (var uwpSource in uwpSources)
             {
-                actualSources.Add(Path.Combine(Path.GetDirectoryName(uwpSource), GetUwpSources(uwpSource)));
+                actualSources.Add(Path.Combine(Path.GetDirectoryName(uwpSource), DefaultTestHostManager.GetUwpSources(uwpSource)));
             }
 
             return actualSources;
@@ -413,7 +414,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         return _testHostProcess != null;
     }
 
-    private string GetUwpSources(string uwpSource)
+    private static string GetUwpSources(string uwpSource)
     {
         var doc = XDocument.Load(uwpSource);
         var ns = doc.Root.Name.Namespace;

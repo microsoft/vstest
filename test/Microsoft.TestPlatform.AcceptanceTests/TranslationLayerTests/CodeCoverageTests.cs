@@ -437,10 +437,10 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
     private IList<string> GetTestAssemblies()
     {
-        return GetProjects().Select(p => GetAssetFullPath(p)).ToList();
+        return CodeCoverageTests.GetProjects().Select(p => GetAssetFullPath(p)).ToList();
     }
 
-    private IList<string> GetProjects()
+    private static IList<string> GetProjects()
     {
         return new List<string> { "SimpleTestProject.dll", "SimpleTestProject2.dll" };
     }
@@ -455,7 +455,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
                                     <RunSettings>
                                         <RunConfiguration>
                                             <TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion>
-                                            <TestAdaptersPaths>{GetNetStandardAdapterPath()}</TestAdaptersPaths>
+                                            <TestAdaptersPaths>{CodeCoverageAcceptanceTestBase.GetNetStandardAdapterPath()}</TestAdaptersPaths>
                                             <MaxCpuCount>{cpuCount}</MaxCpuCount>
                                         </RunConfiguration>
                                         <DataCollectionRunSettings>
@@ -490,12 +490,12 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     {
         if (attachments.Count == 1)
         {
-            var xmlCoverage = GetXmlCoverage(attachments.First().Attachments.First().Uri.LocalPath, _tempDirectory);
+            var xmlCoverage = CodeCoverageAcceptanceTestBase.GetXmlCoverage(attachments.First().Attachments.First().Uri.LocalPath, _tempDirectory);
 
-            foreach (var project in GetProjects())
+            foreach (var project in CodeCoverageTests.GetProjects())
             {
-                var moduleNode = GetModuleNode(xmlCoverage.DocumentElement, project.ToLower());
-                AssertCoverage(moduleNode, ExpectedMinimalModuleCoverage);
+                var moduleNode = CodeCoverageAcceptanceTestBase.GetModuleNode(xmlCoverage.DocumentElement, project.ToLower());
+                CodeCoverageAcceptanceTestBase.AssertCoverage(moduleNode, ExpectedMinimalModuleCoverage);
             }
         }
     }

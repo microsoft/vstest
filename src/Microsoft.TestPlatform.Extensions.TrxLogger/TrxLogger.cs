@@ -270,7 +270,7 @@ public class TrxLogger : ITestLoggerWithParameters
         var testElement = GetOrCreateTestElement(executionId, parentExecutionId, testType, parentTestElement, e.Result);
 
         // Update test links. Test Links are updated in case of Ordered test.
-        UpdateTestLinks(testElement, parentTestElement);
+        TrxLogger.UpdateTestLinks(testElement, parentTestElement);
 
         // Convert the rocksteady result to trx test result
         var testResult = CreateTestResult(executionId, parentExecutionId, testType, testElement, parentTestElement, parentTestResult, e.Result);
@@ -518,7 +518,7 @@ public class TrxLogger : ITestLoggerWithParameters
     {
         var defaultTrxFileName = LoggerTestRun.RunConfiguration.RunDeploymentRootDirectory + ".trx";
 
-        return _trxFileHelper.GetNextIterationFileName(_testResultsDirPath, defaultTrxFileName, false);
+        return TrxFileHelper.GetNextIterationFileName(_testResultsDirPath, defaultTrxFileName, false);
     }
 
     /// <summary>
@@ -540,7 +540,7 @@ public class TrxLogger : ITestLoggerWithParameters
         LoggerTestRun.Started = TestRunStartTime;
 
         // Save default test settings
-        string runDeploymentRoot = _trxFileHelper.ReplaceInvalidFileNameChars(LoggerTestRun.Name);
+        string runDeploymentRoot = TrxFileHelper.ReplaceInvalidFileNameChars(LoggerTestRun.Name);
         TestRunConfiguration testrunConfig = new("default", _trxFileHelper);
         testrunConfig.RunDeploymentRootDirectory = runDeploymentRoot;
         LoggerTestRun.RunConfiguration = testrunConfig;
@@ -631,7 +631,7 @@ public class TrxLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="testElement"></param>
     /// <param name="parentTestElement"></param>
-    private void UpdateTestLinks(ITestElement testElement, ITestElement parentTestElement)
+    private static void UpdateTestLinks(ITestElement testElement, ITestElement parentTestElement)
     {
         if (parentTestElement != null &&
             parentTestElement.TestType.Equals(TrxLoggerConstants.OrderedTestType) &&

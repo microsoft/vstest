@@ -353,7 +353,7 @@ public class DefaultTestHostManagerTests
         CancellationTokenSource cancellationTokenSource = new();
         cancellationTokenSource.Cancel();
 
-        Assert.ThrowsException<AggregateException>(() => _testableTestHostManager.LaunchTestHostAsync(GetDefaultStartInfo(), cancellationTokenSource.Token).Wait());
+        Assert.ThrowsException<AggregateException>(() => _testableTestHostManager.LaunchTestHostAsync(DefaultTestHostManagerTests.GetDefaultStartInfo(), cancellationTokenSource.Token).Wait());
     }
 
     [TestMethod]
@@ -423,7 +423,7 @@ public class DefaultTestHostManagerTests
         string errorData = "Custom Error Strings";
         ErrorCallBackTestHelper(errorData, -1);
 
-        await _testableTestHostManager.LaunchTestHostAsync(GetDefaultStartInfo(), CancellationToken.None);
+        await _testableTestHostManager.LaunchTestHostAsync(DefaultTestHostManagerTests.GetDefaultStartInfo(), CancellationToken.None);
 
         Assert.AreEqual(errorData, _errorMessage);
     }
@@ -434,7 +434,7 @@ public class DefaultTestHostManagerTests
         string errorData = string.Empty;
         ErrorCallBackTestHelper(errorData, 0);
 
-        await _testableTestHostManager.LaunchTestHostAsync(GetDefaultStartInfo(), CancellationToken.None);
+        await _testableTestHostManager.LaunchTestHostAsync(DefaultTestHostManagerTests.GetDefaultStartInfo(), CancellationToken.None);
 
         Assert.IsNull(_errorMessage);
     }
@@ -446,7 +446,7 @@ public class DefaultTestHostManagerTests
     {
         ErrorCallBackTestHelper(errorData, -1);
 
-        await _testableTestHostManager.LaunchTestHostAsync(GetDefaultStartInfo(), CancellationToken.None);
+        await _testableTestHostManager.LaunchTestHostAsync(DefaultTestHostManagerTests.GetDefaultStartInfo(), CancellationToken.None);
 
         Assert.AreEqual(_errorMessage, string.Empty);
     }
@@ -458,7 +458,7 @@ public class DefaultTestHostManagerTests
     {
         ExitCallBackTestHelper(exitCode);
 
-        await _testableTestHostManager.LaunchTestHostAsync(GetDefaultStartInfo(), CancellationToken.None);
+        await _testableTestHostManager.LaunchTestHostAsync(DefaultTestHostManagerTests.GetDefaultStartInfo(), CancellationToken.None);
 
         Assert.AreEqual(_errorMessage, string.Empty);
         Assert.AreEqual(_exitCode, exitCode);
@@ -473,7 +473,7 @@ public class DefaultTestHostManagerTests
             .Callback<object>(p => isVerified = ((Process)p).Id == pid);
 
         ExitCallBackTestHelper(0);
-        await _testableTestHostManager.LaunchTestHostAsync(GetDefaultStartInfo(), CancellationToken.None);
+        await _testableTestHostManager.LaunchTestHostAsync(DefaultTestHostManagerTests.GetDefaultStartInfo(), CancellationToken.None);
         await _testableTestHostManager.CleanTestHostAsync(CancellationToken.None);
 
         Assert.IsTrue(isVerified);
@@ -487,7 +487,7 @@ public class DefaultTestHostManagerTests
         _mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>())).Callback<object>(p => isVerified = ((Process)p).Id == pid).Throws<Exception>();
 
         ExitCallBackTestHelper(0);
-        await _testableTestHostManager.LaunchTestHostAsync(GetDefaultStartInfo(), CancellationToken.None);
+        await _testableTestHostManager.LaunchTestHostAsync(DefaultTestHostManagerTests.GetDefaultStartInfo(), CancellationToken.None);
         await _testableTestHostManager.CleanTestHostAsync(CancellationToken.None);
 
         Assert.IsTrue(isVerified);
@@ -576,7 +576,7 @@ public class DefaultTestHostManagerTests
         _mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<object>(), out exitCode)).Returns(true);
     }
 
-    private TestProcessStartInfo GetDefaultStartInfo()
+    private static TestProcessStartInfo GetDefaultStartInfo()
     {
         return new TestProcessStartInfo();
     }

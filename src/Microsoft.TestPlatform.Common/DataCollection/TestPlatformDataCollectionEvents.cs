@@ -96,10 +96,10 @@ internal sealed class TestPlatformDataCollectionEvents : DataCollectionEvents
     internal bool AreTestCaseEventsSubscribed()
     {
         bool valueOnFailure = false;
-        return (HasEventListener(TestCaseStart, valueOnFailure) || HasEventListener(TestCaseEnd, valueOnFailure));
+        return (TestPlatformDataCollectionEvents.HasEventListener(TestCaseStart, valueOnFailure) || TestPlatformDataCollectionEvents.HasEventListener(TestCaseEnd, valueOnFailure));
     }
 
-    private bool HasEventListener(MulticastDelegate eventToCheck, bool valueOnFailure)
+    private static bool HasEventListener(MulticastDelegate eventToCheck, bool valueOnFailure)
     {
         try
         {

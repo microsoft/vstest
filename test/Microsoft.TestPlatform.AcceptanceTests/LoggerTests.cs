@@ -33,7 +33,7 @@ public class LoggerTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var trxFilePath = Path.Combine(tempDir.Path, trxFileName);
-        Assert.IsTrue(IsValidXml(trxFilePath), "Invalid content in Trx log file");
+        Assert.IsTrue(LoggerTests.IsValidXml(trxFilePath), "Invalid content in Trx log file");
     }
 
     [TestMethod]
@@ -55,7 +55,7 @@ public class LoggerTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var htmlLogFilePath = Path.Combine(tempDir.Path, htmlFileName);
-        IsFileAndContentEqual(htmlLogFilePath);
+        LoggerTests.IsFileAndContentEqual(htmlLogFilePath);
     }
 
     [TestMethod]
@@ -76,7 +76,7 @@ public class LoggerTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var trxLogFilePath = Path.Combine(tempDir.Path, trxFileName);
-        Assert.IsTrue(IsValidXml(trxLogFilePath), "Invalid content in Trx log file");
+        Assert.IsTrue(LoggerTests.IsValidXml(trxLogFilePath), "Invalid content in Trx log file");
     }
 
     [TestMethod]
@@ -119,7 +119,7 @@ public class LoggerTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var htmlLogFilePath = Path.Combine(tempDir.Path, htmlFileName);
-        IsFileAndContentEqual(htmlLogFilePath);
+        LoggerTests.IsFileAndContentEqual(htmlLogFilePath);
     }
 
     [TestMethod]
@@ -170,7 +170,7 @@ public class LoggerTests : AcceptanceTestBase
         Assert.AreEqual("Completed", outcomeValue);
     }
 
-    private bool IsValidXml(string xmlFilePath)
+    private static bool IsValidXml(string xmlFilePath)
     {
         try
         {
@@ -188,7 +188,7 @@ public class LoggerTests : AcceptanceTestBase
         }
     }
 
-    private void IsFileAndContentEqual(string filePath)
+    private static void IsFileAndContentEqual(string filePath)
     {
         StringBuilder sb = new();
         using (var sr = new StreamReader(filePath))

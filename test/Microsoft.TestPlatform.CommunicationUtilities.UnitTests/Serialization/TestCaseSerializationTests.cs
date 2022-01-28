@@ -134,7 +134,7 @@ public class TestCaseSerializationTests
                    + "{\"Key\":{\"Id\":\"TestObject.Traits\",\"Label\":\"Traits\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]\"},\"Value\":[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]}]}";
         _ = Deserialize<TestCase>(json);
 
-        VerifyDummyPropertyIsRegistered();
+        TestCaseSerializationTests.VerifyDummyPropertyIsRegistered();
     }
 
     #endregion
@@ -227,7 +227,7 @@ public class TestCaseSerializationTests
                    + "{ \"Key\": { \"Id\": \"TestObject.Traits\", \"Label\": \"Traits\", \"Category\": \"\", \"Description\": \"\", \"Attributes\": 5, \"ValueType\": \"System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]\"}, \"Value\": [{\"Key\": \"Priority\",\"Value\": \"0\"}, {\"Key\": \"Category\",\"Value\": \"unit\"}]}]}";
         _ = Deserialize<TestCase>(json, 2);
 
-        VerifyDummyPropertyIsRegistered();
+        TestCaseSerializationTests.VerifyDummyPropertyIsRegistered();
     }
 
     #endregion
@@ -263,7 +263,7 @@ public class TestCaseSerializationTests
         return JsonDataSerializer.Instance.Deserialize<T>(json, version);
     }
 
-    private void VerifyDummyPropertyIsRegistered()
+    private static void VerifyDummyPropertyIsRegistered()
     {
         var dummyProperty = TestProperty.Find("DummyProperty");
         Assert.IsNotNull(dummyProperty);

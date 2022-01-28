@@ -127,7 +127,7 @@ internal class InProcDataCollectionExtensionManager
     /// </param>
     private void TriggerTestSessionStart(object sender, SessionStartEventArgs e)
     {
-        TestSessionStartArgs testSessionStartArgs = new(GetSessionStartProperties(e));
+        TestSessionStartArgs testSessionStartArgs = new(InProcDataCollectionExtensionManager.GetSessionStartProperties(e));
         TriggerInProcDataCollectionMethods(Constants.TestSessionStartMethodName, testSessionStartArgs);
     }
 
@@ -259,7 +259,7 @@ internal class InProcDataCollectionExtensionManager
         return codeBase;
     }
 
-    private IDictionary<string, object> GetSessionStartProperties(SessionStartEventArgs sessionStartEventArgs)
+    private static IDictionary<string, object> GetSessionStartProperties(SessionStartEventArgs sessionStartEventArgs)
     {
         var properties = new Dictionary<string, object>
         {

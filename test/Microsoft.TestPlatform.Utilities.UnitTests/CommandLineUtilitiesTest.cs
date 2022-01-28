@@ -10,7 +10,7 @@ using VisualStudio.TestTools.UnitTesting;
 [TestClass]
 public class CommandLineUtilitiesTest
 {
-    private void VerifyCommandLineSplitter(string commandLine, string[] expected)
+    private static void VerifyCommandLineSplitter(string commandLine, string[] expected)
     {
         CommandLineUtilities.SplitCommandLineIntoArguments(commandLine, out var actual);
 
@@ -24,9 +24,9 @@ public class CommandLineUtilitiesTest
     [TestMethod]
     public void TestCommandLineSplitter()
     {
-        VerifyCommandLineSplitter("", new string[0]);
-        VerifyCommandLineSplitter("/testadapterpath:\"c:\\Path\"", new[] { @"/testadapterpath:c:\Path" });
-        VerifyCommandLineSplitter("/testadapterpath:\"c:\\Path\" /logger:\"trx\"", new[] { @"/testadapterpath:c:\Path", "/logger:trx" });
-        VerifyCommandLineSplitter("/testadapterpath:\"c:\\Path\" /logger:\"trx\" /diag:\"log.txt\"", new[] { @"/testadapterpath:c:\Path", "/logger:trx", "/diag:log.txt" });
+        CommandLineUtilitiesTest.VerifyCommandLineSplitter("", new string[0]);
+        CommandLineUtilitiesTest.VerifyCommandLineSplitter("/testadapterpath:\"c:\\Path\"", new[] { @"/testadapterpath:c:\Path" });
+        CommandLineUtilitiesTest.VerifyCommandLineSplitter("/testadapterpath:\"c:\\Path\" /logger:\"trx\"", new[] { @"/testadapterpath:c:\Path", "/logger:trx" });
+        CommandLineUtilitiesTest.VerifyCommandLineSplitter("/testadapterpath:\"c:\\Path\" /logger:\"trx\" /diag:\"log.txt\"", new[] { @"/testadapterpath:c:\Path", "/logger:trx", "/diag:log.txt" });
     }
 }

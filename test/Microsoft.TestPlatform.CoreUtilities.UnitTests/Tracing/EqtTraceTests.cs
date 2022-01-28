@@ -95,7 +95,7 @@ public class EqtTraceTests
         EqtTrace.TraceLevel = PlatformTraceLevel.Error;
 #endif
         EqtTrace.Error(new NotImplementedException());
-        Assert.IsNotNull(ReadLogFile(), "Expected error message");
+        Assert.IsNotNull(EqtTraceTests.ReadLogFile(), "Expected error message");
     }
 
     [TestMethod]
@@ -107,7 +107,7 @@ public class EqtTraceTests
         EqtTrace.TraceLevel = PlatformTraceLevel.Warning;
 #endif
         EqtTrace.Warning("Dummy Warning Message");
-        Assert.IsTrue(ReadLogFile().Contains("Dummy Warning Message"), "Expected Warning message");
+        Assert.IsTrue(EqtTraceTests.ReadLogFile().Contains("Dummy Warning Message"), "Expected Warning message");
     }
 
     [TestMethod]
@@ -119,7 +119,7 @@ public class EqtTraceTests
         EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
 #endif
         EqtTrace.Verbose("Dummy Verbose Message");
-        Assert.IsTrue(ReadLogFile().Contains("Dummy Verbose Message"), "Expected Verbose message");
+        Assert.IsTrue(EqtTraceTests.ReadLogFile().Contains("Dummy Verbose Message"), "Expected Verbose message");
     }
 
     [TestMethod]
@@ -131,7 +131,7 @@ public class EqtTraceTests
         EqtTrace.TraceLevel = PlatformTraceLevel.Info;
 #endif
         EqtTrace.Info("Dummy Info Message");
-        Assert.IsTrue(ReadLogFile().Contains("Dummy Info Message"), "Expected Info message");
+        Assert.IsTrue(EqtTraceTests.ReadLogFile().Contains("Dummy Info Message"), "Expected Info message");
     }
 
     [TestMethod]
@@ -145,7 +145,7 @@ public class EqtTraceTests
         EqtTrace.Info("Dummy Info Message");
         EqtTrace.Verbose("Unexpected Dummy Verbose Message");
 
-        var logFileContent = ReadLogFile();
+        var logFileContent = EqtTraceTests.ReadLogFile();
         Assert.IsFalse(logFileContent.Contains("Unexpected Dummy Verbose Message"), "Verbose message not expected");
         Assert.IsTrue(logFileContent.Contains("Dummy Info Message"), "Expected Info message");
     }
@@ -160,10 +160,10 @@ public class EqtTraceTests
         EqtTrace.TraceLevel = PlatformTraceLevel.Info;
 #endif
         EqtTrace.Info("Dummy Info Message: TraceShouldNotWriteIfDoNotInitializationIsSetToTrue");
-        Assert.IsFalse(ReadLogFile().Contains("Dummy Info Message: TraceShouldNotWriteIfDoNotInitializationIsSetToTrue"), "Did not expect Dummy Info message");
+        Assert.IsFalse(EqtTraceTests.ReadLogFile().Contains("Dummy Info Message: TraceShouldNotWriteIfDoNotInitializationIsSetToTrue"), "Did not expect Dummy Info message");
     }
 
-    private string ReadLogFile()
+    private static string ReadLogFile()
     {
         string log = null;
         try

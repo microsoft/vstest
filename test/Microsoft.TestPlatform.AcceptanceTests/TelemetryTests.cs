@@ -58,7 +58,7 @@ public class TelemetryTests : AcceptanceTestBase
         };
 
         InvokeVsTestForExecution(assemblyPaths, GetTestAdapterPath(), FrameworkArgValue, string.Empty, env);
-        ValidateOutput("Execution", tempDir);
+        TelemetryTests.ValidateOutput("Execution", tempDir);
     }
 
     private void DiscoverTests(string runnerFramework)
@@ -80,10 +80,10 @@ public class TelemetryTests : AcceptanceTestBase
         };
 
         InvokeVsTestForDiscovery(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, env);
-        ValidateOutput("Discovery", tempDir);
+        TelemetryTests.ValidateOutput("Discovery", tempDir);
     }
 
-    private void ValidateOutput(string command, TempDirectory tempDir)
+    private static void ValidateOutput(string command, TempDirectory tempDir)
     {
         if (!Directory.Exists(tempDir.Path))
         {

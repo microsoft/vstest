@@ -820,7 +820,7 @@ public partial class ManagedNameRoundTripTests
     }
 
     #region Helpers
-    private void VerifyRoundTrip(
+    private static void VerifyRoundTrip(
         MethodInfo methodInfo,
         INamedTypeSymbol containingTypeSymbol,
         IMethodSymbol methodSymbol,
@@ -833,7 +833,7 @@ public partial class ManagedNameRoundTripTests
         // VerifyRoundTripFromName(managedTypeName, managedMethodName, containingTypeSymbol, methodSymbol);
     }
 
-    private void VerifyRoundTripFromMethodInfo(
+    private static void VerifyRoundTripFromMethodInfo(
         MethodInfo methodInfo,
         string expectedManagedTypeName,
         string expectedManagedMethodName)
@@ -853,7 +853,7 @@ public partial class ManagedNameRoundTripTests
         Assert.AreEqual(methodInfo.MetadataToken, roundTrippedMethodInfo.MetadataToken);
     }
 
-    private void VerifyRoundTripFromName(
+    private static void VerifyRoundTripFromName(
         string managedTypeName,
         string managedMethodName,
         MethodInfo expectedMethodInfo)

@@ -210,17 +210,17 @@ public class FastFilterTests
     public void FastFilterWithSingleNotEqualsClause()
     {
         var filterString = "FullyQualifiedName!=Test1";
-        CheckFastFailureWithNotEqualClause(filterString);
+        FastFilterTests.CheckFastFailureWithNotEqualClause(filterString);
     }
 
     [TestMethod]
     public void FastFilterWithNotEqualsClauseAndDifferentCase()
     {
         var filterString = "FullyQualifiedName!=Test1&FullyQualifiedName!=test1";
-        CheckFastFailureWithNotEqualClause(filterString);
+        FastFilterTests.CheckFastFailureWithNotEqualClause(filterString);
     }
 
-    private void CheckFastFailureWithNotEqualClause(string filterString)
+    private static void CheckFastFailureWithNotEqualClause(string filterString)
     {
         var filterExpressionWrapper = new FilterExpressionWrapper(filterString);
         var fastFilter = filterExpressionWrapper.FastFilter;

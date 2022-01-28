@@ -417,7 +417,7 @@ public class TestRequestHandler : ITestRequestHandler
                                     testRunCriteriaWithSources.Package,
                                     testRunCriteriaWithSources.RunSettings,
                                     testRunCriteriaWithSources.TestExecutionContext,
-                                    GetTestCaseEventsHandler(testRunCriteriaWithSources.RunSettings),
+                                    TestRequestHandler.GetTestCaseEventsHandler(testRunCriteriaWithSources.RunSettings),
                                     testRunEventsHandler);
                         };
                         _jobQueue.QueueJob(job, 0);
@@ -450,7 +450,7 @@ public class TestRequestHandler : ITestRequestHandler
                                     testRunCriteriaWithTests.Package,
                                     testRunCriteriaWithTests.RunSettings,
                                     testRunCriteriaWithTests.TestExecutionContext,
-                                    GetTestCaseEventsHandler(testRunCriteriaWithTests.RunSettings),
+                                    TestRequestHandler.GetTestCaseEventsHandler(testRunCriteriaWithTests.RunSettings),
                                     testRunEventsHandler);
                         };
                         _jobQueue.QueueJob(job, 0);
@@ -517,7 +517,7 @@ public class TestRequestHandler : ITestRequestHandler
         }
     }
 
-    private ITestCaseEventsHandler GetTestCaseEventsHandler(string runSettings)
+    private static ITestCaseEventsHandler GetTestCaseEventsHandler(string runSettings)
     {
         ITestCaseEventsHandler testCaseEventsHandler = null;
 

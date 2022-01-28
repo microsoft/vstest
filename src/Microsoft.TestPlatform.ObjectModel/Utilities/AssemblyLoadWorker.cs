@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+
 #if NETFRAMEWORK
 using System;
 using System.Diagnostics;
@@ -20,6 +21,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
     /// </summary>
     /// <param name="path">Path of the assembly file</param>
     /// <returns> String representation of the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public string GetTargetFrameworkVersionStringFromPath(string path)
     {
         if (!File.Exists(path))
@@ -74,12 +76,14 @@ internal class AssemblyLoadWorker : MarshalByRefObject
         return dotNetVersion;
     }
 
+
     /// <summary>
     /// Returns the full name of the referenced assemblies by the assembly on the specified path.
     ///
     /// Returns null on failure and an empty array if there is no reference in the project.
     /// </summary>
     /// <param name="path">Path to the assembly file to load from.</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public string[] GetReferencedAssemblies(string path)
     {
         Debug.Assert(!string.IsNullOrEmpty(path));
@@ -108,6 +112,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
     /// <summary>
     /// Returns true if given assembly matched name and public key token.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public bool? CheckAssemblyReference(string path, string referenceAssemblyName, byte[] publicKeyToken)
     {
         try
@@ -166,6 +171,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
     /// <param name="path"></param>
     /// <param name="procArchType"></param>
     /// <param name="frameworkVersion"></param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public void GetPlatformAndFrameworkSettings(string path, out string procArchType, out string frameworkVersion)
     {
         procArchType = nameof(Architecture.Default);

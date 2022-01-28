@@ -251,34 +251,34 @@ public class HtmlLoggerTests
     public void GetFormattedDurationStringShouldGiveCorrectFormat()
     {
         TimeSpan ts1 = new(0, 0, 0, 0, 1);
-        Assert.AreEqual("1ms", _htmlLogger.GetFormattedDurationString(ts1));
+        Assert.AreEqual("1ms", HtmlLogger.HtmlLogger.GetFormattedDurationString(ts1));
 
         TimeSpan ts2 = new(0, 0, 0, 1, 0);
-        Assert.AreEqual("1s", _htmlLogger.GetFormattedDurationString(ts2));
+        Assert.AreEqual("1s", HtmlLogger.HtmlLogger.GetFormattedDurationString(ts2));
 
         TimeSpan ts3 = new(0, 0, 1, 0, 1);
-        Assert.AreEqual("1m", _htmlLogger.GetFormattedDurationString(ts3));
+        Assert.AreEqual("1m", HtmlLogger.HtmlLogger.GetFormattedDurationString(ts3));
 
         TimeSpan ts4 = new(0, 1, 0, 2, 3);
-        Assert.AreEqual("1h", _htmlLogger.GetFormattedDurationString(ts4));
+        Assert.AreEqual("1h", HtmlLogger.HtmlLogger.GetFormattedDurationString(ts4));
 
         TimeSpan ts5 = new(0, 1, 2, 3, 4);
-        Assert.AreEqual("1h 2m", _htmlLogger.GetFormattedDurationString(ts5));
+        Assert.AreEqual("1h 2m", HtmlLogger.HtmlLogger.GetFormattedDurationString(ts5));
 
         TimeSpan ts6 = new(0, 0, 1, 2, 3);
-        Assert.AreEqual("1m 2s", _htmlLogger.GetFormattedDurationString(ts6));
+        Assert.AreEqual("1m 2s", HtmlLogger.HtmlLogger.GetFormattedDurationString(ts6));
 
         TimeSpan ts7 = new(0, 0, 0, 1, 3);
-        Assert.AreEqual("1s 3ms", _htmlLogger.GetFormattedDurationString(ts7));
+        Assert.AreEqual("1s 3ms", HtmlLogger.HtmlLogger.GetFormattedDurationString(ts7));
 
         TimeSpan ts8 = new(2);
-        Assert.AreEqual("< 1ms", _htmlLogger.GetFormattedDurationString(ts8));
+        Assert.AreEqual("< 1ms", HtmlLogger.HtmlLogger.GetFormattedDurationString(ts8));
 
         TimeSpan ts10 = new(1, 0, 0, 1, 3);
-        Assert.AreEqual("> 1d", _htmlLogger.GetFormattedDurationString(ts10));
+        Assert.AreEqual("> 1d", HtmlLogger.HtmlLogger.GetFormattedDurationString(ts10));
 
         TimeSpan ts9 = new(0, 0, 0, 0, 0);
-        Assert.IsNull(_htmlLogger.GetFormattedDurationString(ts9));
+        Assert.IsNull(HtmlLogger.HtmlLogger.GetFormattedDurationString(ts9));
     }
 
     [TestMethod]

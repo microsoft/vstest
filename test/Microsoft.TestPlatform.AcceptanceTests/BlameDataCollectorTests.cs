@@ -325,7 +325,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
             if (file.Contains("Sequence_"))
             {
                 isSequenceAttachmentReceived = true;
-                isValid = IsValidXml(file);
+                isValid = BlameDataCollectorTests.IsValidXml(file);
             }
             else if (validateDumpFile && file.Contains(".dmp"))
             {
@@ -338,7 +338,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         Assert.IsTrue(isValid);
     }
 
-    private bool IsValidXml(string xmlFilePath)
+    private static bool IsValidXml(string xmlFilePath)
     {
         var file = File.OpenRead(xmlFilePath);
         var reader = XmlReader.Create(file);

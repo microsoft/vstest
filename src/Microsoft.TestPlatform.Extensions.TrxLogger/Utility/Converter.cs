@@ -54,11 +54,11 @@ internal class Converter
         TestType testType,
         TestCase rockSteadyTestCase)
     {
-        var testElement = CreateTestElement(testId, testName, rockSteadyTestCase.FullyQualifiedName, rockSteadyTestCase.ExecutorUri.ToString(), rockSteadyTestCase.Source, testType);
+        var testElement = Converter.CreateTestElement(testId, testName, rockSteadyTestCase.FullyQualifiedName, rockSteadyTestCase.ExecutorUri.ToString(), rockSteadyTestCase.Source, testType);
 
         testElement.Storage = rockSteadyTestCase.Source;
-        testElement.Priority = GetPriority(rockSteadyTestCase);
-        testElement.Owner = GetOwner(rockSteadyTestCase);
+        testElement.Priority = Converter.GetPriority(rockSteadyTestCase);
+        testElement.Owner = Converter.GetOwner(rockSteadyTestCase);
         testElement.ExecutionId = new TestExecId(executionId);
         testElement.ParentExecutionId = new TestExecId(parentExecutionId);
 
@@ -124,7 +124,7 @@ internal class Converter
 
         // Clear existing messages and store rocksteady result messages.
         testResult.TextMessages = null;
-        UpdateResultMessages(testResult, rockSteadyTestResult);
+        Converter.UpdateResultMessages(testResult, rockSteadyTestResult);
 
         // Save result attachments to target location.
         UpdateTestResultAttachments(rockSteadyTestResult, testResult, testRun, trxFileDirectory, true);
@@ -141,6 +141,7 @@ internal class Converter
     /// <returns>
     /// The <see cref="TestOutcome"/>.
     /// </returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public TrxObjectModel.TestOutcome ToOutcome(ObjectModel.TestOutcome rockSteadyOutcome)
     {
         TrxObjectModel.TestOutcome outcome = TrxObjectModel.TestOutcome.Failed;
@@ -236,7 +237,7 @@ internal class Converter
     /// </summary>
     /// <param name="unitTestResult">TRX TestResult</param>
     /// <param name="testResult"> rock steady test result</param>
-    private void UpdateResultMessages(TrxObjectModel.TestResult unitTestResult, ObjectModel.TestResult testResult)
+    private static void UpdateResultMessages(TrxObjectModel.TestResult unitTestResult, ObjectModel.TestResult testResult)
     {
         StringBuilder debugTrace = new();
         StringBuilder stdErr = new();
@@ -277,6 +278,7 @@ internal class Converter
     /// <param name="testCase">TestCase object extracted from the TestResult</param>
     /// <param name="categoryId">Property Name from the list of properties in TestCase</param>
     /// <returns> list of properties</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public List<string> GetCustomPropertyValueFromTestCase(TestCase testCase, string categoryId)
     {
         var customProperty = testCase.Properties.FirstOrDefault(t => t.Id.Equals(categoryId));
@@ -296,6 +298,7 @@ internal class Converter
     /// </summary>
     /// <param name="rockSteadyTestCase"></param>
     /// <returns>Test id</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public Guid GetTestId(TestCase rockSteadyTestCase)
     {
         Guid testId = Guid.Empty;
@@ -319,6 +322,7 @@ internal class Converter
     /// </summary>
     /// <param name="testResult"></param>
     /// <returns>Parent execution id.</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public Guid GetParentExecutionId(ObjectModel.TestResult testResult)
     {
         TestProperty parentExecutionIdProperty = testResult.Properties.FirstOrDefault(
@@ -334,6 +338,7 @@ internal class Converter
     /// </summary>
     /// <param name="testResult"></param>
     /// <returns>Execution id.</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public Guid GetExecutionId(ObjectModel.TestResult testResult)
     {
         TestProperty executionIdProperty = testResult.Properties.FirstOrDefault(
@@ -352,6 +357,7 @@ internal class Converter
     /// </summary>
     /// <param name="testResult"></param>
     /// <returns>Test type</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API.")]
     public TestType GetTestType(ObjectModel.TestResult testResult)
     {
         var testTypeGuid = Constants.UnitTestTypeGuid;
@@ -474,7 +480,7 @@ internal class Converter
             Debug.Assert(Path.IsPathRooted(sourceFile), "Source file is not rooted");
 
             // copy the source file to the target location
-            string targetFileName = _trxFileHelper.GetNextIterationFileName(targetDirectory, Path.GetFileName(sourceFile), false);
+            string targetFileName = TrxFileHelper.GetNextIterationFileName(targetDirectory, Path.GetFileName(sourceFile), false);
 
             try
             {
@@ -536,7 +542,7 @@ internal class Converter
 
             Debug.Assert(Path.IsPathRooted(sourceFile), "Source file is not rooted");
             // copy the source file to the target location
-            string targetFileName = _trxFileHelper.GetNextIterationFileName(testResultDirectory, Path.GetFileName(sourceFile), false);
+            string targetFileName = TrxFileHelper.GetNextIterationFileName(testResultDirectory, Path.GetFileName(sourceFile), false);
 
             try
             {
@@ -581,7 +587,7 @@ internal class Converter
     /// </summary>
     /// <param name="rockSteadyTestCase"></param>
     /// <returns>Priority</returns>
-    private int GetPriority(TestCase rockSteadyTestCase)
+    private static int GetPriority(TestCase rockSteadyTestCase)
     {
         int priority = int.MaxValue;
 
@@ -597,7 +603,7 @@ internal class Converter
     /// </summary>
     /// <param name="rockSteadyTestCase"></param>
     /// <returns>Owner</returns>
-    private string GetOwner(TestCase rockSteadyTestCase)
+    private static string GetOwner(TestCase rockSteadyTestCase)
     {
         string owner = null;
 
@@ -615,7 +621,7 @@ internal class Converter
     /// <param name="fullyQualifiedName">Fully qualified name.</param>
     /// <param name="source">Source.</param>
     /// <returns>Test class name.</returns>
-    private string GetTestClassName(string testName, string fullyQualifiedName, string source)
+    private static string GetTestClassName(string testName, string fullyQualifiedName, string source)
     {
         var className = "DefaultClassName";
 
@@ -672,7 +678,7 @@ internal class Converter
     /// <param name="source"></param>
     /// <param name="testType"></param>
     /// <returns>Trx test element</returns>
-    private TestElement CreateTestElement(Guid testId, string name, string fullyQualifiedName, string adapter, string source, TestType testType)
+    private static TestElement CreateTestElement(Guid testId, string name, string fullyQualifiedName, string adapter, string source, TestType testType)
     {
         TestElement testElement;
         if (testType.Equals(Constants.OrderedTestType))
@@ -682,7 +688,7 @@ internal class Converter
         else
         {
             var codeBase = source;
-            var className = GetTestClassName(name, fullyQualifiedName, source);
+            var className = Converter.GetTestClassName(name, fullyQualifiedName, source);
             var testMethodName = fullyQualifiedName.StartsWith($"{className}.") ? fullyQualifiedName.Remove(0, $"{className}.".Length) : fullyQualifiedName;
             var testMethod = new TestMethod(testMethodName, className);
 

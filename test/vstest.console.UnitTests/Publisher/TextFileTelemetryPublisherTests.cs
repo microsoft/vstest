@@ -25,7 +25,7 @@ public class TextFileTelemetryPublisherTests
         dummyDictionary.Add("Dummy2", "DummyValue2");
 
         // Act.
-        publishMetrics.LogToFile("dummyevent", dummyDictionary, mockFileHelper.Object);
+        TextFileTelemetryPublisher.LogToFile("dummyevent", dummyDictionary, mockFileHelper.Object);
 
         // Verify.
         mockFileHelper.Verify(fh => fh.CreateDirectory(It.IsAny<string>()), Times.Once);
@@ -41,7 +41,7 @@ public class TextFileTelemetryPublisherTests
         dummyDictionary.Add("Dummy2", "DummyValue2");
 
         // Act.
-        publishMetrics.LogToFile("dummyevent", dummyDictionary, mockFileHelper.Object);
+        TextFileTelemetryPublisher.LogToFile("dummyevent", dummyDictionary, mockFileHelper.Object);
 
         // Verify.
         mockFileHelper.Verify(fh => fh.WriteAllTextToFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);

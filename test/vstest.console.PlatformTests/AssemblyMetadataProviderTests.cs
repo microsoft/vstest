@@ -92,7 +92,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
         var platformPath = platform.Equals("x64") ? platform : string.Empty;
         var assemblyPath = $@"{_testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\"
                            + $@"contentFiles\any\any\{platformPath}\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-        LoadAssemblyIntoMemory(assemblyPath);
+        AssemblyMetadataProviderTests.LoadAssemblyIntoMemory(assemblyPath);
         var stopWatch = Stopwatch.StartNew();
         var arch = _assemblyMetadataProvider.GetArchitecture(assemblyPath);
         stopWatch.Stop();
@@ -111,7 +111,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
     {
         var expectedElapsedTime = 5;
         var assemblyPath = _testEnvironment.GetTestAsset("SimpleTestProject3.dll", framework);
-        LoadAssemblyIntoMemory(assemblyPath);
+        AssemblyMetadataProviderTests.LoadAssemblyIntoMemory(assemblyPath);
         var stopWatch = Stopwatch.StartNew();
         var actualFx = _assemblyMetadataProvider.GetFrameWork(assemblyPath);
         stopWatch.Stop();
@@ -138,7 +138,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
     {
         var expectedElapsedTime = 5;
         var assemblyPath = $@"{_testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-        LoadAssemblyIntoMemory(assemblyPath);
+        AssemblyMetadataProviderTests.LoadAssemblyIntoMemory(assemblyPath);
         var stopWatch = Stopwatch.StartNew();
         var fx = _assemblyMetadataProvider.GetFrameWork(assemblyPath);
         stopWatch.Stop();
@@ -154,7 +154,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
     {
         _isManagedAssemblyArchitectureTest = true;
         var assemblyPath = _testEnvironment.GetTestAsset(projectName + ".dll", framework);
-        LoadAssemblyIntoMemory(assemblyPath);
+        AssemblyMetadataProviderTests.LoadAssemblyIntoMemory(assemblyPath);
         var stopWatch = Stopwatch.StartNew();
         var arch = _assemblyMetadataProvider.GetArchitecture(assemblyPath);
         stopWatch.Stop();
@@ -166,7 +166,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
         // Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
     }
 
-    private void LoadAssemblyIntoMemory(string assemblyPath)
+    private static void LoadAssemblyIntoMemory(string assemblyPath)
     {
         // Load the file into RAM in ahead to avoid performance number(expectedElapsedTime) dependence on disk read time.
         File.ReadAllBytes(assemblyPath);

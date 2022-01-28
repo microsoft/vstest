@@ -28,7 +28,7 @@ public class EventLogCollectorTests : AcceptanceTestBase
         using var tempDir = new TempDirectory();
         var assemblyPaths = _testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
 
-        string runSettings = GetRunsettingsFilePath(tempDir);
+        string runSettings = EventLogCollectorTests.GetRunsettingsFilePath(tempDir);
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), runSettings, FrameworkArgValue, resultsDirectory: tempDir.Path);
 
         InvokeVsTest(arguments);
@@ -50,7 +50,7 @@ public class EventLogCollectorTests : AcceptanceTestBase
         var assemblyPaths = _testEnvironment.GetTestAsset("SimpleTestProject.dll");
         using var tempDir = new TempDirectory();
 
-        string runSettings = GetRunsettingsFilePath(tempDir);
+        string runSettings = EventLogCollectorTests.GetRunsettingsFilePath(tempDir);
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), runSettings, FrameworkArgValue, resultsDirectory: tempDir.Path);
 
         InvokeVsTest(arguments);
@@ -62,7 +62,7 @@ public class EventLogCollectorTests : AcceptanceTestBase
         StdErrorDoesNotContains("Unable to read event log");
     }
 
-    private string GetRunsettingsFilePath(TempDirectory tempDirectory)
+    private static string GetRunsettingsFilePath(TempDirectory tempDirectory)
     {
         var runsettingsPath = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
 
@@ -111,20 +111,20 @@ public class EventLogCollectorTests : AcceptanceTestBase
         };
 
         // Since there is no guaranty that test will run in a particular order, we will check file for all available list of ids
-        Assert.IsTrue(VerifyOrder2(fileContent1, eventIdsDics), string.Format("Event log file content: {0}", fileContent1));
-        Assert.IsTrue(VerifyOrder2(fileContent2, eventIdsDics), string.Format("Event log file content: {0}", fileContent2));
-        Assert.IsTrue(VerifyOrder2(fileContent3, eventIdsDics), string.Format("Event log file content: {0}", fileContent3));
+        Assert.IsTrue(EventLogCollectorTests.VerifyOrder2(fileContent1, eventIdsDics), string.Format("Event log file content: {0}", fileContent1));
+        Assert.IsTrue(EventLogCollectorTests.VerifyOrder2(fileContent2, eventIdsDics), string.Format("Event log file content: {0}", fileContent2));
+        Assert.IsTrue(EventLogCollectorTests.VerifyOrder2(fileContent3, eventIdsDics), string.Format("Event log file content: {0}", fileContent3));
 
-        Assert.IsTrue(VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }), string.Format("Event log file content: {0}", fileContent4));
+        Assert.IsTrue(EventLogCollectorTests.VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }), string.Format("Event log file content: {0}", fileContent4));
     }
 
-    private bool VerifyOrder2(string content, Dictionary<string[], bool> eventIdsDics)
+    private static bool VerifyOrder2(string content, Dictionary<string[], bool> eventIdsDics)
     {
         foreach (var eventIds in eventIdsDics)
         {
             if (eventIds.Value == false)
             {
-                if (VerifyOrder(content, eventIds.Key))
+                if (EventLogCollectorTests.VerifyOrder(content, eventIds.Key))
                 {
                     eventIdsDics[eventIds.Key] = true;
                     return true;
@@ -134,7 +134,7 @@ public class EventLogCollectorTests : AcceptanceTestBase
         return false;
     }
 
-    private bool VerifyOrder(string content, string[] eventIds)
+    private static bool VerifyOrder(string content, string[] eventIds)
     {
         for (int i = 0; i < eventIds.Length; i++)
         {

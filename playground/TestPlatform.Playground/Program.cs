@@ -92,12 +92,12 @@ internal class Program
             throw new NotImplementedException();
         }
 
-        private string WriteTests(IEnumerable<TestResult> testResults)
+        private static string WriteTests(IEnumerable<TestResult> testResults)
         {
             return WriteTests(testResults?.Select(t => t.TestCase));
         }
 
-        private string WriteTests(IEnumerable<TestCase> testCases)
+        private static string WriteTests(IEnumerable<TestCase> testCases)
         {
             return testCases == null ? null : "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName));
         }

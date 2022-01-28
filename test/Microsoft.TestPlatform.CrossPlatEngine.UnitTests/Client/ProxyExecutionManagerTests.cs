@@ -784,7 +784,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         }
     }
 
-    private void SignalEvent(ManualResetEvent manualResetEvent)
+    private static void SignalEvent(ManualResetEvent manualResetEvent)
     {
         // Wait for the 100 ms.
         Task.Delay(200).Wait();

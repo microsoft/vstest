@@ -47,8 +47,10 @@ public class FrameworkHandleTests
         Assert.ThrowsException<ObjectDisposedException>(() => frameworkHandle.LaunchProcessWithDebuggerAttached(null, null, null, null));
     }
 
+
     // TODO: Enable method once we fix the "IsDebug" in TestExecutionContext
     // [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "TODO: Remove this suppression when attribute is put back.")]
     public void LaunchProcessWithDebuggerAttachedShouldThrowIfNotInDebugContext()
     {
         var tec = GetTestExecutionContext();

@@ -68,7 +68,7 @@ public class TestLoggerManagerTests
     public void GetResultsDirectoryShouldReturnNullIfRunSettingsIsNull()
     {
         var testLoggerManager = new DummyTestLoggerManager();
-        string result = testLoggerManager.GetResultsDirectory(null);
+        string result = TestLoggerManager.GetResultsDirectory(null);
         Assert.IsNull(result);
     }
 
@@ -86,7 +86,7 @@ public class TestLoggerManagerTests
     </RunSettings> ";
 
         var testLoggerManager = new DummyTestLoggerManager();
-        string result = testLoggerManager.GetResultsDirectory(runSettingsXml);
+        string result = TestLoggerManager.GetResultsDirectory(runSettingsXml);
         Assert.AreEqual(0, string.Compare("DummyTestResultsFolder", result));
     }
 
@@ -103,7 +103,7 @@ public class TestLoggerManagerTests
     </RunSettings> ";
 
         var testLoggerManager = new DummyTestLoggerManager();
-        string result = testLoggerManager.GetResultsDirectory(runSettingsXml);
+        string result = TestLoggerManager.GetResultsDirectory(runSettingsXml);
 
         Assert.AreEqual(0, string.Compare(Constants.DefaultResultsDirectory, result));
     }
@@ -121,7 +121,7 @@ public class TestLoggerManagerTests
                                         </RunSettings> ";
 
         var testLoggerManager = new DummyTestLoggerManager();
-        var framework = testLoggerManager.GetTargetFramework(runSettingsXml);
+        var framework = TestLoggerManager.GetTargetFramework(runSettingsXml);
 
         Assert.AreEqual(".NETFramework,Version=v4.5", framework.Name);
     }
@@ -1630,6 +1630,7 @@ public class TestLoggerManagerTests
     {
         public static int Counter = 0;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "REVIEW ME: Is it ok to make this static?")]
         public void Initialize(TestLoggerEvents events, string testRunDirectory)
         {
             Counter++;
