@@ -141,7 +141,7 @@ public class SocketCommunicationManager : ICommunicationManager
     {
         var stopWatch = Stopwatch.StartNew();
         var result = _clientConnectedEvent.WaitOne(clientConnectionTimeout);
-        EqtTrace.Verbose("SocketCommunicationManager.WaitForClientConnection took: {0} ms, with {1} ms timeout, and finished with {2}", stopWatch.ElapsedMilliseconds, clientConnectionTimeout, result);
+        EqtTrace.Verbose("SocketCommunicationManager.WaitForClientConnection took: {0} ms, with {1} ms timeout, and finished with {2}.", stopWatch.ElapsedMilliseconds, clientConnectionTimeout, result);
 
         return result;
     }
@@ -221,7 +221,7 @@ public class SocketCommunicationManager : ICommunicationManager
     {
         var stopWatch = Stopwatch.StartNew();
         var result = _clientConnectionAcceptedEvent.WaitOne(connectionTimeout);
-        EqtTrace.Verbose("SocketCommunicationManager.WaitForServerConnection took: {0} ms, with {1} ms timeout, and finished with {2}", stopWatch.ElapsedMilliseconds, connectionTimeout, result);
+        EqtTrace.Verbose("SocketCommunicationManager.WaitForServerConnection took: {0} ms, with {1} ms timeout, and finished with {2}.", stopWatch.ElapsedMilliseconds, connectionTimeout, result);
 
         return result;
     }

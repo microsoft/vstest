@@ -346,7 +346,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
                     }
                 }
             },
-                _cancellationTokenSource.Token);
+            _cancellationTokenSource.Token);
 
         _attachmentTasks[fileTransferInfo.Context].Add(continuationTask);
     }
