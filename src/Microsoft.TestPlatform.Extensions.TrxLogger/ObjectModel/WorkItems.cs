@@ -153,11 +153,11 @@ internal sealed class WorkItemCollection : EqtBaseCollection<WorkItem>
         StringBuilder returnString = new();
         if (Count > 0)
         {
-            returnString.Append(",");
+            returnString.Append(',');
             foreach (WorkItem item in this)
             {
                 returnString.Append(item);
-                returnString.Append(",");
+                returnString.Append(',');
             }
         }
 

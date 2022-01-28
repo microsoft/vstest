@@ -31,7 +31,7 @@ public class ExceptionUtilities
         {
             exceptionString
                 .AppendLine()
-                .Append(Resources.Resources.InnerException).Append(" ").AppendLine(inner.Message);
+                .Append(Resources.Resources.InnerException).Append(' ').AppendLine(inner.Message);
             AppendStackTrace(exceptionString, inner);
             inner = inner.InnerException;
         }

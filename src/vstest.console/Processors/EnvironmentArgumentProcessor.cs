@@ -108,7 +108,7 @@ internal class EnvironmentArgumentProcessor : IArgumentProcessor
         /// Set the environment variables in RunSettings.xml
         /// </summary>
         /// <param name="argument">
-        /// Environment variable to set. 
+        /// Environment variable to set.
         /// </param>
         public void Initialize(string argument)
         {
@@ -121,7 +121,7 @@ internal class EnvironmentArgumentProcessor : IArgumentProcessor
             var key = argument;
             var value = string.Empty;
 
-            if (key.Contains("="))
+            if (key.Contains('='))
             {
                 value = key.Substring(key.IndexOf("=") + 1);
                 key = key.Substring(0, key.IndexOf("="));

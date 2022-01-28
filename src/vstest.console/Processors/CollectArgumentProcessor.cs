@@ -124,7 +124,7 @@ internal class CollectArgumentExecutor : IArgumentExecutor
         var collectArgumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, exceptionMessage);
 
         // First argument is collector name. Remaining are key value pairs for configurations.
-        if (collectArgumentList[0].Contains("="))
+        if (collectArgumentList[0].Contains('='))
         {
             throw new CommandLineException(exceptionMessage);
         }
