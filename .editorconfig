@@ -142,6 +142,12 @@ dotnet_diagnostic.IDE0065.severity = none
 # Keep this in sync with th related C# rule: csharp_prefer_simple_using_statement
 dotnet_diagnostic.IDE0063.severity = warning
 
+# CA1847: Use char literal for a single character lookup
+dotnet_diagnostic.CA1847.severity = warning # not default, increased severity to ensure it is applied
+
+# CA2249: Consider using 'string.Contains' instead of 'string.IndexOf'
+dotnet_diagnostic.CA2249.severity = warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences
