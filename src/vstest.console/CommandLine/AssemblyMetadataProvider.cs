@@ -97,8 +97,8 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
     private Architecture GetArchitectureFromAssemblyMetadata(string path)
     {
         Architecture arch = Architecture.AnyCPU;
-        using (Stream stream = this.fileHelper.GetStream(path, FileMode.Open, FileAccess.Read))
-        using (PEReader peReader = new PEReader(stream))
+        using (Stream stream = _fileHelper.GetStream(path, FileMode.Open, FileAccess.Read))
+        using (PEReader peReader = new(stream))
         {
             switch (peReader.PEHeaders.CoffHeader.Machine)
             {
