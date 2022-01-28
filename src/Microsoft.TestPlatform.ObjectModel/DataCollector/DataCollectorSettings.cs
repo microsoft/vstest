@@ -1,239 +1,231 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+using System;
+using System.Globalization;
+using System.Xml;
+
+/// <summary>
+/// The in procedure data collector settings.
+/// </summary>
+public class DataCollectorSettings
 {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
-    using System.Xml;
+    /// <summary>
+    /// Gets or sets the uri.
+    /// </summary>
+    public Uri Uri
+    {
+        get;
+        set;
+    }
 
     /// <summary>
-    /// The in procedure data collector settings.
+    /// Gets or sets the assembly qualified name.
     /// </summary>
-    public class DataCollectorSettings
+    public string AssemblyQualifiedName
     {
-        /// <summary>
-        /// Gets or sets the uri.
-        /// </summary>
-        public Uri Uri
+        get;
+        set;
+    }
+
+    /// <summary>
+    /// Gets or sets the friendly name.
+    /// </summary>
+    public string FriendlyName
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether is enabled.
+    /// </summary>
+    public bool IsEnabled
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
+    /// Gets or sets value CodeBase of collector DLL. The syntax is same as Code Base in AssemblyName class.
+    /// </summary>
+    public string CodeBase
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
+    /// Gets or sets the configuration.
+    /// </summary>
+    public XmlElement Configuration
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
+    /// The to xml.
+    /// </summary>
+    /// <returns>
+    /// The <see cref="XmlElement"/>.
+    /// </returns>
+    public XmlElement ToXml()
+    {
+        XmlDocument doc = new();
+        XmlElement root = doc.CreateElement(Constants.DataCollectorSettingName);
+        AppendAttribute(doc, root, "uri", Uri.ToString());
+        AppendAttribute(doc, root, "assemblyQualifiedName", AssemblyQualifiedName);
+        AppendAttribute(doc, root, "friendlyName", FriendlyName);
+
+        root.AppendChild(doc.ImportNode(Configuration, true));
+
+        return root;
+    }
+
+    /// <summary>
+    /// The to xml.
+    /// </summary>
+    /// <param name="dataCollectorName">
+    /// The data collector name.
+    /// </param>
+    /// <returns>
+    /// The <see cref="XmlElement"/>.
+    /// </returns>
+    public XmlElement ToXml(string dataCollectorName)
+    {
+        XmlDocument doc = new();
+        XmlElement root = doc.CreateElement(dataCollectorName);
+        if (Uri != null)
         {
-            get;
-            set;
+            AppendAttribute(doc, root, "uri", Uri.ToString());
         }
 
-        /// <summary>
-        /// Gets or sets the assembly qualified name.
-        /// </summary>
-        public string AssemblyQualifiedName
+        if (!string.IsNullOrWhiteSpace(AssemblyQualifiedName))
         {
-            get;
-            set;
+            AppendAttribute(doc, root, "assemblyQualifiedName", AssemblyQualifiedName);
         }
 
-        /// <summary>
-        /// Gets or sets the friendly name.
-        /// </summary>
-        public string FriendlyName
+        if (!string.IsNullOrWhiteSpace(FriendlyName))
         {
-            get;
-            set;
+            AppendAttribute(doc, root, "friendlyName", FriendlyName);
         }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether is enabled.
-        /// </summary>
-        public bool IsEnabled
+        AppendAttribute(doc, root, "enabled", IsEnabled.ToString());
+
+        if (!string.IsNullOrWhiteSpace(CodeBase))
         {
-            get;
-            set;
+            AppendAttribute(doc, root, "codebase", CodeBase);
         }
 
-        /// <summary>
-        /// Gets or sets value CodeBase of collector DLL. The syntax is same as Code Base in AssemblyName class.
-        /// </summary>
-        public string CodeBase
+        if (Configuration != null)
         {
-            get;
-            set;
+            root.AppendChild(doc.ImportNode(Configuration, true));
         }
 
-        /// <summary>
-        /// Gets or sets the configuration.
-        /// </summary>
-        public XmlElement Configuration
+        return root;
+    }
+
+    /// <summary>
+    /// The from xml.
+    /// </summary>
+    /// <param name="reader">
+    /// The reader.
+    /// </param>
+    /// <returns>
+    /// The <see cref="InProcDataCollectorSettings"/>.
+    /// </returns>
+    /// <exception cref="SettingsException">
+    /// Settings exception
+    /// </exception>
+    internal static DataCollectorSettings FromXml(XmlReader reader)
+    {
+        DataCollectorSettings settings = new();
+        settings.IsEnabled = true;
+        bool empty = reader.IsEmptyElement;
+        if (reader.HasAttributes)
         {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// The to xml.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="XmlElement"/>.
-        /// </returns>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        public XmlElement ToXml()
-        {
-            XmlDocument doc = new XmlDocument();
-            XmlElement root = doc.CreateElement(Constants.DataCollectorSettingName);
-            AppendAttribute(doc, root, "uri", this.Uri.ToString());
-            AppendAttribute(doc, root, "assemblyQualifiedName", this.AssemblyQualifiedName);
-            AppendAttribute(doc, root, "friendlyName", this.FriendlyName);
-
-            root.AppendChild(doc.ImportNode(this.Configuration, true));
-
-            return root;
-        }
-
-        /// <summary>
-        /// The to xml.
-        /// </summary>
-        /// <param name="dataCollectorName">
-        /// The data collector name.
-        /// </param>
-        /// <returns>
-        /// The <see cref="XmlElement"/>.
-        /// </returns>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        public XmlElement ToXml(string dataCollectorName)
-        {
-            XmlDocument doc = new XmlDocument();
-            XmlElement root = doc.CreateElement(dataCollectorName);
-            if (this.Uri != null)
+            while (reader.MoveToNextAttribute())
             {
-                AppendAttribute(doc, root, "uri", this.Uri.ToString());
-            }
-
-            if (!string.IsNullOrWhiteSpace(this.AssemblyQualifiedName))
-            {
-                AppendAttribute(doc, root, "assemblyQualifiedName", this.AssemblyQualifiedName);
-            }
-
-            if (!string.IsNullOrWhiteSpace(this.FriendlyName))
-            {
-                AppendAttribute(doc, root, "friendlyName", this.FriendlyName);
-            }
-
-            AppendAttribute(doc, root, "enabled", this.IsEnabled.ToString());
-
-            if (!string.IsNullOrWhiteSpace(this.CodeBase))
-            {
-                AppendAttribute(doc, root, "codebase", this.CodeBase);
-            }
-
-            if (this.Configuration != null)
-            {
-                root.AppendChild(doc.ImportNode(this.Configuration, true));
-            }
-
-            return root;
-        }
-
-        /// <summary>
-        /// The from xml.
-        /// </summary>
-        /// <param name="reader">
-        /// The reader.
-        /// </param>
-        /// <returns>
-        /// The <see cref="InProcDataCollectorSettings"/>.
-        /// </returns>
-        /// <exception cref="SettingsException">
-        /// Settings exception
-        /// </exception>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        internal static DataCollectorSettings FromXml(XmlReader reader)
-        {
-            DataCollectorSettings settings = new DataCollectorSettings();
-            settings.IsEnabled = true;
-            bool empty = reader.IsEmptyElement;
-            if (reader.HasAttributes)
-            {
-                while (reader.MoveToNextAttribute())
+                switch (reader.Name)
                 {
-                    switch (reader.Name)
-                    {
-                        case "uri":
-                            ValidateArg.NotNullOrEmpty(reader.Value, "uri");
-                            try
-                            {
-                                settings.Uri = new Uri(reader.Value);
-                            }
-                            catch (UriFormatException)
-                            {
-                                throw new SettingsException(String.Format(CultureInfo.CurrentCulture, Resources.Resources.InvalidDataCollectorUriInSettings, reader.Value));
-                            }
+                    case "uri":
+                        ValidateArg.NotNullOrEmpty(reader.Value, "uri");
+                        try
+                        {
+                            settings.Uri = new Uri(reader.Value);
+                        }
+                        catch (UriFormatException)
+                        {
+                            throw new SettingsException(String.Format(CultureInfo.CurrentCulture, Resources.Resources.InvalidDataCollectorUriInSettings, reader.Value));
+                        }
 
-                            break;
+                        break;
 
-                        case "assemblyQualifiedName":
-                            ValidateArg.NotNullOrEmpty(reader.Value, "assemblyQualifiedName");
-                            settings.AssemblyQualifiedName = reader.Value;
-                            break;
+                    case "assemblyQualifiedName":
+                        ValidateArg.NotNullOrEmpty(reader.Value, "assemblyQualifiedName");
+                        settings.AssemblyQualifiedName = reader.Value;
+                        break;
 
-                        case "friendlyName":
-                            ValidateArg.NotNullOrEmpty(reader.Value, "FriendlyName");
-                            settings.FriendlyName = reader.Value;
-                            break;
+                    case "friendlyName":
+                        ValidateArg.NotNullOrEmpty(reader.Value, "FriendlyName");
+                        settings.FriendlyName = reader.Value;
+                        break;
 
-                        case "enabled":
-                            settings.IsEnabled = bool.Parse(reader.Value);
-                            break;
+                    case "enabled":
+                        settings.IsEnabled = bool.Parse(reader.Value);
+                        break;
 
-                        case "codebase":
-                            settings.CodeBase = reader.Value; // Optional.
-                            break;
+                    case "codebase":
+                        settings.CodeBase = reader.Value; // Optional.
+                        break;
 
-                        default:
-                            throw new SettingsException(
-                                String.Format(
-                                    CultureInfo.CurrentCulture,
-                                    Resources.Resources.InvalidSettingsXmlAttribute,
-                                    Constants.DataCollectionRunSettingsName,
-                                    reader.Name));
-                    }
+                    default:
+                        throw new SettingsException(
+                            String.Format(
+                                CultureInfo.CurrentCulture,
+                                Resources.Resources.InvalidSettingsXmlAttribute,
+                                Constants.DataCollectionRunSettingsName,
+                                reader.Name));
                 }
-
             }
 
-            reader.Read();
-            if (!empty)
-            {
-                while (reader.NodeType == XmlNodeType.Element)
-                {
-                    switch (reader.Name)
-                    {
-                        case "Configuration":
-                            XmlDocument doc = new XmlDocument();
-                            XmlElement element = doc.CreateElement("Configuration");
-                            element.InnerXml = reader.ReadInnerXml();
-                            settings.Configuration = element;
-                            break;
-
-                        default:
-                            throw new SettingsException(
-                                String.Format(
-                                    CultureInfo.CurrentCulture,
-                                    Resources.Resources.InvalidSettingsXmlElement,
-                                    Constants.DataCollectionRunSettingsName,
-                                    reader.Name));
-                    }
-                }
-                reader.ReadEndElement();
-            }
-            return settings;
         }
 
-        private static void AppendAttribute(XmlDocument doc, XmlElement owner, string attributeName, string attributeValue)
+        reader.Read();
+        if (!empty)
         {
-            XmlAttribute attribute = doc.CreateAttribute(attributeName);
-            attribute.Value = attributeValue;
-            owner.Attributes.Append(attribute);
+            while (reader.NodeType == XmlNodeType.Element)
+            {
+                switch (reader.Name)
+                {
+                    case "Configuration":
+                        XmlDocument doc = new();
+                        XmlElement element = doc.CreateElement("Configuration");
+                        element.InnerXml = reader.ReadInnerXml();
+                        settings.Configuration = element;
+                        break;
+
+                    default:
+                        throw new SettingsException(
+                            String.Format(
+                                CultureInfo.CurrentCulture,
+                                Resources.Resources.InvalidSettingsXmlElement,
+                                Constants.DataCollectionRunSettingsName,
+                                reader.Name));
+                }
+            }
+            reader.ReadEndElement();
         }
+        return settings;
+    }
+
+    private static void AppendAttribute(XmlDocument doc, XmlElement owner, string attributeName, string attributeValue)
+    {
+        XmlAttribute attribute = doc.CreateAttribute(attributeName);
+        attribute.Value = attributeValue;
+        owner.Attributes.Append(attribute);
     }
 }

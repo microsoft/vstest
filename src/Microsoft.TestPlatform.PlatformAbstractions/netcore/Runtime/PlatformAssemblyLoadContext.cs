@@ -3,26 +3,25 @@
 
 #if NETCOREAPP
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+using System.Reflection;
+using System.Runtime.Loader;
+
+using Interfaces;
+
+/// <inheritdoc/>
+public class PlatformAssemblyLoadContext : IAssemblyLoadContext
 {
-    using System.Reflection;
-    using System.Runtime.Loader;
-
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-
     /// <inheritdoc/>
-    public class PlatformAssemblyLoadContext : IAssemblyLoadContext
+    public AssemblyName GetAssemblyNameFromPath(string assemblyPath)
     {
-        /// <inheritdoc/>
-        public AssemblyName GetAssemblyNameFromPath(string assemblyPath)
-        {
-            return AssemblyLoadContext.GetAssemblyName(assemblyPath);
-        }
+        return AssemblyLoadContext.GetAssemblyName(assemblyPath);
+    }
 
-        public Assembly LoadAssemblyFromPath(string assemblyPath)
-        {
-            return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-        }
+    public Assembly LoadAssemblyFromPath(string assemblyPath)
+    {
+        return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
     }
 }
 

@@ -1,97 +1,96 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal;
+
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+using Utilities;
+using TestTools.UnitTesting;
+using Moq;
+
+[TestClass]
+public class ProgressIndicatorTests
 {
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Moq;
+    ProgressIndicator _indicator;
+    Mock<IOutput> _consoleOutput;
+    Mock<IConsoleHelper> _consoleHelper;
 
-    [TestClass]
-    public class ProgressIndicatorTests
+    [TestInitialize]
+    public void TestInit()
     {
-        ProgressIndicator indicator;
-        Mock<IOutput> consoleOutput;
-        Mock<IConsoleHelper> consoleHelper;
+        _consoleOutput = new Mock<IOutput>();
+        _consoleHelper = new Mock<IConsoleHelper>();
+        _consoleHelper.Setup(c => c.WindowWidth).Returns(100);
+        _consoleHelper.Setup(c => c.CursorTop).Returns(20);
+        _indicator = new ProgressIndicator(_consoleOutput.Object, _consoleHelper.Object);
+    }
 
-        [TestInitialize]
-        public void TestInit()
-        {
-            consoleOutput = new Mock<IOutput>();
-            consoleHelper = new Mock<IConsoleHelper>();
-            consoleHelper.Setup(c => c.WindowWidth).Returns(100);
-            consoleHelper.Setup(c => c.CursorTop).Returns(20);
-            indicator = new ProgressIndicator(consoleOutput.Object, consoleHelper.Object);
-        }
+    [TestCleanup]
+    public void TestCleanup()
+    {
+        _indicator.Stop();
+    }
 
-        [TestCleanup]
-        public void TestCleanup()
-        {
-            indicator.Stop();
-        }
+    [TestMethod]
+    public void StartShouldStartPrintingProgressMessage()
+    {
+        _indicator.Start();
+        _consoleOutput.Verify(m => m.Write("Test run in progress.", OutputLevel.Information), Times.Once);
+        Assert.IsTrue(_indicator.IsRunning);
+    }
 
-        [TestMethod]
-        public void StartShouldStartPrintingProgressMessage()
-        {
-            indicator.Start();
-            consoleOutput.Verify(m => m.Write("Test run in progress.", OutputLevel.Information), Times.Once);
-            Assert.IsTrue(indicator.IsRunning);
-        }
+    [TestMethod]
+    public void StartShouldShowProgressMessage()
+    {
+        _indicator.Start();
 
-        [TestMethod]
-        public void StartShouldShowProgressMessage()
-        {
-            indicator.Start();
+        _consoleHelper.Setup(c => c.CursorLeft).Returns(30);
+        System.Threading.Thread.Sleep(1500);
 
-            consoleHelper.Setup(c => c.CursorLeft).Returns(30);
-            System.Threading.Thread.Sleep(1500);
+        Assert.IsTrue(_indicator.IsRunning);
+        _consoleOutput.Verify(m => m.Write("Test run in progress.", OutputLevel.Information), Times.Once);
+        _consoleOutput.Verify(m => m.Write(".", OutputLevel.Information), Times.Once);
+    }
 
-            Assert.IsTrue(indicator.IsRunning);
-            consoleOutput.Verify(m => m.Write("Test run in progress.", OutputLevel.Information), Times.Once);
-            consoleOutput.Verify(m => m.Write(".", OutputLevel.Information), Times.Once);
-        }
+    [TestMethod]
+    public void PauseShouldClearTheStdOutMessage()
+    {
+        _indicator.Start();
+        _indicator.Pause();
 
-        [TestMethod]
-        public void PauseShouldClearTheStdOutMessage()
-        {
-            indicator.Start();
-            indicator.Pause();
+        Assert.IsFalse(_indicator.IsRunning);
+        string clearMessage = new(' ', _consoleHelper.Object.WindowWidth);
+        _consoleOutput.Verify(m => m.Write("Test run in progress.", OutputLevel.Information), Times.Once);
+        _consoleOutput.Verify(m => m.Write(clearMessage, OutputLevel.Information), Times.Once);
 
-            Assert.IsFalse(indicator.IsRunning);
-            string clearMessage = new string(' ', consoleHelper.Object.WindowWidth);
-            consoleOutput.Verify(m => m.Write("Test run in progress.", OutputLevel.Information), Times.Once);
-            consoleOutput.Verify(m => m.Write(clearMessage, OutputLevel.Information), Times.Once);
+        _consoleHelper.Verify(ch => ch.SetCursorPosition(0, 20), Times.Exactly(2));
+    }
 
-            consoleHelper.Verify(ch => ch.SetCursorPosition(0, 20), Times.Exactly(2));
-        }
+    [TestMethod]
+    public void PauseStartAndStopShouldClearPrintProgressAndThenClearTheStdOutMessage()
+    {
+        _indicator.Start();
+        _indicator.Pause();
+        _indicator.Start();
+        _indicator.Stop();
 
-        [TestMethod]
-        public void PauseStartAndStopShouldClearPrintProgressAndThenClearTheStdOutMessage()
-        {
-            indicator.Start();
-            indicator.Pause();
-            indicator.Start();
-            indicator.Stop();
+        Assert.IsFalse(_indicator.IsRunning);
+        string clearMessage = new(' ', _consoleHelper.Object.WindowWidth);
+        _consoleOutput.Verify(m => m.Write("Test run in progress.", OutputLevel.Information), Times.Exactly(2));
+        _consoleOutput.Verify(m => m.Write(clearMessage, OutputLevel.Information), Times.Exactly(2));
+        _consoleHelper.Verify(ch => ch.SetCursorPosition(0, 20), Times.Exactly(4));
+    }
 
-            Assert.IsFalse(indicator.IsRunning);
-            string clearMessage = new string(' ', consoleHelper.Object.WindowWidth);
-            consoleOutput.Verify(m => m.Write("Test run in progress.", OutputLevel.Information), Times.Exactly(2));
-            consoleOutput.Verify(m => m.Write(clearMessage, OutputLevel.Information), Times.Exactly(2));
-            consoleHelper.Verify(ch => ch.SetCursorPosition(0, 20), Times.Exactly(4));
-        }
+    [TestMethod]
+    public void StopShouldClearTheStdOutMessage()
+    {
+        _indicator.Start();
+        _indicator.Stop();
 
-        [TestMethod]
-        public void StopShouldClearTheStdOutMessage()
-        {
-            indicator.Start();
-            indicator.Stop();
-
-            Assert.IsFalse(indicator.IsRunning);
-            string clearMessage = new string(' ', consoleHelper.Object.WindowWidth);
-            consoleOutput.Verify(m => m.Write("Test run in progress.", OutputLevel.Information), Times.Once);
-            consoleOutput.Verify(m => m.Write(clearMessage, OutputLevel.Information), Times.Once);
-            consoleHelper.Verify(ch => ch.SetCursorPosition(0, 20), Times.Exactly(2));
-        }
+        Assert.IsFalse(_indicator.IsRunning);
+        string clearMessage = new(' ', _consoleHelper.Object.WindowWidth);
+        _consoleOutput.Verify(m => m.Write("Test run in progress.", OutputLevel.Information), Times.Once);
+        _consoleOutput.Verify(m => m.Write(clearMessage, OutputLevel.Information), Times.Once);
+        _consoleHelper.Verify(ch => ch.SetCursorPosition(0, 20), Times.Exactly(2));
     }
 }

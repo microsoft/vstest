@@ -1,48 +1,48 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.ObjectModel.UnitTests
+namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
+
+using System;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using VisualStudio.TestTools.UnitTesting;
+using MSTest.TestFramework.AssertExtensions;
+
+[TestClass]
+public class RunConfigurationTests
 {
-    using System;
-
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using MSTest.TestFramework.AssertExtensions;
-
-    [TestClass]
-    public class RunConfigurationTests
+    [TestMethod]
+    public void RunConfigurationDefaultValuesMustBeUsedOnCreation()
     {
-        [TestMethod]
-        public void RunConfigurationDefaultValuesMustBeUsedOnCreation()
-        {
-            var runConfiguration = new RunConfiguration();
+        var runConfiguration = new RunConfiguration();
 
-            // Verify Default
-            Assert.AreEqual(Constants.DefaultPlatform, runConfiguration.TargetPlatform);
-            Assert.AreEqual(Framework.DefaultFramework, runConfiguration.TargetFramework);
-            Assert.AreEqual(Constants.DefaultBatchSize, runConfiguration.BatchSize);
-            Assert.AreEqual(0, runConfiguration.TestSessionTimeout);
-            Assert.AreEqual(Constants.DefaultResultsDirectory, runConfiguration.ResultsDirectory);
-            Assert.IsNull(runConfiguration.SolutionDirectory);
-            Assert.AreEqual(Constants.DefaultTreatTestAdapterErrorsAsWarnings, runConfiguration.TreatTestAdapterErrorsAsWarnings);
-            Assert.IsNull(runConfiguration.BinariesRoot);
-            Assert.IsNull(runConfiguration.TestAdaptersPaths);
-            Assert.AreEqual(Constants.DefaultCpuCount, runConfiguration.MaxCpuCount);
-            Assert.IsFalse(runConfiguration.DisableAppDomain);
-            Assert.IsFalse(runConfiguration.DisableParallelization);
-            Assert.IsFalse(runConfiguration.DesignMode);
-            Assert.IsFalse(runConfiguration.InIsolation);
-            Assert.AreEqual(runConfiguration.DesignMode, runConfiguration.ShouldCollectSourceInformation);
-            Assert.AreEqual(Constants.DefaultExecutionThreadApartmentState, runConfiguration.ExecutionThreadApartmentState);
-        }
+        // Verify Default
+        Assert.AreEqual(Constants.DefaultPlatform, runConfiguration.TargetPlatform);
+        Assert.AreEqual(Framework.DefaultFramework, runConfiguration.TargetFramework);
+        Assert.AreEqual(Constants.DefaultBatchSize, runConfiguration.BatchSize);
+        Assert.AreEqual(0, runConfiguration.TestSessionTimeout);
+        Assert.AreEqual(Constants.DefaultResultsDirectory, runConfiguration.ResultsDirectory);
+        Assert.IsNull(runConfiguration.SolutionDirectory);
+        Assert.AreEqual(Constants.DefaultTreatTestAdapterErrorsAsWarnings, runConfiguration.TreatTestAdapterErrorsAsWarnings);
+        Assert.IsNull(runConfiguration.BinariesRoot);
+        Assert.IsNull(runConfiguration.TestAdaptersPaths);
+        Assert.AreEqual(Constants.DefaultCpuCount, runConfiguration.MaxCpuCount);
+        Assert.IsFalse(runConfiguration.DisableAppDomain);
+        Assert.IsFalse(runConfiguration.DisableParallelization);
+        Assert.IsFalse(runConfiguration.DesignMode);
+        Assert.IsFalse(runConfiguration.InIsolation);
+        Assert.AreEqual(runConfiguration.DesignMode, runConfiguration.ShouldCollectSourceInformation);
+        Assert.AreEqual(Constants.DefaultExecutionThreadApartmentState, runConfiguration.ExecutionThreadApartmentState);
+    }
 
-        [TestMethod]
-        public void RunConfigurationShouldNotThrowExceptionOnUnknownElements()
-        {
-            string settingsXml =
-                @"<?xml version=""1.0"" encoding=""utf-8""?>
+    [TestMethod]
+    public void RunConfigurationShouldNotThrowExceptionOnUnknownElements()
+    {
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
                        <BadElement>TestResults</BadElement>
@@ -50,17 +50,17 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                      </RunConfiguration>
                 </RunSettings>";
 
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+        var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
 
-            Assert.IsNotNull(runConfiguration);
-            Assert.IsTrue(runConfiguration.DesignMode);
-        }
+        Assert.IsNotNull(runConfiguration);
+        Assert.IsTrue(runConfiguration.DesignMode);
+    }
 
-        [TestMethod]
-        public void RunConfigurationReadsValuesCorrectlyFromXml()
-        {
-            string settingsXml =
-              @"<?xml version=""1.0"" encoding=""utf-8""?>
+    [TestMethod]
+    public void RunConfigurationReadsValuesCorrectlyFromXml()
+    {
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
                        <ResultsDirectory>TestResults</ResultsDirectory>
@@ -82,94 +82,87 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                      </RunConfiguration>
                 </RunSettings>";
 
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+        var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
 
-            // Verify Default
-            Assert.AreEqual(Architecture.X64, runConfiguration.TargetPlatform);
+        // Verify Default
+        Assert.AreEqual(Architecture.X64, runConfiguration.TargetPlatform);
 
-            var expectedFramework = Framework.FromString("FrameworkCore10");
-            var actualFramework = runConfiguration.TargetFramework;
-            Assert.AreEqual(expectedFramework.Name, runConfiguration.TargetFramework.Name);
-            Assert.AreEqual(expectedFramework.Version, runConfiguration.TargetFramework.Version);
+        var expectedFramework = Framework.FromString("FrameworkCore10");
+        _ = runConfiguration.TargetFramework;
+        Assert.AreEqual(expectedFramework.Name, runConfiguration.TargetFramework.Name);
+        Assert.AreEqual(expectedFramework.Version, runConfiguration.TargetFramework.Version);
 
-            Assert.AreEqual("TestResults", runConfiguration.ResultsDirectory);
+        Assert.AreEqual("TestResults", runConfiguration.ResultsDirectory);
 
-            var expectedSolutionPath = Environment.GetEnvironmentVariable("temp");
-            Assert.AreEqual(expectedSolutionPath, runConfiguration.SolutionDirectory);
+        var expectedSolutionPath = Environment.GetEnvironmentVariable("temp");
+        Assert.AreEqual(expectedSolutionPath, runConfiguration.SolutionDirectory);
 
-            Assert.IsTrue(runConfiguration.TreatTestAdapterErrorsAsWarnings);
-            Assert.AreEqual(@"E:\x\z", runConfiguration.BinariesRoot);
-            Assert.AreEqual(@"C:\a\b;D:\x\y", runConfiguration.TestAdaptersPaths);
-            Assert.AreEqual(2, runConfiguration.MaxCpuCount);
-            Assert.AreEqual(5, runConfiguration.BatchSize);
-            Assert.AreEqual(10000, runConfiguration.TestSessionTimeout);
-            Assert.IsTrue(runConfiguration.DisableAppDomain);
-            Assert.IsTrue(runConfiguration.DisableParallelization);
-            Assert.IsTrue(runConfiguration.DesignMode);
-            Assert.IsTrue(runConfiguration.InIsolation);
-            Assert.IsFalse(runConfiguration.ShouldCollectSourceInformation);
-            Assert.AreEqual(PlatformApartmentState.STA, runConfiguration.ExecutionThreadApartmentState);
-        }
+        Assert.IsTrue(runConfiguration.TreatTestAdapterErrorsAsWarnings);
+        Assert.AreEqual(@"E:\x\z", runConfiguration.BinariesRoot);
+        Assert.AreEqual(@"C:\a\b;D:\x\y", runConfiguration.TestAdaptersPaths);
+        Assert.AreEqual(2, runConfiguration.MaxCpuCount);
+        Assert.AreEqual(5, runConfiguration.BatchSize);
+        Assert.AreEqual(10000, runConfiguration.TestSessionTimeout);
+        Assert.IsTrue(runConfiguration.DisableAppDomain);
+        Assert.IsTrue(runConfiguration.DisableParallelization);
+        Assert.IsTrue(runConfiguration.DesignMode);
+        Assert.IsTrue(runConfiguration.InIsolation);
+        Assert.IsFalse(runConfiguration.ShouldCollectSourceInformation);
+        Assert.AreEqual(PlatformApartmentState.STA, runConfiguration.ExecutionThreadApartmentState);
+    }
 
-        [TestMethod]
-        public void SetTargetFrameworkVersionShouldSetTargetFramework()
-        {
-#pragma warning disable 612, 618
+    [TestMethod]
+    [Obsolete]
+    public void SetTargetFrameworkVersionShouldSetTargetFramework()
+    {
+        var runConfiguration = new RunConfiguration();
+        runConfiguration.TargetFrameworkVersion = FrameworkVersion.Framework35;
+        Equals(Framework.FromString("Framework35").Name, runConfiguration.TargetFramework.Name);
+        Assert.AreEqual(FrameworkVersion.Framework35, runConfiguration.TargetFrameworkVersion);
 
-            var runConfiguration = new RunConfiguration();
-            runConfiguration.TargetFrameworkVersion = FrameworkVersion.Framework35;
-            StringAssert.Equals(Framework.FromString("Framework35").Name, runConfiguration.TargetFramework.Name);
-            Assert.AreEqual(FrameworkVersion.Framework35, runConfiguration.TargetFrameworkVersion);
+        runConfiguration.TargetFrameworkVersion = FrameworkVersion.Framework40;
+        Equals(Framework.FromString("Framework40").Name, runConfiguration.TargetFramework.Name);
+        Assert.AreEqual(FrameworkVersion.Framework40, runConfiguration.TargetFrameworkVersion);
 
-            runConfiguration.TargetFrameworkVersion = FrameworkVersion.Framework40;
-            StringAssert.Equals(Framework.FromString("Framework40").Name, runConfiguration.TargetFramework.Name);
-            Assert.AreEqual(FrameworkVersion.Framework40, runConfiguration.TargetFrameworkVersion);
+        runConfiguration.TargetFrameworkVersion = FrameworkVersion.Framework45;
+        Equals(Framework.FromString("Framework45").Name, runConfiguration.TargetFramework.Name);
+        Assert.AreEqual(FrameworkVersion.Framework45, runConfiguration.TargetFrameworkVersion);
 
-            runConfiguration.TargetFrameworkVersion = FrameworkVersion.Framework45;
-            StringAssert.Equals(Framework.FromString("Framework45").Name, runConfiguration.TargetFramework.Name);
-            Assert.AreEqual(FrameworkVersion.Framework45, runConfiguration.TargetFrameworkVersion);
+        runConfiguration.TargetFrameworkVersion = FrameworkVersion.FrameworkCore10;
+        Equals(Framework.FromString("FrameworkCore10").Name, runConfiguration.TargetFramework.Name);
+        Assert.AreEqual(FrameworkVersion.FrameworkCore10, runConfiguration.TargetFrameworkVersion);
 
-            runConfiguration.TargetFrameworkVersion = FrameworkVersion.FrameworkCore10;
-            StringAssert.Equals(Framework.FromString("FrameworkCore10").Name, runConfiguration.TargetFramework.Name);
-            Assert.AreEqual(FrameworkVersion.FrameworkCore10, runConfiguration.TargetFrameworkVersion);
+        runConfiguration.TargetFrameworkVersion = FrameworkVersion.FrameworkUap10;
+        Equals(Framework.FromString("FrameworkUap10").Name, runConfiguration.TargetFramework.Name);
+        Assert.AreEqual(FrameworkVersion.FrameworkUap10, runConfiguration.TargetFrameworkVersion);
+    }
 
-            runConfiguration.TargetFrameworkVersion = FrameworkVersion.FrameworkUap10;
-            StringAssert.Equals(Framework.FromString("FrameworkUap10").Name, runConfiguration.TargetFramework.Name);
-            Assert.AreEqual(FrameworkVersion.FrameworkUap10, runConfiguration.TargetFrameworkVersion);
+    [TestMethod]
+    [Obsolete]
+    public void SetTargetFrameworkShouldSetTargetFrameworkVersion()
+    {
+        var runConfiguration = new RunConfiguration();
+        runConfiguration.TargetFramework = Framework.FromString("Framework35");
+        Assert.AreEqual(FrameworkVersion.Framework35, runConfiguration.TargetFrameworkVersion);
 
-#pragma warning restore 612, 618
-        }
+        runConfiguration.TargetFramework = Framework.FromString("Framework40");
+        Assert.AreEqual(FrameworkVersion.Framework40, runConfiguration.TargetFrameworkVersion);
 
-        [TestMethod]
-        public void SetTargetFrameworkShouldSetTargetFrameworkVersion()
-        {
-            var runConfiguration = new RunConfiguration();
+        runConfiguration.TargetFramework = Framework.FromString("Framework45");
+        Assert.AreEqual(FrameworkVersion.Framework45, runConfiguration.TargetFrameworkVersion);
 
-#pragma warning disable 612, 618
+        runConfiguration.TargetFramework = Framework.FromString("FrameworkCore10");
+        Assert.AreEqual(FrameworkVersion.FrameworkCore10, runConfiguration.TargetFrameworkVersion);
 
-            runConfiguration.TargetFramework = Framework.FromString("Framework35");
-            Assert.AreEqual(FrameworkVersion.Framework35, runConfiguration.TargetFrameworkVersion);
+        runConfiguration.TargetFramework = Framework.FromString("FrameworkUap10");
+        Assert.AreEqual(FrameworkVersion.FrameworkUap10, runConfiguration.TargetFrameworkVersion);
+    }
 
-            runConfiguration.TargetFramework = Framework.FromString("Framework40");
-            Assert.AreEqual(FrameworkVersion.Framework40, runConfiguration.TargetFrameworkVersion);
-
-            runConfiguration.TargetFramework = Framework.FromString("Framework45");
-            Assert.AreEqual(FrameworkVersion.Framework45, runConfiguration.TargetFrameworkVersion);
-
-            runConfiguration.TargetFramework = Framework.FromString("FrameworkCore10");
-            Assert.AreEqual(FrameworkVersion.FrameworkCore10, runConfiguration.TargetFrameworkVersion);
-
-            runConfiguration.TargetFramework = Framework.FromString("FrameworkUap10");
-            Assert.AreEqual(FrameworkVersion.FrameworkUap10, runConfiguration.TargetFrameworkVersion);
-
-#pragma warning restore 612, 618
-        }
-
-        [TestMethod]
-        public void RunConfigurationFromXmlThrowsSettingsExceptionIfBatchSizeIsInvalid()
-        {
-            string settingsXml =
-             @"<?xml version=""1.0"" encoding=""utf-8""?>
+    [TestMethod]
+    public void RunConfigurationFromXmlThrowsSettingsExceptionIfBatchSizeIsInvalid()
+    {
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
                        <BatchSize>Foo</BatchSize>
@@ -177,16 +170,16 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                 </RunSettings>";
 
 
-            Assert.That.Throws<SettingsException>(
-                    () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
-                    .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value 'Foo' specified for 'BatchSize'.");
-        }
+        Assert.That.Throws<SettingsException>(
+                () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
+            .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value 'Foo' specified for 'BatchSize'.");
+    }
 
-        [TestMethod]
-        public void RunConfigurationFromXmlThrowsSettingsExceptionIfTestSessionTimeoutIsInvalid()
-        {
-            string settingsXml =
-             @"<?xml version=""1.0"" encoding=""utf-8""?>
+    [TestMethod]
+    public void RunConfigurationFromXmlThrowsSettingsExceptionIfTestSessionTimeoutIsInvalid()
+    {
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
                        <TestSessionTimeout>-1</TestSessionTimeout>
@@ -194,16 +187,16 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                 </RunSettings>";
 
 
-            Assert.That.Throws<SettingsException>(
-                    () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
-                    .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value '-1' specified for 'TestSessionTimeout'.");
-        }
+        Assert.That.Throws<SettingsException>(
+                () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
+            .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value '-1' specified for 'TestSessionTimeout'.");
+    }
 
-        [TestMethod]
-        public void RunConfigurationFromXmlShouldNotThrowsSettingsExceptionIfTestSessionTimeoutIsZero()
-        {
-            string settingsXml =
-             @"<?xml version=""1.0"" encoding=""utf-8""?>
+    [TestMethod]
+    public void RunConfigurationFromXmlShouldNotThrowsSettingsExceptionIfTestSessionTimeoutIsZero()
+    {
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
                        <TestSessionTimeout>0</TestSessionTimeout>
@@ -211,14 +204,14 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                 </RunSettings>";
 
 
-            XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
-        }
+        XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+    }
 
-        [TestMethod]
-        public void RunConfigurationFromXmlThrowsSettingsExceptionIfExecutionThreadApartmentStateIsInvalid()
-        {
-            string settingsXml =
-                @"<?xml version=""1.0"" encoding=""utf-8""?>
+    [TestMethod]
+    public void RunConfigurationFromXmlThrowsSettingsExceptionIfExecutionThreadApartmentStateIsInvalid()
+    {
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
                        <ExecutionThreadApartmentState>RandomValue</ExecutionThreadApartmentState>
@@ -226,134 +219,133 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                 </RunSettings>";
 
 
-            Assert.That.Throws<SettingsException>(
-                    () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
-                .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value 'RandomValue' specified for 'ExecutionThreadApartmentState'.");
-        }
+        Assert.That.Throws<SettingsException>(
+                () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
+            .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value 'RandomValue' specified for 'ExecutionThreadApartmentState'.");
+    }
 
-        [TestMethod]
-        public void RunConfigurationFromXmlThrowsSettingsExceptionIfBatchSizeIsNegativeInteger()
-        {
-            string settingsXml =
-             @"<?xml version=""1.0"" encoding=""utf-8""?>
+    [TestMethod]
+    public void RunConfigurationFromXmlThrowsSettingsExceptionIfBatchSizeIsNegativeInteger()
+    {
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
                        <BatchSize>-10</BatchSize>
                      </RunConfiguration>
                 </RunSettings>";
 
-            Assert.That.Throws<SettingsException>(
-              () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
-              .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value '-10' specified for 'BatchSize'.");
-        }
+        Assert.That.Throws<SettingsException>(
+                () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
+            .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value '-10' specified for 'BatchSize'.");
+    }
 
-        [DataRow(true)]
-        [DataRow(false)]
-        [DataTestMethod]
-        public void RunConfigurationShouldReadValueForDesignMode(bool designModeValue)
-        {
-            string settingsXml = string.Format(
-                @"<?xml version=""1.0"" encoding=""utf-8""?>
+    [DataRow(true)]
+    [DataRow(false)]
+    [DataTestMethod]
+    public void RunConfigurationShouldReadValueForDesignMode(bool designModeValue)
+    {
+        string settingsXml = string.Format(
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
                        <DesignMode>{0}</DesignMode>
                      </RunConfiguration>
                 </RunSettings>", designModeValue);
 
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+        var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
 
-            Assert.AreEqual(designModeValue, runConfiguration.DesignMode);
-        }
+        Assert.AreEqual(designModeValue, runConfiguration.DesignMode);
+    }
 
-        [TestMethod]
-        public void RunConfigurationShouldSetDesignModeAsFalseByDefault()
-        {
-            string settingsXml =
-              @"<?xml version=""1.0"" encoding=""utf-8""?>
+    [TestMethod]
+    public void RunConfigurationShouldSetDesignModeAsFalseByDefault()
+    {
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
                        <TargetPlatform>x64</TargetPlatform>
                      </RunConfiguration>
                 </RunSettings>";
 
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+        var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
 
-            Assert.IsFalse(runConfiguration.DesignMode);
-        }
+        Assert.IsFalse(runConfiguration.DesignMode);
+    }
 
-        [TestMethod]
-        public void RunConfigurationToXmlShouldProvideDesignMode()
-        {
-            var runConfiguration = new RunConfiguration { DesignMode = true };
+    [TestMethod]
+    public void RunConfigurationToXmlShouldProvideDesignMode()
+    {
+        var runConfiguration = new RunConfiguration { DesignMode = true };
 
-            StringAssert.Contains(runConfiguration.ToXml().InnerXml, "<DesignMode>True</DesignMode>");
-        }
+        StringAssert.Contains(runConfiguration.ToXml().InnerXml, "<DesignMode>True</DesignMode>");
+    }
 
-        [DataRow(true)]
-        [DataRow(false)]
-        [DataTestMethod]
-        public void RunConfigurationShouldReadValueForCollectSourceInformation(bool val)
-        {
-            string settingsXml = string.Format(
-                @"<?xml version=""1.0"" encoding=""utf-8""?>
+    [DataRow(true)]
+    [DataRow(false)]
+    [DataTestMethod]
+    public void RunConfigurationShouldReadValueForCollectSourceInformation(bool val)
+    {
+        string settingsXml = string.Format(
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
                        <CollectSourceInformation>{0}</CollectSourceInformation>
                      </RunConfiguration>
                 </RunSettings>", val);
 
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+        var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
 
-            Assert.AreEqual(val, runConfiguration.ShouldCollectSourceInformation);
-        }
+        Assert.AreEqual(val, runConfiguration.ShouldCollectSourceInformation);
+    }
 
-        [TestMethod]
-        public void RunConfigurationShouldSetCollectSourceInformationSameAsDesignModeByDefault()
-        {
-            string settingsXml =
-              @"<?xml version=""1.0"" encoding=""utf-8""?>
+    [TestMethod]
+    public void RunConfigurationShouldSetCollectSourceInformationSameAsDesignModeByDefault()
+    {
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
                        <TargetPlatform>x64</TargetPlatform>
                      </RunConfiguration>
                 </RunSettings>";
 
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+        var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
 
-            Assert.AreEqual(runConfiguration.DesignMode, runConfiguration.ShouldCollectSourceInformation);
-        }
+        Assert.AreEqual(runConfiguration.DesignMode, runConfiguration.ShouldCollectSourceInformation);
+    }
 
-        [DataTestMethod]
-        [DataRow(true)]
-        [DataRow(false)]
-        public void RunConfigurationToXmlShouldProvideCollectSourceInformationSameAsDesignMode(bool val)
-        {
-            var runConfiguration = new RunConfiguration { DesignMode = val };
-            StringAssert.Contains(runConfiguration.ToXml().InnerXml.ToUpperInvariant(), $"<CollectSourceInformation>{val}</CollectSourceInformation>".ToUpperInvariant());
-        }
+    [DataTestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public void RunConfigurationToXmlShouldProvideCollectSourceInformationSameAsDesignMode(bool val)
+    {
+        var runConfiguration = new RunConfiguration { DesignMode = val };
+        StringAssert.Contains(runConfiguration.ToXml().InnerXml.ToUpperInvariant(), $"<CollectSourceInformation>{val}</CollectSourceInformation>".ToUpperInvariant());
+    }
 
-        [TestMethod]
-        public void RunConfigurationToXmlShouldProvideExecutionThreadApartmentState()
-        {
-            var runConfiguration = new RunConfiguration { ExecutionThreadApartmentState = PlatformApartmentState.STA };
+    [TestMethod]
+    public void RunConfigurationToXmlShouldProvideExecutionThreadApartmentState()
+    {
+        var runConfiguration = new RunConfiguration { ExecutionThreadApartmentState = PlatformApartmentState.STA };
 
-            StringAssert.Contains(runConfiguration.ToXml().InnerXml, "<ExecutionThreadApartmentState>STA</ExecutionThreadApartmentState>");
-        }
+        StringAssert.Contains(runConfiguration.ToXml().InnerXml, "<ExecutionThreadApartmentState>STA</ExecutionThreadApartmentState>");
+    }
 
-        [TestMethod]
-        public void RunConfigurationShouldThrowSettingsExceptionIfResultsirectoryIsEmpty()
-        {
-            string settingsXml =
-             @"<?xml version=""1.0"" encoding=""utf-8""?>
+    [TestMethod]
+    public void RunConfigurationShouldThrowSettingsExceptionIfResultsirectoryIsEmpty()
+    {
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
                        <ResultsDirectory/>
                      </RunConfiguration>
                 </RunSettings>";
 
-            Assert.That.Throws<SettingsException>(
-              () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
-              .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value '' specified for 'ResultsDirectory'.");
-        }
+        Assert.That.Throws<SettingsException>(
+                () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
+            .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value '' specified for 'ResultsDirectory'.");
     }
 }

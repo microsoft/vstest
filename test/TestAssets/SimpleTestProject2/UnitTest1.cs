@@ -1,40 +1,40 @@
-// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace SampleUnitTestProject2
+namespace SampleUnitTestProject2;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+/// <summary>
+/// The unit test 1.
+/// </summary>
+[TestClass]
+public class UnitTest1
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    /// <summary>
+    /// The passing test.
+    /// </summary>
+    [TestMethod]
+    public void PassingTest2()
+    {
+        Assert.AreEqual(2, 2);
+    }
 
     /// <summary>
-    /// The unit test 1.
+    /// The failing test.
     /// </summary>
-    [TestClass]
-    public class UnitTest1
+    [TestMethod]
+    public void FailingTest2()
     {
-        /// <summary>
-        /// The passing test.
-        /// </summary>
-        [TestMethod]
-        public void PassingTest2()
-        {
-            Assert.AreEqual(2, 2);
-        }
+        Assert.AreEqual(2, 3);
+    }
 
-        /// <summary>
-        /// The failing test.
-        /// </summary>
-        [TestMethod]
-        public void FailingTest2()
-        {
-            Assert.AreEqual(2, 3);
-        }
-
-        /// <summary>
-        /// The skipping test.
-        /// </summary>
-        [Ignore]
-        [TestMethod]
-        public void SkippingTest2()
-        {
-        }
+    /// <summary>
+    /// The skipping test.
+    /// </summary>
+    [Ignore]
+    [TestMethod]
+    public void SkippingTest2()
+    {
     }
 }

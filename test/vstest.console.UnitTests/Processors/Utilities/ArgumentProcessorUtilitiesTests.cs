@@ -1,65 +1,66 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.Utilities
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.Utilities;
+
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using TestTools.UnitTesting;
+
+[TestClass]
+public class ArgumentProcessorUtilitiesTests
 {
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using TestTools.UnitTesting;
-
-    [TestClass]
-    public class ArgumentProcessorUtilitiesTests
+    [TestMethod]
+    [DataRow("")]
+    [DataRow(" ")]
+    [DataRow(";;;;")]
+    public void GetArgumentListShouldThrowErrorOnInvalidArgument(string argument)
     {
-        [TestMethod]
-        [DataRow("")]
-        [DataRow(" ")]
-        [DataRow(";;;;")]
-        public void GetArgumentListShouldThrowErrorOnInvalidArgument(string argument)
+        try
         {
-            try
-            {
-                ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, "test exception.");
-            }
-            catch (Exception e)
-            {
-                Assert.IsTrue(e.GetType().Equals(typeof(CommandLineException)));
-                Assert.IsTrue(e.Message.Contains("test exception."));
-            }
+            ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, "test exception.");
         }
-
-        [TestMethod]
-        [DataRow("abc.txt;tracelevel=info;newkey=newvalue")]
-        [DataRow(";;;abc.txt;;;tracelevel=info;;;newkey=newvalue;;;;")]
-        public void GetArgumentListShouldReturnCorrectArgumentList(string argument)
+        catch (Exception e)
         {
-            var argumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, "test exception.");
-            argumentList.SequenceEqual(new string[] { "abc.txt", "tracelevel=info", "newkey=newvalue" });
+            Assert.IsTrue(e.GetType().Equals(typeof(CommandLineException)));
+            Assert.IsTrue(e.Message.Contains("test exception."));
         }
+    }
 
-        [TestMethod]
-        [DataRow(new string[] { "key1=value1", "invalidPair", "key2=value2"})]
-        public void GetArgumentParametersShouldThrowErrorOnInvalidParameters(string[] parameterArgs)
+    [TestMethod]
+    [DataRow("abc.txt;tracelevel=info;newkey=newvalue")]
+    [DataRow(";;;abc.txt;;;tracelevel=info;;;newkey=newvalue;;;;")]
+    public void GetArgumentListShouldReturnCorrectArgumentList(string argument)
+    {
+        var argumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, "test exception.");
+        argumentList.SequenceEqual(new string[] { "abc.txt", "tracelevel=info", "newkey=newvalue" });
+    }
+
+    [TestMethod]
+    [DataRow(new string[] { "key1=value1", "invalidPair", "key2=value2" })]
+    public void GetArgumentParametersShouldThrowErrorOnInvalidParameters(string[] parameterArgs)
+    {
+        try
         {
-            try
-            {
-                ArgumentProcessorUtilities.GetArgumentParameters(parameterArgs, ArgumentProcessorUtilities.EqualNameValueSeparator, "test exception.");
-            }
-            catch (Exception e)
-            {
-                Assert.IsTrue(e.GetType().Equals(typeof(CommandLineException)));
-                Assert.IsTrue(e.Message.Contains("test exception."));
-            }
+            ArgumentProcessorUtilities.GetArgumentParameters(parameterArgs, ArgumentProcessorUtilities.EqualNameValueSeparator, "test exception.");
         }
-
-        [TestMethod]
-        public void GetArgumentParametersShouldReturnCorrectParameterDictionary()
+        catch (Exception e)
         {
-            var parameterDict = ArgumentProcessorUtilities.GetArgumentParameters(new string[] { "key1=value1", "key2=value2", "key3=value3" }, ArgumentProcessorUtilities.EqualNameValueSeparator, "test exception.");
-
-            var expectedDict = new Dictionary<string, string> { { "key1", "value1"}, { "key2", "value2"}, { "key3", "value3"} };
-            CollectionAssert.AreEqual(parameterDict.OrderBy(kv => kv.Key).ToList(), expectedDict.OrderBy(kv => kv.Key).ToList());
+            Assert.IsTrue(e.GetType().Equals(typeof(CommandLineException)));
+            Assert.IsTrue(e.Message.Contains("test exception."));
         }
+    }
+
+    [TestMethod]
+    public void GetArgumentParametersShouldReturnCorrectParameterDictionary()
+    {
+        var parameterDict = ArgumentProcessorUtilities.GetArgumentParameters(new string[] { "key1=value1", "key2=value2", "key3=value3" }, ArgumentProcessorUtilities.EqualNameValueSeparator, "test exception.");
+
+        var expectedDict = new Dictionary<string, string> { { "key1", "value1" }, { "key2", "value2" }, { "key3", "value3" } };
+        CollectionAssert.AreEqual(parameterDict.OrderBy(kv => kv.Key).ToList(), expectedDict.OrderBy(kv => kv.Key).ToList());
     }
 }
