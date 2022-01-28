@@ -48,6 +48,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- CVE-2019-0657 mitigation -->
+    <PackageReference Include="System.Private.Uri" Version="$(SystemUriVersion)" />
+    <!-- / CVE-2019-0657 mitigation -->
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
     <!-- Disabled auto code generation to support net20
   <Compile Update="Resources\Resources.Designer.cs">

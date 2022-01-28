@@ -40,6 +40,10 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
+
+    <!-- CVE-2019-0657 mitigation -->
+    <PackageReference Include="System.Private.Uri" Version="$(SystemUriVersion)" />
+    <!-- / CVE-2019-0657 mitigation -->
   </ItemGroup>
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) AND '$(OS)' != 'Windows_NT' ">
     <Reference Include="netstandard" />
