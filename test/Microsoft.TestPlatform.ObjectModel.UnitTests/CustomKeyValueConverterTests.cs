@@ -1,97 +1,95 @@
-﻿﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.ObjectModel.UnitTests
+namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
+using System.Collections.Generic;
+using System.Globalization;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+using VisualStudio.TestTools.UnitTesting;
+
+[TestClass]
+public class CustomKeyValueConverterTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
+    private readonly CustomKeyValueConverter _customKeyValueConverter;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    [TestClass]
-    public class CustomKeyValueConverterTests
+    public CustomKeyValueConverterTests()
     {
-        private readonly CustomKeyValueConverter customKeyValueConverter;
+        _customKeyValueConverter = new CustomKeyValueConverter();
+    }
 
-        public CustomKeyValueConverterTests()
-        {
-            this.customKeyValueConverter = new CustomKeyValueConverter();
-        }
+    [TestMethod]
+    public void CustomKeyValueConverterShouldDeserializeWellformedJson()
+    {
+        var json = "[{ \"Key\": \"key1\", \"Value\": \"val1\" }]";
 
-        [TestMethod]
-        public void CustomKeyValueConverterShouldDeserializeWellformedJson()
-        {
-            var json = "[{ \"Key\": \"key1\", \"Value\": \"val1\" }]";
+        var data = _customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
 
-            var data = this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
+        Assert.IsNotNull(data);
+        Assert.AreEqual(1, data.Length);
+        Assert.AreEqual("key1", data[0].Key);
+        Assert.AreEqual("val1", data[0].Value);
+    }
 
-            Assert.IsNotNull(data);
-            Assert.AreEqual(1, data.Length);
-            Assert.AreEqual("key1", data[0].Key);
-            Assert.AreEqual("val1", data[0].Value);
-        }
+    [TestMethod]
+    public void CustomKeyValueConverterShouldDeserializeKeyValuePairArray()
+    {
+        var json = "[{ \"Key\": \"key1\", \"Value\": \"val1\" }, { \"Key\": \"key2\", \"Value\": \"val2\" }]";
 
-        [TestMethod]
-        public void CustomKeyValueConverterShouldDeserializeKeyValuePairArray()
-        {
-            var json = "[{ \"Key\": \"key1\", \"Value\": \"val1\" }, { \"Key\": \"key2\", \"Value\": \"val2\" }]";
+        var data = _customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
 
-            var data = this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
+        Assert.IsNotNull(data);
+        Assert.AreEqual(2, data.Length);
+        Assert.AreEqual("key1", data[0].Key);
+        Assert.AreEqual("val1", data[0].Value);
+        Assert.AreEqual("key2", data[1].Key);
+        Assert.AreEqual("val2", data[1].Value);
+    }
 
-            Assert.IsNotNull(data);
-            Assert.AreEqual(2, data.Length);
-            Assert.AreEqual("key1", data[0].Key);
-            Assert.AreEqual("val1", data[0].Value);
-            Assert.AreEqual("key2", data[1].Key);
-            Assert.AreEqual("val2", data[1].Value);
-        }
+    [TestMethod]
+    public void CustomKeyValueConverterShouldDeserializeEmptyArray()
+    {
+        var json = "[]";
 
-        [TestMethod]
-        public void CustomKeyValueConverterShouldDeserializeEmptyArray()
-        {
-            var json = "[]";
+        var data = _customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
 
-            var data = this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
+        Assert.IsNotNull(data);
+        Assert.AreEqual(0, data.Length);
+    }
 
-            Assert.IsNotNull(data);
-            Assert.AreEqual(0, data.Length);
-        }
+    [TestMethod]
+    public void CustomKeyValueConverterShouldDeserializeEmptyKeyOrValue()
+    {
+        var json = "[{ \"Key\": \"\", \"Value\": \"\" }]";
 
-        [TestMethod]
-        public void CustomKeyValueConverterShouldDeserializeEmptyKeyOrValue()
-        {
-            var json = "[{ \"Key\": \"\", \"Value\": \"\" }]";
+        var data = _customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
 
-            var data = this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
+        Assert.AreEqual(1, data.Length);
+        Assert.AreEqual(string.Empty, data[0].Key);
+        Assert.AreEqual(string.Empty, data[0].Value);
+    }
 
-            Assert.AreEqual(1, data.Length);
-            Assert.AreEqual(string.Empty, data[0].Key);
-            Assert.AreEqual(string.Empty, data[0].Value);
-        }
+    [TestMethod]
+    public void CustomKeyValueConverterShouldDeserializeDuplicateKeysKvps()
+    {
+        var json = "[{ \"Key\": \"key1\", \"Value\": \"val1\" }, { \"Key\": \"key1\", \"Value\": \"val2\" }]";
 
-        [TestMethod]
-        public void CustomKeyValueConverterShouldDeserializeDuplicateKeysKvps()
-        {
-            var json = "[{ \"Key\": \"key1\", \"Value\": \"val1\" }, { \"Key\": \"key1\", \"Value\": \"val2\" }]";
+        var data = _customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
 
-            var data = this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
+        Assert.IsNotNull(data);
+        Assert.AreEqual(2, data.Length);
+        Assert.AreEqual("key1", data[0].Key);
+        Assert.AreEqual("val1", data[0].Value);
+        Assert.AreEqual("key1", data[1].Key);
+        Assert.AreEqual("val2", data[1].Value);
+    }
 
-            Assert.IsNotNull(data);
-            Assert.AreEqual(2, data.Length);
-            Assert.AreEqual("key1", data[0].Key);
-            Assert.AreEqual("val1", data[0].Value);
-            Assert.AreEqual("key1", data[1].Key);
-            Assert.AreEqual("val2", data[1].Value);
-        }
+    [TestMethod]
+    public void CustomKeyValueConverterShouldDeserializeNullValue()
+    {
+        var data = _customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, null) as KeyValuePair<string, string>[];
 
-        [TestMethod]
-        public void CustomKeyValueConverterShouldDeserializeNullValue()
-        {
-            var data = this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, null) as KeyValuePair<string, string>[];
-
-            Assert.IsNull(data);
-        }
+        Assert.IsNull(data);
     }
 }

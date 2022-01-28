@@ -1,133 +1,133 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+
+using System;
+using System.Diagnostics.Contracts;
+
+using CommandLine;
+
+/// <summary>
+/// Argument Executor which handles adding the source provided to the TestManager.
+/// </summary>
+internal class TestSourceArgumentProcessor : IArgumentProcessor
 {
-    using System;
-    using System.Diagnostics.Contracts;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine;
+    #region Constants
 
     /// <summary>
-    /// Argument Executor which handles adding the source provided to the TestManager.
+    /// The command name.
     /// </summary>
-    internal class TestSourceArgumentProcessor : IArgumentProcessor
+    public const string CommandName = "/TestSource";
+
+    #endregion
+
+    private Lazy<IArgumentProcessorCapabilities> _metadata;
+
+    private Lazy<IArgumentExecutor> _executor;
+
+    /// <summary>
+    /// Gets the metadata.
+    /// </summary>
+    public Lazy<IArgumentProcessorCapabilities> Metadata
     {
-        #region Constants
-
-        /// <summary>
-        /// The command name.
-        /// </summary>
-        public const string CommandName = "/TestSource";
-
-        #endregion
-
-        private Lazy<IArgumentProcessorCapabilities> metadata;
-
-        private Lazy<IArgumentExecutor> executor;
-
-        /// <summary>
-        /// Gets the metadata.
-        /// </summary>
-        public Lazy<IArgumentProcessorCapabilities> Metadata
+        get
         {
-            get
+            if (_metadata == null)
             {
-                if (this.metadata == null)
-                {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new TestSourceArgumentProcessorCapabilities());
-                }
-                return this.metadata;
+                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new TestSourceArgumentProcessorCapabilities());
             }
-        }
-
-        /// <summary>
-        /// Gets or sets the executor.
-        /// </summary>
-        public Lazy<IArgumentExecutor> Executor
-        {
-            get
-            {
-                if (this.executor == null)
-                {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new TestSourceArgumentExecutor(CommandLineOptions.Instance));
-                }
-
-                return this.executor;
-            }
-            set
-            {
-                this.executor = value;
-            }
+            return _metadata;
         }
     }
 
     /// <summary>
-    /// The test source argument processor capabilities.
+    /// Gets or sets the executor.
     /// </summary>
-    internal class TestSourceArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
+    public Lazy<IArgumentExecutor> Executor
     {
-        public override string CommandName => TestSourceArgumentProcessor.CommandName;
+        get
+        {
+            if (_executor == null)
+            {
+                _executor = new Lazy<IArgumentExecutor>(() => new TestSourceArgumentExecutor(CommandLineOptions.Instance));
+            }
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
+            return _executor;
+        }
+        set
+        {
+            _executor = value;
+        }
+    }
+}
 
-        public override bool IsSpecialCommand => true;
+/// <summary>
+/// The test source argument processor capabilities.
+/// </summary>
+internal class TestSourceArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
+{
+    public override string CommandName => TestSourceArgumentProcessor.CommandName;
+
+    public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
+
+    public override bool IsSpecialCommand => true;
+}
+
+/// <summary>
+/// Argument Executor which handles adding the source provided to the TestManager.
+/// </summary>
+internal class TestSourceArgumentExecutor : IArgumentExecutor
+{
+    #region Fields
+
+    /// <summary>
+    /// Used for adding sources to the test manager.
+    /// </summary>
+    private readonly CommandLineOptions _testSources;
+
+    #endregion
+
+    #region Constructor
+
+    /// <summary>
+    /// Default constructor.
+    /// </summary>
+    /// <param name="testSources">
+    /// The test Sources.
+    /// </param>
+    public TestSourceArgumentExecutor(CommandLineOptions testSources)
+    {
+        Contract.Requires(testSources != null);
+        _testSources = testSources;
+    }
+
+    #endregion
+
+    #region IArgumentExecutor
+
+    /// <summary>
+    /// Initializes with the argument that was provided with the command.
+    /// </summary>
+    /// <param name="argument">Argument that was provided with the command.</param>
+    public void Initialize(string argument)
+    {
+        Contract.Assert(_testSources != null);
+        _testSources.AddSource(argument);
     }
 
     /// <summary>
-    /// Argument Executor which handles adding the source provided to the TestManager.
+    /// Executes the argument processor.
     /// </summary>
-    internal class TestSourceArgumentExecutor : IArgumentExecutor
+    /// <returns>
+    /// The <see cref="ArgumentProcessorResult"/>.
+    /// </returns>
+    public ArgumentProcessorResult Execute()
     {
-        #region Fields
-
-        /// <summary>
-        /// Used for adding sources to the test manager.
-        /// </summary>
-        private CommandLineOptions testSources;
-
-        #endregion
-
-        #region Constructor
-
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        /// <param name="testSources">
-        /// The test Sources.
-        /// </param>
-        public TestSourceArgumentExecutor(CommandLineOptions testSources)
-        {
-            Contract.Requires(testSources != null);
-            this.testSources = testSources;
-        }
-
-        #endregion
-
-        #region IArgumentExecutor
-
-        /// <summary>
-        /// Initializes with the argument that was provided with the command.
-        /// </summary>
-        /// <param name="argument">Argument that was provided with the command.</param>
-        public void Initialize(string argument)
-        {
-            Contract.Assert(this.testSources != null);
-            this.testSources.AddSource(argument);
-        }
-
-        /// <summary>
-        /// Executes the argument processor.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="ArgumentProcessorResult"/>.
-        /// </returns>
-        public ArgumentProcessorResult Execute()
-        {
-            // Nothing to do. Our work was done during initialize.
-            return ArgumentProcessorResult.Success;
-        }
-
-        #endregion
-
+        // Nothing to do. Our work was done during initialize.
+        return ArgumentProcessorResult.Success;
     }
+
+    #endregion
+
 }

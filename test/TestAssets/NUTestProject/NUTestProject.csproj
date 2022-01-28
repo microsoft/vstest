@@ -8,6 +8,7 @@
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <AssemblyName>NUTestProject</AssemblyName>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

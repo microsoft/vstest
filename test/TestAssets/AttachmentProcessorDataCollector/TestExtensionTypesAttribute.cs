@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using AttachmentProcessorDataCollector;
+
 using Microsoft.VisualStudio.TestPlatform;
 
 [assembly: TestExtensionTypes(typeof(SampleDataCollectorV1))]
@@ -17,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform
     {
         public TestExtensionTypesAttribute(params Type[] types)
         {
-            this.Types = types;
+            Types = types;
         }
 
         public Type[] Types { get; }
