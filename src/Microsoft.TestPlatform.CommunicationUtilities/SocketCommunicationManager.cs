@@ -139,7 +139,7 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <returns>True if Client is connected, false otherwise</returns>
     public bool WaitForClientConnection(int clientConnectionTimeout)
     {
-        Stopwatch stopWatch = Stopwatch.StartNew();
+        var stopWatch = Stopwatch.StartNew();
         var result = _clientConnectedEvent.WaitOne(clientConnectionTimeout);
         EqtTrace.Verbose("SocketCommunicationManager.WaitForClientConnection took: {0} ms, with {1} ms timeout, and finished with {2}", stopWatch.ElapsedMilliseconds, clientConnectionTimeout, result);
 
@@ -219,7 +219,7 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <returns>True, if Server got a connection from client</returns>
     public bool WaitForServerConnection(int connectionTimeout)
     {
-        Stopwatch stopWatch = Stopwatch.StartNew();
+        var stopWatch = Stopwatch.StartNew();
         var result = _clientConnectionAcceptedEvent.WaitOne(connectionTimeout);
         EqtTrace.Verbose("SocketCommunicationManager.WaitForServerConnection took: {0} ms, with {1} ms timeout, and finished with {2}", stopWatch.ElapsedMilliseconds, connectionTimeout, result);
 

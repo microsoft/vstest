@@ -168,7 +168,7 @@ public class TestRequestSender : ITestRequestSender
         var sw = Stopwatch.StartNew();
         if (EqtTrace.IsVerboseEnabled)
         {
-            EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting for connection with timeout: {0}", connectionTimeout);
+            EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting for connection with timeout: {0}.", connectionTimeout);
         }
 
         // Wait until either connection is successful, handled by connected.WaitHandle
@@ -178,7 +178,7 @@ public class TestRequestSender : ITestRequestSender
 
         if (EqtTrace.IsVerboseEnabled)
         {
-            EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting took {0} ms, with timeout {1} ms, and result {2}, which is {3}", sw.ElapsedMilliseconds, connectionTimeout, waitIndex, waitIndex == 0 ? "success" : "failure");
+            EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting took {0} ms, with timeout {1} ms, and result {2}, which is {3}.", sw.ElapsedMilliseconds, connectionTimeout, waitIndex, waitIndex == 0 ? "success" : "failure");
         }
 
         // Return true if connection was successful.
