@@ -1,202 +1,201 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
-{
-    using System;
-    using System.Collections.Generic;
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using System;
+using System.Collections.Generic;
+
+using Client;
+using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using ObjectModel.Engine;
+
+/// <summary>
+/// Represents the test session pool.
+/// </summary>
+public class TestSessionPool
+{
+    private static readonly object InstanceLockObject = new();
+    private static volatile TestSessionPool s_instance;
+
+    private readonly object _lockObject = new();
+    private readonly Dictionary<TestSessionInfo, ProxyTestSessionManager> _sessionPool;
 
     /// <summary>
-    /// Represents the test session pool.
+    /// Initializes a new instance of the <see cref="TestSessionPool"/> class.
     /// </summary>
-    public class TestSessionPool
+    internal TestSessionPool()
     {
-        private static object instanceLockObject = new object();
-        private static volatile TestSessionPool instance;
+        _sessionPool = new Dictionary<TestSessionInfo, ProxyTestSessionManager>();
+    }
 
-        private object lockObject = new object();
-        private Dictionary<TestSessionInfo, ProxyTestSessionManager> sessionPool;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TestSessionPool"/> class.
-        /// </summary>
-        internal TestSessionPool()
+    /// <summary>
+    /// Gets the test session pool instance.
+    /// Sets the test session pool instance for testing purposes only.
+    /// </summary>
+    /// 
+    /// <remarks>Thread-safe singleton pattern.</remarks>
+    public static TestSessionPool Instance
+    {
+        get
         {
-            this.sessionPool = new Dictionary<TestSessionInfo, ProxyTestSessionManager>();
-        }
-
-        /// <summary>
-        /// Gets the test session pool instance.
-        /// Sets the test session pool instance for testing purposes only.
-        /// </summary>
-        /// 
-        /// <remarks>Thread-safe singleton pattern.</remarks>
-        public static TestSessionPool Instance
-        {
-            get
+            if (s_instance == null)
             {
-                if (TestSessionPool.instance == null)
+                lock (InstanceLockObject)
                 {
-                    lock (TestSessionPool.instanceLockObject)
+                    if (s_instance == null)
                     {
-                        if (TestSessionPool.instance == null)
-                        {
-                            TestSessionPool.instance = new TestSessionPool();
-                        }
+                        s_instance = new TestSessionPool();
                     }
                 }
+            }
 
-                return TestSessionPool.instance;
-            }
-            internal set
-            {
-                TestSessionPool.instance = value;
-            }
+            return s_instance;
         }
-
-        /// <summary>
-        /// Adds a session to the pool.
-        /// </summary>
-        /// 
-        /// <param name="testSessionInfo">The test session info object.</param>
-        /// <param name="proxyManager">The proxy manager object.</param>
-        /// 
-        /// <returns>True if the operation succeeded, false otherwise.</returns>
-        public virtual bool AddSession(
-            TestSessionInfo testSessionInfo,
-            ProxyTestSessionManager proxyManager)
+        internal set
         {
-            lock (this.lockObject)
-            {
-                // Check if the session info already exists.
-                if (this.sessionPool.ContainsKey(testSessionInfo))
-                {
-                    return false;
-                }
-
-                // Adds an association between session info and proxy manager to the pool.
-                this.sessionPool.Add(testSessionInfo, proxyManager);
-                return true;
-            }
+            s_instance = value;
         }
+    }
 
-        /// <summary>
-        /// Kills and removes a session from the pool.
-        /// </summary>
-        /// 
-        /// <param name="testSessionInfo">The test session info object.</param>
-        /// 
-        /// <returns>True if the operation succeeded, false otherwise.</returns>
-        public virtual bool KillSession(TestSessionInfo testSessionInfo)
+    /// <summary>
+    /// Adds a session to the pool.
+    /// </summary>
+    /// 
+    /// <param name="testSessionInfo">The test session info object.</param>
+    /// <param name="proxyManager">The proxy manager object.</param>
+    /// 
+    /// <returns>True if the operation succeeded, false otherwise.</returns>
+    public virtual bool AddSession(
+        TestSessionInfo testSessionInfo,
+        ProxyTestSessionManager proxyManager)
+    {
+        lock (_lockObject)
         {
-            // TODO (copoiena): What happens if some request is running for the current session ?
-            // Should we stop the request as well ? Probably yes.
-            IProxyTestSessionManager proxyManager = null;
-
-            lock (this.lockObject)
+            // Check if the session info already exists.
+            if (_sessionPool.ContainsKey(testSessionInfo))
             {
-                // Check if the session info exists.
-                if (!this.sessionPool.ContainsKey(testSessionInfo))
-                {
-                    return false;
-                }
-
-                // Remove the session from the pool.
-                proxyManager = this.sessionPool[testSessionInfo];
-                this.sessionPool.Remove(testSessionInfo);
+                return false;
             }
 
-            // Kill the session.
-            return proxyManager.StopSession();
+            // Adds an association between session info and proxy manager to the pool.
+            _sessionPool.Add(testSessionInfo, proxyManager);
+            return true;
         }
+    }
 
-        /// <summary>
-        /// Gets a reference to the proxy object from the session pool.
-        /// </summary>
-        /// 
-        /// <param name="testSessionInfo">The test session info object.</param>
-        /// <param name="source">The source to be associated to this proxy.</param>
-        /// <param name="runSettings">The run settings.</param>
-        /// 
-        /// <returns>The proxy object.</returns>
-        public virtual ProxyOperationManager TryTakeProxy(
-            TestSessionInfo testSessionInfo,
-            string source,
-            string runSettings)
+    /// <summary>
+    /// Kills and removes a session from the pool.
+    /// </summary>
+    /// 
+    /// <param name="testSessionInfo">The test session info object.</param>
+    /// 
+    /// <returns>True if the operation succeeded, false otherwise.</returns>
+    public virtual bool KillSession(TestSessionInfo testSessionInfo)
+    {
+        // TODO (copoiena): What happens if some request is running for the current session ?
+        // Should we stop the request as well ? Probably yes.
+        IProxyTestSessionManager proxyManager = null;
+
+        lock (_lockObject)
         {
-            ProxyTestSessionManager sessionManager = null;
-            lock (this.lockObject)
+            // Check if the session info exists.
+            if (!_sessionPool.ContainsKey(testSessionInfo))
             {
-                if (!this.sessionPool.ContainsKey(testSessionInfo))
-                {
-                    return null;
-                }
-
-                // Gets the session manager reference from the pool.
-                sessionManager = this.sessionPool[testSessionInfo];
+                return false;
             }
 
-            try
-            {
-                // Deque an actual proxy to do work.
-                return sessionManager.DequeueProxy(source, runSettings);
-            }
-            catch (InvalidOperationException ex)
-            {
-                // If we are unable to dequeue the proxy we just eat up the exception here as
-                // it is safe to proceed.
-                // 
-                // WARNING: This should not normally happen and it raises questions regarding the
-                // test session pool operation and consistency.
-                EqtTrace.Warning("TestSessionPool.ReturnProxy failed: {0}", ex.ToString());
-            }
-
-            return null;
+            // Remove the session from the pool.
+            proxyManager = _sessionPool[testSessionInfo];
+            _sessionPool.Remove(testSessionInfo);
         }
 
-        /// <summary>
-        /// Returns the proxy object to the session pool.
-        /// </summary>
-        /// 
-        /// <param name="testSessionInfo">The test session info object.</param>
-        /// <param name="proxyId">The proxy id to be returned.</param>
-        /// 
-        /// <returns>True if the operation succeeded, false otherwise.</returns>
-        public virtual bool ReturnProxy(TestSessionInfo testSessionInfo, int proxyId)
+        // Kill the session.
+        return proxyManager.StopSession();
+    }
+
+    /// <summary>
+    /// Gets a reference to the proxy object from the session pool.
+    /// </summary>
+    /// 
+    /// <param name="testSessionInfo">The test session info object.</param>
+    /// <param name="source">The source to be associated to this proxy.</param>
+    /// <param name="runSettings">The run settings.</param>
+    /// 
+    /// <returns>The proxy object.</returns>
+    public virtual ProxyOperationManager TryTakeProxy(
+        TestSessionInfo testSessionInfo,
+        string source,
+        string runSettings)
+    {
+        ProxyTestSessionManager sessionManager = null;
+        lock (_lockObject)
         {
-            ProxyTestSessionManager sessionManager = null;
-            lock (this.lockObject)
+            if (!_sessionPool.ContainsKey(testSessionInfo))
             {
-                if (!this.sessionPool.ContainsKey(testSessionInfo))
-                {
-                    return false;
-                }
-
-                // Gets the session manager reference from the pool.
-                sessionManager = this.sessionPool[testSessionInfo];
+                return null;
             }
 
-            try
-            {
-                // Try re-enqueueing the specified proxy.
-                return sessionManager.EnqueueProxy(proxyId);
-            }
-            catch (InvalidOperationException ex)
-            {
-                // If we are unable to re-enqueue the proxy we just eat up the exception here as
-                // it is safe to proceed.
-                // 
-                // WARNING: This should not normally happen and it raises questions regarding the
-                // test session pool operation and consistency.
-                EqtTrace.Warning("TestSessionPool.ReturnProxy failed: {0}", ex.ToString());
-            }
-
-            return false;
+            // Gets the session manager reference from the pool.
+            sessionManager = _sessionPool[testSessionInfo];
         }
+
+        try
+        {
+            // Deque an actual proxy to do work.
+            return sessionManager.DequeueProxy(source, runSettings);
+        }
+        catch (InvalidOperationException ex)
+        {
+            // If we are unable to dequeue the proxy we just eat up the exception here as
+            // it is safe to proceed.
+            // 
+            // WARNING: This should not normally happen and it raises questions regarding the
+            // test session pool operation and consistency.
+            EqtTrace.Warning("TestSessionPool.ReturnProxy failed: {0}", ex.ToString());
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Returns the proxy object to the session pool.
+    /// </summary>
+    /// 
+    /// <param name="testSessionInfo">The test session info object.</param>
+    /// <param name="proxyId">The proxy id to be returned.</param>
+    /// 
+    /// <returns>True if the operation succeeded, false otherwise.</returns>
+    public virtual bool ReturnProxy(TestSessionInfo testSessionInfo, int proxyId)
+    {
+        ProxyTestSessionManager sessionManager = null;
+        lock (_lockObject)
+        {
+            if (!_sessionPool.ContainsKey(testSessionInfo))
+            {
+                return false;
+            }
+
+            // Gets the session manager reference from the pool.
+            sessionManager = _sessionPool[testSessionInfo];
+        }
+
+        try
+        {
+            // Try re-enqueueing the specified proxy.
+            return sessionManager.EnqueueProxy(proxyId);
+        }
+        catch (InvalidOperationException ex)
+        {
+            // If we are unable to re-enqueue the proxy we just eat up the exception here as
+            // it is safe to proceed.
+            // 
+            // WARNING: This should not normally happen and it raises questions regarding the
+            // test session pool operation and consistency.
+            EqtTrace.Warning("TestSessionPool.ReturnProxy failed: {0}", ex.ToString());
+        }
+
+        return false;
     }
 }

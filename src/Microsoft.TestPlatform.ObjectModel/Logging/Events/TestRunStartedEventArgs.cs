@@ -1,27 +1,26 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+using System;
+
+/// <summary>
+/// Event arguments used for raising TestRunStarted events.
+/// Mainly contains the process Id of the test execution process running the tests.
+/// </summary>
+public class TestRunStartedEventArgs : EventArgs
 {
-    using System;
+    public int ProcessId { get; private set; }
 
-    /// <summary>
-    /// Event arguments used for raising TestRunStarted events.
-    /// Mainly contains the process Id of the test execution process running the tests.
-    /// </summary>
-    public class TestRunStartedEventArgs : EventArgs
+    /// <param name="processId">The process Id of the test execution process running the tests.</param>
+    public TestRunStartedEventArgs(int processId)
     {
-        public int ProcessId { get; private set; }
+        ProcessId = processId;
+    }
 
-        /// <param name="processId">The process Id of the test execution process running the tests.</param>
-        public TestRunStartedEventArgs(int processId)
-        {
-            ProcessId = processId;
-        }
-
-        public override string ToString()
-        {
-            return "ProcessId = " + ProcessId;
-        }
+    public override string ToString()
+    {
+        return "ProcessId = " + ProcessId;
     }
 }

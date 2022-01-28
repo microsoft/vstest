@@ -6,13 +6,5 @@
     <NoWarn>$(NoWarn);CA1416</NoWarn>
   </PropertyGroup>
 
-  <!-- Static analysis dependencies -->
-  <ItemGroup Condition="$(EnableCodeAnalysis) == 'true' AND '$(DotNetBuildFromSource)' != 'true'" >
-    <PackageReference Include="StyleCop.Analyzers">
-      <Version>1.0.1</Version>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-
   <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Localization.targets" /> 
 </Project>

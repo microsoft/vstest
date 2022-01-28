@@ -1,64 +1,46 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+
+using System;
+using System.Runtime.Serialization;
+
+/// <summary>
+/// Class identifying test execution id.
+/// Execution ID is assigned to test at run creation time and is guaranteed to be unique within that run.
+/// </summary>
+[DataContract]
+public sealed class TestExecId
 {
-    using System;
-    using System.Runtime.Serialization;
-
-    /// <summary>
-    /// Class identifying test execution id.
-    /// Execution ID is assigned to test at run creation time and is guaranteed to be unique within that run.
-    /// </summary>
-    [DataContract]
-    public sealed class TestExecId
+    public TestExecId()
     {
-        private Guid execId;
+        Id = Guid.NewGuid();
+    }
 
-        private static TestExecId empty = new TestExecId(Guid.Empty);
+    public TestExecId(Guid id)
+    {
+        Id = id;
+    }
 
-        public TestExecId()
-        {
-            execId = Guid.NewGuid();
-        }
+    [DataMember]
+    public static TestExecId Empty { get; } = new TestExecId(Guid.Empty);
 
-        public TestExecId(Guid id)
-        {
-            execId = id;
-        }
+    [DataMember]
+    public Guid Id { get; }
 
-        [DataMember]
-        public static TestExecId Empty
-        {
-            get { return empty; }
-        }
+    public override bool Equals(object obj)
+    {
+        return obj is TestExecId testExecId && Id.Equals(testExecId.Id);
+    }
 
-        [DataMember]
-        public Guid Id
-        {
-            get { return execId; }
-        }
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
 
-        public override bool Equals(object obj)
-        {
-            TestExecId id = obj as TestExecId;
-
-            if (id == null)
-            {
-                return false;
-            }
-
-            return execId.Equals(id.execId);
-        }
-
-        public override int GetHashCode()
-        {
-            return execId.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return execId.ToString("B");
-        }
+    public override string ToString()
+    {
+        return Id.ToString("B");
     }
 }
