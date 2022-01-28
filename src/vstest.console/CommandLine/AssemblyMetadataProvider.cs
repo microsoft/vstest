@@ -125,7 +125,7 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
                     }
                 default:
                     {
-                        EqtTrace.Error($"AssemblyMetadataProvider.GetArchitecture: Unhandled architecture '{peReader.PEHeaders.CoffHeader.Machine}'");
+                        EqtTrace.Error($"AssemblyMetadataProvider.GetArchitecture: Unhandled architecture '{peReader.PEHeaders.CoffHeader.Machine}'.");
                         break;
                     }
             }
