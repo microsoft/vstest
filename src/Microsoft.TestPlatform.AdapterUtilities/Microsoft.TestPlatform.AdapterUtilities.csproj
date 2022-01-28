@@ -1,61 +1,61 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
-	</PropertyGroup>
-	<Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
+  </PropertyGroup>
+  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
 
-	<PropertyGroup>
-		<TargetFrameworks>netstandard1.0;netstandard2.0;net45</TargetFrameworks>
-		<TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);uap10.0</TargetFrameworks>
-		<TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
-		<WarningsAsErrors>true</WarningsAsErrors>
-		<AssemblyName>Microsoft.TestPlatform.AdapterUtilities</AssemblyName>
-		<RootNamespace>Microsoft.TestPlatform.AdapterUtilities</RootNamespace>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.0;netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);uap10.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
+    <WarningsAsErrors>true</WarningsAsErrors>
+    <AssemblyName>Microsoft.TestPlatform.AdapterUtilities</AssemblyName>
+    <RootNamespace>Microsoft.TestPlatform.AdapterUtilities</RootNamespace>
+  </PropertyGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
-		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-		<NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
-		<TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-		<TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
-		<TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
-		<TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
-		<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-		<DefineConstants>$(DefineConstants);WINDOWS_UWP</DefineConstants>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
+    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
+    <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
+    <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <DefineConstants>$(DefineConstants);WINDOWS_UWP</DefineConstants>
 
-		<!-- On non windows environment, make UAP behave like desktop .NET framework -->
-		<TargetFrameworkIdentifier Condition="'$(OS)' != 'Windows_NT'">.NETFramework</TargetFrameworkIdentifier>
-		<TargetFrameworkVersion Condition="'$(OS)' != 'Windows_NT'">v4.5.1</TargetFrameworkVersion>
-		<IsTestProject>false</IsTestProject>
-	</PropertyGroup>
+    <!-- On non windows environment, make UAP behave like desktop .NET framework -->
+    <TargetFrameworkIdentifier Condition="'$(OS)' != 'Windows_NT'">.NETFramework</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion Condition="'$(OS)' != 'Windows_NT'">v4.5.1</TargetFrameworkVersion>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net45'">
-		<RuntimeIdentifier>any</RuntimeIdentifier>
-		<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
-	</PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net45'">
+    <RuntimeIdentifier>any</RuntimeIdentifier>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+  </PropertyGroup>
 
-	<ItemGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
-		<PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="5.1.0" />
-		<PackageReference Include="System.Net.Http" Version="$(SystemNetHttpVersion)" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="5.1.0" />
+    <PackageReference Include="System.Net.Http" Version="$(SystemNetHttpVersion)" />
 
-		<!-- CVE-2018-8356 mitigation -->
-		<PackageReference Include="System.ServiceModel.Duplex" Version="$(SystemServiceModelVersion)" />
-		<PackageReference Include="System.ServiceModel.NetTcp" Version="$(SystemServiceModelVersion)" />
-		<PackageReference Include="System.ServiceModel.Primitives" Version="$(SystemServiceModelVersion)" />
-		<PackageReference Include="System.ServiceModel.Security" Version="$(SystemServiceModelVersion)" />
-		<PackageReference Include="System.Private.ServiceModel" Version="$(SystemServiceModelVersion)" />
-		<!-- / CVE-2018-8356 mitigation -->
-	</ItemGroup>
+    <!-- CVE-2018-8356 mitigation -->
+    <PackageReference Include="System.ServiceModel.Duplex" Version="$(SystemServiceModelVersion)" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="$(SystemServiceModelVersion)" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="$(SystemServiceModelVersion)" />
+    <PackageReference Include="System.ServiceModel.Security" Version="$(SystemServiceModelVersion)" />
+    <PackageReference Include="System.Private.ServiceModel" Version="$(SystemServiceModelVersion)" />
+    <!-- / CVE-2018-8356 mitigation -->
+  </ItemGroup>
 
-	<ItemGroup>
-		<!-- CVE-2019-0657 mitigation -->
-		<PackageReference Include="System.Private.Uri" Version="$(SystemUriVersion)" />
-		<!-- / CVE-2019-0657 mitigation -->
-	</ItemGroup>
+  <ItemGroup>
+    <!-- CVE-2019-0657 mitigation -->
+    <PackageReference Include="System.Private.Uri" Version="$(SystemUriVersion)" />
+    <!-- / CVE-2019-0657 mitigation -->
+  </ItemGroup>
 
-	<ItemGroup>
-		<EmbeddedResource Include="Resources\Resources.resx" />
-		<!-- Disabled auto code generation to support net20
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Resources.resx" />
+    <!-- Disabled auto code generation to support net20
 		<Compile Update="Resources\Resources.Designer.cs">
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>
@@ -66,16 +66,16 @@
 			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 		-->
-	</ItemGroup>
+  </ItemGroup>
 
-	<ItemGroup>
-		<!-- API that is common to all frameworks that we build for. -->
-		<AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
-		<AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
-		<!-- API that is common to all frameworks except for .NET Standard 1.0 and UAP10. -->
-		<AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' AND '$(TargetFramework)' != 'uap10.0' " Include="PublicAPI\net\PublicAPI.Shipped.txt" />
-		<AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' AND '$(TargetFramework)' != 'uap10.0' " Include="PublicAPI\net\PublicAPI.Unshipped.txt" />
-	</ItemGroup>
+  <ItemGroup>
+    <!-- API that is common to all frameworks that we build for. -->
+    <AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
+    <!-- API that is common to all frameworks except for .NET Standard 1.0 and UAP10. -->
+    <AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' AND '$(TargetFramework)' != 'uap10.0' " Include="PublicAPI\net\PublicAPI.Shipped.txt" />
+    <AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' AND '$(TargetFramework)' != 'uap10.0' " Include="PublicAPI\net\PublicAPI.Unshipped.txt" />
+  </ItemGroup>
 
-	<Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
+  <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
