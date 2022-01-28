@@ -2,29 +2,30 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 
-namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
+namespace Microsoft.TestPlatform.Common.UnitTests.Filtering;
+
+using System.Collections.Generic;
+using System.Linq;
+
+using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+using VisualStudio.TestTools.UnitTesting;
+
+[TestClass]
+public class TestCaseFilterExpressionTests
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    [TestClass]
-    public class TestCaseFilterExpressionTests
+    [TestMethod]
+    public void ValidForPropertiesShouldNotSetvalidForMatchVariableTofalseIfFilterIsInvalid()
     {
-        [TestMethod]
-        public void ValidForPropertiesShouldNotSetvalidForMatchVariableTofalseIfFilterIsInvalid()
-        {
-            var filterExpressionWrapper = new FilterExpressionWrapper("highlyunlikelyproperty=unused");
-            var testCaseFilterExpression = new TestCaseFilterExpression(filterExpressionWrapper);
+        var filterExpressionWrapper = new FilterExpressionWrapper("highlyunlikelyproperty=unused");
+        var testCaseFilterExpression = new TestCaseFilterExpression(filterExpressionWrapper);
 
-            Assert.AreEqual("highlyunlikelyproperty", testCaseFilterExpression.ValidForProperties(new List<string>() { "TestCategory" }, (s) => { return null; }).Single());
+        Assert.AreEqual("highlyunlikelyproperty", testCaseFilterExpression.ValidForProperties(new List<string>() { "TestCategory" }, (s) => null).Single());
 
-            TestCase dummyTestCase = new TestCase();
-            bool result = testCaseFilterExpression.MatchTestCase(dummyTestCase, (s) => { return "unused"; });
+        TestCase dummyTestCase = new();
+        bool result = testCaseFilterExpression.MatchTestCase(dummyTestCase, (s) => "unused");
 
-            Assert.IsTrue(result);
-        }
+        Assert.IsTrue(result);
     }
 }

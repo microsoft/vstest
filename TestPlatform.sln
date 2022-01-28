@@ -97,6 +97,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{EE49
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E344E0A2-7715-4C7F-BAF7-D64EA94CB19B}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		Nuget.config = Nuget.config
 	EndProjectSection
 EndProject

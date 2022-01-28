@@ -4,79 +4,78 @@
 using System;
 using System.Globalization;
 
-namespace Microsoft.VisualStudio.TestPlatform.Execution
+namespace Microsoft.VisualStudio.TestPlatform.Execution;
+
+internal static class UiLanguageOverride
 {
-    internal static class UILanguageOverride
+    private const string DotnetCliUiLanguage = nameof(DotnetCliUiLanguage);
+    private const string Vslang = nameof(Vslang);
+    private const string PreferredUiLang = nameof(PreferredUiLang);
+
+    internal static void SetCultureSpecifiedByUser()
     {
-        private const string DOTNET_CLI_UI_LANGUAGE = nameof(DOTNET_CLI_UI_LANGUAGE);
-        private const string VSLANG = nameof(VSLANG);
-        private const string PreferredUILang = nameof(PreferredUILang);
-
-        internal static void SetCultureSpecifiedByUser()
+        CultureInfo language = GetOverriddenUiLanguage();
+        if (language == null)
         {
-            CultureInfo language = GetOverriddenUILanguage();
-            if (language == null)
-            {
-                return;
-            }
-
-            ApplyOverrideToCurrentProcess(language);
-            FlowOverrideToChildProcesses(language);
+            return;
         }
 
+        ApplyOverrideToCurrentProcess(language);
+        FlowOverrideToChildProcesses(language);
+    }
 
-        private static void ApplyOverrideToCurrentProcess(CultureInfo language)
-        {
-            CultureInfo.DefaultThreadCurrentUICulture = language;
-        }
 
-        private static CultureInfo GetOverriddenUILanguage()
+    private static void ApplyOverrideToCurrentProcess(CultureInfo language)
+    {
+        CultureInfo.DefaultThreadCurrentUICulture = language;
+    }
+
+    private static CultureInfo GetOverriddenUiLanguage()
+    {
+        // DOTNET_CLI_UI_LANGUAGE=<culture name> is the main way for users to customize the CLI's UI language.
+        string dotnetCliLanguage = Environment.GetEnvironmentVariable(DotnetCliUiLanguage);
+        if (dotnetCliLanguage != null)
         {
-            // DOTNET_CLI_UI_LANGUAGE=<culture name> is the main way for users to customize the CLI's UI language.
-            string dotnetCliLanguage = Environment.GetEnvironmentVariable(DOTNET_CLI_UI_LANGUAGE);
-            if (dotnetCliLanguage != null)
+            try
             {
-                try
-                {
-                    return new CultureInfo(dotnetCliLanguage);
-                }
-                catch (CultureNotFoundException) { }
+                return new CultureInfo(dotnetCliLanguage);
             }
+            catch (CultureNotFoundException) { }
+        }
 
 #if !NETCOREAPP1_0
-            // VSLANG=<lcid> is set by VS and we respect that as well so that we will respect the VS 
-            // language preference if we're invoked by VS. 
-            string vsLang = Environment.GetEnvironmentVariable(VSLANG);
-            if (vsLang != null && int.TryParse(vsLang, out int vsLcid))
+        // VSLANG=<lcid> is set by VS and we respect that as well so that we will respect the VS
+        // language preference if we're invoked by VS.
+        string vsLang = Environment.GetEnvironmentVariable(Vslang);
+        if (vsLang != null && int.TryParse(vsLang, out int vsLcid))
+        {
+            try
             {
-                try
-                {
-                    return new CultureInfo(vsLcid);
-                }
-                catch (ArgumentOutOfRangeException) { }
-                catch (CultureNotFoundException) { }
+                return new CultureInfo(vsLcid);
             }
+            catch (ArgumentOutOfRangeException) { }
+            catch (CultureNotFoundException) { }
+        }
 # endif
-            return null;
-        }
+        return null;
+    }
 
-        private static void FlowOverrideToChildProcesses(CultureInfo language)
-        {
-            // Do not override any environment variables that are already set as we do not want to clobber a more granular setting with our global setting.
-            SetIfNotAlreadySet(DOTNET_CLI_UI_LANGUAGE, language.Name);
+    private static void FlowOverrideToChildProcesses(CultureInfo language)
+    {
+        // Do not override any environment variables that are already set as we do not want to clobber a more granular setting with our global setting.
+        SetIfNotAlreadySet(DotnetCliUiLanguage, language.Name);
 #if !NETCOREAPP1_0
-            SetIfNotAlreadySet(VSLANG, language.LCID.ToString()); // for tools following VS guidelines to just work in CLI
+        SetIfNotAlreadySet(Vslang, language.LCID.ToString()); // for tools following VS guidelines to just work in CLI
 #endif
-            SetIfNotAlreadySet(PreferredUILang, language.Name); // for C#/VB targets that pass $(PreferredUILang) to compiler
-        }
+        SetIfNotAlreadySet(PreferredUiLang, language.Name); // for C#/VB targets that pass $(PreferredUILang) to compiler
+    }
 
-        private static void SetIfNotAlreadySet(string environmentVariableName, string value)
+    private static void SetIfNotAlreadySet(string environmentVariableName, string value)
+    {
+        string currentValue = Environment.GetEnvironmentVariable(environmentVariableName);
+        if (currentValue == null)
         {
-            string currentValue = Environment.GetEnvironmentVariable(environmentVariableName);
-            if (currentValue == null)
-            {
-                Environment.SetEnvironmentVariable(environmentVariableName, value);
-            }
+            Environment.SetEnvironmentVariable(environmentVariableName, value);
         }
     }
 }

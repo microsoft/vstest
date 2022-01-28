@@ -1,146 +1,145 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
-{
-    using System;
-    using System.Collections.Generic;
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using System;
+using System.Collections.Generic;
+
+using CommunicationUtilities.Interfaces;
+using DataCollection.Interfaces;
+using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using ObjectModel.Host;
+
+/// <summary>
+/// The proxy operation manager with data collection.
+/// </summary>
+public class ProxyOperationManagerWithDataCollection : ProxyOperationManager
+{
+    private IDictionary<string, string> _dataCollectionEnvironmentVariables;
+    private readonly IRequestData _requestData;
+    private int _dataCollectionPort;
 
     /// <summary>
-    /// The proxy operation manager with data collection.
+    /// Initializes a new instance of the <see cref="ProxyOperationManagerWithDataCollection"/>
+    /// class.
     /// </summary>
-    public class ProxyOperationManagerWithDataCollection : ProxyOperationManager
+    /// 
+    /// <param name="requestData">The request data.</param>
+    /// <param name="requestSender">The request sender.</param>
+    /// <param name="testHostManager">The test host manager.</param>
+    /// <param name="proxyDataCollectionManager">The data collection proxy.</param>
+    public ProxyOperationManagerWithDataCollection(
+        IRequestData requestData,
+        ITestRequestSender requestSender,
+        ITestRuntimeProvider testHostManager,
+        IProxyDataCollectionManager proxyDataCollectionManager)
+        : base(
+            requestData,
+            requestSender,
+            testHostManager)
     {
-        private IDictionary<string, string> dataCollectionEnvironmentVariables;
-        private IRequestData requestData;
-        private int dataCollectionPort;
+        ProxyDataCollectionManager = proxyDataCollectionManager;
+        DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
+        _requestData = requestData;
+        _dataCollectionEnvironmentVariables = new Dictionary<string, string>();
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyOperationManagerWithDataCollection"/>
-        /// class.
-        /// </summary>
-        /// 
-        /// <param name="requestData">The request data.</param>
-        /// <param name="requestSender">The request sender.</param>
-        /// <param name="testHostManager">The test host manager.</param>
-        /// <param name="proxyDataCollectionManager">The data collection proxy.</param>
-        public ProxyOperationManagerWithDataCollection(
-            IRequestData requestData,
-            ITestRequestSender requestSender,
-            ITestRuntimeProvider testHostManager,
-            IProxyDataCollectionManager proxyDataCollectionManager)
-            : base(
-                  requestData,
-                  requestSender,
-                  testHostManager)
+        testHostManager.HostLaunched += TestHostLaunchedHandler;
+    }
+
+    /// <inheritdoc />
+    public override void Initialize(bool skipDefaultAdapters)
+    {
+        ProxyDataCollectionManager.Initialize();
+
+        try
         {
-            this.ProxyDataCollectionManager = proxyDataCollectionManager;
-            this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
-            this.requestData = requestData;
-            this.dataCollectionEnvironmentVariables = new Dictionary<string, string>();
+            var dataCollectionParameters = ProxyDataCollectionManager.BeforeTestRunStart(
+                resetDataCollectors: true,
+                isRunStartingNow: true,
+                runEventsHandler: DataCollectionRunEventsHandler);
 
-            testHostManager.HostLaunched += this.TestHostLaunchedHandler;
+            if (dataCollectionParameters != null)
+            {
+                _dataCollectionEnvironmentVariables = dataCollectionParameters.EnvironmentVariables;
+                _dataCollectionPort = dataCollectionParameters.DataCollectionEventsPort;
+            }
+        }
+        catch (Exception)
+        {
+            // On failure in calling BeforeTestRunStart, call AfterTestRunEnd to end the data
+            // collection process.
+            ProxyDataCollectionManager.AfterTestRunEnd(
+                isCanceled: true,
+                runEventsHandler: DataCollectionRunEventsHandler);
+            throw;
         }
 
-        /// <inheritdoc />
-        public override void Initialize(bool skipDefaultAdapters)
+        base.Initialize(skipDefaultAdapters);
+    }
+
+    /// <inheritdoc />
+    public override TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
+    {
+        if (testProcessStartInfo.EnvironmentVariables == null)
         {
-            this.ProxyDataCollectionManager.Initialize();
-
-            try
+            testProcessStartInfo.EnvironmentVariables = _dataCollectionEnvironmentVariables;
+        }
+        else
+        {
+            foreach (var kvp in _dataCollectionEnvironmentVariables)
             {
-                var dataCollectionParameters = this.ProxyDataCollectionManager.BeforeTestRunStart(
-                    resetDataCollectors: true,
-                    isRunStartingNow: true,
-                    runEventsHandler: this.DataCollectionRunEventsHandler);
-
-                if (dataCollectionParameters != null)
-                {
-                    this.dataCollectionEnvironmentVariables = dataCollectionParameters.EnvironmentVariables;
-                    this.dataCollectionPort = dataCollectionParameters.DataCollectionEventsPort;
-                }
+                testProcessStartInfo.EnvironmentVariables[kvp.Key] = kvp.Value;
             }
-            catch (Exception)
-            {
-                // On failure in calling BeforeTestRunStart, call AfterTestRunEnd to end the data
-                // collection process.
-                this.ProxyDataCollectionManager.AfterTestRunEnd(
-                    isCanceled: true,
-                    runEventsHandler: this.DataCollectionRunEventsHandler);
-                throw;
-            }
-
-            base.Initialize(skipDefaultAdapters);
         }
 
-        /// <inheritdoc />
-        public override TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
+        // Update telemetry opt in status because by default test host telemetry is opted out.
+        var telemetryOptedIn = _requestData.IsTelemetryOptedIn ? "true" : "false";
+        testProcessStartInfo.Arguments += " --datacollectionport " + _dataCollectionPort
+                                                                   + " --telemetryoptedin " + telemetryOptedIn;
+
+        return testProcessStartInfo;
+    }
+
+    /// <inheritdoc />
+    public override bool SetupChannel(
+        IEnumerable<string> sources,
+        string runSettings,
+        ITestMessageEventHandler eventHandler)
+    {
+        // Log all the messages that are reported while initializing the DataCollectionClient.
+        if (DataCollectionRunEventsHandler.Messages.Count > 0)
         {
-            if (testProcessStartInfo.EnvironmentVariables == null)
+            foreach (var message in DataCollectionRunEventsHandler.Messages)
             {
-                testProcessStartInfo.EnvironmentVariables = this.dataCollectionEnvironmentVariables;
-            }
-            else
-            {
-                foreach (var kvp in this.dataCollectionEnvironmentVariables)
-                {
-                    testProcessStartInfo.EnvironmentVariables[kvp.Key] = kvp.Value;
-                }
-            }
-
-            // Update telemetry opt in status because by default test host telemetry is opted out.
-            var telemetryOptedIn = this.requestData.IsTelemetryOptedIn ? "true" : "false";
-            testProcessStartInfo.Arguments += " --datacollectionport " + this.dataCollectionPort
-                                              + " --telemetryoptedin " + telemetryOptedIn;
-
-            return testProcessStartInfo;
-        }
-
-        /// <inheritdoc />
-        public override bool SetupChannel(
-            IEnumerable<string> sources,
-            string runSettings,
-            ITestMessageEventHandler eventHandler)
-        {
-            // Log all the messages that are reported while initializing the DataCollectionClient.
-            if (this.DataCollectionRunEventsHandler.Messages.Count > 0)
-            {
-                foreach (var message in this.DataCollectionRunEventsHandler.Messages)
-                {
-                    eventHandler.HandleLogMessage(message.Item1, message.Item2);
-                }
-
-                this.DataCollectionRunEventsHandler.Messages.Clear();
+                eventHandler.HandleLogMessage(message.Item1, message.Item2);
             }
 
-            return base.SetupChannel(sources, runSettings);
+            DataCollectionRunEventsHandler.Messages.Clear();
         }
 
-        /// <summary>
-        /// Gets the data collection run events handler.
-        /// </summary>
-        internal DataCollectionRunEventsHandler DataCollectionRunEventsHandler
-        {
-            get; private set;
-        }
+        return base.SetupChannel(sources, runSettings);
+    }
 
-        /// <summary>
-        /// Gets the proxy data collection manager.
-        /// </summary>
-        internal IProxyDataCollectionManager ProxyDataCollectionManager
-        {
-            get; private set;
-        }
+    /// <summary>
+    /// Gets the data collection run events handler.
+    /// </summary>
+    internal DataCollectionRunEventsHandler DataCollectionRunEventsHandler
+    {
+        get; private set;
+    }
 
-        private void TestHostLaunchedHandler(object sender, HostProviderEventArgs e)
-        {
-            this.ProxyDataCollectionManager.TestHostLaunched(e.ProcessId);
-        }
+    /// <summary>
+    /// Gets the proxy data collection manager.
+    /// </summary>
+    internal IProxyDataCollectionManager ProxyDataCollectionManager
+    {
+        get; private set;
+    }
+
+    private void TestHostLaunchedHandler(object sender, HostProviderEventArgs e)
+    {
+        ProxyDataCollectionManager.TestHostLaunched(e.ProcessId);
     }
 }

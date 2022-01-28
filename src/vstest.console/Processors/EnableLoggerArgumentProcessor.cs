@@ -1,182 +1,182 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
-{
-    using System;
-    using System.Diagnostics.Contracts;
-    using System.Globalization;
-    using System.Linq;
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+using System;
+using System.Diagnostics.Contracts;
+using System.Globalization;
+using System.Linq;
+
+using Utilities;
+using Common;
+using Common.Interfaces;
+
+using CommandLineResources = Resources.Resources;
+
+/// <summary>
+/// An argument processor that allows the user to enable a specific logger
+/// from the command line using the --Logger|/Logger command line switch.
+/// </summary>
+internal class EnableLoggerArgumentProcessor : IArgumentProcessor
+{
+    #region Constants
 
     /// <summary>
-    /// An argument processor that allows the user to enable a specific logger
-    /// from the command line using the --Logger|/Logger command line switch.
+    /// The command name.
     /// </summary>
-    internal class EnableLoggerArgumentProcessor : IArgumentProcessor
+    public const string CommandName = "/Logger";
+
+    #endregion
+
+    #region Fields
+
+    private Lazy<IArgumentProcessorCapabilities> _metadata;
+
+    private Lazy<IArgumentExecutor> _executor;
+
+    /// <summary>
+    /// Gets or sets the executor.
+    /// </summary>
+    public Lazy<IArgumentExecutor> Executor
     {
-        #region Constants
-
-        /// <summary>
-        /// The command name.
-        /// </summary>
-        public const string CommandName = "/Logger";
-
-        #endregion
-
-        #region Fields
-
-        private Lazy<IArgumentProcessorCapabilities> metadata;
-
-        private Lazy<IArgumentExecutor> executor;
-
-        /// <summary>
-        /// Gets or sets the executor.
-        /// </summary>
-        public Lazy<IArgumentExecutor> Executor
+        get
         {
-            get
+            if (_executor == null)
             {
-                if (this.executor == null)
-                {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor(RunSettingsManager.Instance));
-                }
-
-                return this.executor;
+                _executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor(RunSettingsManager.Instance));
             }
 
-            set
-            {
-                this.executor = value;
-            }
+            return _executor;
         }
 
-        /// <summary>
-        /// Gets the metadata.
-        /// </summary>
-        public Lazy<IArgumentProcessorCapabilities> Metadata
+        set
         {
-            get
-            {
-                if (this.metadata == null)
-                {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new EnableLoggerArgumentProcessorCapabilities());
-                }
-
-                return this.metadata;
-            }
+            _executor = value;
         }
-
-        #endregion
     }
 
-    internal class EnableLoggerArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
+    /// <summary>
+    /// Gets the metadata.
+    /// </summary>
+    public Lazy<IArgumentProcessorCapabilities> Metadata
     {
-        /// <summary>
-        /// Gets the command name.
-        /// </summary>
-        public override string CommandName => EnableLoggerArgumentProcessor.CommandName;
+        get
+        {
+            if (_metadata == null)
+            {
+                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new EnableLoggerArgumentProcessorCapabilities());
+            }
 
-        /// <summary>
-        /// Gets a value indicating whether allow multiple.
-        /// </summary>
-        public override bool AllowMultiple => true;
+            return _metadata;
+        }
+    }
 
-        /// <summary>
-        /// Gets a value indicating whether is action.
-        /// </summary>
-        public override bool IsAction => false;
+    #endregion
+}
 
-        /// <summary>
-        /// Gets the priority.
-        /// </summary>
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Logging;
+internal class EnableLoggerArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
+{
+    /// <summary>
+    /// Gets the command name.
+    /// </summary>
+    public override string CommandName => EnableLoggerArgumentProcessor.CommandName;
 
-        /// <summary>
-        /// Gets the help content resource name.
-        /// </summary>
+    /// <summary>
+    /// Gets a value indicating whether allow multiple.
+    /// </summary>
+    public override bool AllowMultiple => true;
+
+    /// <summary>
+    /// Gets a value indicating whether is action.
+    /// </summary>
+    public override bool IsAction => false;
+
+    /// <summary>
+    /// Gets the priority.
+    /// </summary>
+    public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Logging;
+
+    /// <summary>
+    /// Gets the help content resource name.
+    /// </summary>
 #if NETFRAMEWORK
-        public override string HelpContentResourceName => CommandLineResources.EnableLoggersArgumentHelp;
+    public override string HelpContentResourceName => CommandLineResources.EnableLoggersArgumentHelp;
 #else
-        public override string HelpContentResourceName => CommandLineResources.EnableLoggerArgumentsInNetCore;
+    public override string HelpContentResourceName => CommandLineResources.EnableLoggerArgumentsInNetCore;
 #endif
 
-        /// <summary>
-        /// Gets the help priority.
-        /// </summary>
-        public override HelpContentPriority HelpPriority => HelpContentPriority.EnableLoggerArgumentProcessorHelpPriority;
+    /// <summary>
+    /// Gets the help priority.
+    /// </summary>
+    public override HelpContentPriority HelpPriority => HelpContentPriority.EnableLoggerArgumentProcessorHelpPriority;
+}
+
+/// <summary>
+/// The argument executor.
+/// </summary>
+internal class EnableLoggerArgumentExecutor : IArgumentExecutor
+{
+    private readonly IRunSettingsProvider _runSettingsManager;
+
+    #region Constructors
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EnableLoggerArgumentExecutor"/> class.
+    /// </summary>
+    public EnableLoggerArgumentExecutor(IRunSettingsProvider runSettingsManager)
+    {
+        Contract.Requires(runSettingsManager != null);
+        _runSettingsManager = runSettingsManager;
+    }
+
+    #endregion
+
+    #region IArgumentProcessor
+
+    /// <summary>
+    /// Initializes with the argument that was provided with the command.
+    /// </summary>
+    /// <param name="argument">Argument that was provided with the command.</param>
+    public void Initialize(string argument)
+    {
+        string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.LoggerUriInvalid, argument);
+
+        // Throw error in case logger argument null or empty.
+        if (string.IsNullOrWhiteSpace(argument))
+        {
+            throw new CommandLineException(exceptionMessage);
+        }
+
+        // Get logger argument list.
+        var loggerArgumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, exceptionMessage);
+
+        // Get logger identifier.
+        var loggerIdentifier = loggerArgumentList[0];
+        if (loggerIdentifier.Contains("="))
+        {
+            throw new CommandLineException(exceptionMessage);
+        }
+
+        // Get logger parameters
+        var loggerParameterArgs = loggerArgumentList.Skip(1);
+        var loggerParameters = ArgumentProcessorUtilities.GetArgumentParameters(loggerParameterArgs, ArgumentProcessorUtilities.EqualNameValueSeparator, exceptionMessage);
+
+        // Add logger to run settings.
+        LoggerUtilities.AddLoggerToRunSettings(loggerIdentifier, loggerParameters, _runSettingsManager);
     }
 
     /// <summary>
-    /// The argument executor.
+    /// Execute logger argument.
     /// </summary>
-    internal class EnableLoggerArgumentExecutor : IArgumentExecutor
+    /// <returns>
+    /// The <see cref="ArgumentProcessorResult"/>.
+    /// </returns>
+    public ArgumentProcessorResult Execute()
     {
-        private readonly IRunSettingsProvider runSettingsManager;
-
-#region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EnableLoggerArgumentExecutor"/> class.
-        /// </summary>
-        public EnableLoggerArgumentExecutor(IRunSettingsProvider runSettingsManager)
-        {
-            Contract.Requires(runSettingsManager != null);
-            this.runSettingsManager = runSettingsManager;
-        }
-
-#endregion
-
-#region IArgumentProcessor
-
-        /// <summary>
-        /// Initializes with the argument that was provided with the command.
-        /// </summary>
-        /// <param name="argument">Argument that was provided with the command.</param>
-        public void Initialize(string argument)
-        {
-            string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.LoggerUriInvalid, argument);
-
-            // Throw error in case logger argument null or empty.
-            if (string.IsNullOrWhiteSpace(argument))
-            {
-                throw new CommandLineException(exceptionMessage);
-            }
-
-            // Get logger argument list.
-            var loggerArgumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, exceptionMessage);
-
-            // Get logger identifier.
-            var loggerIdentifier = loggerArgumentList[0];
-            if (loggerIdentifier.Contains("="))
-            {
-                throw new CommandLineException(exceptionMessage);
-            }
-
-            // Get logger parameters
-            var loggerParameterArgs = loggerArgumentList.Skip(1);
-            var loggerParameters = ArgumentProcessorUtilities.GetArgumentParameters(loggerParameterArgs, ArgumentProcessorUtilities.EqualNameValueSeparator, exceptionMessage);
-
-            // Add logger to run settings.
-            LoggerUtilities.AddLoggerToRunSettings(loggerIdentifier, loggerParameters, runSettingsManager);
-        }
-
-        /// <summary>
-        /// Execute logger argument.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="ArgumentProcessorResult"/>.
-        /// </returns>
-        public ArgumentProcessorResult Execute()
-        {
-            // Nothing to do since we enabled the logger in the initialize method.
-            return ArgumentProcessorResult.Success;
-        }
-
-#endregion
+        // Nothing to do since we enabled the logger in the initialize method.
+        return ArgumentProcessorResult.Success;
     }
+
+    #endregion
 }
