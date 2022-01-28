@@ -154,6 +154,9 @@ dotnet_diagnostic.CA2016.severity = warning # not default, increased severity to
 # CA1806: Do not ignore method results
 dotnet_diagnostic.CA1806.severity = warning # not default, increased severity to ensure it is applied
 
+# CA2241: Provide correct arguments to formatting methods
+dotnet_diagnostic.CA2241.severity = warning
+
 #### C# Coding Conventions ####
 
 # var preferences

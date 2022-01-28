@@ -242,7 +242,7 @@ internal class TestPlatform : ITestPlatform
                 {
                     if (EqtTrace.IsWarningEnabled)
                     {
-                        EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
+                        EqtTrace.Warning($"AdapterPath Not Found: {adapterPath}");
                     }
 
                     continue;
