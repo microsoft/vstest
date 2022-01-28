@@ -103,7 +103,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                 switch (peReader.PEHeaders.CoffHeader.Machine)
                 {
                     case Machine.Amd64:
-                        return Architecture.X64;
                     case Machine.IA64:
                         return Architecture.X64;
                     case Machine.Arm64:
@@ -111,9 +110,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                     case Machine.Arm:
                         return Architecture.ARM;
                     case Machine.I386:
-                        return Architecture.X86;
+                        // If requires 32bit or if R2R
+                        var corflags = peReader.PEHeaders.CorHeader.Flags;
+                        if ((corflags & CorFlags.Requires32Bit) != 0 || ((corflags & CorFlags.ILOnly) == 0))
+                        {
+                            return Architecture.X86;
+                        }
+                        else
+                        {
+                            return Architecture.AnyCPU;
+                        }
                     default:
-                        break;
+                        {
+                            EqtTrace.Error($"AssemblyMetadataProvider.GetArchitecture: Unhandled architecture '{peReader.PEHeaders.CoffHeader.Machine}'");
+                            break;
+                        }
                 }
             }
 
