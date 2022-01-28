@@ -670,6 +670,8 @@ internal class TestRequestManager : ITestRequestManager
                     break;
             }
 
+            // We prefer to not throw in case of unhandled architecture but return Default,
+            // it should be handled in correct way by the callers.
             return Architecture.Default;
         }
 #endif
