@@ -120,10 +120,10 @@ dotnet_remove_unnecessary_suppression_exclusions = none
 dotnet_diagnostic.CA2208.severity = warning # not default, increased severity to ensure it is always applied
 
 # CA1834: Consider using 'StringBuilder.Append(char)' when applicable
-dotnet_diagnostic.CA1834.severity = warning	# not default, increased severity to ensure it is always applied
+dotnet_diagnostic.CA1834.severity = warning # not default, increased severity to ensure it is always applied
 
 # CA1847: Use char literal for a single character lookup
-dotnet_diagnostic.CA1847.severity = warning	# not default, increased severity to ensure it is always applied
+dotnet_diagnostic.CA1847.severity = warning # not default, increased severity to ensure it is always applied
 
 # CA1822: Mark members as static
 dotnet_diagnostic.CA1822.severity = warning # not default, increased severity to ensure it is always applied
@@ -149,10 +149,10 @@ dotnet_diagnostic.CA1847.severity = warning # not default, increased severity to
 dotnet_diagnostic.CA2249.severity = warning # not default, increased severity to ensure it is applied
 
 # CA2016: Forward the 'CancellationToken' parameter to methods
-dotnet_diagnostic.CA2016.severity = warning
+dotnet_diagnostic.CA2016.severity = warning # not default, increased severity to ensure it is applied
 
 # CA1806: Do not ignore method results
-dotnet_diagnostic.CA1806.severity = warning
+dotnet_diagnostic.CA1806.severity = warning # not default, increased severity to ensure it is applied
 
 #### C# Coding Conventions ####
 
