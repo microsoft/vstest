@@ -21,7 +21,7 @@ $ErrorActionPreference = "Continue"
 Write-Verbose "Setup environment variables."
 $env:TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.FullName
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
-$env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools" 
+$env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $script:ErrorCount = 0
 
 #
@@ -32,11 +32,11 @@ Write-Verbose "Setup build configuration."
 $TPB_SignCertificate = $Certificate
 $TPB_Configuration = $Configuration
 $TPB_AssembliesPattern = @(
-    "*test*.dll", "*qualitytools*.dll", "*test*.exe", "*datacollector*.dll", "*datacollector*.exe", 
-    "QTAgent*.exe", "Microsoft.VisualStudio*.dll", "Microsoft.TestPlatform.Build.dll", "Microsoft.DiaSymReader.dll", 
-    "Microsoft.IntelliTrace*.dll", "concrt140.dll", "msvcp140.dll", "vccorlib140.dll", "vcruntime140.dll", "codecoveragemessages.dll", 
-    "covrun32.dll", "msdia140.dll", "covrun64.dll", "IntelliTrace.exe", "ProcessSnapshotCleanup.exe", "TDEnvCleanup.exe", 
-    "CodeCoverage.exe", "Microsoft.ShDocVw.dll", "UIAComwrapper.dll", "Interop.UIAutomationClient.dll", "SettingsMigrator.exe", 
+    "*test*.dll", "*qualitytools*.dll", "*test*.exe", "*datacollector*.dll", "*datacollector*.exe",
+    "QTAgent*.exe", "Microsoft.VisualStudio*.dll", "Microsoft.TestPlatform.Build.dll", "Microsoft.DiaSymReader.dll",
+    "Microsoft.IntelliTrace*.dll", "concrt140.dll", "msvcp140.dll", "vccorlib140.dll", "vcruntime140.dll", "codecoveragemessages.dll",
+    "covrun32.dll", "msdia140.dll", "covrun64.dll", "IntelliTrace.exe", "ProcessSnapshotCleanup.exe", "TDEnvCleanup.exe",
+    "CodeCoverage.exe", "Microsoft.ShDocVw.dll", "UIAComwrapper.dll", "Interop.UIAutomationClient.dll", "SettingsMigrator.exe",
     "Newtonsoft.Json.dll", "DumpMinitool*.exe"
 )
 
@@ -104,7 +104,7 @@ function Verify-Assemblies
             }
         }
     }
-    
+
     Write-Debug "Verify-Assemblies: Complete"
 }
 
@@ -116,25 +116,25 @@ function Verify-NugetPackages
     $nugetInstallDir = Join-Path $env:TP_TOOLS_DIR "nuget"
     $nugetInstallPath = Join-Path $nugetInstallDir "nuget.exe"
 
-    if(![System.IO.File]::Exists($nugetInstallPath)) 
+    if(![System.IO.File]::Exists($nugetInstallPath))
     {
         # Create the directory for nuget.exe if it does not exist
         New-Item -ItemType Directory -Force -Path $nugetInstallDir
         Invoke-WebRequest https://dist.nuget.org/win-x86-commandline/v4.6.1/nuget.exe -OutFile $nugetInstallPath
     }
-    
+
     Write-Debug "Using nuget.exe installed at $nugetInstallPath"
 
     $artifactsDirectory = Join-Path $env:TP_OUT_DIR $TPB_Configuration
     $packagesDirectory = Join-Path $artifactsDirectory "packages"
-    
+
     Get-ChildItem -Filter *.nupkg  $packagesDirectory | % {
         & $nugetInstallPath verify -signature -CertificateFingerprint "3F9001EA83C560D712C24CF213C3D312CB3BFF51EE89435D3430BD06B5D0EECE;AA12DA22A49BCE7D5C1AE64CC1F3D892F150DA76140F210ABD2CBFFCA2C18A27;" $_.FullName
         if($LASTEXITCODE -eq 1) {
             $script:ErrorCount = $script:ErrorCount + 1
         }
     }
-    
+
     Write-Debug "Verify-NugetPackages: Complete"
 }
 

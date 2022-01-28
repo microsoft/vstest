@@ -84,7 +84,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{EE49
 		scripts\build.ps1 = scripts\build.ps1
 		scripts\build.sh = scripts\build.sh
 		scripts\PortableToFullPdb.ps1 = scripts\PortableToFullPdb.ps1
-		scripts\stylecop.json = scripts\stylecop.json
 		scripts\stylecop.ruleset = scripts\stylecop.ruleset
 		scripts\stylecop.test.ruleset = scripts\stylecop.test.ruleset
 		scripts\test.ps1 = scripts\test.ps1

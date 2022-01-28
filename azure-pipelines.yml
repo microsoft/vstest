@@ -69,7 +69,7 @@ jobs:
     displayName: 'Run script build.cmd'
     inputs:
       filename: build.cmd
-      # build should not be needed in the end, we are copying the build task from the build folder, but we should get 
+      # build should not be needed in the end, we are copying the build task from the build folder, but we should get
       # it either from artifacts, if present, or from extracted package file
       # Adding it at the moment to avoid this error: #[error]Copy-Item : Cannot find path 'D:\a\1\s\src\Microsoft.TestPlatform.Build\bin\Release\netstandard2.0' because it does  not exist.
       arguments: '-verbose -configuration $(buildConfiguration) -steps "InstallDotnet, Restore, Build, PrepareAcceptanceTests"'
@@ -142,7 +142,7 @@ jobs:
       buildConfiguration: 'Release'
       VSTestRTMBuild: 'false'
   steps:
-  - script: chmod +x ./scripts/vsts-prebuild.sh 
+  - script: chmod +x ./scripts/vsts-prebuild.sh
     displayName: 'Preparing for set version'
 
   - script: ./scripts/vsts-prebuild.sh -build "preview-$(Build.BuildNumber)" -rtm "$(VSTestRTMBuild)" -branch "$(Build.SourceBranch)"
@@ -152,7 +152,7 @@ jobs:
     displayName: 'Build'
 
   - script: ./test.sh -c $(buildConfiguration) -p Unit
-    displayName: 'Unit tests'  
+    displayName: 'Unit tests'
 
   - task: DownloadPipelineArtifact@2
     inputs:

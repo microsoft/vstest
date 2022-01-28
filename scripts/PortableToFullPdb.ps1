@@ -32,45 +32,45 @@ function Locate-PdbConverterTool
 }
 
 function ConvertPortablePdbToWindowsPdb
-{	
+{
     $allPdbs = Get-ChildItem -path $TP_OUT_DIR\$Configuration *.pdb -Recurse | % {$_.FullName}
     $portablePdbs = New-Object System.Collections.Generic.List[System.Object]
-	
+
     foreach($pdb in $allPdbs)
     {
-	# First four bytes should be 'BSJB' for portable pdb
-	$bytes = [char[]](Get-Content $pdb -Encoding byte -TotalCount 4) -join ''
-	
-	if( $bytes -eq "BSJB")
-	{
-		$portablePdbs.Add($pdb)
-	}
+    # First four bytes should be 'BSJB' for portable pdb
+    $bytes = [char[]](Get-Content $pdb -Encoding byte -TotalCount 4) -join ''
+
+    if( $bytes -eq "BSJB")
+    {
+        $portablePdbs.Add($pdb)
     }
-	
+    }
+
     $pdbConverter = Locate-PdbConverterTool
-    
+
     foreach($portablePdb in $portablePdbs)
     {
-	# First check if corresponding dll exists
+    # First check if corresponding dll exists
         $dllOrExePath = $portablePdb -replace ".pdb",".dll"
-		
-		if(!(Test-Path -path $dllOrExePath))
-		{
-			# If no corresponding dll found, check if exe exists
-			$dllOrExePath = $portablePdb -replace ".pdb",".exe"
-			
-			if(!(Test-Path -path $dllOrExePath))
-            		{
-			    throw "Unable to locate dll/exe corresponding to $portablePdb"
-            		}
-		}
-		
+
+        if(!(Test-Path -path $dllOrExePath))
+        {
+            # If no corresponding dll found, check if exe exists
+            $dllOrExePath = $portablePdb -replace ".pdb",".exe"
+
+            if(!(Test-Path -path $dllOrExePath))
+                    {
+                throw "Unable to locate dll/exe corresponding to $portablePdb"
+                    }
+        }
+
         $fullpdb = $portablePdb -replace ".pdb",".pdbfull"
 
         Write-Verbose "$pdbConverter $dll /pdb $portablePdb /out $fullpdb"
         & $pdbConverter $dllOrExePath /pdb $portablePdb /out $fullpdb
 
-        Remove-Item -Path $portablePdb 
+        Remove-Item -Path $portablePdb
     }
 }
 
