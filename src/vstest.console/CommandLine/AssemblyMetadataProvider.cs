@@ -110,7 +110,10 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
                 case Machine.Arm:
                     return Architecture.ARM;
                 case Machine.I386:
-                    // If requires 32bit or if R2R
+                    // We can distinguish AnyCPU only from the set of CorFlags.Requires32Bit, but in case of Ready                                         
+                    // to Run image that flag is not "updated" and ignored. So we check if the module is IL only or                    
+                    // not. If it's IL only it means that is a R2R (Ready to Run) and we're already in the correct architecture x86. In all                    
+                    // other cases the architecture will end inside the correct switch branch.
                     var corflags = peReader.PEHeaders.CorHeader.Flags;
                     if ((corflags & CorFlags.Requires32Bit) != 0 || ((corflags & CorFlags.ILOnly) == 0))
                     {
