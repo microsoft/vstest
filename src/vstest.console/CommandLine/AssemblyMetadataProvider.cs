@@ -115,7 +115,7 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
                     // not. If it's not IL only it means that is a R2R (Ready to Run) and we're already in the correct architecture x86. In all                    
                     // other cases the architecture will end inside the correct switch branch.
                     var corflags = peReader.PEHeaders.CorHeader.Flags;
-                    if ((corflags & CorFlags.Requires32Bit) != 0 || ((corflags & CorFlags.ILOnly) == 0))
+                    if ((corflags & CorFlags.Requires32Bit) != 0 || (corflags & CorFlags.ILOnly) == 0)
                     {
                         return Architecture.X86;
                     }
