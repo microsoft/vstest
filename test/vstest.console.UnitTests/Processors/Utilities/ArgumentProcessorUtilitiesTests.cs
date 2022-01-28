@@ -37,7 +37,7 @@ public class ArgumentProcessorUtilitiesTests
     public void GetArgumentListShouldReturnCorrectArgumentList(string argument)
     {
         var argumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, "test exception.");
-        argumentList.SequenceEqual(new string[] { "abc.txt", "tracelevel=info", "newkey=newvalue" });
+        Assert.IsTrue(argumentList.SequenceEqual(new string[] { "abc.txt", "tracelevel=info", "newkey=newvalue" }));
     }
 
     [TestMethod]

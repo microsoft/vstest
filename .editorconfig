@@ -151,6 +151,9 @@ dotnet_diagnostic.CA2249.severity = warning # not default, increased severity to
 # CA2016: Forward the 'CancellationToken' parameter to methods
 dotnet_diagnostic.CA2016.severity = warning
 
+# CA1806: Do not ignore method results
+dotnet_diagnostic.CA1806.severity = warning
+
 #### C# Coding Conventions ####
 
 # var preferences

@@ -398,7 +398,7 @@ public static class TestCaseProperties
     {
         try
         {
-            new Guid(value.ToString());
+            _ = new Guid(value.ToString());
             return true;
         }
         catch (ArgumentNullException)

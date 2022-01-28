@@ -228,13 +228,13 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         var prefixExists = parameters.TryGetValue(PrefixParam, out var prefix);
         if (prefixExists)
         {
-            bool.TryParse(prefix, out AppendPrefix);
+            _ = bool.TryParse(prefix, out AppendPrefix);
         }
 
         var progressArgExists = parameters.TryGetValue(ProgressIndicatorParam, out var enableProgress);
         if (progressArgExists)
         {
-            bool.TryParse(enableProgress, out EnableProgress);
+            _ = bool.TryParse(enableProgress, out EnableProgress);
         }
 
         parameters.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out _targetFramework);

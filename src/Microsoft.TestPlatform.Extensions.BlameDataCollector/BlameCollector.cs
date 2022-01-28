@@ -303,7 +303,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
                     if (string.Equals(attribute.Value, Constants.TrueConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.FalseConfigurationValue, StringComparison.OrdinalIgnoreCase))
                     {
-                        bool.TryParse(attribute.Value, out _collectDumpAlways);
+                        _ = bool.TryParse(attribute.Value, out _collectDumpAlways);
                     }
                     else
                     {

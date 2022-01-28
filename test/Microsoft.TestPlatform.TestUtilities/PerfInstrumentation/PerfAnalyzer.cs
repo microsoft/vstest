@@ -185,7 +185,7 @@ public class PerfAnalyzer
         if (key != null)
         {
             var task = _testPlatformTaskMap[key].Find(t => t.PayLoadProperties["executorUri"].Equals(executorUri));
-            long.TryParse(task.PayLoadProperties["numberOfTests"], out totalTestsExecuted);
+            _ = long.TryParse(task.PayLoadProperties["numberOfTests"], out totalTestsExecuted);
         }
 #endif
         return totalTestsExecuted;
