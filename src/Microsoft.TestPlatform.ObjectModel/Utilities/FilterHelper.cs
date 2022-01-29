@@ -1,88 +1,88 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+
+using Resources;
+
+public static class FilterHelper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Text;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
+    public const char EscapeCharacter = '\\';
+    private static readonly char[] SpecialCharacters = { '\\', '(', ')', '&', '|', '=', '!', '~' };
+    private static readonly HashSet<char> SpecialCharactersSet = new(SpecialCharacters);
 
-    public static class FilterHelper
+    /// <summary>
+    /// Escapes a set of special characters for filter (%, (, ), &, |, =, !, ~) by replacing them with their escape sequences.
+    /// </summary>
+    /// <param name="str">The input string that contains the text to convert.</param>
+    /// <returns>A string of characters with special characters converted to their escaped form.</returns>
+    public static string Escape(string str)
     {
-        public const char EscapeCharacter = '\\';
-        private static readonly char[] SpecialCharacters = { '\\', '(', ')', '&', '|', '=', '!', '~' };
-        private static readonly HashSet<char> SpecialCharactersSet = new HashSet<char>(SpecialCharacters);
-
-        /// <summary>
-        /// Escapes a set of special characters for filter (%, (, ), &, |, =, !, ~) by replacing them with their escape sequences.
-        /// </summary>
-        /// <param name="str">The input string that contains the text to convert.</param>
-        /// <returns>A string of characters with special characters converted to their escaped form.</returns>
-        public static string Escape(string str)
+        if (str == null)
         {
-            if (str == null)
-            {
-                throw new ArgumentNullException(nameof(str));
-            }
-
-            if (str.IndexOfAny(SpecialCharacters) < 0)
-            {
-                return str;
-            }
-
-            var builder = new StringBuilder();
-            for (int i = 0; i < str.Length; ++i)
-            {
-                var currentChar = str[i];
-                if (SpecialCharactersSet.Contains(currentChar))
-                {
-                    builder.Append(EscapeCharacter);
-                }
-                builder.Append(currentChar);
-            }
-
-            return builder.ToString();
+            throw new ArgumentNullException(nameof(str));
         }
 
-        /// <summary>
-        /// Converts any escaped characters in the input filter string.
-        /// </summary>
-        /// <param name="str">The input string that contains the text to convert.</param>
-        /// <returns>A filter string of characters with any escaped characters converted to their un-escaped form.</returns>
-        public static string Unescape(string str)
+        if (str.IndexOfAny(SpecialCharacters) < 0)
         {
-            if (str == null)
-            {
-                throw new ArgumentNullException(nameof(str));
-            }
-
-            if (str.IndexOf(EscapeCharacter) < 0)
-            {
-                return str;
-            }
-
-            var builder = new StringBuilder();
-            for (int i = 0; i < str.Length; ++i)
-            {
-                var currentChar = str[i];
-                if (currentChar == EscapeCharacter)
-                {
-                    if (++i == str.Length || !SpecialCharactersSet.Contains(currentChar = str[i]))
-                    {
-                        // "\" should be followed by a special character.
-                        throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.TestCaseFilterEscapeException, str));
-                    }
-                }
-
-                // Strictly speaking, string to be un-escaped shouldn't contain any of the special characters,
-                // other than being part of escape sequence, but we will ignore that to avoid additional overhead.
-
-                builder.Append(currentChar);
-            }
-
-            return builder.ToString();
+            return str;
         }
+
+        var builder = new StringBuilder();
+        for (int i = 0; i < str.Length; ++i)
+        {
+            var currentChar = str[i];
+            if (SpecialCharactersSet.Contains(currentChar))
+            {
+                builder.Append(EscapeCharacter);
+            }
+            builder.Append(currentChar);
+        }
+
+        return builder.ToString();
+    }
+
+    /// <summary>
+    /// Converts any escaped characters in the input filter string.
+    /// </summary>
+    /// <param name="str">The input string that contains the text to convert.</param>
+    /// <returns>A filter string of characters with any escaped characters converted to their un-escaped form.</returns>
+    public static string Unescape(string str)
+    {
+        if (str == null)
+        {
+            throw new ArgumentNullException(nameof(str));
+        }
+
+        if (str.IndexOf(EscapeCharacter) < 0)
+        {
+            return str;
+        }
+
+        var builder = new StringBuilder();
+        for (int i = 0; i < str.Length; ++i)
+        {
+            var currentChar = str[i];
+            if (currentChar == EscapeCharacter)
+            {
+                if (++i == str.Length || !SpecialCharactersSet.Contains(currentChar = str[i]))
+                {
+                    // "\" should be followed by a special character.
+                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.TestCaseFilterEscapeException, str));
+                }
+            }
+
+            // Strictly speaking, string to be un-escaped shouldn't contain any of the special characters,
+            // other than being part of escape sequence, but we will ignore that to avoid additional overhead.
+
+            builder.Append(currentChar);
+        }
+
+        return builder.ToString();
     }
 }

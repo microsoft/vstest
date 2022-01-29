@@ -3,42 +3,39 @@
 
 #if NETFRAMEWORK
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+using System;
+using System.Diagnostics;
+
+/// <summary>
+/// A class used to expose EqtTrace functionality across AppDomains.
+/// </summary>
+public sealed class RemoteEqtTrace : MarshalByRefObject
 {
-    using System;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
+    /// <summary>
+    /// Gets or sets the trace level.
+    /// </summary>
+    public TraceLevel TraceLevel
+    {
+        get
+        {
+            return PlatformEqtTrace.TraceLevel;
+        }
+
+        set
+        {
+            PlatformEqtTrace.TraceLevel = value;
+        }
+    }
 
     /// <summary>
-    /// A class used to expose EqtTrace functionality across AppDomains.
+    /// Register listeners from parent domain in current domain.
     /// </summary>
-    public sealed class RemoteEqtTrace : MarshalByRefObject
+    /// <param name="listener">Trace listener instance.</param>
+    internal void SetupRemoteListeners(TraceListener listener)
     {
-        /// <summary>
-        /// Gets or sets the trace level.
-        /// </summary>
-        public TraceLevel TraceLevel
-        {
-            get
-            {
-                return PlatformEqtTrace.TraceLevel;
-            }
-
-            set
-            {
-                PlatformEqtTrace.TraceLevel = value;
-            }
-        }
-
-        /// <summary>
-        /// Register listeners from parent domain in current domain.
-        /// </summary>
-        /// <param name="listener">Trace listener instance.</param>
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Used in remote objects.")]
-        internal void SetupRemoteListeners(TraceListener listener)
-        {
-            PlatformEqtTrace.SetupRemoteListeners(listener);
-        }
+        PlatformEqtTrace.SetupRemoteListeners(listener);
     }
 }
 
