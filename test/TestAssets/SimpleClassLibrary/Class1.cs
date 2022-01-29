@@ -3,7 +3,6 @@
 
 namespace SimpleClassLibrary
 {
-    using System.Diagnostics;
     using System.Threading.Tasks;
 
     public class Class1
