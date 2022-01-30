@@ -58,10 +58,7 @@ public class DataCollectionManagerTests
     [TestMethod]
     public void InitializeDataCollectorsShouldThrowExceptionIfSettingsXmlIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() =>
-        {
-            _dataCollectionManager.InitializeDataCollectors(null);
-        });
+        Assert.ThrowsException<ArgumentNullException>(() => _dataCollectionManager.InitializeDataCollectors(null));
     }
 
     [TestMethod]
@@ -279,10 +276,7 @@ public class DataCollectionManagerTests
     public void SessionStartedShouldSendEventToDataCollector()
     {
         var isStartInvoked = false;
-        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
-        {
-            b.SessionStart += (sender, eventArgs) => isStartInvoked = true;
-        });
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.SessionStart += (sender, eventArgs) => isStartInvoked = true);
 
         _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
 
@@ -296,10 +290,7 @@ public class DataCollectionManagerTests
     [TestMethod]
     public void SessionStartedShouldReturnTrueIfTestCaseStartIsSubscribed()
     {
-        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
-        {
-            b.TestCaseStart += (sender, eventArgs) => { };
-        });
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.TestCaseStart += (sender, eventArgs) => { });
 
         _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
 
@@ -312,10 +303,7 @@ public class DataCollectionManagerTests
     [TestMethod]
     public void SessionStaretedShouldContinueDataCollectionIfExceptionIsThrownWhileSendingEventsToDataCollector()
     {
-        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
-        {
-            b.SessionStart += (sender, eventArgs) => throw new Exception();
-        });
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.SessionStart += (sender, eventArgs) => throw new Exception());
 
         _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
 
@@ -405,14 +393,12 @@ public class DataCollectionManagerTests
 
         _mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Returns(new List<AttachmentSet>() { attachment });
 
-        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
-        {
-            b.SessionEnd += (sender, ev) =>
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e)
+            => b.SessionEnd += (sender, ev) =>
             {
                 c.SendFileAsync(e.SessionDataCollectionContext, "filename.txt", true);
                 throw new Exception();
-            };
-        });
+            });
 
         _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
         var sessionStartEventArgs = new SessionStartEventArgs();
@@ -441,7 +427,7 @@ public class DataCollectionManagerTests
     public void TestCaseStartedShouldSendEventToDataCollector()
     {
         var isStartInvoked = false;
-        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => { b.TestCaseStart += (sender, eventArgs) => isStartInvoked = true; });
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.TestCaseStart += (sender, eventArgs) => isStartInvoked = true);
 
         _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
         var args = new TestCaseStartEventArgs(new TestCase());
@@ -454,7 +440,7 @@ public class DataCollectionManagerTests
     public void TestCaseStartedShouldNotSendEventToDataCollectorIfDataColletionIsNotEnbled()
     {
         var isStartInvoked = false;
-        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => { b.TestCaseStart += (sender, eventArgs) => isStartInvoked = true; });
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.TestCaseStart += (sender, eventArgs) => isStartInvoked = true);
 
         var args = new TestCaseStartEventArgs(new TestCase());
         _dataCollectionManager.TestCaseStarted(args);
@@ -466,7 +452,7 @@ public class DataCollectionManagerTests
     public void TestCaseEndedShouldSendEventToDataCollector()
     {
         var isEndInvoked = false;
-        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => { b.TestCaseEnd += (sender, eventArgs) => isEndInvoked = true; });
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.TestCaseEnd += (sender, eventArgs) => isEndInvoked = true);
 
         _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
         var args = new TestCaseEndEventArgs();
@@ -481,10 +467,7 @@ public class DataCollectionManagerTests
     {
         var isEndInvoked = false;
         var runSettings = string.Format(_defaultRunSettings, _dataCollectorSettings);
-        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
-        {
-            b.TestCaseEnd += (sender, eventArgs) => isEndInvoked = true;
-        });
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.TestCaseEnd += (sender, eventArgs) => isEndInvoked = true);
 
         var args = new TestCaseEndEventArgs();
         Assert.IsFalse(isEndInvoked);
@@ -499,10 +482,7 @@ public class DataCollectionManagerTests
                     It.IsAny<DataCollectionEvents>(),
                     It.IsAny<DataCollectionSink>(),
                     It.IsAny<DataCollectionLogger>(),
-                    It.IsAny<DataCollectionEnvironmentContext>())).Callback<XmlElement, DataCollectionEvents, DataCollectionSink, DataCollectionLogger, DataCollectionEnvironmentContext>((a, b, c, d, e) =>
-                    {
-                        callback.Invoke(a, b, c, d, e);
-                    });
+                    It.IsAny<DataCollectionEnvironmentContext>())).Callback<XmlElement, DataCollectionEvents, DataCollectionSink, DataCollectionLogger, DataCollectionEnvironmentContext>(callback.Invoke);
     }
 
     #endregion
@@ -544,14 +524,7 @@ internal class TestableDataCollectionManager : DataCollectionManager
 
     protected override bool IsUriValid(string uri)
     {
-        if (uri.Equals("my://custom/datacollector") || uri.Equals("my://custom/ccdatacollector"))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return uri.Equals("my://custom/datacollector") || uri.Equals("my://custom/ccdatacollector");
     }
 
     protected override DataCollector TryGetTestExtension(string extensionUri)
