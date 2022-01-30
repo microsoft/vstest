@@ -114,6 +114,24 @@ public class ConverterTests
         CollectionAssert.AreEquivalent(expected, unitTestElement.WorkItems.ToArray());
     }
 
+    [TestMethod]
+    public void ToTestElementShouldShouldAssignTraitsOfUnitTestElement()
+    {
+        var testCase = CreateTestCase("TestCaseWithTraits");
+        var result = new TestPlatformObjectModel.TestResult(testCase);
+
+        testCase.Traits.Add("Trait1", "Value1");
+        testCase.Traits.Add("Trait2", "Value2");
+
+        var unitTestElement = _converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
+
+        // They only way to check for TestProperties is to cast the ITestElement object to UnitTestElement
+        Assert.IsInstanceOfType(unitTestElement, typeof(UnitTestElement));
+
+        var expected = new[] { new TestPropertyItem("Trait1", "Value1"), new TestPropertyItem("Trait2", "Value2") };
+        CollectionAssert.AreEquivalent(expected, ((UnitTestElement)unitTestElement).TestProperties.ToArray());
+    }
+
     /// <summary>
     /// Unit test for regression when there's no test categories.
     /// </summary>
