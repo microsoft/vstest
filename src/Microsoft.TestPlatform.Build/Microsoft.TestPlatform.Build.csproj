@@ -9,7 +9,6 @@
     <AssemblyName>Microsoft.TestPlatform.Build</AssemblyName>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
-    <WarningsAsErrors>true</WarningsAsErrors>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
   <ItemGroup>

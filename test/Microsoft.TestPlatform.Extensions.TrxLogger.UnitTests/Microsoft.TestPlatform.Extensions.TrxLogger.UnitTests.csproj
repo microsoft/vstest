@@ -4,8 +4,6 @@
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
     <IsTestProject>true</IsTestProject>
-    <WarningsAsErrors>true</WarningsAsErrors>
-    <EnableCodeAnalysis>true</EnableCodeAnalysis>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
