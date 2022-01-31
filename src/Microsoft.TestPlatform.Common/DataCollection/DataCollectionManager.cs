@@ -768,10 +768,28 @@ internal class DataCollectionManager : IDataCollectionManager
 
     private void LogAttachments(List<AttachmentSet> attachmentSets)
     {
+        if (attachmentSets is null)
+        {
+            EqtTrace.Error("DataCollectionManager.LogAttachments: Unexpected null attachmentSets.");
+            return;
+        }
+
         foreach (var entry in attachmentSets)
         {
+            if (entry is null)
+            {
+                EqtTrace.Error("DataCollectionManager.LogAttachments: Unexpected null entry inside attachmentSets.");
+                continue;
+            }
+
             foreach (var file in entry.Attachments)
             {
+                if (file is null)
+                {
+                    EqtTrace.Error("DataCollectionManager.LogAttachments: Unexpected null file inside entry attachments.");
+                    continue;
+                }
+
                 EqtTrace.Verbose(
                     "Test Attachment Description: Collector:'{0}'  Uri:'{1}'  Description:'{2}' Uri:'{3}' ",
                     entry.DisplayName,

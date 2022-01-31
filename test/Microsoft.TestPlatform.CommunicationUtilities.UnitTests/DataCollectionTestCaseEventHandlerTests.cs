@@ -27,13 +27,15 @@ public class DataCollectionTestCaseEventHandlerTests
     private readonly Mock<IDataCollectionManager> _mockDataCollectionManager;
     private readonly DataCollectionTestCaseEventHandler _requestHandler;
     private readonly Mock<IDataSerializer> _dataSerializer;
+    private readonly Mock<IMessageSink> _messageSink;
 
     public DataCollectionTestCaseEventHandlerTests()
     {
         _mockCommunicationManager = new Mock<ICommunicationManager>();
         _mockDataCollectionManager = new Mock<IDataCollectionManager>();
         _dataSerializer = new Mock<IDataSerializer>();
-        _requestHandler = new DataCollectionTestCaseEventHandler(_mockCommunicationManager.Object, new Mock<IDataCollectionManager>().Object, _dataSerializer.Object);
+        _messageSink = new Mock<IMessageSink>();
+        _requestHandler = new DataCollectionTestCaseEventHandler(_messageSink.Object, _mockCommunicationManager.Object, new Mock<IDataCollectionManager>().Object, _dataSerializer.Object);
     }
 
     [TestMethod]
@@ -91,7 +93,7 @@ public class DataCollectionTestCaseEventHandlerTests
     [TestMethod]
     public void CloseShouldNotThrowExceptionIfCommunicationManagerIsNull()
     {
-        var requestHandler = new DataCollectionTestCaseEventHandler(null, new Mock<IDataCollectionManager>().Object, _dataSerializer.Object);
+        var requestHandler = new DataCollectionTestCaseEventHandler(_messageSink.Object, null, new Mock<IDataCollectionManager>().Object, _dataSerializer.Object);
 
         requestHandler.Close();
 
@@ -107,7 +109,7 @@ public class DataCollectionTestCaseEventHandlerTests
 
         _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = MessageType.SessionEnd, Payload = "false" });
 
-        var requestHandler = new DataCollectionTestCaseEventHandler(_mockCommunicationManager.Object, _mockDataCollectionManager.Object, _dataSerializer.Object);
+        var requestHandler = new DataCollectionTestCaseEventHandler(_messageSink.Object, _mockCommunicationManager.Object, _mockDataCollectionManager.Object, _dataSerializer.Object);
 
         requestHandler.ProcessRequests();
 
@@ -124,7 +126,7 @@ public class DataCollectionTestCaseEventHandlerTests
 
         _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = MessageType.SessionEnd, Payload = "false" });
 
-        var requestHandler = new DataCollectionTestCaseEventHandler(_mockCommunicationManager.Object, _mockDataCollectionManager.Object, _dataSerializer.Object);
+        var requestHandler = new DataCollectionTestCaseEventHandler(_messageSink.Object, _mockCommunicationManager.Object, _mockDataCollectionManager.Object, _dataSerializer.Object);
 
         requestHandler.ProcessRequests();
 

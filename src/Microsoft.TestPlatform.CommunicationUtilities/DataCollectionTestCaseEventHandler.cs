@@ -3,14 +3,19 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 
+using System;
+using System.Collections.ObjectModel;
 using System.Net;
 
 using Common.DataCollector;
+
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+using ObjectModel;
 
 /// <summary>
 /// The test case data collection request handler.
@@ -20,14 +25,14 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
     private readonly ICommunicationManager _communicationManager;
     private readonly IDataCollectionManager _dataCollectionManager;
     private readonly IDataSerializer _dataSerializer;
+    private readonly IMessageSink _messageSink;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DataCollectionTestCaseEventHandler"/> class.
     /// </summary>
-    internal DataCollectionTestCaseEventHandler()
-        : this(new SocketCommunicationManager(), DataCollectionManager.Instance, JsonDataSerializer.Instance)
-    {
-    }
+    internal DataCollectionTestCaseEventHandler(IMessageSink messageSink)
+        : this(messageSink, new SocketCommunicationManager(), DataCollectionManager.Instance, JsonDataSerializer.Instance)
+    { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DataCollectionTestCaseEventHandler"/> class.
@@ -35,11 +40,12 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
     /// <param name="communicationManager">Communication manager implementation.</param>
     /// <param name="dataCollectionManager">Data collection manager implementation.</param>
     /// <param name="dataSerializer">Serializer for serialization and deserialization of the messages.</param>
-    internal DataCollectionTestCaseEventHandler(ICommunicationManager communicationManager, IDataCollectionManager dataCollectionManager, IDataSerializer dataSerializer)
+    internal DataCollectionTestCaseEventHandler(IMessageSink messageSink, ICommunicationManager communicationManager, IDataCollectionManager dataCollectionManager, IDataSerializer dataSerializer)
     {
         _communicationManager = communicationManager;
         _dataCollectionManager = dataCollectionManager;
         _dataSerializer = dataSerializer;
+        _messageSink = messageSink;
     }
 
     /// <inheritdoc />
@@ -79,7 +85,17 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
                     }
 
                     var testCaseStartEventArgs = _dataSerializer.DeserializePayload<TestCaseStartEventArgs>(message);
-                    _dataCollectionManager.TestCaseStarted(testCaseStartEventArgs);
+
+                    try
+                    {
+                        _dataCollectionManager.TestCaseStarted(testCaseStartEventArgs);
+                    }
+                    catch (Exception ex)
+                    {
+                        _messageSink.SendMessage(new DataCollectionMessageEventArgs(TestMessageLevel.Error, $"Error occurred during TestCaseStarted event handling: {ex}"));
+                        EqtTrace.Error($"DataCollectionTestCaseEventHandler.ProcessRequests: Error occurred during TestCaseStarted event handling: {ex}");
+                    }
+
                     _communicationManager.SendMessage(MessageType.DataCollectionTestStartAck);
 
                     if (EqtTrace.IsInfoEnabled)
@@ -96,7 +112,19 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
                     }
 
                     var testCaseEndEventArgs = _dataSerializer.DeserializePayload<TestCaseEndEventArgs>(message);
-                    var attachmentSets = _dataCollectionManager.TestCaseEnded(testCaseEndEventArgs);
+
+                    Collection<AttachmentSet> attachmentSets;
+                    try
+                    {
+                        attachmentSets = _dataCollectionManager.TestCaseEnded(testCaseEndEventArgs);
+                    }
+                    catch (Exception ex)
+                    {
+                        _messageSink.SendMessage(new DataCollectionMessageEventArgs(TestMessageLevel.Error, $"Error occurred during DataCollectionTestEnd event handling: {ex}"));
+                        EqtTrace.Error($"DataCollectionTestCaseEventHandler.ProcessRequests: Error occurred during DataCollectionTestEnd event handling: {ex}");
+                        attachmentSets = new Collection<AttachmentSet>();
+                    }
+
                     _communicationManager.SendMessage(MessageType.DataCollectionTestEndResult, attachmentSets);
 
                     if (EqtTrace.IsInfoEnabled)
@@ -114,7 +142,15 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
                         EqtTrace.Info("DataCollectionTestCaseEventHandler: Test session ended");
                     }
 
-                    Close();
+                    try
+                    {
+                        Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        _messageSink.SendMessage(new DataCollectionMessageEventArgs(TestMessageLevel.Error, $"Error occurred during SessionEnd event handling: {ex}"));
+                        EqtTrace.Error($"DataCollectionTestCaseEventHandler.ProcessRequests: Error occurred during SessionEnd event handling: {ex}");
+                    }
 
                     break;
 
