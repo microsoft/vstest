@@ -16,15 +16,6 @@ jobs:
       modifyEnvironment: false
       failOnStandardError: true
 
-  - task: CmdLine@1
-    displayName: 'Delete stale pdb files'
-    inputs:
-      filename: del
-      arguments: '/S /F *.pdb'
-      workingFolder: '$(SystemRoot)'
-    continueOnError: true
-    condition: always()
-
   - task: BatchScript@1
     displayName: 'Run Unit Tests'
     inputs:
