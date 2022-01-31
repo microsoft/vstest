@@ -379,7 +379,7 @@ public class EventLogDataCollector : DataCollector
         if (!e.Context.HasTestCase)
         {
             Debug.Fail("Context is not for a test case");
-            throw new ArgumentNullException("TestCaseStartEventArgs.Context.HasTestCase");
+            ValidateArg.NotNull(e.Context.TestExecId, "TestCaseStartEventArgs.Context.HasTestCase");
         }
 
         if (EqtTrace.IsVerboseEnabled)

@@ -285,7 +285,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
                     Path.GetFullPath(Environment.ExpandEnvironmentVariables(datacollectorSearchPath));
                 if (!_fileHelper.DirectoryExists(adapterPath))
                 {
-                    EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
+                    EqtTrace.Warning($"AdapterPath Not Found: {adapterPath}");
                     continue;
                 }
 
