@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
@@ -8,7 +8,6 @@
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.Common</AssemblyName>
     <TargetFrameworks>netstandard2.0;netstandard1.3;net451</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
-    <WarningsAsErrors>true</WarningsAsErrors>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
   <ItemGroup>

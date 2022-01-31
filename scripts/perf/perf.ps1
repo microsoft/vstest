@@ -273,14 +273,14 @@ function Invoke-PerformanceTests
                         $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
                          foreach($fx in $Script:TPT_TargetFrameworks)
                         {
-                            if ($Script:TPT_TargetFramework -ne "" -and $fx -ne $Script:TPT_TargetFramework) 
+                            if ($Script:TPT_TargetFramework -ne "" -and $fx -ne $Script:TPT_TargetFramework)
                             {
                                 # Write-Log "Skipped framework $fx based on user setting."
                                 continue;
                             }
-    
+
                             $testContainer = [System.String]::Format($testContainerPath, $fx)
-    
+
                             if (Test-Path $testContainer)
                             {
                                 $adapter = $payload.adapter
@@ -302,12 +302,12 @@ function Invoke-PerformanceTests
                                             $payload | Add-Member currentRunner $runner -Force
                                             $payload | Add-Member currentAdapter $null -Force
                                             $payload | Add-Member currentAdapterVersion $null -Force
-    
+
                                             if($runner -eq "vstest.console")
                                             {
                                                 $payload | Add-Member currentRunnerVersion (Get-ProductVersion($runnerPath)) -Force
                                                 $payload.currentAdapter = $adapter
-    
+
                                                 Measure-DiscoveryTime {&$runnerPath $testContainer --listtests --testadapterpath:$testAdapterPath} $payload
                                                 Measure-ExecutionTime {&$runnerPath $testContainer --testadapterpath:$testAdapterPath} $payload
                                             }
@@ -328,7 +328,7 @@ function Invoke-PerformanceTests
                                             Write-Log "Specified runner $runner doesn't exist at $runnerPath"
                                         }
                                     }
-    
+
                                 }
                                 else
                                 {
@@ -358,19 +358,19 @@ function Invoke-DisplayResults
     "`n"
     "Machine Configuration"
     $osDetails | Format-List 'MachineName', 'OSName', 'OSVersion', 'MachineType' , 'Processor', 'LogicalCores', 'RAMSize'
-    
+
     if($DefaultAction -eq "Both" -or $DefaultAction -eq "Discovery")
     {
         $Script:TPT_Results | Where-Object {$_.Action -like "Discovery"} | Format-Table 'Runner', 'Adapter', 'Action', 'ElapsedTime', 'Goal', 'Delta', 'Status', 'PayLoad', 'RunnerVersion', 'AdapterVersion' -AutoSize
     }
-    
+
     if($DefaultAction -eq "Both" -or $DefaultAction -eq "Execution")
     {
         $Script:TPT_Results | Where-Object {$_.Action -like "Execution"} | Format-Table 'Runner', 'Adapter', 'Action', 'ElapsedTime', 'Goal', 'Delta', 'Status', 'PayLoad', 'RunnerVersion', 'AdapterVersion' -AutoSize
     }
-    
+
     $Host.UI.RawUI.ForegroundColor = $currentColor
-    
+
     if($ExportResults -ne $null -and $ExportResults -eq "csv")
     {
         $Script:TPT_Results | Export-Csv -Path "PerformanceResults.csv" -Force -NoTypeInformation

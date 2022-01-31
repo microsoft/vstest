@@ -187,6 +187,9 @@
       <Item ItemId=";NoProxyMatchesDescription" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[The runsettings changed between the time when the test session was established and the time of the current run/discovery request.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Le impostazioni di esecuzione sono cambiate tra l'ora in cui è stata stabilita la sessione di test e l'ora della richiesta di esecuzione/individuazione corrente.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>

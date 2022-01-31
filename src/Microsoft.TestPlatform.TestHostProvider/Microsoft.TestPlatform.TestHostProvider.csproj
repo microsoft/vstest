@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
@@ -9,7 +9,6 @@
     <TargetFrameworks>netstandard2.0;net451</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <DefineConstants Condition=" '$(DotNetBuildFromSource)' == 'true' ">$(DefineConstants);DOTNET_BUILD_FROM_SOURCE</DefineConstants>
-    <EnableCodeAnalysis>true</EnableCodeAnalysis>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
