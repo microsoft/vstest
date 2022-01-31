@@ -103,7 +103,6 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
             switch (peReader.PEHeaders.CoffHeader.Machine)
             {
                 case Machine.Amd64:
-                    return Architecture.X64;
                 case Machine.IA64:
                     return Architecture.X64;
                 case Machine.Arm64:
@@ -111,9 +110,24 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
                 case Machine.Arm:
                     return Architecture.ARM;
                 case Machine.I386:
-                    return Architecture.X86;
+                    // We can distinguish AnyCPU only from the set of CorFlags.Requires32Bit, but in case of Ready
+                    // to Run image that flag is not "updated" and ignored. So we check if the module is IL only or not.
+                    // If it's not IL only it means that is a R2R (Ready to Run) and we're already in the correct architecture x86.
+                    // In all other cases the architecture will end inside the correct switch branch.
+                    var corflags = peReader.PEHeaders.CorHeader.Flags;
+                    if ((corflags & CorFlags.Requires32Bit) != 0 || (corflags & CorFlags.ILOnly) == 0)
+                    {
+                        return Architecture.X86;
+                    }
+                    else
+                    {
+                        return Architecture.AnyCPU;
+                    }
                 default:
-                    break;
+                    {
+                        EqtTrace.Error($"AssemblyMetadataProvider.GetArchitecture: Unhandled architecture '{peReader.PEHeaders.CoffHeader.Machine}'.");
+                        break;
+                    }
             }
         }
 

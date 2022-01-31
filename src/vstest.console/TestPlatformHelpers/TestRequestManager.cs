@@ -624,7 +624,7 @@ internal class TestRequestManager : ITestRequestManager
                 // We want to find 64-bit SDK because it is more likely to be installed.
                 defaultArchitecture = Environment.Is64BitOperatingSystem ? Architecture.X64 : Architecture.X86;
 #endif
-                EqtTrace.Verbose($"Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}");
+                EqtTrace.Verbose($"TestRequestManager.UpdateRunSettingsIfRequired: Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}, Current process architecture: {_processHelper.GetCurrentProcessArchitecture()}.");
             }
 
             settingsUpdated |= UpdatePlatform(
@@ -664,11 +664,16 @@ internal class TestRequestManager : ITestRequestManager
                     return Architecture.ARM;
                 case PlatformArchitecture.ARM64:
                     return Architecture.ARM64;
+                case PlatformArchitecture.S390x:
+                    return Architecture.S390x;
                 default:
+                    EqtTrace.Error($"TestRequestManager.TranslateToArchitecture: Unhandled architecture '{targetArchitecture}'.");
                     break;
             }
 
-            throw new TestPlatformException($"Invalid target architecture '{targetArchitecture}'");
+            // We prefer to not throw in case of unhandled architecture but return Default,
+            // it should be handled in a correct way by the callers.
+            return Architecture.Default;
         }
 #endif
     }

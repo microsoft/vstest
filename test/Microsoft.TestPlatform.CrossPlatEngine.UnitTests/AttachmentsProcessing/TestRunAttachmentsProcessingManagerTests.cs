@@ -424,7 +424,7 @@ public class TestRunAttachmentsProcessingManagerTests
                 {
                     for (int i = 0; i < 100; ++i)
                     {
-                        Task.Delay(100).Wait();
+                        Task.Delay(100, cancellation).Wait(cancellation);
                         Console.WriteLine($"Iteration: {i}");
                         logger.SendMessage(TestMessageLevel.Informational, $"Iteration: {i}");
 
@@ -434,7 +434,7 @@ public class TestRunAttachmentsProcessingManagerTests
                         if (i == 3)
                         {
                             _cancellationTokenSource.Cancel();
-                            Task.Delay(500).Wait();
+                            Task.Delay(500, cancellation).Wait(cancellation);
                         }
                     }
                 }
@@ -490,7 +490,7 @@ public class TestRunAttachmentsProcessingManagerTests
                 {
                     for (int i = 0; i < 1000; ++i)
                     {
-                        Task.Delay(100).Wait();
+                        Task.Delay(100, cancellation).Wait(cancellation);
                         Console.WriteLine($"Iteration: {i}");
                         logger.SendMessage(TestMessageLevel.Informational, $"Iteration: {i}");
 
@@ -499,7 +499,7 @@ public class TestRunAttachmentsProcessingManagerTests
                         if (i == 3)
                         {
                             _cancellationTokenSource.Cancel();
-                            Task.Delay(500).Wait();
+                            Task.Delay(500, cancellation).Wait(cancellation);
                         }
                     }
                 }

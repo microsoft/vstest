@@ -61,7 +61,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class.
     /// </summary>
-    /// 
+    ///
     /// <param name="testSessionInfo">The test session info.</param>
     /// <param name="proxyOperationManagerCreator">The proxy operation manager creator.</param>
     /// <param name="debugEnabledForTestSession">
@@ -88,7 +88,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class.
     /// </summary>
-    /// 
+    ///
     /// <param name="requestData">
     /// The request data for providing services and data for run.
     /// </param>
@@ -110,11 +110,11 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class.
     /// </summary>
-    /// 
+    ///
     /// <remarks>
     /// Constructor with dependency injection. Used for unit testing.
     /// </remarks>
-    /// 
+    ///
     /// <param name="requestData">The request data for common services and data for run.</param>
     /// <param name="requestSender">Request sender instance.</param>
     /// <param name="testHostManager">Test host manager instance.</param>
@@ -211,7 +211,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
                 // This is workaround for the bug https://github.com/Microsoft/vstest/issues/970
                 var runsettings = _proxyOperationManager.RemoveNodesFromRunsettingsIfRequired(
                     testRunCriteria.TestRunSettings,
-                    (testMessageLevel, message) => { LogMessage(testMessageLevel, message); });
+                    LogMessage);
 
                 if (testRunCriteria.HasSpecificSources)
                 {
@@ -396,10 +396,10 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     /// Ensures that the engine is ready for test operations. Usually includes starting up the
     /// test host process.
     /// </summary>
-    /// 
+    ///
     /// <param name="sources">List of test sources.</param>
     /// <param name="runSettings">Run settings to be used.</param>
-    /// 
+    ///
     /// <returns>
     /// Returns true if the communication is established b/w runner and host, false otherwise.
     /// </returns>

@@ -76,7 +76,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
             new SocketCommunicationManager(),
             messageSink,
             DataCollectionManager.Create(messageSink, requestData),
-            new DataCollectionTestCaseEventHandler(),
+            new DataCollectionTestCaseEventHandler(messageSink),
             JsonDataSerializer.Instance,
             new FileHelper(),
             requestData)
@@ -162,7 +162,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
                         communicationManager,
                         messageSink,
                         DataCollectionManager.Create(messageSink, requestData),
-                        new DataCollectionTestCaseEventHandler(),
+                        new DataCollectionTestCaseEventHandler(messageSink),
                         JsonDataSerializer.Instance,
                         new FileHelper(),
                         requestData);
@@ -285,7 +285,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
                     Path.GetFullPath(Environment.ExpandEnvironmentVariables(datacollectorSearchPath));
                 if (!_fileHelper.DirectoryExists(adapterPath))
                 {
-                    EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
+                    EqtTrace.Warning($"AdapterPath Not Found: {adapterPath}");
                     continue;
                 }
 
@@ -362,7 +362,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
                     }
                     catch (Exception e)
                     {
-                        EqtTrace.Error("DataCollectionRequestHandler.HandleBeforeTestRunStart : Error occurred during initialization of TestHost : {0}", e);
+                        EqtTrace.Error("DataCollectionRequestHandler.HandleBeforeTestRunStart : Error occurred during test case events handling: {0}.", e);
                     }
                 },
                 _cancellationTokenSource.Token);

@@ -4,16 +4,21 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Interfaces;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-using TestTools.UnitTesting;
 
 using Moq;
+
+using TestTools.UnitTesting;
 
 [TestClass]
 public class DataCollectionAttachmentManagerTests
@@ -37,6 +42,56 @@ public class DataCollectionAttachmentManagerTests
     {
         File.Delete(Path.Combine(TempDirectoryPath, "filename.txt"));
         File.Delete(Path.Combine(TempDirectoryPath, "filename1.txt"));
+    }
+
+    [TestMethod]
+    public void ParallelAccessShouldNotBreak()
+    {
+        string outputDirectory = Path.Combine(TempDirectoryPath, Guid.NewGuid().ToString());
+        var dataCollectorSessionId = new SessionId(Guid.NewGuid());
+
+        try
+        {
+            _attachmentManager.Initialize(dataCollectorSessionId, outputDirectory, _messageSink.Object);
+
+            CancellationTokenSource cts = new(TimeSpan.FromSeconds(3));
+            List<Task> parallelTasks = new();
+            int totalTasks = 3;
+
+            // 3 tasks are enough to break bugged code
+            for (int i = 0; i < totalTasks; i++)
+            {
+                parallelTasks.Add(Task.Run(() =>
+                {
+                    while (true)
+                    {
+                        if (cts.IsCancellationRequested)
+                        {
+                            break;
+                        }
+                        _ = TestCaseEvent($"test_{Guid.NewGuid()}");
+                    }
+                }));
+            }
+
+            Task.WaitAll(parallelTasks.ToArray());
+        }
+        finally
+        {
+            if (Directory.Exists(outputDirectory))
+            {
+                Directory.Delete(outputDirectory, true);
+            }
+        }
+
+        List<AttachmentSet> TestCaseEvent(string uri)
+        {
+            var testCaseCtx = new DataCollectionContext(dataCollectorSessionId, new TestExecId(Guid.NewGuid()));
+            string path = Path.Combine(outputDirectory, Guid.NewGuid().ToString());
+            File.WriteAllText(path, "test");
+            _attachmentManager.AddAttachment(new FileTransferInformation(testCaseCtx, path, true), null, new Uri($"//{uri}"), $"{uri}");
+            return _attachmentManager.GetAttachments(testCaseCtx);
+        }
     }
 
     [TestMethod]
