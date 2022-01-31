@@ -57,7 +57,9 @@ internal class Program
         };
 
         var options = new TestPlatformOptions();
-        r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
+        var discoveryHandler = new TestDiscoveryHandler();
+        r.DiscoverTests(sources, sourceSettings, options, discoveryHandler);
+        r.RunTestsWithCustomTestHost(discoveryHandler.DiscoveredTestCases, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
     }
 
     public class TestRunHandler : ITestRunEventsHandler
@@ -100,6 +102,38 @@ internal class Program
         private string WriteTests(IEnumerable<TestCase> testCases)
         {
             return testCases == null ? null : "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName));
+        }
+    }
+
+    public class TestDiscoveryHandler : ITestDiscoveryEventsHandler2
+    {
+        public List<TestCase> DiscoveredTestCases { get; } = new List<TestCase>();
+        public List<string> Messages { get; } = new List<string>();
+
+        public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+        {
+            if (discoveredTestCases != null)
+            {
+                DiscoveredTestCases.AddRange(discoveredTestCases);
+            }
+        }
+
+        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+        {
+            if (lastChunk != null)
+            {
+                DiscoveredTestCases.AddRange(lastChunk);
+            }
+        }
+
+        public void HandleLogMessage(TestMessageLevel level, string message)
+        {
+            Messages.Add($"[{level}]: {message}");
+        }
+
+        public void HandleRawMessage(string rawMessage)
+        {
+
         }
     }
 

@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 using EventHandlers;
@@ -21,6 +22,7 @@ using Utilities;
 
 using CrossPlatResources = CrossPlatEngine.Resources.Resources;
 using ObjectModelConstants = TestPlatform.ObjectModel.Constants;
+using System.Collections.ObjectModel;
 
 public class TestRequestHandler : ITestRequestHandler
 {
@@ -42,6 +44,7 @@ public class TestRequestHandler : ITestRequestHandler
     private readonly ManualResetEventSlim _sessionCompleted;
     private Action<Message> _onLaunchAdapterProcessWithDebuggerAttachedAckReceived;
     private Action<Message> _onAttachDebuggerAckRecieved;
+    private IPathConverter _pathConverter;
     private Exception _messageProcessingUnrecoverableError;
 
     public TestHostConnectionInfo ConnectionInfo { get; set; }
@@ -82,6 +85,7 @@ public class TestRequestHandler : ITestRequestHandler
         _onLaunchAdapterProcessWithDebuggerAttachedAckReceived = (message) => throw new NotImplementedException();
         _onAttachDebuggerAckRecieved = (message) => throw new NotImplementedException();
 
+        _pathConverter = new NullPathConverter();
         _jobQueue = new JobQueue<Action>(
             (action) => action(),
             "TestHostOperationQueue",
@@ -94,6 +98,19 @@ public class TestRequestHandler : ITestRequestHandler
     /// <inheritdoc />
     public virtual void InitializeCommunication()
     {
+        // soo beautiful!
+        var localPath = Environment.GetEnvironmentVariable("--local-path");
+        var remotePath = Environment.GetEnvironmentVariable("--remote-path");
+
+        if (!string.IsNullOrWhiteSpace(localPath) && !string.IsNullOrEmpty(remotePath))
+        {
+            _pathConverter = new PathConverter(localPath, remotePath);
+        }
+        else
+        {
+            _pathConverter = new NullPathConverter();
+        }
+
         _communicationEndPoint = _communicationEndpointFactory.Create(ConnectionInfo.Role);
         _communicationEndPoint.Connected += (sender, connectedArgs) =>
         {
@@ -141,14 +158,16 @@ public class TestRequestHandler : ITestRequestHandler
     /// <inheritdoc />
     public void SendTestCases(IEnumerable<TestCase> discoveredTestCases)
     {
-        var data = _dataSerializer.SerializePayload(MessageType.TestCasesFound, discoveredTestCases, _protocolVersion);
+        var updatedTestCases = _pathConverter.UpdateTestCases(discoveredTestCases, Direction.Send);
+        var data = _dataSerializer.SerializePayload(MessageType.TestCasesFound, updatedTestCases, _protocolVersion);
         SendData(data);
     }
 
     /// <inheritdoc />
     public void SendTestRunStatistics(TestRunChangedEventArgs testRunChangedArgs)
     {
-        var data = _dataSerializer.SerializePayload(MessageType.TestRunStatsChange, testRunChangedArgs, _protocolVersion);
+        var updatedTestRunChangedEventArgs = _pathConverter.UpdateTestRunChangedEventArgs(testRunChangedArgs, Direction.Send);
+        var data = _dataSerializer.SerializePayload(MessageType.TestRunStatsChange, updatedTestRunChangedEventArgs, _protocolVersion);
         SendData(data);
     }
 
@@ -179,16 +198,16 @@ public class TestRequestHandler : ITestRequestHandler
                 curentArgs.IsCanceled,
                 curentArgs.IsAborted,
                 _messageProcessingUnrecoverableError,
-                curentArgs.AttachmentSets, curentArgs.InvokedDataCollectors, curentArgs.ElapsedTimeInRunningTests
+                _pathConverter.UpdateAttachmentSets(curentArgs.AttachmentSets, Direction.Send), curentArgs.InvokedDataCollectors, curentArgs.ElapsedTimeInRunningTests
             );
         }
         var data = _dataSerializer.SerializePayload(
             MessageType.ExecutionComplete,
             new TestRunCompletePayload
             {
-                TestRunCompleteArgs = testRunCompleteArgs,
-                LastRunTests = lastChunkArgs,
-                RunAttachments = runContextAttachments,
+                TestRunCompleteArgs = _pathConverter.UpdateTestRunCompleteEventArgs(testRunCompleteArgs, Direction.Send),
+                LastRunTests = _pathConverter.UpdateTestRunChangedEventArgs(lastChunkArgs, Direction.Send),
+                RunAttachments = _pathConverter.UpdateAttachmentSets(runContextAttachments, Direction.Send),
                 ExecutorUris = executorUris
             },
             _protocolVersion);
@@ -203,7 +222,7 @@ public class TestRequestHandler : ITestRequestHandler
             new DiscoveryCompletePayload
             {
                 TotalTests = discoveryCompleteEventArgs.TotalCount,
-                LastDiscoveredTests = discoveryCompleteEventArgs.IsAborted ? null : lastChunk,
+                LastDiscoveredTests = discoveryCompleteEventArgs.IsAborted ? null : _pathConverter.UpdateTestCases(lastChunk, Direction.Send),
                 IsAborted = discoveryCompleteEventArgs.IsAborted,
                 Metrics = discoveryCompleteEventArgs.Metrics
             },
@@ -333,7 +352,7 @@ public class TestRequestHandler : ITestRequestHandler
                     {
                         _testHostManagerFactoryReady.Wait();
                         var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
-                        var pathToAdditionalExtensions = _dataSerializer.DeserializePayload<IEnumerable<string>>(message);
+                        var pathToAdditionalExtensions = _pathConverter.UpdatePaths(_dataSerializer.DeserializePayload<IEnumerable<string>>(message), Direction.Receive);
                         Action job = () =>
                         {
                             EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
@@ -357,7 +376,8 @@ public class TestRequestHandler : ITestRequestHandler
                     {
                         _testHostManagerFactoryReady.Wait();
                         var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
-                        var discoveryCriteria = _dataSerializer.DeserializePayload<DiscoveryCriteria>(message);
+                        var discoveryCriteria = _pathConverter.UpdateDiscoveryCriteria(_dataSerializer.DeserializePayload<DiscoveryCriteria>(message), Direction.Receive);
+
                         Action job = () =>
                         {
                             EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
@@ -383,7 +403,7 @@ public class TestRequestHandler : ITestRequestHandler
                     {
                         _testHostManagerFactoryReady.Wait();
                         var testInitializeEventsHandler = new TestInitializeEventsHandler(this);
-                        var pathToAdditionalExtensions = _dataSerializer.DeserializePayload<IEnumerable<string>>(message);
+                        var pathToAdditionalExtensions = _pathConverter.UpdatePaths(_dataSerializer.DeserializePayload<IEnumerable<string>>(message), Direction.Receive);
                         Action job = () =>
                         {
                             EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
@@ -407,7 +427,7 @@ public class TestRequestHandler : ITestRequestHandler
                     {
                         var testRunEventsHandler = new TestRunEventsHandler(this);
                         _testHostManagerFactoryReady.Wait();
-                        var testRunCriteriaWithSources = _dataSerializer.DeserializePayload<TestRunCriteriaWithSources>(message);
+                        var testRunCriteriaWithSources = _pathConverter.UpdateTestRunCriteriaWithSources(_dataSerializer.DeserializePayload<TestRunCriteriaWithSources>(message), Direction.Receive);
                         Action job = () =>
                         {
                             EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
@@ -438,8 +458,7 @@ public class TestRequestHandler : ITestRequestHandler
                     {
                         var testRunEventsHandler = new TestRunEventsHandler(this);
                         _testHostManagerFactoryReady.Wait();
-                        var testRunCriteriaWithTests =
-                            _dataSerializer.DeserializePayload<TestRunCriteriaWithTests>(message);
+                        var testRunCriteriaWithTests = _pathConverter.UpdateTestRunCriteriaWithTests(_dataSerializer.DeserializePayload<TestRunCriteriaWithTests>(message), Direction.Receive);
 
                         Action job = () =>
                         {
@@ -535,4 +554,228 @@ public class TestRequestHandler : ITestRequestHandler
         EqtTrace.Verbose("TestRequestHandler.SendData:  sending data from testhost: {0}", data);
         _channel.Send(data);
     }
+}
+
+internal class NullPathConverter : IPathConverter
+{
+    Collection<AttachmentSet> IPathConverter.UpdateAttachmentSets(Collection<AttachmentSet> attachmentSets, Direction updateDirection)
+    {
+        return attachmentSets;
+    }
+
+    ICollection<AttachmentSet> IPathConverter.UpdateAttachmentSets(ICollection<AttachmentSet> attachmentSets, Direction updateDirection)
+    {
+        return attachmentSets;
+    }
+
+    DiscoveryCriteria IPathConverter.UpdateDiscoveryCriteria(DiscoveryCriteria discoveryCriteria, Direction updateDirection)
+    {
+        return discoveryCriteria;
+    }
+
+    string IPathConverter.UpdatePath(string path, Direction updateDirection)
+    {
+        return path;
+    }
+
+    IEnumerable<string> IPathConverter.UpdatePaths(IEnumerable<string> enumerable, Direction updateDirection)
+    {
+        return enumerable;
+    }
+
+    TestCase IPathConverter.UpdateTestCase(TestCase testCase, Direction updateDirection)
+    {
+        return testCase;
+    }
+
+    IEnumerable<TestCase> IPathConverter.UpdateTestCases(IEnumerable<TestCase> testCases, Direction updateDirection)
+    {
+        return testCases;
+    }
+
+    TestRunChangedEventArgs IPathConverter.UpdateTestRunChangedEventArgs(TestRunChangedEventArgs testRunChangedArgs, Direction updateDirection)
+    {
+        return testRunChangedArgs;
+    }
+
+    TestRunCompleteEventArgs IPathConverter.UpdateTestRunCompleteEventArgs(TestRunCompleteEventArgs testRunCompleteEventArgs, Direction updateDirection)
+    {
+        return testRunCompleteEventArgs;
+    }
+
+    TestRunCriteriaWithSources IPathConverter.UpdateTestRunCriteriaWithSources(TestRunCriteriaWithSources testRunCriteriaWithSources, Direction updateDirection)
+    {
+        return testRunCriteriaWithSources;
+    }
+
+    TestRunCriteriaWithTests IPathConverter.UpdateTestRunCriteriaWithTests(TestRunCriteriaWithTests testRunCriteriaWithTests, Direction updateDirection)
+    {
+        return testRunCriteriaWithTests;
+    }
+}
+
+internal enum Direction
+{
+    Receive,
+    Send
+}
+
+internal class PathConverter : IPathConverter
+{
+    // The path on this computer to which we deployed the test dll and test runner
+    private readonly string _deploymentPath = "";
+    // The path on the remote system where test dll was originally placed, and from which we
+    // copied it to this system. For vstest.console, which is on the other side of this, the names
+    // are inverted, it sends us their local path, and thinks about our local path as remote.
+    private readonly string _originalPath = "";
+
+    public PathConverter(string originalPath, string deploymentPath)
+    {
+        _originalPath = originalPath;
+        _deploymentPath = deploymentPath;
+    }
+
+    public string UpdatePath(string path, Direction updateDirection)
+    {
+        string find;
+        string replaceWith;
+        if (updateDirection == Direction.Receive)
+        {
+            // Request is incoming, the path that is local to the sender (for us that is "remote" path)
+            // needs to be replaced with our path
+            find = _originalPath;
+            replaceWith = _deploymentPath;
+        }
+        else
+        {
+            find = _deploymentPath;
+            replaceWith = _originalPath;
+        }
+
+        return path?.Replace(find, replaceWith);
+    }
+
+    public IEnumerable<string> UpdatePaths(IEnumerable<string> enumerable, Direction updateDirection)
+    {
+        var updatedPaths = enumerable.Select(i => UpdatePath(i, updateDirection)).ToList();
+        return updatedPaths;
+    }
+
+    public TestCase UpdateTestCase(TestCase testCase, Direction updateDirection)
+    {
+        testCase.CodeFilePath = UpdatePath(testCase.CodeFilePath, updateDirection);
+        testCase.Source = UpdatePath(testCase.Source, updateDirection);
+        return testCase;
+    }
+
+    public IEnumerable<TestCase> UpdateTestCases(IEnumerable<TestCase> testCases, Direction updateDirection)
+    {
+        var updatedTestCases = testCases.Select(tc => UpdateTestCase(tc, updateDirection)).ToList();
+
+        return updatedTestCases;
+    }
+
+    public TestRunCompleteEventArgs UpdateTestRunCompleteEventArgs(TestRunCompleteEventArgs testRunCompleteEventArgs, Direction updateDirection)
+    {
+        UpdateAttachmentSets(testRunCompleteEventArgs.AttachmentSets, updateDirection);
+        return testRunCompleteEventArgs;
+    }
+
+    public TestRunChangedEventArgs UpdateTestRunChangedEventArgs(TestRunChangedEventArgs testRunChangedArgs, Direction updateDirection)
+    {
+        UpdateTestResults(testRunChangedArgs.NewTestResults, updateDirection);
+        UpdateTestCases(testRunChangedArgs.ActiveTests, updateDirection);
+        return testRunChangedArgs;
+    }
+
+    public Collection<AttachmentSet> UpdateAttachmentSets(Collection<AttachmentSet> attachmentSets, Direction updateDirection)
+    {
+        attachmentSets.Select(i => UpdateAttachmentSet(i, updateDirection));
+        return attachmentSets;
+    }
+
+    public ICollection<AttachmentSet> UpdateAttachmentSets(ICollection<AttachmentSet> attachmentSets, Direction updateDirection)
+    {
+        attachmentSets.Select(i => UpdateAttachmentSet(i, updateDirection));
+        return attachmentSets;
+    }
+
+    private AttachmentSet UpdateAttachmentSet(AttachmentSet attachmentSet, Direction updateDirection)
+    {
+        attachmentSet.Attachments.Select(a => UpdateAttachment(a, updateDirection));
+        return attachmentSet;
+    }
+
+    private UriDataAttachment UpdateAttachment(UriDataAttachment attachment, Direction updateDirection)
+    {
+        // todo: convert uri?
+        return attachment;
+    }
+
+    private IEnumerable<TestResult> UpdateTestResults(IEnumerable<TestResult> testResults, Direction updateDirection)
+    {
+        testResults.Select(tr =>
+        {
+            tr.Attachments.Select(a => UpdateAttachmentSet(a, updateDirection));
+            UpdateTestCase(tr.TestCase, updateDirection);
+
+            return tr;
+        });
+
+        return testResults;
+    }
+
+    public DiscoveryCriteria UpdateDiscoveryCriteria(DiscoveryCriteria discoveryCriteria, Direction updateDirection)
+    {
+        discoveryCriteria.Package = UpdatePath(discoveryCriteria.Package, updateDirection);
+        foreach (var adapter in discoveryCriteria.AdapterSourceMap.ToList())
+        {
+            var updatedPaths = UpdatePaths(adapter.Value, updateDirection);
+            discoveryCriteria.AdapterSourceMap[adapter.Key] = updatedPaths;
+        }
+        return discoveryCriteria;
+    }
+
+    public TestRunCriteriaWithSources UpdateTestRunCriteriaWithSources(TestRunCriteriaWithSources testRunCriteriaWithSources, Direction updateDirection)
+    {
+        testRunCriteriaWithSources.AdapterSourceMap.Select(adapter => testRunCriteriaWithSources.AdapterSourceMap[adapter.Key] = UpdatePaths(adapter.Value, updateDirection));
+        var package = UpdatePath(testRunCriteriaWithSources.Package, updateDirection);
+        return new TestRunCriteriaWithSources(testRunCriteriaWithSources.AdapterSourceMap, package, testRunCriteriaWithSources.RunSettings, testRunCriteriaWithSources.TestExecutionContext);
+    }
+
+    public TestRunCriteriaWithTests UpdateTestRunCriteriaWithTests(TestRunCriteriaWithTests testRunCriteriaWithTests, Direction updateDirection)
+    {
+        var tests = UpdateTestCases(testRunCriteriaWithTests.Tests, updateDirection);
+        var package = UpdatePath(testRunCriteriaWithTests.Package, updateDirection);
+        return new TestRunCriteriaWithTests(tests, package, testRunCriteriaWithTests.RunSettings, testRunCriteriaWithTests.TestExecutionContext);
+    }
+}
+
+internal interface IPathConverter
+{
+    internal string UpdatePath(string path, Direction updateDirection);
+
+
+    internal IEnumerable<string> UpdatePaths(IEnumerable<string> enumerable, Direction updateDirection);
+
+    internal TestCase UpdateTestCase(TestCase testCase, Direction updateDirection);
+
+    internal IEnumerable<TestCase> UpdateTestCases(IEnumerable<TestCase> testCases, Direction updateDirection);
+
+
+    internal TestRunCompleteEventArgs UpdateTestRunCompleteEventArgs(TestRunCompleteEventArgs testRunCompleteEventArgs, Direction updateDirection);
+
+
+    internal TestRunChangedEventArgs UpdateTestRunChangedEventArgs(TestRunChangedEventArgs testRunChangedArgs, Direction updateDirection);
+
+
+    internal Collection<AttachmentSet> UpdateAttachmentSets(Collection<AttachmentSet> attachmentSets, Direction updateDirection);
+
+    internal ICollection<AttachmentSet> UpdateAttachmentSets(ICollection<AttachmentSet> attachmentSets, Direction updateDirection);
+
+    internal DiscoveryCriteria UpdateDiscoveryCriteria(DiscoveryCriteria discoveryCriteria, Direction updateDirection);
+
+    internal TestRunCriteriaWithSources UpdateTestRunCriteriaWithSources(TestRunCriteriaWithSources testRunCriteriaWithSources, Direction updateDirection);
+
+    internal TestRunCriteriaWithTests UpdateTestRunCriteriaWithTests(TestRunCriteriaWithTests testRunCriteriaWithTests, Direction updateDirection);
 }
