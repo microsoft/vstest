@@ -14,8 +14,6 @@
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <OutputType Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">Exe</OutputType>
     <AssemblyName>Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests</AssemblyName>
-    <WarningsAsErrors>true</WarningsAsErrors>
-    <EnableCodeAnalysis>true</EnableCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Properties\**" />

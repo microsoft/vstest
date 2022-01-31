@@ -9,7 +9,6 @@
     <AssemblyName>vstest.console</AssemblyName>
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
-    <WarningsAsErrors>true</WarningsAsErrors>
     <OutputType>Exe</OutputType>
     <IsTestProject>false</IsTestProject>
     <PlatformTarget Condition="'$(TargetFramework)' == 'net451'">AnyCPU</PlatformTarget>

@@ -15,7 +15,6 @@
   <PropertyGroup>
     <TargetFrameworks>net451</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests</AssemblyName>
-    <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\Microsoft.TestPlatform.Extensions.EventLogCollector.csproj" />
