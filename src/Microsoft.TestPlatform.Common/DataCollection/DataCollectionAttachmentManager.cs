@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -14,18 +15,31 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Interfaces;
-using ObjectModel;
+
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
+using ObjectModel;
+
 /// <summary>
 /// Manages file transfer from data collector to test runner service.
+/// 
+/// Events are handled sequentially so it's not possible have parallel AddAttachment/GetAttachments for the same DataCollectionContext.
+/// DataCollectionContext can be a session context(session start/end) or a test case context(test case start/end).
+/// 
+/// We have two type of events that will fire a collection of files "session end" and "test case end".
+/// File are sent and copied/moved in parallel using async tasks, for these reason we need to use an async structure ConcurrentDictionary
+/// to be able to handle parallel test case start/end events(if host run tests in parallel).
+/// 
+/// We could avoid to use ConcurrentDictionary for the list of the attachment sets of a specific DataCollectionContext, but
+/// we don't know how the user will implement the datacollector and they could send file out of events(wrong usage, no more expected sequential access AddAttachment->GetAttachments),
+/// so we prefer protect every collection. This not means that outcome will be "always correct"(file attached in a correct way) but at least we avoid exceptions.
 /// </summary>
 internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManager
 {
-    private static readonly object AttachmentTaskLock = new();
+    private readonly object _attachmentTaskLock = new();
 
     #region Fields
 
@@ -42,7 +56,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     /// <summary>
     /// Attachment transfer tasks associated with a given datacollection context.
     /// </summary>
-    private readonly Dictionary<DataCollectionContext, List<Task>> _attachmentTasks;
+    private readonly ConcurrentDictionary<DataCollectionContext, List<Task>> _attachmentTasks;
 
     /// <summary>
     /// Use to cancel attachment transfers if test run is canceled.
@@ -74,8 +88,8 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     {
         _fileHelper = fileHelper;
         _cancellationTokenSource = new CancellationTokenSource();
-        _attachmentTasks = new Dictionary<DataCollectionContext, List<Task>>();
-        AttachmentSets = new Dictionary<DataCollectionContext, Dictionary<Uri, AttachmentSet>>();
+        _attachmentTasks = new ConcurrentDictionary<DataCollectionContext, List<Task>>();
+        AttachmentSets = new ConcurrentDictionary<DataCollectionContext, ConcurrentDictionary<Uri, AttachmentSet>>();
     }
 
     #endregion
@@ -90,7 +104,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     /// <summary>
     /// Gets the attachment sets for the given datacollection context.
     /// </summary>
-    internal Dictionary<DataCollectionContext, Dictionary<Uri, AttachmentSet>> AttachmentSets
+    internal ConcurrentDictionary<DataCollectionContext, ConcurrentDictionary<Uri, AttachmentSet>> AttachmentSets
     {
         get; private set;
     }
@@ -155,8 +169,8 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
         if (AttachmentSets.TryGetValue(dataCollectionContext, out var uriAttachmentSetMap))
         {
             attachments = uriAttachmentSetMap.Values.ToList();
-            _attachmentTasks.Remove(dataCollectionContext);
-            AttachmentSets.Remove(dataCollectionContext);
+            _attachmentTasks.TryRemove(dataCollectionContext, out _);
+            AttachmentSets.TryRemove(dataCollectionContext, out _);
         }
 
         return attachments;
@@ -180,14 +194,14 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
 
         if (!AttachmentSets.ContainsKey(fileTransferInfo.Context))
         {
-            var uriAttachmentSetMap = new Dictionary<Uri, AttachmentSet>();
-            AttachmentSets.Add(fileTransferInfo.Context, uriAttachmentSetMap);
-            _attachmentTasks.Add(fileTransferInfo.Context, new List<Task>());
+            var uriAttachmentSetMap = new ConcurrentDictionary<Uri, AttachmentSet>();
+            AttachmentSets.TryAdd(fileTransferInfo.Context, uriAttachmentSetMap);
+            _attachmentTasks.TryAdd(fileTransferInfo.Context, new List<Task>());
         }
 
         if (!AttachmentSets[fileTransferInfo.Context].ContainsKey(uri))
         {
-            AttachmentSets[fileTransferInfo.Context].Add(uri, new AttachmentSet(uri, friendlyName));
+            AttachmentSets[fileTransferInfo.Context].TryAdd(uri, new AttachmentSet(uri, friendlyName));
         }
 
         AddNewFileTransfer(fileTransferInfo, sendFileCompletedCallback, uri, friendlyName);
@@ -327,7 +341,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
                 {
                     if (t.Exception == null)
                     {
-                        lock (AttachmentTaskLock)
+                        lock (_attachmentTaskLock)
                         {
                             AttachmentSets[fileTransferInfo.Context][uri].Attachments.Add(UriDataAttachment.CreateFrom(localFilePath, fileTransferInfo.Description));
                         }
