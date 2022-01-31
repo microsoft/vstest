@@ -3,32 +3,32 @@
 
 #if WINDOWS_UWP
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+using System;
+using System.Threading.Tasks;
+
+using Interfaces;
+
+public class PlatformThread : IThread
 {
-    using System;
-    using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-
-    public class PlatformThread : IThread
+    /// <inheritdoc/>
+    public void Run(Action action, PlatformApartmentState apartmentState, bool waitForCompletion)
     {
-        /// <inheritdoc/>
-        public void Run(Action action, PlatformApartmentState apartmentState, bool waitForCompletion)
+        if (apartmentState == PlatformApartmentState.STA)
         {
-            if (apartmentState == PlatformApartmentState.STA)
-            {
-                throw new ThreadApartmentStateNotSupportedException();
-            }
+            throw new ThreadApartmentStateNotSupportedException();
+        }
 
-            if (action == null)
-            {
-                return;
-            }
+        if (action == null)
+        {
+            return;
+        }
 
-            Task task = Task.Run(action);
-            if (waitForCompletion)
-            {
-                task.Wait();
-            }
+        Task task = Task.Run(action);
+        if (waitForCompletion)
+        {
+            task.Wait();
         }
     }
 }

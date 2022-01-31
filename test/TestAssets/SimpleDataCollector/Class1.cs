@@ -5,6 +5,7 @@ namespace SimpleDataCollector
 {
     using System;
     using System.IO;
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.InProcDataCollector;
@@ -14,19 +15,19 @@ namespace SimpleDataCollector
     /// </summary>
     public class SimpleDataCollector : InProcDataCollection
     {
-        private readonly string fileName;
+        private readonly string _fileName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleDataCollector"/> class.
         /// </summary>
         public SimpleDataCollector()
         {
-            this.fileName = Path.Combine(Path.GetTempPath(), "inproctest.txt");
+            _fileName = Path.Combine(Path.GetTempPath(), "inproctest.txt");
         }
 
         public void Initialize(IDataCollectionSink dataCollectionSink)
         {
-           // Do Nothing
+            // Do Nothing
         }
 
         /// <summary>
@@ -38,10 +39,10 @@ namespace SimpleDataCollector
         public void TestSessionStart(TestSessionStartArgs testSessionStartArgs)
         {
             Console.WriteLine(testSessionStartArgs.Configuration);
-            File.WriteAllText(this.fileName, "TestSessionStart : " + testSessionStartArgs.Configuration + "\r\n");
+            File.WriteAllText(_fileName, "TestSessionStart : " + testSessionStartArgs.Configuration + "\r\n");
 #if NETFRAMEWORK
-            var appDomainFilePath = Path.Combine(Path.GetTempPath(), "appdomain_datacollector.txt");
-            File.WriteAllText(appDomainFilePath, "AppDomain FriendlyName: "+ AppDomain.CurrentDomain.FriendlyName);
+            var appDomainFilePath = Environment.GetEnvironmentVariable("TEST_ASSET_APPDOMAIN_COLLECTOR_PATH") ?? Path.Combine(Path.GetTempPath(), "appdomain_datacollector.txt");
+            File.WriteAllText(appDomainFilePath, "AppDomain FriendlyName: " + AppDomain.CurrentDomain.FriendlyName);
 #endif
         }
 
@@ -57,7 +58,7 @@ namespace SimpleDataCollector
                 "TestCase Name : {0}, TestCase ID:{1}",
                 testCaseStartArgs.TestCase.DisplayName,
                 testCaseStartArgs.TestCase.Id);
-            File.AppendAllText(this.fileName, "TestCaseStart : " + testCaseStartArgs.TestCase.DisplayName + "\r\n");
+            File.AppendAllText(_fileName, "TestCaseStart : " + testCaseStartArgs.TestCase.DisplayName + "\r\n");
         }
 
         /// <summary>
@@ -68,8 +69,8 @@ namespace SimpleDataCollector
         /// </param>
         public void TestCaseEnd(TestCaseEndArgs testCaseEndArgs)
         {
-            Console.WriteLine("TestCase Name:{0}, TestCase ID:{1}, OutCome:{2}", testCaseEndArgs.DataCollectionContext.TestCase.DisplayName, testCaseEndArgs.DataCollectionContext.TestCase.Id, testCaseEndArgs.TestOutcome);            
-            File.AppendAllText(this.fileName, "TestCaseEnd : " + testCaseEndArgs.DataCollectionContext.TestCase.DisplayName + "\r\n");
+            Console.WriteLine("TestCase Name:{0}, TestCase ID:{1}, OutCome:{2}", testCaseEndArgs.DataCollectionContext.TestCase.DisplayName, testCaseEndArgs.DataCollectionContext.TestCase.Id, testCaseEndArgs.TestOutcome);
+            File.AppendAllText(_fileName, "TestCaseEnd : " + testCaseEndArgs.DataCollectionContext.TestCase.DisplayName + "\r\n");
         }
 
         /// <summary>
@@ -81,7 +82,7 @@ namespace SimpleDataCollector
         public void TestSessionEnd(TestSessionEndArgs testSessionEndArgs)
         {
             Console.WriteLine("TestSession Ended");
-            File.AppendAllText(this.fileName, "TestSessionEnd");
+            File.AppendAllText(_fileName, "TestSessionEnd");
         }
     }
 }

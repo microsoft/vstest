@@ -8,8 +8,6 @@
     <AssemblyName>SettingsMigrator</AssemblyName>
     <TargetFrameworks>net451</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
-    <EnableCodeAnalysis>true</EnableCodeAnalysis>
-    <WarningsAsErrors>true</WarningsAsErrors>
     <OutputType>Exe</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <IsTestProject>false</IsTestProject>
