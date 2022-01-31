@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
@@ -76,6 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                 }
 
                 // EqtTrace.Verbose("ProcessHelper: Starting process '{0}' with command line '{1}'", processPath, arguments);
+                // TODO: Enable logging here, and consider wrapping Win32Exeception into another that shows the path of the process.
                 process.Start();
 
                 if (errorCallback != null)
@@ -182,17 +184,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         {
             var proc = process as Process;
             return proc?.Id ?? -1;
-        }
-
-        /// <inheritdoc/>
-        public PlatformArchitecture GetCurrentProcessArchitecture()
-        {
-            if (IntPtr.Size == 8)
-            {
-                return PlatformArchitecture.X64;
-            }
-
-            return PlatformArchitecture.X86;
         }
 
         /// <inheritdoc/>

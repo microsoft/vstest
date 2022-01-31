@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             this.LoadExtensions();
 
-            //unsubscrive session logger
+            //unsubscribe session logger
             this.sessionMessageLogger.TestRunMessage -= this.TestSessionMessageHandler;
 
             this.testPlatformEventSource.AdapterSearchStop();
@@ -158,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             if (this.activeTestRun == null)
             {
-                var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, true, false, null, null, TimeSpan.Zero);
+                var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, true, false, null, null, null, TimeSpan.Zero);
                 testRunEventsHandler.HandleTestRunComplete(testRunCompleteEventArgs, null, null, null);
             }
             else
@@ -174,7 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             if (this.activeTestRun == null)
             {
-                var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero);
+                var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero);
                 testRunEventsHandler.HandleTestRunComplete(testRunCompleteEventArgs, null, null, null);
             }
             else

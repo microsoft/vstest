@@ -7,6 +7,8 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
     using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
@@ -139,7 +141,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
             var testExtensions = this.testPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions);
 
-            Assert.That.DoesNotThrow(() =>this.testPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions));
+            Assert.That.DoesNotThrow(() => this.testPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions));
         }
 
         #region Implementations
@@ -320,6 +322,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
         [DataCollectorFriendlyName("Foo")]
         [DataCollectorTypeUri("datacollector://foo/bar")]
+        [DataCollectorAttachmentProcessor(typeof(DataCollectorAttachmentProcessor))]
         public class ValidDataCollector : DataCollector
         {
             public override void Initialize(
@@ -331,6 +334,21 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             {
             }
         }
+
+        public class DataCollectorAttachmentProcessor : IDataCollectorAttachmentProcessor
+        {
+            public bool SupportsIncrementalProcessing => throw new NotImplementedException();
+
+            public IEnumerable<Uri> GetExtensionUris()
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+            {
+                throw new NotImplementedException();
+            }
+        }
         #endregion
 
         internal class FaultyTestExecutorPluginInformation : TestExtensionPluginInformation
@@ -339,7 +357,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             /// Default constructor
             /// </summary>
             /// <param name="type"> The Type. </param>
-            public FaultyTestExecutorPluginInformation(Type type): base(type)
+            public FaultyTestExecutorPluginInformation(Type type) : base(type)
             {
                 throw new Exception();
             }

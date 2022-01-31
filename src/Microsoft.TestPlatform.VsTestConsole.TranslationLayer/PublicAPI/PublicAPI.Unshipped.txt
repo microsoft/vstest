@@ -1,0 +1,2 @@
+static Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources.CannotFindConsoleRunner.get -> string
+static Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources.ProcessStartWin32Failure.get -> string

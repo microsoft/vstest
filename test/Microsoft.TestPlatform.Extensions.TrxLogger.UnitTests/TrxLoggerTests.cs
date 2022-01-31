@@ -541,7 +541,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             TestRunMessageEventArgs trme = new TestRunMessageEventArgs(TestMessageLevel.Error, message);
             this.testableTrxLogger.TestMessageHandler(new object(), trme);
 
-            this.testableTrxLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            this.testableTrxLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
             Assert.AreEqual(this.testableTrxLogger.TestResultOutcome, TrxLoggerObjectModel.TestOutcome.Failed);
         }
@@ -941,7 +941,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         private static TestRunCompleteEventArgs CreateTestRunCompleteEventArgs()
         {
             var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null,
-                new Collection<AttachmentSet>(), new TimeSpan(1, 0, 0, 0));
+                new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new TimeSpan(1, 0, 0, 0));
             return testRunCompleteEventArgs;
         }
 

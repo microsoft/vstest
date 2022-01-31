@@ -143,15 +143,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// The run Events Handler.
         /// </param>
         /// <returns>
-        /// The <see cref="Collection"/>.
+        /// The <see cref="DataCollectionResult"/>.
         /// </returns>
-        public Collection<AttachmentSet> AfterTestRunEnd(bool isCanceled, ITestMessageEventHandler runEventsHandler)
+        public DataCollectionResult AfterTestRunEnd(bool isCanceled, ITestMessageEventHandler runEventsHandler)
         {
             AfterTestRunEndResult afterTestRunEnd = null;
             this.InvokeDataCollectionServiceAction(
             () =>
             {
-                EqtTrace.Info("ProxyDataCollectionManager.AfterTestRunEnd: Get attachment set for datacollector processId: {0} port: {1}", dataCollectionProcessId, dataCollectionPort);
+                EqtTrace.Info("ProxyDataCollectionManager.AfterTestRunEnd: Get attachment set and invoked data collectors processId: {0} port: {1}", dataCollectionProcessId, dataCollectionPort);
                 afterTestRunEnd = this.dataCollectionRequestSender.SendAfterTestRunEndAndGetResult(runEventsHandler, isCanceled);
             },
             runEventsHandler);
@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 }
             }
 
-            return afterTestRunEnd?.AttachmentSets;
+            return new DataCollectionResult(afterTestRunEnd?.AttachmentSets, afterTestRunEnd?.InvokedDataCollectors);
         }
 
         /// <summary>

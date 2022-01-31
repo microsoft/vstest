@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var projectPath = this.GetProjectFullPath(projectName);
 
             this.InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal""");
-            
+
             // ensure our dev version is used
             this.StdOutputContains("-dev");
             this.ValidateSummaryStatus(1, 1, 1);
@@ -66,7 +66,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void PassInlineSettingsToDll(RunnerInfo runnerInfo)
         {
-
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var assemblyPath = this.BuildMultipleAssemblyPath("ParametrizedTestProject.dll").Trim('\"');

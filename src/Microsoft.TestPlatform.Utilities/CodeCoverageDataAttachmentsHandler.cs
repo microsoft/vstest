@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
-
+    using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -42,7 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             yield return CodeCoverageDataCollectorUri;
         }
 
-        public async Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+        public async Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
         {
             if ((attachments?.Any()) != true)
                 return new Collection<AttachmentSet>();

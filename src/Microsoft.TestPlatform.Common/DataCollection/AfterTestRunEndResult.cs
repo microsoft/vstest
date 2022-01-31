@@ -14,6 +14,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
     [DataContract]
     public class AfterTestRunEndResult
     {
+        // We have more than one ctor for backward-compatibility reason but we don't want to add dependency on Newtonsoft([JsonConstructor])
+        // We want to fallback to the non-public default constructor https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_ConstructorHandling.htm during deserialization
+        private AfterTestRunEndResult()
+        {
+
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AfterTestRunEndResult"/> class.
         /// </summary>
@@ -24,13 +31,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
         /// The metrics.
         /// </param>
         public AfterTestRunEndResult(Collection<AttachmentSet> attachmentSets, IDictionary<string, object> metrics)
+            : this(attachmentSets, new Collection<InvokedDataCollector>(), metrics)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AfterTestRunEndResult"/> class.
+        /// </summary>
+        /// <param name="attachmentSets">
+        /// The collection of attachment sets.
+        /// </param>
+        /// <param name="invokedDataCollectors">
+        /// The collection of the DataCollectors invoked during test session
+        /// </param>
+        /// <param name="metrics">
+        /// The metrics.
+        /// </param>
+        public AfterTestRunEndResult(Collection<AttachmentSet> attachmentSets,
+            Collection<InvokedDataCollector> invokedDataCollectors,
+            IDictionary<string, object> metrics)
         {
             this.AttachmentSets = attachmentSets;
+            this.InvokedDataCollectors = invokedDataCollectors;
             this.Metrics = metrics;
         }
 
         [DataMember]
         public Collection<AttachmentSet> AttachmentSets { get; private set; }
+
+        [DataMember]
+        public Collection<InvokedDataCollector> InvokedDataCollectors { get; private set; }
 
         [DataMember]
         public IDictionary<string, object> Metrics { get; private set; }

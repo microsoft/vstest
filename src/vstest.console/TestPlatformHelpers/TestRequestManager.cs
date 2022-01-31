@@ -36,6 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
     /// <summary>
     /// Defines the test request manger which can fire off discovery and test run requests.
@@ -93,9 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                       IsTelemetryOptedIn(),
                       CommandLineOptions.Instance.IsDesignMode),
                   new ProcessHelper(),
-                  new TestRunAttachmentsProcessingManager(
-                      TestPlatformEventSource.Instance,
-                      new CodeCoverageDataAttachmentsHandler()))
+                  new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new DataCollectorAttachmentsProcessorsFactory()))
         {
         }
 
@@ -400,8 +399,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     this.currentAttachmentsProcessingCancellationTokenSource = new CancellationTokenSource();
 
                     Task task = this.attachmentsProcessingManager.ProcessTestRunAttachmentsAsync(
+                        attachmentsProcessingPayload.RunSettings,
                         requestData,
                         attachmentsProcessingPayload.Attachments,
+                        attachmentsProcessingPayload.InvokedDataCollectors,
                         attachmentsProcessingEventsHandler,
                         this.currentAttachmentsProcessingCancellationTokenSource.Token);
                     task.Wait();
@@ -618,8 +619,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         // it can be specified by user on the command line with --arch or through runsettings.
                         // If it's not specified by user will be filled by current processor architecture;
                         // should be the same as SDK.
-                        defaultArchitecture = runConfiguration.TargetPlatform;
-                        EqtTrace.Verbose($"Default architecture: {defaultArchitecture}");
+                        defaultArchitecture = RunSettingsHelper.Instance.IsDefaultTargetArchitecture ?
+                            TranslateToArchitecture(processHelper.GetCurrentProcessArchitecture()) :
+                            runConfiguration.TargetPlatform;
 #else
                         // We are running in vstest.console.exe that was built against .NET
                         // Framework. This console prefers 32-bit because it needs to run as 32-bit
@@ -630,6 +632,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         // We want to find 64-bit SDK because it is more likely to be installed.
                         defaultArchitecture = Environment.Is64BitOperatingSystem ? Architecture.X64 : Architecture.X86;
 #endif
+                        EqtTrace.Verbose($"Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}");
                     }
 
                     settingsUpdated |= this.UpdatePlatform(
@@ -656,6 +659,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
 
             return settingsUpdated;
+
+#if NETCOREAPP
+            Architecture TranslateToArchitecture(PlatformArchitecture targetArchitecture)
+            {
+                switch (targetArchitecture)
+                {
+                    case PlatformArchitecture.X86:
+                        return Architecture.X86;
+                    case PlatformArchitecture.X64:
+                        return Architecture.X64;
+                    case PlatformArchitecture.ARM:
+                        return Architecture.ARM;
+                    case PlatformArchitecture.ARM64:
+                        return Architecture.ARM64;
+                    default:
+                        break;
+                }
+
+                throw new TestPlatformException($"Invalid target architecture '{targetArchitecture}'");
+            }
+#endif
         }
 
         private bool AddOrUpdateConsoleLogger(

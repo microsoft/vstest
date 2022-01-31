@@ -243,7 +243,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             this.runCompletedClients = 0;
 
             // One data aggregator per parallel run
-            this.currentRunDataAggregator = new ParallelRunDataAggregator();
+            this.currentRunDataAggregator = new ParallelRunDataAggregator(this.actualTestRunCriteria.TestRunSettings);
 
             foreach (var concurrentManager in this.GetConcurrentManagerInstances())
             {
@@ -260,9 +260,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             if (concurrentManager is ProxyExecutionManagerWithDataCollection)
             {
                 var concurrentManagerWithDataCollection = concurrentManager as ProxyExecutionManagerWithDataCollection;
-
-                // TODO : use TestPluginCache to iterate over all IDataCollectorAttachments
-                var attachmentsProcessingManager = new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new CodeCoverageDataAttachmentsHandler());
+                var attachmentsProcessingManager = new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new DataCollectorAttachmentsProcessorsFactory());
 
                 return new ParallelDataCollectionEventsHandler(
                             this.requestData,
@@ -345,7 +343,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     // Aborted is sent to allow the current execution manager replaced with another instance
                     // Ensure that the test run aggregator in parallel run events handler doesn't add these statistics
                     // (since the test run didn't even start)
-                    var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, new Collection<AttachmentSet>(), TimeSpan.Zero);
+                    var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), TimeSpan.Zero);
                     handler.HandleTestRunComplete(completeArgs, null, null, null);
                 },
                 TaskContinuationOptions.OnlyOnFaulted);

@@ -97,6 +97,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             // Setup a dummy current process for tests
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns(DefaultDotnetPath);
             this.mockProcessHelper.Setup(ph => ph.GetTestEngineDirectory()).Returns(DefaultDotnetPath);
+            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessArchitecture()).Returns(PlatformArchitecture.X64);
             this.mockEnvironmentVariable.Setup(ev => ev.GetEnvironmentVariable(It.IsAny<string>())).Returns(Path.GetDirectoryName(DefaultDotnetPath));
             this.mockFileHelper.Setup(ph => ph.Exists(this.defaultTestHostPath)).Returns(true);
             this.mockFileHelper.Setup(ph => ph.Exists(DefaultDotnetPath)).Returns(true);

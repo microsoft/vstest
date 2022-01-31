@@ -245,13 +245,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             };
 
             // parallelLevel = 1 for desktop should go via else route.
-            return (parallelLevel > 1 || !testHostManager.Shared)
+            var executionManager = (parallelLevel > 1 || !testHostManager.Shared)
                 ? new ParallelProxyExecutionManager(
                     requestData,
                     proxyExecutionManagerCreator,
                     parallelLevel,
                     sharedHosts: testHostManager.Shared)
                 : proxyExecutionManagerCreator();
+
+            EqtTrace.Verbose($"TestEngine.GetExecutionManager: Chosen execution manager '{executionManager.GetType().AssemblyQualifiedName}' ParallelLevel '{parallelLevel}' Shared host '{testHostManager.Shared}'");
+
+            return executionManager;
         }
 
         /// <inheritdoc/>
@@ -501,12 +505,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         private IRequestData GetRequestData(bool isTelemetryOptedIn)
         {
             return new RequestData
-                {
-                    MetricsCollection = isTelemetryOptedIn
+            {
+                MetricsCollection = isTelemetryOptedIn
                         ? (IMetricsCollection)new MetricsCollection()
                         : new NoOpMetricsCollection(),
-                    IsTelemetryOptedIn = isTelemetryOptedIn
-                };
+                IsTelemetryOptedIn = isTelemetryOptedIn
+            };
         }
 
         /// <summary>

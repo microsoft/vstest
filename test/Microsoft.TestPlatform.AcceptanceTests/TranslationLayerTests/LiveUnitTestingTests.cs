@@ -14,14 +14,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     {
         private IVsTestConsoleWrapper vstestConsoleWrapper;
         private DiscoveryEventHandler discoveryEventHandler;
-        private DiscoveryEventHandler2 discoveryEventHandler2;
         private RunEventHandler runEventHandler;
 
         public void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
             this.discoveryEventHandler = new DiscoveryEventHandler();
-            this.discoveryEventHandler2 = new DiscoveryEventHandler2();
             this.runEventHandler = new RunEventHandler();
         }
 
