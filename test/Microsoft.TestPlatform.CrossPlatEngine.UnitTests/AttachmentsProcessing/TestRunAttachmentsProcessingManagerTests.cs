@@ -424,7 +424,7 @@ public class TestRunAttachmentsProcessingManagerTests
                 {
                     for (int i = 0; i < 100; ++i)
                     {
-                        Thread.Sleep(100);
+                        Task.Delay(200, cancellation).Wait(cancellation);
                         Console.WriteLine($"Iteration: {i}");
                         logger.SendMessage(TestMessageLevel.Informational, $"Iteration: {i}");
 
@@ -434,11 +434,11 @@ public class TestRunAttachmentsProcessingManagerTests
                         if (i == 3)
                         {
                             _cancellationTokenSource.Cancel();
-                            Thread.Sleep(500);
+                            Task.Delay(1000, cancellation).Wait(cancellation);
                         }
                     }
                 }
-                catch (OperationCanceledException)
+                finally
                 {
                     innerTaskCompletionSource.TrySetResult(null);
                 }
@@ -490,7 +490,7 @@ public class TestRunAttachmentsProcessingManagerTests
                 {
                     for (int i = 0; i < 1000; ++i)
                     {
-                        Thread.Sleep(100);
+                        Task.Delay(200, cancellation).Wait(cancellation);
                         Console.WriteLine($"Iteration: {i}");
                         logger.SendMessage(TestMessageLevel.Informational, $"Iteration: {i}");
 
@@ -499,11 +499,11 @@ public class TestRunAttachmentsProcessingManagerTests
                         if (i == 3)
                         {
                             _cancellationTokenSource.Cancel();
-                            Thread.Sleep(500);
+                            Task.Delay(1000, cancellation).Wait(cancellation);
                         }
                     }
                 }
-                catch (OperationCanceledException)
+                finally
                 {
                     innerTaskCompletionSource.TrySetResult(null);
                 }
