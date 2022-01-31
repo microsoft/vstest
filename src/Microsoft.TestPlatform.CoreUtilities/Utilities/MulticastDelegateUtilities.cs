@@ -27,12 +27,12 @@ public static class MulticastDelegateUtilities
     {
         if (args == null)
         {
-            throw new ArgumentNullException(Resources.CannotBeNullOrEmpty, "args");
+            throw new ArgumentNullException(nameof(args));
         }
 
         if (string.IsNullOrWhiteSpace(traceDisplayName))
         {
-            throw new ArgumentException(Resources.CannotBeNullOrEmpty, traceDisplayName);
+            throw new ArgumentException(Resources.CannotBeNullOrEmpty, nameof(traceDisplayName));
         }
 
         if (delegates != null)
