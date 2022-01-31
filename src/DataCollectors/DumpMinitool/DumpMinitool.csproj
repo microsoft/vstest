@@ -8,7 +8,6 @@
   <PropertyGroup>
     <TargetFrameworks>net451</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
-    <WarningsAsErrors>true</WarningsAsErrors>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
     <OutputType>Exe</OutputType>
@@ -22,6 +21,6 @@
     <AdditionalFiles Include="..\DumpMinitool.x86\PublicAPI\PublicAPI.Shipped.txt" Link="PublicAPI\PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="..\DumpMinitool.x86\PublicAPI\PublicAPI.Unshipped.txt" Link="PublicAPI\PublicAPI.Unshipped.txt" />
   </ItemGroup>
-  
+
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

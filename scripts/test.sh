@@ -66,7 +66,7 @@ TP_OUT_DIR="$TP_ROOT_DIR/artifacts"
 #
 # Dotnet configuration
 #
-# Disable first run since we want to control all package sources 
+# Disable first run since we want to control all package sources
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 # Dotnet build doesnt support --packages yet. See https://github.com/dotnet/cli/issues/2712
 export NUGET_PACKAGES=$TP_PACKAGES_DIR

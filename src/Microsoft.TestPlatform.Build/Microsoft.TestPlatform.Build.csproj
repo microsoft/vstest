@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
@@ -9,7 +9,6 @@
     <AssemblyName>Microsoft.TestPlatform.Build</AssemblyName>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
-    <WarningsAsErrors>true</WarningsAsErrors>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
   <ItemGroup>
@@ -44,4 +43,3 @@
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
-  

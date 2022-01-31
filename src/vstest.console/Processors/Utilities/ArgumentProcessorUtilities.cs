@@ -2,64 +2,56 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+
+using System;
+using System.Collections.Generic;
+
+internal class ArgumentProcessorUtilities
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    public static readonly char[] SemiColonArgumentSeparator = { ';' };
+    public static readonly char[] EqualNameValueSeparator = { '=' };
 
-    internal class ArgumentProcessorUtilities
+    /// <summary>
+    /// Get argument list from raw argument using argument separator.
+    /// </summary>
+    /// <param name="rawArgument">Raw argument.</param>
+    /// <param name="argumentSeparator">Argument separator.</param>
+    /// <param name="exceptionMessage">Exception Message.</param>
+    /// <returns>Argument list.</returns>
+    public static string[] GetArgumentList(string rawArgument, char[] argumentSeparator, string exceptionMessage)
     {
-        public static readonly char[] SemiColonArgumentSeparator = { ';' };
-        public static readonly char[] EqualNameValueSeparator = { '=' };
+        var argumentList = rawArgument?.Split(argumentSeparator, StringSplitOptions.RemoveEmptyEntries);
 
-        /// <summary>
-        /// Get argument list from raw argument using argument separator.
-        /// </summary>
-        /// <param name="rawArgument">Raw argument.</param>
-        /// <param name="argumentSeparator">Argument separator.</param>
-        /// <param name="exceptionMessage">Exception Message.</param>
-        /// <returns>Argument list.</returns>
-        public static string[] GetArgumentList(string rawArgument, char[] argumentSeparator, string exceptionMessage)
+        // Throw error in case of invalid argument.
+        return argumentList == null || argumentList.Length <= 0 ? throw new CommandLineException(exceptionMessage) : argumentList;
+    }
+
+    /// <summary>
+    /// Get argument parameters.
+    /// </summary>
+    /// <param name="parameterArgs">Parameter args.</param>
+    /// <param name="nameValueSeparator">Name value separator.</param>
+    /// <param name="exceptionMessage">Exception message.</param>
+    /// <returns>Parameters dictionary.</returns>
+    public static Dictionary<string, string> GetArgumentParameters(IEnumerable<string> parameterArgs, char[] nameValueSeparator, string exceptionMessage)
+    {
+        var parameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        // Get parameters from parameterNameValuePairs.
+        // Throw error in case of invalid name value pairs.
+        foreach (string parameterArg in parameterArgs)
         {
-            var argumentList = rawArgument?.Split(argumentSeparator, StringSplitOptions.RemoveEmptyEntries);
+            var nameValuePair = parameterArg?.Split(nameValueSeparator, StringSplitOptions.RemoveEmptyEntries);
 
-            // Throw error in case of invalid argument.
-            if (argumentList == null || argumentList.Length <= 0)
+            if (nameValuePair.Length != 2)
             {
                 throw new CommandLineException(exceptionMessage);
             }
 
-            return argumentList;
+            parameters[nameValuePair[0]] = nameValuePair[1];
         }
 
-        /// <summary>
-        /// Get argument parameters.
-        /// </summary>
-        /// <param name="parameterArgs">Parameter args.</param>
-        /// <param name="nameValueSeparator">Name value separator.</param>
-        /// <param name="exceptionMessage">Exception message.</param>
-        /// <returns>Parameters dictionary.</returns>
-        public static Dictionary<string, string> GetArgumentParameters(IEnumerable<string> parameterArgs, char[] nameValueSeparator, string exceptionMessage)
-        {
-            var parameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-            // Get parameters from parameterNameValuePairs.
-            // Throw error in case of invalid name value pairs.
-            foreach (string parameterArg in parameterArgs)
-            {
-                var nameValuePair = parameterArg?.Split(nameValueSeparator, StringSplitOptions.RemoveEmptyEntries);
-
-                if (nameValuePair.Length != 2)
-                {
-                    throw new CommandLineException(exceptionMessage);
-                }
-
-                parameters[nameValuePair[0]] = nameValuePair[1];
-            }
-
-            return parameters;
-        }
+        return parameters;
     }
 }

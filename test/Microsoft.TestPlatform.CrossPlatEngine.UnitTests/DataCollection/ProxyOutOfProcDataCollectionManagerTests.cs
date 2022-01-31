@@ -1,65 +1,66 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
+namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
+
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+using System;
+using System.Collections.ObjectModel;
+
+[TestClass]
+public class ProxyOutOfProcDataCollectionManagerTests
 {
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    private readonly Mock<ITestEventsPublisher> _mockTestEventsPublisher;
+    private readonly Mock<IDataCollectionTestCaseEventSender> _mockDataCollectionTestCaseEventSender;
+    private readonly Collection<AttachmentSet> _attachmentSets;
+    private readonly TestCase _testcase;
+    private VisualStudio.TestPlatform.ObjectModel.TestResult _testResult;
 
-    using Moq;
-    using System;
-    using System.Collections.ObjectModel;
-
-    [TestClass]
-    public class ProxyOutOfProcDataCollectionManagerTests
+    private readonly ProxyOutOfProcDataCollectionManager _proxyOutOfProcDataCollectionManager;
+    public ProxyOutOfProcDataCollectionManagerTests()
     {
-        private Mock<ITestEventsPublisher> mockTestEventsPublisher;
-        private Mock<IDataCollectionTestCaseEventSender> mockDataCollectionTestCaseEventSender;
-        private Collection<AttachmentSet> attachmentSets;
-        private TestCase testcase;
-        private VisualStudio.TestPlatform.ObjectModel.TestResult testResult;
+        _mockTestEventsPublisher = new Mock<ITestEventsPublisher>();
+        _mockDataCollectionTestCaseEventSender = new Mock<IDataCollectionTestCaseEventSender>();
+        _proxyOutOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(_mockDataCollectionTestCaseEventSender.Object, _mockTestEventsPublisher.Object);
 
-        private ProxyOutOfProcDataCollectionManager proxyOutOfProcDataCollectionManager;
-        public ProxyOutOfProcDataCollectionManagerTests()
+        var attachmentSet = new AttachmentSet(new Uri("my://datacollector"), "mydatacollector");
+        attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("my://attachment.txt"), string.Empty));
+        _attachmentSets = new Collection<AttachmentSet>
         {
-            this.mockTestEventsPublisher = new Mock<ITestEventsPublisher>();
-            this.mockDataCollectionTestCaseEventSender = new Mock<IDataCollectionTestCaseEventSender>();
-            this.proxyOutOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(this.mockDataCollectionTestCaseEventSender.Object, this.mockTestEventsPublisher.Object);
+            attachmentSet
+        };
 
-            var attachmentSet = new AttachmentSet(new Uri("my://datacollector"), "mydatacollector");
-            attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("my://attachment.txt"), string.Empty));
-            this.attachmentSets = new Collection<AttachmentSet>();
-            this.attachmentSets.Add(attachmentSet);
+        _testcase = new TestCase();
+        _testcase.Id = Guid.NewGuid();
+        _mockDataCollectionTestCaseEventSender.Setup(x => x.SendTestCaseEnd(It.IsAny<TestCaseEndEventArgs>())).Returns(_attachmentSets);
+        _mockTestEventsPublisher.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(_testcase, TestOutcome.Passed));
+        _testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(_testcase);
+    }
 
-            this.testcase = new TestCase();
-            this.testcase.Id = Guid.NewGuid();
-            this.mockDataCollectionTestCaseEventSender.Setup(x => x.SendTestCaseEnd(It.IsAny<TestCaseEndEventArgs>())).Returns(this.attachmentSets);
-            this.mockTestEventsPublisher.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(this.testcase, TestOutcome.Passed));
-            this.testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(this.testcase);
-        }
+    [TestMethod]
+    public void TriggerTestCaseEndShouldReturnCacheAttachmentsAndAssociateWithTestResultWhenTriggerSendTestResultIsInvoked()
+    {
+        _mockTestEventsPublisher.Raise(x => x.TestResult += null, new TestResultEventArgs(_testResult));
 
-        [TestMethod]
-        public void TriggerTestCaseEndShouldReturnCacheAttachmentsAndAssociateWithTestResultWhenTriggerSendTestResultIsInvoked()
-        {
-            this.mockTestEventsPublisher.Raise(x => x.TestResult += null, new TestResultEventArgs(this.testResult));
+        Assert.AreEqual(1, _testResult.Attachments.Count);
+        Assert.IsTrue(_testResult.Attachments[0].Attachments[0].Uri.OriginalString.Contains("attachment.txt"));
+    }
 
-            Assert.AreEqual(1, this.testResult.Attachments.Count);
-            Assert.IsTrue(this.testResult.Attachments[0].Attachments[0].Uri.OriginalString.Contains("attachment.txt"));
-        }
+    [TestMethod]
+    public void TriggerSendTestResultShouldDeleteTheAttachmentsFromCache()
+    {
+        _mockTestEventsPublisher.Raise(x => x.TestResult += null, new TestResultEventArgs(_testResult));
 
-        [TestMethod]
-        public void TriggerSendTestResultShouldDeleteTheAttachmentsFromCache()
-        {
-            this.mockTestEventsPublisher.Raise(x => x.TestResult += null, new TestResultEventArgs(this.testResult));
+        _testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(_testcase);
+        _mockTestEventsPublisher.Raise(x => x.TestResult += null, new TestResultEventArgs(_testResult));
 
-            this.testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(this.testcase);
-            this.mockTestEventsPublisher.Raise(x => x.TestResult += null, new TestResultEventArgs(this.testResult));
-
-            Assert.AreEqual(0, this.testResult.Attachments.Count);
-        }
+        Assert.AreEqual(0, _testResult.Attachments.Count);
     }
 }
