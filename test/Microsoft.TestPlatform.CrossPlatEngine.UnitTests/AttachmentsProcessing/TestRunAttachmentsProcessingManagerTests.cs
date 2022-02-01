@@ -439,13 +439,19 @@ public class TestRunAttachmentsProcessingManagerTests
                         }
                     }
                 }
-                catch (OperationCanceledException)
+                finally
                 {
                     innerTaskCompletionSource.TrySetResult(null);
                 }
 
                 return Task.FromResult(outputAttachments);
             });
+
+        ManualResetEventSlim attachmentProcessingComplete = new(false);
+        _mockEventsHandler.Setup(h => h.HandleTestRunAttachmentsProcessingComplete(It.IsAny<TestRunAttachmentsProcessingCompleteEventArgs>(), It.IsAny<IEnumerable<AttachmentSet>>()))
+            .Callback((TestRunAttachmentsProcessingCompleteEventArgs _, IEnumerable<AttachmentSet> _)
+            =>
+            attachmentProcessingComplete.Set());
 
         // act
         await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, _cancellationTokenSource.Token);
@@ -454,6 +460,9 @@ public class TestRunAttachmentsProcessingManagerTests
 
         // Wait to drain all progress events
         Assert.IsTrue(expectedProgress.Wait(TimeSpan.FromMinutes(1)));
+
+        // Wait for the HandleTestRunAttachmentsProcessingComplete
+        Assert.IsTrue(attachmentProcessingComplete.Wait(TimeSpan.FromMinutes(1)));
 
         // assert
         VerifyCompleteEvent(true, false, inputAttachments[0]);
@@ -507,7 +516,7 @@ public class TestRunAttachmentsProcessingManagerTests
                         }
                     }
                 }
-                catch (OperationCanceledException)
+                finally
                 {
                     innerTaskCompletionSource.TrySetResult(null);
                 }
