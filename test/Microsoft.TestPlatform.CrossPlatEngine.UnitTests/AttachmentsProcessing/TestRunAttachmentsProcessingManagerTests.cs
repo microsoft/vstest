@@ -449,9 +449,7 @@ public class TestRunAttachmentsProcessingManagerTests
 
         ManualResetEventSlim attachmentProcessingComplete = new(false);
         _mockEventsHandler.Setup(h => h.HandleTestRunAttachmentsProcessingComplete(It.IsAny<TestRunAttachmentsProcessingCompleteEventArgs>(), It.IsAny<IEnumerable<AttachmentSet>>()))
-            .Callback((TestRunAttachmentsProcessingCompleteEventArgs _, IEnumerable<AttachmentSet> _)
-            =>
-            attachmentProcessingComplete.Set());
+            .Callback((TestRunAttachmentsProcessingCompleteEventArgs _, IEnumerable<AttachmentSet> _) => attachmentProcessingComplete.Set());
 
         // act
         await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, _cancellationTokenSource.Token);
