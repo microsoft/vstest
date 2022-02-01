@@ -31,7 +31,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(DotNetBuildFromSource)' == 'true' ">
+  <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Coverage.IO" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" />
   </ItemGroup>
 
