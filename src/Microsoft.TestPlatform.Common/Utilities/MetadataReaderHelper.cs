@@ -61,7 +61,7 @@ internal class MetadataReaderExtensionsHelper
         }
         catch (Exception ex)
         {
-            EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Failure during assembly file load '{assemblyFilePath}', fallback to loaded assembly.\n{FormatException(ex)}");
+            EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Failure during assembly file load '{assemblyFilePath}', fallback to the loaded assembly.\n{FormatException(ex)}");
             assemblyToAnalyze = loadedAssembly;
         }
 #else
