@@ -178,16 +178,20 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         var remoteDirectory = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(sources.FirstOrDefault()), "..", "remote"));
 
 
-        // delete only if sources exist, we will delete the test.dll few lines below to make
+        // delete and copy only if sources exist, we will delete the test.dll few lines below to make
         // sure we are not using just the one from the original path, instead from the deploy
         // path, but because we start new testhost after discovery, we would be deleting the
         // only copy of tests.dll, and copying the original folder without it.
-        if (sources.All(File.Exists) && Directory.Exists(remoteDirectory))
+        if (sources.All(File.Exists))
         {
-            Directory.Delete(remoteDirectory, true);
+            if (Directory.Exists(remoteDirectory))
+            {
+                Directory.Delete(remoteDirectory, true);
+            }
+
+            Copy(localDirectory, remoteDirectory);
+            sources.ToList().ForEach(File.Delete);
         }
-        Copy(localDirectory, remoteDirectory);
-        sources.ToList().ForEach(File.Delete);
         // deploy end
 
 
