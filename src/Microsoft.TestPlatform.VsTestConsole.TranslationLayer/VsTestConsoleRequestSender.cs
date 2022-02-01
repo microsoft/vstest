@@ -1508,8 +1508,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                             // we are forwarding messages to this server, when we do that we don't know the content of the message
                             // we just forward it without deserializing. To allow those messages to be sent to a recepient, we wrap
                             // then into one more message that has the metadata.
-                            string recipient = versionedMessage != null ? versionedMessage.Recipient : null;
-                            if (versionedMessage.MessageType == "RawMessageWithMetadata")
+                            string recipient = versionedMessage?.Recipient;
+                            if (versionedMessage?.MessageType == "RawMessageWithMetadata")
                             {
                                 // the original message is replaced with the wrapped message
                                 message = dataSerializer.DeserializeMessage(versionedMessage.Payload.ToString());

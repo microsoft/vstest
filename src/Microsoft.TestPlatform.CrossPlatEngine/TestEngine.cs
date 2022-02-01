@@ -7,7 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-
+    using System.Runtime.CompilerServices;
+    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
@@ -80,6 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = () =>
             {
+                TestHostLimiter.Wait(new CancellationToken());
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
                 hostManager?.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
@@ -173,6 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             // specififed in run settings.
             Func<IProxyExecutionManager> proxyExecutionManagerCreator = () =>
             {
+                TestHostLimiter.Wait(new CancellationToken());
                 // Create a new host manager, to be associated with individual
                 // ProxyExecutionManager(&POM)
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
@@ -283,6 +286,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             Func<ProxyOperationManager> proxyCreator = () =>
             {
+                TestHostLimiter.Wait(new CancellationToken());
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
                 if (hostManager == null)
                 {
@@ -501,12 +505,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         private IRequestData GetRequestData(bool isTelemetryOptedIn)
         {
             return new RequestData
-                {
-                    MetricsCollection = isTelemetryOptedIn
+            {
+                MetricsCollection = isTelemetryOptedIn
                         ? (IMetricsCollection)new MetricsCollection()
                         : new NoOpMetricsCollection(),
-                    IsTelemetryOptedIn = isTelemetryOptedIn
-                };
+                IsTelemetryOptedIn = isTelemetryOptedIn
+            };
         }
 
         /// <summary>

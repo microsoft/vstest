@@ -434,6 +434,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)
         {
+            TestHostLimiter.Release();
             EqtTrace.Verbose("CrossPlatEngine.TestHostManagerHostExited: calling on client process exit callback.");
             this.testHostProcessStdError = e.Data;
 

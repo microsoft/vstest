@@ -9,6 +9,7 @@
     <TargetFrameworks>netstandard2.0;netstandard1.3;net451</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
+	<LangVersion>preview</LangVersion>
     <!--<EnableCodeAnalysis>true</EnableCodeAnalysis>-->
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
