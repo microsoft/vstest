@@ -46,7 +46,7 @@ public static class MulticastDelegateUtilities
 
         if (string.IsNullOrWhiteSpace(traceDisplayName))
         {
-            throw new ArgumentException(nameof(traceDisplayName));
+            throw new ArgumentNullException(nameof(traceDisplayName));
         }
 
         if (delegates != null)
