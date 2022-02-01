@@ -513,15 +513,17 @@ function create_package()
         if [[ $TP_USE_REPO_API = 0 ]]; then
             log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version -p:BranchName=$TPB_BRANCH -p:CommitId=$TPB_COMMIT"
 
-            $dotnet restore $stagingDir/${i} \
-                && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version -p:BranchName="$TPB_BRANCH" -p:CommitId="$TPB_COMMIT" /bl:pack_$i.binlog
+            $dotnet restore $stagingDir/${i} -p:Version=$TPB_Version -p:BranchName="$TPB_BRANCH" -p:CommitId="$TPB_COMMIT" -bl:pack_$i.binlog \
+                && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version -p:BranchName="$TPB_BRANCH" -p:CommitId="$TPB_COMMIT" -bl:pack_$i.binlog
         else
-            log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version -p:BranchName=$TPB_BRANCH -p:CommitId=$TPB_COMMIT (Source Build)"
+            log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version -p:BranchName=$TPB_BRANCH -p:CommitId=$TPB_COMMIT -p:DotNetBuildFromSource=true (Source Build)"
 
-            $dotnet restore $stagingDir/${i} \
-                && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version /bl:pack_$i.binlog -p:DotNetBuildFromSource=true -p:BranchName="$TPB_BRANCH" -p:CommitId="$TPB_COMMIT"
+            $dotnet restore $stagingDir/${i} -p:Version=$TPB_Version -bl:restore_$i.binlog -p:DotNetBuildFromSource=true -p:BranchName="$TPB_BRANCH" -p:CommitId="$TPB_COMMIT" \
+                && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version -bl:pack_$i.binlog -p:DotNetBuildFromSource=true -p:BranchName="$TPB_BRANCH" -p:CommitId="$TPB_COMMIT"
         fi
     done
+
+
 
     log "Create-NugetPackages: Elapsed $(( SECONDS - start ))s."
 }
