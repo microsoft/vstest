@@ -124,19 +124,17 @@ jobs:
   strategy:
     matrix:
       Ubuntu_18_04:
-        vmImage: ''
-        poolName: NetCore1ESPool-Internal
-        poolDemands: ImageOverride -equals Build.Ubuntu.1804.Amd64
+        OSName: Ubuntu
         pwsh: true
       macOS_10_15_Catalina:
-        vmImage: macOS-10.15
-        poolName: ''
-        poolDemands: ''
+        OSName: MacOS
         pwsh: true
   pool:
-    vmImage: $[ variables['vmImage'] ]
-    demands: $[ variables['poolDemands'] ]
-    name: $[ variables['poolName'] ]
+    ${{ if eq(variables['OSName'], 'MacOS') }}:
+      vmImage: macOS-10.15
+    ${{ if eq(variables['OSName'], 'Ubuntu') }}:
+      name: NetCore1ESPool-Internal
+      demands: ImageOverride -equals Build.Ubuntu.1804.Amd64
   variables:
       buildConfiguration: 'Release'
       VSTestRTMBuild: 'false'
