@@ -4,8 +4,7 @@ jobs:
 - job: Windows
   timeoutInMinutes: 120
   pool:
-    name: NetCore1ESPool-Public
-    demands: ImageOverride -equals Build.Windows.Amd64.VS2022.Open
+    vmImage: 'windows-latest'
   variables:
     buildConfiguration: 'Release'
   steps:
@@ -32,27 +31,13 @@ jobs:
       testResultsFiles: '**\*.trx'
     condition: succeededOrFailed()
 
-  - task: PublishPipelineArtifact@1
-    inputs:
-      targetPath: '$(Build.SourcesDirectory)\artifacts'
-      artifact: 'testArtifacts'
-      publishLocation: 'pipeline'
-
 - job: WindowsAcceptance
-  #dependsOn: Windows
   timeoutInMinutes: 120
   pool:
-    name: NetCore1ESPool-Public
-    demands: ImageOverride -equals Build.Windows.Amd64.VS2022.Open
+    vmImage: 'windows-latest'
   variables:
     buildConfiguration: 'Release'
   steps:
-  - task: DownloadPipelineArtifact@2
-    inputs:
-      buildType: 'current'
-      artifactName: 'testArtifacts'
-      targetPath: '$(Build.SourcesDirectory)\artifacts'
-
   - task: PowerShell@2
     inputs:
       targetType: 'inline'
@@ -62,9 +47,6 @@ jobs:
     displayName: 'Run script build.cmd'
     inputs:
       filename: build.cmd
-      # build should not be needed in the end, we are copying the build task from the build folder, but we should get
-      # it either from artifacts, if present, or from extracted package file
-      # Adding it at the moment to avoid this error: #[error]Copy-Item : Cannot find path 'D:\a\1\s\src\Microsoft.TestPlatform.Build\bin\Release\netstandard2.0' because it does  not exist.
       arguments: '-verbose -configuration $(buildConfiguration) -steps "InstallDotnet, Restore, Build, PrepareAcceptanceTests"'
       modifyEnvironment: false
       failOnStandardError: true
@@ -118,23 +100,18 @@ jobs:
     condition: succeededOrFailed()
 
 - job: OtherOSes
-  #dependsOn: Windows
   workspace:
     clean: all
   strategy:
     matrix:
       Ubuntu_18_04:
-        OSName: Ubuntu
+        vmImage: ubuntu-18.04
         pwsh: true
       macOS_10_15_Catalina:
-        OSName: MacOS
+        vmImage: macOS-10.15
         pwsh: true
   pool:
-    ${{ if eq(variables['OSName'], 'MacOS') }}:
-      vmImage: macOS-10.15
-    ${{ if eq(variables['OSName'], 'Ubuntu') }}:
-      name: NetCore1ESPool-Public
-      demands: ImageOverride -equals Build.Ubuntu.1804.Amd64
+    vmImage: $[ variables['vmImage'] ]
   variables:
       buildConfiguration: 'Release'
       VSTestRTMBuild: 'false'
@@ -150,12 +127,6 @@ jobs:
 
   - script: ./test.sh -c $(buildConfiguration) -p Unit
     displayName: 'Unit tests'
-
-  - task: DownloadPipelineArtifact@2
-    inputs:
-      buildType: 'current'
-      artifactName: 'testArtifacts'
-      targetPath: '$(Build.SourcesDirectory)/artifacts'
 
   - script: ./tools/dotnet-linux/dotnet build -c $(buildConfiguration) ./test/TestAssets/TestAssets.sln
     displayName: 'Build test assets'
