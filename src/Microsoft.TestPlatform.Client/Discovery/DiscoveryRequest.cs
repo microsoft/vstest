@@ -398,7 +398,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             HandleLoggerManagerDiscoveryComplete(discoveryCompletePayload);
         }
 
-        OnRawMessageReceived?.Invoke(this, rawMessage);
+        OnRawMessageReceived?.SafeInvoke(this, rawMessage, "DiscoveryRequest.RawMessageReceived");
     }
 
     /// <summary>

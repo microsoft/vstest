@@ -170,6 +170,10 @@ public class TestRunRequestTests
         bool handleLogMessageCalled = false;
         bool handleRawMessageCalled = false;
 
+        _mockDataSerializer
+            .Setup(s => s.SerializePayload(It.IsAny<string>(), It.IsAny<Object>()))
+            .Returns("non-empty rawMessage");
+
         _testRunRequest.TestRunMessage += (object sender, TestRunMessageEventArgs e) => handleLogMessageCalled = true;
 
         _testRunRequest.OnRawMessageReceived += (object sender, string message) => handleRawMessageCalled = true;
