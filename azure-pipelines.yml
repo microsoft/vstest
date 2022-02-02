@@ -44,11 +44,6 @@ jobs:
   variables:
     buildConfiguration: 'Release'
   steps:
-  - task: PowerShell@2
-    inputs:
-      targetType: 'inline'
-      script: 'ls "$(Build.SourcesDirectory)\artifacts\" -Recurse -Dir'
-
   - task: BatchScript@1
     displayName: 'Run script build.cmd'
     inputs:
