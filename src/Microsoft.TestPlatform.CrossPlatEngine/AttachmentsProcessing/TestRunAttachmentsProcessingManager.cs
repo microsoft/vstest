@@ -169,6 +169,13 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
             catch (Exception e)
             {
                 EqtTrace.Error("TestRunAttachmentsProcessingManager: Exception in ProcessAttachmentsAsync: " + e);
+
+                // If it's OperationCanceledException of our cancellationToken we let the exception bubble up.
+                if (e is OperationCanceledException operationCanceled && operationCanceled.CancellationToken == cancellationToken)
+                {
+                    throw;
+                }
+
                 logger.SendMessage(TestMessageLevel.Error, e.ToString());
 
                 // Restore the attachment sets for the others attachment processors.
