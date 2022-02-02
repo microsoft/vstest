@@ -31,6 +31,12 @@ jobs:
       testResultsFiles: '**\*.trx'
     condition: succeededOrFailed()
 
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: '$(Build.SourcesDirectory)\artifacts'
+      artifact: 'testArtifacts'
+      publishLocation: 'pipeline'
+
 - job: WindowsAcceptance
   timeoutInMinutes: 120
   pool:
