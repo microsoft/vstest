@@ -48,7 +48,7 @@ jobs:
     displayName: 'Run script build.cmd'
     inputs:
       filename: build.cmd
-      arguments: '-verbose -configuration $(buildConfiguration) -steps "InstallDotnet, Restore, Build, PrepareAcceptanceTests"'
+      arguments: '-verbose -configuration $(buildConfiguration) -steps "InstallDotnet, Restore, UpdateLocalization, Build, Publish, PrepareAcceptanceTests"'
       modifyEnvironment: false
       failOnStandardError: true
 
