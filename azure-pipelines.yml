@@ -5,7 +5,7 @@ jobs:
   timeoutInMinutes: 120
   pool:
     name: NetCore1ESPool-Public
-    demands: ImageOverride -equals Build.Windows.Amd64.VS2022
+    demands: ImageOverride -equals Build.Windows.Amd64.VS2022.Open
   variables:
     buildConfiguration: 'Release'
   steps:
@@ -43,7 +43,7 @@ jobs:
   timeoutInMinutes: 120
   pool:
     name: NetCore1ESPool-Public
-    demands: ImageOverride -equals Build.Windows.Amd64.VS2022
+    demands: ImageOverride -equals Build.Windows.Amd64.VS2022.Open
   variables:
     buildConfiguration: 'Release'
   steps:
