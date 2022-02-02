@@ -69,7 +69,7 @@ internal class EventLogContainer : IEventLogContainer
     public List<EventLogEntry> EventLogEntries { get; }
 
     /// <inheritdoc />
-    public EventLog EventLog { get; private set; }
+    public EventLog EventLog { get; }
 
     internal int NextEntryIndexToCollect { get; set; }
 

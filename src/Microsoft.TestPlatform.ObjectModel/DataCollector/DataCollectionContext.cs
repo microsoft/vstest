@@ -85,14 +85,14 @@ public class DataCollectionContext
     /// Identifies the session under which the data collection occurs.  Will not be null.
     /// </summary>
     [DataMember]
-    public SessionId SessionId { get; private set; }
+    public SessionId SessionId { get; }
 
     /// <summary>
     /// Identifies the test execution under which the data collection occurs,
     /// or null if no such test exists.
     /// </summary>
     [DataMember]
-    public TestExecId TestExecId { get; private set; }
+    public TestExecId TestExecId { get; }
 
     /// <summary>
     /// Returns true if there is an executing test case associated with this context.

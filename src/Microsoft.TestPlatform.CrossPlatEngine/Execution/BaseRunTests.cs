@@ -67,7 +67,7 @@ internal abstract class BaseRunTests
     /// <summary>
     /// The Run configuration. To determine framework and execution thread apartment state.
     /// </summary>
-    private RunConfiguration _runConfiguration;
+    private readonly RunConfiguration _runConfiguration;
 
     /// <summary>
     /// The Serializer to clone testcase object in case of user input test source is package. E.g UWP scenario(appx/build.appxrecipe).
@@ -147,7 +147,29 @@ internal abstract class BaseRunTests
         _testEventsPublisher = testEventsPublisher;
         _platformThread = platformThread;
         _dataSerializer = dataSerializer;
-        SetContext();
+
+        TestRunCache = new TestRunCache(TestExecutionContext.FrequencyOfRunStatsChangeEvent, TestExecutionContext.RunStatsChangeEventTimeout, OnCacheHit);
+
+        RunContext = new RunContext();
+        RunContext.RunSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(RunSettings);
+        RunContext.KeepAlive = TestExecutionContext.KeepAlive;
+        RunContext.InIsolation = TestExecutionContext.InIsolation;
+        RunContext.IsDataCollectionEnabled = TestExecutionContext.IsDataCollectionEnabled;
+        RunContext.IsBeingDebugged = TestExecutionContext.IsDebug;
+
+        var runConfig = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettings);
+        RunContext.TestRunDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfig);
+        RunContext.SolutionDirectory = RunSettingsUtilities.GetSolutionDirectory(runConfig);
+        _runConfiguration = runConfig;
+
+        FrameworkHandle = new FrameworkHandle(
+            _testCaseEventsHandler,
+            TestRunCache,
+            TestExecutionContext,
+            TestRunEventsHandler);
+        FrameworkHandle.TestRunMessage += OnTestRunMessage;
+
+        ExecutorUrisThatRanTests = new List<string>();
     }
 
     #endregion
@@ -157,17 +179,17 @@ internal abstract class BaseRunTests
     /// <summary>
     /// Gets the run settings.
     /// </summary>
-    protected string RunSettings { get; private set; }
+    protected string RunSettings { get; }
 
     /// <summary>
     /// Gets the test execution context.
     /// </summary>
-    protected TestExecutionContext TestExecutionContext { get; private set; }
+    protected TestExecutionContext TestExecutionContext { get; }
 
     /// <summary>
     /// Gets the test run events handler.
     /// </summary>
-    protected ITestRunEventsHandler TestRunEventsHandler { get; private set; }
+    protected ITestRunEventsHandler TestRunEventsHandler { get; }
 
     /// <summary>
     /// Gets the test run cache.
@@ -320,32 +342,6 @@ internal abstract class BaseRunTests
 
     #region Private methods
 
-    private void SetContext()
-    {
-        TestRunCache = new TestRunCache(TestExecutionContext.FrequencyOfRunStatsChangeEvent, TestExecutionContext.RunStatsChangeEventTimeout, OnCacheHit);
-
-        RunContext = new RunContext();
-        RunContext.RunSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(RunSettings);
-        RunContext.KeepAlive = TestExecutionContext.KeepAlive;
-        RunContext.InIsolation = TestExecutionContext.InIsolation;
-        RunContext.IsDataCollectionEnabled = TestExecutionContext.IsDataCollectionEnabled;
-        RunContext.IsBeingDebugged = TestExecutionContext.IsDebug;
-
-        var runConfig = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettings);
-        RunContext.TestRunDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfig);
-        RunContext.SolutionDirectory = RunSettingsUtilities.GetSolutionDirectory(runConfig);
-        _runConfiguration = runConfig;
-
-        FrameworkHandle = new FrameworkHandle(
-            _testCaseEventsHandler,
-            TestRunCache,
-            TestExecutionContext,
-            TestRunEventsHandler);
-        FrameworkHandle.TestRunMessage += OnTestRunMessage;
-
-        ExecutorUrisThatRanTests = new List<string>();
-    }
-
     private void OnTestRunMessage(object sender, TestRunMessageEventArgs e)
     {
         TestRunEventsHandler.HandleLogMessage(e.Level, e.Message);
@@ -397,7 +393,7 @@ internal abstract class BaseRunTests
             {
                 // Commenting this out because of a compatibility issue with Microsoft.Dotnet.ProjectModel released on nuGet.org.
                 // this.activeExecutor = null;
-                // var runtimeVersion = string.Concat(PlatformServices.Default.Runtime.RuntimeType, " ",	
+                // var runtimeVersion = string.Concat(PlatformServices.Default.Runtime.RuntimeType, " ",
                 // PlatformServices.Default.Runtime.RuntimeVersion);
                 var runtimeVersion = " ";
                 TestRunEventsHandler?.HandleLogMessage(
