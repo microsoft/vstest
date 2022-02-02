@@ -4,7 +4,8 @@ jobs:
 - job: Windows
   timeoutInMinutes: 120
   pool:
-    vmImage: 'windows-latest'
+    name: NetCore1ESPool-Internal
+    demands: ImageOverride -equals build.windows.10.amd64.vs2019
   variables:
     buildConfiguration: 'Release'
   steps:
@@ -41,7 +42,8 @@ jobs:
   dependsOn: Windows
   timeoutInMinutes: 120
   pool:
-    vmImage: 'windows-latest'
+    name: NetCore1ESPool-Internal
+    demands: ImageOverride -equals build.windows.10.amd64.vs2019
   variables:
     buildConfiguration: 'Release'
   steps:
@@ -122,13 +124,19 @@ jobs:
   strategy:
     matrix:
       Ubuntu_18_04:
-        vmImage: ubuntu-18.04
+        vmImage: ''
+        poolName: NetCore1ESPool-Internal
+        poolDemands: ImageOverride -equals Build.Ubuntu.1804.Amd64
         pwsh: true
       macOS_10_15_Catalina:
         vmImage: macOS-10.15
+        poolName: ''
+        poolDemands: ''
         pwsh: true
   pool:
     vmImage: $[ variables['vmImage'] ]
+    demands: $[ variables['poolDemands'] ]
+    name: $[ variables['poolName'] ]
   variables:
       buildConfiguration: 'Release'
       VSTestRTMBuild: 'false'
