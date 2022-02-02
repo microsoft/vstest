@@ -194,15 +194,15 @@ internal abstract class BaseRunTests
     /// <summary>
     /// Gets the test run cache.
     /// </summary>
-    protected ITestRunCache TestRunCache { get; private set; }
+    protected ITestRunCache TestRunCache { get; }
 
     protected bool IsCancellationRequested => _isCancellationRequested;
 
-    protected RunContext RunContext { get; private set; }
+    protected RunContext RunContext { get; }
 
-    protected FrameworkHandle FrameworkHandle { get; private set; }
+    protected FrameworkHandle FrameworkHandle { get; }
 
-    protected ICollection<string> ExecutorUrisThatRanTests { get; private set; }
+    protected ICollection<string> ExecutorUrisThatRanTests { get; }
 
     #endregion
 
