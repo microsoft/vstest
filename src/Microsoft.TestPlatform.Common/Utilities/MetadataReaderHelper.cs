@@ -54,7 +54,16 @@ internal class MetadataReaderExtensionsHelper
 
 #if !NETSTANDARD1_3
         // We don't cache the load because this method is used by DiscoverTestExtensionTypesV2Attribute that caches the outcome Type[]
-        Assembly assemblyToAnalyze = Assembly.LoadFile(assemblyFilePath);
+        Assembly assemblyToAnalyze;
+        try
+        {
+            assemblyToAnalyze = Assembly.LoadFile(assemblyFilePath);
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Failure during assembly file load '{assemblyFilePath}', fallback to the loaded assembly.\n{FormatException(ex)}");
+            assemblyToAnalyze = loadedAssembly;
+        }
 #else
         Assembly assemblyToAnalyze = loadedAssembly;
 #endif
