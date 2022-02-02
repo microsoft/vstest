@@ -166,7 +166,8 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
                     }
                 }
             }
-            catch (Exception e)
+            // If it's OperationCanceledException of our cancellationToken we let the exception bubble up.
+            catch (Exception e) when ((e is OperationCanceledException operationCanceled && operationCanceled.CancellationToken == cancellationToken) == false)
             {
                 EqtTrace.Error("TestRunAttachmentsProcessingManager: Exception in ProcessAttachmentsAsync: " + e);
                 logger.SendMessage(TestMessageLevel.Error, e.ToString());
