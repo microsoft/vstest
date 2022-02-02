@@ -4,7 +4,7 @@ jobs:
 - job: Windows
   timeoutInMinutes: 120
   pool:
-    name: NetCore1ESPool-Internal
+    name: NetCore1ESPool-Public
     demands: ImageOverride -equals build.windows.10.amd64.vs2019
   variables:
     buildConfiguration: 'Release'
@@ -42,7 +42,7 @@ jobs:
   dependsOn: Windows
   timeoutInMinutes: 120
   pool:
-    name: NetCore1ESPool-Internal
+    name: NetCore1ESPool-Public
     demands: ImageOverride -equals build.windows.10.amd64.vs2019
   variables:
     buildConfiguration: 'Release'
@@ -133,7 +133,7 @@ jobs:
     ${{ if eq(variables['OSName'], 'MacOS') }}:
       vmImage: macOS-10.15
     ${{ if eq(variables['OSName'], 'Ubuntu') }}:
-      name: NetCore1ESPool-Internal
+      name: NetCore1ESPool-Public
       demands: ImageOverride -equals Build.Ubuntu.1804.Amd64
   variables:
       buildConfiguration: 'Release'
