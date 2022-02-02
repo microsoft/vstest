@@ -39,7 +39,7 @@ jobs:
       publishLocation: 'pipeline'
 
 - job: WindowsAcceptance
-  dependsOn: Windows
+  #dependsOn: Windows
   timeoutInMinutes: 120
   pool:
     name: NetCore1ESPool-Public
@@ -118,7 +118,7 @@ jobs:
     condition: succeededOrFailed()
 
 - job: OtherOSes
-  dependsOn: Windows
+  #dependsOn: Windows
   workspace:
     clean: all
   strategy:
