@@ -5,7 +5,7 @@
     <TestProject>true</TestProject>
     <IsTestProject>true</IsTestProject>
     <!-- NU1702 suppresses warning about testhost being .NET Framework reference imported to a .NET project.
-    Unfortunately this can't be supressed at single ProjectReference. Neither completely suppressed by using NoWarn.
+    Unfortunately this can't be suppressed at single ProjectReference. Neither completely suppressed by using NoWarn.
     Workaround is documented here: https://github.com/NuGet/Home/issues/8093, but this syntax and placement would be preferred:
     https://github.com/dotnet/core/issues/869
     -->
