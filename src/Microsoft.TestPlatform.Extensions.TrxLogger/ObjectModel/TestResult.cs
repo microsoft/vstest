@@ -297,7 +297,7 @@ internal class TestResult : ITestResult, IXmlTestStore
     /// <summary>
     /// Gets the computer name.
     /// </summary>
-    public string ComputerName { get; private set; }
+    public string ComputerName { get; }
 
     /// <summary>
     /// Gets or sets the outcome.
@@ -408,7 +408,7 @@ internal class TestResult : ITestResult, IXmlTestStore
     /// <summary>
     /// Gets the directory containing the test result files, relative to the root results directory
     /// </summary>
-    public string RelativeTestResultsDirectory { get; private set; }
+    public string RelativeTestResultsDirectory { get; }
 
     /// <summary>
     /// Gets or sets the data row info.

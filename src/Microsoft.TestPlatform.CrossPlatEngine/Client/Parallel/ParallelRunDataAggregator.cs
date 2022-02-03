@@ -66,7 +66,7 @@ internal class ParallelRunDataAggregator
 
     public bool IsCanceled { get; private set; }
 
-    public string RunSettings { get; private set; }
+    public string RunSettings { get; }
 
     #endregion
 
