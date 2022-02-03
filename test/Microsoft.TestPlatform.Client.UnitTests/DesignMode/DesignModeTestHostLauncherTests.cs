@@ -4,7 +4,9 @@
 using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using Moq;
+
 using System.Threading;
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode;
@@ -40,4 +42,3 @@ public class DesignModeTestHostLauncherTests
         mockDesignModeClient.Verify(md => md.LaunchCustomHost(testProcessStartInfo, It.IsAny<CancellationToken>()), Times.Once);
     }
 }
-

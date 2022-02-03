@@ -5,18 +5,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
+
 using CoreUtilities.Helpers;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+
+using Interfaces;
+using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
-using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
+
+using CommonResources = Resources.Resources;
+using ObjectModelConstants = TestPlatform.ObjectModel.Constants;
 
 /// <summary>
 /// Test request sender implementation.
@@ -55,11 +58,11 @@ public class TestRequestSender : ITestRequestSender
 
     // Must be in sync with the highest supported version in
     // src/Microsoft.TestPlatform.CrossPlatEngine/EventHandlers/TestRequestHandler.cs file.
-    private int _highestSupportedVersion = 5;
+    private readonly int _highestSupportedVersion = 5;
 
-    private TestHostConnectionInfo _connectionInfo;
+    private readonly TestHostConnectionInfo _connectionInfo;
 
-    private ITestRuntimeProvider _runtimeProvider;
+    private readonly ITestRuntimeProvider _runtimeProvider;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRequestSender"/> class.
@@ -68,37 +71,37 @@ public class TestRequestSender : ITestRequestSender
     /// <param name="runtimeProvider">The runtime provider.</param>
     public TestRequestSender(ProtocolConfig protocolConfig, ITestRuntimeProvider runtimeProvider)
         : this(
-              _runtimeProvider,
-              communicationEndPoint: null,
-              _runtimeProvider.GetTestHostConnectionInfo(),
-              JsonDataSerializer.Instance,
-              protocolConfig,
-              ClientProcessExitWaitTimeout)
+            runtimeProvider,
+            communicationEndPoint: null,
+            runtimeProvider.GetTestHostConnectionInfo(),
+            JsonDataSerializer.Instance,
+            protocolConfig,
+            ClientProcessExitWaitTimeout)
     {
         SetCommunicationEndPoint();
     }
 
     internal TestRequestSender(
-        ITestRuntimeProvider _runtimeProvider,
+        ITestRuntimeProvider runtimeProvider,
         ICommunicationEndPoint communicationEndPoint,
-        TestHostConnectionInfo _connectionInfo,
+        TestHostConnectionInfo connectionInfo,
         IDataSerializer serializer,
         ProtocolConfig protocolConfig,
-        int _clientExitedWaitTime)
+        int clientExitedWaitTime)
     {
         _dataSerializer = serializer;
         _connected = new ManualResetEventSlim(false);
         _clientExited = new ManualResetEventSlim(false);
-        _clientExitedWaitTime = _clientExitedWaitTime;
+        _clientExitedWaitTime = clientExitedWaitTime;
         _operationCompleted = 0;
 
         _highestSupportedVersion = protocolConfig.Version;
 
         // The connectionInfo here is that of RuntimeProvider, so reverse the role of runner.
-        _runtimeProvider = _runtimeProvider;
+        _runtimeProvider = runtimeProvider;
         _communicationEndpoint = communicationEndPoint;
-        _connectionInfo.Endpoint = _connectionInfo.Endpoint;
-        _connectionInfo.Role = _connectionInfo.Role == ConnectionRole.Host
+        _connectionInfo.Endpoint = connectionInfo.Endpoint;
+        _connectionInfo.Role = connectionInfo.Role == ConnectionRole.Host
             ? ConnectionRole.Client
             : ConnectionRole.Host;
     }
@@ -114,17 +117,17 @@ public class TestRequestSender : ITestRequestSender
     /// <param name="clientExitedWaitTime">Time to wait for client process exit.</param>
     internal TestRequestSender(
         ICommunicationEndPoint communicationEndPoint,
-        TestHostConnectionInfo _connectionInfo,
+        TestHostConnectionInfo connectionInfo,
         IDataSerializer serializer,
         ProtocolConfig protocolConfig,
-        int _clientExitedWaitTime)
+        int clientExitedWaitTime)
         : this(
-              _runtimeProvider: null,
-              communicationEndPoint,
-              _connectionInfo,
-              serializer,
-              protocolConfig,
-              _clientExitedWaitTime)
+            runtimeProvider: null,
+            communicationEndPoint,
+            connectionInfo,
+            serializer,
+            protocolConfig,
+            clientExitedWaitTime)
     {
     }
 
@@ -138,7 +141,7 @@ public class TestRequestSender : ITestRequestSender
             EqtTrace.Verbose("TestRequestSender.InitializeCommunication: initialize communication. ");
         }
 
-        // clientExitCancellationSource = new CancellationTokenSource();
+        // this.clientExitCancellationSource = new CancellationTokenSource();
         _clientExitErrorMessage = string.Empty;
         _communicationEndpoint.Connected += (sender, args) =>
         {
@@ -150,29 +153,33 @@ public class TestRequestSender : ITestRequestSender
         };
 
         _communicationEndpoint.Disconnected += (sender, args) =>
-        {
             // If there's an disconnected event handler, call it
             _onDisconnected?.Invoke(args);
-        };
 
         // Server start returns the listener port
-        // return int.Parse(communicationServer.Start());
+        // return int.Parse(this.communicationServer.Start());
         var endpoint = _communicationEndpoint.Start(_connectionInfo.Endpoint);
-        return endpoint.GetIPEndPoint().Port;
+        return endpoint.GetIpEndPoint().Port;
     }
 
     /// <inheritdoc />
     public bool WaitForRequestHandlerConnection(int connectionTimeout, CancellationToken cancellationToken)
     {
+        var sw = Stopwatch.StartNew();
         if (EqtTrace.IsVerboseEnabled)
         {
-            EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting for connection with timeout: {0}", connectionTimeout);
+            EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting for connection with timeout: {0}.", connectionTimeout);
         }
 
         // Wait until either connection is successful, handled by connected.WaitHandle
         // or operation is canceled, handled by cancellationToken.WaitHandle
         // or testhost exits unexpectedly, handled by clientExited.WaitHandle
         var waitIndex = WaitHandle.WaitAny(new WaitHandle[] { _connected.WaitHandle, cancellationToken.WaitHandle, _clientExited.WaitHandle }, connectionTimeout);
+
+        if (EqtTrace.IsVerboseEnabled)
+        {
+            EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting took {0} ms, with timeout {1} ms, and result {2}, which is {3}.", sw.ElapsedMilliseconds, connectionTimeout, waitIndex, waitIndex == 0 ? "success" : "failure");
+        }
 
         // Return true if connection was successful.
         return waitIndex == 0;
@@ -192,7 +199,7 @@ public class TestRequestSender : ITestRequestSender
 
             if (EqtTrace.IsVerboseEnabled)
             {
-                EqtTrace.Verbose("TestRequestSender.CheckVersionWithTestHost: _onMessageReceived received message: {0}", message);
+                EqtTrace.Verbose("TestRequestSender.CheckVersionWithTestHost: onMessageReceived received message: {0}", message);
             }
 
             if (message.MessageType == MessageType.VersionCheck)
@@ -272,10 +279,7 @@ public class TestRequestSender : ITestRequestSender
     public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 discoveryEventsHandler)
     {
         _messageEventHandler = discoveryEventsHandler;
-        _onDisconnected = (disconnectedEventArgs) =>
-            {
-                OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, true);
-            };
+        _onDisconnected = (disconnectedEventArgs) => OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, true);
         _onMessageReceived = (sender, args) => OnDiscoveryMessageReceived(discoveryEventsHandler, args);
 
         _channel.MessageReceived += _onMessageReceived;
@@ -314,10 +318,7 @@ public class TestRequestSender : ITestRequestSender
     public void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler)
     {
         _messageEventHandler = eventHandler;
-        _onDisconnected = (disconnectedEventArgs) =>
-        {
-            OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
-        };
+        _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
 
         _onMessageReceived = (sender, args) => OnExecutionMessageReceived(sender, args, eventHandler);
         _channel.MessageReceived += _onMessageReceived;
@@ -363,10 +364,7 @@ public class TestRequestSender : ITestRequestSender
     public void StartTestRun(TestRunCriteriaWithTests runCriteria, ITestRunEventsHandler eventHandler)
     {
         _messageEventHandler = eventHandler;
-        _onDisconnected = (disconnectedEventArgs) =>
-        {
-            OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
-        };
+        _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
 
         _onMessageReceived = (sender, args) => OnExecutionMessageReceived(sender, args, eventHandler);
         _channel.MessageReceived += _onMessageReceived;
@@ -634,7 +632,7 @@ public class TestRequestSender : ITestRequestSender
         LogErrorMessage(string.Format(CommonResources.AbortedTestRun, reason));
 
         // notify test run abort to vstest console wrapper.
-        var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
+        var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, null, TimeSpan.Zero);
         var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
         var rawMessage = _dataSerializer.SerializePayload(MessageType.ExecutionComplete, payload);
         testRunEventsHandler.HandleRawMessage(rawMessage);

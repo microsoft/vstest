@@ -9,20 +9,20 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
-using Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
-using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using TestRunAttachmentsProcessing;
+using RequestHelper;
+using Common.Interfaces;
+using CommunicationUtilities;
+using CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using CrossPlatEngine;
+using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ObjectModel.Logging;
+using PlatformAbstractions.Interfaces;
+using TestTools.UnitTesting;
 
 using Moq;
 
@@ -76,7 +76,7 @@ public class DesignModeClientTests
 
         _designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Error, "message"));
 
-        _mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(),It.IsAny<TestMessagePayload>()), Times.Once());
+        _mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<TestMessagePayload>()), Times.Once());
     }
 
     [TestMethod]
@@ -168,10 +168,10 @@ public class DesignModeClientTests
         var testRunPayload = new TestRunRequestPayload { RunSettings = null, TestCases = testList };
 
         var getProcessStartInfoMessage = new Message
-                                             {
-                                                 MessageType = MessageType.GetTestRunnerProcessStartInfoForRunSelected,
-                                                 Payload = JToken.FromObject("random")
-                                             };
+        {
+            MessageType = MessageType.GetTestRunnerProcessStartInfoForRunSelected,
+            Payload = JToken.FromObject("random")
+        };
 
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
         TestRunRequestPayload receivedTestRunPayload = null;
@@ -191,13 +191,13 @@ public class DesignModeClientTests
                         It.IsAny<ProtocolConfig>()))
             .Callback(
                 (TestRunRequestPayload trp,
-                 ITestHostLauncher testHostManager,
-                 ITestRunEventsRegistrar testRunEventsRegistrar,
-                 ProtocolConfig config) =>
-                    {
-                        receivedTestRunPayload = trp;
-                        allTasksComplete.Set();
-                    });
+                    ITestHostLauncher testHostManager,
+                    ITestRunEventsRegistrar testRunEventsRegistrar,
+                    ProtocolConfig config) =>
+                {
+                    receivedTestRunPayload = trp;
+                    allTasksComplete.Set();
+                });
 
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage())
             .Returns(getProcessStartInfoMessage)
@@ -231,10 +231,10 @@ public class DesignModeClientTests
         var testRunPayload = new TestRunRequestPayload { RunSettings = null, TestCases = testList };
 
         var getProcessStartInfoMessage = new Message
-                                             {
-                                                 MessageType = MessageType.TestRunSelectedTestCasesDefaultHost,
-                                                 Payload = JToken.FromObject("random")
-                                             };
+        {
+            MessageType = MessageType.TestRunSelectedTestCasesDefaultHost,
+            Payload = JToken.FromObject("random")
+        };
 
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
         TestRunRequestPayload receivedTestRunPayload = null;
@@ -245,17 +245,17 @@ public class DesignModeClientTests
         _mockCommunicationManager.Setup(cm => cm.DeserializePayload<TestRunRequestPayload>(getProcessStartInfoMessage))
             .Returns(testRunPayload);
         _mockTestRequestManager.Setup(
-            trm =>
-            trm.RunTests(
-                It.IsAny<TestRunRequestPayload>(),
-                It.IsAny<ITestHostLauncher>(),
-                It.IsAny<ITestRunEventsRegistrar>(),
-                It.IsAny<ProtocolConfig>()))
+                trm =>
+                    trm.RunTests(
+                        It.IsAny<TestRunRequestPayload>(),
+                        It.IsAny<ITestHostLauncher>(),
+                        It.IsAny<ITestRunEventsRegistrar>(),
+                        It.IsAny<ProtocolConfig>()))
             .Callback(
                 (TestRunRequestPayload trp,
-                 ITestHostLauncher testHostManager,
-                 ITestRunEventsRegistrar testRunEventsRegistrar,
-                 ProtocolConfig config) =>
+                    ITestHostLauncher testHostManager,
+                    ITestRunEventsRegistrar testRunEventsRegistrar,
+                    ProtocolConfig config) =>
                 {
                     receivedTestRunPayload = trp;
                     allTasksComplete.Set();
@@ -311,10 +311,7 @@ public class DesignModeClientTests
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
 
         var expectedProcessId = 1234;
-        Action sendMessageAction = () =>
-        {
-            testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId, null);
-        };
+        Action sendMessageAction = () => testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId, null);
 
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.CustomTestHostLaunch, It.IsAny<object>())).
             Callback(() => Task.Run(sendMessageAction));
@@ -334,10 +331,7 @@ public class DesignModeClientTests
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
 
         var expectedProcessId = -1;
-        Action sendMessageAction = () =>
-        {
-            testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId, "Dummy");
-        };
+        Action sendMessageAction = () => testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId, "Dummy");
 
         _mockCommunicationManager
             .Setup(cm => cm.SendMessage(MessageType.CustomTestHostLaunch, It.IsAny<object>()))
@@ -508,8 +502,8 @@ public class DesignModeClientTests
             rm => rm.RunTests(
                 It.IsAny<TestRunRequestPayload>(),
                 null,
-                It.IsAny<IdentifiableDesignModeTestEventsRegistrar>(),
-            It.IsAny<ProtocolConfig>())).Throws(new Exception());
+                It.IsAny<DesignModeTestEventsRegistrar>(),
+                It.IsAny<ProtocolConfig>())).Throws(new Exception());
 
         _designModeClient.ConnectToClientAndProcessRequests(PortNumber, _mockTestRequestManager.Object);
 
@@ -532,8 +526,8 @@ public class DesignModeClientTests
             rm => rm.RunTests(
                 It.IsAny<TestRunRequestPayload>(),
                 null,
-                It.IsAny<IdentifiableDesignModeTestEventsRegistrar>(),
-            It.IsAny<ProtocolConfig>())).Throws(new TestPlatformException("Hello world"));
+                It.IsAny<DesignModeTestEventsRegistrar>(),
+                It.IsAny<ProtocolConfig>())).Throws(new TestPlatformException("Hello world"));
 
         _designModeClient.ConnectToClientAndProcessRequests(PortNumber, _mockTestRequestManager.Object);
 
@@ -563,8 +557,8 @@ public class DesignModeClientTests
                 Assert.IsNull(((StartTestSessionAckPayload)actualPayload).TestSessionInfo);
             });
         _mockCommunicationManager.Setup(
-            cm => cm.DeserializePayload<StartTestSessionPayload>(
-                startTestSessionMessage))
+                cm => cm.DeserializePayload<StartTestSessionPayload>(
+                    startTestSessionMessage))
             .Returns(payload);
 
         _mockTestRequestManager.Setup(
@@ -611,8 +605,8 @@ public class DesignModeClientTests
             });
 
         _mockCommunicationManager.Setup(
-            cm => cm.DeserializePayload<TestSessionInfo>(
-                stopTestSessionMessage))
+                cm => cm.DeserializePayload<TestSessionInfo>(
+                    stopTestSessionMessage))
             .Returns(testSessionInfo);
 
         mockTestPool.Setup(tp => tp.KillSession(testSessionInfo)).Throws(new Exception("DummyException"));
@@ -654,8 +648,8 @@ public class DesignModeClientTests
             });
 
         _mockCommunicationManager.Setup(
-            cm => cm.DeserializePayload<TestSessionInfo>(
-                stopTestSessionMessage))
+                cm => cm.DeserializePayload<TestSessionInfo>(
+                    stopTestSessionMessage))
             .Returns(testSessionInfo);
 
         mockTestPool.Setup(tp => tp.KillSession(testSessionInfo)).Returns(false);
@@ -697,8 +691,8 @@ public class DesignModeClientTests
             });
 
         _mockCommunicationManager.Setup(
-            cm => cm.DeserializePayload<TestSessionInfo>(
-                stopTestSessionMessage))
+                cm => cm.DeserializePayload<TestSessionInfo>(
+                    stopTestSessionMessage))
             .Returns(testSessionInfo);
 
         mockTestPool.Setup(tp => tp.KillSession(testSessionInfo)).Returns(true);
@@ -716,7 +710,7 @@ public class DesignModeClientTests
     [TestMethod]
     public void DesignModeClientSendTestMessageShouldSendTestMessage()
     {
-        var testPayload = new TestMessagePayload { MessageLevel = ObjectModel.Logging.TestMessageLevel.Error, Message = "DummyMessage" };
+        var testPayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = "DummyMessage" };
 
         _designModeClient.SendTestMessage(testPayload.MessageLevel, testPayload.Message, MessageMetadata.Empty);
 

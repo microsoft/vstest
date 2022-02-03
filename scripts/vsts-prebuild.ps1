@@ -1,11 +1,11 @@
 # Sets variables which are used across the build tasks.
 
-param ( 
-  [Parameter(Mandatory)] 
+param (
+  [Parameter(Mandatory)]
   [string] $BuildSuffix,
-  [Parameter(Mandatory)] 
+  [Parameter(Mandatory)]
   [string] $IsRtmBuild,
-  [Parameter(Mandatory)] 
+  [Parameter(Mandatory)]
   $Branch
 )
 
@@ -15,15 +15,15 @@ $TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.FullN
 $TpVersion = [string](([xml](Get-Content $TP_ROOT_DIR\scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix)
 $buildPrefix = $TpVersion.Trim()
 
-if ($IsRtmBuild.ToLower() -eq "false") 
-{ 
+if ($IsRtmBuild.ToLower() -eq "false")
+{
   if ($null -ne $Branch -and $Branch -like "refs/heads/rel/*")
-  { 
+  {
     $BuildSuffix = $BuildSuffix -replace "preview", "release"
   }
 
   $packageVersion = $buildPrefix+"-"+$buildSuffix
-} 
+}
 else
 {
   $packageVersion = $buildPrefix

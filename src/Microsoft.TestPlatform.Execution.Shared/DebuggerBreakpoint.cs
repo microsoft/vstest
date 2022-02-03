@@ -1,9 +1,15 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+
 using System;
 using System.Diagnostics;
 using System.IO;
+#if !NETCOREAPP1_0 && DEBUG
 using System.Reflection;
+#endif
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,17 +48,17 @@ internal static class DebuggerBreakpoint
             }
             else
             {
-                ConsoleOutput.Instance.WriteLine($"Attaching Visual Studio with PID {vsPid}... No breakpoints are automatically set.", OutputLevel.Information);
+                ConsoleOutput.Instance.WriteLine($"Attaching Visual Studio with PID {vsPid} to the process '{Process.GetCurrentProcess().ProcessName}({Process.GetCurrentProcess().Id})'... No breakpoints are automatically set.", OutputLevel.Information);
             }
 
-            AttachVS(Process.GetCurrentProcess(), vsPid);
+            AttachVs(Process.GetCurrentProcess(), vsPid);
 
             Break();
         }
 #endif
     }
 
-    private static bool AttachVS(Process process, int? vsPid)
+    private static bool AttachVs(Process process, int? vsPid)
     {
 #if NETCOREAPP1_0 || !DEBUG
         return false;
@@ -61,7 +67,7 @@ internal static class DebuggerBreakpoint
         // We could call the library code directly here for .NET, and .NET Framework, but then we would also need to package it
         // together with testhost. So instead we always run the executable, and pass path to it using env variable.
 
-        var env = "VSTEST_DEBUG_ATTACHVS_PATH";
+        const string env = "VSTEST_DEBUG_ATTACHVS_PATH";
         var vsAttachPath = Environment.GetEnvironmentVariable(env) ?? FindAttachVs();
 
         // Always set it so we propagate it to child processes even if it was not previously set.
@@ -76,14 +82,7 @@ internal static class DebuggerBreakpoint
         {
             throw new InvalidOperationException($"Cannot start tool, path {vsAttachPath} does not exist.");
         }
-        var startInfo = new ProcessStartInfo
-        {
-            FileName = vsAttachPath,
-            Arguments = $"{process.Id} {vsPid}",
-            CreateNoWindow = true, 
-            UseShellExecute = false,
-        };
-        var attachVsProcess = Process.Start(startInfo);
+        var attachVsProcess = Process.Start(vsAttachPath, $"{process.Id} {vsPid}");
         attachVsProcess.WaitForExit();
 
         return attachVsProcess.ExitCode == 0;
@@ -92,9 +91,9 @@ internal static class DebuggerBreakpoint
 
     private static string FindAttachVs()
     {
-# if NETCOREAPP1_0 || !DEBUG
+#if NETCOREAPP1_0 || !DEBUG
         return null;
-# else 
+#else
 
         var fromPath = FindOnPath("AttachVS.exe");
         if (fromPath != null)
@@ -173,7 +172,7 @@ internal static class DebuggerBreakpoint
         var nativeDebugEnabled = Environment.GetEnvironmentVariable(environmentVariable);
 
         if (!string.IsNullOrEmpty(nativeDebugEnabled) && nativeDebugEnabled.Equals("1", StringComparison.Ordinal)
-            && new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows))
+                                                      && new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows))
         {
             while (!IsDebuggerPresent())
             {

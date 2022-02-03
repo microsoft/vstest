@@ -12,7 +12,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+using Interfaces;
+
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
@@ -23,8 +24,8 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
-using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
-using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+using CommunicationUtilitiesResources = VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+using CoreUtilitiesConstants = VisualStudio.TestPlatform.CoreUtilities.Constants;
 
 /// <summary>
 /// An implementation of <see cref="IVsTestConsoleWrapper"/> to invoke test operations
@@ -70,8 +71,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     public VsTestConsoleWrapper(
         string vstestConsolePath)
         : this(
-              vstestConsolePath,
-              ConsoleParameters.Default)
+            vstestConsolePath,
+            ConsoleParameters.Default)
     {
     }
 
@@ -83,13 +84,13 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <param name="consoleParameters">The parameters to be passed onto the runner process.</param>
     public VsTestConsoleWrapper(
         string vstestConsolePath,
-        ConsoleParameters _consoleParameters)
+        ConsoleParameters consoleParameters)
         : this(
-              new VsTestConsoleRequestSender(),
-              new VsTestConsoleProcessManager(vstestConsolePath),
-              _consoleParameters,
-              TestPlatformEventSource.Instance,
-              new ProcessHelper())
+            new VsTestConsoleRequestSender(),
+            new VsTestConsoleProcessManager(vstestConsolePath),
+            consoleParameters,
+            TestPlatformEventSource.Instance,
+            new ProcessHelper())
     {
     }
 
@@ -105,13 +106,13 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     internal VsTestConsoleWrapper(
         string vstestConsolePath,
         string dotnetExePath,
-        ConsoleParameters _consoleParameters)
+        ConsoleParameters consoleParameters)
         : this(
-              new VsTestConsoleRequestSender(),
-              new VsTestConsoleProcessManager(vstestConsolePath, dotnetExePath),
-              _consoleParameters,
-              TestPlatformEventSource.Instance,
-              new ProcessHelper())
+            new VsTestConsoleRequestSender(),
+            new VsTestConsoleProcessManager(vstestConsolePath, dotnetExePath),
+            consoleParameters,
+            TestPlatformEventSource.Instance,
+            new ProcessHelper())
     {
     }
 
@@ -125,17 +126,17 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <param name="testPlatformEventSource">Performance event source.</param>
     /// <param name="processHelper">Helper for process related utilities.</param>
     internal VsTestConsoleWrapper(
-        ITranslationLayerRequestSender _requestSender,
+        ITranslationLayerRequestSender requestSender,
         IProcessManager processManager,
-        ConsoleParameters _consoleParameters,
-        ITestPlatformEventSource _testPlatformEventSource,
-        IProcessHelper _processHelper)
+        ConsoleParameters consoleParameters,
+        ITestPlatformEventSource testPlatformEventSource,
+        IProcessHelper processHelper)
     {
-        _requestSender = _requestSender;
+        _requestSender = requestSender;
         _vstestConsoleProcessManager = processManager;
-        _consoleParameters = _consoleParameters;
-        _testPlatformEventSource = _testPlatformEventSource;
-        _processHelper = _processHelper;
+        _consoleParameters = consoleParameters;
+        _testPlatformEventSource = testPlatformEventSource;
+        _processHelper = processHelper;
         _pathToAdditionalExtensions = new List<string>();
 
         _vstestConsoleProcessManager.ProcessExited += (sender, args) => _requestSender.OnProcessExited();
@@ -249,11 +250,11 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    public void InitializeExtensions(IEnumerable<string> _pathToAdditionalExtensions)
+    public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
     {
         EnsureInitialized();
 
-        _pathToAdditionalExtensions = _pathToAdditionalExtensions.ToList();
+        _pathToAdditionalExtensions = pathToAdditionalExtensions.ToList();
         _requestSender.InitializeExtensions(_pathToAdditionalExtensions);
     }
 
@@ -661,10 +662,10 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    public async Task InitializeExtensionsAsync(IEnumerable<string> _pathToAdditionalExtensions)
+    public async Task InitializeExtensionsAsync(IEnumerable<string> pathToAdditionalExtensions)
     {
         await EnsureInitializedAsync().ConfigureAwait(false);
-        _pathToAdditionalExtensions = _pathToAdditionalExtensions.ToList();
+        _pathToAdditionalExtensions = pathToAdditionalExtensions.ToList();
         _requestSender.InitializeExtensions(_pathToAdditionalExtensions);
     }
 
@@ -939,6 +940,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task ProcessTestRunAttachmentsAsync(
         IEnumerable<AttachmentSet> attachments,
+        IEnumerable<InvokedDataCollector> invokedDataCollectors,
         string processingSettings,
         bool isLastBatch,
         bool collectMetrics,
@@ -950,10 +952,23 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         await EnsureInitializedAsync().ConfigureAwait(false);
         await _requestSender.ProcessTestRunAttachmentsAsync(
             attachments,
+            invokedDataCollectors,
+            processingSettings,
             collectMetrics,
             testSessionEventsHandler,
             cancellationToken).ConfigureAwait(false);
     }
+
+    /// <inheritdoc/>
+    public Task ProcessTestRunAttachmentsAsync(
+        IEnumerable<AttachmentSet> attachments,
+        string processingSettings,
+        bool isLastBatch,
+        bool collectMetrics,
+        ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler,
+        CancellationToken cancellationToken)
+        => ProcessTestRunAttachmentsAsync(attachments, Enumerable.Empty<InvokedDataCollector>(), processingSettings, isLastBatch, collectMetrics, testSessionEventsHandler, cancellationToken);
+
     #endregion
 
     private void EnsureInitialized()
@@ -967,12 +982,12 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
                 StartSession();
                 _sessionStarted = WaitForConnection();
 
-                if (_sessionStarted)
-                {
-                    EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Send a request to initialize extensions.");
-                    _requestSender.InitializeExtensions(_pathToAdditionalExtensions);
-                }
+            if (_sessionStarted)
+            {
+                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Send a request to initialize extensions.");
+                _requestSender.InitializeExtensions(_pathToAdditionalExtensions);
             }
+        }
 
             if (!_sessionStarted && _requestSender != null)
             {
@@ -1014,7 +1029,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
                     CoreUtilitiesConstants.VstestConsoleProcessName,
                     timeout,
                     EnvironmentHelper.VstestConnectionTimeout)
-                );
+            );
         }
 
         _testPlatformEventSource.TranslationLayerInitializeStop();

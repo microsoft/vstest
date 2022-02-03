@@ -13,52 +13,52 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-using Microsoft.VisualStudio.TestPlatform.Client;
-using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+using Client;
+using Client.RequestHelper;
+using Internal;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
-using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
-using Microsoft.VisualStudio.TestPlatform.Common;
-using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Publisher;
+using Resources;
+using CommandLineUtilities;
+using Common;
+using Common.Interfaces;
+using Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using CoreUtilities.Tracing;
+using CoreUtilities.Tracing.Interfaces;
+using CrossPlatEngine.TestRunAttachmentsProcessing;
+using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
+using PlatformAbstractions;
+using PlatformAbstractions.Interfaces;
+using Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
-using System.Collections.Concurrent;
+using Utilities.Helpers;
 
 /// <summary>
 /// Defines the test request manger which can fire off discovery and test run requests.
 /// </summary>
 internal class TestRequestManager : ITestRequestManager
 {
-    private static ITestRequestManager testRequestManagerInstance;
+    private static ITestRequestManager s_testRequestManagerInstance;
 
-    private const int runRequestTimeout = 5000;
+    private const int RunRequestTimeout = 5000;
 
     private readonly ITestPlatform _testPlatform;
     private readonly ITestPlatformEventSource _testPlatformEventSource;
     private readonly Task<IMetricsPublisher> _metricsPublisher;
-    private readonly object _syncObject = new object();
+    private readonly object _syncObject = new();
 
     private bool _isDisposed;
     private bool _telemetryOptedIn;
-    private CommandLineOptions _commandLineOptions;
-    private TestRunResultAggregator _testRunResultAggregator;
-    private InferHelper _inferHelper;
-    private IProcessHelper _processHelper;
-    private ITestRunAttachmentsProcessingManager _attachmentsProcessingManager;
+    private readonly CommandLineOptions _commandLineOptions;
+    private readonly TestRunResultAggregator _testRunResultAggregator;
+    private readonly InferHelper _inferHelper;
+    private readonly IProcessHelper _processHelper;
+    private readonly ITestRunAttachmentsProcessingManager _attachmentsProcessingManager;
 
     private int _runId = 0;
     private int _discoveryId = 0;
@@ -77,7 +77,6 @@ internal class TestRequestManager : ITestRequestManager
     /// Maintains the current active test run attachments processing cancellation token source.
     /// Assumption: There can only be one active attachments processing request.
     /// </summary>
-    //TODO: !
     private CancellationTokenSource _currentAttachmentsProcessingCancellationTokenSource;
 
     #region Constructor
@@ -87,39 +86,37 @@ internal class TestRequestManager : ITestRequestManager
     /// </summary>
     public TestRequestManager()
         : this(
-              CommandLineOptions.Instance,
-              TestPlatformFactory.GetTestPlatform(),
-              TestRunResultAggregator.Instance,
-              TestPlatformEventSource.Instance,
-              new InferHelper(AssemblyMetadataProvider.Instance),
-              MetricsPublisherFactory.GetMetricsPublisher(
-                  IsTelemetryOptedIn(),
-                  CommandLineOptions.Instance.IsDesignMode),
-              new ProcessHelper(),
-              new TestRunAttachmentsProcessingManager(
-                  TestPlatformEventSource.Instance,
-                  new CodeCoverageDataAttachmentsHandler()))
+            CommandLineOptions.Instance,
+            TestPlatformFactory.GetTestPlatform(),
+            TestRunResultAggregator.Instance,
+            TestPlatformEventSource.Instance,
+            new InferHelper(AssemblyMetadataProvider.Instance),
+            MetricsPublisherFactory.GetMetricsPublisher(
+                IsTelemetryOptedIn(),
+                CommandLineOptions.Instance.IsDesignMode),
+            new ProcessHelper(),
+            new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new DataCollectorAttachmentsProcessorsFactory()))
     {
     }
 
     internal TestRequestManager(
-        CommandLineOptions _commandLineOptions,
-        ITestPlatform _testPlatform,
-        TestRunResultAggregator _testRunResultAggregator,
-        ITestPlatformEventSource _testPlatformEventSource,
-        InferHelper _inferHelper,
-        Task<IMetricsPublisher> _metricsPublisher,
-        IProcessHelper _processHelper,
-        ITestRunAttachmentsProcessingManager _attachmentsProcessingManager)
+        CommandLineOptions commandLineOptions,
+        ITestPlatform testPlatform,
+        TestRunResultAggregator testRunResultAggregator,
+        ITestPlatformEventSource testPlatformEventSource,
+        InferHelper inferHelper,
+        Task<IMetricsPublisher> metricsPublisher,
+        IProcessHelper processHelper,
+        ITestRunAttachmentsProcessingManager attachmentsProcessingManager)
     {
-        _testPlatform = _testPlatform;
-        _commandLineOptions = _commandLineOptions;
-        _testRunResultAggregator = _testRunResultAggregator;
-        _testPlatformEventSource = _testPlatformEventSource;
-        _inferHelper = _inferHelper;
-        _metricsPublisher = _metricsPublisher;
-        _processHelper = _processHelper;
-        _attachmentsProcessingManager = _attachmentsProcessingManager;
+        _testPlatform = testPlatform;
+        _commandLineOptions = commandLineOptions;
+        _testRunResultAggregator = testRunResultAggregator;
+        _testPlatformEventSource = testPlatformEventSource;
+        _inferHelper = inferHelper;
+        _metricsPublisher = metricsPublisher;
+        _processHelper = processHelper;
+        _attachmentsProcessingManager = attachmentsProcessingManager;
     }
 
     #endregion
@@ -131,12 +128,12 @@ internal class TestRequestManager : ITestRequestManager
     {
         get
         {
-            if (testRequestManagerInstance == null)
+            if (s_testRequestManagerInstance == null)
             {
-                testRequestManagerInstance = new TestRequestManager();
+                s_testRequestManagerInstance = new TestRequestManager();
             }
 
-            return testRequestManagerInstance;
+            return s_testRequestManagerInstance;
         }
     }
 
@@ -179,10 +176,10 @@ internal class TestRequestManager : ITestRequestManager
 
         var requestData = GetRequestData(protocolConfig);
         if (UpdateRunSettingsIfRequired(
-            runsettings,
-            discoveryPayload.Sources?.ToList(),
-            discoveryEventsRegistrar,
-            out string updatedRunsettings))
+                runsettings,
+                discoveryPayload.Sources?.ToList(),
+                discoveryEventsRegistrar,
+                out string updatedRunsettings))
         {
             runsettings = updatedRunsettings;
         }
@@ -406,8 +403,10 @@ internal class TestRequestManager : ITestRequestManager
                 _currentAttachmentsProcessingCancellationTokenSource = new CancellationTokenSource();
 
                 Task task = _attachmentsProcessingManager.ProcessTestRunAttachmentsAsync(
+                    attachmentsProcessingPayload.RunSettings,
                     requestData,
                     attachmentsProcessingPayload.Attachments,
+                    attachmentsProcessingPayload.InvokedDataCollectors,
                     attachmentsProcessingEventsHandler,
                     _currentAttachmentsProcessingCancellationTokenSource.Token);
                 task.Wait();
@@ -448,10 +447,10 @@ internal class TestRequestManager : ITestRequestManager
         var requestData = GetRequestData(protocolConfig);
 
         if (UpdateRunSettingsIfRequired(
-            payload.RunSettings,
-            payload.Sources,
-            null,
-            out string updatedRunsettings))
+                payload.RunSettings,
+                payload.Sources,
+                null,
+                out string updatedRunsettings))
         {
             payload.RunSettings = updatedRunsettings;
         }
@@ -505,8 +504,8 @@ internal class TestRequestManager : ITestRequestManager
             InferRunSettingsHelper.IsTestSettingsEnabled(runsettings));
 
         if (InferRunSettingsHelper.TryGetLegacySettingElements(
-            runsettings,
-            out Dictionary<string, string> legacySettingsTelemetry))
+                runsettings,
+                out Dictionary<string, string> legacySettingsTelemetry))
         {
             foreach (var ciData in legacySettingsTelemetry)
             {
@@ -602,81 +601,107 @@ internal class TestRequestManager : ITestRequestManager
         if (!string.IsNullOrEmpty(runsettingsXml))
         {
             // TargetFramework is full CLR. Set DesignMode based on current context.
-            using (var stream = new StringReader(runsettingsXml))
-            using (var reader = XmlReader.Create(
+            using var stream = new StringReader(runsettingsXml);
+            using var reader = XmlReader.Create(
                 stream,
-                XmlRunSettingsUtilities.ReaderSettings))
-            {
-                var document = new XmlDocument();
-                document.Load(reader);
-                var navigator = document.CreateNavigator();
-                var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
-                var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml)
-                    ?? new LoggerRunSettings();
+                XmlRunSettingsUtilities.ReaderSettings);
+            var document = new XmlDocument();
+            document.Load(reader);
+            var navigator = document.CreateNavigator();
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
+            var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml)
+                                    ?? new LoggerRunSettings();
 
-                settingsUpdated |= UpdateFramework(
-                    document,
-                    navigator,
-                    sources,
-                    sourceFrameworks,
-                    registrar,
-                    out Framework chosenFramework);
+            settingsUpdated |= UpdateFramework(
+                document,
+                navigator,
+                sources,
+                sourceFrameworks,
+                registrar,
+                out Framework chosenFramework);
 
-                // Choose default architecture based on the framework.
-                // For .NET core, the default platform architecture should be based on the process.	
-                Architecture defaultArchitecture = Architecture.X86;
-                if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                    || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
+            // Choose default architecture based on the framework.
+            // For .NET core, the default platform architecture should be based on the process.
+            Architecture defaultArchitecture = Architecture.X86;
+            if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+                || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
                 // This is a special case for 1 version of Nuget.Frameworks that was shipped with using identifier NET5 instead of NETCoreApp5 for .NET 5.
-                    || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
-                {
+                || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
 #if NETCOREAPP
-                    // We are running in vstest.console that is either started via dotnet.exe
-                    // or via vstest.console.exe .NET Core executable. For AnyCPU dlls this
-                    // should resolve 32-bit SDK when running from 32-bit dotnet process and 
-                    // 64-bit SDK when running from 64-bit dotnet process.
-                    // As default architecture we specify the expected test host architecture,
-                    // it can be specified by user on the command line with --arch or through runsettings.
-                    // If it's not specified by user will be filled by current processor architecture;
-                    // should be the same as SDK.
-                    defaultArchitecture = runConfiguration.TargetPlatform;
-                    EqtTrace.Verbose($"Default architecture: {defaultArchitecture}");
+                // We are running in vstest.console that is either started via dotnet.exe
+                // or via vstest.console.exe .NET Core executable. For AnyCPU dlls this
+                // should resolve 32-bit SDK when running from 32-bit dotnet process and
+                // 64-bit SDK when running from 64-bit dotnet process.
+                // As default architecture we specify the expected test host architecture,
+                // it can be specified by user on the command line with --arch or through runsettings.
+                // If it's not specified by user will be filled by current processor architecture;
+                // should be the same as SDK.
+                defaultArchitecture = RunSettingsHelper.Instance.IsDefaultTargetArchitecture ?
+                    TranslateToArchitecture(_processHelper.GetCurrentProcessArchitecture()) :
+                    runConfiguration.TargetPlatform;
 #else
-                    // We are running in vstest.console.exe that was built against .NET
-                    // Framework. This console prefers 32-bit because it needs to run as 32-bit
-                    // to be compatible with QTAgent. It runs as 32-bit both under VS and in
-                    // Developer console. Set the default architecture based on the OS
-                    // architecture, to find 64-bit dotnet SDK when running AnyCPU dll on 64-bit
-                    // system, and 32-bit SDK when running AnyCPU dll on 32-bit OS.
-                    // We want to find 64-bit SDK because it is more likely to be installed.
-                    defaultArchitecture = Environment.Is64BitOperatingSystem ? Architecture.X64 : Architecture.X86;
+                // We are running in vstest.console.exe that was built against .NET
+                // Framework. This console prefers 32-bit because it needs to run as 32-bit
+                // to be compatible with QTAgent. It runs as 32-bit both under VS and in
+                // Developer console. Set the default architecture based on the OS
+                // architecture, to find 64-bit dotnet SDK when running AnyCPU dll on 64-bit
+                // system, and 32-bit SDK when running AnyCPU dll on 32-bit OS.
+                // We want to find 64-bit SDK because it is more likely to be installed.
+                defaultArchitecture = Environment.Is64BitOperatingSystem ? Architecture.X64 : Architecture.X86;
 #endif
-                }
-
-                settingsUpdated |= UpdatePlatform(
-                    document,
-                    navigator,
-                    sources,
-                    sourcePlatforms,
-                    defaultArchitecture,
-                    out Architecture chosenPlatform);
-                CheckSourcesForCompatibility(
-                    chosenFramework,
-                    chosenPlatform,
-                    defaultArchitecture,
-                    sourcePlatforms,
-                    sourceFrameworks,
-                    registrar);
-                settingsUpdated |= UpdateDesignMode(document, runConfiguration);
-                settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
-                settingsUpdated |= UpdateTargetDevice(navigator, document, runConfiguration);
-                settingsUpdated |= AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
-
-                updatedRunSettingsXml = navigator.OuterXml;
+                EqtTrace.Verbose($"TestRequestManager.UpdateRunSettingsIfRequired: Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}, Current process architecture: {_processHelper.GetCurrentProcessArchitecture()}.");
             }
+
+            settingsUpdated |= UpdatePlatform(
+                document,
+                navigator,
+                sources,
+                sourcePlatforms,
+                defaultArchitecture,
+                out Architecture chosenPlatform);
+            CheckSourcesForCompatibility(
+                chosenFramework,
+                chosenPlatform,
+                defaultArchitecture,
+                sourcePlatforms,
+                sourceFrameworks,
+                registrar);
+            settingsUpdated |= UpdateDesignMode(document, runConfiguration);
+            settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
+            settingsUpdated |= UpdateTargetDevice(navigator, document, runConfiguration);
+            settingsUpdated |= AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
+
+            updatedRunSettingsXml = navigator.OuterXml;
         }
 
         return settingsUpdated;
+
+#if NETCOREAPP
+        static Architecture TranslateToArchitecture(PlatformArchitecture targetArchitecture)
+        {
+            switch (targetArchitecture)
+            {
+                case PlatformArchitecture.X86:
+                    return Architecture.X86;
+                case PlatformArchitecture.X64:
+                    return Architecture.X64;
+                case PlatformArchitecture.ARM:
+                    return Architecture.ARM;
+                case PlatformArchitecture.ARM64:
+                    return Architecture.ARM64;
+                case PlatformArchitecture.S390x:
+                    return Architecture.S390x;
+                default:
+                    EqtTrace.Error($"TestRequestManager.TranslateToArchitecture: Unhandled architecture '{targetArchitecture}'.");
+                    break;
+            }
+
+            // We prefer to not throw in case of unhandled architecture but return Default,
+            // it should be handled in a correct way by the callers.
+            return Architecture.Default;
+        }
+#endif
     }
 
     private bool AddOrUpdateConsoleLogger(
@@ -816,8 +841,8 @@ internal class TestRequestManager : ITestRequestManager
         IBaseTestEventsRegistrar registrar,
         out Framework chosenFramework)
     {
-        // Get framework from sources. 
-        // This looks like you can optimize it by moving it down to if (updateFramework), but it has a side-effect of 
+        // Get framework from sources.
+        // This looks like you can optimize it by moving it down to if (updateFramework), but it has a side-effect of
         // populating the sourceFrameworks, which is later checked when source compatibility check is done against the value
         // that we either inferred as the common framework, or that is forced in runsettings.
         var inferedFramework = _inferHelper.AutoDetectFramework(sources, sourceFrameworks);
@@ -971,7 +996,7 @@ internal class TestRequestManager : ITestRequestManager
             }
         }
         else if (!_commandLineOptions.IsDesignMode
-            && _commandLineOptions.FrameworkVersionSpecified)
+                 && _commandLineOptions.FrameworkVersionSpecified)
         {
             required = false;
             chosenFramework = _commandLineOptions.TargetFrameworkVersion;
@@ -1041,7 +1066,7 @@ internal class TestRequestManager : ITestRequestManager
                 "Local Machine");
         }
         else if (targetDevice.Equals("Device", StringComparison.Ordinal)
-            || targetDevice.Contains("Emulator"))
+                 || targetDevice.Contains("Emulator"))
         {
             requestData.MetricsCollection.Add(
                 TelemetryDataConstants.TargetDevice,
@@ -1062,8 +1087,8 @@ internal class TestRequestManager : ITestRequestManager
 
         // Collecting TargetOS.
         requestData.MetricsCollection.Add(
-           TelemetryDataConstants.TargetOS,
-           new PlatformEnvironment().OperatingSystemVersion);
+            TelemetryDataConstants.TargetOS,
+            new PlatformEnvironment().OperatingSystemVersion);
 
         //Collecting DisableAppDomain.
         requestData.MetricsCollection.Add(
@@ -1081,7 +1106,7 @@ internal class TestRequestManager : ITestRequestManager
     {
         var telemetryStatus = Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN");
         return !string.IsNullOrEmpty(telemetryStatus)
-            && telemetryStatus.Equals("1", StringComparison.Ordinal);
+               && telemetryStatus.Equals("1", StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -1166,23 +1191,23 @@ internal class TestRequestManager : ITestRequestManager
         {
             ProtocolConfig = protocolConfig,
             MetricsCollection =
-                           _telemetryOptedIn || IsTelemetryOptedIn()
-                               ? (IMetricsCollection)new MetricsCollection()
-                               : new NoOpMetricsCollection(),
+                _telemetryOptedIn || IsTelemetryOptedIn()
+                    ? (IMetricsCollection)new MetricsCollection()
+                    : new NoOpMetricsCollection(),
             IsTelemetryOptedIn = _telemetryOptedIn || IsTelemetryOptedIn()
         };
     }
 
     private List<String> GetSources(TestRunRequestPayload testRunRequestPayload)
     {
-        List<string> sources = new List<string>();
+        List<string> sources = new();
         if (testRunRequestPayload.Sources != null
             && testRunRequestPayload.Sources.Count > 0)
         {
             sources = testRunRequestPayload.Sources;
         }
         else if (testRunRequestPayload.TestCases != null
-            && testRunRequestPayload.TestCases.Count > 0)
+                 && testRunRequestPayload.TestCases.Count > 0)
         {
             ISet<string> sourcesSet = new HashSet<string>();
             foreach (var testCase in testRunRequestPayload.TestCases)

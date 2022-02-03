@@ -11,15 +11,15 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using CoreUtilities.Extensions;
+using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using ObjectModel.Host;
+using ObjectModel.Logging;
+using PlatformAbstractions;
+using PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CoreUtilities.Helpers;
@@ -35,10 +35,10 @@ public class ProxyOperationManager
 {
     private readonly string _versionCheckPropertyName = "IsVersionCheckRequired";
     private readonly string _makeRunsettingsCompatiblePropertyName = "MakeRunsettingsCompatible";
-    private readonly ManualResetEventSlim _testHostExited = new ManualResetEventSlim(false);
+    private readonly ManualResetEventSlim _testHostExited = new(false);
     private readonly IProcessHelper _processHelper;
 
-    private IBaseProxy _baseProxy;
+    private readonly IBaseProxy _baseProxy;
     private bool _versionCheckRequired = true;
     private bool _makeRunsettingsCompatible;
     private bool _makeRunsettingsCompatibleSet;
@@ -60,10 +60,10 @@ public class ProxyOperationManager
         ITestRequestSender requestSender,
         ITestRuntimeProvider testHostManager)
         : this(
-              requestData,
-              requestSender,
-              testHostManager,
-              null)
+            requestData,
+            requestSender,
+            testHostManager,
+            null)
     { }
 
     /// <summary>
@@ -78,12 +78,12 @@ public class ProxyOperationManager
         IRequestData requestData,
         ITestRequestSender requestSender,
         ITestRuntimeProvider testHostManager,
-        IBaseProxy _baseProxy)
+        IBaseProxy baseProxy)
     {
         RequestData = requestData;
         RequestSender = requestSender;
         TestHostManager = testHostManager;
-        _baseProxy = _baseProxy;
+        _baseProxy = baseProxy;
 
         _initialized = false;
         _testHostLaunched = false;
@@ -239,7 +239,7 @@ public class ProxyOperationManager
         var nativeHostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_NATIVE_DEBUG");
 
         if ((!string.IsNullOrEmpty(hostDebugEnabled)
-                && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
+             && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
             || (new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows)
                 && !string.IsNullOrEmpty(nativeHostDebugEnabled)
                 && nativeHostDebugEnabled.Equals("1", StringComparison.Ordinal)))
@@ -308,7 +308,10 @@ public class ProxyOperationManager
                 // The upper bound for wait should be 100ms.
                 var timeout = 100;
                 EqtTrace.Verbose("ProxyOperationManager.Close: waiting for test host to exit for {0} ms", timeout);
-                _testHostExited.Wait(timeout);
+                if (!_testHostExited.Wait(timeout))
+                {
+                    EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
+                }
 
                 // Closing the communication channel.
                 RequestSender.Close();
@@ -323,8 +326,6 @@ public class ProxyOperationManager
         finally
         {
             _initialized = false;
-
-            EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
 
             // Please clean up test host.
             TestHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
@@ -394,18 +395,15 @@ public class ProxyOperationManager
 
     private string GetTimestampedLogFile(string logFile)
     {
-        if (string.IsNullOrWhiteSpace(logFile))
-        {
-            return null;
-        }
-
-        return Path.ChangeExtension(
-            logFile,
-            string.Format(
-                "host.{0}_{1}{2}",
-                DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
-                new PlatformEnvironment().GetCurrentManagedThreadId(),
-                Path.GetExtension(logFile))).AddDoubleQuote();
+        return string.IsNullOrWhiteSpace(logFile)
+            ? null
+            : Path.ChangeExtension(
+                logFile,
+                string.Format(
+                    "host.{0}_{1}{2}",
+                    DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
+                    new PlatformEnvironment().GetCurrentManagedThreadId(),
+                    Path.GetExtension(logFile))).AddDoubleQuote();
     }
 
     private void CompatIssueWithVersionCheckAndRunsettings()
@@ -434,7 +432,6 @@ public class ProxyOperationManager
 
     private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)
     {
-        TestHostLimiter.Release();
         EqtTrace.Verbose("CrossPlatEngine.TestHostManagerHostExited: calling on client process exit callback.");
         _testHostProcessStdError = e.Data;
 
@@ -447,9 +444,9 @@ public class ProxyOperationManager
         RequestSender.OnClientProcessExit(_testHostProcessStdError);
     }
 
-    private void ThrowOnTestHostExited(bool _testHostExited)
+    private void ThrowOnTestHostExited(bool testHostExited)
     {
-        if (_testHostExited)
+        if (testHostExited)
         {
             // We might consider passing standard output here in case standard error is not
             // available because some errors don't end up in the standard error output.

@@ -5,10 +5,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 
 using System;
 using System.Threading;
-using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+using RequestHelper;
+using ObjectModel;
+using ObjectModel.Logging;
 
 /// <summary>
 /// The interface for design mode client.

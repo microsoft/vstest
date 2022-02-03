@@ -10,22 +10,22 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.VisualStudio.TestPlatform.Client;
-using Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
-using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Client;
+using TestRunAttachmentsProcessing;
+using RequestHelper;
+using Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using CommunicationUtilities;
+using CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using CoreUtilities.Helpers;
+using CrossPlatEngine;
+using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using ObjectModel.Logging;
+using PlatformAbstractions;
+using PlatformAbstractions.Interfaces;
 
 using CommunicationUtilitiesResources = CommunicationUtilities.Resources.Resources;
 using System.Linq.Expressions;
@@ -38,13 +38,14 @@ public class DesignModeClient : IDesignModeClient
     private readonly ICommunicationManager _communicationManager;
     private readonly IDataSerializer _dataSerializer;
 
-    private ProtocolConfig _protocolConfig = ObjectModel.Constants.DefaultProtocolConfig;
-    private IEnvironment _platformEnvironment;
-    private TestSessionMessageLogger _testSessionMessageLogger;
-    private object _lockObject = new object();
-
-    protected Action<Message> _onCustomTestHostLaunchAckReceived;
-    protected Action<Message> _onAttachDebuggerAckRecieved;
+    private readonly ProtocolConfig _protocolConfig = ObjectModel.Constants.DefaultProtocolConfig;
+    private readonly IEnvironment _platformEnvironment;
+    private readonly TestSessionMessageLogger _testSessionMessageLogger;
+    private readonly object _lockObject = new();
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
+    protected Action<Message> onCustomTestHostLaunchAckReceived;
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
+    protected Action<Message> onAttachDebuggerAckRecieved;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DesignModeClient"/> class.
@@ -68,9 +69,9 @@ public class DesignModeClient : IDesignModeClient
     /// </param>
     internal DesignModeClient(ICommunicationManager communicationManager, IDataSerializer dataSerializer, IEnvironment platformEnvironment)
     {
-        _communicationManager = _communicationManager;
-        _dataSerializer = _dataSerializer;
-        _platformEnvironment = _platformEnvironment;
+        _communicationManager = communicationManager;
+        _dataSerializer = dataSerializer;
+        _platformEnvironment = platformEnvironment;
         _testSessionMessageLogger = TestSessionMessageLogger.Instance;
         _testSessionMessageLogger.TestRunMessage += TestRunMessageHandler;
     }
@@ -122,7 +123,7 @@ public class DesignModeClient : IDesignModeClient
                     "translation layer",
                     connectionTimeoutInSecs,
                     EnvironmentHelper.VstestConnectionTimeout)
-                );
+            );
         }
     }
 
@@ -258,13 +259,13 @@ public class DesignModeClient : IDesignModeClient
 
                     case MessageType.CustomTestHostLaunchCallback:
                         {
-                            _onCustomTestHostLaunchAckReceived?.Invoke(message);
+                            onCustomTestHostLaunchAckReceived?.Invoke(message);
                             break;
                         }
 
                     case MessageType.EditorAttachDebuggerCallback:
                         {
-                            _onAttachDebuggerAckRecieved?.Invoke(message);
+                            onAttachDebuggerAckRecieved?.Invoke(message);
                             break;
                         }
 
@@ -311,7 +312,7 @@ public class DesignModeClient : IDesignModeClient
         {
             var waitHandle = new AutoResetEvent(false);
             Message ackMessage = null;
-            _onCustomTestHostLaunchAckReceived = (ackRawMessage) =>
+            onCustomTestHostLaunchAckReceived = (ackRawMessage) =>
             {
                 ackMessage = ackRawMessage;
                 waitHandle.Set();
@@ -328,18 +329,11 @@ public class DesignModeClient : IDesignModeClient
 
             cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
 
-            _onCustomTestHostLaunchAckReceived = null;
+            onCustomTestHostLaunchAckReceived = null;
 
             var ackPayload = _dataSerializer.DeserializePayload<CustomHostLaunchAckPayload>(ackMessage);
 
-            if (ackPayload.HostProcessId > 0)
-            {
-                return ackPayload.HostProcessId;
-            }
-            else
-            {
-                throw new TestPlatformException(ackPayload.ErrorMessage);
-            }
+            return ackPayload.HostProcessId > 0 ? ackPayload.HostProcessId : throw new TestPlatformException(ackPayload.ErrorMessage);
         }
     }
 
@@ -367,7 +361,7 @@ public class DesignModeClient : IDesignModeClient
         {
             var waitHandle = new AutoResetEvent(false);
             Message ackMessage = null;
-            _onAttachDebuggerAckRecieved = (ackRawMessage) =>
+            onAttachDebuggerAckRecieved = (ackRawMessage) =>
             {
                 ackMessage = ackRawMessage;
                 waitHandle.Set();
@@ -378,7 +372,7 @@ public class DesignModeClient : IDesignModeClient
             WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
 
             cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
-            _onAttachDebuggerAckRecieved = null;
+            onAttachDebuggerAckRecieved = null;
 
             var ackPayload = _dataSerializer.DeserializePayload<EditorAttachDebuggerAckPayload>(ackMessage);
             if (!ackPayload.Attached)

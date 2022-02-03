@@ -6,8 +6,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using System;
 using System.IO;
 
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
+using Interfaces;
+using Serialization;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -17,11 +17,11 @@ using Newtonsoft.Json.Linq;
 /// </summary>
 public class JsonDataSerializer : IDataSerializer
 {
-    private static JsonDataSerializer instance;
+    private static JsonDataSerializer s_instance;
 
-    private static JsonSerializer payloadSerializer; // payload serializer for version <= 1
-    private static JsonSerializer payloadSerializer2; // payload serializer for version >= 2
-    private static JsonSerializer serializer; // generic serializer
+    private static JsonSerializer s_payloadSerializer; // payload serializer for version <= 1
+    private static JsonSerializer s_payloadSerializer2; // payload serializer for version >= 2
+    private static JsonSerializer s_serializer; // generic serializer
 
     /// <summary>
     /// Prevents a default instance of the <see cref="JsonDataSerializer"/> class from being created.
@@ -37,12 +37,12 @@ public class JsonDataSerializer : IDataSerializer
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
         };
 
-        serializer = JsonSerializer.Create();
-        payloadSerializer = JsonSerializer.Create(jsonSettings);
-        payloadSerializer2 = JsonSerializer.Create(jsonSettings);
+        s_serializer = JsonSerializer.Create();
+        s_payloadSerializer = JsonSerializer.Create(jsonSettings);
+        s_payloadSerializer2 = JsonSerializer.Create(jsonSettings);
 
-        payloadSerializer.ContractResolver = new TestPlatformContractResolver1();
-        payloadSerializer2.ContractResolver = new DefaultTestPlatformContractResolver();
+        s_payloadSerializer.ContractResolver = new TestPlatformContractResolver1();
+        s_payloadSerializer2.ContractResolver = new DefaultTestPlatformContractResolver();
 
 #if TRACE_JSON_SERIALIZATION
         // MemoryTraceWriter can help diagnose serialization issues. Enable it for
@@ -57,13 +57,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <summary>
     /// Gets the JSON Serializer instance.
     /// </summary>
-    public static JsonDataSerializer Instance
-    {
-        get
-        {
-            return instance ?? (instance = new JsonDataSerializer());
-        }
-    }
+    public static JsonDataSerializer Instance => s_instance ??= new JsonDataSerializer();
 
     /// <summary>
     /// Deserialize a <see cref="Message"/> from raw JSON text.
@@ -72,7 +66,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>A <see cref="Message"/> instance.</returns>
     public Message DeserializeMessage(string rawMessage)
     {
-        return Deserialize<VersionedMessage>(serializer, rawMessage);
+        return Deserialize<VersionedMessage>(s_serializer, rawMessage);
     }
 
     /// <summary>
@@ -125,7 +119,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>Serialized message.</returns>
     public string SerializeMessage(string messageType)
     {
-        return Serialize(serializer, new Message { MessageType = messageType });
+        return Serialize(s_serializer, new Message { MessageType = messageType });
     }
 
 #pragma warning disable RS0016 // Add public types and members to the declared API
@@ -223,12 +217,10 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>Serialized data.</returns>
     private string Serialize<T>(JsonSerializer serializer, T data)
     {
-        using (var stringWriter = new StringWriter())
-        using (var jsonWriter = new JsonTextWriter(stringWriter))
-        {
-            serializer.Serialize(jsonWriter, data);
-            return stringWriter.ToString();
-        }
+        using var stringWriter = new StringWriter();
+        using var jsonWriter = new JsonTextWriter(stringWriter);
+        serializer.Serialize(jsonWriter, data);
+        return stringWriter.ToString();
     }
 
     /// <summary>
@@ -240,11 +232,9 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>Deserialized data.</returns>
     private T Deserialize<T>(JsonSerializer serializer, string data)
     {
-        using (var stringReader = new StringReader(data))
-        using (var jsonReader = new JsonTextReader(stringReader))
-        {
-            return serializer.Deserialize<T>(jsonReader);
-        }
+        using var stringReader = new StringReader(data);
+        using var jsonReader = new JsonTextReader(stringReader);
+        return serializer.Deserialize<T>(jsonReader);
     }
 
     /// <summary>
@@ -266,24 +256,17 @@ public class JsonDataSerializer : IDataSerializer
             version = 1;
         }
 
-        switch (version)
+        return version switch
         {
-            // 0 is used during negotiation
-            case 0:
-            case 1:
+            // 0 is used during negotiation.
             // Protocol version 3 was accidentally used with serializer v1 and not
             // serializer v2, we downgrade to protocol 2 when 3 would be negotiated
             // unless this is disabled by VSTEST_DISABLE_PROTOCOL_3_VERSION_DOWNGRADE
             // env variable.
-            case 3:
-                return payloadSerializer;
-            case 2:
-            case 4:
-            case 5:
-                return payloadSerializer2;
-            default:
-                throw new NotSupportedException($"Protocol version {version} is not supported. " +
-                    "Ensure it is compatible with the latest serializer or add a new one.");
-        }
+            0 or 1 or 3 => s_payloadSerializer,
+            2 or 4 or 5 => s_payloadSerializer2,
+            _ => throw new NotSupportedException($"Protocol version {version} is not supported. " +
+                "Ensure it is compatible with the latest serializer or add a new one."),
+        };
     }
 }

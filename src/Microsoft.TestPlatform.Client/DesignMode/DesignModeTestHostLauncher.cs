@@ -4,7 +4,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 
 using System.Threading;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
 /// <summary>
@@ -21,8 +22,8 @@ internal class DesignModeTestHostLauncher : ITestHostLauncher2
     /// <param name="designModeClient">Design mode client instance.</param>
     public DesignModeTestHostLauncher(IDesignModeClient designModeClient, string recipient)
     {
-        _designModeClient = _designModeClient;
-        _recipient = _recipient;
+        _designModeClient = designModeClient;
+        _recipient = recipient;
     }
 
     /// <inheritdoc/>

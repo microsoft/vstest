@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
@@ -14,8 +14,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <TargetFrameworks>net451</TargetFrameworks>
-    <AssemblyName>Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests</AssemblyName>    
-    <WarningsAsErrors>true</WarningsAsErrors>
+    <AssemblyName>Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\Microsoft.TestPlatform.Extensions.EventLogCollector.csproj" />

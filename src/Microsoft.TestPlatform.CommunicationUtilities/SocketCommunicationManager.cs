@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -48,28 +49,28 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <summary>
     /// Serializer for the data objects
     /// </summary>
-    private IDataSerializer _dataSerializer;
+    private readonly IDataSerializer _dataSerializer;
 
     /// <summary>
     /// Event used to maintain client connection state
     /// </summary>
-    private ManualResetEvent _clientConnectedEvent = new ManualResetEvent(false);
+    private readonly ManualResetEvent _clientConnectedEvent = new(false);
 
     /// <summary>
     /// Event used to maintain client connection state
     /// </summary>
-    private ManualResetEvent _clientConnectionAcceptedEvent = new ManualResetEvent(false);
+    private readonly ManualResetEvent _clientConnectionAcceptedEvent = new(false);
 
     /// <summary>
     /// Sync object for sending messages
     /// SendMessage over socket channel is NOT thread-safe
     /// </summary>
-    private object _sendSyncObject = new object();
+    private readonly object _sendSyncObject = new();
 
     /// <summary>
     /// Sync object for receiving messages
     /// </summary>
-    private object _receiveSyncObject = new object();
+    private readonly object _receiveSyncObject = new();
 
     private Socket _socket;
 
@@ -83,7 +84,7 @@ public class SocketCommunicationManager : ICommunicationManager
 
     internal SocketCommunicationManager(IDataSerializer dataSerializer)
     {
-        _dataSerializer = _dataSerializer;
+        _dataSerializer = dataSerializer;
     }
 
     #region ServerMethods
@@ -138,7 +139,11 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <returns>True if Client is connected, false otherwise</returns>
     public bool WaitForClientConnection(int clientConnectionTimeout)
     {
-        return _clientConnectedEvent.WaitOne(clientConnectionTimeout);
+        var stopWatch = Stopwatch.StartNew();
+        var result = _clientConnectedEvent.WaitOne(clientConnectionTimeout);
+        EqtTrace.Verbose("SocketCommunicationManager.WaitForClientConnection took: {0} ms, with {1} ms timeout, and finished with {2}.", stopWatch.ElapsedMilliseconds, clientConnectionTimeout, result);
+
+        return result;
     }
 
     /// <summary>
@@ -164,13 +169,13 @@ public class SocketCommunicationManager : ICommunicationManager
     public async Task SetupClientAsync(IPEndPoint endpoint)
     {
         // TODO: pass cancellation token, if user cancels the operation, so we don't wait 50 secs to connect
-        // for now added a check for validation of tcpclient
+        // for now added a check for validation of this.tcpclient
         _clientConnectionAcceptedEvent.Reset();
-        EqtTrace.Info("Trying to connect to server on _socket : {0} ", endpoint);
+        EqtTrace.Info("Trying to connect to server on socket : {0} ", endpoint);
         _tcpClient = new TcpClient { NoDelay = true };
         _socket = _tcpClient.Client;
 
-        Stopwatch watch = new Stopwatch();
+        Stopwatch watch = new();
         watch.Start();
         var connectionTimeout = EnvironmentHelper.GetConnectionTimeout() * 1000;
         do
@@ -214,7 +219,11 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <returns>True, if Server got a connection from client</returns>
     public bool WaitForServerConnection(int connectionTimeout)
     {
-        return _clientConnectionAcceptedEvent.WaitOne(connectionTimeout);
+        var stopWatch = Stopwatch.StartNew();
+        var result = _clientConnectionAcceptedEvent.WaitOne(connectionTimeout);
+        EqtTrace.Verbose("SocketCommunicationManager.WaitForServerConnection took: {0} ms, with {1} ms timeout, and finished with {2}.", stopWatch.ElapsedMilliseconds, connectionTimeout, result);
+
+        return result;
     }
 
     /// <summary>

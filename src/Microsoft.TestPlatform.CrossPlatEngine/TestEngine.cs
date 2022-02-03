@@ -7,25 +7,24 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using Microsoft.VisualStudio.TestPlatform.Common;
-using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
-using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+
+using Common;
+using Common.Hosting;
+using Common.Logging;
+using Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using CommunicationUtilities;
+using Client;
+using Client.Parallel;
+using DataCollection;
+using Utilities;
+using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using ObjectModel.Engine;
+using ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using PlatformAbstractions;
+using PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
@@ -37,7 +36,7 @@ public class TestEngine : ITestEngine
 
     private readonly TestRuntimeProviderManager _testHostProviderManager;
     private ITestExtensionManager _testExtensionManager;
-    private IProcessHelper _processHelper;
+    private readonly IProcessHelper _processHelper;
 
     #endregion
 
@@ -46,11 +45,11 @@ public class TestEngine : ITestEngine
     }
 
     protected TestEngine(
-        TestRuntimeProviderManager _testHostProviderManager,
-        IProcessHelper _processHelper)
+        TestRuntimeProviderManager testHostProviderManager,
+        IProcessHelper processHelper)
     {
-        _testHostProviderManager = _testHostProviderManager;
-        _processHelper = _processHelper;
+        _testHostProviderManager = testHostProviderManager;
+        _processHelper = processHelper;
     }
 
     #region ITestEngine implementation
@@ -88,26 +87,26 @@ public class TestEngine : ITestEngine
             // This function is used to either take a pre-existing proxy operation manager from
             // the test pool or to create a new proxy operation manager on the spot.
             Func<string, ProxyDiscoveryManager, ProxyOperationManager>
-            proxyOperationManagerCreator = (
-                string source,
-                ProxyDiscoveryManager proxyDiscoveryManager) =>
-            {
-                // In case we have an active test session, we always prefer the already
-                // created proxies instead of the ones that need to be created on the spot.
-                var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
-                    discoveryCriteria.TestSessionInfo,
-                    source,
-                    discoveryCriteria.RunSettings);
-
-                if (proxyOperationManager == null)
+                proxyOperationManagerCreator = (
+                    string source,
+                    ProxyDiscoveryManager proxyDiscoveryManager) =>
                 {
-                    // If the proxy creation process based on test session info failed, then
-                    // we'll proceed with the normal creation process as if no test session
-                    // info was passed in in the first place.
-                    // 
-                    // WARNING: This should not normally happen and it raises questions
-                    // regarding the test session pool operation and consistency.
-                    EqtTrace.Warning("ProxyDiscoveryManager creation with test session failed.");
+                    // In case we have an active test session, we always prefer the already
+                    // created proxies instead of the ones that need to be created on the spot.
+                    var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
+                        discoveryCriteria.TestSessionInfo,
+                        source,
+                        discoveryCriteria.RunSettings);
+
+                    if (proxyOperationManager == null)
+                    {
+                        // If the proxy creation process based on test session info failed, then
+                        // we'll proceed with the normal creation process as if no test session
+                        // info was passed in in the first place.
+                        //
+                        // WARNING: This should not normally happen and it raises questions
+                        // regarding the test session pool operation and consistency.
+                        EqtTrace.Warning("ProxyDiscoveryManager creation with test session failed.");
 
                     proxyOperationManager = new ProxyOperationManager(
                         requestData,
@@ -160,9 +159,9 @@ public class TestEngine : ITestEngine
         var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
         if (ShouldRunInNoIsolation(
-            testRunCriteria.TestRunSettings,
-            parallelLevel > 1,
-            isDataCollectorEnabled || isInProcDataCollectorEnabled))
+                testRunCriteria.TestRunSettings,
+                parallelLevel > 1,
+                isDataCollectorEnabled || isInProcDataCollectorEnabled))
         {
             var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
             var newRequestData = GetRequestData(isTelemetryOptedIn);
@@ -193,24 +192,24 @@ public class TestEngine : ITestEngine
                 // This function is used to either take a pre-existing proxy operation manager from
                 // the test pool or to create a new proxy operation manager on the spot.
                 Func<string, ProxyExecutionManager, ProxyOperationManager>
-                proxyOperationManagerCreator = (
-                    string source,
-                    ProxyExecutionManager proxyExecutionManager) =>
-                {
-                    var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
-                        testRunCriteria.TestSessionInfo,
-                        source,
-                        testRunCriteria.TestRunSettings);
-
-                    if (proxyOperationManager == null)
+                    proxyOperationManagerCreator = (
+                        string source,
+                        ProxyExecutionManager proxyExecutionManager) =>
                     {
-                        // If the proxy creation process based on test session info failed, then
-                        // we'll proceed with the normal creation process as if no test session
-                        // info was passed in in the first place.
-                        // 
-                        // WARNING: This should not normally happen and it raises questions
-                        // regarding the test session pool operation and consistency.
-                        EqtTrace.Warning("ProxyExecutionManager creation with test session failed.");
+                        var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
+                            testRunCriteria.TestSessionInfo,
+                            source,
+                            testRunCriteria.TestRunSettings);
+
+                        if (proxyOperationManager == null)
+                        {
+                            // If the proxy creation process based on test session info failed, then
+                            // we'll proceed with the normal creation process as if no test session
+                            // info was passed in in the first place.
+                            //
+                            // WARNING: This should not normally happen and it raises questions
+                            // regarding the test session pool operation and consistency.
+                            EqtTrace.Warning("ProxyExecutionManager creation with test session failed.");
 
                         proxyOperationManager = new ProxyOperationManager(
                             requestData,
@@ -248,13 +247,17 @@ public class TestEngine : ITestEngine
         };
 
         // parallelLevel = 1 for desktop should go via else route.
-        return (parallelLevel > 1 || !testHostManager.Shared)
+        var executionManager = (parallelLevel > 1 || !testHostManager.Shared)
             ? new ParallelProxyExecutionManager(
                 requestData,
                 proxyExecutionManagerCreator,
                 parallelLevel,
                 sharedHosts: testHostManager.Shared)
             : proxyExecutionManagerCreator();
+
+        EqtTrace.Verbose($"TestEngine.GetExecutionManager: Chosen execution manager '{executionManager.GetType().AssemblyQualifiedName}' ParallelLevel '{parallelLevel}' Shared host '{testHostManager.Shared}'");
+
+        return executionManager;
     }
 
     /// <inheritdoc/>
@@ -274,9 +277,9 @@ public class TestEngine : ITestEngine
         var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testSessionCriteria.RunSettings);
 
         if (ShouldRunInNoIsolation(
-            testSessionCriteria.RunSettings,
-            parallelLevel > 1,
-            isDataCollectorEnabled || isInProcDataCollectorEnabled))
+                testSessionCriteria.RunSettings,
+                parallelLevel > 1,
+                isDataCollectorEnabled || isInProcDataCollectorEnabled))
         {
             // This condition is the equivalent of the in-process proxy execution manager case.
             // In this case all tests will be run in the vstest.console process, so there's no
@@ -309,7 +312,7 @@ public class TestEngine : ITestEngine
 
             // TODO (copoiena): For now we don't support data collection alongside test
             // sessions.
-            // 
+            //
             // The reason for this is that, in the case of Code Coverage for example, the
             // data collector needs to pass some environment variables to the testhost process
             // before the testhost process is started. This means that the data collector must
@@ -346,11 +349,7 @@ public class TestEngine : ITestEngine
     }
 
     /// <inheritdoc/>
-    public ITestExtensionManager GetExtensionManager()
-    {
-        return _testExtensionManager
-            ?? (_testExtensionManager = new TestExtensionManager());
-    }
+    public ITestExtensionManager GetExtensionManager() => _testExtensionManager ??= new TestExtensionManager();
 
     /// <inheritdoc/>
     public ITestLoggerManager GetLoggerManager(IRequestData requestData)
@@ -367,34 +366,27 @@ public class TestEngine : ITestEngine
     {
         // No point in creating more processes if number of sources is less than what the user
         // configured for.
-        int numSources = 1;
-        if (testRunCriteria.HasSpecificTests)
-        {
-            numSources = new HashSet<string>(
-                         testRunCriteria.Tests.Select(testCase => testCase.Source)).Count;
-        }
-        else
-        {
-            numSources = testRunCriteria.Sources.Count();
-        }
-
+        int numSources = testRunCriteria.HasSpecificTests
+            ? new HashSet<string>(
+                testRunCriteria.Tests.Select(testCase => testCase.Source)).Count
+            : testRunCriteria.Sources.Count();
         return numSources;
     }
 
     /// <summary>
     /// Verifies parallel setting and returns parallel level to use based on the run criteria.
     /// </summary>
-    /// 
+    ///
     /// <param name="sourceCount">The source count.</param>
     /// <param name="runSettings">The run settings.</param>
-    /// 
+    ///
     /// <returns>The parallel level to use.</returns>
     private int VerifyParallelSettingAndCalculateParallelLevel(
         int sourceCount,
         string runSettings)
     {
         // Default is 1.
-        int parallelLevelToUse = 1;
+        int parallelLevelToUse;
         try
         {
             // Check the user parallel setting.
@@ -498,17 +490,17 @@ public class TestEngine : ITestEngine
     /// <summary>
     /// Get request data on basis of telemetry opted in or not.
     /// </summary>
-    /// 
+    ///
     /// <param name="isTelemetryOptedIn">A flag indicating if telemetry is opted in.</param>
-    /// 
+    ///
     /// <returns>The request data.</returns>
     private IRequestData GetRequestData(bool isTelemetryOptedIn)
     {
         return new RequestData
         {
             MetricsCollection = isTelemetryOptedIn
-                    ? (IMetricsCollection)new MetricsCollection()
-                    : new NoOpMetricsCollection(),
+                ? (IMetricsCollection)new MetricsCollection()
+                : new NoOpMetricsCollection(),
             IsTelemetryOptedIn = isTelemetryOptedIn
         };
     }
@@ -516,7 +508,7 @@ public class TestEngine : ITestEngine
     /// <summary>
     /// Gets test sources from test run criteria.
     /// </summary>
-    /// 
+    ///
     /// <returns>The test sources.</returns>
     private IEnumerable<string> GetSourcesFromTestRunCriteria(TestRunCriteria testRunCriteria)
     {

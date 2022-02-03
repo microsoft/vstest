@@ -11,7 +11,8 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+using Interfaces;
+
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -23,7 +24,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-using TranslationLayerResources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
+using TranslationLayerResources = VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
 
 /// <summary>
 /// Vstest console request sender for sending requests to vstest.console.exe
@@ -40,7 +41,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     private readonly IDataSerializer _dataSerializer;
     private readonly ITestPlatformEventSource _testPlatformEventSource;
 
-    private readonly ManualResetEvent _handShakeComplete = new ManualResetEvent(false);
+    private readonly ManualResetEvent _handShakeComplete = new(false);
     private readonly ConcurrentDictionary<string, ITestSessionEventsHandler> sessionEventHandlers = new ConcurrentDictionary<string, ITestSessionEventsHandler>();
     private readonly ConcurrentDictionary<string, ITestRunEventsHandler> testRunEventHandlers = new ConcurrentDictionary<string, ITestRunEventsHandler>();
     private readonly ConcurrentDictionary<string, ITestHostLauncher> customHostLaunchers = new ConcurrentDictionary<string, ITestHostLauncher>();
@@ -64,9 +65,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// </summary>
     public VsTestConsoleRequestSender()
         : this(
-              new SocketCommunicationManager(),
-              JsonDataSerializer.Instance,
-              TestPlatformEventSource.Instance)
+            new SocketCommunicationManager(),
+            JsonDataSerializer.Instance,
+            TestPlatformEventSource.Instance)
     {
     }
 
@@ -78,13 +79,13 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <param name="dataSerializer">The data serializer.</param>
     /// <param name="testPlatformEventSource">The test platform event source.</param>
     internal VsTestConsoleRequestSender(
-        ICommunicationManager _communicationManager,
-        IDataSerializer _dataSerializer,
-        ITestPlatformEventSource _testPlatformEventSource)
+        ICommunicationManager communicationManager,
+        IDataSerializer dataSerializer,
+        ITestPlatformEventSource testPlatformEventSource)
     {
-        _communicationManager = _communicationManager;
-        _dataSerializer = _dataSerializer;
-        _testPlatformEventSource = _testPlatformEventSource;
+        _communicationManager = communicationManager;
+        _dataSerializer = dataSerializer;
+        _testPlatformEventSource = testPlatformEventSource;
     }
 
     #endregion
@@ -487,7 +488,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 RunSettings = runSettings,
                 HasCustomHostLauncher = testHostLauncher != null,
                 IsDebuggingEnabled = (testHostLauncher != null)
-                && testHostLauncher.IsDebug,
+                                     && testHostLauncher.IsDebug,
                 TestPlatformOptions = options
             };
 
@@ -901,12 +902,16 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public Task ProcessTestRunAttachmentsAsync(
         IEnumerable<AttachmentSet> attachments,
+        IEnumerable<InvokedDataCollector> invokedDataCollectors,
+        string runSettings,
         bool collectMetrics,
         ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler,
         CancellationToken cancellationToken)
     {
         return SendMessageAndListenAndReportAttachmentsProcessingResultAsync(
             attachments,
+            invokedDataCollectors,
+            runSettings,
             collectMetrics,
             testSessionEventsHandler,
             cancellationToken);
@@ -1391,6 +1396,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
     private async Task SendMessageAndListenAndReportAttachmentsProcessingResultAsync(
         IEnumerable<AttachmentSet> attachments,
+        IEnumerable<InvokedDataCollector> invokedDataCollectors,
+        string runSettings,
         bool collectMetrics,
         ITestRunAttachmentsProcessingEventsHandler eventHandler,
         CancellationToken cancellationToken)
@@ -1400,6 +1407,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
             var payload = new TestRunAttachmentsProcessingPayload
             {
                 Attachments = attachments,
+                InvokedDataCollectors = invokedDataCollectors,
+                RunSettings = runSettings,
                 CollectMetrics = collectMetrics
             };
 
@@ -1409,7 +1418,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
             var isTestRunAttachmentsProcessingComplete = false;
 
             using (cancellationToken.Register(() =>
-                _communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingCancel)))
+                       _communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingCancel)))
             {
                 // Cycle through the messages that vstest.console sends.
                 // Currently each operation is not a separate task since it should not take that
@@ -1421,8 +1430,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                     var message = await TryReceiveMessageAsync().ConfigureAwait(false);
 
                     if (string.Equals(
-                        MessageType.TestRunAttachmentsProcessingComplete,
-                        message.MessageType))
+                            MessageType.TestRunAttachmentsProcessingComplete,
+                            message.MessageType))
                     {
                         if (EqtTrace.IsInfoEnabled)
                         {
@@ -1439,8 +1448,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         isTestRunAttachmentsProcessingComplete = true;
                     }
                     else if (string.Equals(
-                        MessageType.TestRunAttachmentsProcessingProgress,
-                        message.MessageType))
+                                 MessageType.TestRunAttachmentsProcessingProgress,
+                                 message.MessageType))
                     {
                         var testRunAttachmentsProcessingProgressPayload = _dataSerializer
                             .DeserializePayload<TestRunAttachmentsProcessingProgressPayload>(message);

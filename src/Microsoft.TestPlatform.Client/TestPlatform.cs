@@ -10,22 +10,23 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
-using Microsoft.VisualStudio.TestPlatform.Client.Execution;
-using Microsoft.VisualStudio.TestPlatform.Common;
-using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
-using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Discovery;
+using Execution;
+using Common;
+using Common.ExtensionFramework;
+using Common.Hosting;
+using Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using CrossPlatEngine;
+using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using ObjectModel.Engine;
+using ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using PlatformAbstractions;
+using Utilities.Helpers;
+using Utilities.Helpers.Interfaces;
+
 using ClientResources = Resources.Resources;
 
 /// <summary>
@@ -66,11 +67,11 @@ internal class TestPlatform : ITestPlatform
     protected TestPlatform(
         ITestEngine testEngine,
         IFileHelper filehelper,
-        TestRuntimeProviderManager _testHostProviderManager)
+        TestRuntimeProviderManager testHostProviderManager)
     {
-         TestEngine = testEngine;
+        TestEngine = testEngine;
         _fileHelper = filehelper;
-        _testHostProviderManager = _testHostProviderManager;
+        _testHostProviderManager = testHostProviderManager;
     }
 
     /// <summary>
@@ -241,7 +242,7 @@ internal class TestPlatform : ITestPlatform
                 {
                     if (EqtTrace.IsWarningEnabled)
                     {
-                        EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
+                        EqtTrace.Warning($"AdapterPath Not Found: {adapterPath}");
                     }
 
                     continue;
@@ -318,15 +319,15 @@ internal class TestPlatform : ITestPlatform
     /// </summary>
     private static void AddExtensionAssembliesFromExtensionDirectory()
     {
-        var _fileHelper = new FileHelper();
+        var fileHelper = new FileHelper();
         var extensionsFolder = Path.Combine(
             Path.GetDirectoryName(
                 typeof(TestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()),
             "Extensions");
 
-        if (_fileHelper.DirectoryExists(extensionsFolder))
+        if (fileHelper.DirectoryExists(extensionsFolder))
         {
-            var defaultExtensionPaths = _fileHelper.EnumerateFiles(
+            var defaultExtensionPaths = fileHelper.EnumerateFiles(
                 extensionsFolder,
                 SearchOption.TopDirectoryOnly,
                 ".dll",
