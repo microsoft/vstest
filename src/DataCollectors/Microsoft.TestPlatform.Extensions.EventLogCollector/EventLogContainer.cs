@@ -55,7 +55,11 @@ internal class EventLogContainer : IEventLogContainer
     /// </param>
     public EventLogContainer(string eventLogName, ISet<string> eventSources, ISet<EventLogEntryType> entryTypes, int maxLogEntries, DataCollectionLogger dataCollectionLogger, DataCollectionContext dataCollectionContext)
     {
-        CreateEventLog(eventLogName);
+        EventLog = new EventLog(eventLogName);
+        EventLog.EnableRaisingEvents = true;
+        EventLog.EntryWritten += OnEventLogEntryWritten;
+        int currentCount = EventLog.Entries.Count;
+        NextEntryIndexToCollect = currentCount == 0 ? 0 : EventLog.Entries[currentCount - 1].Index + 1;
         _eventSources = eventSources;
         _entryTypes = entryTypes;
         _maxLogEntries = maxLogEntries;
@@ -237,15 +241,5 @@ internal class EventLogContainer : IEventLogContainer
 
             _isDisposed = true;
         }
-    }
-
-    private void CreateEventLog(string eventLogName)
-    {
-        EventLog = new EventLog(eventLogName);
-        EventLog.EnableRaisingEvents = true;
-        EventLog.EntryWritten += OnEventLogEntryWritten;
-        int currentCount = EventLog.Entries.Count;
-        NextEntryIndexToCollect =
-            (currentCount == 0) ? 0 : EventLog.Entries[currentCount - 1].Index + 1;
     }
 }
