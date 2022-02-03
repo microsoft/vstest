@@ -54,7 +54,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
 
     private async Task<Collection<AttachmentSet>> InternalProcessTestRunAttachmentsAsync(string runSettingsXml, IRequestData requestData, Collection<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)
     {
-        Stopwatch stopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
 
         try
         {
@@ -169,6 +169,13 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
             catch (Exception e)
             {
                 EqtTrace.Error("TestRunAttachmentsProcessingManager: Exception in ProcessAttachmentsAsync: " + e);
+
+                // If it's OperationCanceledException of our cancellationToken we let the exception bubble up.
+                if (e is OperationCanceledException operationCanceled && operationCanceled.CancellationToken == cancellationToken)
+                {
+                    throw;
+                }
+
                 logger.SendMessage(TestMessageLevel.Error, e.ToString());
 
                 // Restore the attachment sets for the others attachment processors.

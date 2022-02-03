@@ -12,7 +12,6 @@ using System.Xml;
 /// </summary>
 public abstract class TestRunSettings
 {
-
     #region Constructor
 
     /// <summary>
@@ -37,7 +36,7 @@ public abstract class TestRunSettings
     /// during RunSettings.LoadSection() call
     /// TODO: Communicate to Chutzpah and fix it
     /// </summary>
-    public string Name { get; private set; }
+    public string Name { get; }
 
     #endregion
 
@@ -46,6 +45,7 @@ public abstract class TestRunSettings
     /// Converter the setting to be an XmlElement.
     /// </summary>
     /// <returns>The Xml element for the run settings provided.</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes", Justification = "XmlElement is required in the data collector.")]
     public abstract XmlElement ToXml();
 #endif
 }

@@ -545,7 +545,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
             HandleLoggerManagerTestRunComplete(testRunCompletePayload);
         }
 
-        OnRawMessageReceived?.Invoke(this, rawMessage);
+        OnRawMessageReceived?.SafeInvoke(this, rawMessage, "TestRunRequest.RawMessageReceived");
     }
 
     /// <summary>
