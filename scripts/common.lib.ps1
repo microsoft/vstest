@@ -189,13 +189,13 @@ function Get-ElapsedTime([System.Diagnostics.Stopwatch] $timer)
 
 function Set-ScriptFailedOnError
 {
-    param ($Command, $Arguments)
-    if ($lastExitCode -eq 0) {
+    param ($Command, $Arguments, $ExitCode)
+    if (0 -eq $ExitCode) {
         return
     }
 
-    if ($FailFast -eq $true) {
-        Write-Error "Build failed. Stopping as fail fast is set.`nFailed command: $Command $Arguments`nExit code: $LASTEXITCODE"
+    if ($FailFast) {
+        Write-Error "Build failed. Stopping as fail fast is set.`nFailed command: $Command $Arguments`nExit code: $ExitCode"
     }
 
     $script:ScriptFailedCommands += "$Command $Arguments"
@@ -232,7 +232,7 @@ function Invoke-Exe {
         {
             $process.StdErr
         }
-        Set-ScriptFailedOnError -Command $Command -Arguments $Arguments
+        Set-ScriptFailedOnError -Command $Command -Arguments $Arguments -ExitCode $exitCode
     }
 
     if($CaptureOutput)
@@ -246,39 +246,66 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 
-public class ProcessOutputter {
+public class ProcessOutputter
+{
     private readonly ConsoleColor _color;
+    private readonly ConsoleColor _warningColor;
+    private readonly ConsoleColor _errorColor;
     private readonly List<string> _output;
     private int nullCount = 0;
 
-    public ProcessOutputter (ConsoleColor color, bool suppressOutput = false) {
+    public ProcessOutputter(ConsoleColor color, ConsoleColor warningColor, ConsoleColor errorColor, bool suppressOutput = false)
+    {
         _color = color;
+        _warningColor = warningColor;
+        _errorColor = errorColor;
         _output = new List<string>();
 
-        OutputHandler = (s, e) => {
+        OutputHandler = (s, e) =>
+        {
             AppendLine(e.Data);
 
-            if (!suppressOutput) {
-                // These handlers can run at the same time,
-                // without lock they sometimes grab the color the other
-                // one set.
-                lock (Console.Out) {
-                    var fg = Console.ForegroundColor;
-                    try
+            if (suppressOutput || e.Data == null)
+            { 
+                return;
+            }
+    
+            // These handlers can run at the same time,
+            // without lock they sometimes grab the color the other
+            // one set.
+            lock (Console.Out)
+            {
+                var fg = Console.ForegroundColor;
+                try
+                {
+                    var lines = e.Data.Split('\n');
+                    foreach (var line in lines)
                     {
-                        Console.ForegroundColor = _color;
-                        Console.WriteLine(e.Data);
+                        // one extra space before the word, to avoid highlighting
+                        // warnaserror and similar parameters that are not actual errors
+                        //
+                        // The comparison is not done using the insensitive overload because that 
+                        // is too new for PowerShell 5 compiler
+                        var lineToLower = line.ToLowerInvariant();
+                        Console.ForegroundColor = lineToLower.Contains(" warning")
+                            ? _warningColor
+                            : lineToLower.Contains(" error")
+                                ? _errorColor
+                                : _color;
+
+                        Console.WriteLine(line);
                     }
-                    finally
-                    {
-                        Console.ForegroundColor = fg;
-                    }
+                }
+                finally
+                {
+                    Console.ForegroundColor = fg;
                 }
             }
         };
     }
 
-    public ProcessOutputter () {
+    public ProcessOutputter()
+    {
         _output = new List<string>();
         OutputHandler = (s, e) => AppendLine(e.Data);
     }
@@ -286,13 +313,16 @@ public class ProcessOutputter {
     public System.Diagnostics.DataReceivedEventHandler OutputHandler { get; private set; }
     public IEnumerable<string> Output { get { return _output; } }
 
-    private void AppendLine(string line) {
-        if (string.IsNullOrEmpty(line)) {
+    private void AppendLine(string line)
+    {
+        if (string.IsNullOrEmpty(line))
+        {
             nullCount++;
             return;
         }
 
-        while (nullCount > 0) {
+        while (nullCount > 0)
+        {
             --nullCount;
             _output.Add(string.Empty);
         }
@@ -333,8 +363,8 @@ function Start-InlineProcess {
         $processInfo.Verb = "runas"
     }
 
-    $outputHandler = [ProcessOutputter]::new("White", $SuppressOutput.IsPresent)
-    $errorHandler = [ProcessOutputter]::new("Red", $SuppressOutput.IsPresent)
+    $outputHandler = [ProcessOutputter]::new("White", "Yellow", "Red", $SuppressOutput.IsPresent)
+    $errorHandler = [ProcessOutputter]::new("White", "Yellow", "Red", $SuppressOutput.IsPresent)
     $outputDataReceived = $outputHandler.OutputHandler
     $errorDataReceivedEvent = $errorHandler.OutputHandler
 
