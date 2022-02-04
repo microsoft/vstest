@@ -227,9 +227,6 @@ function Invoke-Exe {
 
     Write-Verbose "Done. Exit code: $exitCode"
 
-    if ($exitCode -ne 0) {
-
-    }
     if ($exitCode -ne 0 -and ($IgnoreExitCode -notcontains $exitCode)) {
         if($CaptureOutput)
         {
