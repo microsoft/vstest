@@ -153,8 +153,8 @@ public class JsonDataSerializer : IDataSerializer
         var serializedPayload = JToken.FromObject(payload, payloadSerializer);
 
         return version > 1 ?
-            Serialize(serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
-            Serialize(serializer, new Message { MessageType = messageType, Payload = serializedPayload });
+            Serialize(s_serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
+            Serialize(s_serializer, new Message { MessageType = messageType, Payload = serializedPayload });
     }
 
     /// <summary>
@@ -180,7 +180,7 @@ public class JsonDataSerializer : IDataSerializer
             throw new InvalidOperationException("Message with metadata must carry version and can't be returned using Protocol version 1.");
         }
 
-        return Serialize(serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload, Recipient = metadata.Recipient });
+        return Serialize(s_serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload, Recipient = metadata.Recipient });
     }
 
     /// <summary>
