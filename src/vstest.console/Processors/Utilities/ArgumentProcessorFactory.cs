@@ -77,7 +77,7 @@ internal class ArgumentProcessorFactory
     /// <summary>
     /// Returns all of the available argument processors.
     /// </summary>
-    public IEnumerable<IArgumentProcessor> AllArgumentProcessors { get; private set; }
+    public IEnumerable<IArgumentProcessor> AllArgumentProcessors { get; }
 
     /// <summary>
     /// Gets a mapping between command and Argument Executor.
