@@ -60,17 +60,11 @@ function Write-Log {
         [string]
         $Level = "Success"
     )
-
-    $currentColor = $Host.UI.RawUI.ForegroundColor
-    try {
-        $Host.UI.RawUI.ForegroundColor = if ("Success" -eq $Level) { "Green" } else { "Red" }
-        if ($message)
-        {
-            Write-Output "... $message"
-        }
-    }
-    finally {
-        $Host.UI.RawUI.ForegroundColor = $currentColor
+    
+    if ($message)
+    {
+        $color = if ("Success" -eq $Level) { "Green" } else { "Red" }
+        Write-Host "... $message" -ForegroundColor $color
     }
 }
 
@@ -265,15 +259,20 @@ public class ProcessOutputter {
             AppendLine(e.Data);
 
             if (!suppressOutput) {
-                var fg = Console.ForegroundColor;
-                try
-                {
-                    Console.ForegroundColor = _color;
-                    Console.WriteLine(e.Data);
-                }
-                finally
-                {
-                    Console.ForegroundColor = fg;
+                // These handlers can run at the same time,
+                // without lock they sometimes grab the color the other
+                // one set.
+                lock (Console.Out) {
+                    var fg = Console.ForegroundColor;
+                    try
+                    {
+                        Console.ForegroundColor = _color;
+                        Console.WriteLine(e.Data);
+                    }
+                    finally
+                    {
+                        Console.ForegroundColor = fg;
+                    }
                 }
             }
         };

@@ -175,13 +175,10 @@ function Get-ConsoleRunnerPath($runner, $targetFrameWork)
 
 function Write-Log ([string] $message, $messageColor = "Green")
 {
-    $currentColor = $Host.UI.RawUI.ForegroundColor
-    $Host.UI.RawUI.ForegroundColor = $messageColor
     if ($message)
     {
-        Write-Output "... $message"
+        Write-Host "... $message" -ForegroundColor $messageColor
     }
-    $Host.UI.RawUI.ForegroundColor = $currentColor
 }
 
 function Get-ProductVersion($filePath)
@@ -352,24 +349,27 @@ function Invoke-PerformanceTests
 #
 function Invoke-DisplayResults
 {
-    $currentColor = $Host.UI.RawUI.ForegroundColor
-    $Host.UI.RawUI.ForegroundColor = "Green"
-    $osDetails = Get-SystemInfo
-    "`n"
-    "Machine Configuration"
-    $osDetails | Format-List 'MachineName', 'OSName', 'OSVersion', 'MachineType' , 'Processor', 'LogicalCores', 'RAMSize'
+    try {
+        $currentColor = $Host.UI.RawUI.ForegroundColor
+        $Host.UI.RawUI.ForegroundColor = "Green"
+        $osDetails = Get-SystemInfo
+        "`n"
+        "Machine Configuration"
+        $osDetails | Format-List 'MachineName', 'OSName', 'OSVersion', 'MachineType' , 'Processor', 'LogicalCores', 'RAMSize'
 
-    if($DefaultAction -eq "Both" -or $DefaultAction -eq "Discovery")
-    {
-        $Script:TPT_Results | Where-Object {$_.Action -like "Discovery"} | Format-Table 'Runner', 'Adapter', 'Action', 'ElapsedTime', 'Goal', 'Delta', 'Status', 'PayLoad', 'RunnerVersion', 'AdapterVersion' -AutoSize
+        if($DefaultAction -eq "Both" -or $DefaultAction -eq "Discovery")
+        {
+            $Script:TPT_Results | Where-Object {$_.Action -like "Discovery"} | Format-Table 'Runner', 'Adapter', 'Action', 'ElapsedTime', 'Goal', 'Delta', 'Status', 'PayLoad', 'RunnerVersion', 'AdapterVersion' -AutoSize
+        }
+
+        if($DefaultAction -eq "Both" -or $DefaultAction -eq "Execution")
+        {
+            $Script:TPT_Results | Where-Object {$_.Action -like "Execution"} | Format-Table 'Runner', 'Adapter', 'Action', 'ElapsedTime', 'Goal', 'Delta', 'Status', 'PayLoad', 'RunnerVersion', 'AdapterVersion' -AutoSize
+        }
     }
-
-    if($DefaultAction -eq "Both" -or $DefaultAction -eq "Execution")
-    {
-        $Script:TPT_Results | Where-Object {$_.Action -like "Execution"} | Format-Table 'Runner', 'Adapter', 'Action', 'ElapsedTime', 'Goal', 'Delta', 'Status', 'PayLoad', 'RunnerVersion', 'AdapterVersion' -AutoSize
+    finally {
+        $Host.UI.RawUI.ForegroundColor = $currentColor
     }
-
-    $Host.UI.RawUI.ForegroundColor = $currentColor
 
     if($ExportResults -ne $null -and $ExportResults -eq "csv")
     {
