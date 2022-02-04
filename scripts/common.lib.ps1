@@ -231,6 +231,7 @@ function Invoke-Exe {
         if($CaptureOutput)
         {
             $process.StdErr
+        }
         Set-ScriptFailedOnError -Command $Command -Arguments $Arguments -ExitCode $exitCode
     }
 
