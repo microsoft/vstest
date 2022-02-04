@@ -746,24 +746,13 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     sourceOutcome = TestOutcome.Skipped;
                 }
 
-
-                string resultString;
-                switch (sourceOutcome)
+                string resultString = sourceOutcome switch
                 {
-                    case TestOutcome.Failed:
-                        resultString = (CommandLineResources.FailedTestIndicator + "!").PadRight(LongestResultIndicator);
-                        break;
-                    case TestOutcome.Passed:
-                        resultString = (CommandLineResources.PassedTestIndicator + "!").PadRight(LongestResultIndicator);
-                        break;
-                    case TestOutcome.Skipped:
-                        resultString = (CommandLineResources.SkippedTestIndicator + "!").PadRight(LongestResultIndicator);
-                        break;
-                    default:
-                        resultString = CommandLineResources.None.PadRight(LongestResultIndicator);
-                        break;
-                }
-
+                    TestOutcome.Failed => (CommandLineResources.FailedTestIndicator + "!").PadRight(LongestResultIndicator),
+                    TestOutcome.Passed => (CommandLineResources.PassedTestIndicator + "!").PadRight(LongestResultIndicator),
+                    TestOutcome.Skipped => (CommandLineResources.SkippedTestIndicator + "!").PadRight(LongestResultIndicator),
+                    _ => CommandLineResources.None.PadRight(LongestResultIndicator),
+                };
                 var failed = sourceSummary.FailedTests.ToString().PadLeft(5);
                 var passed = sourceSummary.PassedTests.ToString().PadLeft(5);
                 var skipped = sourceSummary.SkippedTests.ToString().PadLeft(5);
