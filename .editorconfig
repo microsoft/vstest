@@ -146,6 +146,9 @@ dotnet_diagnostic.CA1836.severity = warning # not default, increased severity to
 # CA2211: Non-constant fields should not be visible
 dotnet_diagnostic.CA2211.severity = warning # not default, increased severity to ensure it is applied
 
+# CA1806: Do not ignore method results
+dotnet_diagnostic.CA1806.severity = warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences
