@@ -264,12 +264,12 @@ public class TestHostProviderManagerTests
             throw new NotImplementedException();
         }
 
-        public void OnHostExited(HostProviderEventArgs e)
+        public void OnHostExited(HostProviderEventArgs _)
         {
             HostExited.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
-        public void OnHostLaunched(HostProviderEventArgs e)
+        public void OnHostLaunched(HostProviderEventArgs _)
         {
             HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
         }
