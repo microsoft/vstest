@@ -1038,10 +1038,10 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 
 internal static class Id
 {
-    private static int _id;
+    private static int s_id;
 
     public static int Next()
     {
-        return Interlocked.Increment(ref _id);
+        return Interlocked.Increment(ref s_id);
     }
 }

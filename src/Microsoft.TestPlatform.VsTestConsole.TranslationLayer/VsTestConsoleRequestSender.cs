@@ -42,10 +42,10 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     private readonly ITestPlatformEventSource _testPlatformEventSource;
 
     private readonly ManualResetEvent _handShakeComplete = new(false);
-    private readonly ConcurrentDictionary<string, ITestSessionEventsHandler> sessionEventHandlers = new();
-    private readonly ConcurrentDictionary<string, ITestRunEventsHandler> testRunEventHandlers = new();
-    private readonly ConcurrentDictionary<string, ITestHostLauncher> customHostLaunchers = new();
-    private readonly ConcurrentDictionary<string, ITestDiscoveryEventsHandler2> testRunDiscoveryHandlers = new();
+    private readonly ConcurrentDictionary<string, ITestSessionEventsHandler> _sessionEventHandlers = new();
+    private readonly ConcurrentDictionary<string, ITestRunEventsHandler> _testRunEventHandlers = new();
+    private readonly ConcurrentDictionary<string, ITestHostLauncher> _customHostLaunchers = new();
+    private readonly ConcurrentDictionary<string, ITestDiscoveryEventsHandler2> _testRunDiscoveryHandlers = new();
     private bool _handShakeSuccessful = false;
 
     private int _protocolVersion = 5;
@@ -54,7 +54,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// Used to cancel blocking tasks associated with the vstest.console process.
     /// </summary>
     private CancellationTokenSource _processExitCancellationTokenSource;
-    private readonly ConcurrentDictionary<string, BlockingCollection<Message>> recipientQueues = new();
+    private readonly ConcurrentDictionary<string, BlockingCollection<Message>> _recipientQueues = new();
     private readonly object _spinnerLock = new();
     private Task _spinner;
 
@@ -494,12 +494,12 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
             var id = Id.Next().ToString();
 
-            if (!sessionEventHandlers.TryAdd(id, eventsHandler))
+            if (!_sessionEventHandlers.TryAdd(id, eventsHandler))
             {
                 throw new InvalidOperationException($"Adding session handler under unique id {id} did not succeed, this should never happen.");
             }
 
-            if (!customHostLaunchers.TryAdd(id, testHostLauncher))
+            if (!_customHostLaunchers.TryAdd(id, testHostLauncher))
             {
                 throw new InvalidOperationException($"Adding launcher under unique id {id} did not succeed, this should never happen.");
             }
@@ -518,7 +518,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                     case MessageType.StartTestSessionCallback:
                         var ackPayload = _dataSerializer
                             .DeserializePayload<StartTestSessionAckPayload>(message);
-                        var handler = sessionEventHandlers[id];
+                        var handler = _sessionEventHandlers[id];
                         handler?.HandleStartTestSessionComplete(
                             ackPayload.TestSessionInfo);
                         return ackPayload.TestSessionInfo;
@@ -534,7 +534,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                     case MessageType.TestMessage:
                         var testMessagePayload = _dataSerializer
                             .DeserializePayload<TestMessagePayload>(message);
-                        var handler2 = sessionEventHandlers[id];
+                        var handler2 = _sessionEventHandlers[id];
                         handler2?.HandleLogMessage(
                             testMessagePayload.MessageLevel,
                             testMessagePayload.Message);
@@ -1018,7 +1018,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         ITestDiscoveryEventsHandler2 eventHandler)
     {
         var sender = Id.Next().ToString();
-        if (!testRunDiscoveryHandlers.TryAdd(sender, eventHandler))
+        if (!_testRunDiscoveryHandlers.TryAdd(sender, eventHandler))
         {
             throw new InvalidOperationException($"Adding handler under unique id {sender} did not succeed, this should never happen.");
         }
@@ -1073,7 +1073,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
                     // Adding metrics from vstest.console.
                     discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
-                    var handler = testRunDiscoveryHandlers[metadata.Recipient ?? sender];
+                    var handler = _testRunDiscoveryHandlers[metadata.Recipient ?? sender];
 
                     handler.HandleDiscoveryComplete(
                         discoveryCompleteEventArgs,
@@ -1084,7 +1084,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 {
                     var testMessagePayload = _dataSerializer
                         .DeserializePayload<TestMessagePayload>(message, out var metadata);
-                    var handler = testRunDiscoveryHandlers[metadata.Recipient ?? sender];
+                    var handler = _testRunDiscoveryHandlers[metadata.Recipient ?? sender];
                     eventHandler.HandleLogMessage(
                         testMessagePayload.MessageLevel,
                         testMessagePayload.Message);
@@ -1212,12 +1212,12 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         try
         {
             var sender = Id.Next().ToString();
-            if (!testRunEventHandlers.TryAdd(sender, eventHandler))
+            if (!_testRunEventHandlers.TryAdd(sender, eventHandler))
             {
                 throw new InvalidOperationException($"Adding handler under unique id {sender} did not succeed, this should never happen.");
             }
 
-            if (!customHostLaunchers.TryAdd(sender, customHostLauncher))
+            if (!_customHostLaunchers.TryAdd(sender, customHostLauncher))
             {
                 throw new InvalidOperationException($"Adding launcher under unique id {sender} did not succeed, this should never happen.");
             }
@@ -1240,7 +1240,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         .DeserializePayload<TestRunChangedEventArgs>(
                         message);
 
-                    var handler = testRunEventHandlers[sender];
+                    var handler = _testRunEventHandlers[sender];
                     handler.HandleTestRunStatsChange(testRunChangedArgs);
                 }
                 else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
@@ -1253,7 +1253,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
                     var testRunCompletePayload = _dataSerializer
                         .DeserializePayload<TestRunCompletePayload>(message);
-                    var handler = testRunEventHandlers[sender];
+                    var handler = _testRunEventHandlers[sender];
                     handler.HandleTestRunComplete(
                         testRunCompletePayload.TestRunCompleteArgs,
                         testRunCompletePayload.LastRunTests,
@@ -1265,7 +1265,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 {
                     var testMessagePayload = _dataSerializer
                         .DeserializePayload<TestMessagePayload>(message);
-                    var handler = testRunEventHandlers[sender];
+                    var handler = _testRunEventHandlers[sender];
                     handler.HandleLogMessage(
                         testMessagePayload.MessageLevel,
                         testMessagePayload.Message);
@@ -1498,7 +1498,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     private Message TryRecieveMessageForRecipient(string recipient)
     {
         EnsureSpinning();
-        var queue = recipientQueues.GetOrAdd(recipient, _ => new BlockingCollection<Message>());
+        var queue = _recipientQueues.GetOrAdd(recipient, _ => new BlockingCollection<Message>());
         return queue.Take();
     }
 
@@ -1524,7 +1524,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                             message = _dataSerializer.DeserializeMessage(versionedMessage.Payload.ToString());
                         }
 
-                        if (!recipientQueues.TryGetValue(recipient, out var queue))
+                        if (!_recipientQueues.TryGetValue(recipient, out var queue))
                         {
                             throw new InvalidOperationException($"Recipient {recipient} does not have a queue.");
                         }
@@ -1580,7 +1580,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
             var testProcessStartInfo = _dataSerializer
                 .DeserializePayload<TestProcessStartInfo>(message);
 
-            var hostLauncher = customHostLaunchers[recipient];
+            var hostLauncher = _customHostLaunchers[recipient];
             ackPayload.HostProcessId = hostLauncher != null
                 ? hostLauncher.LaunchTestHost(testProcessStartInfo)
                 : -1;
@@ -1617,7 +1617,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         {
             var pid = _dataSerializer.DeserializePayload<int>(message);
 
-            var customHostLauncher = customHostLaunchers[recipient];
+            var customHostLauncher = _customHostLaunchers[recipient];
             ackPayload.Attached = customHostLauncher is ITestHostLauncher2 launcher
             && launcher.AttachDebuggerToProcess(pid);
         }

@@ -101,8 +101,8 @@ internal class Program
     public class TestRunHandler : ITestRunEventsHandler2, ITestDiscoveryEventsHandler2
     {
         private readonly string _name;
-        public ConcurrentBag<TestCase> _discoveredTests = new();
-        public List<TestCase> DiscoveredTests { get; } = new List<TestCase>();
+        private readonly ConcurrentBag<TestCase> _discoveredTests = new();
+        public List<TestCase> DiscoveredTests => _discoveredTests.ToList();
 
         public TestRunHandler(string name)
         {

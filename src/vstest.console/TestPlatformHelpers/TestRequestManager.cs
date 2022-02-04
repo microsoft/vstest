@@ -67,12 +67,12 @@ internal class TestRequestManager : ITestRequestManager
     /// <summary>
     /// Maintains the current active execution request.
     /// </summary>
-    private readonly ConcurrentDictionary<int, ITestRunRequest> testRunRequests = new();
+    private readonly ConcurrentDictionary<int, ITestRunRequest> _testRunRequests = new();
 
     /// <summary>
     /// Maintains the current active discovery request.
     /// </summary>
-    private readonly ConcurrentDictionary<int, IDiscoveryRequest> discoveryRequests = new();
+    private readonly ConcurrentDictionary<int, IDiscoveryRequest> _discoveryRequests = new();
 
     /// <summary>
     /// Maintains the current active test run attachments processing cancellation token source.
@@ -221,7 +221,7 @@ internal class TestRequestManager : ITestRequestManager
                 requestData,
                 criteria,
                 discoveryPayload.TestPlatformOptions);
-            if (!discoveryRequests.TryAdd(id, discoveryRequest))
+            if (!_discoveryRequests.TryAdd(id, discoveryRequest))
             {
                 // This should never happen because we atomically increment the id, but let's have it in case I am wrong.
                 throw new InvalidOperationException($"Discovery request with id '{id}' already exists.");
@@ -238,7 +238,7 @@ internal class TestRequestManager : ITestRequestManager
         }
         finally
         {
-            if (discoveryRequests.TryRemove(id, out var discoveryRequest))
+            if (_discoveryRequests.TryRemove(id, out var discoveryRequest))
             {
                 // Dispose the discovery request and unregister for events.
                 discoveryEventsRegistrar?.UnregisterDiscoveryEvents(discoveryRequest);
@@ -525,7 +525,7 @@ internal class TestRequestManager : ITestRequestManager
     public void CancelTestRun()
     {
         EqtTrace.Info("TestRequestManager.CancelTestRun: Sending cancel request to all run requests.");
-        var requests = testRunRequests?.ToList();
+        var requests = _testRunRequests?.ToList();
         foreach (var request in requests)
         {
             EqtTrace.Info("TestRequestManager.CancelTestRun: Sending cancel request to run {0}.", request.Key);
@@ -537,7 +537,7 @@ internal class TestRequestManager : ITestRequestManager
     public void CancelDiscovery()
     {
         EqtTrace.Info("TestRequestManager.CancelDiscovery: Sending cancel request all discovery requests.");
-        var requests = discoveryRequests?.ToList();
+        var requests = _discoveryRequests?.ToList();
         foreach (var request in requests)
         {
             EqtTrace.Info("TestRequestManager.CancelDiscovery: Sending cancel request to discovery {0}.", request.Key);
@@ -549,7 +549,7 @@ internal class TestRequestManager : ITestRequestManager
     public void AbortTestRun()
     {
         EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request to all run requests.");
-        var requests = testRunRequests?.ToList();
+        var requests = _testRunRequests?.ToList();
         foreach (var request in requests)
         {
             EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request to run {0}.", request.Key);
@@ -944,7 +944,7 @@ internal class TestRequestManager : ITestRequestManager
                 testRunCriteria,
                 options);
 
-            if (!testRunRequests.TryAdd(id, runRequest))
+            if (!_testRunRequests.TryAdd(id, runRequest))
             {
                 // This should never happen because we atomically increment the id, but let's have it in case I am wrong.
                 throw new InvalidOperationException($"Discovery request with id '{id}' already exists.");
@@ -968,7 +968,7 @@ internal class TestRequestManager : ITestRequestManager
         }
         finally
         {
-            if (testRunRequests.TryRemove(id, out var runRequest))
+            if (_testRunRequests.TryRemove(id, out var runRequest))
             {
                 _testRunResultAggregator.UnregisterTestRunEvents(runRequest);
                 testRunEventsRegistrar?.UnregisterTestRunEvents(runRequest);
