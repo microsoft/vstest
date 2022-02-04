@@ -140,6 +140,9 @@ dotnet_diagnostic.IDE0053.severity = warning # not default, increased severity t
 # CA2016: Forward the 'CancellationToken' parameter to methods
 dotnet_diagnostic.CA2016.severity = warning # not default, increased severity to ensure it is applied
 
+# CA1836: Prefer IsEmpty over Count
+dotnet_diagnostic.CA1836.severity = warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences
