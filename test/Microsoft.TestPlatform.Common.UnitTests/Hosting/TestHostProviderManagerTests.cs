@@ -169,7 +169,7 @@ public class TestHostProviderManagerTests
             Shared = !config.DisableAppDomain;
 
             // This is expected to be called once every run so returning a new instance every time.
-            return framework.Name.IndexOf("netframework", StringComparison.OrdinalIgnoreCase) >= 0;
+            return framework.Name.Contains("netframework", StringComparison.OrdinalIgnoreCase);
         }
 
         public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
@@ -241,8 +241,8 @@ public class TestHostProviderManagerTests
             Shared = !config.DisableAppDomain;
 
             // This is expected to be called once every run so returning a new instance every time.
-            return framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                   || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0;
+            return framework.Name.Contains("netstandard", StringComparison.OrdinalIgnoreCase)
+                   || framework.Name.Contains("netcoreapp", StringComparison.OrdinalIgnoreCase);
         }
 
         public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)

@@ -251,7 +251,7 @@ public class InferRunSettingsHelperTests
 
         var result = InferRunSettingsHelper.MakeRunsettingsCompatible(settings);
 
-        Assert.IsTrue(result.IndexOf("DesignMode", StringComparison.OrdinalIgnoreCase) < 0);
+        Assert.IsFalse(result.Contains("DesignMode", StringComparison.OrdinalIgnoreCase));
     }
 
     [TestMethod]

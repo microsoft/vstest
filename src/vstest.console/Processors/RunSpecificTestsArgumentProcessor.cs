@@ -297,7 +297,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         {
             foreach (var nameCriteria in _selectedTestNames)
             {
-                if (testCase.FullyQualifiedName.IndexOf(nameCriteria, StringComparison.OrdinalIgnoreCase) != -1)
+                if (testCase.FullyQualifiedName.Contains(nameCriteria, StringComparison.OrdinalIgnoreCase))
                 {
                     _selectedTestCases.Add(testCase);
 

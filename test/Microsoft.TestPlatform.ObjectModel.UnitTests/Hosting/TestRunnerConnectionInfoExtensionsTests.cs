@@ -50,7 +50,7 @@ public class TestRunnerConnectionInfoExtensionsTests
 
         var options = connectionInfo.ToCommandLineOptions();
 
-        Assert.IsTrue(options.IndexOf("--parentprocessid 123", StringComparison.OrdinalIgnoreCase) >= 0);
+        Assert.IsTrue(options.Contains("--parentprocessid 123", StringComparison.OrdinalIgnoreCase));
     }
 
     [TestMethod]
@@ -60,7 +60,7 @@ public class TestRunnerConnectionInfoExtensionsTests
 
         var options = connectionInfo.ToCommandLineOptions();
 
-        Assert.IsFalse(options.IndexOf("--diag", StringComparison.OrdinalIgnoreCase) >= 0);
+        Assert.IsFalse(options.Contains("--diag", StringComparison.OrdinalIgnoreCase));
     }
 
     [TestMethod]

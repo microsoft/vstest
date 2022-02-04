@@ -292,7 +292,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         var framework = config.TargetFramework;
 
         // This is expected to be called once every run so returning a new instance every time.
-        return framework.Name.IndexOf("NETFramework", StringComparison.OrdinalIgnoreCase) >= 0;
+        return framework.Name.Contains("NETFramework", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc/>

@@ -18,5 +18,8 @@ internal static class PolyfillStringExtensions
 {
     public static bool Contains(this string s, char c)
         => s.Contains(c.ToString());
+
+    public static bool Contains(this string s, string value, StringComparison comparisonType)
+        => s.IndexOf(value, comparisonType) >= 0;
 }
 #endif

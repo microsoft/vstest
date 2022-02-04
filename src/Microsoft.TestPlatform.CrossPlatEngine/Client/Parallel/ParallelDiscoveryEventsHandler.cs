@@ -155,7 +155,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
 
         // Do not send CancellationRequested message to Output window in IDE, as it is not useful for user
         if (string.Equals(message.MessageType, MessageType.TestMessage)
-            && rawMessage.IndexOf(CommonResources.CancellationRequested) >= 0)
+            && rawMessage.Contains(CommonResources.CancellationRequested))
         {
             return;
         }

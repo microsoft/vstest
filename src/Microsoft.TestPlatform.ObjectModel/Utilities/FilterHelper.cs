@@ -51,7 +51,7 @@ public static class FilterHelper
     /// <returns>A filter string of characters with any escaped characters converted to their un-escaped form.</returns>
     public static string Unescape(string str!!)
     {
-        if (str.IndexOf(EscapeCharacter) < 0)
+        if (!str.Contains(EscapeCharacter))
         {
             return str;
         }

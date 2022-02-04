@@ -476,7 +476,7 @@ public class TestEngine : ITestEngine
             (runConfiguration.TargetPlatform == ObjectModel.Constants.DefaultPlatform || runConfiguration.TargetPlatform == Architecture.AnyCPU) &&
             !runConfiguration.DisableAppDomain &&
             !runConfiguration.DesignMode &&
-            runConfiguration.TargetFramework.Name.IndexOf("netframework", StringComparison.OrdinalIgnoreCase) >= 0)
+            runConfiguration.TargetFramework.Name.Contains("netframework", StringComparison.OrdinalIgnoreCase))
         {
             EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: running test in process(inside vstest.console.exe process)");
             return true;

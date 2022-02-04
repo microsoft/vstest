@@ -281,7 +281,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             {
                 // Check if testhost.dll is found in nuget folder or next to the test.dll, and use that to locate testhost.exe that is in the build folder in the same Nuget package.
                 testHostPath = GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
-                if (!string.IsNullOrWhiteSpace(testHostPath) && testHostPath.IndexOf("microsoft.testplatform.testhost", StringComparison.OrdinalIgnoreCase) >= 0)
+                if (!string.IsNullOrWhiteSpace(testHostPath) && testHostPath.Contains("microsoft.testplatform.testhost", StringComparison.OrdinalIgnoreCase))
                 {
                     // testhost.dll is present in path {testHostNugetRoot}\lib\netcoreapp2.1\testhost.dll
                     // testhost.(x86).exe is present in location {testHostNugetRoot}\build\netcoreapp2.1\{x86/x64}\{testhost.x86.exe/testhost.exe}
@@ -598,9 +598,9 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         var framework = config.TargetFramework;
 
         // This is expected to be called once every run so returning a new instance every time.
-        return framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-               || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
-               || framework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0;
+        return framework.Name.Contains("netstandard", StringComparison.OrdinalIgnoreCase)
+               || framework.Name.Contains("netcoreapp", StringComparison.OrdinalIgnoreCase)
+               || framework.Name.Contains("net5", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc/>

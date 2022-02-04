@@ -138,7 +138,7 @@ internal class Condition
                     foreach (string propertyValue in multiValue)
                     {
                         Debug.Assert(null != propertyValue, "PropertyValue can not be null.");
-                        result = result || propertyValue.IndexOf(Value, StringComparison.OrdinalIgnoreCase) != -1;
+                        result = result || propertyValue.Contains(Value, StringComparison.OrdinalIgnoreCase);
                         if (result)
                         {
                             break;
@@ -156,7 +156,7 @@ internal class Condition
                     foreach (string propertyValue in multiValue)
                     {
                         Debug.Assert(null != propertyValue, "PropertyValue can not be null.");
-                        result = result && propertyValue.IndexOf(Value, StringComparison.OrdinalIgnoreCase) == -1;
+                        result = result && !propertyValue.Contains(Value, StringComparison.OrdinalIgnoreCase);
                         if (!result)
                         {
                             break;

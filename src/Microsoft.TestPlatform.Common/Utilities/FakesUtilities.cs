@@ -71,16 +71,16 @@ public static class FakesUtilities
         }
 
         // Since there are no FrameworkVersion values for .Net Core 2.0 +, we check TargetFramework instead
-        // and default to FrameworkCore10 for .Net Core 
-        if (targetFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0 ||
-            targetFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0 ||
-            targetFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
+        // and default to FrameworkCore10 for .Net Core
+        if (targetFramework.Name.Contains("netstandard", StringComparison.OrdinalIgnoreCase) ||
+            targetFramework.Name.Contains("netcoreapp", StringComparison.OrdinalIgnoreCase) ||
+            targetFramework.Name.Contains("net5", StringComparison.OrdinalIgnoreCase))
         {
             return FrameworkVersion.FrameworkCore10;
         }
 
-        // Since the Datacollector is separated on the NetFramework/NetCore line, any value of NETFramework 
-        // can be passed along to the fakes data collector configuration creator. 
+        // Since the Datacollector is separated on the NetFramework/NetCore line, any value of NETFramework
+        // can be passed along to the fakes data collector configuration creator.
         // We default to Framework40 to preserve back compat
         return FrameworkVersion.Framework40;
     }
@@ -97,9 +97,9 @@ public static class FakesUtilities
         FrameworkVersion framework)
     {
         // A new Fakes Configurator API makes the decision to add the right datacollector uri to the configuration
-        // There now exist two data collector URIs to support two different scenarios. The new scenario involves 
-        // using the CLRIE profiler, and the old involves using the Intellitrace profiler (which isn't supported in 
-        // .NET Core scenarios). The old API still exists for fallback measures. 
+        // There now exist two data collector URIs to support two different scenarios. The new scenario involves
+        // using the CLRIE profiler, and the old involves using the Intellitrace profiler (which isn't supported in
+        // .NET Core scenarios). The old API still exists for fallback measures.
 
         var crossPlatformConfigurator = TryGetFakesCrossPlatformDataCollectorConfigurator();
         if (crossPlatformConfigurator != null)
@@ -162,7 +162,7 @@ public static class FakesUtilities
         FrameworkVersion framework)
     {
 
-        // The fallback settings is for the old implementation of fakes 
+        // The fallback settings is for the old implementation of fakes
         // that only supports .Net Framework versions
         if (framework
             is not FrameworkVersion.Framework35
