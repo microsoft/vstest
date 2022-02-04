@@ -602,7 +602,7 @@ internal class Converter
             fullyQualifiedName;
 
         // C# test case scenario.
-        if (nameToCheck.Contains("."))
+        if (nameToCheck.Contains('.'))
         {
             return nameToCheck.Substring(0, nameToCheck.LastIndexOf('.'));
         }

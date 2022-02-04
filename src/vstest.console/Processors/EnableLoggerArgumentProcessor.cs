@@ -145,7 +145,7 @@ internal class EnableLoggerArgumentExecutor : IArgumentExecutor
 
         // Get logger identifier.
         var loggerIdentifier = loggerArgumentList[0];
-        if (loggerIdentifier.Contains("="))
+        if (loggerIdentifier.Contains('='))
         {
             throw new CommandLineException(exceptionMessage);
         }

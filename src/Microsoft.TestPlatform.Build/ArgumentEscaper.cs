@@ -98,5 +98,6 @@ public static class ArgumentEscaper
         && argument.EndsWith("\"", StringComparison.Ordinal);
 
     internal static bool ArgumentContainsWhitespace(string argument)
-        => argument.Contains(" ") || argument.Contains("\t") || argument.Contains("\n");
+        => argument.Contains(' ') || argument.Contains('\t') || argument.Contains('\n');
 }
+

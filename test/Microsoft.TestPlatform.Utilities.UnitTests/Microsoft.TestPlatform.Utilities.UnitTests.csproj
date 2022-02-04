@@ -6,6 +6,7 @@
     <IsTestProject>true</IsTestProject>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
+  <Import Project="..\..\src\Microsoft.TestPlatform.Polyfill\Microsoft.TestPlatform.Polyfill.projitems" Label="Shared" />
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>

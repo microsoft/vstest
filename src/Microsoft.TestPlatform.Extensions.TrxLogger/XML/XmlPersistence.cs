@@ -807,7 +807,7 @@ internal class XmlPersistence
                 query.Append('/');
             }
 
-            if (part != "." && part != ".." && !part.Contains(":") && (part.Length > 0) && (!part.StartsWith("@", StringComparison.Ordinal)))
+            if (part != "." && part != ".." && !part.Contains(':') && (part.Length > 0) && (!part.StartsWith("@", StringComparison.Ordinal)))
             {
                 query.Append(DefaultNamespacePrefixEquivalent + ":");
             }

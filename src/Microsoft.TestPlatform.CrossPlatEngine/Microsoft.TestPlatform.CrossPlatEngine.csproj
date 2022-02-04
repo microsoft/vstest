@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
   </PropertyGroup>
+  <Import Project="..\Microsoft.TestPlatform.Polyfill\Microsoft.TestPlatform.Polyfill.projitems" Label="Shared" />
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.CrossPlatEngine</AssemblyName>

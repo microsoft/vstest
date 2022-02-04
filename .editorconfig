@@ -192,6 +192,9 @@ dotnet_diagnostic.CA1806.severity = warning # not default, increased severity to
 # CA1834: Consider using 'StringBuilder.Append(char)' when applicable
 dotnet_diagnostic.CA1834.severity = warning # not default, increased severity to ensure it is always applied
 
+# CA1847: Use char literal for a single character lookup
+dotnet_diagnostic.CA1847.severity = warning # not default, increased severity to ensure it is always applied
+
 #### C# Coding Conventions ####
 
 # var preferences
