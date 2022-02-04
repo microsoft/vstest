@@ -26,6 +26,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using PlatformAbstractions;
 using PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+using System.Threading;
 
 /// <summary>
 /// Cross platform test engine entry point for the client.
@@ -108,15 +109,15 @@ public class TestEngine : ITestEngine
                         // regarding the test session pool operation and consistency.
                         EqtTrace.Warning("ProxyDiscoveryManager creation with test session failed.");
 
-                    proxyOperationManager = new ProxyOperationManager(
-                        requestData,
-                        new TestRequestSender(requestData.ProtocolConfig, hostManager),
-                        hostManager,
-                        proxyDiscoveryManager);
-                }
+                        proxyOperationManager = new ProxyOperationManager(
+                            requestData,
+                            new TestRequestSender(requestData.ProtocolConfig, hostManager),
+                            hostManager,
+                            proxyDiscoveryManager);
+                    }
 
-                return proxyOperationManager;
-            };
+                    return proxyOperationManager;
+                };
 
             // In case we have an active test session, we always prefer the already
             // created proxies instead of the ones that need to be created on the spot.
@@ -211,15 +212,15 @@ public class TestEngine : ITestEngine
                             // regarding the test session pool operation and consistency.
                             EqtTrace.Warning("ProxyExecutionManager creation with test session failed.");
 
-                        proxyOperationManager = new ProxyOperationManager(
-                            requestData,
-                            requestSender,
-                            hostManager,
-                            proxyExecutionManager);
-                    }
+                            proxyOperationManager = new ProxyOperationManager(
+                                requestData,
+                                requestSender,
+                                hostManager,
+                                proxyExecutionManager);
+                        }
 
-                    return proxyOperationManager;
-                };
+                        return proxyOperationManager;
+                    };
 
                 // In case we have an active test session, data collection needs were
                 // already taken care of when first creating the session. As a consequence

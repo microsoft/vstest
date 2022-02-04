@@ -42,10 +42,10 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     private readonly ITestPlatformEventSource _testPlatformEventSource;
 
     private readonly ManualResetEvent _handShakeComplete = new(false);
-    private readonly ConcurrentDictionary<string, ITestSessionEventsHandler> sessionEventHandlers = new ConcurrentDictionary<string, ITestSessionEventsHandler>();
-    private readonly ConcurrentDictionary<string, ITestRunEventsHandler> testRunEventHandlers = new ConcurrentDictionary<string, ITestRunEventsHandler>();
-    private readonly ConcurrentDictionary<string, ITestHostLauncher> customHostLaunchers = new ConcurrentDictionary<string, ITestHostLauncher>();
-    private readonly ConcurrentDictionary<string, ITestDiscoveryEventsHandler2> testRunDiscoveryHandlers = new ConcurrentDictionary<string, ITestDiscoveryEventsHandler2>();
+    private readonly ConcurrentDictionary<string, ITestSessionEventsHandler> sessionEventHandlers = new();
+    private readonly ConcurrentDictionary<string, ITestRunEventsHandler> testRunEventHandlers = new();
+    private readonly ConcurrentDictionary<string, ITestHostLauncher> customHostLaunchers = new();
+    private readonly ConcurrentDictionary<string, ITestDiscoveryEventsHandler2> testRunDiscoveryHandlers = new();
     private bool _handShakeSuccessful = false;
 
     private int _protocolVersion = 5;
@@ -54,8 +54,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// Used to cancel blocking tasks associated with the vstest.console process.
     /// </summary>
     private CancellationTokenSource _processExitCancellationTokenSource;
-    private ConcurrentDictionary<string, BlockingCollection<Message>> recipientQueues = new System.Collections.Concurrent.ConcurrentDictionary<string, BlockingCollection<Message>>();
-    private object _spinnerLock = new object();
+    private readonly ConcurrentDictionary<string, BlockingCollection<Message>> recipientQueues = new();
+    private readonly object _spinnerLock = new();
     private Task _spinner;
 
     #region Constructor
@@ -1528,7 +1528,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         {
                             throw new InvalidOperationException($"Recipient {recipient} does not have a queue.");
                         }
-                        
+
                         queue.Add(message);
                     }
                 });

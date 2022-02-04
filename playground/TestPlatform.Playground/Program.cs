@@ -59,7 +59,7 @@ internal class Program
         ";
 
         var tasks = new List<Task>();
-        Action<string,TestRunHandler, DebuggerTestHostLauncher> execute = (source, handler, launcher) =>
+        Action<string, TestRunHandler, DebuggerTestHostLauncher> execute = (source, handler, launcher) =>
         {
             var options = new TestPlatformOptions();
             Console2.WriteLine("Run tests");
@@ -100,8 +100,8 @@ internal class Program
 
     public class TestRunHandler : ITestRunEventsHandler2, ITestDiscoveryEventsHandler2
     {
-        private string _name;
-        public ConcurrentBag<TestCase> _discoveredTests = new ConcurrentBag<TestCase>();
+        private readonly string _name;
+        public ConcurrentBag<TestCase> _discoveredTests = new();
         public List<TestCase> DiscoveredTests { get; } = new List<TestCase>();
 
         public TestRunHandler(string name)
@@ -176,7 +176,7 @@ internal class Program
 
     internal class DebuggerTestHostLauncher : ITestHostLauncher2
     {
-        private string _name;
+        private readonly string _name;
 
         public DebuggerTestHostLauncher(string name)
         {

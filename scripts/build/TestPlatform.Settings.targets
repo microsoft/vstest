@@ -20,7 +20,7 @@
          serialization. This is also defined in build script. -->
     <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">15.0.0</AssemblyVersion>
 
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <PublicSign Condition="'$(CIBuild)' == '' or '$(CIBuild)' == 'false'">true</PublicSign>
     <DelaySign Condition="'$(CIBuild)' == 'true'">true</DelaySign>
     <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
@@ -69,7 +69,7 @@
       <PropertyGroup>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
         <!-- Suppress warnings about testhost being x64 (AMD64)/x86 when imported into AnyCPU (MSIL) test projects. -->
-        <NoWarn>$(NoWarn);MSB3270</NoWarn>
+        <NoWarn>$(NoWarn);MSB3270;CS8032</NoWarn>
       </PropertyGroup>
 
       <!-- Test projects are not discovered in test window without test container capability -->

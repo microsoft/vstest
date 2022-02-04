@@ -28,7 +28,6 @@ using PlatformAbstractions;
 using PlatformAbstractions.Interfaces;
 
 using CommunicationUtilitiesResources = CommunicationUtilities.Resources.Resources;
-using System.Linq.Expressions;
 
 /// <summary>
 /// The design mode client.
@@ -367,7 +366,7 @@ public class DesignModeClient : IDesignModeClient
                 waitHandle.Set();
             };
 
-            _communicationManager.SendMessage(MessageType.EditorAttachDebugger, pid, new MessageMetadata (_protocolConfig.Version, recipient));
+            _communicationManager.SendMessage(MessageType.EditorAttachDebugger, pid, new MessageMetadata(_protocolConfig.Version, recipient));
 
             WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
 
@@ -436,7 +435,7 @@ public class DesignModeClient : IDesignModeClient
                     SendTestMessage(e.Level, e.Message, MessageMetadata.Empty);
                 break;
 
-           
+
             default:
                 throw new NotSupportedException($"Test message level '{e.Level}' is not supported.");
         }
@@ -461,7 +460,7 @@ public class DesignModeClient : IDesignModeClient
                                 testRunPayload.DebuggingEnabled, recipient)
                             : null;
 
-                    testRequestManager.RunTests(testRunPayload, customLauncher, new IdentifiableDesignModeTestEventsRegistrar(this, recipient), _protocolConfig);
+                    testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this, recipient), _protocolConfig);
                 }
                 catch (Exception ex)
                 {
@@ -490,7 +489,7 @@ public class DesignModeClient : IDesignModeClient
                 try
                 {
                     testRequestManager.ResetOptions();
-                    testRequestManager.DiscoverTests(discoveryRequestPayload, new IdentifiableDesignModeTestEventsRegistrar(this, recipient), _protocolConfig);
+                    testRequestManager.DiscoverTests(discoveryRequestPayload, new DesignModeTestEventsRegistrar(this, recipient), _protocolConfig);
                 }
                 catch (Exception ex)
                 {

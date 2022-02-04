@@ -37,6 +37,7 @@ using PlatformAbstractions.Interfaces;
 using Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Utilities.Helpers;
+using System.Collections.Concurrent;
 
 /// <summary>
 /// Defines the test request manger which can fire off discovery and test run requests.
@@ -66,12 +67,12 @@ internal class TestRequestManager : ITestRequestManager
     /// <summary>
     /// Maintains the current active execution request.
     /// </summary>
-    private ConcurrentDictionary<int, ITestRunRequest> testRunRequests = new ConcurrentDictionary<int, ITestRunRequest>();
+    private readonly ConcurrentDictionary<int, ITestRunRequest> testRunRequests = new();
 
     /// <summary>
     /// Maintains the current active discovery request.
     /// </summary>
-    private ConcurrentDictionary<int, IDiscoveryRequest> discoveryRequests = new ConcurrentDictionary<int, IDiscoveryRequest>();
+    private readonly ConcurrentDictionary<int, IDiscoveryRequest> discoveryRequests = new();
 
     /// <summary>
     /// Maintains the current active test run attachments processing cancellation token source.
@@ -366,7 +367,7 @@ internal class TestRequestManager : ITestRequestManager
                 runCriteria,
                 testRunEventsRegistrar,
                 testRunRequestPayload.TestPlatformOptions);
-             EqtTrace.Info("TestRequestManager.RunTests: run tests completed.");
+            EqtTrace.Info("TestRequestManager.RunTests: run tests completed.");
         }
         finally
         {

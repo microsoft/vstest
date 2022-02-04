@@ -4,7 +4,6 @@
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -43,7 +42,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 
     private bool _sessionStarted;
 
-    private readonly SemaphoreSlim _initializing = new SemaphoreSlim(1, 1);
+    private readonly SemaphoreSlim _initializing = new(1, 1);
 
     /// <summary>
     /// Path to additional extensions to reinitialize vstest.console
@@ -982,12 +981,12 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
                 StartSession();
                 _sessionStarted = WaitForConnection();
 
-            if (_sessionStarted)
-            {
-                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Send a request to initialize extensions.");
-                _requestSender.InitializeExtensions(_pathToAdditionalExtensions);
+                if (_sessionStarted)
+                {
+                    EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Send a request to initialize extensions.");
+                    _requestSender.InitializeExtensions(_pathToAdditionalExtensions);
+                }
             }
-        }
 
             if (!_sessionStarted && _requestSender != null)
             {

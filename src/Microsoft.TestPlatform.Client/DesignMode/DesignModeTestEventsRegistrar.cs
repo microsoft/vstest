@@ -8,15 +8,15 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-internal class IdentifiableDesignModeTestEventsRegistrar : ITestDiscoveryEventsRegistrar, ITestRunEventsRegistrar
+internal class DesignModeTestEventsRegistrar : ITestDiscoveryEventsRegistrar, ITestRunEventsRegistrar
 {
-    private string _testRunId;
-    private IDesignModeClient _designModeClient;
+    private readonly string _testRunId;
+    private readonly IDesignModeClient _designModeClient;
 
-    public IdentifiableDesignModeTestEventsRegistrar(IDesignModeClient designModeClient, string testRunId)
+    public DesignModeTestEventsRegistrar(IDesignModeClient designModeClient, string testRunId)
     {
-        _testRunId = _testRunId;
-        _designModeClient = _designModeClient;
+        _testRunId = testRunId;
+        _designModeClient = designModeClient;
     }
 
 

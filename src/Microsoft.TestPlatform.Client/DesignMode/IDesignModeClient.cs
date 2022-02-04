@@ -9,6 +9,7 @@ using System.Threading;
 using RequestHelper;
 using ObjectModel;
 using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
 /// The interface for design mode client.
