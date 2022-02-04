@@ -51,7 +51,7 @@ internal class UnitTestElement : TestElement, IXmlTestStoreCustom
     /// <summary>
     /// Gets the test method.
     /// </summary>
-    public TestMethod TestMethod { get; private set; }
+    public TestMethod TestMethod { get; }
 
     /// <summary>
     /// Gets or sets the storage.

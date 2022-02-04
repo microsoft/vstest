@@ -210,12 +210,12 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <summary>
     /// Parent discovery manager
     /// </summary>
-    internal IProxyDiscoveryManager DiscoveryManager { get; private set; }
+    internal IProxyDiscoveryManager DiscoveryManager { get; }
 
     /// <summary>
     /// Logger manager.
     /// </summary>
-    internal ITestLoggerManager LoggerManager { get; private set; }
+    internal ITestLoggerManager LoggerManager { get; }
 
     #region ITestDiscoveryEventsHandler2 Methods
 
