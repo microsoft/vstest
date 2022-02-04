@@ -143,6 +143,9 @@ dotnet_diagnostic.CA2016.severity = warning # not default, increased severity to
 # CA1836: Prefer IsEmpty over Count
 dotnet_diagnostic.CA1836.severity = warning # not default, increased severity to ensure it is applied
 
+# CA2211: Non-constant fields should not be visible
+dotnet_diagnostic.CA2211.severity = warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences

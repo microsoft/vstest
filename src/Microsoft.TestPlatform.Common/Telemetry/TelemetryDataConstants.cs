@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 /// <summary>
 /// The Telemetry data constants.
 /// </summary>
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Non-constant fields should not be visible", Justification = "Part of the public API.")]
 public static class TelemetryDataConstants
 {
     // ******************** Execution ***********************

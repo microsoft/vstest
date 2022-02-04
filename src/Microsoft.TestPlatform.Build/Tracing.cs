@@ -8,6 +8,7 @@ namespace Microsoft.TestPlatform.Build.Trace;
 public static class Tracing
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Non-constant fields should not be visible", Justification = "Part of the public API.")]
     public static bool traceEnabled = false;
 
     public static void Trace(string message)
