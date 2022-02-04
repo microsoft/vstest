@@ -102,7 +102,7 @@ public class LazyExtension<TExtension, TMetadata>
     /// </summary>
     internal bool IsExtensionCreated { get; private set; }
 
-    internal TestPluginInformation TestPluginInfo { get; private set; }
+    internal TestPluginInformation TestPluginInfo { get; }
 
     /// <summary>
     /// Gets the test extension instance.

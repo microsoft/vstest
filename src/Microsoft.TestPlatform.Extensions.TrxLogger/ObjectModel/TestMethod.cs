@@ -23,12 +23,12 @@ internal sealed class TestMethod : IXmlTestStore
     /// <summary>
     /// Gets the name.
     /// </summary>
-    public string Name { get; private set; }
+    public string Name { get; }
 
     /// <summary>
     /// Gets the class name.
     /// </summary>
-    public string ClassName { get; private set; }
+    public string ClassName { get; }
 
     /// <summary>
     /// Gets or sets a value indicating whether is valid.

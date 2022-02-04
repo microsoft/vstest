@@ -59,13 +59,13 @@ public class UriDataAttachment
     /// Description of the attachment.
     /// </summary>
     [DataMember]
-    public string Description { get; private set; }
+    public string Description { get; }
 
     /// <summary>
     /// Uri of the attachment.
     /// </summary>
     [DataMember]
-    public Uri Uri { get; private set; }
+    public Uri Uri { get; }
 
     public UriDataAttachment(Uri uri, string description)
     {
