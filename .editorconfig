@@ -149,6 +149,9 @@ dotnet_diagnostic.CA2211.severity = warning # not default, increased severity to
 # CA1806: Do not ignore method results
 dotnet_diagnostic.CA1806.severity = warning # not default, increased severity to ensure it is applied
 
+# CA1834: Consider using 'StringBuilder.Append(char)' when applicable
+dotnet_diagnostic.CA1834.severity = warning # not default, increased severity to ensure it is always applied
+
 #### C# Coding Conventions ####
 
 # var preferences

@@ -184,11 +184,11 @@ internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategor
         StringBuilder returnString = new();
         if (Count > 0)
         {
-            returnString.Append(",");
+            returnString.Append(',');
             foreach (TestCategoryItem item in this)
             {
                 returnString.Append(item.TestCategory);
-                returnString.Append(",");
+                returnString.Append(',');
             }
         }
 
