@@ -1046,4 +1046,3 @@ internal static class Id
         return Interlocked.Increment(ref _id);
     }
 }
-

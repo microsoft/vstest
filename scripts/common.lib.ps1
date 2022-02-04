@@ -11,8 +11,8 @@ $TPB_BRANCH = "LOCALBRANCH"
 $TPB_COMMIT = "LOCALBUILD"
 
 try {
-    $TPB_BRANCH = $env:BUILD_SOURCEBRANCH -replace "^refs/heads/"  
-    if ([string]::IsNullOrWhiteSpace($TPB_BRANCH)) { 
+    $TPB_BRANCH = $env:BUILD_SOURCEBRANCH -replace "^refs/heads/"
+    if ([string]::IsNullOrWhiteSpace($TPB_BRANCH)) {
         $TPB_BRANCH = git -C "." rev-parse --abbrev-ref HEAD
     }
 }
@@ -20,7 +20,7 @@ catch { }
 
 try {
     $TPB_COMMIT = $env:BUILD_SOURCEVERSION
-    if ([string]::IsNullOrWhiteSpace($TPB_COMMIT)) { 
+    if ([string]::IsNullOrWhiteSpace($TPB_COMMIT)) {
         $TPB_COMMIT = git -C "." rev-parse HEAD
     }
 }
@@ -42,9 +42,9 @@ $GlobalJson = Get-Content -Raw -Path (Join-Path $env:TP_ROOT_DIR 'global.json') 
 #
 # Dotnet configuration
 #
-# Disable first run since we want to control all package sources 
+# Disable first run since we want to control all package sources
 Write-Verbose "Setup dotnet configuration."
-$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1 
+$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "5.8.1"
@@ -113,7 +113,7 @@ function Install-DotNetCli
 
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '2.1.30' -Channel '2.1' -Architecture x86 -NoPath
     ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
-    
+
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '3.1.22' -Channel '3.1' -Architecture x64 -NoPath
     $env:DOTNET_ROOT= $dotnetInstallPath
 
@@ -130,7 +130,7 @@ function Install-DotNetCli
 
     "---- dotnet environment variables"
     Get-ChildItem "Env:\dotnet_*"
-    
+
     "`n`n---- x64 dotnet"
     Invoke-Exe "$env:DOTNET_ROOT\dotnet.exe" -Arguments "--info"
 
@@ -144,10 +144,10 @@ function Install-DotNetCli
 
 function Clear-Package {
     # find all microsoft packages that have the same version as we specified
-    # this is cache-busting the nuget packages, so we don't reuse them from cache 
+    # this is cache-busting the nuget packages, so we don't reuse them from cache
     # after we built new ones
     if (Test-Path $env:TP_PACKAGES_DIR) {
-        $devPackages = Get-ChildItem $env:TP_PACKAGES_DIR/microsoft.*/$TPB_Version | Select-Object -ExpandProperty FullName 
+        $devPackages = Get-ChildItem $env:TP_PACKAGES_DIR/microsoft.*/$TPB_Version | Select-Object -ExpandProperty FullName
         $devPackages | Remove-Item -Force -Recurse -Confirm:$false
     }
 }
@@ -167,11 +167,11 @@ function Copy-Bulk {
         [string]$root,
         [hashtable]$files
     )
-    
+
     $files.GetEnumerator() | ForEach-Object {
         $from = Join-Path $root $_.Name
         $to = $_.Value
-          
+
         New-Item -ItemType directory -Path "$to\" -Force | Out-Null
         Copy-Item "$from\*" $to -Force -Recurse
     }
@@ -234,14 +234,14 @@ function Invoke-Exe {
         if($CaptureOutput)
         {
             $process.StdErr
-        }  
+        }
         Set-ScriptFailedOnError -Command $Command -Arguments $Arguments
     }
-    
+
     if($CaptureOutput)
     {
         $process.StdOut
-    }  
+    }
 }
 
 Add-Type -TypeDefinition @'
@@ -249,12 +249,12 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 
-public class ProcessOutputter { 
+public class ProcessOutputter {
     private readonly ConsoleColor _color;
     private readonly List<string> _output;
     private int nullCount = 0;
 
-    public ProcessOutputter (ConsoleColor color, bool suppressOutput = false) { 
+    public ProcessOutputter (ConsoleColor color, bool suppressOutput = false) {
         _color = color;
         _output = new List<string>();
 
@@ -280,8 +280,8 @@ public class ProcessOutputter {
             }
         };
     }
-    
-    public ProcessOutputter () { 
+
+    public ProcessOutputter () {
         _output = new List<string>();
         OutputHandler = (s, e) => AppendLine(e.Data);
     }
@@ -299,7 +299,7 @@ public class ProcessOutputter {
             --nullCount;
             _output.Add(string.Empty);
         }
-        
+
         _output.Add(line);
     }
 }
@@ -319,15 +319,15 @@ function Start-InlineProcess {
         [switch]
         $Elevate,
 
-        [switch] 
+        [switch]
         $SuppressOutput
     )
-    
+
     $processInfo = [System.Diagnostics.ProcessStartInfo]::new()
     $processInfo.FileName = $Path
     $processInfo.Arguments = $Arguments
     $processInfo.WorkingDirectory = $WorkingDirectory
-    
+
     $processInfo.RedirectStandardError = $true
     $processInfo.RedirectStandardOutput = $true
     $processInfo.UseShellExecute = $false

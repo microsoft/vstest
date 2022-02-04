@@ -141,7 +141,7 @@ public class EventLogDataCollector : DataCollector
     /// <summary>
     /// Gets the context data.
     /// </summary>
-    internal Dictionary<DataCollectionContext, EventLogSessionContext> ContextMap { get; private set; }
+    internal Dictionary<DataCollectionContext, EventLogSessionContext> ContextMap { get; }
 
     #endregion
 
