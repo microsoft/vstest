@@ -12,8 +12,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 static class TestHostLimiter
 {
     private const string VSTEST_RUNNER_MAXPARALLELLEVEL = nameof(VSTEST_RUNNER_MAXPARALLELLEVEL);
-    private static readonly int maxCount;
-    private static readonly SemaphoreSlim semaphore;
+    private static readonly int MaxCount;
+    private static readonly SemaphoreSlim Semaphore;
 
     static TestHostLimiter()
     {
@@ -37,38 +37,38 @@ static class TestHostLimiter
             parallelLevel = 1;
         }
 
-        maxCount = parallelLevel ?? Environment.ProcessorCount;
+        MaxCount = parallelLevel ?? Environment.ProcessorCount;
 
         if (EqtTrace.IsVerboseEnabled)
         {
-            EqtTrace.Verbose($"TestHostLimiter.ctor: Maximum parallel level for testhosts is {maxCount}.");
+            EqtTrace.Verbose($"TestHostLimiter.ctor: Maximum parallel level for testhosts is {MaxCount}.");
         }
 
         // We initialize the semaphore to have as many available slots,
         // as we have processors. And the current count is the same, meaning
         // that are slots are "empty".
-        semaphore = new SemaphoreSlim(maxCount, maxCount);
+        Semaphore = new SemaphoreSlim(MaxCount, MaxCount);
     }
 
     public static void Wait(CancellationToken cancellationToken, [CallerMemberName] string caller = null)
     {
         if (EqtTrace.IsVerboseEnabled)
         {
-            EqtTrace.Verbose($"TestHostLimiter.Wait: Waiting for an empty slot for a testhost. There are currently {maxCount - semaphore.CurrentCount}/{maxCount} test hosts running. Caller {caller}.");
+            EqtTrace.Verbose($"TestHostLimiter.Wait: Waiting for an empty slot for a testhost. There are currently {MaxCount - Semaphore.CurrentCount}/{MaxCount} test hosts running. Caller {caller}.");
         }
-        semaphore.Wait(cancellationToken);
-        EqtTrace.Verbose($"TestHostLimiter.Wait: Got a slot for a testhost. There are currently {maxCount - semaphore.CurrentCount}/{maxCount} test hosts running. Caller {caller}.");
+        Semaphore.Wait(cancellationToken);
+        EqtTrace.Verbose($"TestHostLimiter.Wait: Got a slot for a testhost. There are currently {MaxCount - Semaphore.CurrentCount}/{MaxCount} test hosts running. Caller {caller}.");
     }
 
     public static int Release([CallerMemberName] string caller = null)
     {
-        var previousCount = semaphore.Release();
+        var previousCount = Semaphore.Release();
         if (EqtTrace.IsVerboseEnabled)
         {
             // Release returns the previous count, so if there is 1 testhost out of 3 running
             // we will see count 2, and max 3. 3 - 2 - 1 = 0 testhosts running.
-            var count = maxCount - previousCount - 1;
-            EqtTrace.Verbose($"TestHostLimiter.Release: Released a slot for testhost, there are currently {count}/{maxCount} test hosts running. Caller {caller}.");
+            var count = MaxCount - previousCount - 1;
+            EqtTrace.Verbose($"TestHostLimiter.Release: Released a slot for testhost, there are currently {count}/{MaxCount} test hosts running. Caller {caller}.");
         }
         return previousCount;
     }
