@@ -61,16 +61,10 @@ function Write-Log {
         $Level = "Success"
     )
     
-    $currentColor = $Host.UI.RawUI.ForegroundColor
-    try {
-        $Host.UI.RawUI.ForegroundColor = if ("Success" -eq $Level) { "Green" } else { "Red" }
-        if ($message)
-        {
-            Write-Output "... $message"
-        }
-    }
-    finally {
-        $Host.UI.RawUI.ForegroundColor = $currentColor
+    if ($message)
+    {
+        $color = if ("Success" -eq $Level) { "Green" } else { "Red" }
+        Write-Host "... $message" -ForegroundColor $color
     }
 }
 
@@ -233,6 +227,9 @@ function Invoke-Exe {
 
     Write-Verbose "Done. Exit code: $exitCode"
 
+    if ($exitCode -ne 0) {
+
+    }
     if ($exitCode -ne 0 -and ($IgnoreExitCode -notcontains $exitCode)) {
         if($CaptureOutput)
         {
