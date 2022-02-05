@@ -119,13 +119,10 @@ $Script:ScriptFailed = $false
 
 function Write-Log ([string] $message, $messageColor = "Green")
 {
-    $currentColor = $Host.UI.RawUI.ForegroundColor
-    $Host.UI.RawUI.ForegroundColor = $messageColor
     if ($message)
     {
-        Write-Output "... $message"
+        Write-Host "... $message" -ForegroundColor $messageColor
     }
-    $Host.UI.RawUI.ForegroundColor = $currentColor
 }
 
 function Write-VerboseLog([string] $message)
