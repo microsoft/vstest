@@ -60,12 +60,15 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
 
     public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions)
     {
-        throw new NotImplementedException();
+        // send extensions so we send InitializeExecutionMessage
+        return new[] { @"c:\temp\extension.dll" };
     }
 
     public IEnumerable<string> GetTestSources(IEnumerable<string> sources)
     {
-        throw new NotImplementedException();
+        // gives testhost opportunity to translate sources to something else,
+        // e.g. in uwp the main exe is returned, rather than the dlls that dlls that are tested
+        return sources;
     }
 
     public void Initialize(IMessageLogger logger, string runsettingsXml)
