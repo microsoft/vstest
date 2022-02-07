@@ -26,12 +26,14 @@
 
     <ItemGroup>
         <ManifestBuildData Include="Location=$(FeedUrl)" />
+        <ManifestBuildData Include="RepoUri=$(BUILD_REPOSITORY_URI)" />
     </ItemGroup>
 
     <UsingTask TaskName="GenerateBuildManifest" AssemblyFile="$(MicrosoftDotNetBuildTasksFeedTaskDir)Microsoft.DotNet.Build.Tasks.Feed.dll" />
 
     <Target Name="PublishToBuildAssetRegistry">
         <GenerateBuildManifest Artifacts="@(ItemsToPush)"
+            PublishingVersion="3"
             ItemsToSign="@(ItemsToSignPostBuild)"
             StrongNameSignInfo="@(StrongNameSignInfo)"
             FileSignInfo="@(FileSignInfo)"
