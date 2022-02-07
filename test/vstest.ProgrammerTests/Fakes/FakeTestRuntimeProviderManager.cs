@@ -9,9 +9,9 @@ namespace vstest.ProgrammerTests.CommandLine.Fakes;
 
 internal class FakeTestRuntimeProviderManager : ITestRuntimeProviderManager
 {
-    public FakeTestRuntimeProviderManager(FakeProcessHelper fakeProcessHelper)
+    public FakeTestRuntimeProviderManager(FakeProcessHelper fakeProcessHelper, FakeCommunicationEndpoint fakeCommunicationEndpoint)
     {
-        TestRuntimeProvider = new FakeTestRuntimeProvider(fakeProcessHelper);
+        TestRuntimeProvider = new FakeTestRuntimeProvider(fakeProcessHelper, fakeCommunicationEndpoint);
     }
 
     public FakeTestRuntimeProvider TestRuntimeProvider { get; private set; }

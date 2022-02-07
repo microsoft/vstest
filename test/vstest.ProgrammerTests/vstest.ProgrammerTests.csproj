@@ -19,6 +19,7 @@
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
     <ProjectReference Include="..\..\src\vstest.console\vstest.console.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Utilities\Microsoft.TestPlatform.Utilities.csproj">
       <FromP2P>true</FromP2P>

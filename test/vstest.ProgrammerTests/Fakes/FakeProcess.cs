@@ -3,6 +3,7 @@
 
 
 #pragma warning disable IDE1006 // Naming Styles
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 namespace vstest.ProgrammerTests.CommandLine.Fakes;
@@ -15,6 +16,7 @@ internal class FakeProcess
     public string Arguments { get; set; }
 
     public PlatformArchitecture Architecture { get; init; } = PlatformArchitecture.X64;
+    public event EventHandler<int> ProcessExited = delegate { };
 
     public FakeProcess(string path, string arguments = null)
     {

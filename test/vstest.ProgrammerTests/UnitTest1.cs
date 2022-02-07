@@ -55,7 +55,7 @@ public class TestDiscoveryTests
 
         var fakeCommunicationEndpoint = new FakeCommunicationEndpoint();
         TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint);
-        var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(fakeProcessHelper);
+        var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(fakeProcessHelper, fakeCommunicationEndpoint);
         var testEngine = new TestEngine(fakeTestRuntimeProviderManager, fakeProcessHelper);
         var fakeFileHelper = new FakeFileHelper();
         var testPlatform = new TestPlatform(testEngine, fakeFileHelper, fakeTestRuntimeProviderManager);

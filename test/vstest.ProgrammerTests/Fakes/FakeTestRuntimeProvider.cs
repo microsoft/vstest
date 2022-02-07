@@ -12,6 +12,7 @@ namespace vstest.ProgrammerTests.CommandLine.Fakes;
 internal class FakeTestRuntimeProvider : ITestRuntimeProvider
 {
     public FakeProcessHelper FakeProcessHelper { get; }
+    public FakeCommunicationEndpoint FakeCommunicationEndpoint { get; }
     public FakeProcess? TestHostProcess { get; private set; }
 
     // TODO: make this configurable?
@@ -20,9 +21,10 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
     public event EventHandler<HostProviderEventArgs> HostLaunched;
     public event EventHandler<HostProviderEventArgs> HostExited;
 
-    public FakeTestRuntimeProvider(FakeProcessHelper fakeProcessHelper)
+    public FakeTestRuntimeProvider(FakeProcessHelper fakeProcessHelper, FakeCommunicationEndpoint fakeCommunicationEndpoint)
     {
         FakeProcessHelper = fakeProcessHelper;
+        FakeCommunicationEndpoint = fakeCommunicationEndpoint;
     }
 
     public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
@@ -43,7 +45,8 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
         // TODO: Makes this configurable?
         return new TestHostConnectionInfo
         {
-            Endpoint = "127.0.0.0:8080",
+            // using 9090 for no particular reason, apart from knowing that port 0 is ignored somewhere in our codebase
+            Endpoint = "127.0.0.1:9090",
             Role = ConnectionRole.Client,
             Transport = Transport.Sockets,
         };
@@ -51,7 +54,8 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
 
     public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
     {
-        throw new NotImplementedException();
+        // TODO: do we need to do more here? How to link testhost to the fake one we "start"?
+        return new TestProcessStartInfo();
     }
 
     public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions)
@@ -71,7 +75,11 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
 
     public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        // todo: Add fake process for testhost
+        // TestHostProcess = FakeProcessHelper.LaunchProcess(testHostStartInfo);
+        //HostLaunched(this, new HostProviderEventArgs("Fake testhost launched", 0, TestHostProcess.Id));
+        //TestHostProcess.ProcessExited += (s, e) => HostExited(s, new HostProviderEventArgs($"Fake testhost {TestHostProcess.Id} exited", -99999, e));
+        return Task.FromResult(true);
     }
 
     public void SetCustomLauncher(ITestHostLauncher customLauncher)

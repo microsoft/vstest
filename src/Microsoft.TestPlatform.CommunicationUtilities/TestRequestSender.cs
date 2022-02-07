@@ -150,6 +150,12 @@ public class TestRequestSender : ITestRequestSender
         _communicationEndpoint.Connected += (sender, args) =>
         {
             _channel = args.Channel;
+            // TODO: I suspect that Channel can be null only because of some unit tests,
+            // and being connected and actually not setting any channel should be error
+            // rather than silently waiting for timeout
+            // TODO: also this event is called back on connected, why are the event args holding
+            // the Connected boolean and why do we check it here. If we did not connect we should
+            // have not fired this event.
             if (args.Connected && _channel != null)
             {
                 _connected.Set();
@@ -194,7 +200,8 @@ public class TestRequestSender : ITestRequestSender
     {
         // Negotiation follows these steps:
         // Runner sends highest supported version to Test host
-        // Test host sends the version it can support (must be less than highest) to runner
+        // Test host compares the version with the highest version it can support.
+        // Test host sends back the lower number of the two. So the highest protocol version, that both sides support is used.
         // Error case: test host can send a protocol error if it cannot find a supported version
         var protocolNegotiated = new ManualResetEvent(false);
         _onMessageReceived = (sender, args) =>
