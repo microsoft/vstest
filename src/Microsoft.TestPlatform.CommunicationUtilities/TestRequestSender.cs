@@ -78,7 +78,6 @@ public class TestRequestSender : ITestRequestSender
             protocolConfig,
             ClientProcessExitWaitTimeout)
     {
-        SetCommunicationEndPoint();
     }
 
     internal TestRequestSender(
@@ -99,7 +98,12 @@ public class TestRequestSender : ITestRequestSender
 
         // The connectionInfo here is that of RuntimeProvider, so reverse the role of runner.
         _runtimeProvider = runtimeProvider;
-        _communicationEndpoint = communicationEndPoint;
+
+        // TODO: In various places TestRequest sender is instantiated, and we can't easily inject the factory, so this is last
+        // resort of getting the dependency into the execution flow.
+        // TODO: I am not sure if we need multiple instances of ICommunicationEndpoint, in that case we should register
+        // and resolve Func<ICommunicationEndPoint> and invoke that.
+        _communicationEndpoint = communicationEndPoint ?? TestServiceLocator.Get<ICommunicationEndPoint>() ?? SetCommunicationEndPoint();
         _connectionInfo.Endpoint = connectionInfo.Endpoint;
         _connectionInfo.Role = connectionInfo.Role == ConnectionRole.Host
             ? ConnectionRole.Client
@@ -748,24 +752,24 @@ public class TestRequestSender : ITestRequestSender
         Interlocked.CompareExchange(ref _operationCompleted, 1, 0);
     }
 
-    private void SetCommunicationEndPoint()
+    private ICommunicationEndPoint SetCommunicationEndPoint()
     {
         // TODO: Use factory to get the communication endpoint. It will abstract out the type of communication endpoint like socket, shared memory or named pipe etc.,
         if (_connectionInfo.Role == ConnectionRole.Client)
         {
-            _communicationEndpoint = new SocketClient();
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TestRequestSender is acting as client");
             }
+            return new SocketClient();
         }
         else
         {
-            _communicationEndpoint = new SocketServer();
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TestRequestSender is acting as server");
             }
+            return new SocketServer();
         }
     }
 }

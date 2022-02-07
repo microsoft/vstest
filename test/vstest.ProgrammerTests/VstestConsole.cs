@@ -3,6 +3,8 @@
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
 
+using vstest.ProgrammerTests.CommandLine.Fakes;
+
 namespace vstest.ProgrammerTests.CommandLine;
 
 internal class VstestConsole
@@ -30,18 +32,5 @@ internal class VstestConsole
         var commandLine = new[] { Sources, Arguments }.SelectMany(s => s).JoinBySpace();
         // vstest.console
         var console = new Executor(Output).Execute(commandLine);
-    }
-}
-
-internal static class StringExtensions
-{
-    public static string Join(this IEnumerable<string> value, string separator)
-    {
-        return string.Join(separator, value);
-    }
-
-    public static string JoinBySpace(this IEnumerable<string> value)
-    {
-        return string.Join(" ", value);
     }
 }

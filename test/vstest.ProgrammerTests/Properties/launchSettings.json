@@ -3,6 +3,9 @@
     "WSL": {
       "commandName": "WSL2",
       "distributionName": ""
+    },
+    "vstest.ProgrammerTests": {
+      "commandName": "Project"
     }
   }
 }

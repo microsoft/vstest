@@ -1,24 +1,23 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Text;
+
+using System.Runtime.Versioning;
 
 using FluentAssertions;
 
 using Microsoft.VisualStudio.TestPlatform.Client;
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
-using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+using vstest.ProgrammerTests.CommandLine.Fakes;
 
 #pragma warning disable IDE1006 // Naming Styles
 namespace vstest.ProgrammerTests.CommandLine;
@@ -48,78 +47,67 @@ public class TestDiscoveryTests
 {
     public void GivenAnMSTestAssemblyWith5Tests_WhenTestsAreDiscovered_Then5TestsAreFound()
     {
+        // -- arrange
         var commandLineOptions = CommandLineOptions.Instance;
 
-        var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager();
-        var fakeProcessHelper = new FakeProcessHelper();
+        var fakeCurrentProcess = new FakeProcess(@"C:\temp\vstest.console.exe");
+        var fakeProcessHelper = new FakeProcessHelper(fakeCurrentProcess);
+
+        var fakeCommunicationEndpoint = new FakeCommunicationEndpoint();
+        TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint);
+        var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(fakeProcessHelper);
         var testEngine = new TestEngine(fakeTestRuntimeProviderManager, fakeProcessHelper);
         var fakeFileHelper = new FakeFileHelper();
         var testPlatform = new TestPlatform(testEngine, fakeFileHelper, fakeTestRuntimeProviderManager);
 
-        var testRunResultAggregator  = new TestRunResultAggregator();
+        var testRunResultAggregator = new TestRunResultAggregator();
         var fakeTestPlatformEventSource = new FakeTestPlatformEventSource();
 
-        var fakeAssemblyMetadataProvider = new FakeAssemblyMetadataProvider();
+        var fakeAssemblyMetadataProvider = new FakeAssemblyMetadataProvider(fakeFileHelper);
         var inferHelper = new InferHelper(fakeAssemblyMetadataProvider);
 
-        Task<IMetricsPublisher> fakeMetricsPublisherTask = 
-        TestRequestManager trm = new(
+        // This is most likely not the correctl place where to cut this off, plugin cache is probably the better place,
+        // but it is not injected, and I don't want to investigate this now.
+        var fakeDataCollectorAttachmentsProcessorsFactory = new FakeDataCollectorAttachmentsProcessorsFactory();
+        var testRunAttachmentsProcessingManager = new TestRunAttachmentsProcessingManager(fakeTestPlatformEventSource, fakeDataCollectorAttachmentsProcessorsFactory);
+
+        Task<IMetricsPublisher> fakeMetricsPublisherTask = Task.FromResult<IMetricsPublisher>(new FakeMetricsPublisher());
+        TestRequestManager testRequestManager = new(
             commandLineOptions,
             testPlatform,
             testRunResultAggregator,
             fakeTestPlatformEventSource,
             inferHelper,
-            metricsPublisherTask,
-            
+            fakeMetricsPublisherTask,
+            fakeProcessHelper,
+            testRunAttachmentsProcessingManager
             );
 
+        // -- act
 
+        // TODO: Get framework name from constants
+        // TODO: have mstest1dll canned
+        var mstest1Dll = new FakeDllFile(@"C:\temp\mstest1.dll", new FrameworkName(".NETCoreApp,Version=v5.0"), Architecture.X64);
+        fakeFileHelper.AddFile(mstest1Dll);
+        var testRunRequestPayload = new TestRunRequestPayload
+        {
+            // TODO: passing null sources and null testcases does not fail fast
+            Sources = mstest1Dll.Path.ToList(),
+            // TODO: passing null runsettings does not fail fast, instead it fails in Fakes settings code
+            // TODO: passing empty string fails in the xml parser code
+            RunSettings = "<RunSettings></RunSettings>"
+        };
+
+        // var fakeTestHostLauncher = new FakeTestHostLauncher();
+        var fakeTestRunEventsRegistrar = new FakeTestRunEventsRegistrar();
+        var protocolConfig = new ProtocolConfig();
+
+        testRequestManager.RunTests(testRunRequestPayload, testHostLauncher: null, fakeTestRunEventsRegistrar, protocolConfig);
+
+        // -- assert
+        // fakeTestRunEventsRegistrar.RunTests.Should().HaveCount(2);
     }
 
-}
-
-internal class FakeAssemblyMetadataProvider : IAssemblyMetadataProvider
-{
-    public FakeAssemblyMetadataProvider()
-    {
-    }
-}
-
-internal class FakeTestPlatformEventSource : ITestPlatformEventSource
-{
-    public FakeTestPlatformEventSource()
-    {
-    }
-}
-
-internal class FakeFileHelper : IFileHelper
-{
-    public FakeFileHelper()
-    {
-    }
-}
-
-internal class FakeProcessHelper : IProcessHelper
-{
-    public FakeProcessHelper()
-    {
-    }
-}
-
-internal class FakeTestRuntimeProviderManager : ITestRuntimeProviderManager
-{
-    public FakeTestRuntimeProviderManager()
-    {
-    }
-}
-
-internal class FakeTestHostProcess : FakeProcess
-{
-    public FakeTestHostProcess(string commandLine) : base(commandLine)
-    {
-    }
-
-    public CapturedRunSettings? RunSettings { get; internal set; }
 }
 
 internal class Fixture : IDisposable
@@ -141,71 +129,11 @@ internal class Fixture : IDisposable
     }
 }
 
-internal class FakeTestExtensionManager : ITestExtensionManager
-{
-    public void ClearExtensions()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void UseAdditionalExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-internal class FakeProcess
-{
-    public string CommandLine { get; }
-
-    public FakeProcess(string commandLine)
-    {
-        CommandLine = commandLine;
-    }
-}
-
 
 
 internal class CapturedRunSettings
 {
     public int MaxParallelLevel { get; internal set; }
-}
-
-internal class FakeOutput : IOutput
-{
-    public FakeOutput()
-    {
-    }
-
-    public List<OutputMessage> Messages { get; } = new();
-    public StringBuilder CurrentLine { get; } = new();
-    public List<string> Lines { get; } = new();
-
-    public void Write(string message, OutputLevel level)
-    {
-        Messages.Add(new OutputMessage(message, level, isNewLine: false));
-        CurrentLine.Append(message);
-    }
-
-    public void WriteLine(string message, OutputLevel level)
-    {
-        Lines.Add(CurrentLine + message);
-        CurrentLine.Clear();
-    }
-}
-
-internal class OutputMessage
-{
-    public OutputMessage(string message, OutputLevel level, bool isNewLine)
-    {
-        Message = message;
-        Level = level;
-        IsNewLine = isNewLine;
-    }
-
-    public string Message { get; }
-    public OutputLevel Level { get; }
-    public bool IsNewLine { get; }
 }
 
 internal static class RunConfiguration

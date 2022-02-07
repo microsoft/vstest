@@ -480,7 +480,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
             runStatsChangeEventTimeout,
             testHostLauncher)
     {
-        var testCases = tests as IList<TestCase> ?? tests.ToList();
+        var testCases = tests as IList<TestCase> ?? tests?.ToList();
         ValidateArg.NotNullOrEmpty(testCases, nameof(tests));
 
         Tests = testCases;
