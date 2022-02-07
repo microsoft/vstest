@@ -84,7 +84,7 @@ public class AcceptanceTestBase : IntegrationTestBase
         };
 
     protected bool IsDesktopTargetFramework()
-        => _testEnvironment.TargetFramework == AcceptanceTestBase.DesktopTargetFramework;
+        => _testEnvironment.TargetFramework == DesktopTargetFramework;
 
     protected string GetTargetFramworkForRunsettings()
     {

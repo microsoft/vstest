@@ -207,7 +207,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     private void CollectCodeCoverage(RunnerInfo runnerInfo, TestParameters testParameters)
     {
         using var tempDir = new TempDirectory();
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = CreateArguments(tempDir, runnerInfo, testParameters, out var trxFilePath);
 
@@ -218,7 +218,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             testParameters.ExpectedSkippedTests,
             testParameters.ExpectedFailedTests);
 
-        var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, tempDir.Path);
+        var actualCoverageFile = GetCoverageFileNameFromTrx(trxFilePath, tempDir.Path);
         Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {tempDir.Path} trxfile: {trxFilePath}");
         Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
 

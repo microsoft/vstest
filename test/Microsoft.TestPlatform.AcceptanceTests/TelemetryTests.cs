@@ -24,7 +24,7 @@ public class TelemetryTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsShouldPublishMetrics(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         RunTests(runnerInfo.RunnerFramework);
     }

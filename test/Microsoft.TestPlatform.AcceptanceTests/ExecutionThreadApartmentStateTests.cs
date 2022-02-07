@@ -14,7 +14,7 @@ public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void UITestShouldPassIfApartmentStateIsSTA(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
@@ -28,7 +28,7 @@ public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WarningShouldBeShownWhenValueIsSTAForNetCore(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var assemblyPaths =
@@ -44,7 +44,7 @@ public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void UITestShouldFailWhenDefaultApartmentStateIsMTA(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var assemblyPaths =
@@ -60,7 +60,7 @@ public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void CancelTestExectionShouldWorkWhenApartmentStateIsSTA(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var assemblyPaths =

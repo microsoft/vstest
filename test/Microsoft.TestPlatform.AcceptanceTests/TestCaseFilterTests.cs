@@ -16,7 +16,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithAndOperatorTrait(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(
@@ -34,7 +34,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithCategoryTraitInMixCase(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(
@@ -52,7 +52,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithClassNameTrait(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(
@@ -70,7 +70,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithFullyQualifiedNameTrait(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(
@@ -90,7 +90,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithNameTrait(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(
@@ -108,7 +108,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithOrOperatorTrait(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(
@@ -126,7 +126,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithPriorityTrait(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(
@@ -148,7 +148,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void TestCaseFilterShouldWorkIfOnlyPropertyValueGivenInExpression(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(
@@ -175,7 +175,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
             return;
         }
 
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(
@@ -208,7 +208,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
             return;
         }
 
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         string testAssemblyPath = _testEnvironment.GetTestAsset("MstestV1UnitTestProject.dll");

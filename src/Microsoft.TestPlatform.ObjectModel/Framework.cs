@@ -23,11 +23,11 @@ public class Framework
     /// </summary>
     public static Framework DefaultFramework { get; } =
 #if NETFRAMEWORK
-        Framework.FromString(".NETFramework,Version=v4.0");
+        FromString(".NETFramework,Version=v4.0");
 #elif NETSTANDARD1_0
         null;
 #else
-        Framework.FromString(".NETCoreApp,Version=v1.0");
+        FromString(".NETCoreApp,Version=v1.0");
 #endif
 
     /// <summary>
