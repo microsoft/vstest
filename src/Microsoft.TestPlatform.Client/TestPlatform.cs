@@ -34,7 +34,7 @@ using ClientResources = Resources.Resources;
 /// </summary>
 internal class TestPlatform : ITestPlatform
 {
-    private readonly TestRuntimeProviderManager _testHostProviderManager;
+    private readonly ITestRuntimeProviderManager _testHostProviderManager;
 
     private readonly IFileHelper _fileHelper;
 
@@ -64,10 +64,10 @@ internal class TestPlatform : ITestPlatform
     /// <param name="testEngine">The test engine.</param>
     /// <param name="filehelper">The file helper.</param>
     /// <param name="testHostProviderManager">The data.</param>
-    protected TestPlatform(
+    internal TestPlatform(
         ITestEngine testEngine,
         IFileHelper filehelper,
-        TestRuntimeProviderManager testHostProviderManager)
+        ITestRuntimeProviderManager testHostProviderManager)
     {
         TestEngine = testEngine;
         _fileHelper = filehelper;

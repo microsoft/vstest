@@ -34,7 +34,7 @@ public class TestEngine : ITestEngine
 {
     #region Private Fields
 
-    private readonly TestRuntimeProviderManager _testHostProviderManager;
+    private readonly ITestRuntimeProviderManager _testHostProviderManager;
     private ITestExtensionManager _testExtensionManager;
     private readonly IProcessHelper _processHelper;
 
@@ -44,8 +44,8 @@ public class TestEngine : ITestEngine
     {
     }
 
-    protected TestEngine(
-        TestRuntimeProviderManager testHostProviderManager,
+    internal TestEngine(
+        ITestRuntimeProviderManager testHostProviderManager,
         IProcessHelper processHelper)
     {
         _testHostProviderManager = testHostProviderManager;

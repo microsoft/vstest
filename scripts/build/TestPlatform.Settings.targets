@@ -20,7 +20,7 @@
          serialization. This is also defined in build script. -->
     <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">15.0.0</AssemblyVersion>
 
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <PublicSign Condition="'$(CIBuild)' == '' or '$(CIBuild)' == 'false'">true</PublicSign>
     <DelaySign Condition="'$(CIBuild)' == 'true'">true</DelaySign>
     <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
