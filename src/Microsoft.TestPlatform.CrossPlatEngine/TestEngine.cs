@@ -68,6 +68,7 @@ public class TestEngine : ITestEngine
         requestData.MetricsCollection.Add(
             TelemetryDataConstants.ParallelEnabledDuringDiscovery,
             parallelLevel > 1 ? "True" : "False");
+        requestData.MetricsCollection.Add(TelemetryDataConstants.TestSessionId, discoveryCriteria.TestSessionInfo.Id);
 
         if (ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
         {
@@ -153,6 +154,7 @@ public class TestEngine : ITestEngine
         requestData.MetricsCollection.Add(
             TelemetryDataConstants.ParallelEnabledDuringExecution,
             parallelLevel > 1 ? "True" : "False");
+        requestData.MetricsCollection.Add(TelemetryDataConstants.TestSessionId, testRunCriteria.TestSessionInfo.Id);
 
         var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
         var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testRunCriteria.TestRunSettings);

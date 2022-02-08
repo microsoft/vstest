@@ -89,6 +89,18 @@ public interface ITestRequestManager : IDisposable
         ProtocolConfig protocolConfig);
 
     /// <summary>
+    /// Stops a test session.
+    /// </summary>
+    /// 
+    /// <param name="testSessionInfo">The test session info.</param>
+    /// <param name="eventsHandler">The events handler.</param>
+    /// <param name="protocolConfig">Protocol related information.</param>
+    public void StopTestSession(
+        TestSessionInfo testSessionInfo,
+        ITestSessionEventsHandler eventsHandler,
+        ProtocolConfig protocolConfig);
+
+    /// <summary>
     /// Cancel the current test run request.
     /// </summary>
     void CancelTestRun();

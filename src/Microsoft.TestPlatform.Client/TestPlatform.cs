@@ -187,7 +187,7 @@ internal class TestPlatform : ITestPlatform
             return false;
         }
 
-        return testSessionManager.StartSession(eventsHandler);
+        return testSessionManager.StartSession(eventsHandler, requestData);
     }
 
     /// <summary>

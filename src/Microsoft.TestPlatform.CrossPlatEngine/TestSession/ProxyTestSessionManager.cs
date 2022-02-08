@@ -5,11 +5,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 
 using Client;
 using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using ObjectModel.Engine;
 
@@ -20,6 +22,13 @@ using CrossPlatResources = Resources.Resources;
 /// </summary>
 public class ProxyTestSessionManager : IProxyTestSessionManager
 {
+    private enum TestSessionState : int
+    {
+        Success = 0,
+        ProxySetupFailure = 1,
+        SessionExistsFailure = 2
+    }
+
     private readonly object _lockObject = new();
     private readonly object _proxyOperationLockObject = new();
     private volatile bool _proxySetupFailed = false;
@@ -29,6 +38,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     private readonly Func<ProxyOperationManager> _proxyCreator;
     private readonly IList<ProxyOperationManagerContainer> _proxyContainerList;
     private readonly IDictionary<string, int> _proxyMap;
+    private readonly Stopwatch _testSessionStopwatch;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyTestSessionManager"/> class.
@@ -48,10 +58,17 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
 
         _proxyContainerList = new List<ProxyOperationManagerContainer>();
         _proxyMap = new Dictionary<string, int>();
+        _testSessionStopwatch = new Stopwatch();
     }
 
     /// <inheritdoc/>
     public virtual bool StartSession(ITestSessionEventsHandler eventsHandler)
+    {
+        return StartSession(eventsHandler, null);
+    }
+
+    /// <inheritdoc/>
+    public virtual bool StartSession(ITestSessionEventsHandler eventsHandler, IRequestData requestData)
     {
         lock (_lockObject)
         {
@@ -61,6 +78,9 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             }
             _testSessionInfo = new TestSessionInfo();
         }
+
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
 
         // Create all the proxies in parallel, one task per proxy.
         var taskList = new Task[_testhostCount];
@@ -96,10 +116,25 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
 
         // Wait for proxy creation to be over.
         Task.WaitAll(taskList);
+        stopwatch.Stop();
+
+        // Collecting session metrics.
+        requestData?.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionId,
+            _testSessionInfo.Id);
+        requestData?.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionSpawnedTesthostCount,
+            _proxyContainerList.Count);
+        requestData?.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionTesthostSpawnTimeInSec,
+            stopwatch.Elapsed.TotalSeconds);
 
         // Dispose of all proxies if even one of them failed during setup.
         if (_proxySetupFailed)
         {
+            requestData?.MetricsCollection.Add(
+                TelemetryDataConstants.TestSessionState,
+                TestSessionState.ProxySetupFailure.ToString());
             DisposeProxies();
             return false;
         }
@@ -107,9 +142,18 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         // Make the session available.
         if (!TestSessionPool.Instance.AddSession(_testSessionInfo, this))
         {
+            requestData?.MetricsCollection.Add(
+                TelemetryDataConstants.TestSessionState,
+                TestSessionState.SessionExistsFailure.ToString());
             DisposeProxies();
             return false;
         }
+
+        requestData?.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionState,
+            TestSessionState.Success.ToString());
+
+        _testSessionStopwatch.Start();
 
         // Let the caller know the session has been created.
         eventsHandler.HandleStartTestSessionComplete(_testSessionInfo);
@@ -119,16 +163,38 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     /// <inheritdoc/>
     public virtual bool StopSession()
     {
+        return StopSession(null);
+    }
+
+    /// <inheritdoc/>
+    public virtual bool StopSession(IRequestData requestData)
+    {
+        var testSessionId = string.Empty;
         lock (_lockObject)
         {
             if (_testSessionInfo == null)
             {
                 return false;
             }
+
+            testSessionId = _testSessionInfo.Id.ToString();
             _testSessionInfo = null;
         }
 
+        // Dispose of the pooled testhosts.
         DisposeProxies();
+
+        // Compute session time.
+        _testSessionStopwatch.Stop();
+
+        // Collecting session metrics.
+        requestData?.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionId,
+            testSessionId);
+        requestData?.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionTotalSessionTimeInSec,
+            _testSessionStopwatch.Elapsed.TotalSeconds);
+
         return true;
     }
 

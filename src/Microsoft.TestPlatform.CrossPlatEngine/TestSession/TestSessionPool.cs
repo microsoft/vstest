@@ -94,6 +94,19 @@ public class TestSessionPool
     /// <returns>True if the operation succeeded, false otherwise.</returns>
     public virtual bool KillSession(TestSessionInfo testSessionInfo)
     {
+        return KillSession(testSessionInfo, null);
+    }
+
+    /// <summary>
+    /// Kills and removes a session from the pool.
+    /// </summary>
+    /// 
+    /// <param name="testSessionInfo">The test session info object.</param>
+    /// <param name="requestData">The request data.</param>
+    /// 
+    /// <returns>True if the operation succeeded, false otherwise.</returns>
+    public virtual bool KillSession(TestSessionInfo testSessionInfo, IRequestData requestData)
+    {
         // TODO (copoiena): What happens if some request is running for the current session ?
         // Should we stop the request as well ? Probably yes.
         IProxyTestSessionManager proxyManager = null;
@@ -112,7 +125,7 @@ public class TestSessionPool
         }
 
         // Kill the session.
-        return proxyManager.StopSession();
+        return proxyManager.StopSession(requestData);
     }
 
     /// <summary>

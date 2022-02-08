@@ -23,9 +23,30 @@ public interface IProxyTestSessionManager
     bool StartSession(ITestSessionEventsHandler eventsHandler);
 
     /// <summary>
+    /// Starts the test session based on the test session criteria.
+    /// </summary>
+    /// 
+    /// <param name="eventsHandler">
+    /// Event handler for handling events fired during test session management operations.
+    /// </param>
+    /// <param name="requestData">The request data.</param>
+    /// 
+    /// <returns>True if the operation succeeded, false otherwise.</returns>
+    bool StartSession(ITestSessionEventsHandler eventsHandler, IRequestData requestData);
+
+    /// <summary>
     /// Stops the test session.
     /// </summary>
     ///
     /// <returns>True if the operation succeeded, false otherwise.</returns>
     bool StopSession();
+
+    /// <summary>
+    /// Stops the test session.
+    /// </summary>
+    ///
+    /// <param name="requestData">The request data.</param>
+    ///
+    /// <returns>True if the operation succeeded, false otherwise.</returns>
+    bool StopSession(IRequestData requestData);
 }
