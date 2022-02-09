@@ -38,12 +38,12 @@ internal sealed class TestLink : IXmlTestStore
     /// <summary>
     /// Gets the name.
     /// </summary>
-    public string Name { get; private set; } = string.Empty;
+    public string Name { get; } = string.Empty;
 
     /// <summary>
     /// Gets the storage.
     /// </summary>
-    public string Storage { get; private set; } = string.Empty;
+    public string Storage { get; } = string.Empty;
 
     /// <summary>
     /// Whether this Link is equal to other Link. Compares by Id.

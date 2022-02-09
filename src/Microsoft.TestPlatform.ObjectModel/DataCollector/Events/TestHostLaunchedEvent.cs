@@ -20,7 +20,7 @@ public sealed class TestHostLaunchedEventArgs : DataCollectionEventArgs
 
     #region Public properties
 
-    public int TestHostProcessId { get; private set; }
+    public int TestHostProcessId { get; }
 
     #endregion
 

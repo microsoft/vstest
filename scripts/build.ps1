@@ -55,6 +55,7 @@ Param(
 )
 
 $ErrorActionPreference = 'Stop'
+$ErrorView = 'Normal'
 
 . $PSScriptRoot\common.lib.ps1
 

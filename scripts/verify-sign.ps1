@@ -151,12 +151,6 @@ function Write-Debug ([string] $message)
 
 function Write-ToCI ([string] $message, [string]$type, [switch]$vso)
 {
-    $currentColor = $Host.UI.RawUI.ForegroundColor
-
-    if($type -eq "error") {
-        $Host.UI.RawUI.ForegroundColor = "Red"
-    }
-
     if ($message -or $vso -or $type)
     {
         $prefix = ""
@@ -164,15 +158,15 @@ function Write-ToCI ([string] $message, [string]$type, [switch]$vso)
             $prefix = "vso"
         }
 
-        Write-Output "##$prefix[$type]$message"
+        $color = if($type -eq "error") { "Red" } else { $Host.UI.RawUI.ForegroundColor }
+        Write-Host "##$prefix[$type]$message" -ForegroundColor $color
     }
-    $Host.UI.RawUI.ForegroundColor = $currentColor
 }
 
 Write-Debug "Variables used: "
 Get-ChildItem variable:TPB_*
-Write-Output ""
-Write-Output ""
+Write-Host ""
+Write-Host ""
 
 Verify-Assemblies
 Verify-NugetPackages

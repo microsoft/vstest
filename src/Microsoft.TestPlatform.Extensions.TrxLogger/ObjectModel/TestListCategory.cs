@@ -113,7 +113,7 @@ internal class TestListCategory : IXmlTestStore
     /// <summary>
     /// Gets the id.
     /// </summary>
-    public TestListCategoryId Id { get; private set; } = new TestListCategoryId();
+    public TestListCategoryId Id { get; } = new TestListCategoryId();
 
     /// <summary>
     /// Gets or sets id of parent category. Use TestCategoryId.Root for top level categories.
