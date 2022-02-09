@@ -193,7 +193,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
 
         HandleLogMessage(TestMessageLevel.Error, message);
         HandleRawMessage(rawMessage);
-        Abort();
+            Abort();
     }
 
     /// <summary>

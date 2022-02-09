@@ -18,10 +18,13 @@ internal class FakeProcessHelper : IProcessHelper
     public List<FakeProcess> Processes { get; } = new();
     public int LastProcessId => _lastProcessId;
 
-    public FakeProcessHelper(FakeProcess currentProcess)
+    public FakeErrorAggregator FakeErrorAggregator { get; }
+
+    public FakeProcessHelper(FakeProcess currentProcess, FakeErrorAggregator fakeErrorAggregator)
     {
         CurrentProcess = currentProcess;
         AddProcess(currentProcess);
+        FakeErrorAggregator = fakeErrorAggregator;
     }
 
     private void AddProcess(FakeProcess currentProcess)

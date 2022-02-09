@@ -7,7 +7,7 @@ namespace vstest.ProgrammerTests.CommandLine.Fakes;
 
 internal class FakeTestHostProcess : FakeProcess
 {
-    public FakeTestHostProcess(string commandLine) : base(commandLine)
+    public FakeTestHostProcess(string commandLine, string arguments, FakeErrorAggregator fakeErrorAggregator) : base(commandLine, arguments, fakeErrorAggregator)
     {
     }
 

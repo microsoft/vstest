@@ -110,7 +110,7 @@ public class SocketClient : ICommunicationEndPoint
     private void Stop(Exception error)
     {
         EqtTrace.Info("SocketClient.PrivateStop: Stop communication from server endpoint: {0}, error:{1}", _endPoint, error);
-
+        // TODO: this is here to prevent stack overflow.
         if (!_stopped)
         {
             // Do not allow stop to be called multiple times.

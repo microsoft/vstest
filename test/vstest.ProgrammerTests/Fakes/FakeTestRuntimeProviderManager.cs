@@ -9,12 +9,14 @@ namespace vstest.ProgrammerTests.CommandLine.Fakes;
 
 internal class FakeTestRuntimeProviderManager : ITestRuntimeProviderManager
 {
-    public FakeTestRuntimeProviderManager(FakeProcessHelper fakeProcessHelper, FakeCommunicationEndpoint fakeCommunicationEndpoint)
+    public FakeTestRuntimeProviderManager(FakeProcessHelper fakeProcessHelper, FakeCommunicationEndpoint fakeCommunicationEndpoint, FakeErrorAggregator fakeErrorAggregator)
     {
         TestRuntimeProvider = new FakeTestRuntimeProvider(fakeProcessHelper, fakeCommunicationEndpoint);
+        FakeErrorAggregator = fakeErrorAggregator;
     }
 
     public FakeTestRuntimeProvider TestRuntimeProvider { get; private set; }
+    public FakeErrorAggregator FakeErrorAggregator { get; }
 
     public ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration)
     {

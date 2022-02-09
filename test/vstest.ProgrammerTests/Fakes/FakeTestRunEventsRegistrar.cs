@@ -10,6 +10,11 @@ namespace vstest.ProgrammerTests.CommandLine.Fakes;
 
 internal class FakeTestRunEventsRegistrar : ITestRunEventsRegistrar
 {
+    public FakeTestRunEventsRegistrar(FakeErrorAggregator fakeErrorAggregator)
+    {
+        FakeErrorAggregator = fakeErrorAggregator;
+    }
+
     public List<object> AllEvents { get; } = new();
     public List<string> Warnings { get; } = new();
     public List<EventRecord<TestRunCompleteEventArgs>> RunCompletionEvents { get; } = new();
@@ -17,6 +22,7 @@ internal class FakeTestRunEventsRegistrar : ITestRunEventsRegistrar
     public List<EventRecord<TestRunChangedEventArgs>> RunStatsChange { get; } = new();
     public List<EventRecord<string>> RawMessageEvents { get; } = new();
     public List<EventRecord<TestRunMessageEventArgs>> TestRunMessageEvents { get; } = new();
+    public FakeErrorAggregator FakeErrorAggregator { get; }
 
     public void LogWarning(string message)
     {

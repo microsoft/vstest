@@ -10,6 +10,13 @@ namespace vstest.ProgrammerTests.CommandLine.Fakes;
 
 internal class FakeDataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachmentsProcessorsFactory
 {
+    public FakeDataCollectorAttachmentsProcessorsFactory(FakeErrorAggregator fakeErrorAggregator)
+    {
+        FakeErrorAggregator = fakeErrorAggregator;
+    }
+
+    public FakeErrorAggregator FakeErrorAggregator { get; }
+
     public DataCollectorAttachmentProcessor[] Create(InvokedDataCollector[] invokedDataCollectors, IMessageLogger logger)
     {
         throw new NotImplementedException();

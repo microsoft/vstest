@@ -8,9 +8,12 @@ namespace vstest.ProgrammerTests.CommandLine.Fakes;
 
 internal class FakeTestPlatformEventSource : ITestPlatformEventSource
 {
-    public FakeTestPlatformEventSource()
+    public FakeTestPlatformEventSource(FakeErrorAggregator fakeErrorAggregator)
     {
+        FakeErrorAggregator = fakeErrorAggregator;
     }
+
+    public FakeErrorAggregator FakeErrorAggregator { get; }
 
     public void AdapterDiscoveryStart(string executorUri)
     {

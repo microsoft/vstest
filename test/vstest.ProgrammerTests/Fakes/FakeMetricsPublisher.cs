@@ -8,13 +8,20 @@ namespace vstest.ProgrammerTests.CommandLine.Fakes;
 
 internal class FakeMetricsPublisher : IMetricsPublisher
 {
+    public FakeMetricsPublisher(FakeErrorAggregator fakeErrorAggregator)
+    {
+        FakeErrorAggregator = fakeErrorAggregator;
+    }
+
+    public FakeErrorAggregator FakeErrorAggregator { get; }
+
     public void Dispose()
     {
-        throw new NotImplementedException();
+        // do nothing
     }
 
     public void PublishMetrics(string eventName, IDictionary<string, object> metrics)
     {
-        throw new NotImplementedException();
+        // TODO: does nothing but probably should
     }
 }

@@ -6,7 +6,11 @@ using System.Collections.Concurrent;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+using vstest.ProgrammerTests.CommandLine;
 
 namespace vstest.ProgrammerTests.Fakes;
 
@@ -31,22 +35,30 @@ internal class FakeCommunicationChannel : ICommunicationChannel
     /// </summary>
     public bool Faulted { get; private set; }
 
-    public List<string> UnknowsMessages { get; } = new();
-
     public List<RequestResponsePair<Message, FakeMessage>> ProcessedMessages { get; } = new();
 
     /// <summary>
     /// Queue of MessageType of the incoming request, and the response that will be sent back.
     /// </summary>
     public Queue<RequestResponsePair<string, FakeMessage>> NextResponses { get; } = new();
+    public FakeErrorAggregator FakeErrorAggregator { get; }
 
     public CancellationTokenSource CancellationTokenSource = new();
 
     public event EventHandler<MessageReceivedEventArgs>? MessageReceived;
 
-    public FakeCommunicationChannel()
+    public FakeCommunicationChannel(FakeErrorAggregator fakeErrorAggregator)
     {
+        FakeErrorAggregator = fakeErrorAggregator;
+
         NextResponses.Enqueue(new RequestResponsePair<string, FakeMessage>(MessageType.VersionCheck, new FakeMessage<int>(MessageType.VersionCheck, 5)));
+        NextResponses.Enqueue(new RequestResponsePair<string, FakeMessage>(MessageType.ExecutionInitialize, FakeMessage.NoResponse));
+        var result = new TestRunCompletePayload
+        {
+            TestRunCompleteArgs = new TestRunCompleteEventArgs(new TestRunStatistics(), false, false, null, new System.Collections.ObjectModel.Collection<AttachmentSet>(), TimeSpan.Zero),
+            LastRunTests = new TestRunChangedEventArgs(new TestRunStatistics(), new List<TestResult>(), new List<TestCase>()),
+        };
+        NextResponses.Enqueue(new RequestResponsePair<string, FakeMessage>(MessageType.StartTestExecutionWithSources, new FakeMessage<TestRunCompletePayload>(MessageType.ExecutionComplete, result)));
 
         Spin = Task.Run(async () =>
         {
@@ -74,7 +86,11 @@ internal class FakeCommunicationChannel : ICommunicationChannel
                             //
                             // With this check in place we will not respond to TestRunStart with success, but with error.
                             // TODO: Better way to map MessageType and the payload type.
-                            var errorResponse = new FakeMessage<TestMessagePayload>(MessageType.TestMessage, new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = "FakeCommunicationChannel: Channel is faulted." });
+                            // TODO: simpler way to report error, and add it to the error aggregator
+                            var errorMessage = $"FakeCommunicationChannel: FakeCommunicationChannel: Got message {requestMessage.MessageType}. But a message that was unexptected was received previously and the channel is now faulted. Review {nameof(ProcessedMessages)}, and {nameof(NextResponses)}.";
+                            var exception = new Exception(errorMessage);
+                            FakeErrorAggregator.Add(exception);
+                            var errorResponse = new FakeMessage<TestMessagePayload>(MessageType.TestMessage, new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = errorMessage });
                             ProcessedMessages.Add(new RequestResponsePair<Message, FakeMessage>(requestMessage, errorResponse));
                             Faulted = true;
                             Respond(errorResponse);
@@ -84,7 +100,10 @@ internal class FakeCommunicationChannel : ICommunicationChannel
                         if (!NextResponses.TryPeek(out var nextResponsePair))
                         {
                             // If there are no more prepared responses then return protocol error.
-                            var errorResponse = new FakeMessage<TestMessagePayload>(MessageType.ProtocolError, new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = "FakeCommunicationChannel: No more responses are available." });
+                            var errorMessage = $"FakeCommunicationChannel: Got message {requestMessage.MessageType}, but no more requests were expected, because there are no more responses in {nameof(NextResponses)}.";
+                            var exception = new Exception(errorMessage);
+                            FakeErrorAggregator.Add(exception);
+                            var errorResponse = new FakeMessage<TestMessagePayload>(MessageType.ProtocolError, new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = errorMessage });
                             ProcessedMessages.Add(new RequestResponsePair<Message, FakeMessage>(requestMessage, errorResponse));
                             Faulted = true;
                             Respond(errorResponse);
@@ -93,7 +112,10 @@ internal class FakeCommunicationChannel : ICommunicationChannel
                         {
                             // If the incoming message does not match what we expected return protocol error. The lsat message will remain in the
                             // NextResponses queue.
-                            var errorResponse = new FakeMessage<TestMessagePayload>(MessageType.ProtocolError, new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = $"FakeCommunicationChannel: Excpected message {nextResponsePair.Request} but got {requestMessage.MessageType}." });
+                            var errorMessage = $"FakeCommunicationChannel: Excpected message {nextResponsePair.Request} but got {requestMessage.MessageType}.";
+                            var exception = new Exception(errorMessage);
+                            FakeErrorAggregator.Add(exception);
+                            var errorResponse = new FakeMessage<TestMessagePayload>(MessageType.ProtocolError, new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = errorMessage });
                             ProcessedMessages.Add(new RequestResponsePair<Message, FakeMessage>(requestMessage, errorResponse));
                             Faulted = true;
                             Respond(errorResponse);
@@ -104,7 +126,12 @@ internal class FakeCommunicationChannel : ICommunicationChannel
                             // TODO: remove !, once we fix the type
                             var response = responsePair.Response!;
                             ProcessedMessages.Add(new RequestResponsePair<Message, FakeMessage>(requestMessage, response));
-                            Respond(response);
+
+                            // If we created a pair with NoResponse message, we won't send that back to the server.
+                            if (response != FakeMessage.NoResponse)
+                            {
+                                Respond(response);
+                            }
                         }
                     }
                     else
@@ -112,9 +139,9 @@ internal class FakeCommunicationChannel : ICommunicationChannel
                         await Task.Delay(100);
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-
+                    FakeErrorAggregator.Add(ex);
                 }
             }
 
@@ -123,7 +150,7 @@ internal class FakeCommunicationChannel : ICommunicationChannel
 
     private void Respond(FakeMessage response)
     {
-        // TODO: we never call this when MessageRecieved is null, but how do I tell that to the compiler?
+        // TODO: we never call this when MessageRecieved is null, but how do I tell that to the compiler? And is that even true? 
         MessageReceived!(this, new MessageReceivedEventArgs { Data = response.SerializedMessage });
     }
 
@@ -229,4 +256,9 @@ internal abstract class FakeMessage
     // TODO: Is there a better way to ensure that is is not null, we will always set it in the inherited types, but it would be nice to have warning if we did not.
     // And adding constructor makes it difficult to use the serializer, especially if we wanted to the serializer dynamic and not a static instance.
     public string SerializedMessage { get; init; } = string.Empty;
+
+    /// <summary>
+    /// When paired with this message, the channel should only recieve the request but not send this message back to the caller. 
+    /// </summary>
+    public static FakeMessage NoResponse { get; }
 }

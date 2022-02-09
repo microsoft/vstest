@@ -16,13 +16,17 @@ internal class FakeProcess
     public string Arguments { get; set; }
 
     public PlatformArchitecture Architecture { get; init; } = PlatformArchitecture.X64;
+    public string V { get; }
+    public FakeErrorAggregator FakeErrorAggregator { get; }
+
     public event EventHandler<int> ProcessExited = delegate { };
 
-    public FakeProcess(string path, string arguments = null)
+    public FakeProcess(string path, string arguments, FakeErrorAggregator fakeErrorAggregator)
     {
         Path = path;
         Name = System.IO.Path.GetFileName(path);
         Arguments = arguments;
+        FakeErrorAggregator = fakeErrorAggregator;
     }
 
     internal static FakeProcess EnsureFakeProcess(object process)

@@ -8,7 +8,13 @@ namespace vstest.ProgrammerTests.CommandLine.Fakes;
 
 internal class FakeFileHelper : IFileHelper
 {
+    public FakeFileHelper(FakeErrorAggregator fakeErrorAggregator)
+    {
+        FakeErrorAggregator = fakeErrorAggregator;
+    }
+
     public List<FakeFile> Files { get; } = new();
+    public FakeErrorAggregator FakeErrorAggregator { get; }
 
     public void CopyFile(string sourcePath, string destinationPath)
     {

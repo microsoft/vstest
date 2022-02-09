@@ -11,22 +11,25 @@ namespace vstest.ProgrammerTests.CommandLine.Fakes;
 
 internal class FakeAssemblyMetadataProvider : IAssemblyMetadataProvider
 {
-    private readonly FakeFileHelper _fakeFileHelper;
+    public FakeFileHelper FakeFileHelper { get; }
 
-    public FakeAssemblyMetadataProvider(FakeFileHelper fakeFileHelper)
+    public FakeErrorAggregator FakeErrorAggregator { get; }
+
+    public FakeAssemblyMetadataProvider(FakeFileHelper fakeFileHelper, FakeErrorAggregator fakeErrorAggregator)
     {
-        _fakeFileHelper = fakeFileHelper;
+        FakeFileHelper = fakeFileHelper;
+        FakeErrorAggregator = fakeErrorAggregator;
     }
 
     public Architecture GetArchitecture(string filePath)
     {
-        var file = (FakeDllFile)_fakeFileHelper.Files.Single(f => f.Path == filePath);
+        var file = (FakeDllFile)FakeFileHelper.Files.Single(f => f.Path == filePath);
         return file.Architecture;
     }
 
     public FrameworkName GetFrameWork(string filePath)
     {
-        var file = (FakeDllFile)_fakeFileHelper.Files.Single(f => f.Path == filePath);
+        var file = (FakeDllFile)FakeFileHelper.Files.Single(f => f.Path == filePath);
         return file.FrameworkName;
     }
 }

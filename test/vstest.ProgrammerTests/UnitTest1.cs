@@ -45,33 +45,34 @@ internal class InlineRunSettingsTests
 
 public class TestDiscoveryTests
 {
-    public void GivenAnMSTestAssemblyWith5Tests_WhenTestsAreDiscovered_Then5TestsAreFound()
+    public void GivenAnMSTestAssemblyWith5Tests_WhenTestsAreRun_Then5TestsAreExecuted()
     {
         // -- arrange
+        var fakeErrorAggregator = new FakeErrorAggregator();
         var commandLineOptions = CommandLineOptions.Instance;
 
-        var fakeCurrentProcess = new FakeProcess(@"C:\temp\vstest.console.exe");
-        var fakeProcessHelper = new FakeProcessHelper(fakeCurrentProcess);
+        var fakeCurrentProcess = new FakeProcess(@"C:\temp\vstest.console.exe", string.Empty, fakeErrorAggregator);
+        var fakeProcessHelper = new FakeProcessHelper(fakeCurrentProcess, fakeErrorAggregator);
 
-        var fakeCommunicationEndpoint = new FakeCommunicationEndpoint();
+        var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(fakeErrorAggregator);
         TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint);
-        var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(fakeProcessHelper, fakeCommunicationEndpoint);
+        var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(fakeProcessHelper, fakeCommunicationEndpoint, fakeErrorAggregator);
         var testEngine = new TestEngine(fakeTestRuntimeProviderManager, fakeProcessHelper);
-        var fakeFileHelper = new FakeFileHelper();
+        var fakeFileHelper = new FakeFileHelper(fakeErrorAggregator);
         var testPlatform = new TestPlatform(testEngine, fakeFileHelper, fakeTestRuntimeProviderManager);
 
         var testRunResultAggregator = new TestRunResultAggregator();
-        var fakeTestPlatformEventSource = new FakeTestPlatformEventSource();
+        var fakeTestPlatformEventSource = new FakeTestPlatformEventSource(fakeErrorAggregator);
 
-        var fakeAssemblyMetadataProvider = new FakeAssemblyMetadataProvider(fakeFileHelper);
+        var fakeAssemblyMetadataProvider = new FakeAssemblyMetadataProvider(fakeFileHelper, fakeErrorAggregator);
         var inferHelper = new InferHelper(fakeAssemblyMetadataProvider);
 
         // This is most likely not the correctl place where to cut this off, plugin cache is probably the better place,
         // but it is not injected, and I don't want to investigate this now.
-        var fakeDataCollectorAttachmentsProcessorsFactory = new FakeDataCollectorAttachmentsProcessorsFactory();
+        var fakeDataCollectorAttachmentsProcessorsFactory = new FakeDataCollectorAttachmentsProcessorsFactory(fakeErrorAggregator);
         var testRunAttachmentsProcessingManager = new TestRunAttachmentsProcessingManager(fakeTestPlatformEventSource, fakeDataCollectorAttachmentsProcessorsFactory);
 
-        Task<IMetricsPublisher> fakeMetricsPublisherTask = Task.FromResult<IMetricsPublisher>(new FakeMetricsPublisher());
+        Task<IMetricsPublisher> fakeMetricsPublisherTask = Task.FromResult<IMetricsPublisher>(new FakeMetricsPublisher(fakeErrorAggregator));
         TestRequestManager testRequestManager = new(
             commandLineOptions,
             testPlatform,
@@ -89,25 +90,28 @@ public class TestDiscoveryTests
         // TODO: have mstest1dll canned
         var mstest1Dll = new FakeDllFile(@"C:\temp\mstest1.dll", new FrameworkName(".NETCoreApp,Version=v5.0"), Architecture.X64);
         fakeFileHelper.AddFile(mstest1Dll);
+        // TODO: this gives me run configuration that is way too complete, do we a way to generate "bare" runsettings? if not we should add them. Would be also useful to get
+        // runsettings from parameter set so people can use it
+        // TODO: TestSessionTimeout gives me way to abort the run without having to cancel it externally, but could probably still lead to hangs if that funtionality is broken
+        var runConfiguration = new Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration { TestSessionTimeout = 60_000 }.ToXml().OuterXml;
         var testRunRequestPayload = new TestRunRequestPayload
         {
             // TODO: passing null sources and null testcases does not fail fast
             Sources = mstest1Dll.Path.ToList(),
             // TODO: passing null runsettings does not fail fast, instead it fails in Fakes settings code
             // TODO: passing empty string fails in the xml parser code
-            RunSettings = "<RunSettings></RunSettings>"
+            RunSettings = $"<RunSettings>{runConfiguration}</RunSettings>"
         };
 
         // var fakeTestHostLauncher = new FakeTestHostLauncher();
-        var fakeTestRunEventsRegistrar = new FakeTestRunEventsRegistrar();
+        var fakeTestRunEventsRegistrar = new FakeTestRunEventsRegistrar(fakeErrorAggregator);
         var protocolConfig = new ProtocolConfig();
 
         testRequestManager.RunTests(testRunRequestPayload, testHostLauncher: null, fakeTestRunEventsRegistrar, protocolConfig);
 
         // -- assert
-        // fakeTestRunEventsRegistrar.RunTests.Should().HaveCount(2);
+        fakeErrorAggregator.Errors.Should().BeEmpty();
     }
-
 }
 
 internal class Fixture : IDisposable
