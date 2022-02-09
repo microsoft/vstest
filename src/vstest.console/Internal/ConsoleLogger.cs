@@ -175,13 +175,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="events">Events that can be registered for.</param>
     /// <param name="testRunDirectory">Test Run Directory</param>
-    public void Initialize(TestLoggerEvents events, string testRunDirectory)
+    public void Initialize(TestLoggerEvents events!!, string testRunDirectory)
     {
-        if (events == null)
-        {
-            throw new ArgumentNullException(nameof(events));
-        }
-
         if (Output == null)
         {
             Output = ConsoleOutput.Instance;
@@ -207,13 +202,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         // events.DiscoveredTests += DiscoveredTestsHandler;
     }
 
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters!!)
     {
-        if (parameters == null)
-        {
-            throw new ArgumentNullException(nameof(parameters));
-        }
-
         if (parameters.Count == 0)
         {
             throw new ArgumentException("No default parameters added", nameof(parameters));

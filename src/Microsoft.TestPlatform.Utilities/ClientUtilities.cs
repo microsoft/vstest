@@ -21,13 +21,8 @@ public static class ClientUtilities
     /// </summary>
     /// <param name="xmlDocument">Xml Document containing Runsettings xml</param>
     /// <param name="path">Path of the .runsettings xml file</param>
-    public static void FixRelativePathsInRunSettings(XmlDocument xmlDocument, string path)
+    public static void FixRelativePathsInRunSettings(XmlDocument xmlDocument!!, string path)
     {
-        if (xmlDocument == null)
-        {
-            throw new ArgumentNullException(nameof(xmlDocument));
-        }
-
         if (string.IsNullOrEmpty(path))
         {
             throw new ArgumentNullException(nameof(path));

@@ -35,18 +35,8 @@ public static class FakesUtilities
     /// <param name="sources">test sources</param>
     /// <param name="runSettingsXml">runsettings</param>
     /// <returns>updated runsettings for fakes</returns>
-    public static string GenerateFakesSettingsForRunConfiguration(string[] sources, string runSettingsXml)
+    public static string GenerateFakesSettingsForRunConfiguration(string[] sources!!, string runSettingsXml!!)
     {
-        if (sources == null)
-        {
-            throw new ArgumentNullException(nameof(sources));
-        }
-
-        if (runSettingsXml == null)
-        {
-            throw new ArgumentNullException(nameof(runSettingsXml));
-        }
-
         var doc = new XmlDocument();
         using (var xmlReader = XmlReader.Create(
                    new StringReader(runSettingsXml),

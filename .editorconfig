@@ -140,6 +140,10 @@ dotnet_diagnostic.IDE0053.severity = warning # not default, increased severity t
 # CA2016: Forward the 'CancellationToken' parameter to methods
 dotnet_diagnostic.CA2016.severity = warning # not default, increased severity to ensure it is applied
 
+# IDE0190: Null check can be simplified
+csharp_style_prefer_parameter_null_checking = true # not default, increased severity to ensure it is applied
+dotnet_diagnostic.IDE0190.severity = warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences
@@ -195,7 +199,7 @@ csharp_using_directive_placement = outside_namespace:silent
 #### .NET Formatting Rules ####
 
 # IDE0055: Fix formatting
-dotnet_diagnostic.IDE0055.severity = warning
+dotnet_diagnostic.IDE0055.severity = suggestion # Downgraded to suggestion due to https://github.com/dotnet/roslyn/issues/59414
 
 #### C# Formatting Rules ####
 

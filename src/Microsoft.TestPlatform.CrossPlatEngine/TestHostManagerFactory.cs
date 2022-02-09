@@ -26,9 +26,9 @@ public class TestHostManagerFactory : ITestHostManagerFactory
     /// <param name="requestData">
     /// Provide common services and data for a discovery/run request.
     /// </param>
-    public TestHostManagerFactory(IRequestData requestData)
+    public TestHostManagerFactory(IRequestData requestData!!)
     {
-        _requestData = requestData ?? throw new System.ArgumentNullException(nameof(requestData));
+        _requestData = requestData;
     }
 
     /// <summary>
