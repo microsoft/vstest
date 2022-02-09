@@ -141,7 +141,7 @@ dotnet_diagnostic.IDE0053.severity = warning # not default, increased severity t
 dotnet_diagnostic.CA2016.severity = warning # not default, increased severity to ensure it is applied
 
 # IDE0190: Null check can be simplified
-csharp_style_prefer_parameter_null_checking = true # not default, increased severity to ensure it is applied
+# Keep this in sync with the related C# rule: csharp_style_prefer_parameter_null_checking
 dotnet_diagnostic.IDE0190.severity = warning # not default, increased severity to ensure it is applied
 
 #### C# Coding Conventions ####
@@ -195,6 +195,10 @@ csharp_style_unused_value_expression_statement_preference = discard_variable:sil
 # 'using' directive preferences
 # Keep this in sync with the related .NET rule: IDE0065
 csharp_using_directive_placement = outside_namespace:silent
+
+# IDE0190: Null check can be simplified
+# Keep this in sync with the related .NET rule: IDE0190
+csharp_style_prefer_parameter_null_checking = true # not default, increased severity to ensure it is applied
 
 #### .NET Formatting Rules ####
 
