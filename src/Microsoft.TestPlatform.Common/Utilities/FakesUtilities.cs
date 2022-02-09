@@ -72,9 +72,11 @@ public static class FakesUtilities
 
         // Since there are no FrameworkVersion values for .Net Core 2.0 +, we check TargetFramework instead
         // and default to FrameworkCore10 for .Net Core
-        if (targetFramework.Name.Contains("netstandard", StringComparison.OrdinalIgnoreCase) ||
-            targetFramework.Name.Contains("netcoreapp", StringComparison.OrdinalIgnoreCase) ||
-            targetFramework.Name.Contains("net5", StringComparison.OrdinalIgnoreCase))
+#pragma warning disable CA2249 // Consider using 'string.Contains' instead of 'string.IndexOf' | Runtime context might not contain the extension
+        if (targetFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0 ||
+            targetFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0 ||
+            targetFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
+#pragma warning restore CA2249 // Consider using 'string.Contains' instead of 'string.IndexOf'
         {
             return FrameworkVersion.FrameworkCore10;
         }
