@@ -327,8 +327,16 @@ public class ProxyOperationManager
         {
             _initialized = false;
 
-            // Please clean up test host.
-            TestHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
+            // This is calling external code, make sure we don't fail when it throws
+            try
+            {
+                // Please clean up test host.
+                TestHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error($"ProxyOperationManager: Cleaning testhost failed: {ex}");
+            }
 
             TestHostManager.HostExited -= TestHostManagerHostExited;
             TestHostManager.HostLaunched -= TestHostManagerHostLaunched;

@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 public static class TestServiceLocator
 {
     public static Dictionary<Type, object> Instances { get; } = new Dictionary<Type, object>();
+    public static List<Resolve> Resolves { get; } = new();
 
     public static void Register<TRegistration>(TRegistration instance)
     {
@@ -21,7 +22,22 @@ public static class TestServiceLocator
         if (!Instances.TryGetValue(typeof(TRegistration), out var instance))
             throw new InvalidOperationException($"Cannot find instance for type {typeof(TRegistration)}.");
 
+#if !NETSTANDARD1_0
+        Resolves.Add(new Resolve(typeof(TRegistration).FullName, Environment.StackTrace));
+#endif
         return (TRegistration)instance;
     }
 }
 
+// TODO: Make this internal, I am just trying to have easier time trying this out.
+public class Resolve
+{
+    public Resolve(string type, string stackTrace)
+    {
+        Type = type;
+        StackTrace = stackTrace;
+    }
+
+    public string Type { get; }
+    public string StackTrace { get; }
+}

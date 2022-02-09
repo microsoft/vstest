@@ -193,7 +193,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
 
         HandleLogMessage(TestMessageLevel.Error, message);
         HandleRawMessage(rawMessage);
-            Abort();
+        Abort();
     }
 
     /// <summary>
@@ -277,6 +277,10 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                 ExecutionManager.Abort(this);
             }
         }
+
+        // REVIEW: Added this, review this change. If we call abort, the event is never set, and we end up waiting for it to complete forever.
+        // I think w
+        _runCompletionEvent.Set();
 
         EqtTrace.Info("TestRunRequest.Abort: Aborted.");
     }

@@ -26,7 +26,14 @@ public class Runner
                         try
                         {
                             var i = Activator.CreateInstance(t);
-                            m.Invoke(i, Array.Empty<object>());
+                            var result = m.Invoke(i, Array.Empty<object>());
+                            if (result is Task task)
+                            {
+                                // When the result is a task we need to await it.
+                                // TODO: this can be improved with await, imho
+                                task.GetAwaiter().GetResult();
+                            };
+
                             logger.WriteTestPassed(m);
                         }
                         catch (Exception ex)

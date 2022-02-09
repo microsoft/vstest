@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -58,7 +59,7 @@ internal class FakeCommunicationChannel : ICommunicationChannel
             TestRunCompleteArgs = new TestRunCompleteEventArgs(new TestRunStatistics(), false, false, null, new System.Collections.ObjectModel.Collection<AttachmentSet>(), TimeSpan.Zero),
             LastRunTests = new TestRunChangedEventArgs(new TestRunStatistics(), new List<TestResult>(), new List<TestCase>()),
         };
-        NextResponses.Enqueue(new RequestResponsePair<string, FakeMessage>(MessageType.StartTestExecutionWithSources, new FakeMessage<TestRunCompletePayload>(MessageType.ExecutionComplete, result)));
+        NextResponses.Enqueue(new RequestResponsePair<string, FakeMessage>(MessageType.StartTestExecutionWithSources, new FakeMessage<TestRunCompletePayload>(MessageType.ExecutionComplete, result), true));
 
         Spin = Task.Run(async () =>
         {
@@ -123,6 +124,11 @@ internal class FakeCommunicationChannel : ICommunicationChannel
                         else
                         {
                             var responsePair = NextResponses.Dequeue();
+                            if (responsePair.Debug && Debugger.IsAttached)
+                            {
+                                // We are about to send an interesting message
+                                Debugger.Break();
+                            }
                             // TODO: remove !, once we fix the type
                             var response = responsePair.Response!;
                             ProcessedMessages.Add(new RequestResponsePair<Message, FakeMessage>(requestMessage, response));
@@ -150,8 +156,18 @@ internal class FakeCommunicationChannel : ICommunicationChannel
 
     private void Respond(FakeMessage response)
     {
-        // TODO: we never call this when MessageRecieved is null, but how do I tell that to the compiler? And is that even true? 
-        MessageReceived!(this, new MessageReceivedEventArgs { Data = response.SerializedMessage });
+        // We started processing the message when there was still someone listenting, but processing the message
+        // took us some time and the listener might have unsubscribed. check again if anyone is interested in the
+        // data. This is still a race condondition. In real code we solve this via SafeInvoke that does null check
+        // and catches the exception. In this code I prefer doing it this way, to see if it is fragile.
+        //
+        // The data from the message will be lost if the listener unsubscribes. This is okay, as it is similar to writing data
+        // to network stream while the other side disconnects. This is purely issue of timing, that can never be avoided.
+        if (MessageReceived != null)
+        {
+            MessageReceived(this, new MessageReceivedEventArgs { Data = response.SerializedMessage });
+        }
+        //TODO: record unprocessed responses?
     }
 
     public void Dispose()
@@ -175,16 +191,18 @@ internal class FakeCommunicationChannel : ICommunicationChannel
 
 internal class RequestResponsePair<T, U> where T : class
 {
-    public RequestResponsePair(T request, U response)
+    public RequestResponsePair(T request, U response, bool debug = false)
     {
         Request = request;
         Response = response;
+        Debug = debug;
     }
 
-    public RequestResponsePair(T request, Func<T, U> responseFactory)
+    public RequestResponsePair(T request, Func<T, U> responseFactory, bool debug = false)
     {
         Request = request;
         ResponseFactory = responseFactory;
+        Debug = debug;
     }
 
     public T Request { get; }
@@ -192,6 +210,8 @@ internal class RequestResponsePair<T, U> where T : class
     // TODO: make this Expression<Func< so we can get some info about what this is doing when looking directly at this instance
     public Func<T, U>? ResponseFactory { get; }
     public U? Response { get; private set; }
+
+    public bool Debug { get; init; }
 
     // TODO: Let's sleep on this and see if I understand tomorrow what I was trying to do, because this has too many usages now...
     // One day later I do remember it, but I am still not convinced. But let's keep that for now. The idea here is to get either a canned

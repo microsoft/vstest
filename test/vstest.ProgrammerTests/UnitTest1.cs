@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 
+using System.Diagnostics;
 using System.Runtime.Versioning;
 
 using FluentAssertions;
@@ -45,7 +46,7 @@ internal class InlineRunSettingsTests
 
 public class TestDiscoveryTests
 {
-    public void GivenAnMSTestAssemblyWith5Tests_WhenTestsAreRun_Then5TestsAreExecuted()
+    public async Task GivenAnMSTestAssemblyWith5Tests_WhenTestsAreRun_Then5TestsAreExecuted()
     {
         // -- arrange
         var fakeErrorAggregator = new FakeErrorAggregator();
@@ -93,7 +94,9 @@ public class TestDiscoveryTests
         // TODO: this gives me run configuration that is way too complete, do we a way to generate "bare" runsettings? if not we should add them. Would be also useful to get
         // runsettings from parameter set so people can use it
         // TODO: TestSessionTimeout gives me way to abort the run without having to cancel it externally, but could probably still lead to hangs if that funtionality is broken
-        var runConfiguration = new Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration { TestSessionTimeout = 60_000 }.ToXml().OuterXml;
+        // TODO: few tries later, that is exactly the case when we abort, it still hangs on waiting to complete request, because test run complete was not sent
+        // var runConfiguration = new Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration { TestSessionTimeout = 40_000 }.ToXml().OuterXml;
+        var runConfiguration = string.Empty;
         var testRunRequestPayload = new TestRunRequestPayload
         {
             // TODO: passing null sources and null testcases does not fail fast
@@ -107,7 +110,25 @@ public class TestDiscoveryTests
         var fakeTestRunEventsRegistrar = new FakeTestRunEventsRegistrar(fakeErrorAggregator);
         var protocolConfig = new ProtocolConfig();
 
+        var cancelAbort = new CancellationTokenSource();
+        var task = Task.Run(async () =>
+        {
+            // TODO: we make sure the test is running 1 minute at max and then we try to abort
+            // if we aborted we write the error to aggregator, this needs to be made into a pattern
+            // so we can avoid hanging if the run does not complete correctly
+            await Task.Delay(TimeSpan.FromMinutes(10), cancelAbort.Token);
+            if (Debugger.IsAttached)
+            {
+                // we will abort because we are hanging, look at stacks to see what the problem is
+                Debugger.Break();
+            }
+            fakeErrorAggregator.Add(new Exception("errr we aborted"));
+            testRequestManager.AbortTestRun();
+
+        });
         testRequestManager.RunTests(testRunRequestPayload, testHostLauncher: null, fakeTestRunEventsRegistrar, protocolConfig);
+        cancelAbort.Cancel();
+        await task;
 
         // -- assert
         fakeErrorAggregator.Errors.Should().BeEmpty();
