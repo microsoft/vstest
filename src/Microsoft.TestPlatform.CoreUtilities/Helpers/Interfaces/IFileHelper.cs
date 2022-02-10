@@ -131,6 +131,14 @@ public interface IFileHelper
     /// </param>
     void DeleteEmptyDirectroy(string directoryPath);
 
+    /// <summary>
+    /// Helper for deleting a directory.
+    /// </summary>
+    /// <param name="directoryPath">
+    /// The directory path.
+    /// </param>
+    void DeleteDirectory(string directoryPath, bool recursive);
+
 #if !NETSTANDARD1_0
     /// <summary>
     /// Gets all files in directory based on search pattern

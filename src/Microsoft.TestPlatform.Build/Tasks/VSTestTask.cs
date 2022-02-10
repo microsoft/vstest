@@ -161,6 +161,18 @@ public class VSTestTask : Task, ICancelableTask
         set;
     }
 
+    public string VSTestArtifactsProcessingMode
+    {
+        get;
+        set;
+    }
+
+    public string VSTestSessionCorrelationId
+    {
+        get;
+        set;
+    }
+
     public override bool Execute()
     {
         var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
@@ -414,6 +426,16 @@ public class VSTestTask : Task, ICancelableTask
         if (!string.IsNullOrWhiteSpace(VSTestNoLogo))
         {
             allArgs.Add("--nologo");
+        }
+
+        if (!string.IsNullOrEmpty(VSTestArtifactsProcessingMode) && VSTestArtifactsProcessingMode.Equals("collect", StringComparison.OrdinalIgnoreCase))
+        {
+            allArgs.Add("--artifactsProcessingMode-collect");
+        }
+
+        if (!string.IsNullOrEmpty(VSTestSessionCorrelationId))
+        {
+            allArgs.Add("--testSessionCorrelationId:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VSTestSessionCorrelationId));
         }
 
         return allArgs;
