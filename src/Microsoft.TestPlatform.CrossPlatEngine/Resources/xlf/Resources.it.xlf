@@ -169,7 +169,7 @@
       </trans-unit>
       <trans-unit id="AttachmentOutputFormat">
         <source>  {0}</source>
-        <target state="new">{0}</target>
+        <target state="new">  {0}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="AttachmentsBanner">
