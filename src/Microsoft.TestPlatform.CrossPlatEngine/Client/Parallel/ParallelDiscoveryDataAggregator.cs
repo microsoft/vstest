@@ -166,11 +166,8 @@ internal class ParallelDiscoveryDataAggregator
             {
                 SourcesWithDiscoveryStatus[source] = status;
 
-                if (EqtTrace.IsInfoEnabled)
-                {
-                    EqtTrace.Info("ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus: " +
-                                     $"{source} is marked with {status} status.");
-                }
+                EqtTrace.Info("ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus: " +
+                              $"{source} is marked with {status} status.");
             }
         }
     }

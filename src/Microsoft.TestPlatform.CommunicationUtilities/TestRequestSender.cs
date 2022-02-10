@@ -305,11 +305,7 @@ public class TestRequestSender : ITestRequestSender
             return;
         }
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.SendDiscoveryAbort: Sending discovery abort.");
-        }
-
+        EqtTrace.Verbose("TestRequestSender.SendDiscoveryAbort: Sending discovery abort.");
         _channel?.Send(_dataSerializer.SerializeMessage(MessageType.CancelDiscovery));
     }
     #endregion
