@@ -168,10 +168,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
         _baseTestRunEventsHandler = eventHandler;
         try
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
-            }
+            EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
 
             var testSources = new List<string>(
                 testRunCriteria.HasSpecificSources

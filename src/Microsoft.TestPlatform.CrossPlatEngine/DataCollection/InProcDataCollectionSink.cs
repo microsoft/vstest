@@ -43,11 +43,7 @@ internal class InProcDataCollectionSink : IDataCollectionSink
 
         if (!_testCaseDataCollectionDataMap.TryGetValue(testCaseId, out TestCaseDataCollectionData testCaseDataCollection))
         {
-            if (EqtTrace.IsWarningEnabled)
-            {
-                EqtTrace.Warning("No DataCollection Data set for the test case {0}", testCaseId);
-            }
-
+            EqtTrace.Warning("No DataCollection Data set for the test case {0}", testCaseId);
             return new Dictionary<string, string>();
         }
         else
@@ -88,10 +84,7 @@ internal class InProcDataCollectionSink : IDataCollectionSink
             }
             else
             {
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("The data for in-proc data collector with key {0} has already been set. Will be reset with new value", key);
-                }
+                EqtTrace.Warning("The data for in-proc data collector with key {0} has already been set. Will be reset with new value", key);
                 CollectionData[key] = value;
             }
         }

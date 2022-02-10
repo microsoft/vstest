@@ -82,20 +82,14 @@ public class SocketClient : ICommunicationEndPoint
             if (connectAsyncTask.IsFaulted)
             {
                 Connected.SafeInvoke(this, new ConnectedEventArgs(connectAsyncTask.Exception), "SocketClient: Server Failed to Connect");
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("Unable to connect to server, Exception occurred : {0}", connectAsyncTask.Exception);
-                }
+                EqtTrace.Verbose("Unable to connect to server, Exception occurred: {0}", connectAsyncTask.Exception);
             }
             else
             {
                 _channel = _channelFactory(_tcpClient.GetStream());
                 Connected.SafeInvoke(this, new ConnectedEventArgs(_channel), "SocketClient: ServerConnected");
 
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("Connected to server, and starting MessageLoopAsync");
-                }
+                EqtTrace.Verbose("Connected to server, and starting MessageLoopAsync");
 
                 // Start the message loop
                 Task.Run(() => _tcpClient.MessageLoopAsync(

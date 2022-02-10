@@ -766,11 +766,8 @@ internal class TestRequestManager : ITestRequestManager
         }
 
         // Log compatible sources
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Compatible sources list : ");
-            EqtTrace.Info(string.Join("\n", compatibleSources.ToArray()));
-        }
+        EqtTrace.Info("Compatible sources list: ");
+        EqtTrace.Info(string.Join("\n", compatibleSources.ToArray()));
     }
 
     private bool UpdatePlatform(

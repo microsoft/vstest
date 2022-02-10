@@ -156,19 +156,13 @@ internal class DataCollectorInformation
     {
         try
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("dataCollectorInfo.DisposeDataCollector: calling Dispose() on {0}", DataCollector.GetType());
-            }
+            EqtTrace.Verbose("dataCollectorInfo.DisposeDataCollector: calling Dispose() on {0}", DataCollector.GetType());
 
             DataCollector.Dispose();
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("DataCollectorInfo.DisposeDataCollector: exception while calling Dispose() on {0}: " + ex, DataCollector.GetType());
-            }
+            EqtTrace.Error("DataCollectorInfo.DisposeDataCollector: exception while calling Dispose() on {0}: " + ex, DataCollector.GetType());
         }
     }
 

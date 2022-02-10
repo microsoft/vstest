@@ -65,10 +65,7 @@ public class TextFileTelemetryPublisher : IMetricsPublisher
         var telemetryData = string.Join(";", metrics.Select(x => x.Key + "=" + x.Value));
         var finalData = string.Concat(eventName, ";", telemetryData);
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("TextFileTelemetryPublisher.LogToFile : Logging telemetry data points to file {0}", path);
-        }
+        EqtTrace.Info("TextFileTelemetryPublisher.LogToFile: Logging telemetry data points to file {0}", path);
 
         fileHelper.WriteAllTextToFile(path, finalData);
     }

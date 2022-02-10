@@ -23,10 +23,7 @@ public class NativeMethodsHelper : INativeMethodsHelper
         var isWow64Process = IsWow64Process(processHandle, out var isWow64);
         if (!isWow64Process)
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("NativeMethodsHelper: The call to IsWow64Process failed.");
-            }
+            EqtTrace.Verbose("NativeMethodsHelper: The call to IsWow64Process failed.");
         }
 
         var is64Bit = !isWow64;

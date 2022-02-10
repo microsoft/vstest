@@ -240,11 +240,7 @@ internal class TestPlatform : ITestPlatform
                 var adapterPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(customTestAdaptersPath));
                 if (!Directory.Exists(adapterPath))
                 {
-                    if (EqtTrace.IsWarningEnabled)
-                    {
-                        EqtTrace.Warning($"AdapterPath Not Found: {adapterPath}");
-                    }
-
+                    EqtTrace.Warning($"AdapterPath Not Found: {adapterPath}");
                     continue;
                 }
 

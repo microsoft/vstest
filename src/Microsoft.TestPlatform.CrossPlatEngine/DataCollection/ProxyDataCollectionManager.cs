@@ -282,35 +282,20 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
     {
         try
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("ProxyDataCollectionManager.InvokeDataCollectionServiceAction: Starting.");
-            }
-
+            EqtTrace.Verbose("ProxyDataCollectionManager.InvokeDataCollectionServiceAction: Starting.");
             action();
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("ProxyDataCollectionManager.InvokeDataCollectionServiceAction: Completed.");
-            }
+            EqtTrace.Info("ProxyDataCollectionManager.InvokeDataCollectionServiceAction: Completed.");
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsWarningEnabled)
-            {
-                EqtTrace.Warning("ProxyDataCollectionManager.InvokeDataCollectionServiceAction: TestPlatformException = {0}.", ex);
-            }
-
+            EqtTrace.Warning("ProxyDataCollectionManager.InvokeDataCollectionServiceAction: TestPlatformException = {0}.", ex);
             HandleExceptionMessage(runEventsHandler, ex);
         }
     }
 
     private void HandleExceptionMessage(ITestMessageEventHandler runEventsHandler, Exception exception)
     {
-        if (EqtTrace.IsErrorEnabled)
-        {
-            EqtTrace.Error(exception);
-        }
-
+        EqtTrace.Error(exception);
         runEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, exception.ToString());
     }
 

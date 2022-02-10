@@ -153,10 +153,7 @@ public class DesignModeClient : IDesignModeClient
             {
                 var message = _communicationManager.ReceiveMessage();
 
-                if (EqtTrace.IsInfoEnabled)
-                {
-                    EqtTrace.Info("DesignModeClient.ProcessRequests: Processing Message: {0}", message);
-                }
+                EqtTrace.Info("DesignModeClient.ProcessRequests: Processing Message: {0}", message);
 
                 switch (message.MessageType)
                 {

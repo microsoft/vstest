@@ -295,10 +295,7 @@ internal class ArgumentProcessorFactory
             }
             catch (Exception e)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception creating argument processor: {0}", e);
-                }
+                EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception creating argument processor: {0}", e);
                 throw;
             }
 
@@ -310,10 +307,7 @@ internal class ArgumentProcessorFactory
                 }
                 catch (Exception e)
                 {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception initializing argument processor: {0}", e);
-                    }
+                    EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception initializing argument processor: {0}", e);
                     throw;
                 }
             }
@@ -345,10 +339,7 @@ internal class ArgumentProcessorFactory
             }
             catch (Exception e)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception creating argument processor: {0}", e);
-                }
+                EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception creating argument processor: {0}", e);
                 throw;
             }
 
@@ -360,10 +351,7 @@ internal class ArgumentProcessorFactory
                 }
                 catch (Exception e)
                 {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception initializing argument processor: {0}", e);
-                    }
+                    EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception initializing argument processor: {0}", e);
                     throw;
                 }
             }
