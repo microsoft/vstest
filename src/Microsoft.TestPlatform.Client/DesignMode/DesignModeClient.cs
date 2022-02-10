@@ -185,8 +185,8 @@ public class DesignModeClient : IDesignModeClient
 
                     case MessageType.StopTestSession:
                         {
-                            var testSessionInfo = _communicationManager.DeserializePayload<TestSessionInfo>(message);
-                            StopTestSession(testSessionInfo, testRequestManager);
+                            var testSessionPayload = _communicationManager.DeserializePayload<StopTestSessionPayload>(message);
+                            StopTestSession(testSessionPayload, testRequestManager);
                             break;
                         }
 
@@ -542,7 +542,7 @@ public class DesignModeClient : IDesignModeClient
         });
     }
 
-    private void StopTestSession(TestSessionInfo testSessionInfo, ITestRequestManager requestManager)
+    private void StopTestSession(StopTestSessionPayload payload, ITestRequestManager requestManager)
     {
         Task.Run(() =>
         {
@@ -551,14 +551,14 @@ public class DesignModeClient : IDesignModeClient
             try
             {
                 requestManager.ResetOptions();
-                requestManager.StopTestSession(testSessionInfo, eventsHandler, _protocolConfig);
+                requestManager.StopTestSession(payload, eventsHandler, _protocolConfig);
             }
             catch (Exception ex)
             {
                 EqtTrace.Error("DesignModeClient: Exception in StopTestSession: " + ex);
 
                 eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
-                eventsHandler.HandleStopTestSessionComplete(testSessionInfo, false);
+                eventsHandler.HandleStopTestSessionComplete(new(payload.TestSessionInfo));
             }
         });
     }

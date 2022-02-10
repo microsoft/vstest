@@ -2336,12 +2336,30 @@ public class TestRequestManagerTests
         TestSessionPool.Instance = mockTestPool.Object;
 
         mockTestPool.Setup(tp => tp.KillSession(testSessionInfo, It.IsAny<IRequestData>()))
-            .Returns(result);
-        mockEventsHandler.Setup(eh => eh.HandleStopTestSessionComplete(testSessionInfo, result))
-            .Callback(() => { });
+            .Returns((TestSessionInfo _, IRequestData rd) =>
+            {
+                rd.MetricsCollection.Add(TelemetryDataConstants.TestSessionId, testSessionInfo.Id.ToString());
+                return result;
+            });
+        mockEventsHandler.Setup(eh => eh.HandleStopTestSessionComplete(
+                It.IsAny<StopTestSessionCompleteEventArgs>()))
+            .Callback((StopTestSessionCompleteEventArgs eventArgs) =>
+            {
+                Assert.IsNotNull(eventArgs.TestSessionInfo);
+                Assert.IsNotNull(eventArgs.Metrics);
+                Assert.AreEqual(eventArgs.TestSessionInfo, testSessionInfo);
+                Assert.AreEqual(
+                    eventArgs.Metrics[TelemetryDataConstants.TestSessionId],
+                    testSessionInfo.Id.ToString());
+                Assert.AreEqual(eventArgs.IsStopped, result);
+            });
 
         _testRequestManager.StopTestSession(
-            testSessionInfo,
+            new()
+            {
+                TestSessionInfo = testSessionInfo,
+                CollectMetrics = true
+            },
             mockEventsHandler.Object,
             _protocolConfig);
 
@@ -2350,8 +2368,7 @@ public class TestRequestManagerTests
                 It.IsAny<IRequestData>()),
             Times.Once);
         mockEventsHandler.Verify(eh => eh.HandleStopTestSessionComplete(
-                testSessionInfo,
-                result),
+                It.IsAny<StopTestSessionCompleteEventArgs>()),
             Times.Once);
 
         _mockTestPlatformEventSource.Verify(
@@ -2374,11 +2391,22 @@ public class TestRequestManagerTests
 
         mockTestPool.Setup(tp => tp.KillSession(testSessionInfo, It.IsAny<IRequestData>()))
             .Returns(result);
-        mockEventsHandler.Setup(eh => eh.HandleStopTestSessionComplete(testSessionInfo, result))
-            .Callback(() => { });
+        mockEventsHandler.Setup(eh => eh.HandleStopTestSessionComplete(
+                It.IsAny<StopTestSessionCompleteEventArgs>()))
+            .Callback((StopTestSessionCompleteEventArgs eventArgs) =>
+            {
+                Assert.IsNotNull(eventArgs.TestSessionInfo);
+                Assert.IsNull(eventArgs.Metrics);
+                Assert.AreEqual(eventArgs.TestSessionInfo, testSessionInfo);
+                Assert.AreEqual(eventArgs.IsStopped, result);
+            });
 
         _testRequestManager.StopTestSession(
-            testSessionInfo,
+            new()
+            {
+                TestSessionInfo = testSessionInfo,
+                CollectMetrics = true
+            },
             mockEventsHandler.Object,
             _protocolConfig);
 
@@ -2387,8 +2415,7 @@ public class TestRequestManagerTests
                 It.IsAny<IRequestData>()),
             Times.Once);
         mockEventsHandler.Verify(eh => eh.HandleStopTestSessionComplete(
-                testSessionInfo,
-                result),
+                It.IsAny<StopTestSessionCompleteEventArgs>()),
             Times.Once);
 
         _mockTestPlatformEventSource.Verify(
@@ -2411,15 +2438,24 @@ public class TestRequestManagerTests
         mockTestPool.Setup(tp => tp.KillSession(testSessionInfo, It.IsAny<IRequestData>()))
             .Throws(new Exception("DummyException"));
         mockEventsHandler.Setup(eh => eh.HandleStopTestSessionComplete(
-                testSessionInfo,
-                It.IsAny<bool>()))
-            .Callback(() => { });
+                It.IsAny<StopTestSessionCompleteEventArgs>()))
+            .Callback((StopTestSessionCompleteEventArgs eventArgs) =>
+            {
+                Assert.IsNotNull(eventArgs.TestSessionInfo);
+                Assert.IsNotNull(eventArgs.Metrics);
+                Assert.AreEqual(eventArgs.TestSessionInfo, testSessionInfo);
+                Assert.AreEqual(eventArgs.IsStopped, false);
+            });
 
         var exceptionThrown = false;
         try
         {
             _testRequestManager.StopTestSession(
-                testSessionInfo,
+                new()
+                {
+                    TestSessionInfo = testSessionInfo,
+                    CollectMetrics = true
+                },
                 mockEventsHandler.Object,
                 _protocolConfig);
         }
@@ -2435,8 +2471,7 @@ public class TestRequestManagerTests
                 It.IsAny<IRequestData>()),
             Times.Once);
         mockEventsHandler.Verify(eh => eh.HandleStopTestSessionComplete(
-                testSessionInfo,
-                It.IsAny<bool>()),
+                It.IsAny<StopTestSessionCompleteEventArgs>()),
             Times.Never);
 
         _mockTestPlatformEventSource.Verify(

@@ -492,12 +492,13 @@ internal class TestRequestManager : ITestRequestManager
 
     /// <inheritdoc/>
     public void StopTestSession(
-        TestSessionInfo testSessionInfo,
+        StopTestSessionPayload payload,
         ITestSessionEventsHandler eventsHandler,
         ProtocolConfig protocolConfig)
     {
         EqtTrace.Info("TestRequestManager.StopTestSession: Stopping test session.");
 
+        _telemetryOptedIn = payload.CollectMetrics;
         var requestData = GetRequestData(protocolConfig);
 
         lock (_syncObject)
@@ -507,8 +508,14 @@ internal class TestRequestManager : ITestRequestManager
                 EqtTrace.Info("TestRequestManager.StopTestSession: Synchronization context taken.");
                 _testPlatformEventSource.StopTestSessionStart();
 
-                var stopped = TestSessionPool.Instance.KillSession(testSessionInfo, requestData);
-                eventsHandler.HandleStopTestSessionComplete(testSessionInfo, stopped);
+                var stopped = TestSessionPool.Instance.KillSession(payload.TestSessionInfo, requestData);
+                eventsHandler.HandleStopTestSessionComplete(
+                    new()
+                    {
+                        TestSessionInfo = payload.TestSessionInfo,
+                        Metrics = stopped ? requestData.MetricsCollection.Metrics : null,
+                        IsStopped = stopped
+                    });
 
                 if (!stopped)
                 {

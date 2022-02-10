@@ -42,12 +42,11 @@ internal class TestSessionEventsHandler : ITestSessionEventsHandler
     }
 
     /// <inheritdoc />
-    public void HandleStopTestSessionComplete(TestSessionInfo testSessionInfo, bool stopped)
+    public void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs eventArgs)
     {
         var ackPayload = new StopTestSessionAckPayload()
         {
-            TestSessionInfo = testSessionInfo,
-            IsStopped = stopped
+            EventArgs = eventArgs
         };
 
         _communicationManager.SendMessage(MessageType.StopTestSessionCallback, ackPayload);

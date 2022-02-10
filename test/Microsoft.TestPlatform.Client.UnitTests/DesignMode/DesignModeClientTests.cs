@@ -585,10 +585,15 @@ public class DesignModeClientTests
         TestSessionPool.Instance = mockTestPool.Object;
 
         var testSessionInfo = new TestSessionInfo();
+        var stopTestSessionPayload = new StopTestSessionPayload
+        {
+            TestSessionInfo = testSessionInfo,
+            CollectMetrics = true
+        };
         var stopTestSessionMessage = new Message()
         {
             MessageType = MessageType.StopTestSession,
-            Payload = JToken.FromObject(testSessionInfo)
+            Payload = JToken.FromObject(stopTestSessionPayload)
         };
 
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
@@ -600,18 +605,18 @@ public class DesignModeClientTests
             {
                 _completeEvent.Set();
 
-                Assert.AreEqual(((StopTestSessionAckPayload)actualPayload).TestSessionInfo, testSessionInfo);
-                Assert.IsFalse(((StopTestSessionAckPayload)actualPayload).IsStopped);
+                Assert.AreEqual(((StopTestSessionAckPayload)actualPayload).EventArgs.TestSessionInfo, testSessionInfo);
+                Assert.IsFalse(((StopTestSessionAckPayload)actualPayload).EventArgs.IsStopped);
             });
 
         _mockCommunicationManager.Setup(
-                cm => cm.DeserializePayload<TestSessionInfo>(
+                cm => cm.DeserializePayload<StopTestSessionPayload>(
                     stopTestSessionMessage))
-            .Returns(testSessionInfo);
+            .Returns(stopTestSessionPayload);
 
         _mockTestRequestManager.Setup(
             rm => rm.StopTestSession(
-                It.IsAny<TestSessionInfo>(),
+                It.IsAny<StopTestSessionPayload>(),
                 It.IsAny<ITestSessionEventsHandler>(),
                 It.IsAny<ProtocolConfig>())).Throws(new Exception("DummyException"));
 

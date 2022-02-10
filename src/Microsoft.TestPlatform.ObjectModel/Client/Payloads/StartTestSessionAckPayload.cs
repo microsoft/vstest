@@ -5,8 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 
 using System.Runtime.Serialization;
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-
 /// <summary>
 /// Class used to define the start test session ack payload sent by the design mode client
 /// back to the vstest.console translation layers.
