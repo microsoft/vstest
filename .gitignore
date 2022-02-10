@@ -139,3 +139,6 @@ src/package/sign/sign.nuget.targets
 # diag log files
 # ===========================
 logs/
+
+.fake
+.ionide
