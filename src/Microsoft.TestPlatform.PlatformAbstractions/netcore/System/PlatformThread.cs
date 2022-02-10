@@ -3,52 +3,52 @@
 
 #if NETCOREAPP
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+using System;
+using System.Runtime.ExceptionServices;
+using System.Threading;
+
+using Interfaces;
+
+public class PlatformThread : IThread
 {
-    using System;
-    using System.Runtime.ExceptionServices;
-    using System.Threading;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-
-    public class PlatformThread : IThread
+    /// <inheritdoc/>
+    public void Run(Action action, PlatformApartmentState apartmentState, bool waitForCompletion)
     {
-        /// <inheritdoc/>
-        public void Run(Action action, PlatformApartmentState apartmentState, bool waitForCompletion)
+        if (apartmentState == PlatformApartmentState.STA)
         {
-            if (apartmentState == PlatformApartmentState.STA)
+            throw new ThreadApartmentStateNotSupportedException();
+        }
+
+        if (action == null)
+        {
+            return;
+        }
+
+        Exception exThrown = null;
+        var thread = new Thread(() =>
+        {
+            try
             {
-                throw new ThreadApartmentStateNotSupportedException();
+                action();
             }
-
-            if (action == null)
+            catch (Exception e)
             {
-                return;
+                exThrown = e;
             }
+        });
 
-            Exception exThrown = null;
-            var thread = new Thread(() =>
+        // ApartmentState is not supported in netcoreapp1.0.
+        thread.IsBackground = true;
+        thread.Start();
+        if (waitForCompletion)
+        {
+            thread.Join();
+            if (exThrown != null)
             {
-                try
-                {
-                    action();
-                }
-                catch (Exception e)
-                {
-                    exThrown = e;
-                }
-            });
-
-            // ApartmentState is not supported in netcoreapp1.0.
-            thread.IsBackground = true;
-            thread.Start();
-            if (waitForCompletion)
-            {
-                thread.Join();
-                if (exThrown != null)
-                {
-                    // Preserve the stacktrace when re-throwing the exception.
-                    ExceptionDispatchInfo.Capture(exThrown).Throw();
-                }
+                // Preserve the stacktrace when re-throwing the exception.
+                ExceptionDispatchInfo.Capture(exThrown).Throw();
             }
         }
     }

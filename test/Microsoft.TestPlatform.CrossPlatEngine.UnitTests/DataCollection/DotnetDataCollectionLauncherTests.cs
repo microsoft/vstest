@@ -1,72 +1,71 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
+namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
+[TestClass]
+public class DotnetDataCollectionLauncherTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Reflection;
+    private readonly Mock<IFileHelper> _mockFileHelper;
 
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    private readonly Mock<IProcessHelper> _mockProcessHelper;
 
-    using Moq;
+    private readonly Mock<IMessageLogger> _mockMessageLogger;
 
-    [TestClass]
-    public class DotnetDataCollectionLauncherTests
+    private readonly DotnetDataCollectionLauncher _dataCollectionLauncher;
+
+    public DotnetDataCollectionLauncherTests()
     {
-        private Mock<IFileHelper> mockFileHelper;
+        _mockFileHelper = new Mock<IFileHelper>();
+        _mockProcessHelper = new Mock<IProcessHelper>();
+        _mockMessageLogger = new Mock<IMessageLogger>();
 
-        private Mock<IProcessHelper> mockProcessHelper;
+        _dataCollectionLauncher = new DotnetDataCollectionLauncher(_mockProcessHelper.Object, _mockFileHelper.Object, _mockMessageLogger.Object);
+    }
 
-        private Mock<IMessageLogger> mockMessageLogger;
+    [TestMethod]
+    public void LaunchDataCollectorShouldLaunchDataCollectorProcess()
+    {
+        List<string> arguments = new();
+        _dataCollectionLauncher.LaunchDataCollector(null, arguments);
 
-        private DotnetDataCollectionLauncher dataCollectionLauncher;
+        _mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<object, string>>(), It.IsAny<Action<Object>>(), It.IsAny<Action<object, string>>()), Times.Once());
+    }
 
-        public DotnetDataCollectionLauncherTests()
-        {
-            this.mockFileHelper = new Mock<IFileHelper>();
-            this.mockProcessHelper = new Mock<IProcessHelper>();
-            this.mockMessageLogger = new Mock<IMessageLogger>();
+    [TestMethod]
+    public void LaunchDataCollectorShouldAppendDoubleQuoteForDataCollectorDllPath()
+    {
+        var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation());
+        var dataCollectorAssemblyPath = Path.Combine(currentWorkingDirectory, "datacollector.dll");
 
-            this.dataCollectionLauncher = new DotnetDataCollectionLauncher(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockMessageLogger.Object);
-        }
+        List<string> arguments = new();
+        _dataCollectionLauncher.LaunchDataCollector(null, arguments);
 
-        [TestMethod]
-        public void LaunchDataCollectorShouldLaunchDataCollectorProcess()
-        {
-            List<string> arguments = new List<string>();
-            this.dataCollectionLauncher.LaunchDataCollector(null, arguments);
+        _mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), string.Format("{0} \"{1}\" {2} ", "exec", dataCollectorAssemblyPath, string.Join(" ", arguments)), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<object, string>>(), It.IsAny<Action<Object>>(), It.IsAny<Action<object, string>>()), Times.Once());
+    }
 
-            this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<object, string>>(), It.IsAny<Action<Object>>(), It.IsAny<Action<object, string>>()), Times.Once());
-        }
+    [TestMethod]
+    public void LaunchDataCollectorShouldLaunchDataCollectorProcessWithCurrecntWorkingDirectory()
+    {
+        List<string> arguments = new();
+        _dataCollectionLauncher.LaunchDataCollector(null, arguments);
 
-        [TestMethod]
-        public void LaunchDataCollectorShouldAppendDoubleQuoteForDataCollectorDllPath()
-        {
-            var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation());
-            var dataCollectorAssemblyPath = Path.Combine(currentWorkingDirectory, "datacollector.dll");
+        string currentWorkingDirectory = Directory.GetCurrentDirectory();
 
-            List<string> arguments = new List<string>();
-            this.dataCollectionLauncher.LaunchDataCollector(null, arguments);
-
-            this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), string.Format("{0} \"{1}\" {2} ", "exec", dataCollectorAssemblyPath, string.Join(" ", arguments)), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<object, string>>(), It.IsAny<Action<Object>>(), It.IsAny<Action<object, string>>()), Times.Once());
-        }
-
-        [TestMethod]
-        public void LaunchDataCollectorShouldLaunchDataCollectorProcessWithCurrecntWorkingDirectory()
-        {
-            List<string> arguments = new List<string>();
-            this.dataCollectionLauncher.LaunchDataCollector(null, arguments);
-
-            string currentWorkingDirectory = Directory.GetCurrentDirectory();
-
-            this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), currentWorkingDirectory, It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<object, string>>(), It.IsAny<Action<Object>>(), It.IsAny<Action<object, string>>()), Times.Once());
-        }
+        _mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), currentWorkingDirectory, It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<object, string>>(), It.IsAny<Action<Object>>(), It.IsAny<Action<object, string>>()), Times.Once());
     }
 }

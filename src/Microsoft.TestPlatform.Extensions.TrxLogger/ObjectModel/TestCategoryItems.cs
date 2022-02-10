@@ -1,268 +1,266 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+
+using System;
+using System.Diagnostics;
+using System.Text;
+
+using Utility;
+
+using XML;
+
+#region TestCategoryItem
+/// <summary>
+/// Stores a string which categorizes the Test
+/// </summary>
+internal sealed class TestCategoryItem : IXmlTestStore
 {
-    using System;
-    using System.Diagnostics;
-    using System.Text;
+    #region Fields
+    [StoreXmlSimpleField(Location = "@TestCategory", DefaultValue = "")]
+    private readonly string _category = string.Empty;
 
-    using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-    using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+    #endregion
 
-    #region TestCategoryItem
+    #region Constructors
     /// <summary>
-    /// Stores a string which categorizes the Test
+    /// Create a new item with the category set
     /// </summary>
-    internal sealed class TestCategoryItem : IXmlTestStore
+    /// <param name="category">The category.</param>
+    public TestCategoryItem(string category)
     {
-        #region Fields
-        [StoreXmlSimpleField(Location = "@TestCategory", DefaultValue = "")]
-        private string category = string.Empty;
-
-        #endregion
-
-        #region Constructors
-        /// <summary>
-        /// Create a new item with the category set
-        /// </summary>
-        /// <param name="category">The category.</param>
-        public TestCategoryItem(string category)
+        // Treat null as empty.
+        if (category == null)
         {
-            // Treat null as empty.
-            if (category == null)
-            {
-                category = String.Empty;
-            }
-
-
-            this.category = this.StripIllegalChars(category);
+            category = String.Empty;
         }
 
-        #endregion
 
-        #region Properties/Methods
-        /// <summary>
-        /// Gets the category for this TestCategory
-        /// </summary>
-        public string TestCategory
+        _category = StripIllegalChars(category);
+    }
+
+    #endregion
+
+    #region Properties/Methods
+    /// <summary>
+    /// Gets the category for this TestCategory
+    /// </summary>
+    public string TestCategory
+    {
+        get
         {
-            get
-            {
-                return this.category;
-            }
+            return _category;
         }
+    }
 
-        private string StripIllegalChars(string category)
+    private string StripIllegalChars(string category)
+    {
+        string ret = category.Trim();
+        ret = ret.Replace("&", String.Empty);
+        ret = ret.Replace("|", String.Empty);
+        ret = ret.Replace("!", String.Empty);
+        ret = ret.Replace(",", String.Empty);
+        return ret;
+    }
+
+    #endregion
+
+    #region Methods - overrides
+    /// <summary>
+    /// Compare the values of the items
+    /// </summary>
+    /// <param name="other">Value being compared to.</param>
+    /// <returns>True if the values are the same and false otherwise.</returns>
+    public override bool Equals(object other)
+    {
+        if (other is not TestCategoryItem otherItem)
         {
-            string ret = category.Trim();
-            ret = ret.Replace("&", String.Empty);
-            ret = ret.Replace("|", String.Empty);
-            ret = ret.Replace("!", String.Empty);
-            ret = ret.Replace(",", String.Empty);
-            return ret;
+            return false;
         }
+        Debug.Assert(_category != null, "category is null");
+        return String.Equals(_category, otherItem._category, StringComparison.OrdinalIgnoreCase);
+    }
 
-        #endregion
+    /// <summary>
+    /// Convert the category name to a hashcode
+    /// </summary>
+    /// <returns>Hashcode of the category.</returns>
+    public override int GetHashCode()
+    {
+        Debug.Assert(_category != null, "category is null");
+        return _category.ToUpperInvariant().GetHashCode();
+    }
 
-        #region Methods - overrides
-        /// <summary>
-        /// Compare the values of the items
-        /// </summary>
-        /// <param name="other">Value being compared to.</param>
-        /// <returns>True if the values are the same and false otherwise.</returns>
-        public override bool Equals(object other)
-        {
-            TestCategoryItem otherItem = other as TestCategoryItem;
-            if (otherItem == null)
-            {
-                return false;
-            }
-            Debug.Assert(this.category != null, "category is null");
-            return String.Equals(this.category, otherItem.category, StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Convert the category name to a hashcode
-        /// </summary>
-        /// <returns>Hashcode of the category.</returns>
-        public override int GetHashCode()
-        {
-            Debug.Assert(this.category != null, "category is null");
-            return this.category.ToUpperInvariant().GetHashCode();
-        }
-
-        /// <summary>
-        /// Convert the category name to a string
-        /// </summary>
-        /// <returns>The category.</returns>
-        public override string ToString()
-        {
-            Debug.Assert(this.category != null, "category is null");
-            return this.category;
-        }
-        #endregion
-
-        #region IXmlTestStore Members
-
-        /// <summary>
-        /// Saves the class under the XmlElement.
-        /// </summary>
-        /// <param name="element"> XmlElement element </param>
-        /// <param name="parameters"> XmlTestStoreParameters parameters</param>
-        public void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
-        {
-            new XmlPersistence().SaveSingleFields(element, this, parameters);
-        }
-
-        #endregion
+    /// <summary>
+    /// Convert the category name to a string
+    /// </summary>
+    /// <returns>The category.</returns>
+    public override string ToString()
+    {
+        Debug.Assert(_category != null, "category is null");
+        return _category;
     }
     #endregion
 
-    #region TestCategoryItemCollection
+    #region IXmlTestStore Members
+
     /// <summary>
-    /// A collection of strings which categorize the test.
+    /// Saves the class under the XmlElement.
     /// </summary>
-    internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategoryItem>
+    /// <param name="element"> XmlElement element </param>
+    /// <param name="parameters"> XmlTestStoreParameters parameters</param>
+    public void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
     {
-        #region Constructors
-        /// <summary>
-        /// Creates an empty TestCategoryItemCollection.
-        /// </summary>
-        public TestCategoryItemCollection()
+        new XmlPersistence().SaveSingleFields(element, this, parameters);
+    }
+
+    #endregion
+}
+#endregion
+
+#region TestCategoryItemCollection
+/// <summary>
+/// A collection of strings which categorize the test.
+/// </summary>
+internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategoryItem>
+{
+    #region Constructors
+    /// <summary>
+    /// Creates an empty TestCategoryItemCollection.
+    /// </summary>
+    public TestCategoryItemCollection()
+    {
+    }
+
+    /// <summary>
+    /// Create a new TestCategoryItemCollection based on the string array.
+    /// </summary>
+    /// <param name="items">Add these items to the collection.</param>
+    public TestCategoryItemCollection(string[] items)
+    {
+        EqtAssert.ParameterNotNull(items, nameof(items));
+        foreach (string s in items)
         {
+            Add(s);
         }
+    }
 
-        /// <summary>
-        /// Create a new TestCategoryItemCollection based on the string array.
-        /// </summary>
-        /// <param name="items">Add these items to the collection.</param>
-        public TestCategoryItemCollection(string[] items)
+    #endregion
+
+    #region Methods
+
+    /// <summary>
+    /// Adds the category.
+    /// </summary>
+    /// <param name="item">Category to be added.</param>
+    public void Add(string item)
+    {
+        Add(new TestCategoryItem(item));
+    }
+
+    /// <summary>
+    /// Adds the category.
+    /// </summary>
+    /// <param name="item">Category to be added.</param>
+    public override void Add(TestCategoryItem item)
+    {
+        EqtAssert.ParameterNotNull(item, nameof(item));
+
+        // Don't add empty items.
+        if (!String.IsNullOrEmpty(item.TestCategory))
         {
-            EqtAssert.ParameterNotNull(items, nameof(items));
-            foreach (string s in items)
-            {
-                this.Add(s);
-            }
+            base.Add(item);
         }
+    }
 
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Adds the category.
-        /// </summary>
-        /// <param name="item">Category to be added.</param>
-        public void Add(string item)
+    /// <summary>
+    /// Convert the TestCategoryItemCollection to a string.
+    /// each item is surrounded by a comma (,)
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString()
+    {
+        StringBuilder returnString = new();
+        if (Count > 0)
         {
-            this.Add(new TestCategoryItem(item));
-        }
-
-        /// <summary>
-        /// Adds the category.
-        /// </summary>
-        /// <param name="item">Category to be added.</param>
-        public override void Add(TestCategoryItem item)
-        {
-            EqtAssert.ParameterNotNull(item, nameof(item));
-
-            // Don't add empty items.
-            if (!String.IsNullOrEmpty(item.TestCategory))
-            {
-                base.Add(item);
-            }
-        }
-
-        /// <summary>
-        /// Convert the TestCategoryItemCollection to a string.
-        /// each item is surrounded by a comma (,)
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString()
-        {
-            StringBuilder returnString = new StringBuilder();
-            if (this.Count > 0)
-            {
-                returnString.Append(",");
-                foreach (TestCategoryItem item in this)
-                {
-                    returnString.Append(item.TestCategory);
-                    returnString.Append(",");
-                }
-            }
-
-            return returnString.ToString();
-        }
-
-        /// <summary>
-        /// Convert the TestCategoryItemCollection to an array of strings.
-        /// </summary>
-        /// <returns>Array of strings containing the test categories.</returns>
-        public string[] ToArray()
-        {
-            string[] result = new string[this.Count];
-
-            int i = 0;
+            returnString.Append(",");
             foreach (TestCategoryItem item in this)
             {
-                result[i++] = item.TestCategory;
+                returnString.Append(item.TestCategory);
+                returnString.Append(",");
             }
-
-            return result;
         }
 
-        /// <summary>
-        /// Compare the collection items
-        /// </summary>
-        /// <param name="obj">other collection</param>
-        /// <returns>true if the collections contain the same items</returns>
-        public override bool Equals(object obj)
-        {
-            TestCategoryItemCollection other = obj as TestCategoryItemCollection;
-            bool result = false;
+        return returnString.ToString();
+    }
 
-            if (other == null)
+    /// <summary>
+    /// Convert the TestCategoryItemCollection to an array of strings.
+    /// </summary>
+    /// <returns>Array of strings containing the test categories.</returns>
+    public string[] ToArray()
+    {
+        string[] result = new string[Count];
+
+        int i = 0;
+        foreach (TestCategoryItem item in this)
+        {
+            result[i++] = item.TestCategory;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Compare the collection items
+    /// </summary>
+    /// <param name="obj">other collection</param>
+    /// <returns>true if the collections contain the same items</returns>
+    public override bool Equals(object obj)
+    {
+        bool result = false;
+
+        if (obj is not TestCategoryItemCollection other)
+        {
+            // Other object is not a TestCategoryItemCollection.
+            result = false;
+        }
+        else if (ReferenceEquals(this, other))
+        {
+            // The other object is the same object as this one.
+            result = true;
+        }
+        else if (Count != other.Count)
+        {
+            // The count of categories in the other object does not
+            // match this one, so they are not equal.
+            result = false;
+        }
+        else
+        {
+            // Check each item and return on the first mismatch.
+            foreach (TestCategoryItem item in this)
             {
-                // Other object is not a TestCategoryItemCollection.
-                result = false;
-            }
-            else if (Object.ReferenceEquals(this, other))
-            {
-                // The other object is the same object as this one.
-                result = true;
-            }
-            else if (this.Count != other.Count)
-            {
-                // The count of categories in the other object does not
-                // match this one, so they are not equal.
-                result = false;
-            }
-            else
-            {
-                // Check each item and return on the first mismatch.
-                foreach (TestCategoryItem item in this)
+                if (!other.Contains(item))
                 {
-                    if (!other.Contains(item))
-                    {
-                        result = false;
-                        break;
-                    }
+                    result = false;
+                    break;
                 }
             }
-
-            return result;
         }
 
-        /// <summary>
-        /// Return the hash code of this collection
-        /// </summary>
-        /// <returns>The hashcode.</returns>
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-        #endregion
+        return result;
+    }
+
+    /// <summary>
+    /// Return the hash code of this collection
+    /// </summary>
+    /// <returns>The hashcode.</returns>
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
     }
     #endregion
 }
+#endregion

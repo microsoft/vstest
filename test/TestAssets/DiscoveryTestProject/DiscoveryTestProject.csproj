@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
@@ -9,7 +9,7 @@
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="MSTest.TestFramework" Version="$(MSTestFrameworkVersion)" />
     <PackageReference Include="MSTest.TestAdapter" Version="$(MSTestAdapterVersion)" />

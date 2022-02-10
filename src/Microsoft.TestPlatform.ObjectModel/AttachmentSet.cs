@@ -1,87 +1,86 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
+
+/// <summary>
+/// Represents a set of attachments.
+/// </summary>
+[DataContract]
+public class AttachmentSet
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Runtime.Serialization;
+    /// <summary>
+    /// URI of the sender.
+    /// If a data-collector is sending this set, then it should be uri of the data collector. Also if an
+    /// executor is sending this attachment, then it should be uri of executor.
+    /// </summary>
+    [DataMember]
+    public Uri Uri { get; private set; }
 
     /// <summary>
-    /// Represents a set of attachments.
+    /// Name of the sender.
     /// </summary>
-    [DataContract]
-    public class AttachmentSet
+    [DataMember]
+    public string DisplayName { get; private set; }
+
+    /// <summary>
+    /// List of data attachments.
+    /// These attachments can be things such as files that the collector/adapter wants to make available to the publishers.
+    /// </summary>
+    [DataMember]
+    public IList<UriDataAttachment> Attachments { get; private set; }
+
+    public AttachmentSet(Uri uri, string displayName)
     {
-        /// <summary>
-        /// URI of the sender.
-        /// If a data-collector is sending this set, then it should be uri of the data collector. Also if an
-        /// executor is sending this attachment, then it should be uri of executor.
-        /// </summary>
-        [DataMember]
-        public Uri Uri {get; private set;}
-
-        /// <summary>
-        /// Name of the sender.
-        /// </summary>
-        [DataMember]
-        public string DisplayName {get; private set;}
-
-        /// <summary>
-        /// List of data attachments.
-        /// These attachments can be things such as files that the collector/adapter wants to make available to the publishers.
-        /// </summary>
-        [DataMember]
-        public IList<UriDataAttachment> Attachments {get; private set;}
-
-        public AttachmentSet(Uri uri, string displayName)
-        {
-            Uri = uri;
-            DisplayName = displayName;
-            Attachments = new List<UriDataAttachment>();
-        }
-
-        public override string ToString()
-        {
-            return $"{nameof(Uri)}: {Uri.AbsoluteUri}, {nameof(DisplayName)}: {DisplayName}, {nameof(Attachments)}: [{ string.Join(",", Attachments)}]";
-        }
+        Uri = uri;
+        DisplayName = displayName;
+        Attachments = new List<UriDataAttachment>();
     }
 
+    public override string ToString()
+    {
+        return $"{nameof(Uri)}: {Uri.AbsoluteUri}, {nameof(DisplayName)}: {DisplayName}, {nameof(Attachments)}: [{ string.Join(",", Attachments)}]";
+    }
+}
+
+
+/// <summary>
+/// Defines the data attachment.
+/// Dev10 equivalent is UriDataAttachment.
+/// </summary>
+[DataContract]
+public class UriDataAttachment
+{
+    /// <summary>
+    /// Description of the attachment.
+    /// </summary>
+    [DataMember]
+    public string Description { get; }
 
     /// <summary>
-    /// Defines the data attachment.
-    /// Dev10 equivalent is UriDataAttachment.
+    /// Uri of the attachment.
     /// </summary>
-    [DataContract]
-    public class UriDataAttachment
+    [DataMember]
+    public Uri Uri { get; }
+
+    public UriDataAttachment(Uri uri, string description)
     {
-        /// <summary>
-        /// Description of the attachment.
-        /// </summary>
-        [DataMember]
-        public string Description { get; private set; }
+        Uri = uri;
+        Description = description;
+    }
 
-        /// <summary>
-        /// Uri of the attachment.
-        /// </summary>
-        [DataMember]
-        public Uri Uri { get; private set; }
+    public override string ToString()
+    {
+        return $"{nameof(Uri)}: {Uri.AbsoluteUri}, {nameof(Description)}: {Description}";
+    }
 
-        public UriDataAttachment(Uri uri, string description)
-        {
-            Uri = uri;
-            Description = description;
-        }
-
-        public override string ToString()
-        {
-            return $"{nameof(Uri)}: {Uri.AbsoluteUri}, {nameof(Description)}: {Description}";
-        }
-
-        public static UriDataAttachment CreateFrom(string localFilePath, string description)
-        {
-            var uri = new UriBuilder() { Scheme = "file", Host = "", Path = localFilePath }.Uri;
-            return new UriDataAttachment(uri, description);
-        }
+    public static UriDataAttachment CreateFrom(string localFilePath, string description)
+    {
+        var uri = new UriBuilder() { Scheme = "file", Host = "", Path = localFilePath }.Uri;
+        return new UriDataAttachment(uri, description);
     }
 }

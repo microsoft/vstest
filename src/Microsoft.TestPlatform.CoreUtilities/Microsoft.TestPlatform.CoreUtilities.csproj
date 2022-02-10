@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
@@ -64,19 +64,19 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-  <ProjectReference Include="..\Microsoft.TestPlatform.PlatformAbstractions\Microsoft.TestPlatform.PlatformAbstractions.csproj" />
+    <ProjectReference Include="..\Microsoft.TestPlatform.PlatformAbstractions\Microsoft.TestPlatform.PlatformAbstractions.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
-	  <!-- API that is common to all frameworks that we build for. -->
-	  <AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
-	  <AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
-	  <!-- API that is common to all frameworks except for .NET Standard 1.0. -->
-	  <AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' " Include="PublicAPI\net\PublicAPI.Shipped.txt" />
-	  <AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' " Include="PublicAPI\net\PublicAPI.Unshipped.txt" />
-	  <!-- Framework specific API -->
-	  <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
-	  <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
+    <!-- API that is common to all frameworks that we build for. -->
+    <AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
+    <!-- API that is common to all frameworks except for .NET Standard 1.0. -->
+    <AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' " Include="PublicAPI\net\PublicAPI.Shipped.txt" />
+    <AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' " Include="PublicAPI\net\PublicAPI.Unshipped.txt" />
+    <!-- Framework specific API -->
+    <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
   </ItemGroup>
   <PropertyGroup Label="Configuration">
     <RootNamespace>Microsoft.VisualStudio.TestPlatform.CoreUtilities</RootNamespace>

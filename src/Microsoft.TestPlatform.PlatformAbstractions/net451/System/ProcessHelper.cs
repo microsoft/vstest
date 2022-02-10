@@ -3,26 +3,31 @@
 
 #if NETFRAMEWORK || NETSTANDARD2_0
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+using System;
+using System.Diagnostics;
+using System.IO;
+
+using Interfaces;
+
+public partial class ProcessHelper : IProcessHelper
 {
-    using System;
-    using System.Diagnostics;
-    using System.IO;
-
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-
-    public partial class ProcessHelper : IProcessHelper
+    /// <inheritdoc/>
+    public string GetCurrentProcessLocation()
     {
-        /// <inheritdoc/>
-        public string GetCurrentProcessLocation()
-        {
-            return Path.GetDirectoryName(this.GetCurrentProcessFileName());
-        }
+        return Path.GetDirectoryName(GetCurrentProcessFileName());
+    }
 
-        public IntPtr GetProcessHandle(int processId)
-        {
-            return Process.GetProcessById(processId).Handle;
-        }
+    public IntPtr GetProcessHandle(int processId)
+    {
+        return Process.GetProcessById(processId).Handle;
+    }
+
+    /// <inheritdoc/>
+    public PlatformArchitecture GetCurrentProcessArchitecture()
+    {
+        return IntPtr.Size == 8 ? PlatformArchitecture.X64 : PlatformArchitecture.X86;
     }
 }
 

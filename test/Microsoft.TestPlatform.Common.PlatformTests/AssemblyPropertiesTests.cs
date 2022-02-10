@@ -1,77 +1,76 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.Common.UnitTests.Utilities
+namespace TestPlatform.Common.UnitTests.Utilities;
+
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+[TestClass]
+public class AssemblyPropertiesTests : IntegrationTestBase
 {
-    using Microsoft.TestPlatform.TestUtilities;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    private readonly IAssemblyProperties _assemblyProperties;
 
-    [TestClass]
-    public class AssemblyPropertiesTests : IntegrationTestBase
+    public AssemblyPropertiesTests()
     {
-        private IAssemblyProperties assemblyProperties;
+        _assemblyProperties = new AssemblyProperties();
+    }
 
-        public AssemblyPropertiesTests()
-        {
-            this.assemblyProperties = new AssemblyProperties();
-        }
+    [TestMethod]
+    [DataRow("net451")]
+    [DataRow("netcoreapp2.1")]
+    public void GetAssemblyTypeForManagedDll(string framework)
+    {
+        var assemblyPath = _testEnvironment.GetTestAsset("SimpleTestProject3.dll", framework);
+        var assemblyType = _assemblyProperties.GetAssemblyType(assemblyPath);
 
-        [TestMethod]
-        [DataRow("net451")]
-        [DataRow("netcoreapp2.1")]
-        public void GetAssemblyTypeForManagedDll(string framework)
-        {
-            var assemblyPath = this.testEnvironment.GetTestAsset("SimpleTestProject3.dll", framework);
-            var assemblyType = this.assemblyProperties.GetAssemblyType(assemblyPath);
+        Assert.AreEqual(AssemblyType.Managed, assemblyType);
+    }
 
-            Assert.AreEqual(AssemblyType.Managed, assemblyType);
-        }
+    [TestMethod]
+    public void GetAssemblyTypeForNativeDll()
+    {
+        var assemblyPath = $@"{_testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
+        var assemblyType = _assemblyProperties.GetAssemblyType(assemblyPath);
 
-        [TestMethod]
-        public void GetAssemblyTypeForNativeDll()
-        {
-            var assemblyPath = $@"{this.testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-            var assemblyType = this.assemblyProperties.GetAssemblyType(assemblyPath);
+        Assert.AreEqual(AssemblyType.Native, assemblyType);
+    }
 
-            Assert.AreEqual(AssemblyType.Native, assemblyType);
-        }
+    [TestMethod]
+    public void GetAssemblyTypeForManagedExe()
+    {
+        var assemblyPath = _testEnvironment.GetTestAsset("ConsoleManagedApp.exe", "net451");
+        var assemblyType = _assemblyProperties.GetAssemblyType(assemblyPath);
 
-        [TestMethod]
-        public void GetAssemblyTypeForManagedExe()
-        {
-            var assemblyPath = this.testEnvironment.GetTestAsset("ConsoleManagedApp.exe", "net451");
-            var assemblyType = this.assemblyProperties.GetAssemblyType(assemblyPath);
+        Assert.AreEqual(AssemblyType.Managed, assemblyType);
+    }
 
-            Assert.AreEqual(AssemblyType.Managed, assemblyType);
-        }
+    [TestMethod]
+    [DataRow("netcoreapp2.1")]
+    public void GetAssemblyTypeForNetCoreManagedExe(string framework)
+    {
+        var assemblyPath = _testEnvironment.GetTestAsset("ConsoleManagedApp.dll", framework);
+        var assemblyType = _assemblyProperties.GetAssemblyType(assemblyPath);
 
-        [TestMethod]
-        [DataRow("netcoreapp2.1")]
-        public void GetAssemblyTypeForNetCoreManagedExe(string framework)
-        {
-            var assemblyPath = this.testEnvironment.GetTestAsset("ConsoleManagedApp.dll", framework);
-            var assemblyType = this.assemblyProperties.GetAssemblyType(assemblyPath);
+        Assert.AreEqual(AssemblyType.Managed, assemblyType);
+    }
 
-            Assert.AreEqual(AssemblyType.Managed, assemblyType);
-        }
+    [TestMethod]
+    public void GetAssemblyTypeForNativeExe()
+    {
+        var assemblyPath = $@"{_testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.ConsoleNativeApp.exe";
+        var assemblyType = _assemblyProperties.GetAssemblyType(assemblyPath);
 
-        [TestMethod]
-        public void GetAssemblyTypeForNativeExe()
-        {
-            var assemblyPath = $@"{this.testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.ConsoleNativeApp.exe";
-            var assemblyType = this.assemblyProperties.GetAssemblyType(assemblyPath);
+        Assert.AreEqual(AssemblyType.Native, assemblyType);
+    }
 
-            Assert.AreEqual(AssemblyType.Native, assemblyType);
-        }
+    [TestMethod]
+    public void GetAssemblyTypeShouldReturnNoneInCaseOfError()
+    {
+        var assemblyType = _assemblyProperties.GetAssemblyType("invalidFile.dll");
 
-        [TestMethod]
-        public void GetAssemblyTypeShouldReturnNoneInCaseOfError()
-        {
-            var assemblyType = this.assemblyProperties.GetAssemblyType("invalidFile.dll");
-
-            Assert.AreEqual(AssemblyType.None, assemblyType);
-        }
+        Assert.AreEqual(AssemblyType.None, assemblyType);
     }
 }

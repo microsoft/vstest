@@ -1,29 +1,28 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
+namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator;
+
+using System.Xml;
+
+/// <summary>
+/// Contains the test settings nodes that need to be converted.
+/// </summary>
+public class TestSettingsNodes
 {
-    using System.Xml;
+    public XmlNode Deployment { get; set; }
 
-    /// <summary>
-    /// Contains the test settings nodes that need to be converted.
-    /// </summary>
-    public class TestSettingsNodes
-    {
-        public XmlNode Deployment { get; set; }
+    public XmlNode Script { get; set; }
 
-        public XmlNode Script { get; set; }
+    public XmlNode WebSettings { get; set; }
 
-        public XmlNode WebSettings { get; set; }
+    public XmlNodeList Datacollectors { get; set; }
 
-        public XmlNodeList Datacollectors { get; set; }
+    public XmlNode Timeout { get; set; }
 
-        public XmlNode Timeout { get; set; }
+    public XmlNode UnitTestConfig { get; set; }
 
-        public XmlNode UnitTestConfig { get; set; }
+    public XmlNode Hosts { get; set; }
 
-        public XmlNode Hosts { get; set; }
-
-        public XmlNode Execution { get; set; }
-    }
+    public XmlNode Execution { get; set; }
 }

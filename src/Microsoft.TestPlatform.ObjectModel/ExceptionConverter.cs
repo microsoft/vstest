@@ -1,30 +1,28 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
-{
-    using System;
-    using System.Diagnostics.CodeAnalysis;
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-    /// <summary>
-    /// Base exception for all Rocksteady service exceptions
-    /// </summary>
+using System;
+
+/// <summary>
+/// Base exception for all Rocksteady service exceptions
+/// </summary>
 #if NETFRAMEWORK
-    [Serializable]
+[Serializable]
 #endif
-    [SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]
-    public class TestPlatformException : Exception
+public class TestPlatformException : Exception
+{
+    public TestPlatformException(String message)
+        : base(message)
     {
-        public TestPlatformException(String message)
-            : base(message)
-        {
-        }
-
-        public TestPlatformException(string message, Exception innerException)
-            : base(message, innerException)
-        {
-        }
     }
+
+    public TestPlatformException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+}
 
 #if FullCLR
     /// <summary>
@@ -97,12 +95,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 #endif
 
 #if NETFRAMEWORK
-    [Serializable]
+[Serializable]
 #endif
-    [SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]
-    public class ProcessExitedException : TestPlatformException
-    {
-        public ProcessExitedException(string message) : base(message) { }
-        public ProcessExitedException(string message, Exception inner) : base(message, inner) { }
-    }
+public class ProcessExitedException : TestPlatformException
+{
+    public ProcessExitedException(string message) : base(message) { }
+    public ProcessExitedException(string message, Exception inner) : base(message, inner) { }
 }

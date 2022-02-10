@@ -1,235 +1,234 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+using System;
+using System.Globalization;
+using System.Xml;
+
+/// <summary>
+/// The logger settings.
+/// </summary>
+public class LoggerSettings
 {
-    using System;
-    using System.Globalization;
-    using System.Xml;
+    /// <summary>
+    /// Gets or sets the uri.
+    /// </summary>
+    public Uri Uri
+    {
+        get;
+        set;
+    }
 
     /// <summary>
-    /// The logger settings.
+    /// Gets or sets the assembly qualified name.
     /// </summary>
-    public class LoggerSettings
+    public string AssemblyQualifiedName
     {
-        /// <summary>
-        /// Gets or sets the uri.
-        /// </summary>
-        public Uri Uri
-        {
-            get;
-            set;
-        }
+        get;
+        set;
+    }
 
-        /// <summary>
-        /// Gets or sets the assembly qualified name.
-        /// </summary>
-        public string AssemblyQualifiedName
-        {
-            get;
-            set;
-        }
+    /// <summary>
+    /// Gets or sets value CodeBase of logger DLL. The syntax is same as Code Base in AssemblyName class.
+    /// </summary>
+    public string CodeBase
+    {
+        get;
+        set;
+    }
 
-        /// <summary>
-        /// Gets or sets value CodeBase of logger DLL. The syntax is same as Code Base in AssemblyName class.
-        /// </summary>
-        public string CodeBase
-        {
-            get;
-            set;
-        }
+    /// <summary>
+    /// Gets or sets the friendly name.
+    /// </summary>
+    public string FriendlyName
+    {
+        get;
+        set;
+    }
 
-        /// <summary>
-        /// Gets or sets the friendly name.
-        /// </summary>
-        public string FriendlyName
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether is enabled.
-        /// </summary>
-        public bool IsEnabled
-        {
-            get;
-            set;
-        }
+    /// <summary>
+    /// Gets or sets a value indicating whether is enabled.
+    /// </summary>
+    public bool IsEnabled
+    {
+        get;
+        set;
+    }
 
 #if !NETSTANDARD1_0
-        /// <summary>
-        /// Gets or sets the configuration.
-        /// </summary>
-        public XmlElement Configuration
+    /// <summary>
+    /// Gets or sets the configuration.
+    /// </summary>
+    public XmlElement Configuration
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
+    /// The to xml.
+    /// </summary>
+    /// <returns>
+    /// The <see cref="XmlElement"/>.
+    /// </returns>
+    public XmlElement ToXml()
+    {
+        return ToXml(Constants.LoggerSettingName);
+    }
+
+    /// <summary>
+    /// The to xml.
+    /// </summary>
+    /// <param name="loggerName">
+    /// The logger name.
+    /// </param>
+    /// <returns>
+    /// The <see cref="XmlElement"/>.
+    /// </returns>
+    public XmlElement ToXml(string loggerName)
+    {
+        var doc = new XmlDocument();
+        var root = doc.CreateElement(loggerName);
+
+        AppendAttribute(doc, root, Constants.LoggerFriendlyName, FriendlyName);
+        AppendAttribute(doc, root, Constants.LoggerUriName, Uri?.ToString());
+        AppendAttribute(doc, root, Constants.LoggerAssemblyQualifiedName, AssemblyQualifiedName);
+        AppendAttribute(doc, root, Constants.LoggerCodeBase, CodeBase);
+        AppendAttribute(doc, root, Constants.LoggerEnabledName, IsEnabled.ToString());
+
+        if (Configuration != null)
         {
-            get;
-            set;
+            root.AppendChild(doc.ImportNode(Configuration, true));
         }
 
-        /// <summary>
-        /// The to xml.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="XmlElement"/>.
-        /// </returns>
-        public XmlElement ToXml()
+        return root;
+    }
+
+    private static void AppendAttribute(XmlDocument doc, XmlElement owner, string attributeName, string attributeValue)
+    {
+        if (string.IsNullOrWhiteSpace(attributeValue))
         {
-            return ToXml(Constants.LoggerSettingName);
+            return;
         }
 
-        /// <summary>
-        /// The to xml.
-        /// </summary>
-        /// <param name="loggerName">
-        /// The logger name.
-        /// </param>
-        /// <returns>
-        /// The <see cref="XmlElement"/>.
-        /// </returns>
-        public XmlElement ToXml(string loggerName)
-        {
-            var doc = new XmlDocument();
-            var root = doc.CreateElement(loggerName);
-
-            AppendAttribute(doc, root, Constants.LoggerFriendlyName, this.FriendlyName);
-            AppendAttribute(doc, root, Constants.LoggerUriName, this.Uri?.ToString());
-            AppendAttribute(doc, root, Constants.LoggerAssemblyQualifiedName, this.AssemblyQualifiedName);
-            AppendAttribute(doc, root, Constants.LoggerCodeBase, this.CodeBase);
-            AppendAttribute(doc, root, Constants.LoggerEnabledName, this.IsEnabled.ToString());
-
-            if (Configuration != null)
-            {
-                root.AppendChild(doc.ImportNode(Configuration, true));
-            }
-
-            return root;
-        }
-
-        private static void AppendAttribute(XmlDocument doc, XmlElement owner, string attributeName, string attributeValue)
-        {
-            if (string.IsNullOrWhiteSpace(attributeValue))
-            {
-                return;
-            }
-
-            XmlAttribute attribute = doc.CreateAttribute(attributeName);
-            attribute.Value = attributeValue;
-            owner.Attributes.Append(attribute);
-        }
+        XmlAttribute attribute = doc.CreateAttribute(attributeName);
+        attribute.Value = attributeValue;
+        owner.Attributes.Append(attribute);
+    }
 #endif
 
-        internal static LoggerSettings FromXml(XmlReader reader)
+    internal static LoggerSettings FromXml(XmlReader reader)
+    {
+        var elementName = reader.Name;
+        var empty = reader.IsEmptyElement;
+        var settings = new LoggerSettings
         {
-            var elementName = reader.Name;
-            var empty = reader.IsEmptyElement;
-            var settings = new LoggerSettings
-            {
-                IsEnabled = true
-            };
+            IsEnabled = true
+        };
 
-            // Read attributes.
-            if (reader.HasAttributes)
-            {
-                while (reader.MoveToNextAttribute())
-                {
-                    switch (reader.Name.ToLowerInvariant())
-                    {
-                        case Constants.LoggerFriendlyNameLower:
-                            settings.FriendlyName = reader.Value;
-                            break;
-
-                        case Constants.LoggerUriName:
-                            try
-                            {
-                                settings.Uri = new Uri(reader.Value);
-                            }
-#if NETSTANDARD1_0
-                            catch
-#else
-                            catch (UriFormatException)
-#endif
-                            {
-                                throw new SettingsException(
-                                    string.Format(
-                                        CultureInfo.CurrentCulture,
-                                        Resources.Resources.InvalidUriInSettings,
-                                        reader.Value,
-                                        elementName));
-                            }
-                            break;
-
-                        case Constants.LoggerAssemblyQualifiedNameLower:
-                            settings.AssemblyQualifiedName = reader.Value;
-                            break;
-
-                        case Constants.LoggerCodeBaseLower:
-                            settings.CodeBase = reader.Value;
-                            break;
-
-                        case Constants.LoggerEnabledName:
-                            bool.TryParse(reader.Value, out var value);
-                            settings.IsEnabled = value;
-                            break;
-
-                        default:
-                            throw new SettingsException(
-                                string.Format(
-                                    CultureInfo.CurrentCulture,
-                                    Resources.Resources.InvalidSettingsXmlAttribute,
-                                    elementName,
-                                    reader.Name));
-                    }
-                }
-            }
-
-            // Check for required attributes.
-            if (string.IsNullOrWhiteSpace(settings.FriendlyName) &&
-                string.IsNullOrWhiteSpace(settings.Uri?.ToString()) &&
-                string.IsNullOrWhiteSpace(settings.AssemblyQualifiedName))
-            {
-                throw new SettingsException(
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        Resources.Resources.MissingLoggerAttributes,
-                        elementName,
-                        Constants.LoggerFriendlyName));
-            }
-
-            // Move to next node.
-            reader.Read();
-
-            // Return empty settings if previous element is empty.
-            if (empty)
-            {
-                return settings;
-            }
-
-            // Read inner elements.
-            while (reader.NodeType == XmlNodeType.Element)
+        // Read attributes.
+        if (reader.HasAttributes)
+        {
+            while (reader.MoveToNextAttribute())
             {
                 switch (reader.Name.ToLowerInvariant())
                 {
-#if !NETSTANDARD1_0
-                    case Constants.LoggerConfigurationNameLower:                        
-                        var document = new XmlDocument();
-                        var element = document.CreateElement(reader.Name);
-                        element.InnerXml = reader.ReadInnerXml();
-                        settings.Configuration = element;
+                    case Constants.LoggerFriendlyNameLower:
+                        settings.FriendlyName = reader.Value;
                         break;
+
+                    case Constants.LoggerUriName:
+                        try
+                        {
+                            settings.Uri = new Uri(reader.Value);
+                        }
+#if NETSTANDARD1_0
+                        catch
+#else
+                        catch (UriFormatException)
 #endif
+                        {
+                            throw new SettingsException(
+                                string.Format(
+                                    CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidUriInSettings,
+                                    reader.Value,
+                                    elementName));
+                        }
+                        break;
+
+                    case Constants.LoggerAssemblyQualifiedNameLower:
+                        settings.AssemblyQualifiedName = reader.Value;
+                        break;
+
+                    case Constants.LoggerCodeBaseLower:
+                        settings.CodeBase = reader.Value;
+                        break;
+
+                    case Constants.LoggerEnabledName:
+                        bool.TryParse(reader.Value, out var value);
+                        settings.IsEnabled = value;
+                        break;
+
                     default:
                         throw new SettingsException(
                             string.Format(
                                 CultureInfo.CurrentCulture,
-                                Resources.Resources.InvalidSettingsXmlElement,
+                                Resources.Resources.InvalidSettingsXmlAttribute,
                                 elementName,
                                 reader.Name));
                 }
             }
-            reader.ReadEndElement();
+        }
 
+        // Check for required attributes.
+        if (string.IsNullOrWhiteSpace(settings.FriendlyName) &&
+            string.IsNullOrWhiteSpace(settings.Uri?.ToString()) &&
+            string.IsNullOrWhiteSpace(settings.AssemblyQualifiedName))
+        {
+            throw new SettingsException(
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    Resources.Resources.MissingLoggerAttributes,
+                    elementName,
+                    Constants.LoggerFriendlyName));
+        }
+
+        // Move to next node.
+        reader.Read();
+
+        // Return empty settings if previous element is empty.
+        if (empty)
+        {
             return settings;
         }
+
+        // Read inner elements.
+        while (reader.NodeType == XmlNodeType.Element)
+        {
+            switch (reader.Name.ToLowerInvariant())
+            {
+#if !NETSTANDARD1_0
+                case Constants.LoggerConfigurationNameLower:
+                    var document = new XmlDocument();
+                    var element = document.CreateElement(reader.Name);
+                    element.InnerXml = reader.ReadInnerXml();
+                    settings.Configuration = element;
+                    break;
+#endif
+                default:
+                    throw new SettingsException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            Resources.Resources.InvalidSettingsXmlElement,
+                            elementName,
+                            reader.Name));
+            }
+        }
+        reader.ReadEndElement();
+
+        return settings;
     }
 }

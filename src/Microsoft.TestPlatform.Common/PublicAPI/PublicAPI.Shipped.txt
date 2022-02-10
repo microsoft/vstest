@@ -10,8 +10,10 @@ const Microsoft.VisualStudio.TestPlatform.Common.TestPlatformDefaults.MaxBytesLo
 const Microsoft.VisualStudio.TestPlatform.Common.TestPlatformDefaults.MaxNumberOfEventsLoggerEventQueueCanHold = "MaxNumberOfEventsLoggerEventQueueCanHold" -> string
 Microsoft.VisualStudio.TestPlatform.Common.DataCollection.AfterTestRunEndResult
 Microsoft.VisualStudio.TestPlatform.Common.DataCollection.AfterTestRunEndResult.AfterTestRunEndResult(System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet> attachmentSets, System.Collections.Generic.IDictionary<string, object> metrics) -> void
+Microsoft.VisualStudio.TestPlatform.Common.DataCollection.AfterTestRunEndResult.AfterTestRunEndResult(System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet> attachmentSets, System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector> invokedDataCollectors, System.Collections.Generic.IDictionary<string, object> metrics) -> void
 Microsoft.VisualStudio.TestPlatform.Common.DataCollection.AfterTestRunEndResult.AttachmentSets.get -> System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet>
 Microsoft.VisualStudio.TestPlatform.Common.DataCollection.AfterTestRunEndResult.Metrics.get -> System.Collections.Generic.IDictionary<string, object>
+Microsoft.VisualStudio.TestPlatform.Common.DataCollection.AfterTestRunEndResult.InvokedDataCollectors.get -> System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector>
 Microsoft.VisualStudio.TestPlatform.Common.DataCollection.BeforeTestRunStartResult
 Microsoft.VisualStudio.TestPlatform.Common.DataCollection.BeforeTestRunStartResult.BeforeTestRunStartResult(System.Collections.Generic.IDictionary<string, string> environmentVariables, int dataCollectionEventsPort) -> void
 Microsoft.VisualStudio.TestPlatform.Common.DataCollection.BeforeTestRunStartResult.DataCollectionEventsPort.get -> int
@@ -21,8 +23,10 @@ Microsoft.VisualStudio.TestPlatform.Common.Exceptions.InvalidLoggerException.Inv
 Microsoft.VisualStudio.TestPlatform.Common.Exceptions.InvalidLoggerException.InvalidLoggerException(string message, System.Exception innerException) -> void
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.DataCollectorMetadata
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.DataCollectorMetadata.DataCollectorMetadata(string extension, string friendlyName) -> void
+Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.DataCollectorMetadata.DataCollectorMetadata(string extension, string friendlyName, bool hasAttachmentProcessor) -> void
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.DataCollectorMetadata.ExtensionUri.get -> string
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.DataCollectorMetadata.FriendlyName.get -> string
+Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.DataCollectorMetadata.HasAttachmentProcessor.get -> bool
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.TestLoggerMetadata
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.TestLoggerMetadata.ExtensionUri.get -> string
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.TestLoggerMetadata.FriendlyName.get -> string
@@ -47,6 +51,7 @@ Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities.TestExte
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities.TestPluginInformation
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities.TestPluginInformation.AssemblyQualifiedName.get -> string
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities.TestPluginInformation.TestPluginInformation(System.Type testExtensionType) -> void
+Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities.TestPluginInformation.FilePath.get -> string
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.VSExtensionManager
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.VSExtensionManager.GetUnitTestExtensions() -> System.Collections.Generic.IEnumerable<string>
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.VSExtensionManager.VSExtensionManager() -> void
@@ -76,6 +81,7 @@ Microsoft.VisualStudio.TestPlatform.Common.Interfaces.IBaseTestEventsRegistrar
 Microsoft.VisualStudio.TestPlatform.Common.Interfaces.IBaseTestEventsRegistrar.LogWarning(string message) -> void
 Microsoft.VisualStudio.TestPlatform.Common.Interfaces.IDataCollectorCapabilities
 Microsoft.VisualStudio.TestPlatform.Common.Interfaces.IDataCollectorCapabilities.FriendlyName.get -> string
+Microsoft.VisualStudio.TestPlatform.Common.Interfaces.IDataCollectorCapabilities.HasAttachmentProcessor.get -> bool
 Microsoft.VisualStudio.TestPlatform.Common.Interfaces.ISettingsProviderCapabilities
 Microsoft.VisualStudio.TestPlatform.Common.Interfaces.ISettingsProviderCapabilities.SettingsName.get -> string
 Microsoft.VisualStudio.TestPlatform.Common.Interfaces.ITestDiscovererCapabilities

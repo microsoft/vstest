@@ -1,21 +1,20 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
-{
-    using System.IO;
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
+using System.IO;
+
+/// <summary>
+/// Helper class to return platform specific stream.
+/// </summary>
+public interface IStream
+{
     /// <summary>
-    /// Helper class to return platform specific stream.
+    /// Returns platform specific Buffered Stream with desired buffer size.
     /// </summary>
-    public interface IStream
-    {
-        /// <summary>
-        /// Returns platform specific Buffered Stream with desired buffer size.
-        /// </summary>
-        /// <param name="stream">Input Stream</param>
-        /// <param name="bufferSize">Buffer Size</param>
-        /// <returns>Buffered Stream</returns>
-        Stream CreateBufferedStream(Stream stream, int bufferSize);
-    }
+    /// <param name="stream">Input Stream</param>
+    /// <param name="bufferSize">Buffer Size</param>
+    /// <returns>Buffered Stream</returns>
+    Stream CreateBufferedStream(Stream stream, int bufferSize);
 }

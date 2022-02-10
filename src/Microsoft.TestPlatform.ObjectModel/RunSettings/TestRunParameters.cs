@@ -1,76 +1,75 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Xml;
+
+using Utilities;
+
+/// <summary>
+/// This class deals with the run settings, Test Run Parameters node and the extracting of Key Value Pair's from the parameters listed.
+/// </summary>
+internal class TestRunParameters
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Xml;
-
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
     /// <summary>
-    /// This class deals with the run settings, Test Run Parameters node and the extracting of Key Value Pair's from the parameters listed.
+    /// Get the test run parameters from the provided reader.
     /// </summary>
-    internal class TestRunParameters
+    /// <param name="reader"> The reader. </param>
+    /// <returns> The dictionary of test run parameters. </returns>
+    /// <exception cref="SettingsException"> Throws when format is incorrect. </exception>
+    internal static Dictionary<string, object> FromXml(XmlReader reader)
     {
-        /// <summary>
-        /// Get the test run parameters from the provided reader.
-        /// </summary>
-        /// <param name="reader"> The reader. </param>
-        /// <returns> The dictionary of test run parameters. </returns>
-        /// <exception cref="SettingsException"> Throws when format is incorrect. </exception>
-        internal static Dictionary<string, object> FromXml(XmlReader reader)
+        var testParameters = new Dictionary<string, object>();
+
+        if (!reader.IsEmptyElement)
         {
-            var testParameters = new Dictionary<string, object>();
+            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+            reader.Read();
 
-            if (!reader.IsEmptyElement)
+            while (reader.NodeType == XmlNodeType.Element)
             {
-                XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                reader.Read();
-
-                while (reader.NodeType == XmlNodeType.Element)
+                string elementName = reader.Name;
+                switch (elementName)
                 {
-                    string elementName = reader.Name;
-                    switch (elementName)
-                    {
-                        case "Parameter":
-                            string paramName = null;
-                            string paramValue = null;
-                            for (int attIndex = 0; attIndex < reader.AttributeCount; attIndex++)
+                    case "Parameter":
+                        string paramName = null;
+                        string paramValue = null;
+                        for (int attIndex = 0; attIndex < reader.AttributeCount; attIndex++)
+                        {
+                            reader.MoveToAttribute(attIndex);
+                            if (string.Equals(reader.Name, "Name", StringComparison.OrdinalIgnoreCase))
                             {
-                                reader.MoveToAttribute(attIndex);
-                                if (string.Equals(reader.Name, "Name", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    paramName = reader.Value;
-                                }
-                                else if (string.Equals(reader.Name, "Value", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    paramValue = reader.Value;
-                                }
+                                paramName = reader.Value;
                             }
-
-                            if (paramName != null && paramValue != null)
+                            else if (string.Equals(reader.Name, "Value", StringComparison.OrdinalIgnoreCase))
                             {
-                                testParameters[paramName] = paramValue;
+                                paramValue = reader.Value;
                             }
+                        }
 
-                            break;
-                        default:
-                            throw new SettingsException(
-                                string.Format(
-                                    CultureInfo.CurrentCulture,
-                                    Resources.Resources.InvalidSettingsXmlElement,
-                                    Constants.TestRunParametersName,
-                                    reader.Name));
-                    }
+                        if (paramName != null && paramValue != null)
+                        {
+                            testParameters[paramName] = paramValue;
+                        }
 
-                    reader.Read();
+                        break;
+                    default:
+                        throw new SettingsException(
+                            string.Format(
+                                CultureInfo.CurrentCulture,
+                                Resources.Resources.InvalidSettingsXmlElement,
+                                Constants.TestRunParametersName,
+                                reader.Name));
                 }
-            }
 
-            return testParameters;
+                reader.Read();
+            }
         }
+
+        return testParameters;
     }
 }

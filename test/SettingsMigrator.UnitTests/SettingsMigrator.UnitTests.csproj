@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
@@ -8,8 +8,6 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <TargetFramework>net451</TargetFramework>
-	<WarningsAsErrors>true</WarningsAsErrors>
-    <EnableCodeAnalysis>true</EnableCodeAnalysis>
     <AssemblyName>SettingsMigrator.UnitTests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
@@ -17,8 +15,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="oldTestSettings.testsettings" CopyToOutputDirectory="Always" />
-	<Content Include="oldRunSettingsWithEmbeddedSettings.runsettings" CopyToOutputDirectory="Always" />
-	<Content Include="oldRunSettingsWithDataCollector.runsettings" CopyToOutputDirectory="Always" />
+    <Content Include="oldRunSettingsWithEmbeddedSettings.runsettings" CopyToOutputDirectory="Always" />
+    <Content Include="oldRunSettingsWithDataCollector.runsettings" CopyToOutputDirectory="Always" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
