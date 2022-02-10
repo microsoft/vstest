@@ -73,15 +73,31 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
 
     public void Initialize(IMessageLogger logger, string runsettingsXml)
     {
+        // TODO: this is called twice, is that okay?
+        // TODO: and also by HandlePartialRunComplete after the test run has completed and we aborted because the client disconnected
+
         // do nothing
     }
 
     public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
     {
-        // todo: Add fake process for testhost
-        // TestHostProcess = FakeProcessHelper.LaunchProcess(testHostStartInfo);
-        //HostLaunched(this, new HostProviderEventArgs("Fake testhost launched", 0, TestHostProcess.Id));
-        //TestHostProcess.ProcessExited += (s, e) => HostExited(s, new HostProviderEventArgs($"Fake testhost {TestHostProcess.Id} exited", -99999, e));
+        TestHostProcess = (FakeProcess)FakeProcessHelper.LaunchProcess(
+            testHostStartInfo.FileName,
+            testHostStartInfo.Arguments,
+            testHostStartInfo.WorkingDirectory,
+            testHostStartInfo.EnvironmentVariables,
+            errorCallback: (_, _) => { },
+            exitCallBack: p => {
+                var process = (FakeProcess)p;
+                if (HostExited != null)
+                {
+                    // TODO: When we exit, eventually there are no subscribers, maybe we should review if we don't lose the error output sometimes, in unnecessary way
+                    HostExited(this, new HostProviderEventArgs(process.ErrorOutput, process.ExitCode, process.Id));
+                }
+            },
+            outputCallback: (_, _) => { }
+            );
+        HostLaunched(this, new HostProviderEventArgs("Fake testhost launched", 0, TestHostProcess.Id));
         return Task.FromResult(true);
     }
 

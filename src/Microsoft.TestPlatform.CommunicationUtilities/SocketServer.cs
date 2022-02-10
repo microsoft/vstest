@@ -103,11 +103,16 @@ public class SocketServer : ICommunicationEndPoint
             }
 
             // Start the message loop
-            Task.Run(() => _tcpClient.MessageLoopAsync(_channel, error => Stop(error), _cancellation.Token)).ConfigureAwait(false);
+            Task.Run(() => _tcpClient.MessageLoopAsync(_channel, error => StopOnError(error), _cancellation.Token)).ConfigureAwait(false);
         }
     }
 
-    private void Stop(Exception error)
+    /// <summary>
+    /// Stop the connection when error was encountered. Dispose all communication, and notify subscribers of Disconnected event
+    /// that we aborted.
+    /// </summary>
+    /// <param name="error"></param>
+    private void StopOnError(Exception error)
     {
         EqtTrace.Info("SocketServer.PrivateStop: Stopping server endPoint: {0} error: {1}", _endPoint, error);
 

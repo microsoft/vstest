@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Runtime.Versioning;
 
 using FluentAssertions;
+using FluentAssertions.Extensions;
 
 using Microsoft.VisualStudio.TestPlatform.Client;
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
@@ -13,12 +14,14 @@ using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 using vstest.ProgrammerTests.CommandLine.Fakes;
+using vstest.ProgrammerTests.Fakes;
 
 #pragma warning disable IDE1006 // Naming Styles
 namespace vstest.ProgrammerTests.CommandLine;
@@ -29,37 +32,74 @@ internal class InlineRunSettingsTests
 {
     public void GivenInlineRunsettingsWhenCallingVstestConsoleThenTheyPropagateToTestHost()
     {
-        using Fixture fixture = new();
-        fixture.VstestConsole
-            .WithSource(TestDlls.MSTest1)
-            .WithArguments($" -- {RunConfiguration.MaxParallelLevel.InlinePath}=3")
-            .Execute();
+        //using Fixture fixture = new();
+        //fixture.VstestConsole
+        //    .WithSource(TestDlls.MSTest1)
+        //    .WithArguments($" -- {RunConfiguration.MaxParallelLevel.InlinePath}=3")
+        //    .Execute();
 
-        fixture.Processes.Should().HaveCount(1);
-        var process = fixture.Processes.First();
-        process.Should().BeAssignableTo<FakeTestHostProcess>();
-        var testhost = (FakeTestHostProcess)process;
-        testhost.RunSettings.Should().NotBeNull();
-        testhost.RunSettings!.MaxParallelLevel.Should().Be(3);
+        //fixture.Processes.Should().HaveCount(1);
+        //var process = fixture.Processes.First();
+        //process.Should().BeAssignableTo<FakeTestHostProcess>();
+        //var testhost = (FakeTestHostProcess)process;
+        //testhost.RunSettings.Should().NotBeNull();
+        //testhost.RunSettings!.MaxParallelLevel.Should().Be(3);
     }
 }
 
 public class TestDiscoveryTests
 {
-    public async Task GivenAnMSTestAssemblyWith5Tests_WhenTestsAreRun_Then5TestsAreExecuted()
+    public async Task GivenAnMSTestAssemblyWith108Tests_WhenTestsAreRun_Then108TestsAreExecuted()
     {
         // -- arrange
         var fakeErrorAggregator = new FakeErrorAggregator();
         var commandLineOptions = CommandLineOptions.Instance;
 
-        var fakeCurrentProcess = new FakeProcess(@"C:\temp\vstest.console.exe", string.Empty, fakeErrorAggregator);
+        var fakeCurrentProcess = new FakeProcess(@"C:\temp\vstest.console.exe", string.Empty, null, null, null, null, null, fakeErrorAggregator);
         var fakeProcessHelper = new FakeProcessHelper(fakeCurrentProcess, fakeErrorAggregator);
 
-        var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(fakeErrorAggregator);
+        var fakeFileHelper = new FakeFileHelper(fakeErrorAggregator);
+        // TODO: Get framework name from constants
+        // TODO: have mstest1dll canned
+        var tests = new FakeTestBatchBuilder()
+            .WithTotalCount(108)
+            .WithDuration(100.Milliseconds())
+            .WithBatchSize(10)
+            .Build();
+        var mstest1Dll = new FakeTestDllFile(@"C:\temp\mstest1.dll", new FrameworkName(".NETCoreApp,Version=v5.0"), Architecture.X64, tests);
+        fakeFileHelper.AddFile(mstest1Dll);
+
+        List<FakeMessage> changeMessages = tests.Take(tests.Count - 1).Select(batch =>  // TODO: make the stats agree with the tests below
+            new FakeMessage<TestRunChangedEventArgs>(MessageType.TestRunStatsChange,
+                  new TestRunChangedEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = batch.Count }), batch, new List<TestCase>())
+                 )).ToList<FakeMessage>();
+        FakeMessage completedMessage = new FakeMessage<TestRunCompletePayload>(MessageType.ExecutionComplete, new TestRunCompletePayload
+        {
+            // TODO: make the stats agree with the tests below
+            TestRunCompleteArgs = new TestRunCompleteEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = 1 }), false, false, null, new System.Collections.ObjectModel.Collection<AttachmentSet>(), TimeSpan.Zero),
+            LastRunTests = new TestRunChangedEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = 1 }), tests.Last(), new List<TestCase>()),
+        });
+        List<FakeMessage> messages = changeMessages.Concat(new[] { completedMessage }).ToList();
+        var responses = new List<RequestResponsePair<string, FakeMessage>> {
+        new RequestResponsePair<string, FakeMessage>(MessageType.VersionCheck, new FakeMessage<int>(MessageType.VersionCheck, 5)),
+        new RequestResponsePair<string, FakeMessage>(MessageType.ExecutionInitialize, FakeMessage.NoResponse),
+        new RequestResponsePair<string, FakeMessage>(MessageType.StartTestExecutionWithSources, messages),
+        new RequestResponsePair<string, FakeMessage>(MessageType.SessionEnd, message =>
+            {
+                // TODO: how do we associate this to the correct process?
+                var fp = fakeProcessHelper.Processes.Last();
+                fakeProcessHelper.TerminateProcess(fp);
+
+                return new List<FakeMessage> { FakeMessage.NoResponse };
+            }),
+        };
+
+
+        var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(new FakeCommunicationChannel(responses, fakeErrorAggregator), fakeErrorAggregator);
         TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint);
         var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(fakeProcessHelper, fakeCommunicationEndpoint, fakeErrorAggregator);
         var testEngine = new TestEngine(fakeTestRuntimeProviderManager, fakeProcessHelper);
-        var fakeFileHelper = new FakeFileHelper(fakeErrorAggregator);
+
         var testPlatform = new TestPlatform(testEngine, fakeFileHelper, fakeTestRuntimeProviderManager);
 
         var testRunResultAggregator = new TestRunResultAggregator();
@@ -87,10 +127,6 @@ public class TestDiscoveryTests
 
         // -- act
 
-        // TODO: Get framework name from constants
-        // TODO: have mstest1dll canned
-        var mstest1Dll = new FakeDllFile(@"C:\temp\mstest1.dll", new FrameworkName(".NETCoreApp,Version=v5.0"), Architecture.X64);
-        fakeFileHelper.AddFile(mstest1Dll);
         // TODO: this gives me run configuration that is way too complete, do we a way to generate "bare" runsettings? if not we should add them. Would be also useful to get
         // runsettings from parameter set so people can use it
         // TODO: TestSessionTimeout gives me way to abort the run without having to cancel it externally, but could probably still lead to hangs if that funtionality is broken
@@ -110,12 +146,12 @@ public class TestDiscoveryTests
         var fakeTestRunEventsRegistrar = new FakeTestRunEventsRegistrar(fakeErrorAggregator);
         var protocolConfig = new ProtocolConfig();
 
+        // TODO: we make sure the test is running 10 minutes at max and then we try to abort
+        // if we aborted we write the error to aggregator, this needs to be made into a pattern
+        // so we can avoid hanging if the run does not complete correctly
         var cancelAbort = new CancellationTokenSource();
         var task = Task.Run(async () =>
         {
-            // TODO: we make sure the test is running 1 minute at max and then we try to abort
-            // if we aborted we write the error to aggregator, this needs to be made into a pattern
-            // so we can avoid hanging if the run does not complete correctly
             await Task.Delay(TimeSpan.FromMinutes(10), cancelAbort.Token);
             if (Debugger.IsAttached)
             {
@@ -128,10 +164,15 @@ public class TestDiscoveryTests
         });
         testRequestManager.RunTests(testRunRequestPayload, testHostLauncher: null, fakeTestRunEventsRegistrar, protocolConfig);
         cancelAbort.Cancel();
-        await task;
+        if (!task.IsCanceled)
+        {
+            await task;
+        }
+        // pattern end
 
         // -- assert
         fakeErrorAggregator.Errors.Should().BeEmpty();
+        fakeTestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults).Should().HaveCount(110);
     }
 }
 

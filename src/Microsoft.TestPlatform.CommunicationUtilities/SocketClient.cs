@@ -100,14 +100,14 @@ public class SocketClient : ICommunicationEndPoint
                 // Start the message loop
                 Task.Run(() => _tcpClient.MessageLoopAsync(
                         _channel,
-                        Stop,
+                        StopOnError,
                         _cancellation.Token))
                     .ConfigureAwait(false);
             }
         }
     }
 
-    private void Stop(Exception error)
+    private void StopOnError(Exception error)
     {
         EqtTrace.Info("SocketClient.PrivateStop: Stop communication from server endpoint: {0}, error:{1}", _endPoint, error);
         // TODO: this is here to prevent stack overflow.

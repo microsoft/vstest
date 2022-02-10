@@ -9,14 +9,16 @@ using vstest.ProgrammerTests.CommandLine.Fakes;
 
 namespace vstest.ProgrammerTests.CommandLine;
 
-internal class FakeDllFile : FakeFile
+internal class FakeTestDllFile : FakeFile
 {
-    public FrameworkName FrameworkName { get; init; }
-    public Architecture Architecture { get; init; }
+    public FrameworkName FrameworkName { get; }
+    public Architecture Architecture { get; }
+    public List<List<TestResult>> TestResultBatches { get; }
 
-    public FakeDllFile(string path, FrameworkName frameworkName, Architecture architecture) : base(path)
+    public FakeTestDllFile(string path, FrameworkName frameworkName, Architecture architecture, List<List<TestResult>> testResultBatches) : base(path)
     {
         FrameworkName = frameworkName;
         Architecture = architecture;
+        TestResultBatches = testResultBatches;
     }
 }

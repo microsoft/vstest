@@ -27,6 +27,8 @@ using ObjectModelConstants = TestPlatform.ObjectModel.Constants;
 public class TestRequestSender : ITestRequestSender
 {
     // Time to wait for test host exit
+    // DONOTMERGE: this was 10s, I made it 1 second, because it makes my tests pass faster when I get in error state
+    // REVIEW: this was 10s, I made it 1 seconds
     private const int ClientProcessExitWaitTimeout = 10 * 1000;
 
     private readonly IDataSerializer _dataSerializer;
@@ -576,7 +578,9 @@ public class TestRequestSender : ITestRequestSender
         }
         catch (Exception exception)
         {
-            OnTestRunAbort(testRunEventsHandler, exception, false);
+            // If we failed to process the incoming message, initiate client (testhost) abort, because we can't recover, and don't wait
+            // for it to exit and write into error stream, because it did not do anything wrong, so no error is coming there
+            OnTestRunAbort(testRunEventsHandler, exception, getClientError: false);
         }
     }
 
@@ -684,20 +688,25 @@ public class TestRequestSender : ITestRequestSender
 
     private string GetAbortErrorMessage(Exception exception, bool getClientError)
     {
+
         EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Exception: " + exception);
 
         // It is also possible for an operation to abort even if client has not
-        // disconnected, e.g. if there's an error parsing the response from test host. We
-        // want the exception to be available in those scenarios.
+        // disconnected, because we initiate client abort when there is error in processing incoming messages.
+        // in this case, we will use the exception as the failure result, if it is present. Otherwise we will
+        // try to wait for the client process to exit, and capture it's error output (we are listening to it's standard and
+        // error output in the ClientExited callback).
         var reason = exception?.Message;
         if (getClientError)
         {
             EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Client has disconnected. Wait for standard error.");
 
             // Wait for test host to exit for a moment
+            // TODO: this timeout is 10 seconds, make it also configurable like the other famous 
             if (_clientExited.Wait(_clientExitedWaitTime))
             {
-                // Set a default message of test host process exited and additionally specify the error if present
+                // Set a default message of test host process exited and additionally specify the error if we were able to get it
+                // from error output of the process
                 EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Received test host error message.");
                 reason = CommonResources.TestHostProcessCrashed;
                 if (!string.IsNullOrWhiteSpace(_clientExitErrorMessage))

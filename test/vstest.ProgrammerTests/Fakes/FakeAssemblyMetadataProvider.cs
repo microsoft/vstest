@@ -23,13 +23,13 @@ internal class FakeAssemblyMetadataProvider : IAssemblyMetadataProvider
 
     public Architecture GetArchitecture(string filePath)
     {
-        var file = (FakeDllFile)FakeFileHelper.Files.Single(f => f.Path == filePath);
+        var file = (FakeTestDllFile)FakeFileHelper.Files.Single(f => f.Path == filePath);
         return file.Architecture;
     }
 
     public FrameworkName GetFrameWork(string filePath)
     {
-        var file = (FakeDllFile)FakeFileHelper.Files.Single(f => f.Path == filePath);
+        var file = (FakeTestDllFile)FakeFileHelper.Files.Single(f => f.Path == filePath);
         return file.FrameworkName;
     }
 }

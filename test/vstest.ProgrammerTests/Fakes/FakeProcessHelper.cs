@@ -84,26 +84,31 @@ internal class FakeProcessHelper : IProcessHelper
 
     public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<object, string> errorCallback, Action<object> exitCallBack, Action<object, string> outputCallback)
     {
-        throw new NotImplementedException();
+        var process = new FakeProcess(processPath, arguments, workingDirectory, environmentVariables, errorCallback, exitCallBack, outputCallback, FakeErrorAggregator);
+        Processes.Add(process);
+
+        return process;
     }
 
     public void SetExitCallback(int processId, Action<object> callbackAction)
     {
-        throw new NotImplementedException();
+        // TODO: implement?
     }
 
     public void TerminateProcess(object process)
     {
-        throw new NotImplementedException();
+        var fakeProcess = (FakeProcess)process;
+        fakeProcess.Exit();
     }
 
     public bool TryGetExitCode(object process, out int exitCode)
     {
-        throw new NotImplementedException();
+        exitCode = ((FakeProcess)process).ExitCode;
+        return true;
     }
 
     public void WaitForProcessExit(object process)
     {
-        throw new NotImplementedException();
+        // todo: implement for timeouts?
     }
 }

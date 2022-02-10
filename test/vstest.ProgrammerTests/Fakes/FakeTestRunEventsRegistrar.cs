@@ -16,18 +16,18 @@ internal class FakeTestRunEventsRegistrar : ITestRunEventsRegistrar
     }
 
     public List<object> AllEvents { get; } = new();
-    public List<string> Warnings { get; } = new();
-    public List<EventRecord<TestRunCompleteEventArgs>> RunCompletionEvents { get; } = new();
+    public List<string> LoggedWarnings { get; } = new();
+    public List<EventRecord<TestRunCompleteEventArgs>> RunCompleteEvents { get; } = new();
     public List<EventRecord<TestRunStartEventArgs>> RunStartEvents { get; } = new();
-    public List<EventRecord<TestRunChangedEventArgs>> RunStatsChange { get; } = new();
+    public List<EventRecord<TestRunChangedEventArgs>> RunChangedEvents { get; } = new();
     public List<EventRecord<string>> RawMessageEvents { get; } = new();
-    public List<EventRecord<TestRunMessageEventArgs>> TestRunMessageEvents { get; } = new();
+    public List<EventRecord<TestRunMessageEventArgs>> RunMessageEvents { get; } = new();
     public FakeErrorAggregator FakeErrorAggregator { get; }
 
     public void LogWarning(string message)
     {
         AllEvents.Add(message);
-        Warnings.Add(message);
+        LoggedWarnings.Add(message);
     }
 
     public void RegisterTestRunEvents(ITestRunRequest testRunRequest)
@@ -52,7 +52,7 @@ internal class FakeTestRunEventsRegistrar : ITestRunEventsRegistrar
     {
         var eventRecord = new EventRecord<TestRunCompleteEventArgs>(sender, e);
         AllEvents.Add(eventRecord);
-        RunCompletionEvents.Add(eventRecord);
+        RunCompleteEvents.Add(eventRecord);
     }
 
     private void OnRunStart(object? sender, TestRunStartEventArgs e)
@@ -66,7 +66,7 @@ internal class FakeTestRunEventsRegistrar : ITestRunEventsRegistrar
     {
         var eventRecord = new EventRecord<TestRunChangedEventArgs>(sender, e);
         AllEvents.Add(eventRecord);
-        RunStatsChange.Add(eventRecord);
+        RunChangedEvents.Add(eventRecord);
     }
 
     private void OnRawMessage(object? sender, string e)
@@ -79,7 +79,11 @@ internal class FakeTestRunEventsRegistrar : ITestRunEventsRegistrar
     private void OnTestRunMessage(object? sender, TestRunMessageEventArgs e)
     {
         var eventRecord = new EventRecord<TestRunMessageEventArgs>(sender, e);
+        if (e.Level == TestMessageLevel.Error)
+        {
+            FakeErrorAggregator.Errors.Add(eventRecord);
+        }
         AllEvents.Add(eventRecord);
-        TestRunMessageEvents.Add(eventRecord);
+        RunMessageEvents.Add(eventRecord);
     }
 }
