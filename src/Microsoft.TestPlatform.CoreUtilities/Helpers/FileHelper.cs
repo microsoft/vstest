@@ -140,6 +140,11 @@ public class FileHelper : IFileHelper
     {
         File.Delete(path);
     }
+
+    public void DeleteDirectory(string directoryPath, bool recursive)
+    {
+        Directory.Delete(directoryPath, recursive);
+    }
 }
 
 #endif
