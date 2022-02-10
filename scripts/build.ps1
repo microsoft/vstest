@@ -117,6 +117,13 @@ $updatedDependencies | Set-Content -Encoding $encoding $dependenciesPath -NoNewl
 
 $attachVsPath = "$env:TP_ROOT_DIR\src\AttachVS\bin\Debug\net472"
 
+# Lists changes with modifier and relative path e.g: 
+# M scripts/build.ps1
+# M src/Microsoft.TestPlatform.Common/DataCollection/DataCollectionAttachmentManager.cs
+# M src/Microsoft.TestPlatform.Common/Resources/Resources.Designer.cs
+# M src/Microsoft.TestPlatform.Common/Resources/Resources.resx
+$gitChanges = git -C $env:TP_ROOT_DIR status -u --porcelain
+
 if ($env:PATH -notlike "*$attachVsPath") {
     Write-Log "Adding AttachVS to PATH"
     $env:PATH = "$attachVsPath;$env:PATH"
@@ -1102,6 +1109,20 @@ function Build-SpecificProjects
     }
 }
 
+function Test-GitChanges { 
+    param (
+        [string[]]$Like
+    )
+
+    # For each line check if we match any of the rules
+    # if we do select that path. We do Where-Object twice beacuse 
+    # -like does not support multiple patterns on the right hand side. 
+    # We could check if any pattern matches any line, but that returns
+    # the patterns that match any path, and not paths that return any pattern. 
+    # So the current approach is better for debugging.
+    $gitChanges | Where-Object { $path = $_; $like | Where-Object { $path -like $_ }}
+}
+
 if ($ProjectNamePatterns.Count -ne 0)
 {
     # Build Specific projects.
@@ -1127,7 +1148,9 @@ if ($Force -or $Steps -contains "Restore") {
 }
 
 if ($Force -or $Steps -contains "UpdateLocalization") {
-    Update-LocalizedResources
+    if ($Force -or $CIBuild -or (Test-GitChanges -Like "*.resx", "*Resources.Designer.cs", "*.xlf")) {
+        Update-LocalizedResources
+    }
 }
 
 if ($Force -or $Steps -contains "Build") {
@@ -1136,7 +1159,9 @@ if ($Force -or $Steps -contains "Build") {
 
 if ($Force -or $Steps -contains "Publish") {
     Publish-Package
-    Create-VsixPackage
+    if ($Force -or $CIBuild) {
+        Create-VsixPackage
+    }
     Create-NugetPackages
 }
 
