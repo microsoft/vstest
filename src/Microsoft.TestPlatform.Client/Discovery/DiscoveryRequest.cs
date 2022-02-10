@@ -167,10 +167,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <inheritdoc/>
     public void AbortWithEventHandler()
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DiscoveryRequest.AbortWithEventHandler: Aborting.");
-        }
+        EqtTrace.Verbose("DiscoveryRequest.AbortWithEventHandler: Aborting.");
 
         lock (_syncObject)
         {
@@ -185,19 +182,12 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             }
             else
             {
-                if (EqtTrace.IsInfoEnabled)
-                {
-                    EqtTrace.Info("DiscoveryRequest.AbortWithEventHandler: No operation to abort.");
-                }
-
+                EqtTrace.Info("DiscoveryRequest.AbortWithEventHandler: No operation to abort.");
                 return;
             }
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("DiscoveryRequest.AbortWithEventHandler: Aborted.");
-        }
+        EqtTrace.Info("DiscoveryRequest.AbortWithEventHandler: Aborted.");
     }
 
     /// <summary>

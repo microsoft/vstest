@@ -16,7 +16,6 @@ using ObjectModel.Engine;
 using ObjectModel.Logging;
 
 using CommonResources = Common.Resources.Resources;
-using static Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IParallelProxyDiscoveryManager;
 
 /// <summary>
 /// ParallelDiscoveryEventsHandler for handling the discovery events in case of parallel discovery
@@ -35,7 +34,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
 
     private readonly IRequestData _requestData;
 
-    private readonly object sendMessageLock = new();
+    private readonly object _sendMessageLock = new();
 
     public ParallelDiscoveryEventsHandler(IRequestData requestData,
         IProxyDiscoveryManager proxyDiscoveryManager,
@@ -90,10 +89,10 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         // Do not send TestDiscoveryComplete to actual test discovery handler
         // We need to see if there are still sources left - let the parallel manager decide
         var parallelDiscoveryComplete = _parallelProxyDiscoveryManager.HandlePartialDiscoveryComplete(
-                _proxyDiscoveryManager,
-                totalTests,
-                null, // lastChunk should be null as we already sent this data above
-                isAborted);
+            _proxyDiscoveryManager,
+            totalTests,
+            null, // lastChunk should be null as we already sent this data above
+            isAborted);
 
         if (parallelDiscoveryComplete)
         {
@@ -199,7 +198,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         // All other testhosts which will finish after shouldn't send raw message
         if (!_discoveryDataAggregator.IsMessageSent)
         {
-            lock (sendMessageLock)
+            lock (_sendMessageLock)
             {
                 if (!_discoveryDataAggregator.IsMessageSent)
                 {

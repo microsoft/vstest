@@ -22,9 +22,9 @@ using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using ObjectModel.Engine.TesthostProtocol;
 using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 using CrossPlatEngineResources = Resources.Resources;
-using static Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IParallelProxyDiscoveryManager;
 
 /// <summary>
 /// Orchestrates discovery operations for the engine communicating with the test host process.
@@ -37,7 +37,7 @@ public class DiscoveryManager : IDiscoveryManager
     private ITestDiscoveryEventsHandler2 _testDiscoveryEventsHandler;
     private DiscoveryCriteria _discoveryCriteria;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private string previousSource = null;
+    private string _previousSource = null;
     private ConcurrentDictionary<string, DiscoveryStatus> SourcesWithDiscoveryStatus { get; set; } = new ConcurrentDictionary<string, DiscoveryStatus>();
 
     /// <summary>
@@ -347,19 +347,19 @@ public class DiscoveryManager : IDiscoveryManager
 
             // If it is the first list of testCases which was discovered, we mark sources as partiallyDiscovered.
             // Or if current source is the same as previous we again mark them as partiallyDiscovered for consistency
-            if (previousSource is null || previousSource == currentSource)
+            if (_previousSource is null || _previousSource == currentSource)
             {
                 MarkSourceWithStatus(currentSource, DiscoveryStatus.PartiallyDiscovered);
             }
             // If source is changed, we need to mark previous source as already fullyDiscovered
             // and currentSource should be partiallyDiscovered
-            else if (currentSource != previousSource)
+            else if (currentSource != _previousSource)
             {
-                MarkSourceWithStatus(previousSource, DiscoveryStatus.FullyDiscovered);
+                MarkSourceWithStatus(_previousSource, DiscoveryStatus.FullyDiscovered);
                 MarkSourceWithStatus(currentSource, DiscoveryStatus.PartiallyDiscovered);
             }
 
-            previousSource = currentSource;
+            _previousSource = currentSource;
         }
     }
 
@@ -375,7 +375,7 @@ public class DiscoveryManager : IDiscoveryManager
 
         // When all testcases in project is dividable by 10 then lastChunk is coming as empty
         // So we need to take the lastSource and mark it as FullyDiscovered
-        if (lastChunk.Count == 0) lastChunkSources = new List<string>() { previousSource };
+        if (lastChunk.Count == 0) lastChunkSources = new List<string>() { _previousSource };
 
         MarkSourcesWithStatus(lastChunkSources, DiscoveryStatus.FullyDiscovered);
     }

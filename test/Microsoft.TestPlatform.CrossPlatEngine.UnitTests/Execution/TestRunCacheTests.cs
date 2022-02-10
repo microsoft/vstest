@@ -53,7 +53,7 @@ public class TestRunCacheBehaviors
 
     //    var cache = new TestRunCache(int.MaxValue, cacheTimeout, tester.CacheHitOnTimerLimit);
 
-    //    var tr = _GetTestResult(0);
+    //    var tr = this.GetTestResult(0);
     //    cache.OnTestStarted(tr.TestCase);
 
     //    Assert.AreEqual(0, tester.TotalInProgressTestsReceived);

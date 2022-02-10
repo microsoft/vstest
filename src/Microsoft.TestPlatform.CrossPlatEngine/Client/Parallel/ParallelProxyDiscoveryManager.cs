@@ -15,7 +15,6 @@ using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using ObjectModel.Engine;
 using ObjectModel.Logging;
-using static Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IParallelProxyDiscoveryManager;
 
 /// <summary>
 /// ParallelProxyDiscoveryManager that manages parallel discovery
@@ -50,7 +49,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     /// </summary>
     private readonly object _discoveryStatusLockObject = new();
 
-    private readonly object enumeratorLockObject = new();
+    private readonly object _enumeratorLockObject = new();
 
     #endregion
 
@@ -279,7 +278,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     {
         if (sources == null || sources.Count() == 0) return;
 
-        lock (enumeratorLockObject)
+        lock (_enumeratorLockObject)
         {
             foreach (string source in sources)
             {

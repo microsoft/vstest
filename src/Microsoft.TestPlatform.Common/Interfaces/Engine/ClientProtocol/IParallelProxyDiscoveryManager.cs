@@ -29,14 +29,4 @@ public interface IParallelProxyDiscoveryManager : IParallelOperationManager, IPr
         long totalTests,
         IEnumerable<TestCase> lastChunk,
         bool isAborted);
-
-    /// <summary>
-    /// Enums for indicating discovery status of source
-    /// </summary>
-    public enum DiscoveryStatus
-    {
-        FullyDiscovered, // Indicates that source was fully discovered
-        PartiallyDiscovered, // Indicates that we started discovery of the source but something happened (cancel/abort) and we stopped processing it
-        NotDiscovered // Indicates the sources which were not touched during discovery
-    }
 }

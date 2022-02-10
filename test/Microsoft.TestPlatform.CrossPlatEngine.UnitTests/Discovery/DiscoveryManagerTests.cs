@@ -278,12 +278,7 @@ public class DiscoveryManagerTests
         DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
 
         mockHandler.Setup(ml => ml.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
-            .Callback(
-                (DiscoveryCompleteEventArgs complete,
-                    IEnumerable<TestCase> tests) =>
-                {
-                    receivedDiscoveryCompleteEventArgs = complete;
-                });
+            .Callback((DiscoveryCompleteEventArgs complete, IEnumerable<TestCase> tests) => receivedDiscoveryCompleteEventArgs = complete);
 
         // Act
         _discoveryManager.DiscoverTests(criteria, mockHandler.Object);

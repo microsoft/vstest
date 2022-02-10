@@ -8,9 +8,8 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using static Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IParallelProxyDiscoveryManager;
 
 [TestClass]
 public class ParallelDiscoveryDataAggregatorTests
@@ -234,8 +233,7 @@ public class ParallelDiscoveryDataAggregatorTests
         aggregator.AggregateDiscoveryDataMetrics(dict);
 
         var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
-
-        Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, out var value));
+        Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, out _));
     }
 
     [TestMethod]
