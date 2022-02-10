@@ -101,7 +101,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             var partiallyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered) as IReadOnlyCollection<string>;
             var notDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered) as IReadOnlyCollection<string>;
 
-            // As we immediatelly return results to IDE in case of aborting
+            // As we immediately return results to IDE in case of aborting
             // we need to set isAborted = true and totalTests = -1
             if (_parallelProxyDiscoveryManager.IsAbortRequested)
             {

@@ -52,7 +52,7 @@ public interface IDiscoveryRequest : IRequest
     void Abort();
 
     /// <summary>
-    /// Aborts the discovery request with event handler
+    /// Aborts the discovery request with event handler.
     /// </summary>
     void AbortWithEventHandler();
 }

@@ -88,7 +88,7 @@ public interface ITestRequestSender : IDisposable
     void SendTestRunAbort();
 
     /// <summary>
-    /// Send the request to abort the discovery
+    /// Sends the request to abort the discovery.
     /// </summary>
     void SendDiscoveryAbort();
 

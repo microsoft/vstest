@@ -31,7 +31,7 @@ public interface IDiscoveryManager
     void Abort();
 
     /// <summary>
-    /// Aborts the test discovery with eventHandler
+    /// Aborts the test discovery with eventHandler.
     /// </summary>
     /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
     void Abort(ITestDiscoveryEventsHandler2 eventHandler);

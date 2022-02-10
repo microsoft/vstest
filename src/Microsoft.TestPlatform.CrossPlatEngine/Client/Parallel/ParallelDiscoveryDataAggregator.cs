@@ -160,8 +160,8 @@ internal class ParallelDiscoveryDataAggregator
 
             if (!SourcesWithDiscoveryStatus.ContainsKey(source))
             {
-                EqtTrace.Warning($"ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus : " +
-                                 $"{source} is not present in SourcesWithDiscoveryStatus dictionary");
+                EqtTrace.Warning("ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus: " +
+                                 $"{source} is not present in SourcesWithDiscoveryStatus dictionary.");
             }
             else
             {
@@ -169,15 +169,15 @@ internal class ParallelDiscoveryDataAggregator
 
                 if (EqtTrace.IsInfoEnabled)
                 {
-                    EqtTrace.Info($"ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus : " +
-                                     $"{source} is marked with {status} status");
+                    EqtTrace.Info("ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus: " +
+                                     $"{source} is marked with {status} status.");
                 }
             }
         }
     }
 
     /// <summary>
-    /// Aggregate the value indicating if we already sent message to IDE
+    /// Aggregates the value indicating if we already sent message to IDE.
     /// </summary>
     /// <param name="isMessageSent">Boolean value if we already sent message to IDE</param>
     internal void AggregateIsMessageSent(bool isMessageSent)
@@ -186,7 +186,7 @@ internal class ParallelDiscoveryDataAggregator
     }
 
     /// <summary>
-    /// Returning sources with particular discovery status
+    /// Returns sources with particular discovery status.
     /// </summary>
     /// <param name="status">Status to filter</param>
     /// <returns></returns>
