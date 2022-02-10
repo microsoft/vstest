@@ -119,7 +119,7 @@ internal class ArtifactProcessingPostProcessModeProcessorExecutor : IArgumentExe
             // We don't have async execution at the moment for the argument processors.
             // Anyway post processing could involve a lot of I/O and so we make some space
             // for some possible parallelization async/await and fair I/O for the callee.
-            _artifactProcessingManage.PostProcessArtifacts().Wait();
+            _artifactProcessingManage.PostProcessArtifactsAsync().Wait();
             return ArgumentProcessorResult.Success;
         }
         catch (Exception e)

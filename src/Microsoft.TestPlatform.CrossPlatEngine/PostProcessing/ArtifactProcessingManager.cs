@@ -105,7 +105,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
         }
     }
 
-    public async Task PostProcessArtifacts()
+    public async Task PostProcessArtifactsAsync()
     {
         if (!_featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING))
         {

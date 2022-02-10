@@ -10,5 +10,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 internal interface IArtifactProcessingManager
 {
     void CollectArtifacts(TestRunCompleteEventArgs testRunCompleteEventArgs, string runSettingsXml);
-    Task PostProcessArtifacts();
+    Task PostProcessArtifactsAsync();
 }
