@@ -95,7 +95,7 @@ public interface ITestRequestManager : IDisposable
     /// <param name="testSessionInfo">The test session info.</param>
     /// <param name="eventsHandler">The events handler.</param>
     /// <param name="protocolConfig">Protocol related information.</param>
-    public void StopTestSession(
+    void StopTestSession(
         TestSessionInfo testSessionInfo,
         ITestSessionEventsHandler eventsHandler,
         ProtocolConfig protocolConfig);

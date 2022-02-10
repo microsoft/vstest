@@ -455,7 +455,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         // that will never come.
         if (_protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
         {
-            eventsHandler?.HandleStartTestSessionComplete(null);
+            eventsHandler?.HandleStartTestSessionComplete(new());
             return null;
         }
 
@@ -500,8 +500,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         var ackPayload = _dataSerializer
                             .DeserializePayload<StartTestSessionAckPayload>(message);
                         eventsHandler?.HandleStartTestSessionComplete(
-                            ackPayload.TestSessionInfo);
-                        return ackPayload.TestSessionInfo;
+                            ackPayload.EventArgs);
+                        return ackPayload.EventArgs.TestSessionInfo;
 
                     case MessageType.CustomTestHostLaunch:
                         HandleCustomHostLaunch(testHostLauncher, message);
@@ -536,7 +536,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 TestMessageLevel.Error,
                 TranslationLayerResources.AbortedStartTestSession);
 
-            eventsHandler?.HandleStartTestSessionComplete(null);
+            eventsHandler?.HandleStartTestSessionComplete(new());
         }
         finally
         {
@@ -559,7 +559,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         // that will never come.
         if (_protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
         {
-            eventsHandler?.HandleStartTestSessionComplete(null);
+            eventsHandler?.HandleStartTestSessionComplete(new());
             return await Task.FromResult((TestSessionInfo)null);
         }
 
@@ -603,8 +603,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         var ackPayload = _dataSerializer
                             .DeserializePayload<StartTestSessionAckPayload>(message);
                         eventsHandler?.HandleStartTestSessionComplete(
-                            ackPayload.TestSessionInfo);
-                        return ackPayload.TestSessionInfo;
+                            ackPayload.EventArgs);
+                        return ackPayload.EventArgs.TestSessionInfo;
 
                     case MessageType.CustomTestHostLaunch:
                         HandleCustomHostLaunch(testHostLauncher, message);
@@ -637,7 +637,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 TestMessageLevel.Error,
                 TranslationLayerResources.AbortedStartTestSession);
 
-            eventsHandler?.HandleStartTestSessionComplete(null);
+            eventsHandler?.HandleStartTestSessionComplete(new());
         }
         finally
         {

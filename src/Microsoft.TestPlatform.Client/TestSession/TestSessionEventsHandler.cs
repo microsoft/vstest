@@ -31,11 +31,11 @@ internal class TestSessionEventsHandler : ITestSessionEventsHandler
     }
 
     /// <inheritdoc />
-    public void HandleStartTestSessionComplete(TestSessionInfo testSessionInfo)
+    public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs eventArgs)
     {
         var ackPayload = new StartTestSessionAckPayload()
         {
-            TestSessionInfo = testSessionInfo
+            EventArgs = eventArgs
         };
 
         _communicationManager.SendMessage(MessageType.StartTestSessionCallback, ackPayload);

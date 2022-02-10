@@ -62,12 +62,6 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     }
 
     /// <inheritdoc/>
-    public virtual bool StartSession(ITestSessionEventsHandler eventsHandler)
-    {
-        return StartSession(eventsHandler, null);
-    }
-
-    /// <inheritdoc/>
     public virtual bool StartSession(ITestSessionEventsHandler eventsHandler, IRequestData requestData)
     {
         lock (_lockObject)
@@ -153,17 +147,17 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             TelemetryDataConstants.TestSessionState,
             TestSessionState.Success.ToString());
 
+        // This counts as the session start time.
         _testSessionStopwatch.Start();
 
         // Let the caller know the session has been created.
-        eventsHandler.HandleStartTestSessionComplete(_testSessionInfo);
+        eventsHandler.HandleStartTestSessionComplete(
+            new()
+            {
+                TestSessionInfo = _testSessionInfo,
+                Metrics = requestData?.MetricsCollection.Metrics
+            });
         return true;
-    }
-
-    /// <inheritdoc/>
-    public virtual bool StopSession()
-    {
-        return StopSession(null);
     }
 
     /// <inheritdoc/>

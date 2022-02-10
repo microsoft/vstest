@@ -537,7 +537,7 @@ public class DesignModeClient : IDesignModeClient
                 EqtTrace.Error("DesignModeClient: Exception in StartTestSession: " + ex);
 
                 eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
-                eventsHandler.HandleStartTestSessionComplete(null);
+                eventsHandler.HandleStartTestSessionComplete(new());
             }
         });
     }

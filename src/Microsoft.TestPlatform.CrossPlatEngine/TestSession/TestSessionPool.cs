@@ -90,18 +90,6 @@ public class TestSessionPool
     /// </summary>
     /// 
     /// <param name="testSessionInfo">The test session info object.</param>
-    /// 
-    /// <returns>True if the operation succeeded, false otherwise.</returns>
-    public virtual bool KillSession(TestSessionInfo testSessionInfo)
-    {
-        return KillSession(testSessionInfo, null);
-    }
-
-    /// <summary>
-    /// Kills and removes a session from the pool.
-    /// </summary>
-    /// 
-    /// <param name="testSessionInfo">The test session info object.</param>
     /// <param name="requestData">The request data.</param>
     /// 
     /// <returns>True if the operation succeeded, false otherwise.</returns>

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,25 +16,26 @@ using Microsoft.VisualStudio.TestPlatform.CommandLine;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using System.Runtime.Versioning;
-using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
 
 using Moq;
 
 using TestDoubles;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+
+using Constants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
 
 [TestClass]
 public class TestRequestManagerTests
@@ -2321,6 +2323,128 @@ public class TestRequestManagerTests
         _mockTestPlatformEventSource.Verify(
             tpes => tpes.StartTestSessionStop(),
             Times.Once());
+    }
+
+    [TestMethod]
+    public void StopTestSessionShouldBeSuccessful()
+    {
+        var result = true;
+        var testSessionInfo = new TestSessionInfo();
+        var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+
+        var mockTestPool = new Mock<TestSessionPool>();
+        TestSessionPool.Instance = mockTestPool.Object;
+
+        mockTestPool.Setup(tp => tp.KillSession(testSessionInfo, It.IsAny<IRequestData>()))
+            .Returns(result);
+        mockEventsHandler.Setup(eh => eh.HandleStopTestSessionComplete(testSessionInfo, result))
+            .Callback(() => { });
+
+        _testRequestManager.StopTestSession(
+            testSessionInfo,
+            mockEventsHandler.Object,
+            _protocolConfig);
+
+        mockTestPool.Verify(tp => tp.KillSession(
+                testSessionInfo,
+                It.IsAny<IRequestData>()),
+            Times.Once);
+        mockEventsHandler.Verify(eh => eh.HandleStopTestSessionComplete(
+                testSessionInfo,
+                result),
+            Times.Once);
+
+        _mockTestPlatformEventSource.Verify(
+            tpes => tpes.StopTestSessionStart(),
+            Times.Once);
+        _mockTestPlatformEventSource.Verify(
+            tpes => tpes.StopTestSessionStop(),
+            Times.Once);
+    }
+
+    [TestMethod]
+    public void StopTestSessionShouldFail()
+    {
+        var result = false;
+        var testSessionInfo = new TestSessionInfo();
+        var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+
+        var mockTestPool = new Mock<TestSessionPool>();
+        TestSessionPool.Instance = mockTestPool.Object;
+
+        mockTestPool.Setup(tp => tp.KillSession(testSessionInfo, It.IsAny<IRequestData>()))
+            .Returns(result);
+        mockEventsHandler.Setup(eh => eh.HandleStopTestSessionComplete(testSessionInfo, result))
+            .Callback(() => { });
+
+        _testRequestManager.StopTestSession(
+            testSessionInfo,
+            mockEventsHandler.Object,
+            _protocolConfig);
+
+        mockTestPool.Verify(tp => tp.KillSession(
+                testSessionInfo,
+                It.IsAny<IRequestData>()),
+            Times.Once);
+        mockEventsHandler.Verify(eh => eh.HandleStopTestSessionComplete(
+                testSessionInfo,
+                result),
+            Times.Once);
+
+        _mockTestPlatformEventSource.Verify(
+            tpes => tpes.StopTestSessionStart(),
+            Times.Once);
+        _mockTestPlatformEventSource.Verify(
+            tpes => tpes.StopTestSessionStop(),
+            Times.Once);
+    }
+
+    [TestMethod]
+    public void StopTestSessionShouldPropagateExceptionWhenKillSessionThrows()
+    {
+        var testSessionInfo = new TestSessionInfo();
+        var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+
+        var mockTestPool = new Mock<TestSessionPool>();
+        TestSessionPool.Instance = mockTestPool.Object;
+
+        mockTestPool.Setup(tp => tp.KillSession(testSessionInfo, It.IsAny<IRequestData>()))
+            .Throws(new Exception("DummyException"));
+        mockEventsHandler.Setup(eh => eh.HandleStopTestSessionComplete(
+                testSessionInfo,
+                It.IsAny<bool>()))
+            .Callback(() => { });
+
+        var exceptionThrown = false;
+        try
+        {
+            _testRequestManager.StopTestSession(
+                testSessionInfo,
+                mockEventsHandler.Object,
+                _protocolConfig);
+        }
+        catch
+        {
+            exceptionThrown = true;
+        }
+
+        Assert.IsTrue(exceptionThrown);
+
+        mockTestPool.Verify(tp => tp.KillSession(
+                testSessionInfo,
+                It.IsAny<IRequestData>()),
+            Times.Once);
+        mockEventsHandler.Verify(eh => eh.HandleStopTestSessionComplete(
+                testSessionInfo,
+                It.IsAny<bool>()),
+            Times.Never);
+
+        _mockTestPlatformEventSource.Verify(
+            tpes => tpes.StopTestSessionStart(),
+            Times.Once);
+        _mockTestPlatformEventSource.Verify(
+            tpes => tpes.StopTestSessionStop(),
+            Times.Once);
     }
 
     private static DiscoveryRequestPayload CreateDiscoveryPayload(string runsettings)
