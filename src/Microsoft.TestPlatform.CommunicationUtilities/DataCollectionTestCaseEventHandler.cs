@@ -95,7 +95,7 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
 
                     _communicationManager.SendMessage(MessageType.DataCollectionTestStartAck);
 
-                    EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case '{0} - {1}' started.", testCaseStartEventArgs.TestCaseName, testCaseStartEventArgs.TestCaseId);
+                    EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case '{0} - {1}' started.", testCaseStartEventArgs?.TestCaseName, testCaseStartEventArgs?.TestCaseId);
 
                     break;
 
@@ -118,7 +118,7 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
 
                     _communicationManager.SendMessage(MessageType.DataCollectionTestEndResult, attachmentSets);
 
-                    EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case '{0} - {1}' completed", testCaseEndEventArgs.TestCaseName, testCaseEndEventArgs.TestCaseId);
+                    EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case '{0} - {1}' completed", testCaseEndEventArgs?.TestCaseName, testCaseEndEventArgs?.TestCaseId);
                     break;
 
                 case MessageType.SessionEnd:
