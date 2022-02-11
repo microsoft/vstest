@@ -31,10 +31,7 @@ public class TestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProc
     /// <inheritdoc/>
     public void HandleTestRunAttachmentsProcessingComplete(TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Test run attachments processing completed.");
-        }
+        EqtTrace.Info("Test run attachments processing completed.");
 
         var payload = new TestRunAttachmentsProcessingCompletePayload()
         {

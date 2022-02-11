@@ -127,10 +127,8 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
             _availableTestSources = testRunCriteria.Sources.Count();
         }
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("ParallelProxyExecutionManager: Start execution. Total sources: " + _availableTestSources);
-        }
+        EqtTrace.Verbose("ParallelProxyExecutionManager: Start execution. Total sources: " + _availableTestSources);
+
         return StartTestRunPrivate(eventHandler);
     }
 
@@ -183,10 +181,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
                 ? _runCompletedClients == _runStartedClients
                 : _runCompletedClients == _availableTestSources;
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("ParallelProxyExecutionManager: HandlePartialRunComplete: Total completed clients = {0}, Run complete = {1}, Run canceled: {2}.", _runCompletedClients, allRunsCompleted, testRunCompleteArgs.IsCanceled);
-            }
+            EqtTrace.Verbose("ParallelProxyExecutionManager: HandlePartialRunComplete: Total completed clients = {0}, Run complete = {1}, Run canceled: {2}.", _runCompletedClients, allRunsCompleted, testRunCompleteArgs.IsCanceled);
         }
 
         // verify that all executors are done with the execution and there are no more sources/testcases to execute
@@ -207,10 +202,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
         }
 
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("ParallelProxyExecutionManager: HandlePartialRunComplete: Replace execution manager. Shared: {0}, Aborted: {1}.", SharedHosts, testRunCompleteArgs.IsAborted);
-        }
+        EqtTrace.Verbose("ParallelProxyExecutionManager: HandlePartialRunComplete: Replace execution manager. Shared: {0}, Aborted: {1}.", SharedHosts, testRunCompleteArgs.IsAborted);
 
         RemoveManager(proxyExecutionManager);
         proxyExecutionManager = CreateNewConcurrentManager();
@@ -310,10 +302,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
             Task.Run(() =>
                 {
                     Interlocked.Increment(ref _runStartedClients);
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("ParallelProxyExecutionManager: Execution started. Started clients: " + _runStartedClients);
-                    }
+                    EqtTrace.Verbose("ParallelProxyExecutionManager: Execution started. Started clients: " + _runStartedClients);
 
                     proxyExecutionManager.StartTestRun(testRunCriteria, GetHandlerForGivenManager(proxyExecutionManager));
                 })
@@ -322,10 +311,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
                         // Just in case, the actual execution couldn't start for an instance. Ensure that
                         // we call execution complete since we have already fetched a source. Otherwise
                         // execution will not terminate
-                        if (EqtTrace.IsErrorEnabled)
-                        {
-                            EqtTrace.Error("ParallelProxyExecutionManager: Failed to trigger execution. Exception: " + t.Exception);
-                        }
+                        EqtTrace.Error("ParallelProxyExecutionManager: Failed to trigger execution. Exception: " + t.Exception);
 
                         var handler = GetHandlerForGivenManager(proxyExecutionManager);
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
@@ -343,9 +329,6 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
                     TaskContinuationOptions.OnlyOnFaulted);
         }
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("ProxyParallelExecutionManager: No sources available for execution.");
-        }
+        EqtTrace.Verbose("ProxyParallelExecutionManager: No sources available for execution.");
     }
 }

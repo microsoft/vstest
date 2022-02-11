@@ -161,10 +161,7 @@ internal class PlatformArgumentExecutor : IArgumentExecutor
                 string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidPlatformType, argument, string.Join(", ", validPlatforms)));
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Using platform:{0}", _commandLineOptions.TargetArchitecture);
-        }
+        EqtTrace.Info("Using platform:{0}", _commandLineOptions.TargetArchitecture);
     }
 
     /// <summary>

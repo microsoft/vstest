@@ -147,10 +147,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void StartSession()
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleWrapper.StartSession: Starting VsTestConsoleWrapper session.");
-        }
+        EqtTrace.Info("VsTestConsoleWrapper.StartSession: Starting VsTestConsoleWrapper session.");
 
         _testPlatformEventSource.TranslationLayerInitializeStart();
 

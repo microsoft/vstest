@@ -45,10 +45,7 @@ public class TestDiscoveryEventHandler : ITestDiscoveryEventsHandler2
     /// <param name="lastChunk"> The last chunk. </param>
     public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info(discoveryCompleteEventArgs.IsAborted ? "Discover Aborted." : "Discover Finished.");
-        }
+        EqtTrace.Info(discoveryCompleteEventArgs.IsAborted ? "Discover Aborted." : "Discover Finished.");
 
         _requestHandler.DiscoveryComplete(discoveryCompleteEventArgs, lastChunk);
     }

@@ -119,11 +119,8 @@ public class InferRunSettingsHelper
                 // Delete all invalid RunConfiguration Settings
                 if (listOfInValidRunConfigurationSettings.Count > 0)
                 {
-                    if (EqtTrace.IsWarningEnabled)
-                    {
-                        string settingsName = string.Join(", ", listOfInValidRunConfigurationSettings);
-                        EqtTrace.Warning(string.Format("InferRunSettingsHelper.MakeRunsettingsCompatible: Removing the following settings: {0} from RunSettings file. To use those settings please move to latest version of Microsoft.NET.Test.Sdk", settingsName));
-                    }
+                    string settingsName = string.Join(", ", listOfInValidRunConfigurationSettings);
+                    EqtTrace.Warning("InferRunSettingsHelper.MakeRunsettingsCompatible: Removing the following settings: {0} from RunSettings file. To use those settings please move to latest version of Microsoft.NET.Test.Sdk", settingsName);
 
                     // move navigator to RunConfiguration node
                     runSettingsNavigator.MoveToParent();

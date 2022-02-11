@@ -75,26 +75,17 @@ internal class TestPluginManager
         {
             if (ex is TargetInvocationException)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
-                }
+                EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
                 throw;
             }
 #if NETFRAMEWORK
             else if (ex is SystemException)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
-                }
+                EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
                 throw;
             }
 #endif
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
-            }
+            EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
 
             throw;
         }
