@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client;
 using System;
 using System.Collections.Generic;
 
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -30,7 +31,6 @@ public class ProxyTestSessionManagerTests
     };
     private readonly string _fakeRunSettings = "FakeRunSettings";
     private readonly ProtocolConfig _protocolConfig = new() { Version = 1 };
-    private readonly Dictionary<string, object> _metrics = new();
     private Mock<ITestSessionEventsHandler> _mockEventsHandler;
     private Mock<IRequestData> _mockRequestData;
     private Mock<IMetricsCollection> _mockMetricsCollection;
@@ -39,6 +39,8 @@ public class ProxyTestSessionManagerTests
     public void TestInitialize()
     {
         TestSessionPool.Instance = null;
+
+        var metrics = new Dictionary<string, object>();
 
         _mockEventsHandler = new Mock<ITestSessionEventsHandler>();
         _mockRequestData = new Mock<IRequestData>();
@@ -51,11 +53,20 @@ public class ProxyTestSessionManagerTests
              {
                  Assert.IsNotNull(eventArgs.TestSessionInfo);
                  Assert.IsNotNull(eventArgs.Metrics);
+
+                 Assert.IsTrue(eventArgs.Metrics.ContainsKey(TelemetryDataConstants.TestSessionId));
+                 Assert.IsTrue(eventArgs.Metrics.ContainsKey(TelemetryDataConstants.TestSessionState));
+                 Assert.IsTrue(
+                     eventArgs.Metrics.ContainsKey(TelemetryDataConstants.TestSessionSpawnedTesthostCount)
+                     && (int)eventArgs.Metrics[TelemetryDataConstants.TestSessionSpawnedTesthostCount] > 0);
+                 Assert.IsTrue(eventArgs.Metrics.ContainsKey(TelemetryDataConstants.TestSessionTesthostSpawnTimeInSec));
              });
 
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
         _mockRequestData.Setup(rd => rd.ProtocolConfig).Returns(_protocolConfig);
-        _mockMetricsCollection.Setup(mc => mc.Metrics).Returns(_metrics);
+        _mockMetricsCollection.Setup(mc => mc.Metrics).Returns(metrics);
+        _mockMetricsCollection.Setup(mc => mc.Add(It.IsAny<string>(), It.IsAny<object>()))
+            .Callback((string metric, object value) => metrics.Add(metric, value));
     }
 
     [TestMethod]
@@ -218,12 +229,18 @@ public class ProxyTestSessionManagerTests
             Times.Once);
 
         // First call to StopSession should succeed.
+        _mockMetricsCollection.Object.Metrics.Clear();
         Assert.IsTrue(proxyManager.StopSession(_mockRequestData.Object));
+
         mockProxyOperationManager.Verify(pom => pom.Close(), Times.Once);
+        CheckStopSessionTelemetry(true);
 
         // Second call to StopSession should fail.
+        _mockMetricsCollection.Object.Metrics.Clear();
         Assert.IsFalse(proxyManager.StopSession(_mockRequestData.Object));
+
         mockProxyOperationManager.Verify(pom => pom.Close(), Times.Once);
+        CheckStopSessionTelemetry(false);
     }
 
     [TestMethod]
@@ -248,8 +265,11 @@ public class ProxyTestSessionManagerTests
             Times.Once);
 
         // First call to StopSession should succeed.
+        _mockMetricsCollection.Object.Metrics.Clear();
         Assert.IsTrue(proxyManager.StopSession(_mockRequestData.Object));
+
         mockProxyOperationManager.Verify(pom => pom.Close(), Times.Exactly(testSessionCriteria.Sources.Count));
+        CheckStopSessionTelemetry(true);
     }
 
     [TestMethod]
@@ -346,5 +366,12 @@ public class ProxyTestSessionManagerTests
             testSessionCriteria,
             testSessionCriteria.Sources.Count,
             () => proxyOperationManager);
+    }
+
+    private void CheckStopSessionTelemetry(bool exists)
+    {
+        Assert.AreEqual(_mockMetricsCollection.Object.Metrics.ContainsKey(TelemetryDataConstants.TestSessionId), exists);
+        Assert.AreEqual(_mockMetricsCollection.Object.Metrics.ContainsKey(TelemetryDataConstants.TestSessionState), exists);
+        Assert.AreEqual(_mockMetricsCollection.Object.Metrics.ContainsKey(TelemetryDataConstants.TestSessionTotalSessionTimeInSec), exists);
     }
 }

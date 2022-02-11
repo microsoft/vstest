@@ -298,7 +298,7 @@ public class TestSessionTests
     }
 
     [TestMethod]
-    public void StopTestSessionShouldCallConsoleWrapperStopTestSessionWithCorrectArguments1()
+    public void StopTestSessionWithNoArgsShouldCallConsoleWrapperStopTestSessionWithCorrectArguments()
     {
         _testSession.StopTestSession();
 
@@ -311,7 +311,7 @@ public class TestSessionTests
     }
 
     [TestMethod]
-    public void StopTestSessionShouldCallConsoleWrapperStopTestSessionWithCorrectArguments2()
+    public void StopTestSessionWithOneArgShouldCallConsoleWrapperStopTestSessionWithCorrectArguments()
     {
         var mockTestSessionEventsHandler2 = new Mock<ITestSessionEventsHandler>();
 
@@ -326,7 +326,7 @@ public class TestSessionTests
     }
 
     [TestMethod]
-    public void StopTestSessionShouldCallConsoleWrapperStopTestSessionWithCorrectArguments3()
+    public void StopTestSessionWithTwoArgsShouldCallConsoleWrapperStopTestSessionWithCorrectArguments()
     {
         var testPlatformOptions = new TestPlatformOptions();
         var mockTestSessionEventsHandler2 = new Mock<ITestSessionEventsHandler>();
@@ -574,7 +574,7 @@ public class TestSessionTests
     }
 
     [TestMethod]
-    public async Task StopTestSessionAsyncShouldCallConsoleWrapperStopTestSessionWithCorrectArguments1()
+    public async Task StopTestSessionAsyncWithNoArgsShouldCallConsoleWrapperStopTestSessionWithCorrectArguments()
     {
         await _testSession.StopTestSessionAsync().ConfigureAwait(false);
 
@@ -587,7 +587,7 @@ public class TestSessionTests
     }
 
     [TestMethod]
-    public async Task StopTestSessionAsyncShouldCallConsoleWrapperStopTestSessionWithCorrectArguments2()
+    public async Task StopTestSessionAsyncWithOneArgShouldCallConsoleWrapperStopTestSessionWithCorrectArguments()
     {
         var mockTestSessionEventsHandler2 = new Mock<ITestSessionEventsHandler>();
 
@@ -604,7 +604,7 @@ public class TestSessionTests
     }
 
     [TestMethod]
-    public async Task StopTestSessionAsyncShouldCallConsoleWrapperStopTestSessionWithCorrectArguments3()
+    public async Task StopTestSessionAsyncWithTwoArgsShouldCallConsoleWrapperStopTestSessionWithCorrectArguments()
     {
         var testPlatformOptions = new TestPlatformOptions();
         var mockTestSessionEventsHandler2 = new Mock<ITestSessionEventsHandler>();

@@ -22,11 +22,12 @@ using CrossPlatResources = Resources.Resources;
 /// </summary>
 public class ProxyTestSessionManager : IProxyTestSessionManager
 {
-    private enum TestSessionState : int
+    private enum TestSessionState
     {
-        Success = 0,
-        ProxySetupFailure = 1,
-        SessionExistsFailure = 2
+        Unknown,
+        Error,
+        Active,
+        Terminated
     }
 
     private readonly object _lockObject = new();
@@ -128,7 +129,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         {
             requestData?.MetricsCollection.Add(
                 TelemetryDataConstants.TestSessionState,
-                TestSessionState.ProxySetupFailure.ToString());
+                TestSessionState.Error.ToString());
             DisposeProxies();
             return false;
         }
@@ -138,14 +139,14 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         {
             requestData?.MetricsCollection.Add(
                 TelemetryDataConstants.TestSessionState,
-                TestSessionState.SessionExistsFailure.ToString());
+                TestSessionState.Error.ToString());
             DisposeProxies();
             return false;
         }
 
         requestData?.MetricsCollection.Add(
             TelemetryDataConstants.TestSessionState,
-            TestSessionState.Success.ToString());
+            TestSessionState.Active.ToString());
 
         // This counts as the session start time.
         _testSessionStopwatch.Start();
@@ -188,6 +189,9 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         requestData?.MetricsCollection.Add(
             TelemetryDataConstants.TestSessionTotalSessionTimeInSec,
             _testSessionStopwatch.Elapsed.TotalSeconds);
+        requestData?.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionState,
+            TestSessionState.Terminated.ToString());
 
         return true;
     }

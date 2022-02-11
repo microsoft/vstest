@@ -2447,9 +2447,7 @@ public class TestRequestManagerTests
                 Assert.AreEqual(eventArgs.IsStopped, false);
             });
 
-        var exceptionThrown = false;
-        try
-        {
+        Assert.ThrowsException<Exception>(() =>
             _testRequestManager.StopTestSession(
                 new()
                 {
@@ -2457,14 +2455,7 @@ public class TestRequestManagerTests
                     CollectMetrics = true
                 },
                 mockEventsHandler.Object,
-                _protocolConfig);
-        }
-        catch
-        {
-            exceptionThrown = true;
-        }
-
-        Assert.IsTrue(exceptionThrown);
+                _protocolConfig));
 
         mockTestPool.Verify(tp => tp.KillSession(
                 testSessionInfo,
