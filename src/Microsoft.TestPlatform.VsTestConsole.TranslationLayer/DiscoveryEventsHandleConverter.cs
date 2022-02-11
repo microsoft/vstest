@@ -3,7 +3,6 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
-using System;
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
