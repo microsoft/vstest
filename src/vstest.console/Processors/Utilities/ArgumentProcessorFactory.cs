@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+
 using ObjectModel;
 
 /// <summary>
@@ -41,11 +43,13 @@ internal class ArgumentProcessorFactory
 
     #region Constructor
 
-    /// <summary>
     /// Initializes the argument processor factory.
     /// </summary>
     /// <param name="argumentProcessors">
     /// The argument Processors.
+    /// </param>
+    /// <param name="featureFlag">
+    /// The feature flag support.
     /// </param>
     /// <remarks>
     /// This is not public because the static Create method should be used to access the instance.
@@ -63,11 +67,23 @@ internal class ArgumentProcessorFactory
     /// <summary>
     /// Creates ArgumentProcessorFactory.
     /// </summary>
+    /// <param name="featureFlag">
+    /// The feature flag support.
+    /// </param>
     /// <returns>ArgumentProcessorFactory.</returns>
-    internal static ArgumentProcessorFactory Create()
+    internal static ArgumentProcessorFactory Create(IFeatureFlag featureFlag = null)
     {
+        var defaultArgumentProcessor = DefaultArgumentProcessors;
+
+        if ((featureFlag ?? FeatureFlag.Instance).IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING))
+        {
+            defaultArgumentProcessor.Add(new ArtifactProcessingCollectModeProcessor());
+            defaultArgumentProcessor.Add(new ArtifactProcessingPostProcessModeProcessor());
+            defaultArgumentProcessor.Add(new TestSessionCorrelationIdProcessor());
+        }
+
         // Get the ArgumentProcessorFactory
-        return new ArgumentProcessorFactory(DefaultArgumentProcessors);
+        return new ArgumentProcessorFactory(defaultArgumentProcessor);
     }
 
     #endregion
@@ -207,7 +223,7 @@ internal class ArgumentProcessorFactory
 
     #region Private Methods
 
-    private static IEnumerable<IArgumentProcessor> DefaultArgumentProcessors => new List<IArgumentProcessor> {
+    private static IList<IArgumentProcessor> DefaultArgumentProcessors => new List<IArgumentProcessor> {
         new HelpArgumentProcessor(),
         new TestSourceArgumentProcessor(),
         new ListTestsArgumentProcessor(),

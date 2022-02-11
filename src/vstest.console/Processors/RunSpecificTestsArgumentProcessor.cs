@@ -20,6 +20,8 @@ using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using CommandLineResources = Resources.Resources;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
 
 internal class RunSpecificTestsArgumentProcessor : IArgumentProcessor
 {
@@ -53,6 +55,7 @@ internal class RunSpecificTestsArgumentProcessor : IArgumentProcessor
                         CommandLineOptions.Instance,
                         RunSettingsManager.Instance,
                         TestRequestManager.Instance,
+                        new ArtifactProcessingManager(CommandLineOptions.Instance.TestSessionCorrelationId),
                         ConsoleOutput.Instance));
             }
 
@@ -154,6 +157,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         CommandLineOptions options,
         IRunSettingsProvider runSettingsProvider,
         ITestRequestManager testRequestManager,
+        IArtifactProcessingManager artifactProcessingManager,
         IOutput output)
     {
         Contract.Requires(options != null);
@@ -165,7 +169,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsProvider;
         Output = output;
         _discoveryEventsRegistrar = new DiscoveryEventsRegistrar(DiscoveryRequest_OnDiscoveredTests);
-        _testRunEventsRegistrar = new TestRunRequestEventsRegistrar(Output, _commandLineOptions);
+        _testRunEventsRegistrar = new TestRunRequestEventsRegistrar(Output, _commandLineOptions, artifactProcessingManager);
     }
 
     #endregion
@@ -344,11 +348,13 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     {
         private readonly IOutput _output;
         private readonly CommandLineOptions _commandLineOptions;
+        private readonly IArtifactProcessingManager _artifactProcessingManager;
 
-        public TestRunRequestEventsRegistrar(IOutput output, CommandLineOptions commandLineOptions)
+        public TestRunRequestEventsRegistrar(IOutput output, CommandLineOptions commandLineOptions, IArtifactProcessingManager artifactProcessingManager)
         {
             _output = output;
             _commandLineOptions = commandLineOptions;
+            _artifactProcessingManager = artifactProcessingManager;
         }
 
         public void LogWarning(string message)
@@ -383,6 +389,12 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
                 if (!testsFoundInAnySource && string.IsNullOrEmpty(CommandLineOptions.Instance.TestAdapterPath) && _commandLineOptions.TestCaseFilterValue == null)
                 {
                     _output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
+                }
+
+                // Collect tests session artifacts for post processing
+                if (_commandLineOptions.ArtifactProcessingMode == ArtifactProcessingMode.Collect)
+                {
+                    _artifactProcessingManager.CollectArtifacts(e, RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
                 }
             }
         }

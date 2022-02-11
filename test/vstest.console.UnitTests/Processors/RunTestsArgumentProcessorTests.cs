@@ -52,6 +52,7 @@ public class RunTestsArgumentProcessorTests
     private readonly Mock<IMetricsPublisher> _mockMetricsPublisher;
     private readonly Mock<IProcessHelper> _mockProcessHelper;
     private readonly Mock<ITestRunAttachmentsProcessingManager> _mockAttachmentsProcessingManager;
+    private readonly Mock<IArtifactProcessingManager> _artifactProcessingManager;
 
     public RunTestsArgumentProcessorTests()
     {
@@ -63,6 +64,7 @@ public class RunTestsArgumentProcessorTests
         _mockMetricsPublisherTask = Task.FromResult(_mockMetricsPublisher.Object);
         _mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
         _mockAssemblyMetadataProvider = new Mock<IAssemblyMetadataProvider>();
+        _artifactProcessingManager = new Mock<IArtifactProcessingManager>();
         _inferHelper = new InferHelper(_mockAssemblyMetadataProvider.Object);
         SetupMockExtensions();
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
@@ -117,7 +119,7 @@ public class RunTestsArgumentProcessorTests
         CommandLineOptions.Instance.Reset();
         CommandLineOptions.Instance.IsDesignMode = true;
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object);
-        var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, _mockOutput.Object);
+        var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, _artifactProcessingManager.Object, _mockOutput.Object);
 
         Assert.AreEqual(ArgumentProcessorResult.Success, executor.Execute());
     }
@@ -140,6 +142,7 @@ public class RunTestsArgumentProcessorTests
             CommandLineOptions.Instance,
             runSettingsProvider,
             testRequestManager,
+            _artifactProcessingManager.Object,
             _mockOutput.Object
         );
         return executor;

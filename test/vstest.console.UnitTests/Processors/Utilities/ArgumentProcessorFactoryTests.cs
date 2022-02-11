@@ -8,6 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+using Moq;
+
 using TestPlatform.CommandLine.Processors;
 
 using TestTools.UnitTesting;
@@ -148,7 +152,9 @@ public class ArgumentProcessorFactoryTests
             xplatShortCommandName.Add(name.Replace('/', '-'));
         }
 
-        ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
+        Mock<IFeatureFlag> featureFlag = new();
+        featureFlag.Setup(x => x.IsEnabled(It.IsAny<string>())).Returns(true);
+        ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create(featureFlag.Object);
 
         // Expect command processors to contain both long and short commands.
         CollectionAssert.AreEquivalent(

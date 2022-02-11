@@ -1079,11 +1079,7 @@ internal class TestRequestManager : ITestRequestManager
     /// </summary>
     /// <returns>Returns Telemetry Opted out or not</returns>
     private static bool IsTelemetryOptedIn()
-    {
-        var telemetryStatus = Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN");
-        return !string.IsNullOrEmpty(telemetryStatus)
-               && telemetryStatus.Equals("1", StringComparison.Ordinal);
-    }
+        => Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")?.Equals("1", StringComparison.Ordinal) == true;
 
     /// <summary>
     /// Log Command Line switches for Telemetry purposes
