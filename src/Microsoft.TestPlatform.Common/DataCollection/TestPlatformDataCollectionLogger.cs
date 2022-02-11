@@ -50,13 +50,10 @@ internal class TestPlatformDataCollectionLogger : DataCollectionLogger
         ValidateArg.NotNull(context, nameof(context));
         ValidateArg.NotNull(text, nameof(text));
 
-        if (EqtTrace.IsErrorEnabled)
-        {
-            EqtTrace.Error(
-                "Data collector '{0}' logged the following error: {1}",
-                _dataCollectorConfig.TypeUri,
-                text);
-        }
+        EqtTrace.Error(
+            "Data collector '{0}' logged the following error: {1}",
+            _dataCollectorConfig.TypeUri,
+            text);
 
         SendTextMessage(context, text, TestMessageLevel.Error);
     }
@@ -75,19 +72,16 @@ internal class TestPlatformDataCollectionLogger : DataCollectionLogger
             throw new InvalidOperationException(Resources.Resources.WrongDataCollectionContextType);
         }
 
-        if (EqtTrace.IsErrorEnabled)
-        {
-            EqtTrace.Error(
-                "Data collector '{0}' logged the following error:" + Environment.NewLine +
-                "Description:            {1}" + Environment.NewLine +
-                "Exception type:         {2}" + Environment.NewLine + "Exception message:      {3}"
-                + Environment.NewLine + "Exception stack trace:  {4}",
-                _dataCollectorConfig.TypeUri,
-                text,
-                exception.GetType(),
-                exception.Message,
-                exception.StackTrace);
-        }
+        EqtTrace.Error(
+            "Data collector '{0}' logged the following error:" + Environment.NewLine +
+            "Description:            {1}" + Environment.NewLine +
+            "Exception type:         {2}" + Environment.NewLine + "Exception message:      {3}"
+            + Environment.NewLine + "Exception stack trace:  {4}",
+            _dataCollectorConfig.TypeUri,
+            text,
+            exception.GetType(),
+            exception.Message,
+            exception.StackTrace);
 
         // Currently there is one type of DataCollectionMessage sent across client for all message kind.
         // If required new type can be created for different message type.

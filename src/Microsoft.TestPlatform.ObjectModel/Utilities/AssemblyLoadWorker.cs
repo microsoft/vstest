@@ -34,17 +34,11 @@ internal class AssemblyLoadWorker : MarshalByRefObject
         }
         catch (BadImageFormatException)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("AssemblyLoadWorker:GetTargetFrameworkVersionString() caught BadImageFormatException. Falling to native binary.");
-            }
+            EqtTrace.Error("AssemblyLoadWorker:GetTargetFrameworkVersionString() caught BadImageFormatException. Falling to native binary.");
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("AssemblyLoadWorker:GetTargetFrameworkVersionString() Returning default. Unhandled exception: {0}.", ex);
-            }
+            EqtTrace.Error("AssemblyLoadWorker:GetTargetFrameworkVersionString() Returning default. Unhandled exception: {0}.", ex);
         }
 
         return string.Empty;
@@ -215,10 +209,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
 
             if (string.IsNullOrEmpty(procArchType))
             {
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("Unable to find the platform type for image:{0} with PEKind:{1}, Machine:{2}. Returning Default:{3}", path, peKindString, machineTypeString, "AnyCPU");
-                }
+                EqtTrace.Verbose("Unable to find the platform type for image:{0} with PEKind:{1}, Machine:{2}. Returning Default:{3}", path, peKindString, machineTypeString, "AnyCPU");
                 procArchType = "AnyCPU";
             }
 
@@ -249,18 +240,12 @@ internal class AssemblyLoadWorker : MarshalByRefObject
         }
         catch (BadImageFormatException)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("AssemblyLoadWorker:GetPlatformAndFrameworkSettings() caught BadImageFormatException. Falling to native binary.");
-            }
+            EqtTrace.Error("AssemblyLoadWorker:GetPlatformAndFrameworkSettings() caught BadImageFormatException. Falling to native binary.");
             procArchType = GetArchitectureForSource(path);
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("AssemblyLoadWorker:GetPlatformAndFrameworkSettings() Returning default. Unhandled exception: {0}.", ex);
-            }
+            EqtTrace.Error("AssemblyLoadWorker:GetPlatformAndFrameworkSettings() Returning default. Unhandled exception: {0}.", ex);
             return;
         }
     }
@@ -350,20 +335,14 @@ internal class AssemblyLoadWorker : MarshalByRefObject
                 }
                 else
                 {
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("Source path {0} is not a valid image path. Returning default proc arch type {1}.", imagePath, "AnyCPU");
-                    }
+                    EqtTrace.Verbose("Source path {0} is not a valid image path. Returning default proc arch type {1}.", imagePath, "AnyCPU");
                 }
             }
         }
         catch (Exception ex)
         {
             //Ignore all exception
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("AssemblyLoadWorker:GetArchitectureForSource() Returning default:{0}. Unhandled exception: {1}.", "AnyCPU", ex.ToString());
-            }
+            EqtTrace.Error("AssemblyLoadWorker:GetArchitectureForSource() Returning default:{0}. Unhandled exception: {1}.", "AnyCPU", ex.ToString());
         }
 
         return archType;

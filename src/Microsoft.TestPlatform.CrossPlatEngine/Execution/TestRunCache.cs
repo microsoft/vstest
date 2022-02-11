@@ -382,10 +382,7 @@ internal class TestRunCache : ITestRunCache
             }
             catch (Exception ex)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestRunCache: OnCacheTimeHit: Exception occurred while checking for cache hit. {0}", ex);
-                }
+                EqtTrace.Error("TestRunCache: OnCacheTimeHit: Exception occurred while checking for cache hit. {0}", ex);
             }
         }
     }

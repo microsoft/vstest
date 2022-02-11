@@ -456,10 +456,7 @@ internal class TestLoggerManager : ITestLoggerManager
             }
             catch (SettingsException se)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the test results directory: Error {0}", se);
-                }
+                EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the test results directory: Error {0}", se);
             }
         }
 
@@ -483,10 +480,7 @@ internal class TestLoggerManager : ITestLoggerManager
             }
             catch (SettingsException se)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the target framework: Error {0}", se);
-                }
+                EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the target framework: Error {0}", se);
             }
         }
 

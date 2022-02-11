@@ -48,10 +48,7 @@ internal class AssemblyResolver : IDisposable
     [System.Security.SecurityCritical]
     public AssemblyResolver(IEnumerable<string> directories)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info($"AssemblyResolver.ctor: Creating AssemblyResolver with searchDirectories {string.Join(",", directories)}");
-        }
+        EqtTrace.Info($"AssemblyResolver.ctor: Creating AssemblyResolver with searchDirectories {string.Join(",", directories)}");
 
         _resolvedAssemblies = new Dictionary<string, Assembly>();
 
@@ -70,10 +67,7 @@ internal class AssemblyResolver : IDisposable
     [System.Security.SecurityCritical]
     internal void AddSearchDirectories(IEnumerable<string> directories)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info($"AssemblyResolver.AddSearchDirectories: Adding more searchDirectories {string.Join(",", directories)}");
-        }
+        EqtTrace.Info($"AssemblyResolver.AddSearchDirectories: Adding more searchDirectories {string.Join(",", directories)}");
 
         foreach (var directory in directories)
         {
@@ -120,10 +114,7 @@ internal class AssemblyResolver : IDisposable
             }
             catch (Exception ex)
             {
-                if (EqtTrace.IsInfoEnabled)
-                {
-                    EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to create assemblyName. Reason:{1} ", args.Name, ex);
-                }
+                EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to create assemblyName. Reason:{1} ", args.Name, ex);
 
                 _resolvedAssemblies[args.Name] = null;
                 return null;
@@ -186,10 +177,7 @@ internal class AssemblyResolver : IDisposable
                 }
             }
 
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to load assembly.", args.Name);
-            }
+            EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to load assembly.", args.Name);
 
             _resolvedAssemblies[args.Name] = null;
             return null;

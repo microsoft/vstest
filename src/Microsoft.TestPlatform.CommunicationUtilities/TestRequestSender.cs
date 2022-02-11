@@ -136,10 +136,7 @@ public class TestRequestSender : ITestRequestSender
     /// <inheritdoc />
     public int InitializeCommunication()
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.InitializeCommunication: initialize communication. ");
-        }
+        EqtTrace.Verbose("TestRequestSender.InitializeCommunication: initialize communication. ");
 
         // this.clientExitCancellationSource = new CancellationTokenSource();
         _clientExitErrorMessage = string.Empty;
@@ -166,20 +163,14 @@ public class TestRequestSender : ITestRequestSender
     public bool WaitForRequestHandlerConnection(int connectionTimeout, CancellationToken cancellationToken)
     {
         var sw = Stopwatch.StartNew();
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting for connection with timeout: {0}.", connectionTimeout);
-        }
+        EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting for connection with timeout: {0}.", connectionTimeout);
 
         // Wait until either connection is successful, handled by connected.WaitHandle
         // or operation is canceled, handled by cancellationToken.WaitHandle
         // or testhost exits unexpectedly, handled by clientExited.WaitHandle
         var waitIndex = WaitHandle.WaitAny(new WaitHandle[] { _connected.WaitHandle, cancellationToken.WaitHandle, _clientExited.WaitHandle }, connectionTimeout);
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting took {0} ms, with timeout {1} ms, and result {2}, which is {3}.", sw.ElapsedMilliseconds, connectionTimeout, waitIndex, waitIndex == 0 ? "success" : "failure");
-        }
+        EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting took {0} ms, with timeout {1} ms, and result {2}, which is {3}.", sw.ElapsedMilliseconds, connectionTimeout, waitIndex, waitIndex == 0 ? "success" : "failure");
 
         // Return true if connection was successful.
         return waitIndex == 0;
@@ -197,10 +188,7 @@ public class TestRequestSender : ITestRequestSender
         {
             var message = _dataSerializer.DeserializeMessage(args.Data);
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestRequestSender.CheckVersionWithTestHost: onMessageReceived received message: {0}", message);
-            }
+            EqtTrace.Verbose("TestRequestSender.CheckVersionWithTestHost: onMessageReceived received message: {0}", message);
 
             if (message.MessageType == MessageType.VersionCheck)
             {
@@ -236,10 +224,7 @@ public class TestRequestSender : ITestRequestSender
             // without any versioning in the message itself.
             var data = _dataSerializer.SerializePayload(MessageType.VersionCheck, _highestSupportedVersion);
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestRequestSender.CheckVersionWithTestHost: Sending check version message: {0}", data);
-            }
+            EqtTrace.Verbose("TestRequestSender.CheckVersionWithTestHost: Sending check version message: {0}", data);
 
             _channel.Send(data);
 
@@ -267,10 +252,7 @@ public class TestRequestSender : ITestRequestSender
             pathToAdditionalExtensions,
             _protocolVersion);
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.InitializeDiscovery: Sending initialize discovery with message: {0}", message);
-        }
+        EqtTrace.Verbose("TestRequestSender.InitializeDiscovery: Sending initialize discovery with message: {0}", message);
 
         _channel.Send(message);
     }
@@ -288,10 +270,7 @@ public class TestRequestSender : ITestRequestSender
             discoveryCriteria,
             _protocolVersion);
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.DiscoverTests: Sending discover tests with message: {0}", message);
-        }
+        EqtTrace.Verbose("TestRequestSender.DiscoverTests: Sending discover tests with message: {0}", message);
 
         _channel.Send(message);
     }
@@ -319,10 +298,8 @@ public class TestRequestSender : ITestRequestSender
             MessageType.ExecutionInitialize,
             pathToAdditionalExtensions,
             _protocolVersion);
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.InitializeExecution: Sending initialize execution with message: {0}", message);
-        }
+
+        EqtTrace.Verbose("TestRequestSender.InitializeExecution: Sending initialize execution with message: {0}", message);
 
         _channel.Send(message);
     }
@@ -365,10 +342,7 @@ public class TestRequestSender : ITestRequestSender
             runCriteria,
             _protocolVersion);
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.StartTestRun: Sending test run with message: {0}", message);
-        }
+        EqtTrace.Verbose("TestRequestSender.StartTestRun: Sending test run with message: {0}", message);
 
         _channel.Send(message);
     }
@@ -411,10 +385,7 @@ public class TestRequestSender : ITestRequestSender
             runCriteria,
             _protocolVersion);
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.StartTestRun: Sending test run with message: {0}", message);
-        }
+        EqtTrace.Verbose("TestRequestSender.StartTestRun: Sending test run with message: {0}", message);
 
         _channel.Send(message);
     }
@@ -428,10 +399,7 @@ public class TestRequestSender : ITestRequestSender
             return;
         }
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.SendTestRunCancel: Sending test run cancel.");
-        }
+        EqtTrace.Verbose("TestRequestSender.SendTestRunCancel: Sending test run cancel.");
 
         _channel?.Send(_dataSerializer.SerializeMessage(MessageType.CancelTestRun));
     }
@@ -445,10 +413,7 @@ public class TestRequestSender : ITestRequestSender
             return;
         }
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.SendTestRunAbort: Sending test run abort.");
-        }
+        EqtTrace.Verbose("TestRequestSender.SendTestRunAbort: Sending test run abort.");
 
         _channel?.Send(_dataSerializer.SerializeMessage(MessageType.AbortTestRun));
     }
@@ -460,10 +425,7 @@ public class TestRequestSender : ITestRequestSender
     {
         if (!IsOperationComplete())
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestRequestSender.EndSession: Sending end session.");
-            }
+            EqtTrace.Verbose("TestRequestSender.EndSession: Sending end session.");
 
             _channel?.Send(_dataSerializer.SerializeMessage(MessageType.SessionEnd));
         }
@@ -474,10 +436,7 @@ public class TestRequestSender : ITestRequestSender
     {
         // This method is called on test host exit. If test host has any errors, stdError
         // provides the crash call stack.
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info($"TestRequestSender.OnClientProcessExit: Test host process exited. Standard error: {stdError}");
-        }
+        EqtTrace.Info($"TestRequestSender.OnClientProcessExit: Test host process exited. Standard error: {stdError}");
 
         _clientExitErrorMessage = stdError;
         _clientExited.Set();
@@ -510,10 +469,7 @@ public class TestRequestSender : ITestRequestSender
         try
         {
             var rawMessage = messageReceived.Data;
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Received message: {0}", rawMessage);
-            }
+            EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Received message: {0}", rawMessage);
 
             // Send raw message first to unblock handlers waiting to send message to IDEs
             testRunEventsHandler.HandleRawMessage(rawMessage);
@@ -549,10 +505,7 @@ public class TestRequestSender : ITestRequestSender
                             MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback,
                             processId,
                             _protocolVersion);
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Sending LaunchAdapterProcessWithDebuggerAttachedCallback message: {0}", data);
-                    }
+                    EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Sending LaunchAdapterProcessWithDebuggerAttachedCallback message: {0}", data);
 
                     _channel.Send(data);
                     break;
@@ -566,10 +519,7 @@ public class TestRequestSender : ITestRequestSender
                         result,
                         _protocolVersion);
 
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Sending AttachDebugger with message: {0}", message);
-                    }
+                    EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Sending AttachDebugger with message: {0}", message);
 
                     _channel.Send(resultMessage);
 
@@ -589,10 +539,7 @@ public class TestRequestSender : ITestRequestSender
             var rawMessage = args.Data;
 
             // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestRequestSender.OnDiscoveryMessageReceived: Received message: {0}", rawMessage);
-            }
+            EqtTrace.Verbose("TestRequestSender.OnDiscoveryMessageReceived: Received message: {0}", rawMessage);
 
             // Send raw message first to unblock handlers waiting to send message to IDEs
             discoveryEventsHandler.HandleRawMessage(rawMessage);
@@ -757,10 +704,7 @@ public class TestRequestSender : ITestRequestSender
         }
 
         // Complete the currently ongoing operation (Discovery/Execution)
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.SetOperationComplete: Setting operation complete.");
-        }
+        EqtTrace.Verbose("TestRequestSender.SetOperationComplete: Setting operation complete.");
 
         _communicationEndpoint.Stop();
         Interlocked.CompareExchange(ref _operationCompleted, 1, 0);
@@ -772,18 +716,12 @@ public class TestRequestSender : ITestRequestSender
         if (_connectionInfo.Role == ConnectionRole.Client)
         {
             _communicationEndpoint = new SocketClient();
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestRequestSender is acting as client");
-            }
+            EqtTrace.Verbose("TestRequestSender is acting as client.");
         }
         else
         {
             _communicationEndpoint = new SocketServer();
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestRequestSender is acting as server");
-            }
+            EqtTrace.Verbose("TestRequestSender is acting as server.");
         }
     }
 }

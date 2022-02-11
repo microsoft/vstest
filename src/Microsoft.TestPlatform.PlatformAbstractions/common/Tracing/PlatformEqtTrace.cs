@@ -336,25 +336,39 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
                 return true;
             }
 
+            using var process = Process.GetCurrentProcess();
+            string runnerLogFileName = $"{Path.GetFileNameWithoutExtension(process.MainModule.FileName)}_{process.Id}.{DateTime.Now:yy-MM-dd_HH-mm-ss_fffff}.diag";
             string logsDirectory = Path.GetTempPath();
 
             // Set the trace level and add the trace listener
             if (LogFile == null)
             {
-                using var process = Process.GetCurrentProcess();
-
                 // In case of parallel execution, there may be several processes with same name.
                 // Add a process id to make the traces unique.
-                LogFile = Path.Combine(
-                    logsDirectory,
-                    Path.GetFileNameWithoutExtension(process.MainModule.FileName) + "." + process.Id + ".TpTrace.log");
+                LogFile = Path.Combine(logsDirectory, runnerLogFileName);
             }
 
             // Add a default listener
             s_traceFileSize = DefaultTraceFileSize;
             try
             {
-                Source.Listeners.Add(new RollingFileTraceListener(LogFile, ListenerName, s_traceFileSize));
+                // If we point to a folder we create default filename
+                if (LogFile.EndsWith(@"\") || LogFile.EndsWith("/"))
+                {
+                    if (!Directory.Exists(LogFile))
+                    {
+                        Directory.CreateDirectory(LogFile);
+                    }
+
+                    runnerLogFileName = Path.Combine(LogFile, runnerLogFileName);
+                    LogFile = Path.Combine(LogFile, $"{Path.GetFileNameWithoutExtension(process.MainModule.FileName)}_{process.Id}.diag");
+                }
+                else
+                {
+                    runnerLogFileName = LogFile;
+                }
+
+                Source.Listeners.Add(new RollingFileTraceListener(runnerLogFileName, ListenerName, s_traceFileSize));
             }
             catch (Exception e)
             {

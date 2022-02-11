@@ -60,31 +60,25 @@ public static class MulticastDelegateUtilities
                 try
                 {
                     handler.DynamicInvoke(sender, args);
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, took {5} ms.",
-                                traceDisplayName,
-                                ++i,
-                                invocationList.Length,
-                                handler.GetTargetName(),
-                                handler.GetMethodName(),
-                                stopwatch.ElapsedMilliseconds);
-                    }
-                }
-                catch (TargetInvocationException exception)
-                {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error(
-                            "MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, failed after {5} ms with: {6}.",
+                    EqtTrace.Verbose("MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, took {5} ms.",
+                            traceDisplayName,
                             ++i,
                             invocationList.Length,
                             handler.GetTargetName(),
                             handler.GetMethodName(),
-                            traceDisplayName,
-                            stopwatch.ElapsedMilliseconds,
-                            exception);
-                    }
+                            stopwatch.ElapsedMilliseconds);
+                }
+                catch (TargetInvocationException exception)
+                {
+                    EqtTrace.Error(
+                        "MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, failed after {5} ms with: {6}.",
+                        ++i,
+                        invocationList.Length,
+                        handler.GetTargetName(),
+                        handler.GetMethodName(),
+                        traceDisplayName,
+                        stopwatch.ElapsedMilliseconds,
+                        exception);
                 }
             }
         }

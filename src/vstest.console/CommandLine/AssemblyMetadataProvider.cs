@@ -45,10 +45,7 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
             EqtTrace.Warning("AssemblyMetadataProvider.GetFrameWork: failed to determine TargetFrameworkVersion exception: {0} for assembly: {1}", ex, filePath);
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("AssemblyMetadataProvider.GetFrameWork: Determined framework:'{0}' for source: '{1}'", frameworkName, filePath);
-        }
+        EqtTrace.Info("AssemblyMetadataProvider.GetFrameWork: Determined framework:'{0}' for source: '{1}'", frameworkName, filePath);
 
         return frameworkName;
     }
@@ -67,10 +64,7 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
         {
             // AssemblyName will throw Exception if assembly contains native code or no manifest.
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("AssemblyMetadataProvider.GetArchitecture: Failed get ProcessorArchitecture using AssemblyName API with exception: {0}", ex);
-            }
+            EqtTrace.Verbose("AssemblyMetadataProvider.GetArchitecture: Failed get ProcessorArchitecture using AssemblyName API with exception: {0}", ex);
 
             try
             {
@@ -78,18 +72,12 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
             }
             catch (Exception e)
             {
-                if (EqtTrace.IsInfoEnabled)
-                {
-                    EqtTrace.Info("AssemblyMetadataProvider.GetArchitecture: Failed to determine Assembly Architecture with exception: {0}", e);
-                }
+                EqtTrace.Info("AssemblyMetadataProvider.GetArchitecture: Failed to determine Assembly Architecture with exception: {0}", e);
             }
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("AssemblyMetadataProvider.GetArchitecture: Determined architecture:{0} info for assembly: {1}", archType,
-                assemblyPath);
-        }
+        EqtTrace.Info("AssemblyMetadataProvider.GetArchitecture: Determined architecture:{0} info for assembly: {1}", archType,
+            assemblyPath);
 
         return archType;
     }

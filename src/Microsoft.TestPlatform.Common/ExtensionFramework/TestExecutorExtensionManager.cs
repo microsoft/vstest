@@ -223,12 +223,9 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error(
-                    "TestExecutorExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}",
-                    ex);
-            }
+            EqtTrace.Error(
+                "TestExecutorExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}",
+                ex);
 
             if (shouldThrowOnError)
             {

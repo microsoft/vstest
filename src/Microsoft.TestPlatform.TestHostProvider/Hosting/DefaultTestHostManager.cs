@@ -345,10 +345,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     private Version GetAndLogFileVersion(string path)
     {
         var fileVersion = _fileHelper.GetFileVersion(path);
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("FileVersion for {0} : {1}", path, fileVersion);
-        }
+        EqtTrace.Verbose("FileVersion for {0} : {1}", path, fileVersion);
 
         return fileVersion;
     }

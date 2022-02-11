@@ -60,10 +60,7 @@ public class AssemblyProperties : IAssemblyProperties
             EqtTrace.Warning("PEReaderHelper.GetAssemblyType: failed to determine assembly type: {0} for assembly: {1}", ex, filePath);
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("PEReaderHelper.GetAssemblyType: Determined assemblyType:'{0}' for source: '{1}'", assemblyType, filePath);
-        }
+        EqtTrace.Info("PEReaderHelper.GetAssemblyType: Determined assemblyType:'{0}' for source: '{1}'", assemblyType, filePath);
 
         return assemblyType;
     }

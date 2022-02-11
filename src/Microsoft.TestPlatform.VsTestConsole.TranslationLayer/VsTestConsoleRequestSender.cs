@@ -88,10 +88,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public int InitializeCommunication()
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Started.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Started.");
 
         _processExitCancellationTokenSource = new CancellationTokenSource();
         _handShakeSuccessful = false;
@@ -117,10 +114,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
             _handShakeComplete.Set();
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Ended.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Ended.");
 
         return port;
     }
@@ -135,10 +129,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public async Task<int> InitializeCommunicationAsync(int clientConnectionTimeout)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info($"VsTestConsoleRequestSender.InitializeCommunicationAsync: Started with client connection timeout {clientConnectionTimeout} milliseconds.");
-        }
+        EqtTrace.Info($"VsTestConsoleRequestSender.InitializeCommunicationAsync: Started with client connection timeout {clientConnectionTimeout} milliseconds.");
 
         _processExitCancellationTokenSource = new CancellationTokenSource();
         _handShakeSuccessful = false;
@@ -162,10 +153,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
             _handShakeComplete.Set();
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunicationAsync: Ended.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunicationAsync: Ended.");
 
         return _handShakeSuccessful ? port : -1;
     }
@@ -173,10 +161,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info($"VsTestConsoleRequestSender.InitializeExtensions: Initializing extensions with additional extensions path {string.Join(",", pathToAdditionalExtensions.ToList())}.");
-        }
+        EqtTrace.Info($"VsTestConsoleRequestSender.InitializeExtensions: Initializing extensions with additional extensions path {string.Join(",", pathToAdditionalExtensions.ToList())}.");
 
         _communicationManager.SendMessage(
             MessageType.ExtensionsInitialize,
@@ -192,10 +177,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         TestSessionInfo testSessionInfo,
         ITestDiscoveryEventsHandler2 eventHandler)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.DiscoverTests: Starting test discovery.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.DiscoverTests: Starting test discovery.");
 
         SendMessageAndListenAndReportTestCases(
             sources,
@@ -213,10 +195,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         TestSessionInfo testSessionInfo,
         ITestDiscoveryEventsHandler2 eventHandler)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.DiscoverTestsAsync: Starting test discovery.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.DiscoverTestsAsync: Starting test discovery.");
 
         await SendMessageAndListenAndReportTestCasesAsync(
             sources,
@@ -234,10 +213,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         TestSessionInfo testSessionInfo,
         ITestRunEventsHandler runEventsHandler)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
 
         SendMessageAndListenAndReportTestResults(
             MessageType.TestRunAllSourcesWithDefaultHost,
@@ -260,10 +236,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         TestSessionInfo testSessionInfo,
         ITestRunEventsHandler runEventsHandler)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
 
         await SendMessageAndListenAndReportTestResultsAsync(
             MessageType.TestRunAllSourcesWithDefaultHost,
@@ -286,10 +259,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         TestSessionInfo testSessionInfo,
         ITestRunEventsHandler runEventsHandler)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
 
         SendMessageAndListenAndReportTestResults(
             MessageType.TestRunAllSourcesWithDefaultHost,
@@ -312,10 +282,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         TestSessionInfo testSessionInfo,
         ITestRunEventsHandler runEventsHandler)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
 
         await SendMessageAndListenAndReportTestResultsAsync(
             MessageType.TestRunAllSourcesWithDefaultHost,
@@ -339,10 +306,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         ITestRunEventsHandler runEventsHandler,
         ITestHostLauncher customHostLauncher)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHost: Starting test run.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHost: Starting test run.");
 
         SendMessageAndListenAndReportTestResults(
             MessageType.GetTestRunnerProcessStartInfoForRunAll,
@@ -367,10 +331,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         ITestRunEventsHandler runEventsHandler,
         ITestHostLauncher customHostLauncher)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHostAsync: Starting test run.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHostAsync: Starting test run.");
 
         await SendMessageAndListenAndReportTestResultsAsync(
             MessageType.GetTestRunnerProcessStartInfoForRunAll,
@@ -395,10 +356,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         ITestRunEventsHandler runEventsHandler,
         ITestHostLauncher customHostLauncher)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHost: Starting test run.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHost: Starting test run.");
 
         SendMessageAndListenAndReportTestResults(
             MessageType.GetTestRunnerProcessStartInfoForRunSelected,
@@ -423,10 +381,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         ITestRunEventsHandler runEventsHandler,
         ITestHostLauncher customHostLauncher)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHostAsync: Starting test run.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHostAsync: Starting test run.");
 
         await SendMessageAndListenAndReportTestResultsAsync(
             MessageType.GetTestRunnerProcessStartInfoForRunSelected,
@@ -459,10 +414,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
             return null;
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.StartTestSession: Starting test session.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestSession: Starting test session.");
 
         try
         {
@@ -563,10 +515,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
             return await Task.FromResult((TestSessionInfo)null);
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.StartTestSession: Starting test session.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestSession: Starting test session.");
 
         try
         {
@@ -661,10 +610,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
             return false;
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.StopTestSession: Stop test session.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.StopTestSession: Stop test session.");
 
         // Due to various considertaions it is possible to end up with a null test session
         // after doing the start test session call. However, we should filter out requests
@@ -746,10 +692,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
             return await Task.FromResult(false);
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.StopTestSession: Stop test session.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.StopTestSession: Stop test session.");
 
         // Due to various considertaions it is possible to end up with a null test session
         // after doing the start test session call. However, we should filter out requests
@@ -820,10 +763,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public void CancelTestRun()
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.CancelTestRun: Canceling test run.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.CancelTestRun: Canceling test run.");
 
         _communicationManager.SendMessage(MessageType.CancelTestRun);
     }
@@ -831,10 +771,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public void AbortTestRun()
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.AbortTestRun: Aborting test run.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.AbortTestRun: Aborting test run.");
 
         _communicationManager.SendMessage(MessageType.AbortTestRun);
     }
@@ -842,10 +779,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public void CancelDiscovery()
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleRequestSender.CancelDiscovery: Canceling test discovery.");
-        }
+        EqtTrace.Info("VsTestConsoleRequestSender.CancelDiscovery: Canceling test discovery.");
 
         _communicationManager.SendMessage(MessageType.CancelDiscovery);
     }
@@ -1018,11 +952,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 }
                 else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
                 {
-                    if (EqtTrace.IsInfoEnabled)
-                    {
-                        EqtTrace.Info(
-                            "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestCases: Discovery complete.");
-                    }
+                    EqtTrace.Info(
+                        "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestCases: Discovery complete.");
 
                     var discoveryCompletePayload =
                         _dataSerializer
@@ -1112,11 +1043,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 }
                 else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
                 {
-                    if (EqtTrace.IsInfoEnabled)
-                    {
-                        EqtTrace.Info(
-                            "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestCasesAsync: Discovery complete.");
-                    }
+                    EqtTrace.Info(
+                        "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestCasesAsync: Discovery complete.");
 
                     var discoveryCompletePayload =
                         _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
@@ -1197,11 +1125,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 }
                 else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
                 {
-                    if (EqtTrace.IsInfoEnabled)
-                    {
-                        EqtTrace.Info(
-                            "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestResults: Execution complete.");
-                    }
+                    EqtTrace.Info(
+                        "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestResults: Execution complete.");
 
                     var testRunCompletePayload = _dataSerializer
                         .DeserializePayload<TestRunCompletePayload>(message);
@@ -1280,11 +1205,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 }
                 else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
                 {
-                    if (EqtTrace.IsInfoEnabled)
-                    {
-                        EqtTrace.Info(
-                            "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestResultsAsync: Execution complete.");
-                    }
+                    EqtTrace.Info(
+                        "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestResultsAsync: Execution complete.");
 
                     var testRunCompletePayload = _dataSerializer
                         .DeserializePayload<TestRunCompletePayload>(message);
@@ -1374,11 +1296,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                             MessageType.TestRunAttachmentsProcessingComplete,
                             message.MessageType))
                     {
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info(
-                                "VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachments: Process complete.");
-                        }
+                        EqtTrace.Info(
+                            "VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachments: Process complete.");
 
                         var testRunAttachmentsProcessingCompletePayload = _dataSerializer
                             .DeserializePayload<TestRunAttachmentsProcessingCompletePayload>(message);

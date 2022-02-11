@@ -125,11 +125,11 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <summary>
     /// Constructor added for testing purpose
     /// </summary>
-    /// <param name="output"></param>
-    internal ConsoleLogger(IOutput output, IProgressIndicator progressIndicator)
+    internal ConsoleLogger(IOutput output, IProgressIndicator progressIndicator, IFeatureFlag featureFlag)
     {
         Output = output;
         _progressIndicator = progressIndicator;
+        _featureFlag = featureFlag;
     }
 
     #endregion
@@ -147,6 +147,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     }
 
     private IProgressIndicator _progressIndicator;
+
+    private readonly IFeatureFlag _featureFlag = FeatureFlag.Instance;
 
     /// <summary>
     /// Get the verbosity level for the console logger
@@ -689,13 +691,16 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         var runLevelAttachementCount = (e.AttachmentSets == null) ? 0 : e.AttachmentSets.Sum(attachmentSet => attachmentSet.Attachments.Count);
         if (runLevelAttachementCount > 0)
         {
-            Output.Information(false, CommandLineResources.AttachmentsBanner);
-            foreach (var attachmentSet in e.AttachmentSets)
+            if (!_featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING) || _featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX))
             {
-                foreach (var uriDataAttachment in attachmentSet.Attachments)
+                Output.Information(false, CommandLineResources.AttachmentsBanner);
+                foreach (var attachmentSet in e.AttachmentSets)
                 {
-                    var attachmentOutput = string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath);
-                    Output.Information(false, attachmentOutput);
+                    foreach (var uriDataAttachment in attachmentSet.Attachments)
+                    {
+                        var attachmentOutput = string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath);
+                        Output.Information(false, attachmentOutput);
+                    }
                 }
             }
         }

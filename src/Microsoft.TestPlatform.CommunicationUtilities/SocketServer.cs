@@ -97,10 +97,7 @@ public class SocketServer : ICommunicationEndPoint
             _channel = _channelFactory(_tcpClient.GetStream());
             Connected.SafeInvoke(this, new ConnectedEventArgs(_channel), "SocketServer: ClientConnected");
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("SocketServer.OnClientConnected: Client connected for endPoint: {0}, starting MessageLoopAsync:", _endPoint);
-            }
+            EqtTrace.Verbose("SocketServer.OnClientConnected: Client connected for endPoint: {0}, starting MessageLoopAsync:", _endPoint);
 
             // Start the message loop
             Task.Run(() => _tcpClient.MessageLoopAsync(_channel, error => Stop(error), _cancellation.Token)).ConfigureAwait(false);
