@@ -31,23 +31,22 @@ internal class TestSessionEventsHandler : ITestSessionEventsHandler
     }
 
     /// <inheritdoc />
-    public void HandleStartTestSessionComplete(TestSessionInfo testSessionInfo)
+    public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs eventArgs)
     {
         var ackPayload = new StartTestSessionAckPayload()
         {
-            TestSessionInfo = testSessionInfo
+            EventArgs = eventArgs
         };
 
         _communicationManager.SendMessage(MessageType.StartTestSessionCallback, ackPayload);
     }
 
     /// <inheritdoc />
-    public void HandleStopTestSessionComplete(TestSessionInfo testSessionInfo, bool stopped)
+    public void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs eventArgs)
     {
         var ackPayload = new StopTestSessionAckPayload()
         {
-            TestSessionInfo = testSessionInfo,
-            IsStopped = stopped
+            EventArgs = eventArgs
         };
 
         _communicationManager.SendMessage(MessageType.StopTestSessionCallback, ackPayload);

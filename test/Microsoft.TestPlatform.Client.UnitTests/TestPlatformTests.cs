@@ -551,6 +551,15 @@ public class TestPlatformTests
         var tp = new TestableTestPlatform(_testEngine.Object, _hostManager.Object);
         var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
 
+        mockEventsHandler.Setup(
+            eh => eh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()))
+            .Callback((StartTestSessionCompleteEventArgs eventArgs) =>
+            {
+                Assert.IsNull(eventArgs.TestSessionInfo);
+                Assert.IsNull(eventArgs.Metrics);
+            });
+
         var testSessionCriteria = new StartTestSessionCriteria()
         {
             RunSettings = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -568,7 +577,7 @@ public class TestPlatformTests
                 mockEventsHandler.Object));
 
         mockEventsHandler.Verify(
-            eh => eh.HandleStartTestSessionComplete(null),
+            eh => eh.HandleStartTestSessionComplete(It.IsAny<StartTestSessionCompleteEventArgs>()),
             Times.Once);
     }
 
@@ -588,9 +597,12 @@ public class TestPlatformTests
         };
 
         var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+        var mockRequestData = new Mock<IRequestData>();
         var mockTestSessionManager = new Mock<IProxyTestSessionManager>();
         mockTestSessionManager.Setup(
-                tsm => tsm.StartSession(It.IsAny<ITestSessionEventsHandler>()))
+                tsm => tsm.StartSession(
+                    It.IsAny<ITestSessionEventsHandler>(),
+                    It.IsAny<IRequestData>()))
             .Returns(true);
         _testEngine.Setup(
                 te => te.GetTestSessionManager(
@@ -605,7 +617,8 @@ public class TestPlatformTests
                 mockEventsHandler.Object));
 
         mockTestSessionManager.Verify(
-            tsm => tsm.StartSession(mockEventsHandler.Object));
+            tsm => tsm.StartSession(mockEventsHandler.Object, It.IsAny<IRequestData>()),
+            Times.Once);
     }
 
     [TestMethod]
@@ -624,9 +637,12 @@ public class TestPlatformTests
         };
 
         var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+        var mockRequestData = new Mock<IRequestData>();
         var mockTestSessionManager = new Mock<IProxyTestSessionManager>();
         mockTestSessionManager.Setup(
-                tsm => tsm.StartSession(It.IsAny<ITestSessionEventsHandler>()))
+                tsm => tsm.StartSession(
+                    It.IsAny<ITestSessionEventsHandler>(),
+                    It.IsAny<IRequestData>()))
             .Returns(false);
         _testEngine.Setup(
                 te => te.GetTestSessionManager(
@@ -636,12 +652,13 @@ public class TestPlatformTests
 
         Assert.IsFalse(
             tp.StartTestSession(
-                new Mock<IRequestData>().Object,
+                mockRequestData.Object,
                 testSessionCriteria,
                 mockEventsHandler.Object));
 
         mockTestSessionManager.Verify(
-            tsm => tsm.StartSession(mockEventsHandler.Object));
+            tsm => tsm.StartSession(mockEventsHandler.Object, mockRequestData.Object),
+            Times.Once);
     }
 
     private void InvokeCreateDiscoveryRequest(TestPlatformOptions options = null)
