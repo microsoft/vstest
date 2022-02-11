@@ -62,6 +62,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         _testSessionStopwatch = new Stopwatch();
     }
 
+    // NOTE: The method is virtual for mocking purposes.
     /// <inheritdoc/>
     public virtual bool StartSession(ITestSessionEventsHandler eventsHandler, IRequestData requestData)
     {
@@ -161,6 +162,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         return true;
     }
 
+    // NOTE: The method is virtual for mocking purposes.
     /// <inheritdoc/>
     public virtual bool StopSession(IRequestData requestData)
     {
