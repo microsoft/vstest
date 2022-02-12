@@ -40,9 +40,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 [FriendlyName(DefaultTestHostFriendlyName)]
 public class DefaultTestHostManager : ITestRuntimeProvider2
 {
-    private const string X64TestHostProcessName = "testhost{0}.exe";
-    private const string X86TestHostProcessName = "testhost{0}.x86.exe";
-
     private const string DefaultTestHostUri = "HostProvider://DefaultTestHost";
     private const string DefaultTestHostFriendlyName = "DefaultTestHost";
     private const string TestAdapterEndsWithPattern = @"TestAdapter.dll";
@@ -131,24 +128,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         IDictionary<string, string> environmentVariables,
         TestRunnerConnectionInfo connectionInfo)
     {
-        string testHostProcessName;
-        if (_targetFramework.Name.StartsWith(".NETFramework,Version=v"))
-        {
-            var targetFrameworkMoniker = "net" + _targetFramework.Name.Replace(".NETFramework,Version=v", string.Empty).Replace(".", string.Empty);
-
-            // Net451 or older will use the default testhost.exe that is compiled against net451.
-            var isSupportedNetTarget = new[] { "net452", "net46", "net461", "net462", "net47", "net471", "net472", "net48" }.Contains(targetFrameworkMoniker);
-            var targetFrameworkSuffix = isSupportedNetTarget ? $".{targetFrameworkMoniker}" : string.Empty;
-
-            // Default test host manager supports shared test sources
-            testHostProcessName = string.Format(_architecture == Architecture.X86 ? X86TestHostProcessName : X64TestHostProcessName, targetFrameworkSuffix);
-        }
-        else
-        {
-            // This path is probably happening only in our tests, because otherwise we are first running CanExecuteCurrentRunConfiguration
-            // which would disqualify anything that is not netframework.
-            testHostProcessName = string.Format(_architecture == Architecture.X86 ? X86TestHostProcessName : X64TestHostProcessName, string.Empty);
-        }
+        string testHostProcessName = GetTestHostName(_architecture, _targetFramework, _processHelper.GetCurrentProcessArchitecture());
 
         var currentWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location), "..//");
         var argumentsString = " " + connectionInfo.ToCommandLineOptions();
@@ -158,7 +138,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
         if (!File.Exists(testhostProcessPath))
         {
-            // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies.
+            // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies, in dotnet SDK.
             testHostProcessName = Path.Combine("TestHost", testHostProcessName);
             testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
         }
@@ -193,6 +173,67 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>(),
             WorkingDirectory = processWorkingDirectory
         };
+    }
+
+    private string GetTestHostName(Architecture architecture, Framework targetFramework, PlatformArchitecture processArchitecture)
+    {
+        string testHostProcessName = "testhost";
+
+        if (targetFramework.Name.StartsWith(".NETFramework,Version=v"))
+        {
+            var targetFrameworkMoniker = "net" + targetFramework.Name.Replace(".NETFramework,Version=v", string.Empty).Replace(".", string.Empty);
+
+            // Net451 or older will use the default testhost.exe that is compiled against net451.
+            var isSupportedNetTarget = new[] { "net452", "net46", "net461", "net462", "net47", "net471", "net472", "net48" }.Contains(targetFrameworkMoniker);
+            var targetFrameworkSuffix = isSupportedNetTarget ? $".{targetFrameworkMoniker}" : string.Empty;
+
+            testHostProcessName += targetFrameworkSuffix;
+        }
+
+        // If the incoming architecture is default or anyCPU we use the architecture of the currently running process, so when user
+        // starts vstest.console by running x86 dotnet test, we will attempt to run tests as x86 unless they forced other preference
+        //
+        // TODO: Add a general converter from PlatformArchitecture to Architecture and vice versa. We do the translation in multiple places.
+        // Here I am just avoiding it because I don't want to mix those two issues.
+        Architecture processArchitectureAsArchitecture;
+        switch (processArchitecture)
+        {
+            case PlatformArchitecture.X86:
+                processArchitectureAsArchitecture = Architecture.X86;
+                break;
+            case PlatformArchitecture.X64:
+                processArchitectureAsArchitecture = Architecture.X64;
+                break;
+            case PlatformArchitecture.ARM:
+                processArchitectureAsArchitecture = Architecture.ARM;
+                break;
+            case PlatformArchitecture.ARM64:
+                processArchitectureAsArchitecture = Architecture.ARM64;
+                break;
+            case PlatformArchitecture.S390x:
+                processArchitectureAsArchitecture = Architecture.S390x;
+                break;
+            default:
+                throw new NotSupportedException();
+        };
+        var actualArchitecture = architecture == Architecture.Default || architecture == Architecture.AnyCPU
+            ? processArchitectureAsArchitecture
+            : architecture;
+
+        if (actualArchitecture == Architecture.X64)
+        {
+            // testhost.exe (and testhost.net###.exe) is a 64-bit executable, and has no architecture suffix in the name.
+        }
+        else
+        {
+            // Append .<architecture> to the name, such as .x86. It is possible that we are not shipping the
+            // executable for the architecture with VS, and that will fail later with file not found exception,
+            // which is okay.
+            testHostProcessName += $".{architecture.ToString().ToLowerInvariant()}";
+        }
+
+        testHostProcessName += ".exe";
+        return testHostProcessName;
     }
 
     /// <inheritdoc/>
