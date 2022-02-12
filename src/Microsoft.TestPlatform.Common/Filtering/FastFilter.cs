@@ -189,7 +189,7 @@ internal sealed class FastFilter
                 AddProperty(condition.Name, condition.Value);
 
                 // Don't support `Contains`.
-                if (_fastFilterOperation != Operation.Equal && _fastFilterOperation != Operation.NotEqual)
+                if (_fastFilterOperation is not Operation.Equal and not Operation.NotEqual)
                 {
                     _containsValidFilter = false;
                 }

@@ -164,6 +164,22 @@ dotnet_diagnostic.CA1507.severity=warning # not default, increased severity to e
 # CA2215: Dispose methods should call base class dispose
 dotnet_diagnostic.CA2215.severity=warning # not default, increased severity to ensure it is applied
 
+# IDE0019: Use pattern matching
+# Keep this in sync with csharp_style_pattern_matching_over_as_with_null_check
+dotnet_diagnostic.IDE0019.severity = warning # not default, increased severity to ensure it is applied
+
+# IDE0020:
+# Keep this in sync with csharp_style_pattern_matching_over_is_with_cast_check
+dotnet_diagnostic.IDE0020.severity = warning # not default, increased severity to ensure it is applied
+
+# IDE0078: Use pattern matching
+# Keep this in sync with csharp_style_prefer_pattern_matching
+dotnet_diagnostic.IDE0078.severity = warning # not default, increased severity to ensure it is applied
+
+# IDE0083: Use pattern matching (not operator)
+# Keep this in sync with csharp_style_prefer_not_pattern
+dotnet_diagnostic.IDE0083.severity = warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences
@@ -183,11 +199,15 @@ csharp_style_expression_bodied_operators = false:silent
 csharp_style_expression_bodied_properties = true:silent
 
 # Pattern matching preferences
-csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
-csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
-csharp_style_prefer_not_pattern = true:suggestion
-csharp_style_prefer_pattern_matching = true:silent
-csharp_style_prefer_switch_expression = true:suggestion
+# Keep this in sync with IDE0019
+csharp_style_pattern_matching_over_as_with_null_check = true:warning
+# Keep this in sync with IDE0020 and IDE0038
+csharp_style_pattern_matching_over_is_with_cast_check = true:warning
+# Keep this in sync with IDE0083
+csharp_style_prefer_not_pattern = true:warning
+# Keep this in sync with IDE0078
+csharp_style_prefer_pattern_matching = true:warning
+csharp_style_prefer_switch_expression = true:warning
 
 # Null-checking preferences
 csharp_style_conditional_delegate_call = true:suggestion

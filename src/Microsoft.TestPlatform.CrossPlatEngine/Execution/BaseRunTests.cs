@@ -415,7 +415,7 @@ internal abstract class BaseRunTests
             // host by default.
             // Same goes if all adapters implement the new test executor interface but at
             // least one of them needs the test platform to attach to the default test host.
-            if (!(executor.Value is ITestExecutor2)
+            if (executor.Value is not ITestExecutor2
                 || ShouldAttachDebuggerToTestHost(executor, executorUriExtensionTuple, RunContext))
             {
                 EqtTrace.Verbose("Attaching to default test host.");

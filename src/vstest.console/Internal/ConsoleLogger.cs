@@ -456,7 +456,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         {
             case TestMessageLevel.Informational:
                 {
-                    if (VerbosityLevel == Verbosity.Quiet || VerbosityLevel == Verbosity.Minimal)
+                    if (VerbosityLevel is Verbosity.Quiet or Verbosity.Minimal)
                     {
                         break;
                     }
@@ -596,7 +596,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
             case TestOutcome.Passed:
                 {
-                    if (VerbosityLevel == Verbosity.Normal || VerbosityLevel == Verbosity.Detailed)
+                    if (VerbosityLevel is Verbosity.Normal or Verbosity.Detailed)
                     {
                         // Pause the progress indicator before displaying test result information
                         _progressIndicator?.Pause();
@@ -735,7 +735,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                 }
             }
 
-            if (VerbosityLevel == Verbosity.Quiet || VerbosityLevel == Verbosity.Minimal)
+            if (VerbosityLevel is Verbosity.Quiet or Verbosity.Minimal)
             {
                 TestOutcome sourceOutcome = TestOutcome.None;
                 if (sourceSummary.FailedTests > 0)
@@ -827,7 +827,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             totalTests += sourceSummary.TotalTests;
         }
 
-        if (VerbosityLevel == Verbosity.Quiet || VerbosityLevel == Verbosity.Minimal)
+        if (VerbosityLevel is Verbosity.Quiet or Verbosity.Minimal)
         {
             if (e.IsCanceled)
             {
