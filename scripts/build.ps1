@@ -1114,11 +1114,12 @@ function Test-GitChanges {
         [string[]]$Like
     )
 
-    # For each line check if we match any of the rules
-    # if we do select that path. We do Where-Object twice beacuse 
-    # -like does not support multiple patterns on the right hand side. 
-    # We could check if any pattern matches any line, but that returns
-    # the patterns that match any path, and not paths that return any pattern. 
+    # For each line check if we match any of the rules.
+    # We do Where-Object twice because  -like does not support multiple 
+    # patterns on the right hand side. 
+    # We could check if any pattern matches any line, with simpler code, 
+    # but that returns the patterns that matched any path, and not paths 
+    # that matched any pattern.
     # So the current approach is better for debugging.
     $gitChanges | Where-Object { $path = $_; $like | Where-Object { $path -like $_ }}
 }
