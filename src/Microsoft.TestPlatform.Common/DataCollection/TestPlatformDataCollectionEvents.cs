@@ -113,11 +113,7 @@ internal sealed class TestPlatformDataCollectionEvents : DataCollectionEvents
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("TestPlatformDataCollectionEvents.AreTestCaseLevelEventsRequired: Exception occurred while checking whether event {0} has any listeners or not. {1}", eventToCheck, ex);
-            }
-
+            EqtTrace.Error("TestPlatformDataCollectionEvents.AreTestCaseLevelEventsRequired: Exception occurred while checking whether event {0} has any listeners or not. {1}", eventToCheck, ex);
             return valueOnFailure;
         }
     }

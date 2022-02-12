@@ -58,6 +58,6 @@ public class TestSessionInfo : IEquatable<TestSessionInfo>
     /// <returns>True if the two sessions are equal, false otherwise.</returns>
     public bool Equals(TestSessionInfo other)
     {
-        return other != null && Id == other.Id;
+        return other != null && Id.Equals(other.Id);
     }
 }

@@ -191,15 +191,8 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
     private void RunTests(string runSettings)
     {
         // create/start test run
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("RunTestsArgumentProcessor:Execute: Test run is starting.");
-        }
-
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("RunTestsArgumentProcessor:Execute: Queuing Test run.");
-        }
+        EqtTrace.Info("RunTestsArgumentProcessor:Execute: Test run is starting.");
+        EqtTrace.Verbose("RunTestsArgumentProcessor:Execute: Queuing Test run.");
 
         // for command line keep alive is always false.
         // for Windows Store apps it should be false, as Windows Store apps executor should terminate after finishing the test execution.
@@ -208,10 +201,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
         var runRequestPayload = new TestRunRequestPayload() { Sources = _commandLineOptions.Sources.ToList(), RunSettings = runSettings, KeepAlive = keepAlive, TestPlatformOptions = new TestPlatformOptions() { TestCaseFilter = _commandLineOptions.TestCaseFilterValue } };
         _testRequestManager.RunTests(runRequestPayload, null, _testRunEventsRegistrar, Constants.DefaultProtocolConfig);
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("RunTestsArgumentProcessor:Execute: Test run is completed.");
-        }
+        EqtTrace.Info("RunTestsArgumentProcessor:Execute: Test run is completed.");
     }
 
     private class TestRunRequestEventsRegistrar : ITestRunEventsRegistrar

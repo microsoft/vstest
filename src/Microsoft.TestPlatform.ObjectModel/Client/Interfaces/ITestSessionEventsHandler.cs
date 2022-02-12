@@ -12,18 +12,13 @@ public interface ITestSessionEventsHandler : ITestMessageEventHandler
     /// Dispatch StartTestSession complete event to listeners.
     /// </summary>
     /// 
-    /// <param name="testSessionInfo">The test session info.</param>
-    void HandleStartTestSessionComplete(TestSessionInfo testSessionInfo);
+    /// <param name="eventArgs">The event args.</param>
+    void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs eventArgs);
 
     /// <summary>
     /// Dispatch StopTestSession complete event to listeners.
     /// </summary>
     /// 
-    /// <param name="testSessionInfo">
-    /// The test session info for the session that was stopped.
-    /// </param>
-    /// <param name="stopped">
-    /// True if the session was successfully stopped, false otherwise.
-    /// </param>
-    void HandleStopTestSessionComplete(TestSessionInfo testSessionInfo, bool stopped);
+    /// <param name="eventArgs">The event args.</param>
+    void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs eventArgs);
 }

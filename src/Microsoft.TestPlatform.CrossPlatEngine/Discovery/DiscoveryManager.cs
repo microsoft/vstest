@@ -178,10 +178,7 @@ public class DiscoveryManager : IDiscoveryManager
         }
         else
         {
-            if (EqtTrace.IsWarningEnabled)
-            {
-                EqtTrace.Warning("DiscoveryManager: Could not pass the test results as the callback is null.");
-            }
+            EqtTrace.Warning("DiscoveryManager: Could not pass the test results as the callback is null.");
         }
     }
 
@@ -248,23 +245,17 @@ public class DiscoveryManager : IDiscoveryManager
         }
 
         // Log the sources from where tests are being discovered
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("TestDiscoveryManager: Discovering tests from sources {0}", string.Join(",", verifiedSources.ToArray()));
-        }
+        EqtTrace.Info("TestDiscoveryManager: Discovering tests from sources {0}", string.Join(",", verifiedSources.ToArray()));
 
         return verifiedSources;
     }
 
     private void TestSessionMessageHandler(object sender, TestRunMessageEventArgs e)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info(
-                "TestDiscoveryManager.RunMessage: calling TestRunMessage({0}, {1}) callback.",
-                e.Level,
-                e.Message);
-        }
+        EqtTrace.Info(
+            "TestDiscoveryManager.RunMessage: calling TestRunMessage({0}, {1}) callback.",
+            e.Level,
+            e.Message);
 
         if (_testDiscoveryEventsHandler != null)
         {
@@ -272,12 +263,9 @@ public class DiscoveryManager : IDiscoveryManager
         }
         else
         {
-            if (EqtTrace.IsWarningEnabled)
-            {
-                EqtTrace.Warning(
-                    "DiscoveryManager: Could not pass the log message  '{0}' as the callback is null.",
-                    e.Message);
-            }
+            EqtTrace.Warning(
+                "DiscoveryManager: Could not pass the log message  '{0}' as the callback is null.",
+                e.Message);
         }
     }
 

@@ -118,10 +118,7 @@ virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.ProxyOperatio
 virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.ProxyOperationManager.UpdateTestProcessStartInfo(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessStartInfo testProcessStartInfo) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessStartInfo
 virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ProxyTestSessionManager.DequeueProxy(string source, string runSettings) -> Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.ProxyOperationManager
 virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ProxyTestSessionManager.EnqueueProxy(int proxyId) -> bool
-virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ProxyTestSessionManager.StartSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler eventsHandler) -> bool
-virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ProxyTestSessionManager.StopSession() -> bool
 virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestSessionPool.AddSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo testSessionInfo, Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ProxyTestSessionManager proxyManager) -> bool
-virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestSessionPool.KillSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo testSessionInfo) -> bool
 virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestSessionPool.ReturnProxy(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo testSessionInfo, int proxyId) -> bool
 virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestSessionPool.TryTakeProxy(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo testSessionInfo, string source, string runSettings) -> Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.ProxyOperationManager
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.DataCollectionResult

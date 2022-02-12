@@ -106,10 +106,7 @@ public static class RunSettingsUtilities
         }
         catch (SettingsException ex)
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("RunSettingsUtilities.GetMaxCpuCount: Unable to get maximum CPU count from Setting Xml. {0}", ex);
-            }
+            EqtTrace.Verbose("RunSettingsUtilities.GetMaxCpuCount: Unable to get maximum CPU count from Setting Xml. {0}", ex);
         }
 
         return cpuCount;
@@ -149,10 +146,7 @@ public static class RunSettingsUtilities
             }
             catch (SettingsException se)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("RunSettingsUtilities.GetTreatNoTestsAsError: Unable to get the value of TreatNoTestsAsError from runsettings: Error {0}", se);
-                }
+                EqtTrace.Error("RunSettingsUtilities.GetTreatNoTestsAsError: Unable to get the value of TreatNoTestsAsError from runsettings: Error {0}", se);
             }
         }
 

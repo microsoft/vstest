@@ -83,10 +83,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
         }
         catch (OperationCanceledException)
         {
-            if (EqtTrace.IsWarningEnabled)
-            {
-                EqtTrace.Warning("TestRunAttachmentsProcessingManager: Operation was cancelled.");
-            }
+            EqtTrace.Warning("TestRunAttachmentsProcessingManager: Operation was cancelled.");
             return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(true, null), attachments, stopwatch, eventHandler);
         }
         catch (Exception e)
