@@ -180,6 +180,18 @@ dotnet_diagnostic.IDE0078.severity = warning # not default, increased severity t
 # Keep this in sync with csharp_style_prefer_not_pattern
 dotnet_diagnostic.IDE0083.severity = warning # not default, increased severity to ensure it is applied
 
+# CA1836: Prefer IsEmpty over Count
+dotnet_diagnostic.CA1836.severity = warning # not default, increased severity to ensure it is applied
+
+# CA2211: Non-constant fields should not be visible
+dotnet_diagnostic.CA2211.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1806: Do not ignore method results
+dotnet_diagnostic.CA1806.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1834: Consider using 'StringBuilder.Append(char)' when applicable
+dotnet_diagnostic.CA1834.severity = warning # not default, increased severity to ensure it is always applied
+
 #### C# Coding Conventions ####
 
 # var preferences

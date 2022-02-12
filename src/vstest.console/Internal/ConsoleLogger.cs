@@ -82,7 +82,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// </summary>
     public const string ExecutionIdPropertyIdentifier = "ExecutionId";
 
-    // Figure out the longest result string (+1 for ! where applicable), so we don't 
+    // Figure out the longest result string (+1 for ! where applicable), so we don't
     // get misaligned output on non-english systems
     private static readonly int LongestResultIndicator = new[]
     {
@@ -134,7 +134,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
     #endregion
 
-    #region Properties 
+    #region Properties
 
     /// <summary>
     /// Gets instance of IOutput used for sending output.
@@ -163,7 +163,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 #endif
 
     /// <summary>
-    /// Tracks leaf test outcomes per source. This is needed to correctly count hierarchical tests as well as 
+    /// Tracks leaf test outcomes per source. This is needed to correctly count hierarchical tests as well as
     /// tracking counts per source for the minimal and quiet output.
     /// </summary>
     private ConcurrentDictionary<Guid, MinimalTestResult> LeafTestResults { get; set; }
@@ -230,13 +230,13 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         var prefixExists = parameters.TryGetValue(PrefixParam, out var prefix);
         if (prefixExists)
         {
-            bool.TryParse(prefix, out AppendPrefix);
+            _ = bool.TryParse(prefix, out AppendPrefix);
         }
 
         var progressArgExists = parameters.TryGetValue(ProgressIndicatorParam, out var enableProgress);
         if (progressArgExists)
         {
-            bool.TryParse(enableProgress, out EnableProgress);
+            _ = bool.TryParse(enableProgress, out EnableProgress);
         }
 
         parameters.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out _targetFramework);
@@ -249,7 +249,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     #region Private Methods
 
     /// <summary>
-    /// Prints the timespan onto console. 
+    /// Prints the timespan onto console.
     /// </summary>
     private static void PrintTimeSpan(TimeSpan timeSpan)
     {
@@ -544,7 +544,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
         if (!LeafTestResults.TryAdd(executionId, new MinimalTestResult(e.Result)))
         {
-            // This would happen if the key already exists. This should not happen, because we are 
+            // This would happen if the key already exists. This should not happen, because we are
             // inserting by GUID key, so this would mean an error in our code.
             throw new InvalidOperationException($"ExecutionId {executionId} already exists.");
         }
@@ -751,24 +751,13 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     sourceOutcome = TestOutcome.Skipped;
                 }
 
-
-                string resultString;
-                switch (sourceOutcome)
+                string resultString = sourceOutcome switch
                 {
-                    case TestOutcome.Failed:
-                        resultString = (CommandLineResources.FailedTestIndicator + "!").PadRight(LongestResultIndicator);
-                        break;
-                    case TestOutcome.Passed:
-                        resultString = (CommandLineResources.PassedTestIndicator + "!").PadRight(LongestResultIndicator);
-                        break;
-                    case TestOutcome.Skipped:
-                        resultString = (CommandLineResources.SkippedTestIndicator + "!").PadRight(LongestResultIndicator);
-                        break;
-                    default:
-                        resultString = CommandLineResources.None.PadRight(LongestResultIndicator);
-                        break;
-                }
-
+                    TestOutcome.Failed => (CommandLineResources.FailedTestIndicator + "!").PadRight(LongestResultIndicator),
+                    TestOutcome.Passed => (CommandLineResources.PassedTestIndicator + "!").PadRight(LongestResultIndicator),
+                    TestOutcome.Skipped => (CommandLineResources.SkippedTestIndicator + "!").PadRight(LongestResultIndicator),
+                    _ => CommandLineResources.None.PadRight(LongestResultIndicator),
+                };
                 var failed = sourceSummary.FailedTests.ToString().PadLeft(5);
                 var passed = sourceSummary.PassedTests.ToString().PadLeft(5);
                 var skipped = sourceSummary.SkippedTests.ToString().PadLeft(5);

@@ -24,7 +24,7 @@ public class DataCollectionTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void ExecuteTestsWithDataCollection(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');

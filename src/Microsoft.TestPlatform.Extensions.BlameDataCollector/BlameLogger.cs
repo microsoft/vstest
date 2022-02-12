@@ -15,8 +15,8 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 /// <summary>
 /// The blame logger.
 /// </summary>
-[FriendlyName(BlameLogger.FriendlyName)]
-[ExtensionUri(BlameLogger.ExtensionUri)]
+[FriendlyName(FriendlyName)]
+[ExtensionUri(ExtensionUri)]
 public class BlameLogger : ITestLogger
 {
     #region Constants

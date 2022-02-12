@@ -21,7 +21,7 @@ public class DiscoveryTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverAllTests(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         InvokeVsTestForDiscovery(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue);
 
@@ -60,7 +60,7 @@ public class DiscoveryTests : AcceptanceTestBase
         using var tempDir = new TempDirectory();
         var dummyFilePath = Path.Combine(tempDir.Path, $"{Guid.NewGuid()}.txt");
 
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
 
@@ -77,7 +77,7 @@ public class DiscoveryTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsShouldShowProperWarningIfNoTestsOnTestCaseFilter(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var assetFullPath = GetAssetFullPath("SimpleTestProject2.dll");

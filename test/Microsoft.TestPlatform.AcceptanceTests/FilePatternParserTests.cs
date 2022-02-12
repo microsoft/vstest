@@ -16,7 +16,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkOnFiles(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
@@ -37,7 +37,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkOnArbitraryDepthDirectories(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
@@ -60,7 +60,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkForRelativeAssemblyPath(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
@@ -87,7 +87,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkOnMultipleFiles(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssembly = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');

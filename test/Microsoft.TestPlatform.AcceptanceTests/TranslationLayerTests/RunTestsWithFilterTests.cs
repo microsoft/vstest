@@ -37,7 +37,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         var sources = new List<string>
@@ -61,7 +61,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithFastFilter(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         var sources = new List<string>

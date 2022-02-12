@@ -51,7 +51,7 @@ internal class ParallelDiscoveryDataAggregator
     /// <returns></returns>
     public IDictionary<string, object> GetAggregatedDiscoveryDataMetrics()
     {
-        if (_metricsAggregator == null || _metricsAggregator.Count == 0)
+        if (_metricsAggregator == null || _metricsAggregator.IsEmpty)
         {
             return new ConcurrentDictionary<string, object>();
         }

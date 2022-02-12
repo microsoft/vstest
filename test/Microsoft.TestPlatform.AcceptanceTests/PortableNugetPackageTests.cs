@@ -40,7 +40,7 @@ public class PortableNugetPackageTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
 
@@ -55,7 +55,7 @@ public class PortableNugetPackageTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverAllTests(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         InvokeVsTestForDiscovery(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue);
 

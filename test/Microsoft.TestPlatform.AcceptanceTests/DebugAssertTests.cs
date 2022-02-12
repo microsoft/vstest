@@ -16,7 +16,7 @@ public class DebugAssertTests : AcceptanceTestBase
     {
         // when debugging this test in case it starts failing, be aware that the default behavior of Debug.Assert
         // is to not crash the process when we are running in debug, and debugger is attached
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
         var assemblyPath = BuildMultipleAssemblyPath("CrashingOnDebugAssertTestProject.dll").Trim('\"');
