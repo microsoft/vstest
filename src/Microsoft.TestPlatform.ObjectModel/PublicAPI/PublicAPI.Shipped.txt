@@ -264,12 +264,8 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunStatistics.Execut
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunStatistics.Stats.get -> System.Collections.Generic.IDictionary<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome, long>
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunStatistics.this[Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome testOutcome].get -> long
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler.HandleStartTestSessionComplete(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo testSessionInfo) -> void
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler.HandleStopTestSessionComplete(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo testSessionInfo, bool stopped) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StartTestSessionAckPayload
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StartTestSessionAckPayload.StartTestSessionAckPayload() -> void
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StartTestSessionAckPayload.TestSessionInfo.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StartTestSessionAckPayload.TestSessionInfo.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StartTestSessionPayload
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StartTestSessionPayload.HasCustomHostLauncher.get -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StartTestSessionPayload.HasCustomHostLauncher.set -> void
@@ -283,11 +279,7 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StartTestSession
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StartTestSessionPayload.TestPlatformOptions.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestPlatformOptions
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StartTestSessionPayload.TestPlatformOptions.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StopTestSessionAckPayload
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StopTestSessionAckPayload.IsStopped.get -> bool
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StopTestSessionAckPayload.IsStopped.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StopTestSessionAckPayload.StopTestSessionAckPayload() -> void
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StopTestSessionAckPayload.TestSessionInfo.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StopTestSessionAckPayload.TestSessionInfo.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ProtocolConfig
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ProtocolConfig.ProtocolConfig() -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ProtocolConfig.Version.get -> int

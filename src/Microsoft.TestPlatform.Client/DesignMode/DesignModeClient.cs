@@ -182,8 +182,8 @@ public class DesignModeClient : IDesignModeClient
 
                     case MessageType.StopTestSession:
                         {
-                            var testSessionInfo = _communicationManager.DeserializePayload<TestSessionInfo>(message);
-                            StopTestSession(testSessionInfo);
+                            var testSessionPayload = _communicationManager.DeserializePayload<StopTestSessionPayload>(message);
+                            StopTestSession(testSessionPayload, testRequestManager);
                             break;
                         }
 
@@ -543,12 +543,12 @@ public class DesignModeClient : IDesignModeClient
                 EqtTrace.Error("DesignModeClient: Exception in StartTestSession: " + ex);
 
                 eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
-                eventsHandler.HandleStartTestSessionComplete(null);
+                eventsHandler.HandleStartTestSessionComplete(new());
             }
         });
     }
 
-    private void StopTestSession(TestSessionInfo testSessionInfo)
+    private void StopTestSession(StopTestSessionPayload payload, ITestRequestManager requestManager)
     {
         Task.Run(() =>
         {
@@ -556,16 +556,15 @@ public class DesignModeClient : IDesignModeClient
 
             try
             {
-                var stopped = TestSessionPool.Instance.KillSession(testSessionInfo);
-
-                eventsHandler.HandleStopTestSessionComplete(testSessionInfo, stopped);
+                requestManager.ResetOptions();
+                requestManager.StopTestSession(payload, eventsHandler, _protocolConfig);
             }
             catch (Exception ex)
             {
                 EqtTrace.Error("DesignModeClient: Exception in StopTestSession: " + ex);
 
                 eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
-                eventsHandler.HandleStopTestSessionComplete(testSessionInfo, false);
+                eventsHandler.HandleStopTestSessionComplete(new(payload.TestSessionInfo));
             }
         });
     }

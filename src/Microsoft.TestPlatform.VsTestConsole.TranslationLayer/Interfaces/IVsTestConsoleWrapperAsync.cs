@@ -81,6 +81,19 @@ public interface IVsTestConsoleWrapperAsync
 
     /// <summary>
     /// Asynchronous equivalent of <see cref="
+    /// IVsTestConsoleWrapper.StopTestSession(
+    ///     TestSessionInfo,
+    ///     TestPlatformOptions,
+    ///     ITestSessionEventsHandler)"/>.
+    /// </summary>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    Task<bool> StopTestSessionAsync(
+        TestSessionInfo testSessionInfo,
+        TestPlatformOptions options,
+        ITestSessionEventsHandler eventsHandler);
+
+    /// <summary>
+    /// Asynchronous equivalent of <see cref="
     /// IVsTestConsoleWrapper.InitializeExtensions(
     ///     IEnumerable{string})"/>.
     /// </summary>

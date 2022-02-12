@@ -10,6 +10,7 @@ using System.Runtime.Serialization;
 /// Class used to define the start test session payload sent by the vstest.console translation
 /// layers into design mode.
 /// </summary>
+[DataContract]
 public class StartTestSessionPayload
 {
     /// <summary>

@@ -86,6 +86,21 @@ public interface IVsTestConsoleWrapper : IVsTestConsoleWrapperAsync
         ITestSessionEventsHandler eventsHandler);
 
     /// <summary>
+    /// Stops the test session.
+    /// </summary>
+    /// 
+    /// <param name="testSessionInfo">The test session info object.</param>
+    /// <param name="options">Test Platform options.</param>
+    /// <param name="eventsHandler">The session event handler.</param>
+    /// 
+    /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    bool StopTestSession(
+        TestSessionInfo testSessionInfo,
+        TestPlatformOptions options,
+        ITestSessionEventsHandler eventsHandler);
+
+    /// <summary>
     /// Initializes the test platform with paths to extensions like adapters, loggers and any
     /// other extensions.
     /// </summary>

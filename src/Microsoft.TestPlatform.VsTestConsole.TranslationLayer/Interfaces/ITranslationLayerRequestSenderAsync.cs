@@ -124,10 +124,12 @@ internal interface ITranslationLayerRequestSenderAsync : IDisposable
     /// Asynchronous equivalent of <see cref="
     /// ITranslationLayerRequestSender.StopTestSession(
     ///     TestSessionInfo,
+    ///     TestPlatformOptions,
     ///     ITestSessionEventsHandler)"/>.
     /// </summary>
     Task<bool> StopTestSessionAsync(
         TestSessionInfo testSessionInfo,
+        TestPlatformOptions options,
         ITestSessionEventsHandler eventsHandler);
 
     /// <summary>
