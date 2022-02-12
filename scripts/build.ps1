@@ -1159,9 +1159,7 @@ if ($Force -or $Steps -contains "Build") {
 
 if ($Force -or $Steps -contains "Publish") {
     Publish-Package
-    if ($Force -or $CIBuild) {
-        Create-VsixPackage
-    }
+    Create-VsixPackage
     Create-NugetPackages
 }
 
