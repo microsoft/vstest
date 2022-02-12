@@ -25,7 +25,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
 
     #region DiscoverySpecificData
 
-    private int _discoveryCompletedClients = 0;
+    private int _discoveryCompletedClients;
     private int _availableTestSources = -1;
 
     private DiscoveryCriteria _actualDiscoveryCriteria;
@@ -39,7 +39,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     private readonly IRequestData _requestData;
 
     // This field indicates if abort was requested by testplatform (user)
-    private bool _discoveryAbortRequested = false;
+    private bool _discoveryAbortRequested;
 
     #endregion
 

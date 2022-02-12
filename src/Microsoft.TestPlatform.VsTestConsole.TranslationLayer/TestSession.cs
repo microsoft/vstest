@@ -21,7 +21,7 @@ using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfa
 [Obsolete("This API is not final yet and is subject to changes.", false)]
 public class TestSession : ITestSession
 {
-    private bool _disposed = false;
+    private bool _disposed;
 
     private readonly ITestSessionEventsHandler _eventsHandler;
     private readonly IVsTestConsoleWrapper _consoleWrapper;

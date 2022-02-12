@@ -119,7 +119,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     /// <summary>
     /// Used for tracking the total no. of tests discovered from the given sources.
     /// </summary>
-    private long _discoveredTestCount = 0;
+    private long _discoveredTestCount;
 
     /// <summary>
     /// Collection of test cases that match at least one of the given search strings
@@ -129,7 +129,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     /// <summary>
     /// Effective run settings applicable to test run after inferring the multi-targeting settings.
     /// </summary>
-    private string _effectiveRunSettings = null;
+    private string _effectiveRunSettings;
 
     /// <summary>
     /// List of filters that have not yet been discovered

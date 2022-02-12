@@ -32,12 +32,12 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
     /// <summary>
     /// Singleton Instance of this class
     /// </summary>
-    protected static T s_instance = default;
+    protected static T s_instance;
 
     /// <summary>
     /// Default number of Processes
     /// </summary>
-    private int _currentParallelLevel = 0;
+    private int _currentParallelLevel;
 
     #endregion
 

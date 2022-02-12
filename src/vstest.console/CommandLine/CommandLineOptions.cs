@@ -123,7 +123,7 @@ internal class CommandLineOptions
     /// <summary>
     /// Specifies whether the Fakes automatic configuration should be disabled.
     /// </summary>
-    public bool DisableAutoFakes { get; set; } = false;
+    public bool DisableAutoFakes { get; set; }
 
     /// <summary>
     /// Specifies whether vsixExtensions is enabled or not.

@@ -42,7 +42,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
     private readonly ManualResetEvent _handShakeComplete = new(false);
 
-    private bool _handShakeSuccessful = false;
+    private bool _handShakeSuccessful;
 
     private int _protocolVersion = 5;
 

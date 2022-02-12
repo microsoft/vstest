@@ -3,7 +3,6 @@
 
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 
-using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 

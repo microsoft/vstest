@@ -14,8 +14,8 @@ using System;
 [TestClass]
 public class EqtTraceTests
 {
-    private static string s_dirPath = null;
-    private static string s_logFile = null;
+    private static string s_dirPath;
+    private static string s_logFile;
 
     [ClassInitialize]
     public static void Init(TestContext testContext)

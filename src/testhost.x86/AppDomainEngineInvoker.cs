@@ -27,7 +27,7 @@ internal class AppDomainEngineInvoker<T> : IEngineInvoker where T : MarshalByRef
 
     protected readonly IEngineInvoker _actualInvoker;
 
-    private string _mergedTempConfigFile = null;
+    private string _mergedTempConfigFile;
 
     public AppDomainEngineInvoker(string testSourcePath)
     {

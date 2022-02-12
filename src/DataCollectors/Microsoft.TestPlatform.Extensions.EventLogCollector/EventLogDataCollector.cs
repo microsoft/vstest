@@ -305,6 +305,8 @@ public class EventLogDataCollector : DataCollector
     /// <param name="disposing">Not used since this class does not have a finalizer.</param>
     protected override void Dispose(bool disposing)
     {
+        base.Dispose(disposing);
+
         // Unregister events
         _events.SessionStart -= _sessionStartEventHandler;
         _events.SessionEnd -= _sessionEndEventHandler;

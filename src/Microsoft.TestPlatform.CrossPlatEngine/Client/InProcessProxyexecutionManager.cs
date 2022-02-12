@@ -25,7 +25,7 @@ internal class InProcessProxyExecutionManager : IProxyExecutionManager
     private readonly IExecutionManager _executionManager;
     private readonly ITestRuntimeProvider _testHostManager;
 
-    public bool IsInitialized { get; private set; } = false;
+    public bool IsInitialized { get; private set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InProcessProxyexecutionManager"/> class.
