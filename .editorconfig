@@ -161,6 +161,9 @@ dotnet_diagnostic.CA1805.severity=warning # not default, increased severity to e
 # CA1507: Use nameof in place of string
 dotnet_diagnostic.CA1507.severity=warning # not default, increased severity to ensure it is applied
 
+# CA2215: Dispose methods should call base class dispose
+dotnet_diagnostic.CA2215.severity=warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences
