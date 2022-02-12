@@ -152,6 +152,9 @@ dotnet_diagnostic.IDE0077.severity=warning # not default, increased severity to 
 # IDE0076: Remove invalid global 'SuppressMessageAttribute'
 dotnet_diagnostic.IDE0076.severity=warning # not default, increased severity to ensure it is applied
 
+# IDE0043: Invalid string format
+dotnet_diagnostic.IDE0043.severity=warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences
