@@ -103,7 +103,11 @@ internal class Executor
         }
         else
         {
-            PrintSplashScreen(isDiag);
+            // If we're postprocessing we don't need to show the splash
+            if (!ArtifactProcessingPostProcessModeProcessor.ContainsPostProcessCommand(args))
+            {
+                PrintSplashScreen(isDiag);
+            }
         }
 
         int exitCode = 0;

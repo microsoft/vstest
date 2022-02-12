@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
+
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <summary>
 /// Helper class for getting info about dotnet host.

@@ -175,10 +175,7 @@ internal class Converter
             return collectorEntries;
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info($"Converter.ToCollectionEntries: Converting attachmentSets {string.Join(",", attachmentSets)} to collection entries.");
-        }
+        EqtTrace.Info($"Converter.ToCollectionEntries: Converting attachmentSets {string.Join(",", attachmentSets)} to collection entries.");
 
         foreach (var attachmentSet in attachmentSets)
         {
@@ -219,11 +216,7 @@ internal class Converter
                         e.GetType().ToString(),
                         e);
 
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error("Converter: ToResultFiles: " + errorMsg);
-                    }
-
+                    EqtTrace.Error("Converter: ToResultFiles: " + errorMsg);
                     errorMessages.Add(errorMsg);
                 }
             }
@@ -415,10 +408,7 @@ internal class Converter
                     e.GetType().ToString(),
                     e);
 
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("Converter: UpdateTestResultAttachments: " + errorMsg);
-                }
+                EqtTrace.Error("Converter: UpdateTestResultAttachments: " + errorMsg);
 
                 StringBuilder stdErr = new(testResult.StdErr);
                 stdErr.AppendLine(errorMsg);
@@ -464,10 +454,7 @@ internal class Converter
         List<IDataAttachment> uriDataAttachments = new();
         foreach (ObjectModel.UriDataAttachment uriDataAttachment in attachmentSet.Attachments)
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TrxLogger: ToCollectorEntry: Got attachment " + uriDataAttachment.Uri + " with description " + uriDataAttachment.Description);
-            }
+            EqtTrace.Verbose("TrxLogger.ToCollectorEntry: Got attachment " + uriDataAttachment.Uri + " with description " + uriDataAttachment.Description);
 
             string sourceFile = uriDataAttachment.Uri.LocalPath;
             _ = (Path.GetFullPath(sourceFile) == sourceFile);
@@ -490,10 +477,7 @@ internal class Converter
             }
             catch (Exception ex)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("Trxlogger: ToCollectorEntry: " + ex);
-                }
+                EqtTrace.Error("Trxlogger: ToCollectorEntry: " + ex);
             }
         }
 
@@ -529,10 +513,7 @@ internal class Converter
         {
             string sourceFile = uriDataAttachment.Uri.IsAbsoluteUri ? uriDataAttachment.Uri.LocalPath : uriDataAttachment.Uri.ToString();
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TrxLogger: ToResultFiles: Got attachment " + uriDataAttachment.Uri + " with local path " + sourceFile);
-            }
+            EqtTrace.Verbose("TrxLogger: ToResultFiles: Got attachment " + uriDataAttachment.Uri + " with local path " + sourceFile);
 
             Debug.Assert(Path.IsPathRooted(sourceFile), "Source file is not rooted");
             // copy the source file to the target location
@@ -549,10 +530,7 @@ internal class Converter
             }
             catch (Exception ex)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("Trxlogger: ToResultFiles: " + ex);
-                }
+                EqtTrace.Error("Trxlogger: ToResultFiles: " + ex);
             }
         }
 
@@ -567,11 +545,7 @@ internal class Converter
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("Trxlogger: Failed to copy file {0} to {1}. Reason:{2}", sourceFile, targetFile, ex);
-            }
-
+            EqtTrace.Error("Trxlogger: Failed to copy file {0} to {1}. Reason:{2}", sourceFile, targetFile, ex);
             throw;
         }
     }
@@ -652,10 +626,7 @@ internal class Converter
         catch (ArgumentException ex)
         {
             // If source is not valid file path, then className will continue to point default value.
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("Converter: GetTestClassName: " + ex);
-            }
+            EqtTrace.Verbose("Converter: GetTestClassName: " + ex);
         }
 
         return className;

@@ -14,9 +14,9 @@ public class TestIdProvider
     internal const int DigestBytes = DigestBits / 8;
 
     private Guid _id = Guid.Empty;
-    private byte[] _hash = null;
+    private byte[] _hash;
     private byte[] _lastBlock = new byte[BlockBytes];
-    private int _position = 0;
+    private int _position;
 
     private readonly Sha1Implementation _hasher;
 
@@ -121,8 +121,8 @@ public class TestIdProvider
          * For more information please refer to https://tools.ietf.org/html/rfc3174.
          */
 
-        private int _streamSize = 0;
-        private bool _messagePadded = false;
+        private int _streamSize;
+        private bool _messagePadded;
 
         public Sha1Implementation()
         {

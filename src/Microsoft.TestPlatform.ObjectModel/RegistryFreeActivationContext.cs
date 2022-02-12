@@ -20,7 +20,7 @@ internal class RegistryFreeActivationContext : IDisposable
 
     private IntPtr _hActCtx = IntPtr.Zero;
 
-    private bool _disposed = false;
+    private bool _disposed;
 
     private readonly string _manifestFilePath = string.Empty;
 
@@ -107,10 +107,7 @@ internal class RegistryFreeActivationContext : IDisposable
         catch (Exception ex)
         {
             // Log any exceptions during deactivation.
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error(ex);
-            }
+            EqtTrace.Error(ex);
         }
     }
 }

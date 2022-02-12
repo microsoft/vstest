@@ -196,10 +196,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
         {
             var message = _communicationManager.ReceiveMessage();
 
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : Datacollector received message: {0}", message);
-            }
+            EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests: Datacollector received message: {0}", message);
 
             switch (message.MessageType)
             {
@@ -304,10 +301,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
         catch (Exception e)
         {
             // If any exception is thrown while updating additional assemblies, log the exception in eqt trace.
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("DataCollectionRequestHandler.AddExtensionAssemblies: Exception occurred: {0}", e);
-            }
+            EqtTrace.Error("DataCollectionRequestHandler.AddExtensionAssemblies: Exception occurred: {0}", e);
         }
     }
 

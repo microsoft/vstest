@@ -150,9 +150,11 @@ internal interface ITranslationLayerRequestSender : IDisposable, ITranslationLay
     /// </summary>
     /// 
     /// <param name="testSessionInfo">Test session info.</param>
+    /// <param name="options">Test Platform options.</param>
     /// <param name="eventsHandler">Event handler for test session events.</param>
     bool StopTestSession(
         TestSessionInfo testSessionInfo,
+        TestPlatformOptions options,
         ITestSessionEventsHandler eventsHandler);
 
     /// <summary>

@@ -79,7 +79,7 @@ internal abstract class TestExtensionPluginInformation : TestPluginInformation
             }
         }
 
-        if (EqtTrace.IsErrorEnabled && string.IsNullOrEmpty(extensionUri))
+        if (string.IsNullOrEmpty(extensionUri))
         {
             EqtTrace.Error("The type \"{0}\" defined in \"{1}\" does not have ExtensionUri attribute.", testLoggerType.ToString(), testLoggerType.GetTypeInfo().Module.Name);
         }

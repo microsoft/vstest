@@ -248,11 +248,8 @@ internal class TestPluginDiscoverer
 
             if (pluginInfo == null || pluginInfo.IdentifierData == null)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error(
-                        "GetTestExtensionFromType: Either PluginInformation is null or PluginInformation doesn't contain IdentifierData for type {0}.", type.FullName);
-                }
+                EqtTrace.Error(
+                    "GetTestExtensionFromType: Either PluginInformation is null or PluginInformation doesn't contain IdentifierData for type {0}.", type.FullName);
                 return;
             }
 

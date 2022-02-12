@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.Win32.SafeHandles;
+namespace DumpMinitool;
 
 using System;
 using System.Diagnostics;
@@ -10,7 +10,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace DumpMinitool;
+using Microsoft.Win32.SafeHandles;
 
 internal class Program
 {

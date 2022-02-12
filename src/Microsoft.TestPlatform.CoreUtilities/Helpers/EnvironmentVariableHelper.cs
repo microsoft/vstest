@@ -3,11 +3,11 @@
 
 #if !NETSTANDARD1_0
 
+namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+
 using System;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-
-namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 
 internal class EnvironmentVariableHelper : IEnvironmentVariableHelper
 {

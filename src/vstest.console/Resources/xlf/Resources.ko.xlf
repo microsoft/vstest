@@ -1108,6 +1108,11 @@
         <target state="translated">테스트 실행이 {0} 오류로 인해 중단되었습니다.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidTestSessionCorrelationId">
+        <source>Invalid testSessionCorrelationId</source>
+        <target state="new">Invalid testSessionCorrelationId</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -22,7 +22,7 @@ internal class InProcessProxyDiscoveryManager : IProxyDiscoveryManager
     private readonly IDiscoveryManager _discoveryManager;
     private readonly ITestRuntimeProvider _testHostManager;
 
-    public bool IsInitialized { get; private set; } = false;
+    public bool IsInitialized { get; private set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InProcessProxyDiscoveryManager"/> class.

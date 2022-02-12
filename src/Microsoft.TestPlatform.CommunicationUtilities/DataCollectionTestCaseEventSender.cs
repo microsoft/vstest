@@ -80,10 +80,7 @@ public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSen
     public void Close()
     {
         _communicationManager?.StopClient();
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Closing the connection !");
-        }
+        EqtTrace.Info("Closing the connection!");
     }
 
     /// <inheritdoc />
@@ -94,10 +91,7 @@ public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSen
         var message = _communicationManager.ReceiveMessage();
         if (message != null && message.MessageType != MessageType.DataCollectionTestStartAck)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("DataCollectionTestCaseEventSender.SendTestCaseStart : MessageType.DataCollectionTestStartAck not received.");
-            }
+            EqtTrace.Error("DataCollectionTestCaseEventSender.SendTestCaseStart : MessageType.DataCollectionTestStartAck not received.");
         }
     }
 

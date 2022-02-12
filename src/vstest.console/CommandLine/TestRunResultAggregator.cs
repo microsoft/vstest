@@ -12,7 +12,7 @@ using ObjectModel.Logging;
 /// </summary>
 internal class TestRunResultAggregator
 {
-    private static TestRunResultAggregator s_instance = null;
+    private static TestRunResultAggregator s_instance;
 
     #region Constructor
 

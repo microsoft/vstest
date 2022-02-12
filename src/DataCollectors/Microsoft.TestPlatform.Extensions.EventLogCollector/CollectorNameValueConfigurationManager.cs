@@ -61,11 +61,7 @@ internal class CollectorNameValueConfigurationManager
             string settingName = settingElement.GetAttribute(SettingNameAttributeName);
             if (string.IsNullOrWhiteSpace(settingName))
             {
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("Skipping configuration setting due to missing setting name");
-                }
-
+                EqtTrace.Warning("Skipping configuration setting due to missing setting name");
                 continue;
             }
 
@@ -73,11 +69,7 @@ internal class CollectorNameValueConfigurationManager
             string settingValue = settingElement.GetAttribute(SettingValueAttributeName);
             if (string.IsNullOrWhiteSpace(settingValue))
             {
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("Skipping configuration setting '{0}' due to missing value", settingName);
-                }
-
+                EqtTrace.Warning("Skipping configuration setting '{0}' due to missing value", settingName);
                 continue;
             }
 
@@ -85,12 +77,9 @@ internal class CollectorNameValueConfigurationManager
             // overwritten with the last occurrence's value.
             if (NameValuePairs.ContainsKey(settingName))
             {
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose(
-                        "Duplicate configuration setting found for '{0}'. Using the last setting.",
-                        settingName);
-                }
+                EqtTrace.Verbose(
+                    "Duplicate configuration setting found for '{0}'. Using the last setting.",
+                    settingName);
             }
 
             NameValuePairs[settingName] = settingValue;

@@ -246,10 +246,7 @@ public static class FakesUtilities
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("Failed to create Fakes Configurator. Reason:{0} ", ex);
-            }
+            EqtTrace.Info("Failed to create Fakes Configurator. Reason:{0} ", ex);
         }
 #endif
         return null;
@@ -269,10 +266,7 @@ public static class FakesUtilities
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("Failed to create newly implemented Fakes Configurator. Reason:{0} ", ex);
-            }
+            EqtTrace.Info("Failed to create newly implemented Fakes Configurator. Reason: {0} ", ex);
         }
 
         return null;

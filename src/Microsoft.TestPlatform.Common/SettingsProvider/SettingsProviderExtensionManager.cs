@@ -162,10 +162,7 @@ public class SettingsProviderExtensionManager
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("SettingsProviderExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}", ex);
-            }
+            EqtTrace.Error("SettingsProviderExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}", ex);
 
             if (shouldThrowOnError)
             {

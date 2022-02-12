@@ -21,13 +21,11 @@ public class Framework
     /// <summary>
     /// Default .Net target framework.
     /// </summary>
-    public static Framework DefaultFramework { get; } =
+    public static Framework DefaultFramework { get; }
 #if NETFRAMEWORK
-        FromString(".NETFramework,Version=v4.0");
-#elif NETSTANDARD1_0
-        null;
-#else
-        FromString(".NETCoreApp,Version=v1.0");
+        = Framework.FromString(".NETFramework,Version=v4.0");
+#elif !NETSTANDARD1_0
+        = Framework.FromString(".NETCoreApp,Version=v1.0");
 #endif
 
     /// <summary>
