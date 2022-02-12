@@ -3,6 +3,8 @@
 
 #if NETCOREAPP
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 using System.Reflection;

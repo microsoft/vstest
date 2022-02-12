@@ -3,6 +3,8 @@
 
 #if !NETSTANDARD1_0
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 
 using Interfaces;
