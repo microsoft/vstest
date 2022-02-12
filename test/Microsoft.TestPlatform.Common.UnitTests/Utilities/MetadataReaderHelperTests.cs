@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+namespace TestPlatform.Common.UnitTests.Utilities;
+
 using System;
 using System.IO;
 using System.Linq;
@@ -8,8 +10,6 @@ using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace TestPlatform.Common.UnitTests.Utilities;
 
 [TestClass]
 public class MetadataReaderHelperTests

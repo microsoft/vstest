@@ -1,15 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Linq;
-
 namespace Microsoft.TestPlatform.Utilities.UnitTests;
+
+using System.Linq;
 
 using Castle.Core.Internal;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 public class StringUtilitiesTests

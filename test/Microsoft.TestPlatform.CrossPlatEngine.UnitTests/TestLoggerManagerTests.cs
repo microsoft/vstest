@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
-
 namespace TestPlatform.CrossPlatEngine.UnitTests;
 
 using System;
@@ -11,6 +9,7 @@ using System.Reflection;
 using System.Threading;
 
 using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
