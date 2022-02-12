@@ -104,7 +104,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
     #region Fields
 
-    private bool _testRunHasErrorMessages = false;
+    private bool _testRunHasErrorMessages;
 
     /// <summary>
     /// Framework on which the test runs.

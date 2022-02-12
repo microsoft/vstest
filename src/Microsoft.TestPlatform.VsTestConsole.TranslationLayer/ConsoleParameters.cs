@@ -20,7 +20,7 @@ public class ConsoleParameters
 {
     internal static readonly ConsoleParameters Default = new();
 
-    private string _logFilePath = null;
+    private string _logFilePath;
     private readonly IFileHelper _fileHelper;
 
     /// <summary>

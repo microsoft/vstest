@@ -22,7 +22,7 @@ public class TestPlatformDataCollectionSinkTests
 
     private TestPlatformDataCollectionSink _dataCollectionSink;
 
-    private bool _isEventHandlerInvoked = false;
+    private bool _isEventHandlerInvoked;
     private static readonly string TempDirectoryPath = Path.GetTempPath();
 
     public TestPlatformDataCollectionSinkTests()

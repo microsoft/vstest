@@ -155,6 +155,9 @@ dotnet_diagnostic.IDE0076.severity=warning # not default, increased severity to 
 # IDE0043: Invalid string format
 dotnet_diagnostic.IDE0043.severity=warning # not default, increased severity to ensure it is applied
 
+# CA1805: Do not initialize unnecessarily
+dotnet_diagnostic.CA1805.severity=warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences

@@ -18,12 +18,12 @@ internal sealed class FileEventListener : EventListener
     /// <summary>
     /// Storage file to be used to write logs
     /// </summary>
-    private FileStream _fileStream = null;
+    private FileStream _fileStream;
 
     /// <summary>
     /// StreamWriter to write logs to file
     /// </summary>
-    private StreamWriter _streamWriter = null;
+    private StreamWriter _streamWriter;
 
     /// <summary>
     /// Name of the current log file

@@ -128,10 +128,10 @@ internal sealed class FastFilter
 
     internal sealed class Builder
     {
-        private bool _operatorEncountered = false;
+        private bool _operatorEncountered;
         private Operator _fastFilterOperator = Operator.None;
 
-        private bool _conditionEncountered = false;
+        private bool _conditionEncountered;
         private Operation _fastFilterOperation;
         private readonly ImmutableDictionary<string, ImmutableHashSet<string>.Builder>.Builder _filterDictionaryBuilder = ImmutableDictionary.CreateBuilder<string, ImmutableHashSet<string>.Builder>(StringComparer.OrdinalIgnoreCase);
 

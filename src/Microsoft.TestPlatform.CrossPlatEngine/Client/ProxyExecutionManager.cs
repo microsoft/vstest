@@ -31,7 +31,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 /// </summary>
 internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITestRunEventsHandler2
 {
-    private readonly TestSessionInfo _testSessionInfo = null;
+    private readonly TestSessionInfo _testSessionInfo;
     private readonly Func<string, ProxyExecutionManager, ProxyOperationManager> _proxyOperationManagerCreator;
 
     private ITestRuntimeProvider _testHostManager;
@@ -40,13 +40,13 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     private readonly IDataSerializer _dataSerializer;
     private bool _isCommunicationEstablished;
 
-    private ProxyOperationManager _proxyOperationManager = null;
+    private ProxyOperationManager _proxyOperationManager;
     private ITestRunEventsHandler _baseTestRunEventsHandler;
     private bool _skipDefaultAdapters;
-    private readonly bool _debugEnabledForTestSession = false;
+    private readonly bool _debugEnabledForTestSession;
 
     /// <inheritdoc/>
-    public bool IsInitialized { get; private set; } = false;
+    public bool IsInitialized { get; private set; }
 
     /// <summary>
     /// Gets or sets the cancellation token source.

@@ -29,7 +29,7 @@ using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
 [TestClass]
 public class TestLoggerManagerTests
 {
-    private static int s_counter = 0;
+    private static int s_counter;
     private static readonly EventWaitHandle WaitHandle = new AutoResetEvent(false);
     private readonly string _loggerUri = "testlogger://logger";
 
@@ -1628,7 +1628,7 @@ public class TestLoggerManagerTests
     [FriendlyName("InvalidTestLoggerExtension")]
     private class InvalidLogger
     {
-        public static int Counter = 0;
+        public static int Counter;
 
         public void Initialize(TestLoggerEvents events, string testRunDirectory)
         {
@@ -1652,7 +1652,7 @@ public class TestLoggerManagerTests
     private class ValidLoggerWithParameters : ITestLoggerWithParameters
     {
         public static Dictionary<string, string> Parameters;
-        public static int Counter = 0;
+        public static int Counter;
 
         public void Initialize(TestLoggerEvents events, string testRunDirectory)
         {
