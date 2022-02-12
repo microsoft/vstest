@@ -776,7 +776,7 @@ public class IntegrationTestBase
 
     protected static string GetDownloadedDotnetMuxerFromTools(string architecture)
     {
-        if (architecture != "X86" && architecture != "X64")
+        if (architecture is not "X86" and not "X64")
         {
             throw new NotSupportedException(nameof(architecture));
         }

@@ -127,7 +127,7 @@ internal class TestPlatformDataCollectionLogger : DataCollectionLogger
         ValidateArg.NotNull(text, nameof(text));
 
         Debug.Assert(
-            level >= TestMessageLevel.Informational && level <= TestMessageLevel.Error,
+            level is >= TestMessageLevel.Informational and <= TestMessageLevel.Error,
             "Invalid level: " + level);
 
         // Make sure the data collection context is not a derived data collection context.  This

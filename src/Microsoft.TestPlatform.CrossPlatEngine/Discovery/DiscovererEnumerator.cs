@@ -381,8 +381,7 @@ internal class DiscovererEnumerator
         {
             var sourcesToCheck = sources;
 
-            if (discoverer.Metadata.AssemblyType == AssemblyType.Native ||
-                discoverer.Metadata.AssemblyType == AssemblyType.Managed)
+            if (discoverer.Metadata.AssemblyType is AssemblyType.Native or AssemblyType.Managed)
             {
                 assemblyTypeToSoucesMap ??= GetAssemblyTypeToSoucesMap(sources, assemblyProperties);
                 sourcesToCheck = assemblyTypeToSoucesMap[AssemblyType.None].Concat(assemblyTypeToSoucesMap[discoverer.Metadata.AssemblyType]);

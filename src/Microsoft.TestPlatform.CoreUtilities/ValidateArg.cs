@@ -142,7 +142,7 @@ public static class ValidateArg
     {
         NotNull(arg, parameterName);
 
-        if (!(arg is T))
+        if (arg is not T)
         {
             var message = string.Format(CultureInfo.CurrentCulture, Resources.Error_ArgumentNotTypeOf, typeof(T).FullName);
             throw new ArgumentException(message, parameterName);
@@ -218,7 +218,7 @@ public static class ValidateArgProperty
     {
         NotNull(arg, parameterName, propertyName);
 
-        if (!(arg is T))
+        if (arg is not T)
         {
             var message = string.Format(CultureInfo.CurrentCulture, Resources.Error_ArgumentPropertyNotTypeOf, propertyName, typeof(T).FullName);
             throw new ArgumentException(message, parameterName);

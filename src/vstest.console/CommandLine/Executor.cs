@@ -255,7 +255,7 @@ internal class Executor
             }
             catch (Exception ex)
             {
-                if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException)
+                if (ex is CommandLineException or TestPlatformException or SettingsException)
                 {
                     Output.Error(false, ex.Message);
                     result = 1;
@@ -359,7 +359,7 @@ internal class Executor
         }
         catch (Exception ex)
         {
-            if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException || ex is InvalidOperationException)
+            if (ex is CommandLineException or TestPlatformException or SettingsException or InvalidOperationException)
             {
                 EqtTrace.Error("ExecuteArgumentProcessor: failed to execute argument process: {0}", ex);
                 Output.Error(false, ex.Message);
@@ -382,7 +382,7 @@ internal class Executor
         }
 
         Debug.Assert(
-            result >= ArgumentProcessorResult.Success && result <= ArgumentProcessorResult.Abort,
+            result is >= ArgumentProcessorResult.Success and <= ArgumentProcessorResult.Abort,
             "Invalid argument processor result.");
 
         if (result == ArgumentProcessorResult.Fail)
