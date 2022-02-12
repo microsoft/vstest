@@ -146,6 +146,12 @@ dotnet_diagnostic.IDE0059.severity=warning # not default, increased severity to 
 # CA2245: Do not assign a property to itself
 dotnet_diagnostic.CA2245.severity=warning # not default, increased severity to ensure it is applied
 
+# IDE0077: Avoid legacy format target in global 'SuppressMessageAttribute'
+dotnet_diagnostic.IDE0077.severity=warning # not default, increased severity to ensure it is applied
+
+# IDE0076: Remove invalid global 'SuppressMessageAttribute'
+dotnet_diagnostic.IDE0076.severity=warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences
