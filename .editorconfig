@@ -143,6 +143,9 @@ dotnet_diagnostic.CA2016.severity = warning # not default, increased severity to
 # IDE0059: Remove unnecessary value assignment
 dotnet_diagnostic.IDE0059.severity=warning # not default, increased severity to ensure it is applied
 
+# CA2245: Do not assign a property to itself
+dotnet_diagnostic.CA2245.severity=warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences
