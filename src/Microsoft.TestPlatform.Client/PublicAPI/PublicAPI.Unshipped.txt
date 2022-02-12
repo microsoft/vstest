@@ -1,4 +1,3 @@
 Microsoft.VisualStudio.TestPlatform.Client.Discovery.DiscoveryRequest.AbortWithEventHandler() -> void
 Microsoft.VisualStudio.TestPlatform.Client.RequestHelper.ITestRequestManager.CancelDiscoveryWithEventHandler() -> void
-Microsoft.VisualStudio.TestPlatform.Client.RequestHelper.ITestRequestManager.CancelDiscoveryWithEventHandler() -> void
 Microsoft.VisualStudio.TestPlatform.Client.RequestHelper.ITestRequestManager.StopTestSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StopTestSessionPayload payload, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler eventsHandler, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ProtocolConfig protocolConfig) -> void
