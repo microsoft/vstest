@@ -8,7 +8,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 /// </summary>
 public enum DiscoveryStatus
 {
-    FullyDiscovered, // Indicates that source was fully discovered
-    PartiallyDiscovered, // Indicates that we started discovery of the source but something happened (cancel/abort) and we stopped processing it
-    NotDiscovered // Indicates the sources which were not touched during discovery
+    /// <summary>
+    /// Indicates that source was fully discovered.
+    /// </summary>
+    FullyDiscovered,
+
+    /// <summary>
+    /// Indicates that we started discovery of the source but something happened (cancel/abort) and we stopped processing it.
+    /// </summary>
+    PartiallyDiscovered,
+
+    /// <summary>
+    /// Indicates the sources which were not touched during discovery.
+    /// </summary>
+    NotDiscovered,
 }

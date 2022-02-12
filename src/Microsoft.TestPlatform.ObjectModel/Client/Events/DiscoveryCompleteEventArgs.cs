@@ -21,21 +21,9 @@ public class DiscoveryCompleteEventArgs : EventArgs
     /// <param name="partiallyDiscoveredSources">List of partially discovered sources</param>
     /// <param name="notDiscoveredSources">List of not discovered sources</param>
     public DiscoveryCompleteEventArgs(long totalTests, bool isAborted,
-                                      IReadOnlyCollection<string> fullyDiscoveredSources,
-                                      IReadOnlyCollection<string> partiallyDiscoveredSources,
-                                      IReadOnlyCollection<string> notDiscoveredSources) : this(totalTests, isAborted)
-    {
-        FullyDiscoveredSources = fullyDiscoveredSources;
-        PartiallyDiscoveredSources = partiallyDiscoveredSources;
-        NotDiscoveredSources = notDiscoveredSources;
-    }
-
-    /// <summary>
-    /// Constructor for creating event args object
-    /// </summary>
-    /// <param name="totalTests">Total tests which got discovered</param>
-    /// <param name="isAborted">Specifies if discovery has been aborted.</param>
-    public DiscoveryCompleteEventArgs(long totalTests, bool isAborted)
+        IReadOnlyCollection<string> fullyDiscoveredSources,
+        IReadOnlyCollection<string> partiallyDiscoveredSources,
+        IReadOnlyCollection<string> notDiscoveredSources)
     {
         // This event is always raised from the client side, while the total count of tests is maintained
         // only at the testhost end. In case of a discovery abort (various reasons including crash), it is
@@ -44,6 +32,20 @@ public class DiscoveryCompleteEventArgs : EventArgs
 
         TotalCount = totalTests;
         IsAborted = isAborted;
+
+        FullyDiscoveredSources = fullyDiscoveredSources ?? new List<string>();
+        PartiallyDiscoveredSources = partiallyDiscoveredSources ?? new List<string>();
+        NotDiscoveredSources = notDiscoveredSources ?? new List<string>();
+    }
+
+    /// <summary>
+    /// Constructor for creating event args object
+    /// </summary>
+    /// <param name="totalTests">Total tests which got discovered</param>
+    /// <param name="isAborted">Specifies if discovery has been aborted.</param>
+    public DiscoveryCompleteEventArgs(long totalTests, bool isAborted)
+        : this(totalTests, isAborted, null, null, null)
+    {
     }
 
     /// <summary>
@@ -64,15 +66,15 @@ public class DiscoveryCompleteEventArgs : EventArgs
     /// <summary>
     /// Gets the list of sources which were fully discovered.
     /// </summary>
-    public IReadOnlyCollection<string> FullyDiscoveredSources { get; } = new List<string>();
+    public IReadOnlyCollection<string> FullyDiscoveredSources { get; }
 
     /// <summary>
     /// Gets the list of sources which were partially discovered (started discover tests, but then discovery aborted).
     /// </summary>
-    public IReadOnlyCollection<string> PartiallyDiscoveredSources { get; } = new List<string>();
+    public IReadOnlyCollection<string> PartiallyDiscoveredSources { get; }
 
     /// <summary>
     /// Gets the list of sources which were not discovered at all.
     /// </summary>
-    public IReadOnlyCollection<string> NotDiscoveredSources { get; } = new List<string>();
+    public IReadOnlyCollection<string> NotDiscoveredSources { get; }
 }

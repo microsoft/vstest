@@ -51,12 +51,12 @@ internal class ParallelDiscoveryDataAggregator
     /// <summary>
     /// Dictionary which stores source with corresponding discoveryStatus
     /// </summary>
-    internal ConcurrentDictionary<string, DiscoveryStatus> SourcesWithDiscoveryStatus = new();
+    internal ConcurrentDictionary<string, DiscoveryStatus> SourcesWithDiscoveryStatus { get; } = new();
 
     /// <summary>
     /// Indicates if discovery complete payload already sent back to IDE
     /// </summary>
-    internal bool IsMessageSent { get; set; }
+    internal bool IsMessageSent { get; private set; }
 
     #endregion
 
@@ -159,15 +159,15 @@ internal class ParallelDiscoveryDataAggregator
 
             if (!SourcesWithDiscoveryStatus.ContainsKey(source))
             {
-                EqtTrace.Warning("ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus: " +
-                                 $"{source} is not present in SourcesWithDiscoveryStatus dictionary.");
+                EqtTrace.Warning("ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus: "
+                    + $"{source} is not present in SourcesWithDiscoveryStatus dictionary.");
             }
             else
             {
                 SourcesWithDiscoveryStatus[source] = status;
 
-                EqtTrace.Info("ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus: " +
-                              $"{source} is marked with {status} status.");
+                EqtTrace.Info("ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus: "
+                    + $"{source} is marked with {status} status.");
             }
         }
     }
@@ -188,10 +188,12 @@ internal class ParallelDiscoveryDataAggregator
     /// <returns></returns>
     internal ICollection<string> GetSourcesWithStatus(DiscoveryStatus status)
     {
-        if (SourcesWithDiscoveryStatus == null || SourcesWithDiscoveryStatus.IsEmpty) return new List<string>();
-
-        return SourcesWithDiscoveryStatus.Where(source => source.Value == status)
-                                         .Select(source => source.Key).ToList();
+        return SourcesWithDiscoveryStatus == null || SourcesWithDiscoveryStatus.IsEmpty
+            ? new List<string>()
+            : SourcesWithDiscoveryStatus
+                .Where(source => source.Value == status)
+                .Select(source => source.Key)
+                .ToList();
     }
 
     #endregion

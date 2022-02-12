@@ -156,7 +156,7 @@ public class ParallelDiscoveryEventsHandlerTests
         bool aborted = false;
 
         _mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
-                _mockProxyDiscoveryManager.Object, totalTests, null, aborted)).Returns(true);
+            _mockProxyDiscoveryManager.Object, totalTests, null, aborted)).Returns(true);
 
         _mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.DiscoveryComplete)).Returns(payload);
 

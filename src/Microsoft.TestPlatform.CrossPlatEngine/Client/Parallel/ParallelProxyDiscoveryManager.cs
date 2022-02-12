@@ -38,7 +38,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
 
     private readonly IRequestData _requestData;
 
-    public bool IsAbortRequested { get; set; }
+    public bool IsAbortRequested { get; private set; }
 
     #endregion
 

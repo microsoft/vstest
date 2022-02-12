@@ -13,7 +13,7 @@ public interface IParallelProxyDiscoveryManager : IParallelOperationManager, IPr
     /// <summary>
     /// Indicates if user requested an abortion
     /// </summary>
-    bool IsAbortRequested { get; set; }
+    bool IsAbortRequested { get; }
 
     /// <summary>
     /// Handles Partial Discovery Complete event coming from a specific concurrent proxy discovery manager

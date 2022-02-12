@@ -37,13 +37,14 @@ public class DiscoveryManager : IDiscoveryManager
     private ITestDiscoveryEventsHandler2 _testDiscoveryEventsHandler;
     private DiscoveryCriteria _discoveryCriteria;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private string _previousSource = null;
-    private ConcurrentDictionary<string, DiscoveryStatus> SourcesWithDiscoveryStatus { get; set; } = new ConcurrentDictionary<string, DiscoveryStatus>();
+    private string _previousSource;
+    private readonly ConcurrentDictionary<string, DiscoveryStatus> _sourcesWithDiscoveryStatus = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
     /// </summary>
-    public DiscoveryManager(IRequestData requestData) : this(requestData, TestPlatformEventSource.Instance)
+    public DiscoveryManager(IRequestData requestData)
+        : this(requestData, TestPlatformEventSource.Instance)
     {
     }
 
@@ -355,7 +356,7 @@ public class DiscoveryManager : IDiscoveryManager
     /// Mark the last sources as fullyDiscovered
     /// </summary>
     /// <param name="lastChunk">Last chunk of testCases which were discovered</param>
-    private void MarkTheLastChunkSourcesAsFullyDiscovered(IList<TestCase> lastChunk)
+    private void MarkTheLastChunkSourcesAsFullyDiscovered(IEnumerable<TestCase> lastChunk)
     {
         if (lastChunk == null) return;
 
@@ -363,7 +364,7 @@ public class DiscoveryManager : IDiscoveryManager
 
         // When all testcases in project is dividable by 10 then lastChunk is coming as empty
         // So we need to take the lastSource and mark it as FullyDiscovered
-        if (lastChunk.Count == 0) lastChunkSources = new List<string>() { _previousSource };
+        if (!lastChunk.Any()) lastChunkSources = new List<string>() { _previousSource };
 
         MarkSourcesWithStatus(lastChunkSources, DiscoveryStatus.FullyDiscovered);
     }
@@ -377,13 +378,13 @@ public class DiscoveryManager : IDiscoveryManager
     {
         if (source == null) return;
 
-        if (!SourcesWithDiscoveryStatus.ContainsKey(source))
+        if (!_sourcesWithDiscoveryStatus.ContainsKey(source))
         {
             EqtTrace.Warning($"DiscoveryManager.MarkSourceWithStatus : SourcesWithDiscoveryStatus does not contain {source}");
         }
         else
         {
-            SourcesWithDiscoveryStatus[source] = status;
+            _sourcesWithDiscoveryStatus[source] = status;
             EqtTrace.Warning($"DiscoveryManager.MarkSourceWithStatus : Marking {source} with {status} status");
         }
     }
@@ -402,17 +403,17 @@ public class DiscoveryManager : IDiscoveryManager
             if (source == null) continue;
 
             // It is the first time when we fill our map with sources
-            if (status == DiscoveryStatus.NotDiscovered) SourcesWithDiscoveryStatus[source] = status;
+            if (status == DiscoveryStatus.NotDiscovered) _sourcesWithDiscoveryStatus[source] = status;
 
             else
             {
-                if (!SourcesWithDiscoveryStatus.ContainsKey(source))
+                if (!_sourcesWithDiscoveryStatus.ContainsKey(source))
                 {
                     EqtTrace.Warning($"DiscoveryManager.MarkSourcesWithStatus : SourcesWithDiscoveryStatus does not contain {source}");
                 }
                 else
                 {
-                    SourcesWithDiscoveryStatus[source] = status;
+                    _sourcesWithDiscoveryStatus[source] = status;
                     EqtTrace.Warning($"DiscoveryManager.MarkSourcesWithStatus : Marking {source} with {status} status");
                 }
             }
@@ -424,15 +425,14 @@ public class DiscoveryManager : IDiscoveryManager
     /// </summary>
     /// <param name="discoveryStatus">discoveryStatus indicates if source was fully/partially/not discovered</param>
     /// <returns></returns>
-    private IReadOnlyCollection<string> GetFilteredSources(DiscoveryStatus discoveryStatus)
+    private IReadOnlyList<string> GetFilteredSources(DiscoveryStatus discoveryStatus)
     {
         // If by some accident SourcesWithDiscoveryStatus map is empty we will return empty list
-        if (SourcesWithDiscoveryStatus == null || SourcesWithDiscoveryStatus.Count == 0)
-        {
-            return new List<string>();
-        }
-
-        return SourcesWithDiscoveryStatus.Where(source => source.Value == discoveryStatus)
-                                            .Select(source => source.Key).ToList();
+        return _sourcesWithDiscoveryStatus == null || _sourcesWithDiscoveryStatus.IsEmpty
+            ? new List<string>()
+            : _sourcesWithDiscoveryStatus
+                .Where(source => source.Value == discoveryStatus)
+                .Select(source => source.Key)
+                .ToList();
     }
 }

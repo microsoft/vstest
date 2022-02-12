@@ -129,11 +129,12 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             // Sending discovery complete message to IDE
             SendMessage(testDiscoveryCompletePayload);
 
-            var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(_discoveryDataAggregator.TotalTests,
-                                                                                    _discoveryDataAggregator.IsAborted,
-                                                                                    fullyDiscovered,
-                                                                                    partiallyDiscovered,
-                                                                                    notDiscovered);
+            var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
+                _discoveryDataAggregator.TotalTests,
+                _discoveryDataAggregator.IsAborted,
+                fullyDiscovered,
+                partiallyDiscovered,
+                notDiscovered);
 
             finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
 
@@ -219,18 +220,11 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     {
         if (lastChunk == null) return;
 
-        IEnumerable<string> lastChunkSources;
-
         // Sometimes we get lastChunk as empty list (when number of tests in project dividable by 10)
         // Then we will take sources from discoveryCompleteEventArgs coming from testhost
-        if (lastChunk.Count() == 0)
-        {
-            lastChunkSources = discoveryCompleteEventArgs.FullyDiscoveredSources;
-        }
-        else
-        {
-            lastChunkSources = lastChunk.Select(testcase => testcase.Source);
-        }
+        IEnumerable<string> lastChunkSources = !lastChunk.Any()
+            ? discoveryCompleteEventArgs.FullyDiscoveredSources
+            : lastChunk.Select(testcase => testcase.Source);
 
         _discoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus(lastChunkSources, DiscoveryStatus.FullyDiscovered);
     }

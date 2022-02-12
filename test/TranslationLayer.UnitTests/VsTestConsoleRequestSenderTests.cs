@@ -456,8 +456,8 @@ public class VsTestConsoleRequestSenderTests
         DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
 
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
-        mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback(
-                            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
+        mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
+            .Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
 
         mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
             .Callback((DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> tests) => receivedDiscoveryCompleteEventArgs = discoveryCompleteEventArgs);
@@ -470,7 +470,7 @@ public class VsTestConsoleRequestSenderTests
     }
 
     [TestMethod]
-    public void DiscoverTestsShouldCompleteWithCorrectAbortedValuesIfAbortingWasRequsted()
+    public void DiscoverTestsShouldCompleteWithCorrectAbortedValuesIfAbortingWasRequested()
     {
         // Arrange
         InitializeCommunication();
@@ -496,8 +496,8 @@ public class VsTestConsoleRequestSenderTests
         DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
 
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
-        mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback(
-                            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
+        mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
+            .Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
 
         mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
             .Callback((DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> tests) => receivedDiscoveryCompleteEventArgs = discoveryCompleteEventArgs);

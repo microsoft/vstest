@@ -156,10 +156,11 @@ public class DiscoverTests : AcceptanceTestBase
 
         var eventHandler2 = new DiscoveryEventHandler2();
 
-        _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(),
-                                                GetDefaultRunSettings(),
-                                                null,
-                                                eventHandler2);
+        _vstestConsoleWrapper.DiscoverTests(
+            GetTestAssemblies(),
+            GetDefaultRunSettings(),
+            null,
+            eventHandler2);
 
         // Assert.
         Assert.AreEqual(2, eventHandler2.FullyDiscoveredSources.Count);
