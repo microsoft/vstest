@@ -3,10 +3,10 @@
 
 #if !NETSTANDARD1_0
 
+namespace Microsoft.VisualStudio.TestPlatform.Utilities;
+
 using System;
 using System.Collections.Generic;
-
-namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 internal partial class FeatureFlag : IFeatureFlag
 {

@@ -3,10 +3,10 @@
 
 #if !NETSTANDARD1_0
 
+namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.Win32;
-
-namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 internal class WindowsRegistryHelper : IWindowsRegistryHelper
 {

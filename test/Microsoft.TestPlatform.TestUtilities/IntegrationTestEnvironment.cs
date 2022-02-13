@@ -17,7 +17,7 @@ using VisualStudio.TestTools.UnitTesting;
 /// </summary>
 public class IntegrationTestEnvironment
 {
-    public static string TestPlatformRootDirectory =
+    public static string TestPlatformRootDirectory { get; private set; } =
         Environment.GetEnvironmentVariable("TP_ROOT_DIR")
         ?? Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
 

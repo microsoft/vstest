@@ -357,6 +357,6 @@ public static class TestResultProperties
 
     private static bool ValidateOutcome(object value)
     {
-        return (TestOutcome)value <= TestOutcome.NotFound && (TestOutcome)value >= TestOutcome.None;
+        return (TestOutcome)value is <= TestOutcome.NotFound and >= TestOutcome.None;
     }
 }

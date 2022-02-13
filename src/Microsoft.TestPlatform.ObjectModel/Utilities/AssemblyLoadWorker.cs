@@ -307,7 +307,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
 
                     // magic number.32bit or 64bit assembly.
                     UInt16 magic = reader.ReadUInt16();
-                    if (magic != 0x010B && magic != 0x020B)
+                    if (magic is not 0x010B and not 0x020B)
                     {
                         validImage = false;
                     }

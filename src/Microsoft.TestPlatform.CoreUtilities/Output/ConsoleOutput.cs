@@ -14,10 +14,10 @@ using System.IO;
 public class ConsoleOutput : IOutput
 {
     private static readonly object LockObject = new();
-    private static ConsoleOutput s_consoleOutput = null;
+    private static ConsoleOutput s_consoleOutput;
 
-    private readonly TextWriter _standardOutput = null;
-    private readonly TextWriter _standardError = null;
+    private readonly TextWriter _standardOutput;
+    private readonly TextWriter _standardError;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConsoleOutput"/> class.

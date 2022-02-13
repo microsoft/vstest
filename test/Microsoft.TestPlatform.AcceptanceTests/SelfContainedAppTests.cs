@@ -22,7 +22,7 @@ public class SelfContainedAppTests : AcceptanceTestBase
         // properties, the testhost.exe executable is given a runtimeconfig that instructs it to find a hostpolicy.dll and hostfxr.dll next to it
         // that will fail if we run the testhost.exe from the .nuget location, but will work when we run it from the output folder
         // see https://github.com/dotnet/runtime/issues/3569#issuecomment-595820524 and below for description of how it works
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         // the app is published to win10-x64 because of the runtime identifier in the project

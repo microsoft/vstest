@@ -24,7 +24,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void CommandLineRunSettingsShouldWinAmongAllOptions(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var targetPlatform = "x86";
         var testhostProcessName = new[] { "testhost.x86" };
@@ -61,7 +61,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void CLIRunsettingsShouldWinBetweenCLISwitchesAndCLIRunsettings(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var targetPlatform = "x86";
         var testhostProcessName = new[] { "testhost.x86" };
@@ -217,7 +217,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSettingsWithInvalidValueShouldLogError(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var runConfigurationDictionary = new Dictionary<string, string>
@@ -239,7 +239,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void TestAdapterPathFromRunSettings(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var runConfigurationDictionary = new Dictionary<string, string>
@@ -263,7 +263,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsWithPlatform(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
@@ -295,7 +295,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsWithScripts(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
@@ -342,7 +342,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsWithDeploymentItem(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
@@ -379,7 +379,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsTestTimeout(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
@@ -407,7 +407,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsAssemblyResolution(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
@@ -450,7 +450,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void EnvironmentVariablesSettingsShouldSetEnvironmentVariables(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssemblyPath = GetAssetFullPath("EnvironmentVariablesTestProject.dll");

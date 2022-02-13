@@ -168,7 +168,7 @@ public class LoggerSettings
                         break;
 
                     case Constants.LoggerEnabledName:
-                        bool.TryParse(reader.Value, out var value);
+                        _ = bool.TryParse(reader.Value, out var value);
                         settings.IsEnabled = value;
                         break;
 

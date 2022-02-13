@@ -29,10 +29,6 @@ public class CustomDataCollector : DataCollector, ITestExecutionEnvironmentSpeci
     {
         return default;
     }
-
-    protected override void Dispose(bool disposing)
-    {
-    }
 }
 
 [DataCollectorFriendlyName("CustomDataCollector")]

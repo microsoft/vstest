@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
-
 namespace TestPlatform.CrossPlatEngine.UnitTests;
 
 using System;
@@ -11,6 +9,7 @@ using System.Reflection;
 using System.Threading;
 
 using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -29,7 +28,7 @@ using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
 [TestClass]
 public class TestLoggerManagerTests
 {
-    private static int s_counter = 0;
+    private static int s_counter;
     private static readonly EventWaitHandle WaitHandle = new AutoResetEvent(false);
     private readonly string _loggerUri = "testlogger://logger";
 
@@ -1628,7 +1627,7 @@ public class TestLoggerManagerTests
     [FriendlyName("InvalidTestLoggerExtension")]
     private class InvalidLogger
     {
-        public static int Counter = 0;
+        public static int Counter;
 
         public void Initialize(TestLoggerEvents events, string testRunDirectory)
         {
@@ -1652,7 +1651,7 @@ public class TestLoggerManagerTests
     private class ValidLoggerWithParameters : ITestLoggerWithParameters
     {
         public static Dictionary<string, string> Parameters;
-        public static int Counter = 0;
+        public static int Counter;
 
         public void Initialize(TestLoggerEvents events, string testRunDirectory)
         {

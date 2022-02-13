@@ -35,7 +35,9 @@ public class PlatformEnvironment : IEnvironment
             // CLR 2.x. See below link for more information:
             // http://www.mono-project.com/docs/faq/technical/#how-to-detect-the-execution-platform
             int p = (int)Environment.OSVersion.Platform;
-            return (p == 4) || (p == 6) || (p == 128) ? PlatformOperatingSystem.Unix : PlatformOperatingSystem.Windows;
+            return p is 4 or 6 or 128
+                ? PlatformOperatingSystem.Unix
+                : PlatformOperatingSystem.Windows;
         }
     }
 

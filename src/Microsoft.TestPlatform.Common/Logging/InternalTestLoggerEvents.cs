@@ -40,7 +40,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// <summary>
     /// Keeps track if we are disposed.
     /// </summary>
-    private bool _isDisposed = false;
+    private bool _isDisposed;
 
     /// <summary>
     /// Specifies whether logger event queue is bounded or not
