@@ -1110,7 +1110,7 @@
       </trans-unit>
       <trans-unit id="InvalidTestSessionCorrelationId">
         <source>Invalid testSessionCorrelationId</source>
-        <target state="new">Invalid testSessionCorrelationId</target>
+        <target state="translated">TestSessionCorrelationId non valide</target>
         <note></note>
       </trans-unit>
     </body>
