@@ -88,10 +88,15 @@ internal class DefaultEngineInvoker :
     {
         InitializeEqtTrace(argsDictionary);
 
-        if (argsDictionary.ContainsKey(RemotePath) && argsDictionary.ContainsKey(LocalPath))
+        // We don't have a way to pass these values to TestRequestHandler directly
+        // beacuse of it's public interface, we work around that by making it implement a second interface
+        if (_requestHandler is IDeploymentAwareTestRequestHandler deployedHandler)
         {
-            Environment.SetEnvironmentVariable(LocalPath, argsDictionary[LocalPath]);
-            Environment.SetEnvironmentVariable(RemotePath, argsDictionary[RemotePath]);
+            if (argsDictionary.ContainsKey(RemotePath) && argsDictionary.ContainsKey(LocalPath))
+            {
+                deployedHandler.LocalPath = argsDictionary[LocalPath];
+                deployedHandler.RemotePath = argsDictionary[RemotePath];
+            }
         }
 
         if (EqtTrace.IsVerboseEnabled)

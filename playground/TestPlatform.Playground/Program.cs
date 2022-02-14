@@ -59,7 +59,8 @@ internal class Program
         var options = new TestPlatformOptions();
         var discoveryHandler = new TestDiscoveryHandler();
         r.DiscoverTests(sources, sourceSettings, options, discoveryHandler);
-        if (File.Exists(sources[0])) {
+        if (File.Exists(sources[0]))
+        {
             throw new Exception($"File {sources[0]} exists, but it should not because we moved it during deployment!");
         }
         r.RunTestsWithCustomTestHost(discoveryHandler.DiscoveredTestCases, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
