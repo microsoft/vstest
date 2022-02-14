@@ -52,6 +52,8 @@ Copyright (c) .NET Foundation. All rights reserved.
       VSTestBlameHangDumpType="$(VSTestBlameHangDumpType)"
       VSTestBlameHangTimeout="$(VSTestBlameHangTimeout)"
       VSTestTraceDataCollectorDirectoryPath="$(TraceDataCollectorDirectoryPath)"
+      VSTestArtifactsProcessingMode="$(VSTestArtifactsProcessingMode)"
+      VSTestSessionCorrelationId="$(VSTestSessionCorrelationId)"
       VSTestNoLogo="$(VSTestNoLogo)"
       Condition="'$(IsTestProject)' == 'true'"
     />

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestSession;
 
 using System;
@@ -40,21 +42,22 @@ public class TestSessionPoolTests
             new StartTestSessionCriteria(),
             1,
             (Func<ProxyOperationManager>)(() => null));
+        var mockRequestData = new Mock<IRequestData>();
 
-        mockProxyTestSessionManager.SetupSequence(tsm => tsm.StopSession())
+        mockProxyTestSessionManager.SetupSequence(tsm => tsm.StopSession(It.IsAny<IRequestData>()))
             .Returns(true)
             .Returns(false);
 
-        Assert.IsFalse(TestSessionPool.Instance.KillSession(testSessionInfo));
-        mockProxyTestSessionManager.Verify(tsm => tsm.StopSession(), Times.Never);
+        Assert.IsFalse(TestSessionPool.Instance.KillSession(testSessionInfo, mockRequestData.Object));
+        mockProxyTestSessionManager.Verify(tsm => tsm.StopSession(It.IsAny<IRequestData>()), Times.Never);
 
         Assert.IsTrue(TestSessionPool.Instance.AddSession(testSessionInfo, mockProxyTestSessionManager.Object));
-        Assert.IsTrue(TestSessionPool.Instance.KillSession(testSessionInfo));
-        mockProxyTestSessionManager.Verify(tsm => tsm.StopSession(), Times.Once);
+        Assert.IsTrue(TestSessionPool.Instance.KillSession(testSessionInfo, mockRequestData.Object));
+        mockProxyTestSessionManager.Verify(tsm => tsm.StopSession(mockRequestData.Object), Times.Once);
 
         Assert.IsTrue(TestSessionPool.Instance.AddSession(testSessionInfo, mockProxyTestSessionManager.Object));
-        Assert.IsFalse(TestSessionPool.Instance.KillSession(testSessionInfo));
-        mockProxyTestSessionManager.Verify(tsm => tsm.StopSession(), Times.Exactly(2));
+        Assert.IsFalse(TestSessionPool.Instance.KillSession(testSessionInfo, mockRequestData.Object));
+        mockProxyTestSessionManager.Verify(tsm => tsm.StopSession(mockRequestData.Object), Times.Exactly(2));
     }
 
     [TestMethod]

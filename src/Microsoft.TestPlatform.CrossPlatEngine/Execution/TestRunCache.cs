@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 using System;
@@ -382,10 +384,7 @@ internal class TestRunCache : ITestRunCache
             }
             catch (Exception ex)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestRunCache: OnCacheTimeHit: Exception occurred while checking for cache hit. {0}", ex);
-                }
+                EqtTrace.Error("TestRunCache: OnCacheTimeHit: Exception occurred while checking for cache hit. {0}", ex);
             }
         }
     }

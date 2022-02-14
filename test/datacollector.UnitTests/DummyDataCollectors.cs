@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
 
 using System.Collections.Generic;
@@ -28,10 +30,6 @@ public class CustomDataCollector : DataCollector, ITestExecutionEnvironmentSpeci
     public IEnumerable<KeyValuePair<string, string>> GetTestExecutionEnvironmentVariables()
     {
         return default;
-    }
-
-    protected override void Dispose(bool disposing)
-    {
     }
 }
 

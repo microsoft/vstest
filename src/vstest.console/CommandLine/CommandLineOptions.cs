@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
 using System;
@@ -15,6 +17,7 @@ using Utilities.Helpers.Interfaces;
 using CommandLineResources = Resources.Resources;
 using vstest.console.Internal;
 using System.Globalization;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// Provides access to the command-line options.
@@ -122,7 +125,7 @@ internal class CommandLineOptions
     /// <summary>
     /// Specifies whether the Fakes automatic configuration should be disabled.
     /// </summary>
-    public bool DisableAutoFakes { get; set; } = false;
+    public bool DisableAutoFakes { get; set; }
 
     /// <summary>
     /// Specifies whether vsixExtensions is enabled or not.
@@ -271,6 +274,16 @@ internal class CommandLineOptions
     /// Gets or sets the /setting switch value. i.e path to settings file.
     /// </summary>
     internal string SettingsFile { get; set; }
+
+    /// <summary>
+    /// Gets or sets the /ArtifactsProcessingMode value.
+    /// </summary>
+    internal ArtifactProcessingMode ArtifactProcessingMode { get; set; }
+
+    /// <summary>
+    /// Gets or sets the /TestSessionCorrelationId value.
+    /// </summary>
+    internal string TestSessionCorrelationId { get; set; }
 
     #endregion
 

@@ -1,11 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
 /// <summary>
 /// The Telemetry data constants.
 /// </summary>
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Non-constant fields should not be visible", Justification = "Part of the public API.")]
 public static class TelemetryDataConstants
 {
     // ******************** Execution ***********************
@@ -84,8 +87,6 @@ public static class TelemetryDataConstants
 
     public static string ParallelEnabledDuringDiscovery = "VS.TestDiscovery.ParallelEnabled";
 
-    public static string ParallelEnabledDuringStartTestSession = "VS.StartTestSession.ParallelEnabled";
-
     // All the times are in sec
     public static string TimeTakenInSecForDiscovery = "VS.TestDiscovery.TotalTimeTakenInSec";
 
@@ -117,6 +118,19 @@ public static class TelemetryDataConstants
 
     public static string AttachmentsProcessingState = "VS.AttachmentsProcessing.State";
 
+    // *********************Test Sessions****************************
+    public static string ParallelEnabledDuringStartTestSession = "VS.TestSession.ParallelEnabled";
+
+    public static string TestSessionId = "VS.TestSession.Id";
+
+    public static string TestSessionSpawnedTesthostCount = "VS.TestSession.SpawnedTesthostCount";
+
+    public static string TestSessionTesthostSpawnTimeInSec = "VS.TestSession.TesthostSpawnTimeInSec";
+
+    public static string TestSessionState = "VS.TestSession.State";
+
+    public static string TestSessionTotalSessionTimeInSec = "VS.TestSession.TotalSessionTimeInSec";
+
     // **************Events Name **********************************
     public static string TestDiscoveryCompleteEvent = "vs/testplatform/testdiscoverysession";
 
@@ -125,4 +139,6 @@ public static class TelemetryDataConstants
     public static string TestAttachmentsProcessingCompleteEvent = "vs/testplatform/testattachmentsprocessingsession";
 
     public static string StartTestSessionCompleteEvent = "vs/testplatform/starttestsession";
+
+    public static string StopTestSessionCompleteEvent = "vs/testplatform/stoptestsession";
 }

@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery;
 
 using System;
@@ -62,10 +64,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// </summary>
     public void DiscoverAsync()
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DiscoveryRequest.DiscoverAsync: Starting.");
-        }
+        EqtTrace.Verbose("DiscoveryRequest.DiscoverAsync: Starting.");
 
         lock (_syncObject)
         {
@@ -99,10 +98,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             }
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("DiscoveryRequest.DiscoverAsync: Started.");
-        }
+        EqtTrace.Info("DiscoveryRequest.DiscoverAsync: Started.");
     }
 
     /// <summary>
@@ -110,10 +106,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// </summary>
     public void Abort()
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DiscoveryRequest.Abort: Aborting.");
-        }
+        EqtTrace.Verbose("DiscoveryRequest.Abort: Aborting.");
 
         lock (_syncObject)
         {
@@ -128,19 +121,12 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             }
             else
             {
-                if (EqtTrace.IsInfoEnabled)
-                {
-                    EqtTrace.Info("DiscoveryRequest.Abort: No operation to abort.");
-                }
-
+                EqtTrace.Info("DiscoveryRequest.Abort: No operation to abort.");
                 return;
             }
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("DiscoveryRequest.Abort: Aborted.");
-        }
+        EqtTrace.Info("DiscoveryRequest.Abort: Aborted.");
     }
 
     /// <summary>
@@ -149,10 +135,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <param name="timeout"> The timeout. </param>
     bool IRequest.WaitForCompletion(int timeout)
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DiscoveryRequest.WaitForCompletion: Waiting with timeout {0}.", timeout);
-        }
+        EqtTrace.Verbose("DiscoveryRequest.WaitForCompletion: Waiting with timeout {0}.", timeout);
 
         if (_disposed)
         {
@@ -222,19 +205,13 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <inheritdoc/>
     public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete: Starting. Aborted:{0}, TotalTests:{1}", discoveryCompleteEventArgs.IsAborted, discoveryCompleteEventArgs.TotalCount);
-        }
+        EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete: Starting. Aborted:{0}, TotalTests:{1}", discoveryCompleteEventArgs.IsAborted, discoveryCompleteEventArgs.TotalCount);
 
         lock (_syncObject)
         {
             if (_disposed)
             {
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("DiscoveryRequest.DiscoveryComplete: Ignoring as the object is disposed.");
-                }
+                EqtTrace.Warning("DiscoveryRequest.DiscoveryComplete: Ignoring as the object is disposed.");
 
                 return;
             }
@@ -242,11 +219,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             // If discovery event is already raised, ignore current one.
             if (_discoveryCompleted.WaitOne(0))
             {
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete:Ignoring duplicate DiscoveryComplete. Aborted:{0}, TotalTests:{1}", discoveryCompleteEventArgs.IsAborted, discoveryCompleteEventArgs.TotalCount);
-                }
-
+                EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete:Ignoring duplicate DiscoveryComplete. Aborted:{0}, TotalTests:{1}", discoveryCompleteEventArgs.IsAborted, discoveryCompleteEventArgs.TotalCount);
                 return;
             }
 
@@ -275,17 +248,11 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 if (_discoveryCompleted != null)
                 {
                     _discoveryCompleted.Set();
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete: Notified the discovery complete event.");
-                    }
+                    EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete: Notified the discovery complete event.");
                 }
                 else
                 {
-                    if (EqtTrace.IsWarningEnabled)
-                    {
-                        EqtTrace.Warning("DiscoveryRequest.DiscoveryComplete: Discovery complete event was null.");
-                    }
+                    EqtTrace.Warning("DiscoveryRequest.DiscoveryComplete: Discovery complete event was null.");
                 }
 
                 DiscoveryInProgress = false;
@@ -307,29 +274,19 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             }
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("DiscoveryRequest.DiscoveryComplete: Completed.");
-        }
+        EqtTrace.Info("DiscoveryRequest.DiscoveryComplete: Completed.");
     }
 
     /// <inheritdoc/>
     public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DiscoveryRequest.SendDiscoveredTests: Starting.");
-        }
+        EqtTrace.Verbose("DiscoveryRequest.SendDiscoveredTests: Starting.");
 
         lock (_syncObject)
         {
             if (_disposed)
             {
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("DiscoveryRequest.SendDiscoveredTests: Ignoring as the object is disposed.");
-                }
-
+                EqtTrace.Warning("DiscoveryRequest.SendDiscoveredTests: Ignoring as the object is disposed.");
                 return;
             }
 
@@ -338,10 +295,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.OnDiscoveredTests");
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("DiscoveryRequest.SendDiscoveredTests: Completed.");
-        }
+        EqtTrace.Info("DiscoveryRequest.SendDiscoveredTests: Completed.");
     }
 
     /// <summary>
@@ -351,20 +305,13 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <param name="message">Actual contents of the message</param>
     public void HandleLogMessage(TestMessageLevel level, string message)
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DiscoveryRequest.SendDiscoveryMessage: Starting.");
-        }
+        EqtTrace.Verbose("DiscoveryRequest.SendDiscoveryMessage: Starting.");
 
         lock (_syncObject)
         {
             if (_disposed)
             {
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("DiscoveryRequest.SendDiscoveryMessage: Ignoring as the object is disposed.");
-                }
-
+                EqtTrace.Warning("DiscoveryRequest.SendDiscoveryMessage: Ignoring as the object is disposed.");
                 return;
             }
 
@@ -373,10 +320,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             OnDiscoveryMessage.SafeInvoke(this, testRunMessageEvent, "DiscoveryRequest.OnTestMessageRecieved");
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("DiscoveryRequest.SendDiscoveryMessage: Completed.");
-        }
+        EqtTrace.Info("DiscoveryRequest.SendDiscoveryMessage: Completed.");
     }
 
     /// <summary>
@@ -492,10 +436,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
     private void Dispose(bool disposing)
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DiscoveryRequest.Dispose: Starting.");
-        }
+        EqtTrace.Verbose("DiscoveryRequest.Dispose: Starting.");
 
         lock (_syncObject)
         {
@@ -515,10 +456,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             }
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("DiscoveryRequest.Dispose: Completed.");
-        }
+        EqtTrace.Info("DiscoveryRequest.Dispose: Completed.");
     }
 
     #endregion
@@ -533,7 +471,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <summary>
     /// If this request has been disposed.
     /// </summary>
-    private bool _disposed = false;
+    private bool _disposed;
 
     /// <summary>
     /// It get set when current discovery request is completed.

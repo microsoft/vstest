@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal;
 
 using System;
@@ -32,6 +34,7 @@ public class ConsoleLoggerTests
     private Mock<IOutput> _mockOutput;
     private ConsoleLogger _consoleLogger;
     private Mock<IProgressIndicator> _mockProgressIndicator;
+    private Mock<IFeatureFlag> _mockFeatureFlag;
 
     private const string PassedTestIndicator = "  Passed ";
     private const string FailedTestIndicator = "  Failed ";
@@ -1230,11 +1233,13 @@ public class ConsoleLoggerTests
     {
         _mockRequestData = new Mock<IRequestData>();
         _mockMetricsCollection = new Mock<IMetricsCollection>();
+        _mockFeatureFlag = new Mock<IFeatureFlag>();
+        _mockFeatureFlag.Setup(x => x.IsEnabled(It.IsAny<string>())).Returns(true);
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
 
         _mockOutput = new Mock<IOutput>();
         _mockProgressIndicator = new Mock<IProgressIndicator>();
-        _consoleLogger = new ConsoleLogger(_mockOutput.Object, _mockProgressIndicator.Object);
+        _consoleLogger = new ConsoleLogger(_mockOutput.Object, _mockProgressIndicator.Object, _mockFeatureFlag.Object);
     }
 
     private List<ObjectModel.TestResult> GetTestResultsObject()

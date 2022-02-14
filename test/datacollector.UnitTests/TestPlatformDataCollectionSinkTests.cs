@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
 
 using System;
@@ -22,7 +24,7 @@ public class TestPlatformDataCollectionSinkTests
 
     private TestPlatformDataCollectionSink _dataCollectionSink;
 
-    private bool _isEventHandlerInvoked = false;
+    private bool _isEventHandlerInvoked;
     private static readonly string TempDirectoryPath = Path.GetTempPath();
 
     public TestPlatformDataCollectionSinkTests()

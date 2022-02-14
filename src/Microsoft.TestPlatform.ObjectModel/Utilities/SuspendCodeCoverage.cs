@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 #if NETFRAMEWORK
 using System;
@@ -20,7 +22,7 @@ public class SuspendCodeCoverage : IDisposable
     /// <summary>
     /// Whether the object is disposed or not.
     /// </summary>
-    private bool _isDisposed = false;
+    private bool _isDisposed;
 
     /// <summary>
     /// Constructor. Code Coverage instrumentation of the modules, which are loaded

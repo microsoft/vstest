@@ -1111,6 +1111,11 @@
         <target state="translated">La serie de pruebas se ha anulado con el error {0}.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidTestSessionCorrelationId">
+        <source>Invalid testSessionCorrelationId</source>
+        <target state="new">Invalid testSessionCorrelationId</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

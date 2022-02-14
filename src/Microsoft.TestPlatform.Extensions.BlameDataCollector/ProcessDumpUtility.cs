@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 using System;
@@ -40,14 +42,9 @@ internal class ProcessDumpUtility : IProcessDumpUtility
     }
 
     protected Action<object, string> OutputReceivedCallback => (process, data) =>
-    {
         // Log all standard output message of procdump in diag files.
         // Otherwise they end up coming on console in pipleine.
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("ProcessDumpUtility.OutputReceivedCallback: Output received from procdump process: " + data);
-        }
-    };
+        EqtTrace.Info("ProcessDumpUtility.OutputReceivedCallback: Output received from procdump process: " + data);
 
     /// <inheritdoc/>
     public IEnumerable<string> GetDumpFiles(bool warnOnNoDumpFiles, bool processCrashed)

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 using System;
@@ -183,12 +185,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
 
         if (string.IsNullOrEmpty(SessionOutputDirectory))
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error(
-                    "DataCollectionAttachmentManager.AddAttachment: Initialize not invoked.");
-            }
-
+            EqtTrace.Error("DataCollectionAttachmentManager.AddAttachment: Initialize not invoked.");
             return;
         }
 
@@ -294,31 +291,19 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
                 {
                     if (fileTransferInfo.PerformCleanup)
                     {
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Moving file {0} to {1}", fileTransferInfo.FileName, localFilePath);
-                        }
+                        EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer: Moving file {0} to {1}", fileTransferInfo.FileName, localFilePath);
 
                         _fileHelper.MoveFile(fileTransferInfo.FileName, localFilePath);
 
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Moved file {0} to {1}", fileTransferInfo.FileName, localFilePath);
-                        }
+                        EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer: Moved file {0} to {1}", fileTransferInfo.FileName, localFilePath);
                     }
                     else
                     {
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Copying file {0} to {1}", fileTransferInfo.FileName, localFilePath);
-                        }
+                        EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer: Copying file {0} to {1}", fileTransferInfo.FileName, localFilePath);
 
                         _fileHelper.CopyFile(fileTransferInfo.FileName, localFilePath);
 
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Copied file {0} to {1}", fileTransferInfo.FileName, localFilePath);
-                        }
+                        EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer: Copied file {0} to {1}", fileTransferInfo.FileName, localFilePath);
                     }
                 }
                 catch (Exception ex)
@@ -351,13 +336,10 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
                 }
                 catch (Exception e)
                 {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error(
-                            "DataCollectionAttachmentManager.TriggerCallBack: Error occurred while raising the file transfer completed callback for {0}. Error: {1}",
-                            localFilePath,
-                            e.ToString());
-                    }
+                    EqtTrace.Error(
+                        "DataCollectionAttachmentManager.TriggerCallBack: Error occurred while raising the file transfer completed callback for {0}. Error: {1}",
+                        localFilePath,
+                        e.ToString());
                 }
             },
             _cancellationTokenSource.Token);

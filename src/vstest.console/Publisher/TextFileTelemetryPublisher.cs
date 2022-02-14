@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
 
 using System;
@@ -65,10 +67,7 @@ public class TextFileTelemetryPublisher : IMetricsPublisher
         var telemetryData = string.Join(";", metrics.Select(x => x.Key + "=" + x.Value));
         var finalData = string.Concat(eventName, ";", telemetryData);
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("TextFileTelemetryPublisher.LogToFile : Logging telemetry data points to file {0}", path);
-        }
+        EqtTrace.Info("TextFileTelemetryPublisher.LogToFile: Logging telemetry data points to file {0}", path);
 
         fileHelper.WriteAllTextToFile(path, finalData);
     }

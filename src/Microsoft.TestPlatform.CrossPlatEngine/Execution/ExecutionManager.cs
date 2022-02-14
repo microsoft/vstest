@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 using System;
@@ -205,10 +207,7 @@ public class ExecutionManager : IExecutionManager
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsWarningEnabled)
-            {
-                EqtTrace.Warning("TestExecutorWebService: Exception occurred while calling test connection. {0}", ex);
-            }
+            EqtTrace.Warning("TestExecutorWebService: Exception occurred while calling test connection. {0}", ex);
         }
     }
 
@@ -238,12 +237,9 @@ public class ExecutionManager : IExecutionManager
         }
         else
         {
-            if (EqtTrace.IsWarningEnabled)
-            {
-                EqtTrace.Warning(
-                    "ExecutionManager: Could not pass the log message  '{0}' as the callback is null.",
-                    e.Message);
-            }
+            EqtTrace.Warning(
+                "ExecutionManager: Could not pass the log message  '{0}' as the callback is null.",
+                e.Message);
         }
     }
 

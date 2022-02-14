@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 using System;
@@ -31,7 +33,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 /// </summary>
 internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITestRunEventsHandler2
 {
-    private readonly TestSessionInfo _testSessionInfo = null;
+    private readonly TestSessionInfo _testSessionInfo;
     private readonly Func<string, ProxyExecutionManager, ProxyOperationManager> _proxyOperationManagerCreator;
 
     private ITestRuntimeProvider _testHostManager;
@@ -40,13 +42,13 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     private readonly IDataSerializer _dataSerializer;
     private bool _isCommunicationEstablished;
 
-    private ProxyOperationManager _proxyOperationManager = null;
+    private ProxyOperationManager _proxyOperationManager;
     private ITestRunEventsHandler _baseTestRunEventsHandler;
     private bool _skipDefaultAdapters;
-    private readonly bool _debugEnabledForTestSession = false;
+    private readonly bool _debugEnabledForTestSession;
 
     /// <inheritdoc/>
-    public bool IsInitialized { get; private set; } = false;
+    public bool IsInitialized { get; private set; }
 
     /// <summary>
     /// Gets or sets the cancellation token source.
@@ -168,10 +170,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
         _baseTestRunEventsHandler = eventHandler;
         try
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
-            }
+            EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
 
             var testSources = new List<string>(
                 testRunCriteria.HasSpecificSources

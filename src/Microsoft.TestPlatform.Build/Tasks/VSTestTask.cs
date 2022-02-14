@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Build.Tasks;
 
 using System;
@@ -156,6 +158,18 @@ public class VSTestTask : Task, ICancelableTask
     }
 
     public string VSTestNoLogo
+    {
+        get;
+        set;
+    }
+
+    public string VSTestArtifactsProcessingMode
+    {
+        get;
+        set;
+    }
+
+    public string VSTestSessionCorrelationId
     {
         get;
         set;
@@ -414,6 +428,16 @@ public class VSTestTask : Task, ICancelableTask
         if (!string.IsNullOrWhiteSpace(VSTestNoLogo))
         {
             allArgs.Add("--nologo");
+        }
+
+        if (!string.IsNullOrEmpty(VSTestArtifactsProcessingMode) && VSTestArtifactsProcessingMode.Equals("collect", StringComparison.OrdinalIgnoreCase))
+        {
+            allArgs.Add("--artifactsProcessingMode-collect");
+        }
+
+        if (!string.IsNullOrEmpty(VSTestSessionCorrelationId))
+        {
+            allArgs.Add("--testSessionCorrelationId:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(VSTestSessionCorrelationId));
         }
 
         return allArgs;

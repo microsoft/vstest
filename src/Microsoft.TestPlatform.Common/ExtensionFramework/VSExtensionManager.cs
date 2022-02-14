@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 using System;
@@ -103,10 +105,7 @@ public class VSExtensionManager : IVSExtensionManager
                     }
                     else
                     {
-                        if (EqtTrace.IsWarningEnabled)
-                        {
-                            EqtTrace.Warning("VSExtensionManager : Unable to create extension manager");
-                        }
+                        EqtTrace.Warning("VSExtensionManager : Unable to create extension manager");
                     }
                 }
                 finally
@@ -121,10 +120,7 @@ public class VSExtensionManager : IVSExtensionManager
             }
             else
             {
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("VSExtensionManager : Unable to create settings manager");
-                }
+                EqtTrace.Warning("VSExtensionManager : Unable to create settings manager");
             }
         }
 

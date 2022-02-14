@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 using System;
@@ -124,11 +126,8 @@ public class SocketCommunicationManager : ICommunicationManager
             _binaryWriter = new BinaryWriter(bufferedStream);
 
             _clientConnectedEvent.Set();
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
-                EqtTrace.Info("Accepted Client request and set the flag");
-            }
+            EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
+            EqtTrace.Info("Accepted Client request and set the flag");
         }
     }
 
@@ -193,11 +192,8 @@ public class SocketCommunicationManager : ICommunicationManager
                     _binaryReader = new BinaryReader(networkStream);
                     _binaryWriter = new BinaryWriter(bufferedStream);
 
-                    if (EqtTrace.IsInfoEnabled)
-                    {
-                        EqtTrace.Info("Connected to the server successfully ");
-                        EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
-                    }
+                    EqtTrace.Info("Connected to the server successfully ");
+                    EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
 
                     _clientConnectionAcceptedEvent.Set();
                 }

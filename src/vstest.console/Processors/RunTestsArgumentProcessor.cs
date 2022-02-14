@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -19,6 +21,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CommandLineResources = Resources.Resources;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
 
 internal class RunTestsArgumentProcessor : IArgumentProcessor
 {
@@ -51,6 +55,7 @@ internal class RunTestsArgumentProcessor : IArgumentProcessor
                         CommandLineOptions.Instance,
                         RunSettingsManager.Instance,
                         TestRequestManager.Instance,
+                        new ArtifactProcessingManager(CommandLineOptions.Instance.TestSessionCorrelationId),
                         ConsoleOutput.Instance));
             }
 
@@ -127,6 +132,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
         CommandLineOptions commandLineOptions,
         IRunSettingsProvider runSettingsProvider,
         ITestRequestManager testRequestManager,
+        IArtifactProcessingManager artifactProcessingManager,
         IOutput output)
     {
         Contract.Requires(commandLineOptions != null);
@@ -135,7 +141,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsProvider;
         _testRequestManager = testRequestManager;
         Output = output;
-        _testRunEventsRegistrar = new TestRunRequestEventsRegistrar(Output, _commandLineOptions);
+        _testRunEventsRegistrar = new TestRunRequestEventsRegistrar(Output, _commandLineOptions, artifactProcessingManager);
     }
 
     #endregion
@@ -155,8 +161,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
 
         if (_commandLineOptions.IsDesignMode)
         {
-            // Do not attempt execution in case of design mode. Expect execution to happen
-            // via the design mode client.
+            // Do not attempt execution in case of design mode. Expect execution to happen via the design mode client.
             return ArgumentProcessorResult.Success;
         }
 
@@ -188,15 +193,8 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
     private void RunTests(string runSettings)
     {
         // create/start test run
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("RunTestsArgumentProcessor:Execute: Test run is starting.");
-        }
-
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("RunTestsArgumentProcessor:Execute: Queuing Test run.");
-        }
+        EqtTrace.Info("RunTestsArgumentProcessor:Execute: Test run is starting.");
+        EqtTrace.Verbose("RunTestsArgumentProcessor:Execute: Queuing Test run.");
 
         // for command line keep alive is always false.
         // for Windows Store apps it should be false, as Windows Store apps executor should terminate after finishing the test execution.
@@ -205,21 +203,20 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
         var runRequestPayload = new TestRunRequestPayload() { Sources = _commandLineOptions.Sources.ToList(), RunSettings = runSettings, KeepAlive = keepAlive, TestPlatformOptions = new TestPlatformOptions() { TestCaseFilter = _commandLineOptions.TestCaseFilterValue } };
         _testRequestManager.RunTests(runRequestPayload, null, _testRunEventsRegistrar, Constants.DefaultProtocolConfig);
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("RunTestsArgumentProcessor:Execute: Test run is completed.");
-        }
+        EqtTrace.Info("RunTestsArgumentProcessor:Execute: Test run is completed.");
     }
 
     private class TestRunRequestEventsRegistrar : ITestRunEventsRegistrar
     {
         private readonly IOutput _output;
         private readonly CommandLineOptions _commandLineOptions;
+        private readonly IArtifactProcessingManager _artifactProcessingManager;
 
-        public TestRunRequestEventsRegistrar(IOutput output, CommandLineOptions commandLineOptions)
+        public TestRunRequestEventsRegistrar(IOutput output, CommandLineOptions commandLineOptions, IArtifactProcessingManager artifactProcessingManager)
         {
             _output = output;
             _commandLineOptions = commandLineOptions;
+            _artifactProcessingManager = artifactProcessingManager;
         }
 
         public void LogWarning(string message)
@@ -255,6 +252,12 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
                 if (!testsFoundInAnySource && string.IsNullOrEmpty(CommandLineOptions.Instance.TestAdapterPath) && _commandLineOptions.TestCaseFilterValue == null)
                 {
                     _output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
+                }
+
+                // Collect tests session artifacts for post processing
+                if (_commandLineOptions.ArtifactProcessingMode == ArtifactProcessingMode.Collect)
+                {
+                    _artifactProcessingManager.CollectArtifacts(e, RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
                 }
             }
         }

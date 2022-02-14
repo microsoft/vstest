@@ -3,6 +3,8 @@
 
 #if !NETSTANDARD1_0
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 using Interfaces;
@@ -139,6 +141,11 @@ public class FileHelper : IFileHelper
     public void Delete(string path)
     {
         File.Delete(path);
+    }
+
+    public void DeleteDirectory(string directoryPath, bool recursive)
+    {
+        Directory.Delete(directoryPath, recursive);
     }
 }
 

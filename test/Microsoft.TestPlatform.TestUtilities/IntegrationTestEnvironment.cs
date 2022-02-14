@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.TestUtilities;
 
 using System;
@@ -17,7 +19,7 @@ using VisualStudio.TestTools.UnitTesting;
 /// </summary>
 public class IntegrationTestEnvironment
 {
-    public static string TestPlatformRootDirectory =
+    public static string TestPlatformRootDirectory { get; private set; } =
         Environment.GetEnvironmentVariable("TP_ROOT_DIR")
         ?? Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
 

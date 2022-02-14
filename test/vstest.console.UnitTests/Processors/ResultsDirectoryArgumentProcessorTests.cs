@@ -1,16 +1,21 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Text.RegularExpressions;
+#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
-using TestTools.UnitTesting;
-using TestPlatform.CommandLine.Processors;
 using System;
 using System.IO;
-using vstest.console.UnitTests.Processors;
+using System.Text.RegularExpressions;
+
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+
+using TestPlatform.CommandLine.Processors;
+
+using TestTools.UnitTesting;
+
+using vstest.console.UnitTests.Processors;
 
 [TestClass]
 public class ResultsDirectoryArgumentProcessorTests

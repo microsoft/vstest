@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
 using System;
@@ -21,7 +23,7 @@ using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfa
 [Obsolete("This API is not final yet and is subject to changes.", false)]
 public class TestSession : ITestSession
 {
-    private bool _disposed = false;
+    private bool _disposed;
 
     private readonly ITestSessionEventsHandler _eventsHandler;
     private readonly IVsTestConsoleWrapper _consoleWrapper;
@@ -273,6 +275,15 @@ public class TestSession : ITestSession
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     public bool StopTestSession(ITestSessionEventsHandler eventsHandler)
     {
+        return StopTestSession(options: null, eventsHandler);
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    public bool StopTestSession(
+        TestPlatformOptions options,
+        ITestSessionEventsHandler eventsHandler)
+    {
         if (TestSessionInfo == null)
         {
             return true;
@@ -282,6 +293,7 @@ public class TestSession : ITestSession
         {
             return _consoleWrapper.StopTestSession(
                 TestSessionInfo,
+                options,
                 eventsHandler);
         }
         finally
@@ -463,6 +475,15 @@ public class TestSession : ITestSession
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task<bool> StopTestSessionAsync(ITestSessionEventsHandler eventsHandler)
     {
+        return await StopTestSessionAsync(options: null, eventsHandler).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    public async Task<bool> StopTestSessionAsync(
+        TestPlatformOptions options,
+        ITestSessionEventsHandler eventsHandler)
+    {
         if (TestSessionInfo == null)
         {
             return true;
@@ -472,6 +493,7 @@ public class TestSession : ITestSession
         {
             return await _consoleWrapper.StopTestSessionAsync(
                 TestSessionInfo,
+                options,
                 eventsHandler).ConfigureAwait(false);
         }
         finally

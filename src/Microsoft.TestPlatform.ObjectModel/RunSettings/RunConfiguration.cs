@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using Utilities;
@@ -435,7 +437,7 @@ public class RunConfiguration : TestRunSettings
     /// <summary>
     /// Collect source information
     /// </summary>
-    public bool CollectSourceInformationSet { get; private set; } = false;
+    public bool CollectSourceInformationSet { get; private set; }
 
     /// <summary>
     /// Default filter to use to filter tests
@@ -809,11 +811,7 @@ public class RunConfiguration : TestRunSettings
 #endif
                            )
                         {
-                            if (EqtTrace.IsErrorEnabled)
-                            {
-                                EqtTrace.Error(string.Format(CultureInfo.CurrentCulture, Resources.Resources.SolutionDirectoryNotExists, solutionDirectory));
-                            }
-
+                            EqtTrace.Error(string.Format(CultureInfo.CurrentCulture, Resources.Resources.SolutionDirectoryNotExists, solutionDirectory));
                             solutionDirectory = null;
                         }
 
@@ -871,15 +869,12 @@ public class RunConfiguration : TestRunSettings
                     default:
                         // Ignore a runsettings element that we don't understand. It could occur in the case
                         // the test runner is of a newer version, but the test host is of an earlier version.
-                        if (EqtTrace.IsErrorEnabled)
-                        {
-                            EqtTrace.Warning(
-                                string.Format(
-                                    CultureInfo.CurrentCulture,
-                                    Resources.Resources.InvalidSettingsXmlElement,
-                                    Constants.RunConfigurationSettingsName,
-                                    reader.Name));
-                        }
+                        EqtTrace.Warning(
+                            string.Format(
+                                CultureInfo.CurrentCulture,
+                                Resources.Resources.InvalidSettingsXmlElement,
+                                Constants.RunConfigurationSettingsName,
+                                reader.Name));
                         reader.Skip();
                         break;
                 }

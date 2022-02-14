@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.Logging;
 
 using ObjectModel;
@@ -40,7 +42,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// <summary>
     /// Keeps track if we are disposed.
     /// </summary>
-    private bool _isDisposed = false;
+    private bool _isDisposed;
 
     /// <summary>
     /// Specifies whether logger event queue is bounded or not

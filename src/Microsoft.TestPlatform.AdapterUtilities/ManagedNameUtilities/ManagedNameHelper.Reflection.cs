@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
 
 using Microsoft.TestPlatform.AdapterUtilities.Resources;
@@ -384,7 +386,7 @@ public static partial class ManagedNameHelper
             char c = name[i];
             if (NeedsEscaping(c, i))
             {
-                if (c == '\\' || c == '\'')
+                if (c is '\\' or '\'')
                 {
                     // var encoded = Convert.ToString(((uint)c), 16);
                     // b.Append("\\u");
@@ -489,15 +491,11 @@ public static partial class ManagedNameHelper
         }
 
         var category = CharUnicodeInfo.GetUnicodeCategory(c);
-        if (category == UnicodeCategory.NonSpacingMark        // Mn
-            || category == UnicodeCategory.SpacingCombiningMark  // Mc
-            || category == UnicodeCategory.ConnectorPunctuation  // Pc
-            || category == UnicodeCategory.Format)               // Cf
-        {
-            return false;
-        }
-
-        return true;
+        return category
+            is not UnicodeCategory.NonSpacingMark         // Mn
+            and not UnicodeCategory.SpacingCombiningMark  // Mc
+            and not UnicodeCategory.ConnectorPunctuation  // Pc
+            and not UnicodeCategory.Format;               // Cf
     }
 
     private static string GetTypeString(Type type, bool closedType)

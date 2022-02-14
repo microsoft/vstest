@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 using System;
@@ -156,19 +158,13 @@ internal class DataCollectorInformation
     {
         try
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("dataCollectorInfo.DisposeDataCollector: calling Dispose() on {0}", DataCollector.GetType());
-            }
+            EqtTrace.Verbose("dataCollectorInfo.DisposeDataCollector: calling Dispose() on {0}", DataCollector.GetType());
 
             DataCollector.Dispose();
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("DataCollectorInfo.DisposeDataCollector: exception while calling Dispose() on {0}: " + ex, DataCollector.GetType());
-            }
+            EqtTrace.Error("DataCollectorInfo.DisposeDataCollector: exception while calling Dispose() on {0}: " + ex, DataCollector.GetType());
         }
     }
 

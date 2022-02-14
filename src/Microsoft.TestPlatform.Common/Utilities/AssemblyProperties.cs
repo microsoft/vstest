@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
 using System;
@@ -60,10 +62,7 @@ public class AssemblyProperties : IAssemblyProperties
             EqtTrace.Warning("PEReaderHelper.GetAssemblyType: failed to determine assembly type: {0} for assembly: {1}", ex, filePath);
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("PEReaderHelper.GetAssemblyType: Determined assemblyType:'{0}' for source: '{1}'", assemblyType, filePath);
-        }
+        EqtTrace.Info("PEReaderHelper.GetAssemblyType: Determined assemblyType:'{0}' for source: '{1}'", assemblyType, filePath);
 
         return assemblyType;
     }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
 using System;
@@ -194,6 +196,17 @@ public interface ITestSession : IDisposable, ITestSessionAsync
     /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     bool StopTestSession(ITestSessionEventsHandler eventsHandler);
+
+    /// <summary>
+    /// Stops the test session.
+    /// </summary>
+    ///
+    /// <param name="options">Test Platform options.</param>
+    /// <param name="eventsHandler">The session event handler.</param>
+    /// 
+    /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    bool StopTestSession(TestPlatformOptions options, ITestSessionEventsHandler eventsHandler);
 
     /// <summary>
     /// Cancels the last test run.

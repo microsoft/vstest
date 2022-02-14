@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
 using System;
@@ -162,9 +164,10 @@ public static class FakesUtilities
 
         // The fallback settings is for the old implementation of fakes 
         // that only supports .Net Framework versions
-        if (framework != FrameworkVersion.Framework35 &&
-            framework != FrameworkVersion.Framework40 &&
-            framework != FrameworkVersion.Framework45)
+        if (framework
+            is not FrameworkVersion.Framework35
+            and not FrameworkVersion.Framework40
+            and not FrameworkVersion.Framework45)
         {
             return false;
         }
@@ -236,10 +239,7 @@ public static class FakesUtilities
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("Failed to create Fakes Configurator. Reason:{0} ", ex);
-            }
+            EqtTrace.Info("Failed to create Fakes Configurator. Reason:{0} ", ex);
         }
 #endif
         return null;
@@ -259,10 +259,7 @@ public static class FakesUtilities
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("Failed to create newly implemented Fakes Configurator. Reason:{0} ", ex);
-            }
+            EqtTrace.Info("Failed to create newly implemented Fakes Configurator. Reason: {0} ", ex);
         }
 
         return null;

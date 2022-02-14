@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace TestPlatform.Common.UnitTests.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -111,5 +113,5 @@ public class DummyMsTestSetingsProvider : ISettingsProvider
         StringToVerify = reader.ReadOuterXml();
     }
 
-    public static string StringToVerify = string.Empty;
+    public static string StringToVerify { get; private set; } = string.Empty;
 }

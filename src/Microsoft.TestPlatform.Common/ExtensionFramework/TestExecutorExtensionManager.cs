@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 using System;
@@ -223,12 +225,9 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error(
-                    "TestExecutorExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}",
-                    ex);
-            }
+            EqtTrace.Error(
+                "TestExecutorExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}",
+                ex);
 
             if (shouldThrowOnError)
             {

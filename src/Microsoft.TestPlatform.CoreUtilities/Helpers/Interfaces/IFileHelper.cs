@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using System;
@@ -130,6 +132,14 @@ public interface IFileHelper
     /// The directory path.
     /// </param>
     void DeleteEmptyDirectroy(string directoryPath);
+
+    /// <summary>
+    /// Helper for deleting a directory.
+    /// </summary>
+    /// <param name="directoryPath">
+    /// The directory path.
+    /// </param>
+    void DeleteDirectory(string directoryPath, bool recursive);
 
 #if !NETSTANDARD1_0
     /// <summary>

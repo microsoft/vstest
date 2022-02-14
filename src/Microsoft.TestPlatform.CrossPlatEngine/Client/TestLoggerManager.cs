@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 using System;
@@ -36,7 +38,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// <summary>
     /// Keeps track if we are disposed.
     /// </summary>
-    private bool _isDisposed = false;
+    private bool _isDisposed;
 
     /// <summary>
     /// Used to keep track of which loggers have been initialized.
@@ -456,10 +458,7 @@ internal class TestLoggerManager : ITestLoggerManager
             }
             catch (SettingsException se)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the test results directory: Error {0}", se);
-                }
+                EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the test results directory: Error {0}", se);
             }
         }
 
@@ -483,10 +482,7 @@ internal class TestLoggerManager : ITestLoggerManager
             }
             catch (SettingsException se)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the target framework: Error {0}", se);
-                }
+                EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the target framework: Error {0}", se);
             }
         }
 

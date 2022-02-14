@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 using System;
@@ -248,11 +250,8 @@ internal class TestPluginDiscoverer
 
             if (pluginInfo == null || pluginInfo.IdentifierData == null)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error(
-                        "GetTestExtensionFromType: Either PluginInformation is null or PluginInformation doesn't contain IdentifierData for type {0}.", type.FullName);
-                }
+                EqtTrace.Error(
+                    "GetTestExtensionFromType: Either PluginInformation is null or PluginInformation doesn't contain IdentifierData for type {0}.", type.FullName);
                 return;
             }
 

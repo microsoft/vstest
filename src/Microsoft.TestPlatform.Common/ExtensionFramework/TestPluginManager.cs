@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 using System;
@@ -70,26 +72,17 @@ internal class TestPluginManager
         {
             if (ex is TargetInvocationException)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
-                }
+                EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
                 throw;
             }
 #if NETFRAMEWORK
             else if (ex is SystemException)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
-                }
+                EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
                 throw;
             }
 #endif
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
-            }
+            EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
 
             throw;
         }

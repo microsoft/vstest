@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -16,7 +18,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkOnFiles(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
@@ -37,7 +39,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkOnArbitraryDepthDirectories(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
@@ -60,7 +62,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkForRelativeAssemblyPath(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
@@ -87,7 +89,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void WildCardPatternShouldCorrectlyWorkOnMultipleFiles(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var testAssembly = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');

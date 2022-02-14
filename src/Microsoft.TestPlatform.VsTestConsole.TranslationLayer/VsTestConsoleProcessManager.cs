@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
 using System;
@@ -51,8 +53,8 @@ internal class VsTestConsoleProcessManager : IProcessManager
 
     private readonly string _vstestConsolePath;
     private readonly object _syncObject = new();
-    private bool _vstestConsoleStarted = false;
-    private bool _vstestConsoleExited = false;
+    private bool _vstestConsoleStarted;
+    private bool _vstestConsoleExited;
     private readonly bool _isNetCoreRunner;
     private readonly string _dotnetExePath;
     private Process _process;

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
 
 using Interfaces;
@@ -204,22 +206,26 @@ public class VsTestConsoleWrapperTests
     public void StopTestSessionShouldCallRequestSenderWithCorrectArguments()
     {
         var testSessionInfo = new TestSessionInfo();
+        var testPlatformOptions = new TestPlatformOptions();
         var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
 
         _mockRequestSender.Setup(
                 rs => rs.StopTestSession(
                     It.IsAny<TestSessionInfo>(),
+                    It.IsAny<TestPlatformOptions>(),
                     It.IsAny<ITestSessionEventsHandler>()))
             .Returns(true);
 
         Assert.IsTrue(
             _consoleWrapper.StopTestSession(
                 testSessionInfo,
+                testPlatformOptions,
                 mockEventsHandler.Object));
 
         _mockRequestSender.Verify(
             rs => rs.StopTestSession(
                 testSessionInfo,
+                testPlatformOptions,
                 mockEventsHandler.Object),
             Times.Once);
     }

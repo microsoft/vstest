@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 using System;
@@ -25,7 +27,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
 
     #region DiscoverySpecificData
 
-    private int _discoveryCompletedClients = 0;
+    private int _discoveryCompletedClients;
     private int _availableTestSources = -1;
 
     private DiscoveryCriteria _actualDiscoveryCriteria;
@@ -39,7 +41,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     private readonly IRequestData _requestData;
 
     // This field indicates if abort was requested by testplatform (user)
-    private bool _discoveryAbortRequested = false;
+    private bool _discoveryAbortRequested;
 
     #endregion
 
@@ -82,10 +84,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         _sourceEnumerator = discoveryCriteria.Sources.GetEnumerator();
         _availableTestSources = discoveryCriteria.Sources.Count();
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("ParallelProxyDiscoveryManager: Start discovery. Total sources: " + _availableTestSources);
-        }
+        EqtTrace.Verbose("ParallelProxyDiscoveryManager: Start discovery. Total sources: " + _availableTestSources);
         DiscoverTestsPrivate(eventHandler);
     }
 
@@ -119,10 +118,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
             // If there are no more sources/testcases, a parallel executor is truly done with discovery
             allDiscoverersCompleted = _discoveryCompletedClients == _availableTestSources;
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("ParallelProxyDiscoveryManager: HandlePartialDiscoveryComplete: Total completed clients = {0}, Discovery complete = {1}.", _discoveryCompletedClients, allDiscoverersCompleted);
-            }
+            EqtTrace.Verbose("ParallelProxyDiscoveryManager: HandlePartialDiscoveryComplete: Total completed clients = {0}, Discovery complete = {1}.", _discoveryCompletedClients, allDiscoverersCompleted);
         }
 
         /*
@@ -151,10 +147,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
             Otherwise `proxyDiscoveryManager` instance is alredy closed by now and it will give exception
             when trying to do some operation on it.
         */
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("ParallelProxyDiscoveryManager: HandlePartialDiscoveryComplete: Replace discovery manager. Shared: {0}, Aborted: {1}.", SharedHosts, isAborted);
-        }
+        EqtTrace.Verbose("ParallelProxyDiscoveryManager: HandlePartialDiscoveryComplete: Replace discovery manager. Shared: {0}, Aborted: {1}.", SharedHosts, isAborted);
 
         RemoveManager(proxyDiscoveryManager);
 
@@ -209,20 +202,14 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         // Peek to see if we have sources to trigger a discovery
         if (TryFetchNextSource(_sourceEnumerator, out string nextSource))
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("ProxyParallelDiscoveryManager: Triggering test discovery for next source: {0}", nextSource);
-            }
+            EqtTrace.Verbose("ProxyParallelDiscoveryManager: Triggering test discovery for next source: {0}", nextSource);
 
             // Kick off another discovery task for the next source
             var discoveryCriteria = new DiscoveryCriteria(new[] { nextSource }, _actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent, _actualDiscoveryCriteria.DiscoveredTestEventTimeout, _actualDiscoveryCriteria.RunSettings);
             discoveryCriteria.TestCaseFilter = _actualDiscoveryCriteria.TestCaseFilter;
             Task.Run(() =>
                 {
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("ParallelProxyDiscoveryManager: Discovery started.");
-                    }
+                    EqtTrace.Verbose("ParallelProxyDiscoveryManager: Discovery started.");
 
                     proxyDiscoveryManager.DiscoverTests(discoveryCriteria, GetHandlerForGivenManager(proxyDiscoveryManager));
                 })
@@ -231,10 +218,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
                         // Just in case, the actual discovery couldn't start for an instance. Ensure that
                         // we call discovery complete since we have already fetched a source. Otherwise
                         // discovery will not terminate
-                        if (EqtTrace.IsErrorEnabled)
-                        {
-                            EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
-                        }
+                        EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
 
                         var handler = GetHandlerForGivenManager(proxyDiscoveryManager);
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
@@ -252,9 +236,6 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
                     TaskContinuationOptions.OnlyOnFaulted);
         }
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("ProxyParallelDiscoveryManager: No sources available for discovery.");
-        }
+        EqtTrace.Verbose("ProxyParallelDiscoveryManager: No sources available for discovery.");
     }
 }

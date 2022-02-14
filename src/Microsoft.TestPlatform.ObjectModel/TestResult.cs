@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;
@@ -357,6 +359,6 @@ public static class TestResultProperties
 
     private static bool ValidateOutcome(object value)
     {
-        return (TestOutcome)value <= TestOutcome.NotFound && (TestOutcome)value >= TestOutcome.None;
+        return (TestOutcome)value is <= TestOutcome.NotFound and >= TestOutcome.None;
     }
 }

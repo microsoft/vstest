@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 using System;
@@ -15,8 +17,8 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 /// <summary>
 /// The blame logger.
 /// </summary>
-[FriendlyName(BlameLogger.FriendlyName)]
-[ExtensionUri(BlameLogger.ExtensionUri)]
+[FriendlyName(FriendlyName)]
+[ExtensionUri(ExtensionUri)]
 public class BlameLogger : ITestLogger
 {
     #region Constants

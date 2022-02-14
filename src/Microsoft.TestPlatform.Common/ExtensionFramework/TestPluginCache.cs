@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 #if NETFRAMEWORK
@@ -97,27 +99,18 @@ public class TestPluginCache
     {
         var extensions = GetFilteredExtensions(_filterableExtensionPaths, endsWithPattern);
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose(
-                "TestPluginCache.GetExtensionPaths: Filtered extension paths: {0}", string.Join(Environment.NewLine, extensions));
-        }
+        EqtTrace.Verbose(
+            "TestPluginCache.GetExtensionPaths: Filtered extension paths: {0}", string.Join(Environment.NewLine, extensions));
 
         if (!skipDefaultExtensions)
         {
             extensions = extensions.Concat(_defaultExtensionPaths);
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose(
-                    "TestPluginCache.GetExtensionPaths: Added default extension paths: {0}", string.Join(Environment.NewLine, _defaultExtensionPaths));
-            }
+            EqtTrace.Verbose(
+                "TestPluginCache.GetExtensionPaths: Added default extension paths: {0}", string.Join(Environment.NewLine, _defaultExtensionPaths));
         }
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose(
-                "TestPluginCache.GetExtensionPaths: Added unfilterableExtensionPaths: {0}", string.Join(Environment.NewLine, _unfilterableExtensionPaths));
-        }
+        EqtTrace.Verbose(
+            "TestPluginCache.GetExtensionPaths: Added unfilterableExtensionPaths: {0}", string.Join(Environment.NewLine, _unfilterableExtensionPaths));
 
         return extensions.Concat(_unfilterableExtensionPaths).ToList();
     }
@@ -165,11 +158,8 @@ public class TestPluginCache
             // Combine all the possible extensions - both default and additional.
             var allExtensionPaths = GetExtensionPaths(endsWithPattern);
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose(
-                    "TestPluginCache.DiscoverTestExtensions: Discovering the extensions using allExtensionPaths: {0}", string.Join(Environment.NewLine, allExtensionPaths));
-            }
+            EqtTrace.Verbose(
+                "TestPluginCache.DiscoverTestExtensions: Discovering the extensions using allExtensionPaths: {0}", string.Join(Environment.NewLine, allExtensionPaths));
 
             // Discover the test extensions from candidate assemblies.
             pluginInfos = GetTestExtensions<TPluginInfo, TExtension>(allExtensionPaths);
@@ -201,10 +191,7 @@ public class TestPluginCache
         {
             // Nothing to do here, we just do not want to do an EqtTrace.Fail for this thread
             // being aborted as it is a legitimate exception to receive.
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: Data extension discovery is being aborted due to a thread abort.");
-            }
+            EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: Data extension discovery is being aborted due to a thread abort.");
         }
 #endif
         catch (Exception e)
@@ -239,10 +226,7 @@ public class TestPluginCache
     {
         lock (_lockForExtensionsUpdate)
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestPluginCache: Update extensions started. Skip filter = " + skipExtensionFilters);
-            }
+            EqtTrace.Verbose("TestPluginCache: Update extensions started. Skip filter = " + skipExtensionFilters);
 
             var extensions = additionalExtensionsPath?.ToList();
             if (extensions == null || extensions.Count == 0)
@@ -449,13 +433,9 @@ public class TestPluginCache
     {
         if (additionalExtensions.Count == extensionsList.Count && additionalExtensions.All(extensionsList.Contains))
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                var extensionString = string.Join(",", extensionsList);
-                EqtTrace.Verbose(
-                    "TestPluginCache: Ignoring extensions merge as there is no change. Current additionalExtensions are '{0}'.",
-                    extensionString);
-            }
+            EqtTrace.Verbose(
+                "TestPluginCache: Ignoring extensions merge as there is no change. Current additionalExtensions are '{0}'.",
+                string.Join(",", extensionsList));
 
             mergedExtensionsList = extensionsList;
             return false;

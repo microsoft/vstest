@@ -194,8 +194,6 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IProxyExecutionManager.In
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IProxyExecutionManager.IsInitialized.get -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IProxyExecutionManager.StartTestRun(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCriteria testRunCriteria, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunEventsHandler eventHandler) -> int
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IProxyTestSessionManager
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IProxyTestSessionManager.StartSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler eventsHandler) -> bool
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IProxyTestSessionManager.StopSession() -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestCaseEventsHandler
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestCaseEventsHandler.SendSessionEnd() -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestCaseEventsHandler.SendSessionStart(System.Collections.Generic.IDictionary<string, object> properties) -> void

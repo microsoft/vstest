@@ -3,6 +3,8 @@
 
 #if NETFRAMEWORK || NETCOREAPP || NETSTANDARD2_0
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;
@@ -118,7 +120,7 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// <summary>
         /// Whether the object is disposed or not.
         /// </summary>
-        private bool _disposed = false;
+        private bool _disposed;
 
         /// <summary>
         /// A tally keeping writer used when file size rolling is configured.<para/>

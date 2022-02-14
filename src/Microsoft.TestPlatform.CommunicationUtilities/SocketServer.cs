@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 using System;
@@ -97,10 +99,7 @@ public class SocketServer : ICommunicationEndPoint
             _channel = _channelFactory(_tcpClient.GetStream());
             Connected.SafeInvoke(this, new ConnectedEventArgs(_channel), "SocketServer: ClientConnected");
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("SocketServer.OnClientConnected: Client connected for endPoint: {0}, starting MessageLoopAsync:", _endPoint);
-            }
+            EqtTrace.Verbose("SocketServer.OnClientConnected: Client connected for endPoint: {0}, starting MessageLoopAsync:", _endPoint);
 
             // Start the message loop
             Task.Run(() => _tcpClient.MessageLoopAsync(_channel, error => Stop(error), _cancellation.Token)).ConfigureAwait(false);

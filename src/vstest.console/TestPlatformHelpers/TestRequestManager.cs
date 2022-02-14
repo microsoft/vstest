@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 
 using System;
@@ -16,26 +18,27 @@ using System.Collections.Generic;
 using Client;
 using Client.RequestHelper;
 using Internal;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 using Publisher;
 using Resources;
 using CommandLineUtilities;
 using Common;
 using Common.Interfaces;
 using Common.Telemetry;
-using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using CoreUtilities.Tracing;
 using CoreUtilities.Tracing.Interfaces;
 using CrossPlatEngine.TestRunAttachmentsProcessing;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-using ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using ObjectModel;
+using ObjectModel.Engine;
 using PlatformAbstractions;
 using PlatformAbstractions.Interfaces;
 using Utilities;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Utilities.Helpers;
 
 /// <summary>
@@ -433,8 +436,6 @@ internal class TestRequestManager : ITestRequestManager
             _telemetryOptedIn = payload.TestPlatformOptions.CollectMetrics;
         }
 
-        var requestData = GetRequestData(protocolConfig);
-
         if (UpdateRunSettingsIfRequired(
                 payload.RunSettings,
                 payload.Sources,
@@ -452,13 +453,18 @@ internal class TestRequestManager : ITestRequestManager
                     payload.RunSettings));
         }
 
-        // TODO (copoiena): Collect metrics ?
+        var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(payload.RunSettings);
+        var requestData = GetRequestData(protocolConfig);
+
+        // Collect metrics & commands.
+        CollectMetrics(requestData, runConfiguration);
+        LogCommandsTelemetryPoints(requestData);
 
         lock (_syncObject)
         {
             try
             {
-                EqtTrace.Info("TestRequestManager.StartTestRunner: Synchronization context taken.");
+                EqtTrace.Info("TestRequestManager.StartTestSession: Synchronization context taken.");
                 _testPlatformEventSource.StartTestSessionStart();
 
                 var criteria = new StartTestSessionCriteria()
@@ -481,6 +487,51 @@ internal class TestRequestManager : ITestRequestManager
                 // Post the attachments processing complete event.
                 _metricsPublisher.Result.PublishMetrics(
                     TelemetryDataConstants.StartTestSessionCompleteEvent,
+                    requestData.MetricsCollection.Metrics);
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    public void StopTestSession(
+        StopTestSessionPayload payload,
+        ITestSessionEventsHandler eventsHandler,
+        ProtocolConfig protocolConfig)
+    {
+        EqtTrace.Info("TestRequestManager.StopTestSession: Stopping test session.");
+
+        _telemetryOptedIn = payload.CollectMetrics;
+        var requestData = GetRequestData(protocolConfig);
+
+        lock (_syncObject)
+        {
+            try
+            {
+                EqtTrace.Info("TestRequestManager.StopTestSession: Synchronization context taken.");
+                _testPlatformEventSource.StopTestSessionStart();
+
+                var stopped = TestSessionPool.Instance.KillSession(payload.TestSessionInfo, requestData);
+                eventsHandler.HandleStopTestSessionComplete(
+                    new()
+                    {
+                        TestSessionInfo = payload.TestSessionInfo,
+                        Metrics = stopped ? requestData.MetricsCollection.Metrics : null,
+                        IsStopped = stopped
+                    });
+
+                if (!stopped)
+                {
+                    EqtTrace.Warning("TestRequestManager.StopTestSession: Unable to stop test session.");
+                }
+            }
+            finally
+            {
+                EqtTrace.Info("TestRequestManager.StopTestSession: Stopping test session completed.");
+                _testPlatformEventSource.StopTestSessionStop();
+
+                // Post the attachments processing complete event.
+                _metricsPublisher.Result.PublishMetrics(
+                    TelemetryDataConstants.StopTestSessionCompleteEvent,
                     requestData.MetricsCollection.Metrics);
             }
         }
@@ -643,7 +694,7 @@ internal class TestRequestManager : ITestRequestManager
                 registrar);
             settingsUpdated |= UpdateDesignMode(document, runConfiguration);
             settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
-            settingsUpdated |= UpdateTargetDevice(navigator, document, runConfiguration);
+            settingsUpdated |= UpdateTargetDevice(navigator, document);
             settingsUpdated |= AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
 
             updatedRunSettingsXml = navigator.OuterXml;
@@ -703,8 +754,7 @@ internal class TestRequestManager : ITestRequestManager
 
     private bool UpdateTargetDevice(
         XPathNavigator navigator,
-        XmlDocument document,
-        RunConfiguration runConfiguration)
+        XmlDocument document)
     {
         bool updateRequired = InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml);
         if (updateRequired)
@@ -766,11 +816,8 @@ internal class TestRequestManager : ITestRequestManager
         }
 
         // Log compatible sources
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Compatible sources list : ");
-            EqtTrace.Info(string.Join("\n", compatibleSources.ToArray()));
-        }
+        EqtTrace.Info("Compatible sources list: ");
+        EqtTrace.Info(string.Join("\n", compatibleSources.ToArray()));
     }
 
     private bool UpdatePlatform(
@@ -836,7 +883,7 @@ internal class TestRequestManager : ITestRequestManager
         }
 
         // Raise warnings for unsupported frameworks.
-        if (Constants.DotNetFramework35.Equals(chosenFramework.Name))
+        if (ObjectModel.Constants.DotNetFramework35.Equals(chosenFramework.Name))
         {
             EqtTrace.Warning("TestRequestManager.UpdateRunSettingsIfRequired: throw warning on /Framework:Framework35 option.");
             registrar.LogWarning(Resources.Framework35NotSupported);
@@ -864,7 +911,7 @@ internal class TestRequestManager : ITestRequestManager
         loggerRunSettings.LoggerSettingsList.Add(consoleLogger);
         RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(
             document,
-            Constants.LoggerRunSettingsName,
+            ObjectModel.Constants.LoggerRunSettingsName,
             loggerRunSettings.ToXml().InnerXml);
     }
 
@@ -894,7 +941,7 @@ internal class TestRequestManager : ITestRequestManager
             consoleLogger.CodeBase = typeof(ConsoleLogger).GetTypeInfo().Assembly.Location;
             RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(
                 document,
-                Constants.LoggerRunSettingsName,
+                ObjectModel.Constants.LoggerRunSettingsName,
                 loggerRunSettings.ToXml().InnerXml);
 
             return true;
@@ -1079,11 +1126,7 @@ internal class TestRequestManager : ITestRequestManager
     /// </summary>
     /// <returns>Returns Telemetry Opted out or not</returns>
     private static bool IsTelemetryOptedIn()
-    {
-        var telemetryStatus = Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN");
-        return !string.IsNullOrEmpty(telemetryStatus)
-               && telemetryStatus.Equals("1", StringComparison.Ordinal);
-    }
+        => Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")?.Equals("1", StringComparison.Ordinal) == true;
 
     /// <summary>
     /// Log Command Line switches for Telemetry purposes

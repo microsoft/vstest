@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+
 using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 /// <summary>
 /// Creates and return a list of available attachments processor
