@@ -28,7 +28,7 @@ public class TestRunMessageEventArgs : EventArgs
             throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, nameof(message));
         }
 
-        if (level < TestMessageLevel.Informational || level > TestMessageLevel.Error)
+        if (level is < TestMessageLevel.Informational or > TestMessageLevel.Error)
         {
             throw new ArgumentOutOfRangeException(nameof(level));
         }

@@ -189,10 +189,9 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
             throw new ObjectDisposedException("testRunRequest");
         }
 
-        if (State != TestRunState.InProgress
-            && !(State == TestRunState.Completed
-                 || State == TestRunState.Canceled
-                 || State == TestRunState.Aborted))
+        if (State
+            is not TestRunState.InProgress
+            and not (TestRunState.Completed or TestRunState.Canceled or TestRunState.Aborted))
         {
             // If run is already terminated, then we should not throw an exception.
             throw new InvalidOperationException(ClientResources.WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive);

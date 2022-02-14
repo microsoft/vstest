@@ -136,7 +136,7 @@ internal class PlatformArgumentExecutor : IArgumentExecutor
         }
 
         var validPlatforms = Enum.GetValues(typeof(Architecture)).Cast<Architecture>()
-            .Where(e => e != Architecture.AnyCPU && e != Architecture.Default)
+            .Where(e => e is not Architecture.AnyCPU and not Architecture.Default)
             .ToList();
 
         var validPlatform = Enum.TryParse(argument, true, out Architecture platform);

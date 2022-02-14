@@ -17,7 +17,7 @@ public class MultitargetingTestHostTests : AcceptanceTestBase
     [NetFrameworkRunner(NETFX452_48)]
     public void RunningTestWithAFailingDebugAssertDoesNotCrashTheHostingProcess(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var assemblyPath = BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll").Trim('\"');

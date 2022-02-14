@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+namespace Microsoft.TestPlatform.AttachVS;
+
 using System;
 using System.Diagnostics;
 using System.Linq;
-
-namespace Microsoft.TestPlatform.AttachVS;
 
 internal class Program
 {

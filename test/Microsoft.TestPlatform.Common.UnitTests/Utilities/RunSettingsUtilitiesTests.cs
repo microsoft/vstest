@@ -111,5 +111,5 @@ public class DummyMsTestSetingsProvider : ISettingsProvider
         StringToVerify = reader.ReadOuterXml();
     }
 
-    public static string StringToVerify = string.Empty;
+    public static string StringToVerify { get; private set; } = string.Empty;
 }

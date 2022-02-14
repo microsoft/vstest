@@ -435,7 +435,7 @@ public class RunConfiguration : TestRunSettings
     /// <summary>
     /// Collect source information
     /// </summary>
-    public bool CollectSourceInformationSet { get; private set; } = false;
+    public bool CollectSourceInformationSet { get; private set; }
 
     /// <summary>
     /// Default filter to use to filter tests

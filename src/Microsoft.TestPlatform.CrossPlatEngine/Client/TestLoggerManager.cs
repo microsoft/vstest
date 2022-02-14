@@ -36,7 +36,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// <summary>
     /// Keeps track if we are disposed.
     /// </summary>
-    private bool _isDisposed = false;
+    private bool _isDisposed;
 
     /// <summary>
     /// Used to keep track of which loggers have been initialized.

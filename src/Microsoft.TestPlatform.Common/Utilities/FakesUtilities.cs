@@ -172,9 +172,10 @@ public static class FakesUtilities
 
         // The fallback settings is for the old implementation of fakes 
         // that only supports .Net Framework versions
-        if (framework != FrameworkVersion.Framework35 &&
-            framework != FrameworkVersion.Framework40 &&
-            framework != FrameworkVersion.Framework45)
+        if (framework
+            is not FrameworkVersion.Framework35
+            and not FrameworkVersion.Framework40
+            and not FrameworkVersion.Framework45)
         {
             return false;
         }

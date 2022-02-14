@@ -25,7 +25,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
 
     #region DiscoverySpecificData
 
-    private int _discoveryCompletedClients = 0;
+    private int _discoveryCompletedClients;
     private int _availableTestSources = -1;
 
     private DiscoveryCriteria _actualDiscoveryCriteria;

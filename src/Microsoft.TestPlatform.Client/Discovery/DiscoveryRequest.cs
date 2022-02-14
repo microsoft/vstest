@@ -495,7 +495,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <summary>
     /// If this request has been disposed.
     /// </summary>
-    private bool _disposed = false;
+    private bool _disposed;
 
     /// <summary>
     /// It get set when current discovery request is completed.

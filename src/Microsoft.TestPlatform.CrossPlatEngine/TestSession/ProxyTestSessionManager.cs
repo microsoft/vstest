@@ -32,7 +32,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
 
     private readonly object _lockObject = new();
     private readonly object _proxyOperationLockObject = new();
-    private volatile bool _proxySetupFailed = false;
+    private volatile bool _proxySetupFailed;
     private readonly StartTestSessionCriteria _testSessionCriteria;
     private readonly int _testhostCount;
     private TestSessionInfo _testSessionInfo;

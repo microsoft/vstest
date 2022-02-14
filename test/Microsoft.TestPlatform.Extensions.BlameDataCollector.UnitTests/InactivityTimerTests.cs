@@ -11,7 +11,7 @@ using VisualStudio.TestTools.UnitTesting;
 [TestClass]
 public class InactivityTimerTests
 {
-    private int _callBackCount = 0;
+    private int _callBackCount;
     private readonly ManualResetEventSlim _timerEvent = new();
 
     [TestMethod]

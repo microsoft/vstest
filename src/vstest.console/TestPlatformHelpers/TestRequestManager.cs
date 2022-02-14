@@ -699,7 +699,7 @@ internal class TestRequestManager : ITestRequestManager
                 registrar);
             settingsUpdated |= UpdateDesignMode(document, runConfiguration);
             settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
-            settingsUpdated |= UpdateTargetDevice(navigator, document, runConfiguration);
+            settingsUpdated |= UpdateTargetDevice(navigator, document);
             settingsUpdated |= AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
 
             updatedRunSettingsXml = navigator.OuterXml;
@@ -759,8 +759,7 @@ internal class TestRequestManager : ITestRequestManager
 
     private bool UpdateTargetDevice(
         XPathNavigator navigator,
-        XmlDocument document,
-        RunConfiguration runConfiguration)
+        XmlDocument document)
     {
         bool updateRequired = InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml);
         if (updateRequired)

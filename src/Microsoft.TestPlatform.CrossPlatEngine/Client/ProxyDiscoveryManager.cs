@@ -25,7 +25,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 /// </summary>
 public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDiscoveryEventsHandler2
 {
-    private readonly TestSessionInfo _testSessionInfo = null;
+    private readonly TestSessionInfo _testSessionInfo;
     readonly Func<string, ProxyDiscoveryManager, ProxyOperationManager> _proxyOperationManagerCreator;
 
     private ITestRuntimeProvider _testHostManager;
@@ -35,7 +35,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     private readonly IDataSerializer _dataSerializer;
     private bool _isCommunicationEstablished;
 
-    private ProxyOperationManager _proxyOperationManager = null;
+    private ProxyOperationManager _proxyOperationManager;
     private ITestDiscoveryEventsHandler2 _baseTestDiscoveryEventsHandler;
     private bool _skipDefaultAdapters;
 

@@ -51,8 +51,8 @@ internal class VsTestConsoleProcessManager : IProcessManager
 
     private readonly string _vstestConsolePath;
     private readonly object _syncObject = new();
-    private bool _vstestConsoleStarted = false;
-    private bool _vstestConsoleExited = false;
+    private bool _vstestConsoleStarted;
+    private bool _vstestConsoleExited;
     private readonly bool _isNetCoreRunner;
     private readonly string _dotnetExePath;
     private Process _process;

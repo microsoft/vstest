@@ -103,7 +103,7 @@ internal class ParallelRunDataAggregator
     /// <returns></returns>
     public IDictionary<string, object> GetAggregatedRunDataMetrics()
     {
-        if (_metricsAggregator == null || _metricsAggregator.Count == 0)
+        if (_metricsAggregator == null || _metricsAggregator.IsEmpty)
         {
             return new ConcurrentDictionary<string, object>();
         }
