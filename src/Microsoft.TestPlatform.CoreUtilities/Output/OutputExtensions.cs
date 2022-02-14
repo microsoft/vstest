@@ -3,6 +3,8 @@
 
 #if !NETSTANDARD1_0 && !WINDOWS_UWP
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CoreUtilities.Resources;

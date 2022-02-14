@@ -3,6 +3,8 @@
 
 #if !NET451
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 using System.IO;

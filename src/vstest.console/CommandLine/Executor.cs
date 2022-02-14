@@ -21,6 +21,8 @@
 //   Required
 //   Single or multiple
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
 using System;

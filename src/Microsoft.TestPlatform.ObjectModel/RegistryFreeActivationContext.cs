@@ -4,6 +4,8 @@
 
 #if NETFRAMEWORK
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;
