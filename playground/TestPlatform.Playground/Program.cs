@@ -57,13 +57,7 @@ internal class Program
         };
 
         var options = new TestPlatformOptions();
-        var discoveryHandler = new TestDiscoveryHandler();
-        r.DiscoverTests(sources, sourceSettings, options, discoveryHandler);
-        if (File.Exists(sources[0]))
-        {
-            throw new Exception($"File {sources[0]} exists, but it should not because we moved it during deployment!");
-        }
-        r.RunTestsWithCustomTestHost(discoveryHandler.DiscoveredTestCases, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
+        r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
     }
 
     public class TestRunHandler : ITestRunEventsHandler
@@ -96,51 +90,6 @@ internal class Program
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
             throw new NotImplementedException();
-        }
-
-        private string WriteTests(IEnumerable<TestResult> testResults)
-        {
-            return WriteTests(testResults?.Select(t => t.TestCase));
-        }
-
-        private string WriteTests(IEnumerable<TestCase> testCases)
-        {
-            return testCases == null ? null : "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName));
-        }
-    }
-
-    public class TestDiscoveryHandler : ITestDiscoveryEventsHandler2
-    {
-        public List<TestCase> DiscoveredTestCases { get; } = new List<TestCase>();
-        public List<string> Messages { get; } = new List<string>();
-
-        public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
-        {
-            if (discoveredTestCases != null)
-            {
-                DiscoveredTestCases.AddRange(discoveredTestCases);
-                Console.WriteLine($"[DISCOVERY UPDATE] {WriteTests(discoveredTestCases)}");
-            }
-        }
-
-        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
-        {
-            if (lastChunk != null)
-            {
-                DiscoveredTestCases.AddRange(lastChunk);
-                Console.WriteLine($"[DISCOVERY COMPLETE] {WriteTests(lastChunk)}");
-            }
-        }
-
-        public void HandleLogMessage(TestMessageLevel level, string message)
-        {
-            Messages.Add($"[{level}]: {message}");
-            Console.WriteLine(($"[{level}]: {message}"));
-        }
-
-        public void HandleRawMessage(string rawMessage)
-        {
-            Console.WriteLine(($"[RAWMESSAGE]: {rawMessage}"));
         }
 
         private string WriteTests(IEnumerable<TestResult> testResults)

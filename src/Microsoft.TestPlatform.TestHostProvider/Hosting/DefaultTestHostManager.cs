@@ -163,43 +163,12 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
         }
 
-
-
         if (!Shared)
         {
             // Not sharing the host which means we need to pass the test assembly path as argument
             // so that the test host can create an appdomain on startup (Main method) and set appbase
             argumentsString += " --testsourcepath " + sources.FirstOrDefault().AddDoubleQuote();
         }
-
-        // do something like deploy, we copy the whole folder, and remote the sources
-        // from the original folder
-        var localDirectory = Path.GetDirectoryName(sources.FirstOrDefault());
-        var remoteDirectory = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(sources.FirstOrDefault()), "..", "remote"));
-
-
-        // delete and copy only if sources exist, we will delete the test.dll few lines below to make
-        // sure we are not using just the one from the original path, instead from the deploy
-        // path, but because we start new testhost after discovery, we would be deleting the
-        // only copy of tests.dll, and copying the original folder without it.
-        if (sources.All(File.Exists))
-        {
-            if (Directory.Exists(remoteDirectory))
-            {
-                Directory.Delete(remoteDirectory, true);
-            }
-
-            Copy(localDirectory, remoteDirectory);
-            sources.ToList().ForEach(File.Delete);
-        }
-        // deploy end
-
-
-        // this is the path where we deployed the files
-        argumentsString += " --remote-path " + remoteDirectory;
-
-        // this is the path where the files were originally
-        argumentsString += " --local-path " + localDirectory;
 
         EqtTrace.Verbose("DefaultTestHostmanager: Full path of {0} is {1}", testHostProcessName, testhostProcessPath);
 
@@ -224,34 +193,6 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>(),
             WorkingDirectory = processWorkingDirectory
         };
-
-        void Copy(string sourceDirectory, string targetDirectory)
-        {
-            var diSource = new DirectoryInfo(sourceDirectory);
-            var diTarget = new DirectoryInfo(targetDirectory);
-
-            CopyAll(diSource, diTarget);
-        }
-
-        void CopyAll(DirectoryInfo source, DirectoryInfo target)
-        {
-            Directory.CreateDirectory(target.FullName);
-
-            // Copy each file into the new directory.
-            foreach (FileInfo fi in source.GetFiles())
-            {
-                Console.WriteLine(@"Copying {0}\{1}", target.FullName, fi.Name);
-                fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
-            }
-
-            // Copy each subdirectory using recursion.
-            foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
-            {
-                DirectoryInfo nextTargetSubDir =
-                    target.CreateSubdirectory(diSourceSubDir.Name);
-                CopyAll(diSourceSubDir, nextTargetSubDir);
-            }
-        }
     }
 
     /// <inheritdoc/>
