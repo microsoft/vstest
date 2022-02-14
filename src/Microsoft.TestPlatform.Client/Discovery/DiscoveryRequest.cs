@@ -68,7 +68,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
         {
             if (_disposed)
             {
-                throw new ObjectDisposedException("DiscoveryRequest");
+                throw new ObjectDisposedException(nameof(DiscoveryRequest));
             }
 
             // Reset the discovery completion event
