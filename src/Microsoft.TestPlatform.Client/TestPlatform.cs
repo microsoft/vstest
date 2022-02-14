@@ -183,11 +183,11 @@ internal class TestPlatform : ITestPlatform
             // sources tells us we should run in-process (i.e. in vstest.console). Because
             // of this no session will be created because there's no testhost to be launched.
             // Expecting a subsequent call to execute tests with the same set of parameters.
-            eventsHandler.HandleStartTestSessionComplete(null);
+            eventsHandler.HandleStartTestSessionComplete(new());
             return false;
         }
 
-        return testSessionManager.StartSession(eventsHandler);
+        return testSessionManager.StartSession(eventsHandler, requestData);
     }
 
     /// <summary>
@@ -240,11 +240,7 @@ internal class TestPlatform : ITestPlatform
                 var adapterPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(customTestAdaptersPath));
                 if (!Directory.Exists(adapterPath))
                 {
-                    if (EqtTrace.IsWarningEnabled)
-                    {
-                        EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
-                    }
-
+                    EqtTrace.Warning($"AdapterPath Not Found: {adapterPath}");
                     continue;
                 }
 

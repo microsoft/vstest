@@ -141,7 +141,7 @@ public class EventLogDataCollector : DataCollector
     /// <summary>
     /// Gets the context data.
     /// </summary>
-    internal Dictionary<DataCollectionContext, EventLogSessionContext> ContextMap { get; private set; }
+    internal Dictionary<DataCollectionContext, EventLogSessionContext> ContextMap { get; }
 
     #endregion
 
@@ -278,28 +278,20 @@ public class EventLogDataCollector : DataCollector
 
         stopwatch.Stop();
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose(
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "EventLogDataContainer: Wrote {0} event log entries to file '{1}' in {2} seconds",
-                    eventLogEntries.Count,
-                    eventLogPath,
-                    stopwatch.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture)));
-        }
+        EqtTrace.Verbose(
+            "EventLogDataContainer: Wrote {0} event log entries to file '{1}' in {2} seconds",
+            eventLogEntries.Count,
+            eventLogPath,
+            stopwatch.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
 
         // Write the event log file
         FileTransferInformation fileTransferInformation =
             new(dataCollectionContext, eventLogPath, true, _fileHelper);
         _dataSink.SendFileAsync(fileTransferInformation);
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose(
-                "EventLogDataContainer: Event log successfully sent for data collection context '{0}'.",
-                dataCollectionContext.ToString());
-        }
+        EqtTrace.Verbose(
+            "EventLogDataContainer: Event log successfully sent for data collection context '{0}'.",
+            dataCollectionContext.ToString());
 
         return eventLogPath;
     }
@@ -350,10 +342,7 @@ public class EventLogDataCollector : DataCollector
         ValidateArg.NotNull(e, "SessionStartEventArgs");
         ValidateArg.NotNull(e.Context, "SessionStartEventArgs.Context");
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("EventLogDataCollector: SessionStart received");
-        }
+        EqtTrace.Verbose("EventLogDataCollector: SessionStart received");
 
         StartCollectionForContext(e.Context, true);
     }
@@ -363,10 +352,7 @@ public class EventLogDataCollector : DataCollector
         ValidateArg.NotNull(e, "SessionEndEventArgs");
         ValidateArg.NotNull(e.Context, "SessionEndEventArgs.Context");
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("EventLogDataCollector: SessionEnd received");
-        }
+        EqtTrace.Verbose("EventLogDataCollector: SessionEnd received");
 
         WriteCollectedEventLogEntries(e.Context, true, TimeSpan.MaxValue, DateTime.UtcNow);
     }
@@ -379,13 +365,10 @@ public class EventLogDataCollector : DataCollector
         if (!e.Context.HasTestCase)
         {
             Debug.Fail("Context is not for a test case");
-            throw new ArgumentNullException("TestCaseStartEventArgs.Context.HasTestCase");
+            ValidateArg.NotNull(e.Context.TestExecId, "TestCaseStartEventArgs.Context.HasTestCase");
         }
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("EventLogDataCollector: TestCaseStart received for test '{0}'.", e.TestCaseName);
-        }
+        EqtTrace.Verbose("EventLogDataCollector: TestCaseStart received for test '{0}'.", e.TestCaseName);
 
         StartCollectionForContext(e.Context, false);
     }
@@ -397,13 +380,10 @@ public class EventLogDataCollector : DataCollector
         Debug.Assert(e.Context != null, "Context is null");
         Debug.Assert(e.Context.HasTestCase, "Context is not for a test case");
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose(
-                "EventLogDataCollector: TestCaseEnd received for test '{0}' with Test Outcome: {1}.",
-                e.TestCaseName,
-                e.TestOutcome);
-        }
+        EqtTrace.Verbose(
+            "EventLogDataCollector: TestCaseEnd received for test '{0}' with Test Outcome: {1}.",
+            e.TestCaseName,
+            e.TestOutcome);
 
         WriteCollectedEventLogEntries(e.Context, false, TimeSpan.MaxValue, DateTime.UtcNow);
     }
@@ -487,11 +467,8 @@ public class EventLogDataCollector : DataCollector
         if (eventLogs != null)
         {
             EventLogNames = ParseCommaSeparatedList(eventLogs);
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose(
-                    "EventLogDataCollector configuration: " + EventLogConstants.SettingEventLogs + "=" + eventLogs);
-            }
+            EqtTrace.Verbose(
+                "EventLogDataCollector configuration: " + EventLogConstants.SettingEventLogs + "=" + eventLogs);
         }
         else
         {
@@ -517,13 +494,7 @@ public class EventLogDataCollector : DataCollector
                     _eventLogContainerMap.Add(eventLogName, eventLogContainer);
                 }
 
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose(string.Format(
-                        CultureInfo.InvariantCulture,
-                        "EventLogDataCollector: Created EventSource '{0}'",
-                        eventLogName));
-                }
+                EqtTrace.Verbose("EventLogDataCollector: Created EventSource '{0}'", eventLogName);
             }
             catch (Exception ex)
             {
@@ -540,12 +511,9 @@ public class EventLogDataCollector : DataCollector
         if (!string.IsNullOrEmpty(eventSourcesStr))
         {
             EventSources = ParseCommaSeparatedList(eventSourcesStr);
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose(
-                    "EventLogDataCollector configuration: " + EventLogConstants.SettingEventSources + "="
-                    + EventSources);
-            }
+            EqtTrace.Verbose(
+                "EventLogDataCollector configuration: " + EventLogConstants.SettingEventSources + "="
+                + EventSources);
         }
     }
 
@@ -561,12 +529,9 @@ public class EventLogDataCollector : DataCollector
                     (EventLogEntryType)Enum.Parse(typeof(EventLogEntryType), entryTypestring, true));
             }
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose(
-                    "EventLogDataCollector configuration: " + EventLogConstants.SettingEntryTypes + "="
-                    + EntryTypes);
-            }
+            EqtTrace.Verbose(
+                "EventLogDataCollector configuration: " + EventLogConstants.SettingEntryTypes + "="
+                + EntryTypes);
         }
         else
         {
@@ -596,12 +561,9 @@ public class EventLogDataCollector : DataCollector
                 MaxEntries = EventLogConstants.DefaultMaxEntries;
             }
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose(
-                    "EventLogDataCollector configuration: " + EventLogConstants.SettingMaxEntries + "="
-                    + MaxEntries);
-            }
+            EqtTrace.Verbose(
+                "EventLogDataCollector configuration: " + EventLogConstants.SettingMaxEntries + "="
+                + MaxEntries);
         }
         else
         {

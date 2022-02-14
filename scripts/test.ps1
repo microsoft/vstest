@@ -19,8 +19,8 @@ Param(
     [System.String] $TargetFramework,
 
     # Only test sources matching the pattern are run.
-    # Use End2End to run E2E tests. Or to run any one assembly tests, use the 
-    # assembly name. E.g. test -p Microsoft.TestPlatform.CoreUtilities.UnitTests 
+    # Use End2End to run E2E tests. Or to run any one assembly tests, use the
+    # assembly name. E.g. test -p Microsoft.TestPlatform.CoreUtilities.UnitTests
     [Parameter(Mandatory=$false)]
     [Alias("p")]
     [System.String] $Pattern = "Unit",
@@ -71,8 +71,8 @@ ${env:DOTNET_ROOT(x86)} = "${env:DOTNET_ROOT}_x86"
 # disable looking up other dotnets in programfiles
 $env:DOTNET_MULTILEVEL_LOOKUP = 0
 
-# Disable first run since we want to control all package sources 
-$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1 
+# Disable first run since we want to control all package sources
+$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 
 # list what we have set and what is available
 "---- dotnet environment variables"
@@ -119,13 +119,10 @@ $Script:ScriptFailed = $false
 
 function Write-Log ([string] $message, $messageColor = "Green")
 {
-    $currentColor = $Host.UI.RawUI.ForegroundColor
-    $Host.UI.RawUI.ForegroundColor = $messageColor
     if ($message)
     {
-        Write-Output "... $message"
+        Write-Host "... $message" -ForegroundColor $messageColor
     }
-    $Host.UI.RawUI.ForegroundColor = $currentColor
 }
 
 function Write-VerboseLog([string] $message)
@@ -185,7 +182,7 @@ function Invoke-Test
             $testContainerName = $_.BaseName
             $testOutputPath = Join-Path $_.Directory.FullName "bin/$($Script:TPT_Configuration)/{0}"
             $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
-            
+
             $skip = "False"
 
             foreach ($project in $Script:TPT_SkipProjects)
@@ -265,7 +262,7 @@ function Invoke-Test
                 {
                     Remove-Item $fullTrxFilePath
                 }
-					
+
                 Set-TestEnvironment
                 if($fx -eq $TPT_TargetFrameworkFullCLR)
                 {

@@ -154,7 +154,7 @@ internal class DataCollectionManager : IDataCollectionManager
     /// <inheritdoc/>
     public IDictionary<string, string> InitializeDataCollectors(string settingsXml)
     {
-        if (string.IsNullOrEmpty(settingsXml) && EqtTrace.IsInfoEnabled)
+        if (string.IsNullOrEmpty(settingsXml))
         {
             EqtTrace.Info("DataCollectionManager.InitializeDataCollectors : Runsettings is null or empty.");
         }
@@ -242,10 +242,7 @@ internal class DataCollectionManager : IDataCollectionManager
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("DataCollectionManager.SessionEnded: Failed to get attachments : {0}", ex);
-            }
+            EqtTrace.Error("DataCollectionManager.SessionEnded: Failed to get attachments : {0}", ex);
 
             return new Collection<AttachmentSet>(result);
         }
@@ -336,11 +333,7 @@ internal class DataCollectionManager : IDataCollectionManager
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("DataCollectionManager.TestCaseEnded: Failed to get attachments : {0}", ex);
-            }
-
+            EqtTrace.Error("DataCollectionManager.TestCaseEnded: Failed to get attachments: {0}", ex);
             return new Collection<AttachmentSet>(result);
         }
 
@@ -380,10 +373,7 @@ internal class DataCollectionManager : IDataCollectionManager
             return;
         }
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DataCollectionManager.CleanupPlugins: Cleaning up {0} plugins", RunDataCollectors.Count);
-        }
+        EqtTrace.Verbose("DataCollectionManager.CleanupPlugins: Cleaning up {0} plugins", RunDataCollectors.Count);
 
         RemoveDataCollectors(new List<DataCollectorInformation>(RunDataCollectors.Values));
 
@@ -525,10 +515,7 @@ internal class DataCollectionManager : IDataCollectionManager
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while creating data collector {0} : {1}", dataCollectorSettings.FriendlyName, ex);
-            }
+            EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while creating data collector {0} : {1}", dataCollectorSettings.FriendlyName, ex);
 
             // No data collector info, so send the error with no direct association to the collector.
             LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorInitializationError, dataCollectorSettings.FriendlyName, ex));
@@ -546,10 +533,7 @@ internal class DataCollectionManager : IDataCollectionManager
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while initializing data collector {0} : {1}", dataCollectorSettings.FriendlyName, ex);
-            }
+            EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while initializing data collector {0} : {1}", dataCollectorSettings.FriendlyName, ex);
 
             // Log error.
             dataCollectorInfo.Logger.LogError(_dataCollectionEnvironmentContext.SessionDataCollectionContext, string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorInitializationError, dataCollectorConfig.FriendlyName, ex));
@@ -611,11 +595,7 @@ internal class DataCollectionManager : IDataCollectionManager
 
         if (!_isDataCollectionEnabled)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("DataCollectionManger:SendEvent: SendEvent called when no collection is enabled.");
-            }
-
+            EqtTrace.Error("DataCollectionManger:SendEvent: SendEvent called when no collection is enabled.");
             return;
         }
 
@@ -658,10 +638,7 @@ internal class DataCollectionManager : IDataCollectionManager
                     _dataCollectionEnvironmentContext.SessionDataCollectionContext,
                     string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorErrorOnGetVariable, friendlyName, ex));
 
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("DataCollectionManager.GetEnvironmentVariables: Failed to get variable for Collector '{0}': {1}", friendlyName, ex);
-                }
+                EqtTrace.Error("DataCollectionManager.GetEnvironmentVariables: Failed to get variable for Collector '{0}': {1}", friendlyName, ex);
             }
         }
 
@@ -722,11 +699,8 @@ internal class DataCollectionManager : IDataCollectionManager
                 }
                 else
                 {
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        // new variable, add to the list.
-                        EqtTrace.Verbose("DataCollectionManager.AddCollectionEnvironmentVariables: Adding Environment variable '{0}' value '{1}'", namevaluepair.Key, namevaluepair.Value);
-                    }
+                    // new variable, add to the list.
+                    EqtTrace.Verbose("DataCollectionManager.AddCollectionEnvironmentVariables: Adding Environment variable '{0}' value '{1}'", namevaluepair.Key, namevaluepair.Value);
 
                     dataCollectorEnvironmentVariables.Add(
                         namevaluepair.Key,
@@ -768,10 +742,28 @@ internal class DataCollectionManager : IDataCollectionManager
 
     private void LogAttachments(List<AttachmentSet> attachmentSets)
     {
+        if (attachmentSets is null)
+        {
+            EqtTrace.Error("DataCollectionManager.LogAttachments: Unexpected null attachmentSets.");
+            return;
+        }
+
         foreach (var entry in attachmentSets)
         {
+            if (entry is null)
+            {
+                EqtTrace.Error("DataCollectionManager.LogAttachments: Unexpected null entry inside attachmentSets.");
+                continue;
+            }
+
             foreach (var file in entry.Attachments)
             {
+                if (file is null)
+                {
+                    EqtTrace.Error("DataCollectionManager.LogAttachments: Unexpected null file inside entry attachments.");
+                    continue;
+                }
+
                 EqtTrace.Verbose(
                     "Test Attachment Description: Collector:'{0}'  Uri:'{1}'  Description:'{2}' Uri:'{3}' ",
                     entry.DisplayName,

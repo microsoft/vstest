@@ -292,10 +292,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     {
         var message = _dataSerializer.DeserializeMessage(messageReceivedArgs.Data);
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("TestRequestHandler.OnMessageReceived: received message: {0}", message);
-        }
+        EqtTrace.Info("TestRequestHandler.OnMessageReceived: received message: {0}", message);
 
         switch (message.MessageType)
         {

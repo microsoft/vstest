@@ -103,10 +103,7 @@ public class VSExtensionManager : IVSExtensionManager
                     }
                     else
                     {
-                        if (EqtTrace.IsWarningEnabled)
-                        {
-                            EqtTrace.Warning("VSExtensionManager : Unable to create extension manager");
-                        }
+                        EqtTrace.Warning("VSExtensionManager : Unable to create extension manager");
                     }
                 }
                 finally
@@ -121,10 +118,7 @@ public class VSExtensionManager : IVSExtensionManager
             }
             else
             {
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("VSExtensionManager : Unable to create settings manager");
-                }
+                EqtTrace.Warning("VSExtensionManager : Unable to create settings manager");
             }
         }
 

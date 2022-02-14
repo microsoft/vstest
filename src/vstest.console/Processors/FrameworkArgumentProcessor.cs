@@ -157,10 +157,7 @@ internal class FrameworkArgumentExecutor : IArgumentExecutor
                 validFramework.ToString());
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Using .Net Framework version:{0}", _commandLineOptions.TargetFrameworkVersion);
-        }
+        EqtTrace.Info("Using .Net Framework version:{0}", _commandLineOptions.TargetFrameworkVersion);
     }
 
     /// <summary>

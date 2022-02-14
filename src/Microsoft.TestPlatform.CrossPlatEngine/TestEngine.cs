@@ -68,6 +68,9 @@ public class TestEngine : ITestEngine
         requestData.MetricsCollection.Add(
             TelemetryDataConstants.ParallelEnabledDuringDiscovery,
             parallelLevel > 1 ? "True" : "False");
+        requestData.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionId,
+            discoveryCriteria.TestSessionInfo?.Id.ToString() ?? string.Empty);
 
         if (ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
         {
@@ -153,6 +156,9 @@ public class TestEngine : ITestEngine
         requestData.MetricsCollection.Add(
             TelemetryDataConstants.ParallelEnabledDuringExecution,
             parallelLevel > 1 ? "True" : "False");
+        requestData.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionId,
+            testRunCriteria.TestSessionInfo?.Id.ToString() ?? string.Empty);
 
         var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
         var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testRunCriteria.TestRunSettings);
@@ -407,13 +413,10 @@ public class TestEngine : ITestEngine
                 // If only one source, no need to use parallel service client.
                 enableParallel = parallelLevelToUse > 1;
 
-                if (EqtTrace.IsInfoEnabled)
-                {
-                    EqtTrace.Verbose(
-                        "TestEngine: ParallelExecution set to '{0}' as the parallel level is adjusted to '{1}' based on number of sources",
-                        enableParallel,
-                        parallelLevelToUse);
-                }
+                EqtTrace.Verbose(
+                    "TestEngine: ParallelExecution set to '{0}' as the parallel level is adjusted to '{1}' based on number of sources",
+                    enableParallel,
+                    parallelLevelToUse);
             }
         }
         catch (Exception ex)
@@ -438,10 +441,7 @@ public class TestEngine : ITestEngine
 
         if (runConfiguration.InIsolation)
         {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: running test in isolation");
-            }
+            EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: running test in isolation");
             return false;
         }
 
@@ -474,10 +474,7 @@ public class TestEngine : ITestEngine
             !runConfiguration.DesignMode &&
             runConfiguration.TargetFramework.Name.IndexOf("netframework", StringComparison.OrdinalIgnoreCase) >= 0)
         {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: running test in process(inside vstest.console.exe process)");
-            }
+            EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: running test in process(inside vstest.console.exe process)");
             return true;
         }
 

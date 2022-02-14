@@ -54,10 +54,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     /// <returns>Port number</returns>
     public int InitializeCommunication()
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DataCollectionRequestSender.InitializeCommunication : Initialize communication. ");
-        }
+        EqtTrace.Verbose("DataCollectionRequestSender.InitializeCommunication : Initialize communication. ");
 
         var endpoint = _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0));
         _communicationManager.AcceptClientAsync();
@@ -71,10 +68,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     /// <returns>True, if Handler is connected</returns>
     public bool WaitForRequestHandlerConnection(int clientConnectionTimeout)
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DataCollectionRequestSender.WaitForRequestHandlerConnection : Waiting for connection with timeout: {0}", clientConnectionTimeout);
-        }
+        EqtTrace.Verbose("DataCollectionRequestSender.WaitForRequestHandlerConnection : Waiting for connection with timeout: {0}", clientConnectionTimeout);
 
         return _communicationManager.WaitForClientConnection(clientConnectionTimeout);
     }
@@ -92,10 +86,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     /// </summary>
     public void Close()
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Closing the connection");
-        }
+        EqtTrace.Info("Closing the connection");
 
         _communicationManager?.StopServer();
     }
@@ -112,10 +103,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
         var isDataCollectionStarted = false;
         BeforeTestRunStartResult result = null;
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DataCollectionRequestSender.SendBeforeTestRunStartAndGetResult : Send BeforeTestRunStart message with settingsXml {0} and sources {1}: ", settingsXml, sources.ToString());
-        }
+        EqtTrace.Verbose("DataCollectionRequestSender.SendBeforeTestRunStartAndGetResult: Send BeforeTestRunStart message with settingsXml {0} and sources {1}: ", settingsXml, sources.ToString());
 
         var payload = new BeforeTestRunStartPayload
         {
@@ -130,10 +118,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
         {
             var message = _communicationManager.ReceiveMessage();
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("DataCollectionRequestSender.SendBeforeTestRunStartAndGetResult : Received message: {0}", message);
-            }
+            EqtTrace.Verbose("DataCollectionRequestSender.SendBeforeTestRunStartAndGetResult: Received message: {0}", message);
 
             if (message.MessageType == MessageType.DataCollectionMessage)
             {
@@ -156,10 +141,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
         var isDataCollectionComplete = false;
         AfterTestRunEndResult result = null;
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DataCollectionRequestSender.SendAfterTestRunStartAndGetResult : Send AfterTestRunEnd message with isCancelled: {0}", isCancelled);
-        }
+        EqtTrace.Verbose("DataCollectionRequestSender.SendAfterTestRunStartAndGetResult: Send AfterTestRunEnd message with isCancelled: {0}", isCancelled);
 
         _communicationManager.SendMessage(MessageType.AfterTestRunEnd, isCancelled);
 
@@ -169,10 +151,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
         {
             var message = _communicationManager.ReceiveMessage();
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("DataCollectionRequestSender.SendAfterTestRunStartAndGetResult : Received message: {0}", message);
-            }
+            EqtTrace.Verbose("DataCollectionRequestSender.SendAfterTestRunStartAndGetResult: Received message: {0}", message);
 
             if (message.MessageType == MessageType.DataCollectionMessage)
             {

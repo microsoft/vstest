@@ -6,5 +6,5 @@
     <NoWarn>$(NoWarn);CA1416</NoWarn>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Localization.targets" /> 
+  <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Localization.targets" />
 </Project>

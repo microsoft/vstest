@@ -767,4 +767,7 @@
   <data name="TestRunAbortedWithError" xml:space="preserve">
     <value>Test Run Aborted with error {0}.</value>
   </data>
+  <data name="InvalidTestSessionCorrelationId" xml:space="preserve">
+    <value>Invalid testSessionCorrelationId</value>
+  </data>
 </root>

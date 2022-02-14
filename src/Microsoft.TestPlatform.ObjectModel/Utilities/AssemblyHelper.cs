@@ -132,10 +132,9 @@ public static class AssemblyHelper
                 "V3.5" or "V2.0" => FrameworkVersion.Framework35,
                 _ => FrameworkVersion.None,
             };
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("Inferred Multi-Targeting settings:{0} Platform:{1} FrameworkVersion:{2}", testSource, targetPlatform, targetFramework);
-            }
+
+            EqtTrace.Verbose("Inferred Multi-Targeting settings:{0} Platform:{1} FrameworkVersion:{2}", testSource, targetPlatform, targetFramework);
+
             return new KeyValuePair<Architecture, FrameworkVersion>(targetPlatform, targetFramework);
 
         }
@@ -311,19 +310,13 @@ public static class AssemblyHelper
             if (null != runConfiguration && (Equals(runConfiguration.TargetFramework, FrameworkVersion.Framework40) ||
                 string.Equals(runConfiguration.TargetFramework.ToString(), Constants.DotNetFramework40, StringComparison.OrdinalIgnoreCase)))
             {
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("AssemblyHelper.SetNETFrameworkCompatiblityMode: setting .NetFramework,Version=v4.0 compatibility mode.");
-                }
+                EqtTrace.Verbose("AssemblyHelper.SetNETFrameworkCompatiblityMode: setting .NetFramework,Version=v4.0 compatibility mode.");
                 setup.TargetFrameworkName = Constants.DotNetFramework40;
             }
         }
         catch (Exception e)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("AssemblyHelper:SetNETFrameworkCompatiblityMode:  Caught an exception:{0}", e);
-            }
+            EqtTrace.Error("AssemblyHelper:SetNETFrameworkCompatiblityMode: Caught an exception:{0}", e);
         }
     }
 #endif

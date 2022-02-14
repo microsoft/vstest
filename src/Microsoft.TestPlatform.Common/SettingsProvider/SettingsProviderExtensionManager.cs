@@ -66,7 +66,24 @@ public class SettingsProviderExtensionManager
         _logger = logger;
 
         // Populate the map to avoid threading issues
-        PopulateMap();
+        SettingsProvidersMap = new Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>();
+
+        foreach (var settingsProvider in _settingsProviders)
+        {
+            if (SettingsProvidersMap.ContainsKey(settingsProvider.Metadata.SettingsName))
+            {
+                _logger.SendMessage(
+                    TestMessageLevel.Error,
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        CommonResources.DuplicateSettingsName,
+                        settingsProvider.Metadata.SettingsName));
+            }
+            else
+            {
+                SettingsProvidersMap.Add(settingsProvider.Metadata.SettingsName, settingsProvider);
+            }
+        }
     }
 
     #endregion
@@ -76,12 +93,12 @@ public class SettingsProviderExtensionManager
     /// <summary>
     /// Gets the Unfiltered list of settings providers.  Used for the /ListSettingsProviders command line argument.
     /// </summary>
-    public IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> UnfilteredSettingsProviders { get; private set; }
+    public IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> UnfilteredSettingsProviders { get; }
 
     /// <summary>
     /// Gets the map of settings name to settings provider.
     /// </summary>
-    public Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> SettingsProvidersMap { get; private set; }
+    public Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> SettingsProvidersMap { get; }
 
     #endregion
 
@@ -145,10 +162,7 @@ public class SettingsProviderExtensionManager
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("SettingsProviderExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}", ex);
-            }
+            EqtTrace.Error("SettingsProviderExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}", ex);
 
             if (shouldThrowOnError)
             {
@@ -179,32 +193,6 @@ public class SettingsProviderExtensionManager
     }
 
     #endregion
-
-
-    /// <summary>
-    /// Populate the settings provider map
-    /// </summary>
-    private void PopulateMap()
-    {
-        SettingsProvidersMap = new Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>();
-
-        foreach (var settingsProvider in _settingsProviders)
-        {
-            if (SettingsProvidersMap.ContainsKey(settingsProvider.Metadata.SettingsName))
-            {
-                _logger.SendMessage(
-                    TestMessageLevel.Error,
-                    string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CommonResources.DuplicateSettingsName,
-                        settingsProvider.Metadata.SettingsName));
-            }
-            else
-            {
-                SettingsProvidersMap.Add(settingsProvider.Metadata.SettingsName, settingsProvider);
-            }
-        }
-    }
 }
 
 /// <summary>

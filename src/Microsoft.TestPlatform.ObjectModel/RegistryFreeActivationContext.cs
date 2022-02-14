@@ -107,10 +107,7 @@ internal class RegistryFreeActivationContext : IDisposable
         catch (Exception ex)
         {
             // Log any exceptions during deactivation.
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error(ex);
-            }
+            EqtTrace.Error(ex);
         }
     }
 }

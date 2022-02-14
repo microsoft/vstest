@@ -42,6 +42,10 @@ Microsoft.TestPlatform.Build.Tasks.VSTestTask.VSTestLogger.get -> string[]
 Microsoft.TestPlatform.Build.Tasks.VSTestTask.VSTestLogger.set -> void
 Microsoft.TestPlatform.Build.Tasks.VSTestTask.VSTestNoLogo.get -> string
 Microsoft.TestPlatform.Build.Tasks.VSTestTask.VSTestNoLogo.set -> void
+Microsoft.TestPlatform.Build.Tasks.VSTestTask.VSTestArtifactsProcessingMode.get -> string
+Microsoft.TestPlatform.Build.Tasks.VSTestTask.VSTestArtifactsProcessingMode.set -> void
+Microsoft.TestPlatform.Build.Tasks.VSTestTask.VSTestSessionCorrelationId.get -> string
+Microsoft.TestPlatform.Build.Tasks.VSTestTask.VSTestSessionCorrelationId.set -> void
 Microsoft.TestPlatform.Build.Tasks.VSTestTask.VSTestPlatform.get -> string
 Microsoft.TestPlatform.Build.Tasks.VSTestTask.VSTestPlatform.set -> void
 Microsoft.TestPlatform.Build.Tasks.VSTestTask.VSTestResultsDirectory.get -> string

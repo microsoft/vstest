@@ -193,6 +193,19 @@ public interface ITestSessionAsync : IDisposable
         ITestSessionEventsHandler eventsHandler);
 
     /// <summary>
+    /// Stops the test session.
+    /// </summary>
+    ///
+    /// <param name="options">Test Platform options.</param>
+    /// <param name="eventsHandler">The session event handler.</param>
+    /// 
+    /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    Task<bool> StopTestSessionAsync(
+        TestPlatformOptions options,
+        ITestSessionEventsHandler eventsHandler);
+
+    /// <summary>
     /// Cancels the last test run.
     /// </summary>
     [Obsolete("This API is not final yet and is subject to changes.", false)]

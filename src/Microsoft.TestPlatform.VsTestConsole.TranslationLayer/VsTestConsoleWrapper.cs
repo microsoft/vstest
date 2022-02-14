@@ -147,10 +147,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void StartSession()
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleWrapper.StartSession: Starting VsTestConsoleWrapper session.");
-        }
+        EqtTrace.Info("VsTestConsoleWrapper.StartSession: Starting VsTestConsoleWrapper session.");
 
         _testPlatformEventSource.TranslationLayerInitializeStart();
 
@@ -238,11 +235,25 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         TestSessionInfo testSessionInfo,
         ITestSessionEventsHandler eventsHandler)
     {
+        return StopTestSession(
+            testSessionInfo,
+            options: null,
+            eventsHandler);
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    public bool StopTestSession(
+        TestSessionInfo testSessionInfo,
+        TestPlatformOptions options,
+        ITestSessionEventsHandler eventsHandler)
+    {
         _testPlatformEventSource.TranslationLayerStopTestSessionStart();
 
         EnsureInitialized();
         return _requestSender.StopTestSession(
             testSessionInfo,
+            options,
             eventsHandler);
     }
 
@@ -650,11 +661,25 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         TestSessionInfo testSessionInfo,
         ITestSessionEventsHandler eventsHandler)
     {
+        return await StopTestSessionAsync(
+            testSessionInfo,
+            options: null,
+            eventsHandler).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    public async Task<bool> StopTestSessionAsync(
+        TestSessionInfo testSessionInfo,
+        TestPlatformOptions options,
+        ITestSessionEventsHandler eventsHandler)
+    {
         _testPlatformEventSource.TranslationLayerStopTestSessionStart();
 
         await EnsureInitializedAsync().ConfigureAwait(false);
         return await _requestSender.StopTestSessionAsync(
             testSessionInfo,
+            options,
             eventsHandler).ConfigureAwait(false);
     }
 

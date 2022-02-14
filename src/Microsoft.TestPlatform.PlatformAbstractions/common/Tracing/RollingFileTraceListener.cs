@@ -60,7 +60,7 @@ public class RollingFileTraceListener : TextWriterTraceListener
     /// <value>
     /// The <see cref="StreamWriterRollingHelper"/> for the flat file.
     /// </value>
-    internal StreamWriterRollingHelper RollingHelper { get; private set; }
+    internal StreamWriterRollingHelper RollingHelper { get; }
 
     /// <summary>
     /// Writes the trace messages to the file.

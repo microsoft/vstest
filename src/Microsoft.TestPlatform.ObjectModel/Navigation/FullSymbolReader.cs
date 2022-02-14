@@ -276,13 +276,10 @@ internal class FullSymbolReader : ISymbolReader
                 }
                 catch (Exception ex)
                 {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error(
-                            "Ignoring the exception while iterating method symbols:{0} for type:{1}",
-                            ex,
-                            name);
-                    }
+                    EqtTrace.Error(
+                        "Ignoring the exception while iterating method symbols:{0} for type:{1}",
+                        ex,
+                        name);
                 }
                 finally
                 {
@@ -294,10 +291,7 @@ internal class FullSymbolReader : ISymbolReader
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("Ignoring the exception while iterating type symbols:{0}", ex);
-            }
+            EqtTrace.Error("Ignoring the exception while iterating type symbols:{0}", ex);
         }
         finally
         {

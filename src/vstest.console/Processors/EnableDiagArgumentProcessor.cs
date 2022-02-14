@@ -226,8 +226,12 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         // Remove double quotes if present.
         diagFilePathArgument = diagFilePathArgument.Replace("\"", "");
 
-        // Create base directory for diag file path (if doesn't exist)
-        CreateDirectoryIfNotExists(diagFilePathArgument);
+        // If we provide a directory we don't need to create the base directory.
+        if (!diagFilePathArgument.EndsWith(@"\") && !diagFilePathArgument.EndsWith("/"))
+        {
+            // Create base directory for diag file path (if doesn't exist)
+            CreateDirectoryIfNotExists(diagFilePathArgument);
+        }
 
         // return full diag file path. (This is done so that vstest and testhost create logs at same location.)
         return Path.GetFullPath(diagFilePathArgument);

@@ -45,16 +45,13 @@ indent_size = 2
 # C# files
 [*.cs]
 
-# Do not set 'end_of_line = crlf' otherwise the rule IDE0055: Fix formatting will trigger on Linux/MAC OS.
-
 #### Core EditorConfig Options ####
+
+# Do not set 'end_of_line = crlf' otherwise the rule IDE0055: Fix formatting will trigger on Linux/MAC OS.
 
 # Indentation and spacing
 indent_size = 4
 tab_width = 4
-
-# New line preferences
-insert_final_newline = false
 
 #### .NET Coding Conventions ####
 
@@ -116,6 +113,33 @@ dotnet_code_quality_unused_parameters = all:suggestion
 # Suppression preferences
 dotnet_remove_unnecessary_suppression_exclusions = none
 
+# IDE0090: Use 'new(...)'
+dotnet_diagnostic.IDE0090.severity = warning # not default, increased severity to go with simpler declarations
+
+# IDE0005: Remove unnecessary import
+dotnet_diagnostic.IDE0005.severity = warning # not default, increased severity to ensure it is used
+
+# 'using' directive preferences
+# Keep this in sync with the related C# rule: csharp_using_directive_placement
+dotnet_diagnostic.IDE0065.severity = none
+
+# Use simple using statements
+# Keep this in sync with th related C# rule: csharp_prefer_simple_using_statement
+dotnet_diagnostic.IDE0063.severity = warning
+
+# CA2208: Instantiate argument exceptions correctly
+dotnet_diagnostic.CA2208.severity = warning # not default, increased severity to ensure it is always applied
+
+# CA2241: Provide correct arguments to formatting methods
+dotnet_diagnostic.CA2241.severity = warning # not default, increased severity to ensure it is always applied
+
+# IDE0053: Use expression body for lambda expressions
+# Keep this in sync with csharp_style_expression_bodied_lambdas
+dotnet_diagnostic.IDE0053.severity = warning # not default, increased severity to ensure it is applied
+
+# CA2016: Forward the 'CancellationToken' parameter to methods
+dotnet_diagnostic.CA2016.severity = warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences
@@ -127,7 +151,8 @@ csharp_style_var_when_type_is_apparent = false:silent   # not default, turned of
 csharp_style_expression_bodied_accessors = true:silent
 csharp_style_expression_bodied_constructors = false:silent
 csharp_style_expression_bodied_indexers = true:silent
-csharp_style_expression_bodied_lambdas = true:suggestion
+# Keep this in sync with IDE0053
+csharp_style_expression_bodied_lambdas = true:warning # not default, increased severity to ensure it is applied
 csharp_style_expression_bodied_local_functions = false:silent
 csharp_style_expression_bodied_methods = false:silent
 csharp_style_expression_bodied_operators = false:silent
@@ -149,8 +174,8 @@ csharp_preferred_modifier_order = public,private,protected,internal,static,exter
 
 # Code-block preferences
 csharp_prefer_braces = true:silent
+# Keep this in sync with the related .NET rule: IDE0063
 csharp_prefer_simple_using_statement = true:warning # not default, default is true:suggestion, increased severity to ensure it is used
-dotnet_diagnostic.IDE0063.severity = warning
 
 # Expression-level preferences
 csharp_prefer_simple_default_expression = true:suggestion
@@ -164,22 +189,15 @@ csharp_style_unused_value_assignment_preference = discard_variable:suggestion
 csharp_style_unused_value_expression_statement_preference = discard_variable:silent
 
 # 'using' directive preferences
+# Keep this in sync with the related .NET rule: IDE0065
 csharp_using_directive_placement = outside_namespace:silent
-dotnet_diagnostic.IDE0065.severity = none
 
-# CA1822: Mark members as static
-dotnet_diagnostic.CA1822.severity = suggestion # TODO: increase severity and fix related entries
-
-# IDE0090: Use 'new(...)'
-dotnet_diagnostic.IDE0090.severity = warning # not default, increased severity to go with simpler declarations
-
-# IDE0005: Remove unnecessary import
-dotnet_diagnostic.IDE0005.severity = warning # not default, increased severity to ensure it is used
-
-#### C# Formatting Rules ####
+#### .NET Formatting Rules ####
 
 # IDE0055: Fix formatting
 dotnet_diagnostic.IDE0055.severity = warning
+
+#### C# Formatting Rules ####
 
 # New line preferences
 csharp_new_line_before_catch = true
@@ -226,7 +244,7 @@ csharp_space_between_square_brackets = false
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
 
-#### Naming styles ####
+#### .NET Naming styles ####
 
 # not default, we have a lot of multiplatform code in compiler directives that defines methods, but keeps the bodies empty
 # IDE0052: Remove unused private members
@@ -239,15 +257,10 @@ dotnet_diagnostic.IDE0052.severity = silent
 # IDE1006: Naming Styles
 dotnet_diagnostic.IDE1006.severity = warning
 dotnet_diagnostic.IDE0073.severity = warning
-csharp_style_prefer_method_group_conversion = true:silent
-csharp_style_prefer_null_check_over_type_check = true:suggestion
-csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
-csharp_style_prefer_tuple_swap = true:suggestion
 
 # Naming rules
 
 dotnet_style_namespace_match_folder = true:suggestion
-csharp_style_namespace_declarations = file_scoped:warning # not default, default is block_scoped:silent, changed to follow modern preferences
 
 dotnet_naming_rule.types_and_namespaces_should_be_pascalcase.severity = suggestion
 dotnet_naming_rule.types_and_namespaces_should_be_pascalcase.symbols = types_and_namespaces
@@ -434,3 +447,14 @@ dotnet_naming_style.s_camelcase.required_prefix = s_
 dotnet_naming_style.s_camelcase.required_suffix =
 dotnet_naming_style.s_camelcase.word_separator =
 dotnet_naming_style.s_camelcase.capitalization = camel_case
+
+#### C# Naming styles ####
+
+csharp_style_prefer_method_group_conversion = true:silent
+csharp_style_prefer_null_check_over_type_check = true:suggestion
+csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
+csharp_style_prefer_tuple_swap = true:suggestion
+
+# Naming rules
+
+csharp_style_namespace_declarations = file_scoped:warning # not default, default is block_scoped:silent, changed to follow modern preferences
