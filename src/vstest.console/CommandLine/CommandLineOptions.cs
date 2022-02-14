@@ -81,7 +81,7 @@ internal class CommandLineOptions
     /// <summary>
     /// Default constructor.
     /// </summary>
-    protected CommandLineOptions()
+    internal CommandLineOptions()
     {
         BatchSize = DefaultBatchSize;
         TestStatsEventTimeout = _defaultRetrievalTimeout;
