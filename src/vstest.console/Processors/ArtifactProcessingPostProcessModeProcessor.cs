@@ -36,7 +36,7 @@ internal class ArtifactProcessingPostProcessModeProcessor : IArgumentProcessor
         {
             if (_metadata == null)
             {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ArtifactProcessingPostProcessModeProcessorCapabilities(CommandLineOptions.Instance));
+                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ArtifactProcessingPostProcessModeProcessorCapabilities());
             }
 
             return _metadata;
@@ -73,13 +73,6 @@ internal class ArtifactProcessingPostProcessModeProcessor : IArgumentProcessor
 
 internal class ArtifactProcessingPostProcessModeProcessorCapabilities : BaseArgumentProcessorCapabilities
 {
-    private readonly CommandLineOptions _commandLineOptions;
-
-    public ArtifactProcessingPostProcessModeProcessorCapabilities(CommandLineOptions options)
-    {
-        _commandLineOptions = options ?? throw new ArgumentNullException(nameof(options));
-    }
-
     public override string CommandName => ArtifactProcessingPostProcessModeProcessor.CommandName;
 
     public override bool AllowMultiple => false;

@@ -157,4 +157,16 @@ public interface IFileHelper
     /// </summary>
     /// <param name="path"></param>
     void Delete(string path);
+
+    /// <summary>
+    /// Get temporary file path
+    /// </summary>
+    /// <param name="path"></param>
+    public string GetTempPath();
+
+    /// <summary>
+    /// Get file length
+    /// </summary>
+    /// <param name="path"></param>
+    public long GetFileLength(string path);
 }
