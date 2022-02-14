@@ -57,13 +57,8 @@ internal class TestPluginManager
     /// <typeparam name="T">Return type of the test extension</typeparam>
     /// <param name="extensionType">Data type of the extension to be instantiated</param>
     /// <returns>Test extension instance</returns>
-    public static T CreateTestExtension<T>(Type extensionType)
+    public static T CreateTestExtension<T>(Type extensionType!!)
     {
-        if (extensionType == null)
-        {
-            throw new ArgumentNullException(nameof(extensionType));
-        }
-
         EqtTrace.Info("TestPluginManager.CreateTestExtension: Attempting to load test extension: " + extensionType);
 
         try

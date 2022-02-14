@@ -39,9 +39,9 @@ internal class DataCollectorAttachmentProcessor
     /// </summary>
     public IDataCollectorAttachmentProcessor DataCollectorAttachmentProcessorInstance { get; private set; }
 
-    public DataCollectorAttachmentProcessor(string friendlyName, IDataCollectorAttachmentProcessor dataCollectorAttachmentProcessor)
+    public DataCollectorAttachmentProcessor(string friendlyName, IDataCollectorAttachmentProcessor dataCollectorAttachmentProcessor!!)
     {
         FriendlyName = string.IsNullOrEmpty(friendlyName) ? throw new ArgumentException("Invalid FriendlyName", nameof(friendlyName)) : friendlyName;
-        DataCollectorAttachmentProcessorInstance = dataCollectorAttachmentProcessor ?? throw new ArgumentNullException(nameof(dataCollectorAttachmentProcessor));
+        DataCollectorAttachmentProcessorInstance = dataCollectorAttachmentProcessor;
     }
 }

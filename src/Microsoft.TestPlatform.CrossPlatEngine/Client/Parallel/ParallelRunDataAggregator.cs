@@ -33,9 +33,9 @@ internal class ParallelRunDataAggregator
 
     #endregion
 
-    public ParallelRunDataAggregator(string runSettingsXml)
+    public ParallelRunDataAggregator(string runSettingsXml!!)
     {
-        RunSettings = runSettingsXml ?? throw new ArgumentNullException(nameof(runSettingsXml));
+        RunSettings = runSettingsXml;
         ElapsedTime = TimeSpan.Zero;
         RunContextAttachments = new Collection<AttachmentSet>();
         RunCompleteArgsAttachments = new List<AttachmentSet>();

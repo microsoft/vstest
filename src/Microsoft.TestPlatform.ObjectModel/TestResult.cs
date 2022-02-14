@@ -25,9 +25,9 @@ public sealed class TestResult : TestObject
     /// Initializes a new instance of the <see cref="TestResult"/> class.
     /// </summary>
     /// <param name="testCase">The test case the result is for.</param>
-    public TestResult(TestCase testCase)
+    public TestResult(TestCase testCase!!)
     {
-        TestCase = testCase ?? throw new ArgumentNullException(nameof(testCase));
+        TestCase = testCase;
         Messages = new Collection<TestResultMessage>();
         Attachments = new Collection<AttachmentSet>();
 

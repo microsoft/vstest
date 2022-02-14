@@ -88,13 +88,8 @@ public static class OutputExtensions
     /// <param name="messageTypeFormat">Format string for the message type.</param>
     /// <param name="format">Format string for the error message.</param>
     /// <param name="args">Arguments to format into the format string.</param>
-    private static void Output(IOutput output, OutputLevel level, string messageTypeFormat, string format, params object[] args)
+    private static void Output(IOutput output!!, OutputLevel level, string messageTypeFormat, string format, params object[] args)
     {
-        if (output == null)
-        {
-            throw new ArgumentNullException(nameof(output));
-        }
-
         output.WriteLine(Format(messageTypeFormat, format, args), level);
     }
 

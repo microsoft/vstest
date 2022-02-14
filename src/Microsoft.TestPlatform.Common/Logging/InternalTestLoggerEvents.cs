@@ -176,13 +176,8 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// Raises a test run message event to the enabled loggers.
     /// </summary>
     /// <param name="args">Arguments to be raised.</param>
-    internal void RaiseTestRunMessage(TestRunMessageEventArgs args)
+    internal void RaiseTestRunMessage(TestRunMessageEventArgs args!!)
     {
-        if (args == null)
-        {
-            throw new ArgumentNullException(nameof(args));
-        }
-
         CheckDisposed();
 
         // Sending 0 size as this event is not expected to contain any data.

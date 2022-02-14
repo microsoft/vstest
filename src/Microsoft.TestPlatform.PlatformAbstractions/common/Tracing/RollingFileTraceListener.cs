@@ -316,14 +316,9 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// <param name="stream">
         /// The <see cref="FileStream"/> to write to.
         /// </param>
-        public TallyKeepingFileStreamWriter(FileStream stream)
+        public TallyKeepingFileStreamWriter(FileStream stream!!)
             : base(stream)
         {
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
-
             Tally = stream.Length;
         }
 
@@ -336,19 +331,9 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// <param name="encoding">
         /// The <see cref="Encoding"/> to use.
         /// </param>
-        public TallyKeepingFileStreamWriter(FileStream stream, Encoding encoding)
+        public TallyKeepingFileStreamWriter(FileStream stream!!, Encoding encoding!!)
             : base(stream, encoding)
         {
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
-
-            if (encoding == null)
-            {
-                throw new ArgumentNullException(nameof(encoding));
-            }
-
             Tally = stream.Length;
         }
 

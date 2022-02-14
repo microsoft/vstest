@@ -32,13 +32,8 @@ public class LazyExtension<TExtension, TMetadata>
     /// </summary>
     /// <param name="instance">Test extension Instance</param>
     /// <param name="metadata">test extension metadata</param>
-    public LazyExtension(TExtension instance, TMetadata metadata)
+    public LazyExtension(TExtension instance!!, TMetadata metadata)
     {
-        if (instance == null)
-        {
-            throw new ArgumentNullException(nameof(instance));
-        }
-
         if (metadata == null)
         {
             throw new ArgumentNullException(nameof(instance));
@@ -54,10 +49,10 @@ public class LazyExtension<TExtension, TMetadata>
     /// </summary>
     /// <param name="pluginInfo">Test plugin to instantiated on demand.</param>
     /// <param name="metadataType">Metadata type to instantiate on demand</param>
-    public LazyExtension(TestPluginInformation pluginInfo, Type metadataType)
+    public LazyExtension(TestPluginInformation pluginInfo!!, Type metadataType!!)
     {
-        TestPluginInfo = pluginInfo ?? throw new ArgumentNullException(nameof(pluginInfo));
-        _metadataType = metadataType ?? throw new ArgumentNullException(nameof(metadataType));
+        TestPluginInfo = pluginInfo;
+        _metadataType = metadataType;
         IsExtensionCreated = false;
     }
 
@@ -66,14 +61,9 @@ public class LazyExtension<TExtension, TMetadata>
     /// </summary>
     /// <param name="pluginInfo">Test plugin to instantiated on demand</param>
     /// <param name="metadata">Test extension metadata</param>
-    public LazyExtension(TestPluginInformation pluginInfo, TMetadata metadata)
+    public LazyExtension(TestPluginInformation pluginInfo!!, TMetadata metadata!!)
     {
-        if (metadata == null)
-        {
-            throw new ArgumentNullException(nameof(metadata));
-        }
-
-        TestPluginInfo = pluginInfo ?? throw new ArgumentNullException(nameof(pluginInfo));
+        TestPluginInfo = pluginInfo;
         _metadata = metadata;
         IsExtensionCreated = false;
     }
@@ -83,14 +73,9 @@ public class LazyExtension<TExtension, TMetadata>
     /// </summary>
     /// <param name="creator">Test extension creator delegate</param>
     /// <param name="metadata">test extension metadata</param>
-    public LazyExtension(Func<TExtension> creator, TMetadata metadata)
+    public LazyExtension(Func<TExtension> creator!!, TMetadata metadata!!)
     {
-        if (metadata == null)
-        {
-            throw new ArgumentNullException(nameof(metadata));
-        }
-
-        _extensionCreator = creator ?? throw new ArgumentNullException(nameof(creator));
+        _extensionCreator = creator;
         _metadata = metadata;
         IsExtensionCreated = false;
     }
