@@ -23,6 +23,9 @@ using Utilities;
 using CrossPlatResources = CrossPlatEngine.Resources.Resources;
 using ObjectModelConstants = TestPlatform.ObjectModel.Constants;
 using System.Collections.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using System.IO;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 public class TestRequestHandler : ITestRequestHandler
 {
@@ -39,6 +42,7 @@ public class TestRequestHandler : ITestRequestHandler
     private ICommunicationChannel _channel;
 
     private readonly JobQueue<Action> _jobQueue;
+    private readonly IFileHelper _fileHelper;
     private readonly ManualResetEventSlim _requestSenderConnected;
     private readonly ManualResetEventSlim _testHostManagerFactoryReady;
     private readonly ManualResetEventSlim _sessionCompleted;
@@ -73,6 +77,7 @@ public class TestRequestHandler : ITestRequestHandler
         _onLaunchAdapterProcessWithDebuggerAttachedAckReceived = onLaunchAdapterProcessWithDebuggerAttachedAckReceived;
         _onAttachDebuggerAckRecieved = onAttachDebuggerAckRecieved;
         _jobQueue = jobQueue;
+        _fileHelper = new FileHelper();
     }
 
     protected TestRequestHandler(IDataSerializer dataSerializer, ICommunicationEndpointFactory communicationEndpointFactory)
@@ -93,6 +98,7 @@ public class TestRequestHandler : ITestRequestHandler
             25000000,
             true,
             (message) => EqtTrace.Error(message));
+        _fileHelper = new FileHelper();
     }
 
     /// <inheritdoc />
@@ -104,7 +110,7 @@ public class TestRequestHandler : ITestRequestHandler
 
         if (!string.IsNullOrWhiteSpace(localPath) && !string.IsNullOrEmpty(remotePath))
         {
-            _pathConverter = new PathConverter(localPath, remotePath);
+            _pathConverter = new PathConverter(localPath, remotePath, _fileHelper);
         }
         else
         {
@@ -629,10 +635,10 @@ internal class PathConverter : IPathConverter
     // are inverted, it sends us their local path, and thinks about our local path as remote.
     private readonly string _originalPath = "";
 
-    public PathConverter(string originalPath, string deploymentPath)
+    public PathConverter(string originalPath, string deploymentPath, IFileHelper fileHelper)
     {
-        _originalPath = originalPath;
-        _deploymentPath = deploymentPath;
+        _originalPath = fileHelper.GetFullPath(originalPath).TrimEnd('\\').TrimEnd('/') + Path.DirectorySeparatorChar;
+        _deploymentPath = fileHelper.GetFullPath(deploymentPath).TrimEnd('\\').TrimEnd('/') + Path.DirectorySeparatorChar;
     }
 
     public string UpdatePath(string path, Direction updateDirection)
@@ -652,7 +658,8 @@ internal class PathConverter : IPathConverter
             replaceWith = _originalPath;
         }
 
-        return path?.Replace(find, replaceWith);
+        var result = path?.Replace(find, replaceWith);
+        return result;
     }
 
     public IEnumerable<string> UpdatePaths(IEnumerable<string> enumerable, Direction updateDirection)
@@ -690,19 +697,19 @@ internal class PathConverter : IPathConverter
 
     public Collection<AttachmentSet> UpdateAttachmentSets(Collection<AttachmentSet> attachmentSets, Direction updateDirection)
     {
-        attachmentSets.Select(i => UpdateAttachmentSet(i, updateDirection));
+        attachmentSets.Select(i => UpdateAttachmentSet(i, updateDirection)).ToList();
         return attachmentSets;
     }
 
     public ICollection<AttachmentSet> UpdateAttachmentSets(ICollection<AttachmentSet> attachmentSets, Direction updateDirection)
     {
-        attachmentSets.Select(i => UpdateAttachmentSet(i, updateDirection));
+        attachmentSets.Select(i => UpdateAttachmentSet(i, updateDirection)).ToList();
         return attachmentSets;
     }
 
     private AttachmentSet UpdateAttachmentSet(AttachmentSet attachmentSet, Direction updateDirection)
     {
-        attachmentSet.Attachments.Select(a => UpdateAttachment(a, updateDirection));
+        attachmentSet.Attachments.Select(a => UpdateAttachment(a, updateDirection)).ToList();
         return attachmentSet;
     }
 
@@ -714,13 +721,14 @@ internal class PathConverter : IPathConverter
 
     private IEnumerable<TestResult> UpdateTestResults(IEnumerable<TestResult> testResults, Direction updateDirection)
     {
-        testResults.Select(tr =>
+        // The incoming collection is IEnumerable, use foreach to make sure we always do the changes,
+        // as opposed to using .Select which will never run unless you ask for results (which totally
+        // did not happen to me, of course).
+        foreach (var tr in testResults)
         {
             tr.Attachments.Select(a => UpdateAttachmentSet(a, updateDirection));
             UpdateTestCase(tr.TestCase, updateDirection);
-
-            return tr;
-        });
+        }
 
         return testResults;
     }
