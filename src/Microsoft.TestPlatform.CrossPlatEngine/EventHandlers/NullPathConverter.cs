@@ -2,23 +2,31 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+
 using System.Collections.Generic;
 using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using System.Collections.ObjectModel;
+using System;
 
 internal class NullPathConverter : IPathConverter
 {
+    private static readonly Lazy<NullPathConverter> LazyInstance= new(() => new NullPathConverter());
+
+    private NullPathConverter() { }
+
+    public static NullPathConverter Instance => LazyInstance.Value;
+
     Collection<AttachmentSet> IPathConverter.UpdateAttachmentSets(Collection<AttachmentSet> attachmentSets, PathConversionDirection _) => attachmentSets;
 
     ICollection<AttachmentSet> IPathConverter.UpdateAttachmentSets(ICollection<AttachmentSet> attachmentSets, PathConversionDirection _) => attachmentSets;
 
     DiscoveryCriteria IPathConverter.UpdateDiscoveryCriteria(DiscoveryCriteria discoveryCriteria, PathConversionDirection _) => discoveryCriteria;
 
-    string IPathConverter.UpdatePath(string path, PathConversionDirection _) => path;
+    string? IPathConverter.UpdatePath(string? path, PathConversionDirection _) => path;
 
-    IEnumerable<string> IPathConverter.UpdatePaths(IEnumerable<string> enumerable, PathConversionDirection _) => enumerable;
+    IEnumerable<string?> IPathConverter.UpdatePaths(IEnumerable<string?> paths, PathConversionDirection _) => paths;
 
     TestCase IPathConverter.UpdateTestCase(TestCase testCase, PathConversionDirection _) => testCase;
 

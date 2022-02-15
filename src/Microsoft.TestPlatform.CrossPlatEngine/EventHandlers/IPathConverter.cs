@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+
 using System.Collections.Generic;
 using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -12,7 +13,7 @@ internal interface IPathConverter
 {
     string? UpdatePath(string? path, PathConversionDirection updateDirection);
 
-    IEnumerable<string> UpdatePaths(IEnumerable<string> enumerable, PathConversionDirection updateDirection);
+    IEnumerable<string?> UpdatePaths(IEnumerable<string?> paths, PathConversionDirection updateDirection);
 
     TestCase UpdateTestCase(TestCase testCase, PathConversionDirection updateDirection);
 

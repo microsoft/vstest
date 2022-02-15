@@ -91,7 +91,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
         _onLaunchAdapterProcessWithDebuggerAttachedAckReceived = (message) => throw new NotImplementedException();
         _onAttachDebuggerAckRecieved = (message) => throw new NotImplementedException();
 
-        _pathConverter = new NullPathConverter();
+        _pathConverter = NullPathConverter.Instance;
         _jobQueue = new JobQueue<Action>(
             (action) => action(),
             "TestHostOperationQueue",
@@ -107,13 +107,9 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     {
         if (this is IDeploymentAwareTestRequestHandler self
             && !string.IsNullOrWhiteSpace(self.LocalPath)
-            && !string.IsNullOrEmpty(self.RemotePath))
+            && !string.IsNullOrWhiteSpace(self.RemotePath))
         {
             _pathConverter = new PathConverter(self.LocalPath, self.RemotePath, _fileHelper);
-        }
-        else
-        {
-            _pathConverter = new NullPathConverter();
         }
 
         _communicationEndPoint = _communicationEndpointFactory.Create(ConnectionInfo.Role);
