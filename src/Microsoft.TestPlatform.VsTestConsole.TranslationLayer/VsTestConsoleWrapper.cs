@@ -34,8 +34,6 @@ using CoreUtilitiesConstants = VisualStudio.TestPlatform.CoreUtilities.Constants
 /// </summary>
 public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 {
-    #region Private Members
-
     private readonly IProcessManager _vstestConsoleProcessManager;
 
     private readonly ITranslationLayerRequestSender _requestSender;
@@ -55,10 +53,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     private readonly ConsoleParameters _consoleParameters;
 
     private readonly ITestPlatformEventSource _testPlatformEventSource;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="VsTestConsoleWrapper"/> class.
@@ -141,10 +135,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         _vstestConsoleProcessManager.ProcessExited += (sender, args) => _requestSender.OnProcessExited();
         _sessionStarted = false;
     }
-
-    #endregion
-
-    #region IVsTestConsoleWrapper
 
     /// <inheritdoc/>
     public void StartSession()
@@ -567,10 +557,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         _sessionStarted = false;
     }
 
-    #endregion
-
-    #region IVsTestConsoleWrapperAsync
-
     /// <inheritdoc/>
     public async Task StartSessionAsync()
     {
@@ -992,8 +978,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler,
         CancellationToken cancellationToken)
         => ProcessTestRunAttachmentsAsync(attachments, Enumerable.Empty<InvokedDataCollector>(), processingSettings, isLastBatch, collectMetrics, testSessionEventsHandler, cancellationToken);
-
-    #endregion
 
     private void EnsureInitialized()
     {

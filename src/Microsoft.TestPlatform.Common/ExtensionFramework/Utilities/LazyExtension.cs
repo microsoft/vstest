@@ -15,17 +15,11 @@ using System.Linq;
 /// <typeparam name="TMetadata">Test extension metadata</typeparam>
 public class LazyExtension<TExtension, TMetadata>
 {
-    #region Private Members
-
     private static readonly object Synclock = new();
     private TExtension _extension;
     private TMetadata _metadata;
     private readonly Type _metadataType;
     private readonly Func<TExtension> _extensionCreator;
-
-    #endregion
-
-    #region Constructors
 
     /// <summary>
     /// The constructor.
@@ -79,10 +73,6 @@ public class LazyExtension<TExtension, TMetadata>
         _metadata = metadata;
         IsExtensionCreated = false;
     }
-
-    #endregion
-
-    #region Public Properties
 
     /// <summary>
     /// Gets a value indicating whether is extension created.
@@ -147,5 +137,4 @@ public class LazyExtension<TExtension, TMetadata>
         }
     }
 
-    #endregion
 }

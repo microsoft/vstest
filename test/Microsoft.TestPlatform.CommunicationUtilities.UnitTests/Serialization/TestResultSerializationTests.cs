@@ -38,8 +38,6 @@ public class TestResultSerializationTests
         EndTime = DateTimeOffset.MaxValue
     };
 
-    #region v1 serializer Tests (used with protocol 1 and accidentally with 3)
-
     [TestMethod]
     [DataRow(1)]
     [DataRow(3)]
@@ -182,10 +180,6 @@ public class TestResultSerializationTests
         VerifyDummyPropertyIsRegistered();
     }
 
-    #endregion
-
-    #region v2 serializer Tests (used with protocol 2 and 4)
-
     [TestMethod]
     [DataRow(2)]
     [DataRow(4)]
@@ -274,10 +268,6 @@ public class TestResultSerializationTests
         VerifyDummyPropertyIsRegistered();
     }
 
-    #endregion
-
-    #region future
-
     [TestMethod]
     public void TestResultSerializationShouldThrowWhenProvidedProtocolVersionDoesNotExist()
     {
@@ -288,8 +278,6 @@ public class TestResultSerializationTests
 
         Assert.ThrowsException<NotSupportedException>(() => Serialize(TestResult, version));
     }
-
-    #endregion
 
     private static string Serialize<T>(T data, int version)
     {

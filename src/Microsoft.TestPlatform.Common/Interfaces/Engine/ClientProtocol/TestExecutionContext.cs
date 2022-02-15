@@ -16,8 +16,6 @@ using Client;
 [DataContract]
 public class TestExecutionContext
 {
-    #region Constructors
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TestExecutionContext"/> class.
     /// </summary>
@@ -65,10 +63,6 @@ public class TestExecutionContext
         TestCaseFilter = testCaseFilter;
         FilterOptions = filterOptions;
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets or sets the frequency of run stats event.
@@ -183,5 +177,4 @@ public class TestExecutionContext
         set;
     }
 
-    #endregion
 }

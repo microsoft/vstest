@@ -20,8 +20,6 @@ using ObjectModel.Engine;
 /// </summary>
 internal abstract class ParallelOperationManager<T, TU> : IParallelOperationManager, IDisposable
 {
-    #region ConcurrentManagerInstanceData
-
     protected Func<T> CreateNewConcurrentManager { get; set; }
 
     /// <summary>
@@ -41,17 +39,11 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
     /// </summary>
     private int _currentParallelLevel;
 
-    #endregion
-
-    #region Concurrency Keeper Objects
-
     /// <summary>
     /// LockObject to iterate our sourceEnumerator in parallel
     /// We can use the sourceEnumerator itself as lockObject, but since its a changing object - it's risky to use it as one
     /// </summary>
     protected object _sourceEnumeratorLockObject = new();
-
-    #endregion
 
     protected ParallelOperationManager(Func<T> createNewManager, int parallelLevel, bool sharedHosts)
     {

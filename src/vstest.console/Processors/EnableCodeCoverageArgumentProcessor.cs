@@ -24,14 +24,10 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 /// </summary>
 internal class EnableCodeCoverageArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of command for enabling code coverage.
     /// </summary>
     public const string CommandName = "/EnableCodeCoverage";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -96,8 +92,6 @@ internal class EnableCodeCoverageArgumentProcessorCapabilities : BaseArgumentPro
 /// </summary>
 internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
 {
-    #region private variables
-
     private readonly IRunSettingsProvider _runSettingsManager;
     private readonly CommandLineOptions _commandLineOptions;
     private readonly IFileHelper _fileHelper;
@@ -106,8 +100,6 @@ internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
 
     private static readonly string XPathSeperator = "/";
     private static readonly string[] NodeNames = new string[] { Constants.RunSettingsName, Constants.DataCollectionRunSettingsName, Constants.DataCollectorsSettingName, Constants.DataCollectorSettingName };
-
-    #region Default  CodeCoverage Settings String
 
     private static readonly string CodeCoverageCollectorSettingsTemplate =
         @"      <DataCollector uri=""datacollector://microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=16.0.0.0 " + @", Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"" friendlyName=""Code Coverage"">" + Environment.NewLine +
@@ -186,10 +178,6 @@ internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
         @"          </CodeCoverage>" + Environment.NewLine +
         @"        </Configuration>" + Environment.NewLine +
         @"      </DataCollector>";
-
-    #endregion
-
-    #endregion
 
     internal EnableCodeCoverageArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager, IFileHelper fileHelper)
     {

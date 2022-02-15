@@ -16,8 +16,6 @@ using Resources;
 [DataContract]
 public class TestRunMessageEventArgs : EventArgs
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes with the level and the message for the event.
     /// </summary>
@@ -39,10 +37,6 @@ public class TestRunMessageEventArgs : EventArgs
         Message = message;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// The message.
     /// </summary>
@@ -55,5 +49,4 @@ public class TestRunMessageEventArgs : EventArgs
     [DataMember]
     public TestMessageLevel Level { get; set; }
 
-    #endregion
 }

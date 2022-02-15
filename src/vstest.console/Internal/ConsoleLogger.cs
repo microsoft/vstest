@@ -31,7 +31,6 @@ using CommandLineResources = Resources.Resources;
 [ExtensionUri(ExtensionUri)]
 internal class ConsoleLogger : ITestLoggerWithParameters
 {
-    #region Constants
     private const string TestMessageFormattingPrefix = " ";
 
     /// <summary>
@@ -94,8 +93,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         CommandLineResources.None.Length
     }.Max();
 
-    #endregion
-
     internal enum Verbosity
     {
         Quiet,
@@ -104,18 +101,12 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         Detailed
     }
 
-    #region Fields
-
     private bool _testRunHasErrorMessages;
 
     /// <summary>
     /// Framework on which the test runs.
     /// </summary>
     private string _targetFramework;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -133,10 +124,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         _progressIndicator = progressIndicator;
         _featureFlag = featureFlag;
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets instance of IOutput used for sending output.
@@ -169,10 +156,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// tracking counts per source for the minimal and quiet output.
     /// </summary>
     private ConcurrentDictionary<Guid, MinimalTestResult> LeafTestResults { get; set; }
-
-    #endregion
-
-    #region ITestLoggerWithParameters
 
     /// <summary>
     /// Initializes the Test Logger.
@@ -236,10 +219,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
         Initialize(events, String.Empty);
     }
-    #endregion
-
-    #region Private Methods
-
     /// <summary>
     /// Prints the timespan onto console.
     /// </summary>
@@ -412,10 +391,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
         return executionId.Equals(Guid.Empty) ? Guid.NewGuid() : executionId;
     }
-
-    #endregion
-
-    #region Event Handlers
 
     /// <summary>
     /// Called when a test run start is received
@@ -885,8 +860,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             }
         }
     }
-    #endregion
-
     /// <summary>
     /// Raises test run warning occurred before console logger starts listening warning events.
     /// </summary>

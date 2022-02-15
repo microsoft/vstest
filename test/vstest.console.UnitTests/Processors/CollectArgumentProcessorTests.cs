@@ -58,8 +58,6 @@ public class CollectArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is CollectArgumentExecutor);
     }
 
-    #region CollectArgumentProcessorCapabilities tests
-
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -79,10 +77,6 @@ public class CollectArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
-
-    #endregion
-
-    #region CollectArgumentExecutor tests
 
     [TestMethod]
     public void InitializeShouldThrowIfArguemntIsNull()
@@ -708,5 +702,4 @@ public class CollectArgumentProcessorTests
             "  </DataCollectionRunSettings>",
             "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
     }
-    #endregion
 }

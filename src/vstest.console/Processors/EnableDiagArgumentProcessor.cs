@@ -114,8 +114,6 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
     /// </summary>
     public const string TraceLevelParam = "tracelevel";
 
-    #region Constructor
-
     /// <summary>
     /// Default constructor.
     /// </summary>
@@ -124,10 +122,6 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
     {
         _fileHelper = fileHelper;
     }
-
-    #endregion
-
-    #region IArgumentExecutor
 
     /// <summary>
     /// Initializes with the argument that was provided with the command.
@@ -254,5 +248,4 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         }
     }
 
-    #endregion
 }

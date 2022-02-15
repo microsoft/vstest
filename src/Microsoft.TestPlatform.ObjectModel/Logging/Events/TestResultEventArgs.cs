@@ -12,8 +12,6 @@ using System;
 /// </summary>
 public class TestResultEventArgs : EventArgs
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TestResultEventArgs"/> class.
     /// </summary>
@@ -25,14 +23,9 @@ public class TestResultEventArgs : EventArgs
         Result = result;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets the Test Result.
     /// </summary>
     public TestResult Result { get; private set; }
 
-    #endregion
 }

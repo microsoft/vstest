@@ -120,8 +120,6 @@ public class TestPluginManagerTests
         Assert.IsTrue(testExtensions.Any());
     }
 
-    #region Implementations
-
     private abstract class AbstractDummyLogger : ITestLogger
     {
         public void Initialize(TestLoggerEvents events, string testRunDirectory)
@@ -153,5 +151,4 @@ public class TestPluginManagerTests
         }
     }
 
-    #endregion
 }

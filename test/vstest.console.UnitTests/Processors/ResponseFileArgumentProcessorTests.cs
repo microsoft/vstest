@@ -32,8 +32,6 @@ public class ResponseFileArgumentProcessorTests
         Assert.IsNull(processor.Executor);
     }
 
-    #region ResponseFileArgumentProcessorCapabilities tests
-
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -50,5 +48,4 @@ public class ResponseFileArgumentProcessorTests
         Assert.IsTrue(capabilities.IsSpecialCommand);
     }
 
-    #endregion
 }

@@ -14,8 +14,6 @@ using System.Xml;
 /// </summary>
 public abstract class TestRunSettings
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes with the name of the test case.
     /// </summary>
@@ -27,10 +25,6 @@ public abstract class TestRunSettings
         Name = name;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets the name of the test settings.
     /// Do not put a private setter on this
@@ -39,8 +33,6 @@ public abstract class TestRunSettings
     /// TODO: Communicate to Chutzpah and fix it
     /// </summary>
     public string Name { get; }
-
-    #endregion
 
 #if !NETSTANDARD1_0
     /// <summary>

@@ -120,8 +120,6 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// </summary>
     private readonly IFileHelper _fileHelper;
 
-    #region Constructor
-
     internal EnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, IEnvironment environment, IFileHelper fileHelper)
     {
         _runSettingsManager = runSettingsManager;
@@ -130,15 +128,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
         _fileHelper = fileHelper;
     }
 
-    #endregion
-
-    #region Properties
-
     internal IOutput Output { get; set; }
-
-    #endregion
-
-    #region IArgumentExecutor
 
     /// <summary>
     /// Initializes with the argument that was provided with the command.
@@ -383,5 +373,4 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
         outernode.AppendChild(dumpNode);
     }
 
-    #endregion
 }

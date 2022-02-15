@@ -95,8 +95,6 @@ public class RunSpecificTestsArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is RunSpecificTestsArgumentExecutor);
     }
 
-    #region RunSpecificTestsArgumentProcessorCapabilitiesTests
-
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -113,10 +111,6 @@ public class RunSpecificTestsArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
-    #endregion
-
-    #region RunSpecificTestsArgumentExecutorTests
-
     [TestMethod]
     public void InitializeShouldThrowIfArgumentIsNull()
     {
@@ -599,8 +593,6 @@ public class RunSpecificTestsArgumentProcessorTests
 
         _mockOutput.Verify(op => op.WriteLine(It.Is<string>(st => st.Contains("Additionally, path to test adapters can be specified using /TestAdapterPath command.")), OutputLevel.Warning), Times.Never);
     }
-
-    #endregion
 
     private void ResetAndAddSourceToCommandLineOptions()
     {

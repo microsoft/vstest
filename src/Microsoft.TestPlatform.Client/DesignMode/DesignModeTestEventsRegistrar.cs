@@ -23,8 +23,6 @@ public class DesignModeTestEventsRegistrar : ITestDiscoveryEventsRegistrar, ITes
         _designModeClient = designModeClient;
     }
 
-    #region ITestDiscoveryEventsRegistrar
-
     public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
     {
         discoveryRequest.OnRawMessageReceived += OnRawMessageReceived;
@@ -35,10 +33,6 @@ public class DesignModeTestEventsRegistrar : ITestDiscoveryEventsRegistrar, ITes
         discoveryRequest.OnRawMessageReceived -= OnRawMessageReceived;
     }
 
-    #endregion
-
-    #region ITestRunEventsRegistrar
-
     public void RegisterTestRunEvents(ITestRunRequest testRunRequest)
     {
         testRunRequest.OnRawMessageReceived += OnRawMessageReceived;
@@ -48,8 +42,6 @@ public class DesignModeTestEventsRegistrar : ITestDiscoveryEventsRegistrar, ITes
     {
         testRunRequest.OnRawMessageReceived -= OnRawMessageReceived;
     }
-
-    #endregion
 
     /// <summary>
     /// RawMessage received handler for getting rawmessages directly from the host

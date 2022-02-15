@@ -35,8 +35,6 @@ internal class TestPluginDiscoverer
     {
     }
 
-    #region Fields
-
 #if WINDOWS_UAP
         private static HashSet<string> platformAssemblies = new HashSet<string>(new string[] {
             "MICROSOFT.VISUALSTUDIO.TESTPLATFORM.UNITTESTFRAMEWORK.DLL",
@@ -52,10 +50,6 @@ internal class TestPluginDiscoverer
 
         private const string SYSTEM_ASSEMBLY_PREFIX = "system.";
 #endif
-
-    #endregion
-
-    #region Public Methods
 
     /// <summary>
     /// Gets information about each of the test extensions available.
@@ -82,10 +76,6 @@ internal class TestPluginDiscoverer
 
         return pluginInfos;
     }
-
-    #endregion
-
-    #region Private Methods
 
     private void AddKnownExtensions(ref IEnumerable<string> extensionPaths)
     {
@@ -270,5 +260,4 @@ internal class TestPluginDiscoverer
         }
     }
 
-    #endregion
 }

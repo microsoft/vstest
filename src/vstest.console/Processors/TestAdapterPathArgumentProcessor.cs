@@ -27,14 +27,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class TestAdapterPathArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the ListTestsArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/TestAdapterPath";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -82,8 +78,6 @@ internal class TestAdapterPathArgumentProcessorCapabilities : BaseArgumentProces
 /// </summary>
 internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -109,10 +103,6 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
     /// </summary>
     private readonly char[] _argumentSeparators = new[] { ';' };
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Default constructor.
     /// </summary>
@@ -127,10 +117,6 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
         _output = output;
         _fileHelper = fileHelper;
     }
-
-    #endregion
-
-    #region IArgumentExecutor
 
     /// <summary>
     /// Initializes with the argument that was provided with the command.
@@ -215,5 +201,4 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
         return ArgumentProcessorResult.Success;
     }
 
-    #endregion
 }

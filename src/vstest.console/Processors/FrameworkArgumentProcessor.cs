@@ -23,14 +23,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class FrameworkArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the OutputArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/Framework";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -94,8 +90,6 @@ internal class FrameworkArgumentProcessorCapabilities : BaseArgumentProcessorCap
 /// </summary>
 internal class FrameworkArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -104,10 +98,6 @@ internal class FrameworkArgumentExecutor : IArgumentExecutor
     private readonly IRunSettingsProvider _runSettingsManager;
 
     public const string RunSettingsPath = "RunConfiguration.TargetFrameworkVersion";
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -121,10 +111,6 @@ internal class FrameworkArgumentExecutor : IArgumentExecutor
         _commandLineOptions = options;
         _runSettingsManager = runSettingsManager;
     }
-
-    #endregion
-
-    #region IArgumentExecutor
 
     /// <summary>
     /// Initializes with the argument that was provided with the command.
@@ -171,5 +157,4 @@ internal class FrameworkArgumentExecutor : IArgumentExecutor
         return ArgumentProcessorResult.Success;
     }
 
-    #endregion
 }

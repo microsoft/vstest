@@ -58,8 +58,6 @@ public class SocketCommunicationManagerTests : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    #region Server tests
-
     [TestMethod]
     public async Task HostServerShouldStartServerAndReturnPortNumber()
     {
@@ -126,10 +124,6 @@ public class SocketCommunicationManagerTests : IDisposable
         Assert.ThrowsException<AggregateException>(() => _tcpClient.ConnectAsync(IPAddress.Loopback, port).Wait());
     }
 
-    #endregion
-
-    #region Client tests
-
     [TestMethod]
     public async Task SetupClientAsyncShouldConnectToServer()
     {
@@ -174,10 +168,6 @@ public class SocketCommunicationManagerTests : IDisposable
         Assert.ThrowsException<SocketException>(() => WriteOnSocket(client.Client));
     }
 
-    #endregion
-
-    #region Message sender tests
-
     [TestMethod]
     public async Task SendMessageShouldSendMessageWithoutAnyPayload()
     {
@@ -217,10 +207,6 @@ public class SocketCommunicationManagerTests : IDisposable
 
         Assert.AreEqual(DummyPayload, ReadFromStream(client.GetStream()));
     }
-
-    #endregion
-
-    #region Message receiver tests
 
     [TestMethod]
     public async Task ReceiveMessageShouldReceiveDeserializedMessage()
@@ -268,8 +254,6 @@ public class SocketCommunicationManagerTests : IDisposable
 
         Assert.AreEqual(DummyPayload, message);
     }
-    #endregion
-
     [TestMethod]
     public void SocketPollShouldNotHangServerClientCommunication()
     {

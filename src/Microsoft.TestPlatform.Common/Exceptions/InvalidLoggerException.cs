@@ -11,8 +11,6 @@ using System;
 
 public class InvalidLoggerException : TestPlatformException
 {
-    #region Constructors
-
     /// <summary>
     /// Initializes with the message.
     /// </summary>
@@ -32,5 +30,4 @@ public class InvalidLoggerException : TestPlatformException
     {
     }
 
-    #endregion
 }

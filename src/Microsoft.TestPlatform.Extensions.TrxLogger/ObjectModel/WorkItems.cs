@@ -12,19 +12,14 @@ using Utility;
 
 using XML;
 
-#region WorkItem
 /// <summary>
 /// Stores an int which represents a workitem
 /// </summary>
 internal sealed class WorkItem : IXmlTestStore
 {
-    #region Fields
     [StoreXmlField(Location = ".")]
     private readonly int _id = 0;
 
-    #endregion
-
-    #region Constructors
     /// <summary>
     /// Create a new item with the workitem set
     /// </summary>
@@ -34,9 +29,6 @@ internal sealed class WorkItem : IXmlTestStore
         _id = workitemId;
     }
 
-    #endregion
-
-    #region Properties/Methods
     /// <summary>
     /// Gets the id for this WorkItem
     /// </summary>
@@ -48,9 +40,6 @@ internal sealed class WorkItem : IXmlTestStore
         }
     }
 
-    #endregion
-
-    #region Methods - overrides
     /// <summary>
     /// Compare the values of the items
     /// </summary>
@@ -78,10 +67,6 @@ internal sealed class WorkItem : IXmlTestStore
     {
         return _id.ToString(CultureInfo.InvariantCulture);
     }
-    #endregion
-
-    #region IXmlTestStore Members
-
     /// <summary>
     /// Saves the class under the XmlElement.
     /// </summary>
@@ -92,17 +77,12 @@ internal sealed class WorkItem : IXmlTestStore
         new XmlPersistence().SaveSingleFields(element, this, parameters);
     }
 
-    #endregion
 }
-#endregion
-
-#region WorkItemCollection
 /// <summary>
 /// A collection of ints represent the workitems
 /// </summary>
 internal sealed class WorkItemCollection : EqtBaseCollection<WorkItem>
 {
-    #region Constructors
     /// <summary>
     /// Creates an empty WorkItemCollection.
     /// </summary>
@@ -123,9 +103,6 @@ internal sealed class WorkItemCollection : EqtBaseCollection<WorkItem>
         }
     }
 
-    #endregion
-
-    #region Methods
     /// <summary>
     /// Adds the workitem.
     /// </summary>
@@ -233,6 +210,4 @@ internal sealed class WorkItemCollection : EqtBaseCollection<WorkItem>
         XmlPersistence xmlPersistence = new();
         xmlPersistence.SaveHashtable(_container, element, ".", ".", null, "Workitem", parameters);
     }
-    #endregion
 }
-#endregion

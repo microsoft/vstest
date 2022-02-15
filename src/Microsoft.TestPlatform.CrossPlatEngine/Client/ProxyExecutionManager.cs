@@ -58,8 +58,6 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
         get { return _proxyOperationManager.CancellationTokenSource; }
         set { _proxyOperationManager.CancellationTokenSource = value; }
     }
-    #region Constructors
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class.
     /// </summary>
@@ -137,10 +135,6 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
         // Create a new proxy operation manager.
         _proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
     }
-
-    #endregion
-
-    #region IProxyExecutionManager implementation.
 
     /// <inheritdoc/>
     public virtual void Initialize(bool skipDefaultAdapters)
@@ -378,9 +372,6 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
         _baseTestRunEventsHandler.HandleLogMessage(level, message);
     }
 
-    #endregion
-
-    #region IBaseProxy implementation.
     /// <inheritdoc/>
     public virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
     {
@@ -389,8 +380,6 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
         testProcessStartInfo.Arguments += " --telemetryoptedin " + telemetryOptedIn;
         return testProcessStartInfo;
     }
-    #endregion
-
     /// <summary>
     /// Ensures that the engine is ready for test operations. Usually includes starting up the
     /// test host process.

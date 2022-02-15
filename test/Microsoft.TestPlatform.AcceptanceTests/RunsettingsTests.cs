@@ -17,7 +17,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 [TestCategory("Windows-Review")]
 public class RunsettingsTests : AcceptanceTestBase
 {
-    #region Runsettings precedence tests
     /// <summary>
     /// Command line run settings should have high precedence among settings file, cli runsettings and cli switches
     /// </summary>
@@ -114,8 +113,6 @@ public class RunsettingsTests : AcceptanceTestBase
 
         RunTestWithRunSettings(runConfigurationDictionary, null, additionalArgs, testhostProcessName, expectedNumOfProcessCreated);
     }
-
-    #endregion
 
     [TestMethod]
     [NetFullTargetFrameworkDataSource]
@@ -257,8 +254,6 @@ public class RunsettingsTests : AcceptanceTestBase
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 1, 1);
     }
-
-    #region LegacySettings Tests
 
     [TestMethod]
     [TestCategory("Windows-Review")]
@@ -443,10 +438,6 @@ public class RunsettingsTests : AcceptanceTestBase
         ValidateSummaryStatus(1, 0, 0);
     }
 
-    #endregion
-
-    #region RunSettings With EnvironmentVariables Settings Tests
-
     [TestMethod]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
@@ -476,9 +467,6 @@ public class RunsettingsTests : AcceptanceTestBase
         ValidateSummaryStatus(1, 0, 0);
     }
 
-    #endregion
-
-    #region RunSettings defined in project file
     /// <summary>
     /// RunSettingsFilePath can be specified in .csproj and should be honored by `dotnet test`, this test
     /// checks that the settings were honored by translating an inconclusive test to failed "result", instead of the default "skipped".
@@ -508,8 +496,6 @@ public class RunsettingsTests : AcceptanceTestBase
         InvokeDotnetTest($@"{projectPath} --settings {settingsPath} --logger:""Console;Verbosity=normal""");
         ValidateSummaryStatus(0, 0, 1);
     }
-
-    #endregion
 
     private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary, TempDirectory tempDirectory)
     {

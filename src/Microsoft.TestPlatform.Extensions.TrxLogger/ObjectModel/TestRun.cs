@@ -22,10 +22,6 @@ using TrxLoggerResources = VisualStudio.TestPlatform.Extensions.TrxLogger.Resour
 /// </summary>
 internal sealed class TestRun
 {
-    #region Fields
-
-    #region Summary fields
-
     // These fields will be valid when the test run summary is loaded from a results file.
     // The summary fields need to be first in the class so they get serialized first. When we
     // read the summary we don't want to parse the XML tags for other fields because they can
@@ -47,9 +43,6 @@ internal sealed class TestRun
 
     private TestRunConfiguration _runConfig;
 
-    #endregion Summary fields
-
-    #region Non-summary fields
     [StoreXmlSimpleField("Times/@creation")]
     private DateTime _created;
 
@@ -61,12 +54,6 @@ internal sealed class TestRun
 
     [StoreXmlSimpleField("Times/@finish")]
     private DateTime _finished;
-
-    #endregion
-
-    #endregion
-
-    #region Constructors
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRun"/> class.
@@ -81,8 +68,6 @@ internal sealed class TestRun
         EqtAssert.IsTrue(!Guid.Empty.Equals(runId), "Can't use Guid.Empty for run ID.");
         _id = runId;
     }
-
-    #endregion Constructors
 
     /// <summary>
     /// Gets or sets the run configuration.

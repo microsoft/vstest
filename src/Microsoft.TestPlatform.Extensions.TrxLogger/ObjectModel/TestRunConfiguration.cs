@@ -21,7 +21,6 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
 {
     internal static readonly string DeploymentInDirectorySuffix = "In";
 
-    #region  Fields
     private readonly TestRunConfigurationId _id;
     private readonly TrxFileHelper _trxFileHelper;
 
@@ -29,8 +28,6 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
     private readonly string _name;
 
     private string _runDeploymentRoot;
-
-    #endregion
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRunConfiguration"/> class.
@@ -50,8 +47,6 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
         _id = new TestRunConfigurationId();
         _trxFileHelper = trxFileHelper;
     }
-
-    #region IXmlTestStoreCustom Members
 
     /// <summary>
     /// Gets the element name.
@@ -74,8 +69,6 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
             return @"http://microsoft.com/schemas/VisualStudio/TeamTest/2010";
         }
     }
-
-    #endregion
 
     /// <summary>
     /// Gets directory that receives reverse-deployed files from Controller.
@@ -107,8 +100,6 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
             _runDeploymentRoot = value;
         }
     }
-
-    #region IXmlTestStore Members
 
     /// <summary>
     /// Saves the class under the XmlElement..
@@ -158,5 +149,4 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
         }
     }
 
-    #endregion
 }

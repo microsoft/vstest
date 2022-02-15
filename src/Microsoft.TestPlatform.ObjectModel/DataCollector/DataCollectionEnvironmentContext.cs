@@ -17,14 +17,9 @@ using System;
 #endif
 public sealed class DataCollectionEnvironmentContext
 {
-    #region Fields
     /// <summary>
     /// DataCollectionContext for the session.
     /// </summary>
-
-    #endregion
-
-    #region Constructors and initialization
 
     /// <summary>
     /// Default Constructor
@@ -65,14 +60,9 @@ public sealed class DataCollectionEnvironmentContext
         return dataCollectionEnvironmentContext;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// DataCollectionContext for the session.
     /// </summary>
     public DataCollectionContext SessionDataCollectionContext { get; internal set; }
 
-    #endregion
 }

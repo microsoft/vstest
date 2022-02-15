@@ -28,13 +28,9 @@ public class TestSession : ITestSession
     private readonly ITestSessionEventsHandler _eventsHandler;
     private readonly IVsTestConsoleWrapper _consoleWrapper;
 
-    #region Properties
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     public TestSessionInfo TestSessionInfo { get; private set; }
-    #endregion
-
-    #region Constructors
     /// <summary>
     /// Initializes a new instance of the <see cref="TestSession"/> class.
     /// </summary>
@@ -82,9 +78,6 @@ public class TestSession : ITestSession
         StopTestSession();
         _disposed = true;
     }
-    #endregion
-
-    #region ITestSession
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void AbortTestRun()
@@ -301,9 +294,6 @@ public class TestSession : ITestSession
             TestSessionInfo = null;
         }
     }
-    #endregion
-
-    #region ITestSessionAsync
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task DiscoverTestsAsync(
@@ -501,5 +491,4 @@ public class TestSession : ITestSession
             TestSessionInfo = null;
         }
     }
-    #endregion
 }

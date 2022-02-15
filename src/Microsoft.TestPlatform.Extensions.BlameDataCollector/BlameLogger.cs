@@ -21,8 +21,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 [ExtensionUri(ExtensionUri)]
 public class BlameLogger : ITestLogger
 {
-    #region Constants
-
     /// <summary>
     /// Uri used to uniquely identify the Blame logger.
     /// </summary>
@@ -43,10 +41,6 @@ public class BlameLogger : ITestLogger
     /// </summary>
     private readonly IOutput _output;
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="BlameLogger"/> class.
     /// </summary>
@@ -66,10 +60,6 @@ public class BlameLogger : ITestLogger
         _output = output;
         _blameReaderWriter = blameReaderWriter;
     }
-
-    #endregion
-
-    #region ITestLogger
 
     /// <summary>
     /// Initializes the Logger.
@@ -114,10 +104,6 @@ public class BlameLogger : ITestLogger
         _output.Error(false, Resources.Resources.AbortedTestRun, sb.ToString());
     }
 
-    #endregion
-
-    #region Faulty test case fetch
-
     /// <summary>
     /// Fetches faulty test case
     /// </summary>
@@ -153,5 +139,4 @@ public class BlameLogger : ITestLogger
         return faultyTestCaseNames;
     }
 
-    #endregion
 }

@@ -27,8 +27,6 @@ internal class TrxFileHelper
     private static readonly Regex ReservedFileNamesRegex = new(@"(?i:^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]|CLOCK\$)(\..*)?)$");
     private readonly Func<DateTime> _timeProvider;
 
-    #region Constructors
-
     // Have to init InvalidFileNameChars dynamically.
     static TrxFileHelper()
     {
@@ -63,8 +61,6 @@ internal class TrxFileHelper
     {
         _timeProvider = timeProvider ?? (() => DateTime.Now);
     }
-
-    #endregion
 
     /// <summary>
     /// Replaces invalid file name chars in the specified string and changes it if it is a reserved file name.

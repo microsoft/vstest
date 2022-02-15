@@ -57,8 +57,6 @@ public class TestDiscoveryExtensionManagerTests
         Assert.IsTrue(extensionManager.Discoverers.Any());
     }
 
-    #region LoadAndInitialize tests
-
     [TestMethod]
     public void LoadAndInitializeShouldInitializeAllExtensions()
     {
@@ -74,7 +72,6 @@ public class TestDiscoveryExtensionManagerTests
         }
     }
 
-    #endregion
 }
 
 [TestClass]

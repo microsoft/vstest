@@ -45,8 +45,6 @@ public class FrameworkArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is FrameworkArgumentExecutor);
     }
 
-    #region FrameworkArgumentProcessorCapabilities tests
-
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -62,10 +60,6 @@ public class FrameworkArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
-
-    #endregion
-
-    #region FrameworkArgumentExecutor Initialize tests
 
     [TestMethod]
     public void InitializeShouldThrowIfArgumentIsNull()
@@ -127,16 +121,10 @@ public class FrameworkArgumentProcessorTests
         Assert.AreEqual(nameof(FrameworkVersion.Framework45), _runSettingsProvider.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath));
     }
 
-    #endregion
-
-    #region FrameworkArgumentExecutor Execute tests
-
     [TestMethod]
     public void ExecuteShouldReturnSuccess()
     {
         Assert.AreEqual(ArgumentProcessorResult.Success, _executor.Execute());
     }
-
-    #endregion
 
 }

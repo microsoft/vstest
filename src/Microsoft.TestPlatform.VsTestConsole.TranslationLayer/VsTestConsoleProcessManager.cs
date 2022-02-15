@@ -27,8 +27,6 @@ using Resources = VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resou
 /// </summary>
 internal class VsTestConsoleProcessManager : IProcessManager
 {
-    #region Private Members
-
     /// <summary>
     /// Port number for communicating with Vstest CLI
     /// </summary>
@@ -62,12 +60,8 @@ internal class VsTestConsoleProcessManager : IProcessManager
 
     internal IFileHelper FileHelper { get; set; }
 
-    #endregion
-
     /// <inheritdoc/>
     public event EventHandler ProcessExited;
-
-    #region Constructor
 
     /// <summary>
     /// Creates an instance of VsTestConsoleProcessManager class.
@@ -89,8 +83,6 @@ internal class VsTestConsoleProcessManager : IProcessManager
     {
         _dotnetExePath = dotnetExePath;
     }
-
-    #endregion Constructor
 
     /// <summary>
     /// Checks if the process has been initialized.

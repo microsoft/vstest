@@ -37,8 +37,6 @@ internal sealed class TestMethod : IXmlTestStore
     /// </summary>
     public bool IsValid { get; set; }
 
-    #region Override
-
     /// <summary>
     /// Override function for Equals.
     /// </summary>
@@ -65,10 +63,6 @@ internal sealed class TestMethod : IXmlTestStore
         return Name?.GetHashCode() ?? 0;
     }
 
-    #endregion Override
-
-    #region IXmlTestStore Members
-
     /// <summary>
     /// Saves the class under the XmlElement..
     /// </summary>
@@ -86,5 +80,4 @@ internal sealed class TestMethod : IXmlTestStore
         helper.SaveSimpleField(element, "isValid", IsValid, false);
     }
 
-    #endregion
 }

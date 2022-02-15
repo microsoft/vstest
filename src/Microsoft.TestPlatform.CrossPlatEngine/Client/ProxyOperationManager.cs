@@ -49,7 +49,6 @@ public class ProxyOperationManager
     private int _testHostProcessId;
     private string _testHostProcessStdError;
 
-    #region Constructors
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class.
     /// </summary>
@@ -94,9 +93,6 @@ public class ProxyOperationManager
         CancellationTokenSource = new CancellationTokenSource();
     }
 
-    #endregion
-
-    #region Properties
     /// <summary>
     /// Gets or sets the request data.
     /// </summary>
@@ -121,9 +117,6 @@ public class ProxyOperationManager
     /// Gets or sets the cancellation token source.
     /// </summary>
     public CancellationTokenSource CancellationTokenSource { get; set; }
-    #endregion
-
-    #region IProxyOperationManager implementation.
     /// <summary>
     /// Initializes the proxy.
     /// </summary>
@@ -336,8 +329,6 @@ public class ProxyOperationManager
             TestHostManager.HostLaunched -= TestHostManagerHostLaunched;
         }
     }
-
-    #endregion
 
     /// <summary>
     /// This method is exposed to enable derived classes to modify

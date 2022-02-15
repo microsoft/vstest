@@ -81,8 +81,6 @@ internal class TestRequestManager : ITestRequestManager
     /// </summary>
     private CancellationTokenSource _currentAttachmentsProcessingCancellationTokenSource;
 
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRequestManager"/> class.
     /// </summary>
@@ -121,8 +119,6 @@ internal class TestRequestManager : ITestRequestManager
         _attachmentsProcessingManager = attachmentsProcessingManager;
     }
 
-    #endregion
-
     /// <summary>
     /// Gets the test request manager instance.
     /// </summary>
@@ -138,8 +134,6 @@ internal class TestRequestManager : ITestRequestManager
             return s_testRequestManagerInstance;
         }
     }
-
-    #region ITestRequestManager
 
     /// <inheritdoc />
     public void InitializeExtensions(
@@ -587,8 +581,6 @@ internal class TestRequestManager : ITestRequestManager
         EqtTrace.Info("TestRequestManager.CancelTestRunAttachmentsProcessing: Sending cancel request.");
         _currentAttachmentsProcessingCancellationTokenSource?.Cancel();
     }
-
-    #endregion
 
     public void Dispose()
     {

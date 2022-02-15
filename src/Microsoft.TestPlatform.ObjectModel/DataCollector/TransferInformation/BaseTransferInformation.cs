@@ -10,13 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 /// </summary>
 public abstract class BasicTransferInformation
 {
-    #region Fields
-
     private string _description;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BasicTransferInformation"/> class.
@@ -31,18 +25,10 @@ public abstract class BasicTransferInformation
         Description = string.Empty;
     }
 
-    #endregion
-
-    #region  Required Parameters.
-
     /// <summary>
     /// Gets the data collection context the transfer will be associated with.
     /// </summary>
     public DataCollectionContext Context { get; private set; }
-
-    #endregion
-
-    #region Optional Parameters.
 
     /// <summary>
     /// Gets or sets a short description of the data being sent.
@@ -93,5 +79,4 @@ public abstract class BasicTransferInformation
         get;
     }
 
-    #endregion
 }

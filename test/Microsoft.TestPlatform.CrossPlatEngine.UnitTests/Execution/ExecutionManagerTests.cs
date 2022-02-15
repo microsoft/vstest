@@ -250,10 +250,6 @@ public class ExecutionManagerTests
         mockLogger.Verify(rd => rd.HandleLogMessage(It.IsAny<TestMessageLevel>(), "verify that the HandleLogMessage method will not be invoked when handler is not initialized"), Times.Never);
     }
 
-    #region Implementations
-
-    #region Discoverers
-
     private abstract class AbstractTestDiscoverer : ITestDiscoverer
     {
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
@@ -277,10 +273,6 @@ public class ExecutionManagerTests
             throw new NotImplementedException();
         }
     }
-
-    #endregion
-
-    #region Executors
 
     [ExtensionUri("ValidExecutor")]
     private class ValidExecutor : ITestExecutor
@@ -339,10 +331,6 @@ public class ExecutionManagerTests
         }
     }
 
-    #endregion
-
-    #region Loggers
-
     [ExtensionUri("csv")]
     private class ValidLogger : ITestLogger
     {
@@ -370,10 +358,6 @@ public class ExecutionManagerTests
         }
     }
 
-    #endregion
-
-    #region Settings Providers
-
     [SettingsName("ValidSettingsProvider")]
     private class ValidSettingsProvider : ISettingsProvider
     {
@@ -400,10 +384,6 @@ public class ExecutionManagerTests
             throw new NotImplementedException();
         }
     }
-
-    #endregion
-
-    #region  DataCollectors
 
     public class InvalidDataCollector : DataCollector
     {
@@ -441,8 +421,6 @@ public class ExecutionManagerTests
 
         }
     }
-    #endregion
-
     internal class FaultyTestExecutorPluginInformation : TestExtensionPluginInformation
     {
         /// <summary>
@@ -454,5 +432,4 @@ public class ExecutionManagerTests
             throw new Exception();
         }
     }
-    #endregion
 }

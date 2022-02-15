@@ -50,8 +50,6 @@ public class HtmlLoggerTests
         _htmlLogger.Initialize(_events.Object, _parameters);
     }
 
-    #region Initialize Method
-
     [TestMethod]
     public void InitializeShouldThrowExceptionIfEventsIsNull()
     {
@@ -96,8 +94,6 @@ public class HtmlLoggerTests
     {
         Assert.ThrowsException<ArgumentNullException>(() => _htmlLogger.TestMessageHandler(new object(), default));
     }
-
-    #endregion
 
     [TestMethod]
     public void TestMessageHandlerShouldAddMessageWhenItIsInformation()

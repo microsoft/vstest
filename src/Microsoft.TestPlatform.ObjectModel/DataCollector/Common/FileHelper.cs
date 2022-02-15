@@ -16,7 +16,6 @@ internal sealed class FileHelper
     private static readonly Dictionary<char, object> InvalidFileNameChars;
     private static readonly Regex ReservedFileNamesRegex = new(@"(?i:^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]|CLOCK\$)(\..*)?)$");
 
-    #region Constructors
     static FileHelper()
     {
         // Create a hash table of invalid chars.
@@ -31,9 +30,6 @@ internal sealed class FileHelper
     private FileHelper()
     {
     }
-    #endregion
-
-    #region Fields
     /// <summary>
     /// Determines if a file name has invalid characters.
     /// </summary>
@@ -80,5 +76,4 @@ internal sealed class FileHelper
         return ReservedFileNamesRegex.Match(fileName).Success;
     }
 
-    #endregion
 }

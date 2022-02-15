@@ -43,8 +43,6 @@ internal sealed class TestType : IXmlTestStore
         return _typeId.GetHashCode();
     }
 
-    #region IXmlTestStore Members
-
     /// <summary>
     /// Saves the class under the XmlElement..
     /// </summary>
@@ -59,5 +57,4 @@ internal sealed class TestType : IXmlTestStore
         XmlPersistence.SaveUsingReflection(element, this, null, parameters);
     }
 
-    #endregion
 }

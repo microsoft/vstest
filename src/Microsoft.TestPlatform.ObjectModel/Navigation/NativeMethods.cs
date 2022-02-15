@@ -576,8 +576,6 @@ internal static class DiaSourceObject
         return (comObject as IDiaDataSource);
     }
 
-    #region Private
-
     [ComImport, ComVisible(false), Guid("00000001-0000-0000-C000-000000000046"),
      InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     private interface IClassFactory
@@ -596,7 +594,6 @@ internal static class DiaSourceObject
         [In, MarshalAs(UnmanagedType.LPStruct)] Guid rclsid,
         [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid);
 
-    #endregion
 }
 
 /// <summary>

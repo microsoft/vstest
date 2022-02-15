@@ -19,7 +19,6 @@ using System.Xml;
 /// </summary>
 internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
 {
-    #region private classes
     /// <summary>
     /// Wraps non-generic enumerator.
     /// </summary>
@@ -58,15 +57,9 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
         {
         }
     }
-    #endregion
-
-    #region Fields
     protected Hashtable _container;
 
     private string _childElementName;
-    #endregion
-
-    #region Constructors
     protected EqtBaseCollection()
     {
         _container = new Hashtable();
@@ -90,9 +83,6 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
         EqtAssert.ParameterNotNull(other, nameof(other));
         _container = new Hashtable(other._container);
     }
-    #endregion
-
-    #region Methods: ICollection<T>
     // TODO: Consider putting check for null to derived classes.
     public virtual void Add(T item)
     {
@@ -158,9 +148,6 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
     {
         get { return false; }
     }
-    #endregion
-
-    #region IEnumerable
     public virtual IEnumerator GetEnumerator()
     {
         return _container.Keys.GetEnumerator();
@@ -170,10 +157,6 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
     {
         return new EqtBaseCollectionEnumerator<T>(GetEnumerator());
     }
-    #endregion
-
-    #region IXmlTestStore Members
-
     /// <summary>
     /// Default behavior is to create child elements with name same as name of type T.
     /// Does not respect IXmlTestStoreCustom.
@@ -184,9 +167,6 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
         xmlPersistence.SaveHashtable(_container, element, ".", ".", null, ChildElementName, parameters);
     }
 
-    #endregion
-
-    #region Private
     private string ChildElementName
     {
         get
@@ -199,5 +179,4 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
             return _childElementName;
         }
     }
-    #endregion
 }

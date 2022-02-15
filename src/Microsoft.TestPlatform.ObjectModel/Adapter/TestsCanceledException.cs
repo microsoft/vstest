@@ -20,8 +20,6 @@ using System.Runtime.Serialization;
 #endif
 public class TestCanceledException : Exception
 {
-    #region Constructors
-
     /// <summary>
     /// Creates a new TestCanceledException
     /// </summary>
@@ -58,5 +56,4 @@ public class TestCanceledException : Exception
     }
 
 #endif
-    #endregion
 }

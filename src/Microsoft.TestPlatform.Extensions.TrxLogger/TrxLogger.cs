@@ -38,8 +38,6 @@ using TrxLoggerResources = Resources.TrxResource;
 [ExtensionUri(TrxLoggerConstants.ExtensionUri)]
 public class TrxLogger : ITestLoggerWithParameters
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TrxLogger"/> class.
     /// </summary>
@@ -57,10 +55,6 @@ public class TrxLogger : ITestLoggerWithParameters
         _converter = new Converter(fileHelper, trxFileHelper);
         _trxFileHelper = trxFileHelper;
     }
-
-    #endregion
-
-    #region Fields
 
     /// <summary>
     /// Cache the TRX file path
@@ -97,10 +91,6 @@ public class TrxLogger : ITestLoggerWithParameters
     /// Gets the directory under which default trx file and test results attachments should be saved.
     /// </summary>
     private string _testResultsDirPath;
-
-    #endregion
-
-    #region ITestLogger
 
     /// <inheritdoc/>
     public void Initialize(TestLoggerEvents events!!, string testResultsDirPath)
@@ -142,10 +132,6 @@ public class TrxLogger : ITestLoggerWithParameters
         _parametersDictionary = parameters;
         Initialize(events, _parametersDictionary[DefaultLoggerParameterNames.TestRunDirectory]);
     }
-    #endregion
-
-    #region ForTesting
-
     internal string GetRunLevelInformationalMessage()
     {
         return _runLevelStdOut.ToString();
@@ -182,10 +168,6 @@ public class TrxLogger : ITestLoggerWithParameters
     }
 
     internal TrxLoggerObjectModel.TestOutcome TestResultOutcome { get; private set; } = TrxLoggerObjectModel.TestOutcome.Passed;
-
-    #endregion
-
-    #region Event Handlers
 
     /// <summary>
     /// Called when a test message is received.
@@ -741,5 +723,4 @@ public class TrxLogger : ITestLoggerWithParameters
         return outcome;
     }
 
-    #endregion
 }
