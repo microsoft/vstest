@@ -3,6 +3,8 @@
 
 #if NETSTANDARD && !NETSTANDARD2_0
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 using System.Reflection;

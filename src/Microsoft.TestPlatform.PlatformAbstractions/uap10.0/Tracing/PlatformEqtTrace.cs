@@ -3,6 +3,8 @@
 
 #if WINDOWS_UWP
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;

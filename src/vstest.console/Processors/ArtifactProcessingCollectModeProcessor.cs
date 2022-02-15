@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -30,7 +32,7 @@ internal class ArtifactProcessingCollectModeProcessor : IArgumentProcessor
         {
             if (_metadata == null)
             {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ArtifactProcessingCollectModeProcessorCapabilities(CommandLineOptions.Instance));
+                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ArtifactProcessingCollectModeProcessorCapabilities());
             }
 
             return _metadata;
@@ -61,13 +63,6 @@ internal class ArtifactProcessingCollectModeProcessor : IArgumentProcessor
 
 internal class ArtifactProcessingCollectModeProcessorCapabilities : BaseArgumentProcessorCapabilities
 {
-    private readonly CommandLineOptions _commandLineOptions;
-
-    public ArtifactProcessingCollectModeProcessorCapabilities(CommandLineOptions options)
-    {
-        _commandLineOptions = options ?? throw new ArgumentNullException(nameof(options));
-    }
-
     public override string CommandName => ArtifactProcessingCollectModeProcessor.CommandName;
 
     public override bool AllowMultiple => false;

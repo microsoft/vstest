@@ -192,6 +192,10 @@ dotnet_diagnostic.CA1806.severity = warning # not default, increased severity to
 # CA1834: Consider using 'StringBuilder.Append(char)' when applicable
 dotnet_diagnostic.CA1834.severity = warning # not default, increased severity to ensure it is always applied
 
+# IDE0190: Null check can be simplified
+# Keep this in sync with the related C# rule: csharp_style_prefer_parameter_null_checking
+dotnet_diagnostic.IDE0190.severity = warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences
@@ -248,10 +252,14 @@ csharp_style_unused_value_expression_statement_preference = discard_variable:sil
 # Keep this in sync with the related .NET rule: IDE0065
 csharp_using_directive_placement = inside_namespace:warning
 
+# IDE0190: Null check can be simplified
+# Keep this in sync with the related .NET rule: IDE0190
+csharp_style_prefer_parameter_null_checking = true # not default, increased severity to ensure it is applied
+
 #### .NET Formatting Rules ####
 
 # IDE0055: Fix formatting
-dotnet_diagnostic.IDE0055.severity = warning
+dotnet_diagnostic.IDE0055.severity = suggestion # Downgraded to suggestion due to https://github.com/dotnet/roslyn/issues/59414
 
 #### C# Formatting Rules ####
 
