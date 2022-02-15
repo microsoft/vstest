@@ -3,6 +3,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
 using System.Threading;
@@ -15,8 +17,6 @@ using ObjectModel;
 /// <typeparam name="TPayload">The type of the job.</typeparam>
 internal class Job<TPayload>
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="Job{TPayload}"/> class.
     /// </summary>
@@ -39,10 +39,6 @@ internal class Job<TPayload>
     {
         Size = 0;
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets a special job that indicates the queue should shutdown.
@@ -78,10 +74,6 @@ internal class Job<TPayload>
     /// </summary>
     public int Size { get; private set; }
 
-    #endregion
-
-    #region Static Methods
-
     /// <summary>
     /// Creates a job with a manual reset event that will be set when the job is processed.
     /// </summary>
@@ -96,5 +88,4 @@ internal class Job<TPayload>
         return waitJob;
     }
 
-    #endregion
 }

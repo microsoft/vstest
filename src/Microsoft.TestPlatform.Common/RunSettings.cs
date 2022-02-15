@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common;
 
 using System;
@@ -26,8 +28,6 @@ using ObjectModelCommonResources = ObjectModel.Resources.CommonResources;
 /// </summary>
 public class RunSettings : IRunSettings
 {
-    #region Fields
-
     /// <summary>
     /// Map of the settings names in the file to their associated settings provider.
     /// </summary>
@@ -38,8 +38,6 @@ public class RunSettings : IRunSettings
     /// </summary>
     private bool _isSettingsLoaded;
 
-    #endregion
-
     /// <summary>
     /// Initializes a new instance of the <see cref="RunSettings"/> class.
     /// </summary>
@@ -48,16 +46,10 @@ public class RunSettings : IRunSettings
         _settings = new Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>();
     }
 
-    #region Properties
-
     /// <summary>
     /// Gets the settings in the form of Xml string.
     /// </summary>
     public string SettingsXml { get; private set; }
-
-    #endregion
-
-    #region Public Methods
 
     /// <summary>
     /// Get the settings for the provided settings name.
@@ -110,10 +102,6 @@ public class RunSettings : IRunSettings
         var reader = XmlReader.Create(stringReader, XmlRunSettingsUtilities.ReaderSettings);
         ReadRunSettings(reader);
     }
-
-    #endregion
-
-    #region Private Methods
 
     /// <summary>
     /// Validate the runsettings checking that it is well formed.
@@ -263,5 +251,4 @@ public class RunSettings : IRunSettings
             metadata);
     }
 
-    #endregion
 }

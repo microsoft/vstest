@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 using System;
@@ -380,8 +382,6 @@ internal class DataCollectionManager : IDataCollectionManager
         EqtTrace.Info("DataCollectionManager.CleanupPlugins: CleanupPlugins finished");
     }
 
-    #region Load and Initialize DataCollectors
-
     /// <summary>
     /// Tries to get uri of the data collector corresponding to the friendly name. If no such data collector exists return null.
     /// </summary>
@@ -568,8 +568,6 @@ internal class DataCollectionManager : IDataCollectionManager
 
         return runEnabledDataCollectors;
     }
-
-    #endregion
 
     /// <summary>
     /// Sends a warning message against the session which is not associated with a data collector.

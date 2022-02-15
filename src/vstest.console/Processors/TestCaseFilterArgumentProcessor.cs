@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -16,14 +18,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class TestCaseFilterArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the TestCaseFilterArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/TestCaseFilter";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -87,16 +85,10 @@ internal class TestCaseFilterArgumentProcessorCapabilities : BaseArgumentProcess
 /// </summary>
 internal class TestCaseFilterArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
     private readonly CommandLineOptions _commandLineOptions;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -109,7 +101,6 @@ internal class TestCaseFilterArgumentExecutor : IArgumentExecutor
         Contract.Requires(options != null);
         _commandLineOptions = options;
     }
-    #endregion
 
     #region IArgumentExecutor
 

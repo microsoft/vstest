@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 using System;
@@ -61,18 +63,8 @@ public static class XmlRunSettingsUtilities
     /// <param name="runSettingDocument"> XPathNavigable representation of a runsettings file </param>
     /// <param name="dataCollectorUri"> The data Collector Uri. </param>
     /// <returns> True if there is a datacollector configured. </returns>
-    public static bool ContainsDataCollector(IXPathNavigable runSettingDocument, string dataCollectorUri)
+    public static bool ContainsDataCollector(IXPathNavigable runSettingDocument!!, string dataCollectorUri!!)
     {
-        if (runSettingDocument == null)
-        {
-            throw new ArgumentNullException(nameof(runSettingDocument));
-        }
-
-        if (dataCollectorUri == null)
-        {
-            throw new ArgumentNullException(nameof(dataCollectorUri));
-        }
-
         var navigator = runSettingDocument.CreateNavigator();
         var nodes = navigator.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
 
@@ -121,18 +113,8 @@ public static class XmlRunSettingsUtilities
     /// </summary>
     /// <param name="runSettingDocument">runSettingDocument</param>
     /// <param name="settings">settings</param>
-    public static void InsertDataCollectorsNode(IXPathNavigable runSettingDocument, DataCollectorSettings settings)
+    public static void InsertDataCollectorsNode(IXPathNavigable runSettingDocument!!, DataCollectorSettings settings!!)
     {
-        if (runSettingDocument == null)
-        {
-            throw new ArgumentNullException(nameof(runSettingDocument));
-        }
-
-        if (settings == null)
-        {
-            throw new ArgumentNullException(nameof(settings));
-        }
-
         var navigator = runSettingDocument.CreateNavigator();
         MoveToDataCollectorsNode(ref navigator);
 

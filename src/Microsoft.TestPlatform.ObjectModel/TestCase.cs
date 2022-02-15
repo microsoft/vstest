@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;
@@ -22,8 +24,6 @@ public sealed class TestCase : TestObject
     private string _displayName;
     private string _fullyQualifiedName;
     private string _source;
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestCase"/> class.
@@ -57,10 +57,6 @@ public sealed class TestCase : TestObject
         Source = source;
         LineNumber = -1;
     }
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties.
     /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
@@ -179,10 +175,6 @@ public sealed class TestCase : TestObject
         }
     }
 
-    #endregion
-
-    #region private methods
-
     /// <summary>
     /// Creates a Id of TestCase
     /// </summary>
@@ -232,10 +224,6 @@ public sealed class TestCase : TestObject
         SetPropertyValue(property, value);
         _defaultId = Guid.Empty;
     }
-
-    #endregion
-
-    #region Protected Methods
 
     /// <summary>
     /// Return TestProperty's value
@@ -301,10 +289,6 @@ public sealed class TestCase : TestObject
         base.ProtectedSetPropertyValue(property, value);
     }
 
-    #endregion
-
-    #region ManagedName and ManagedType implementations
-
     private static readonly TestProperty ManagedTypeProperty = TestProperty.Register("TestCase.ManagedType", "ManagedType", string.Empty, string.Empty, typeof(string), o => !string.IsNullOrWhiteSpace(o as string), TestPropertyAttributes.Hidden, typeof(TestCase));
     private static readonly TestProperty ManagedMethodProperty = TestProperty.Register("TestCase.ManagedMethod", "ManagedMethod", string.Empty, string.Empty, typeof(string), o => !string.IsNullOrWhiteSpace(o as string), TestPropertyAttributes.Hidden, typeof(TestCase));
 
@@ -324,8 +308,6 @@ public sealed class TestCase : TestObject
 
     private string GetFullyQualifiedName() => ContainsManagedMethodAndType ? $"{ManagedType}.{ManagedMethod}" : FullyQualifiedName;
 
-    #endregion
-
     /// <inheritdoc/>
     public override string ToString() => GetFullyQualifiedName();
 }
@@ -335,8 +317,6 @@ public sealed class TestCase : TestObject
 /// </summary>
 public static class TestCaseProperties
 {
-    #region Private Constants
-
     /// <summary>
     /// These are the core Test properties and may be available in commandline/TeamBuild to filter tests.
     /// These Property names should not be localized.
@@ -348,8 +328,6 @@ public static class TestCaseProperties
     private const string SourceLabel = "Source";
     private const string FilePathLabel = "File Path";
     private const string LineNumberLabel = "Line Number";
-
-    #endregion
 
     public static readonly TestProperty Id = TestProperty.Register("TestCase.Id", IdLabel, string.Empty, string.Empty, typeof(Guid), ValidateGuid, TestPropertyAttributes.Hidden, typeof(TestCase));
     public static readonly TestProperty FullyQualifiedName = TestProperty.Register("TestCase.FullyQualifiedName", FullyQualifiedNameLabel, string.Empty, string.Empty, typeof(string), ValidateName, TestPropertyAttributes.Hidden, typeof(TestCase));

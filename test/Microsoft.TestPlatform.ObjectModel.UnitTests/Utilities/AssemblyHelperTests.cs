@@ -3,6 +3,8 @@
 
 #if NETFRAMEWORK
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;

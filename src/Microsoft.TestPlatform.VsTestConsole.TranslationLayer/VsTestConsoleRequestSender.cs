@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
 using System;
@@ -51,8 +53,6 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// </summary>
     private CancellationTokenSource _processExitCancellationTokenSource;
 
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="VsTestConsoleRequestSender"/> class.
     /// </summary>
@@ -81,7 +81,6 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         _testPlatformEventSource = testPlatformEventSource;
     }
 
-    #endregion
 
     #region ITranslationLayerRequestSender
 

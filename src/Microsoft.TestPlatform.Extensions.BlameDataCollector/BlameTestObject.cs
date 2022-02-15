@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 using System;
@@ -9,8 +11,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 public class BlameTestObject
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="BlameTestObject"/> class.
     /// </summary>
@@ -60,10 +60,6 @@ public class BlameTestObject
         IsCompleted = false;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets or sets the id of the test case.
     /// </summary>
@@ -94,5 +90,4 @@ public class BlameTestObject
     /// </summary>
     public string DisplayName { get; set; }
 
-    #endregion
 }

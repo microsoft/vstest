@@ -21,6 +21,8 @@
 //   Required
 //   Single or multiple
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
 using System;
@@ -51,8 +53,6 @@ internal class Executor
     private readonly ITestPlatformEventSource _testPlatformEventSource;
     private bool _showHelp;
 
-    #region Constructor
-
     /// <summary>
     /// Default constructor.
     /// </summary>
@@ -67,18 +67,10 @@ internal class Executor
         _showHelp = true;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Instance to use for sending output.
     /// </summary>
     private IOutput Output { get; set; }
-
-    #endregion
-
-    #region Methods
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
@@ -183,10 +175,6 @@ internal class Executor
         _testPlatformEventSource.MetricsDisposeStop();
         return exitCode;
     }
-
-    #endregion
-
-    #region Private Methods
 
     /// <summary>
     /// Get the list of argument processors for the arguments.
@@ -494,5 +482,4 @@ internal class Executor
         return false;
     }
 
-    #endregion
 }

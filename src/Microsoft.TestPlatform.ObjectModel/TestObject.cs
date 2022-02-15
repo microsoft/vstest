@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;
@@ -17,8 +19,6 @@ using System.Runtime.Serialization;
 [DataContract]
 public abstract class TestObject
 {
-    #region Fields
-
     private static readonly CustomKeyValueConverter KeyValueConverter = new();
     private static readonly CustomStringArrayConverter StringArrayConverter = new();
 
@@ -68,10 +68,6 @@ public abstract class TestObject
         return _store;
     }
 
-    #endregion Fields
-
-    #region Constructors
-
     protected TestObject()
     {
         _store = new Dictionary<TestProperty, object>();
@@ -98,10 +94,6 @@ public abstract class TestObject
             }
         }
     }
-
-    #endregion Constructors
-
-    #region Properties
 
     /// <summary>
     /// Returns the TestProperties currently specified in this TestObject.
@@ -227,10 +219,6 @@ public abstract class TestObject
 
         ProtectedSetPropertyValue(property, objValue);
     }
-
-    #endregion Property Values
-
-    #region Helpers
 
     /// <summary>
     /// Return TestProperty's value
@@ -358,8 +346,6 @@ public abstract class TestObject
             throw new FormatException(e.Message, e);
         }
     }
-
-    #endregion Helpers
 
     private TraitCollection _traits;
 

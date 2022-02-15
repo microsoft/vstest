@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
 using System;
@@ -22,8 +24,6 @@ using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 /// </summary>
 internal class CommandLineOptions
 {
-    #region Constants/Readonly
-
     /// <summary>
     /// The default batch size.
     /// </summary>
@@ -44,10 +44,6 @@ internal class CommandLineOptions
     /// </summary>
     private readonly TimeSpan _defaultRetrievalTimeout = new(0, 0, 0, 1, 500);
 
-    #endregion
-
-    #region PrivateMembers
-
     private static CommandLineOptions s_instance;
 
     private List<string> _sources = new();
@@ -55,8 +51,6 @@ internal class CommandLineOptions
     private Architecture _architecture;
 
     private Framework _frameworkVersion;
-
-    #endregion
 
     /// <summary>
     /// Gets the instance.
@@ -74,12 +68,10 @@ internal class CommandLineOptions
         }
     }
 
-    #region Constructor
-
     /// <summary>
     /// Default constructor.
     /// </summary>
-    protected CommandLineOptions()
+    internal CommandLineOptions()
     {
         BatchSize = DefaultBatchSize;
         TestStatsEventTimeout = _defaultRetrievalTimeout;
@@ -89,10 +81,6 @@ internal class CommandLineOptions
             UseVsixExtensions = Utilities.GetAppSettingValue(UseVsixExtensionsKey, false);
 #endif
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Specifies whether parallel execution is on or off.
@@ -283,10 +271,6 @@ internal class CommandLineOptions
     /// </summary>
     internal string TestSessionCorrelationId { get; set; }
 
-    #endregion
-
-    #region Public Methods
-
     /// <summary>
     /// Adds a source file to look for tests in.
     /// </summary>
@@ -315,10 +299,6 @@ internal class CommandLineOptions
         _sources = _sources.Union(matchingFiles).ToList();
     }
 
-    #endregion
-
-    #region Internal Methods
-
     /// <summary>
     /// Resets the options. Clears the sources.
     /// </summary>
@@ -327,5 +307,4 @@ internal class CommandLineOptions
         s_instance = null;
     }
 
-    #endregion
 }

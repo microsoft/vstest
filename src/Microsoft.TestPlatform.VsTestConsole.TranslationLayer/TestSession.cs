@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
 using System;
@@ -26,13 +28,9 @@ public class TestSession : ITestSession
     private readonly ITestSessionEventsHandler _eventsHandler;
     private readonly IVsTestConsoleWrapper _consoleWrapper;
 
-    #region Properties
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     public TestSessionInfo TestSessionInfo { get; private set; }
-    #endregion
-
-    #region Constructors
     /// <summary>
     /// Initializes a new instance of the <see cref="TestSession"/> class.
     /// </summary>
@@ -80,7 +78,6 @@ public class TestSession : ITestSession
         StopTestSession();
         _disposed = true;
     }
-    #endregion
 
     #region ITestSession
     /// <inheritdoc/>

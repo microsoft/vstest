@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using Utilities;
@@ -15,8 +17,6 @@ using System.Xml;
 /// </summary>
 public class RunConfiguration : TestRunSettings
 {
-    #region Private Fields
-
     /// <summary>
     /// Platform architecture which rocksteady should use for discovery/execution
     /// </summary>
@@ -67,10 +67,6 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     private bool _shouldCollectSourceInformation;
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="RunConfiguration"/> class.
     /// </summary>
@@ -95,10 +91,6 @@ public class RunConfiguration : TestRunSettings
         TargetDevice = null;
         ExecutionThreadApartmentState = Constants.DefaultExecutionThreadApartmentState;
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets or sets the solution directory.
@@ -445,8 +437,6 @@ public class RunConfiguration : TestRunSettings
     /// Path to dotnet executable to be used to invoke testhost.dll. Specifying this will skip looking up testhost.exe and will force usage of the testhost.dll.
     /// </summary>
     public string DotnetHostPath { get; private set; }
-
-    #endregion
 
 #if !NETSTANDARD1_0
     /// <inheritdoc/>

@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
 
 using System;
@@ -27,7 +29,6 @@ using ObjectModelCommonResources = ObjectModel.Resources.CommonResources;
 /// </remarks>
 public class SettingsProviderExtensionManager
 {
-    #region Fields
     private static SettingsProviderExtensionManager s_settingsProviderExtensionManager;
     private static readonly object Synclock = new();
 
@@ -40,10 +41,6 @@ public class SettingsProviderExtensionManager
     /// Used for logging errors.
     /// </summary>
     private readonly IMessageLogger _logger;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes with the settings providers.
@@ -86,10 +83,6 @@ public class SettingsProviderExtensionManager
         }
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets the Unfiltered list of settings providers.  Used for the /ListSettingsProviders command line argument.
     /// </summary>
@@ -99,10 +92,6 @@ public class SettingsProviderExtensionManager
     /// Gets the map of settings name to settings provider.
     /// </summary>
     public Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> SettingsProvidersMap { get; }
-
-    #endregion
-
-    #region Static Methods
 
     /// <summary>
     /// Creates an instance of the settings provider.
@@ -171,10 +160,6 @@ public class SettingsProviderExtensionManager
         }
     }
 
-    #endregion
-
-    #region Public Methods
-
     /// <summary>
     /// Gets the settings with the provided name.
     /// </summary>
@@ -192,7 +177,6 @@ public class SettingsProviderExtensionManager
         return settingsProvider;
     }
 
-    #endregion
 }
 
 /// <summary>

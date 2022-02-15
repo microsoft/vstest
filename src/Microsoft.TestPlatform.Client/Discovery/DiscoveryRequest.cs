@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery;
 
 using System;
@@ -468,9 +470,6 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     }
 
     #endregion
-
-    #region privates fields
-
     /// <summary>
     /// Request Data
     /// </summary>
@@ -496,5 +495,4 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// </summary>
     private DateTime _discoveryStartTime;
 
-    #endregion
 }

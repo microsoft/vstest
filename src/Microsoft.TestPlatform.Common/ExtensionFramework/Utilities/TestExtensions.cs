@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 
 using System;
@@ -19,8 +21,6 @@ using PlatformAbstractions;
 /// </summary>
 public class TestExtensions
 {
-    #region Properties
-
     /// <summary>
     /// Gets or sets test discoverer extensions.
     /// </summary>
@@ -90,10 +90,6 @@ public class TestExtensions
     /// Gets or sets a value indicating whether are test hosts cached.
     /// </summary>
     internal bool AreDataCollectorsCached { get; set; }
-
-    #endregion
-
-    #region Internal methods
 
     /// <summary>
     /// Adds the extensions specified to the current set of extensions.
@@ -360,10 +356,6 @@ public class TestExtensions
         return extensions;
     }
 
-    #endregion
-
-    #region Private methods
-
     private void SetTestExtensionCache<TPluginInfo>(Dictionary<string, TPluginInfo> testPluginInfos) where TPluginInfo : TestPluginInformation
     {
         Type type = typeof(TPluginInfo);
@@ -398,5 +390,4 @@ public class TestExtensions
         }
     }
 
-    #endregion
 }

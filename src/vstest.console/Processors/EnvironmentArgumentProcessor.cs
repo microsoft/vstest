@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -19,7 +21,6 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class EnvironmentArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
     /// <summary>
     /// The short name of the command line argument that the EnvironmentArgumentProcessor handles.
     /// </summary>
@@ -29,8 +30,6 @@ internal class EnvironmentArgumentProcessor : IArgumentProcessor
     /// The name of the command line argument that the EnvironmentArgumentProcessor handles.
     /// </summary>
     public const string CommandName = "/Environment";
-    #endregion
-
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
     private Lazy<IArgumentExecutor> _executor;
@@ -80,7 +79,6 @@ internal class EnvironmentArgumentProcessor : IArgumentProcessor
 
     internal class ArgumentExecutor : IArgumentExecutor
     {
-        #region Fields
         /// <summary>
         /// Used when warning about overriden environment variables.
         /// </summary>
@@ -95,8 +93,6 @@ internal class EnvironmentArgumentProcessor : IArgumentProcessor
         /// Used when checking and forcing InIsolation mode.
         /// </summary>
         private readonly CommandLineOptions _commandLineOptions;
-        #endregion
-
         public ArgumentExecutor(CommandLineOptions commandLineOptions, IRunSettingsProvider runSettingsProvider, IOutput output)
         {
             _commandLineOptions = commandLineOptions;

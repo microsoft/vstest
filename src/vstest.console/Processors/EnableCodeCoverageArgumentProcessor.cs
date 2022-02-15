@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -22,14 +24,10 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 /// </summary>
 internal class EnableCodeCoverageArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of command for enabling code coverage.
     /// </summary>
     public const string CommandName = "/EnableCodeCoverage";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -94,8 +92,6 @@ internal class EnableCodeCoverageArgumentProcessorCapabilities : BaseArgumentPro
 /// </summary>
 internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
 {
-    #region private variables
-
     private readonly IRunSettingsProvider _runSettingsManager;
     private readonly CommandLineOptions _commandLineOptions;
     private readonly IFileHelper _fileHelper;
@@ -184,8 +180,6 @@ internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
         @"          </CodeCoverage>" + Environment.NewLine +
         @"        </Configuration>" + Environment.NewLine +
         @"      </DataCollector>";
-
-    #endregion
 
     #endregion
 
@@ -309,18 +303,8 @@ internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
     /// <param name="runSettingDocument"> XPathNavigable representation of a runsettings file </param>
     /// <param name="dataCollectorFriendlyName"> The data Collector friendly name. </param>
     /// <returns> True if there is a datacollector configured. </returns>
-    private static bool ContainsDataCollectorWithFriendlyName(IXPathNavigable runSettingDocument, string dataCollectorFriendlyName)
+    private static bool ContainsDataCollectorWithFriendlyName(IXPathNavigable runSettingDocument!!, string dataCollectorFriendlyName!!)
     {
-        if (runSettingDocument == null)
-        {
-            throw new ArgumentNullException(nameof(runSettingDocument));
-        }
-
-        if (dataCollectorFriendlyName == null)
-        {
-            throw new ArgumentNullException(nameof(dataCollectorFriendlyName));
-        }
-
         var navigator = runSettingDocument.CreateNavigator();
         var nodes = navigator.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
 

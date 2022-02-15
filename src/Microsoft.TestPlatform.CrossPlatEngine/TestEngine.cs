@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
 using System;
@@ -32,13 +34,9 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 /// </summary>
 public class TestEngine : ITestEngine
 {
-    #region Private Fields
-
     private readonly TestRuntimeProviderManager _testHostProviderManager;
     private ITestExtensionManager _testExtensionManager;
     private readonly IProcessHelper _processHelper;
-
-    #endregion
 
     public TestEngine() : this(TestRuntimeProviderManager.Instance, new ProcessHelper())
     {

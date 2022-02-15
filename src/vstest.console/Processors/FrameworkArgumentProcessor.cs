@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -21,14 +23,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class FrameworkArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the OutputArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/Framework";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -92,8 +90,6 @@ internal class FrameworkArgumentProcessorCapabilities : BaseArgumentProcessorCap
 /// </summary>
 internal class FrameworkArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -102,10 +98,6 @@ internal class FrameworkArgumentExecutor : IArgumentExecutor
     private readonly IRunSettingsProvider _runSettingsManager;
 
     public const string RunSettingsPath = "RunConfiguration.TargetFrameworkVersion";
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -120,7 +112,6 @@ internal class FrameworkArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsManager;
     }
 
-    #endregion
 
     #region IArgumentExecutor
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -27,14 +29,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class CollectArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of command for enabling code coverage.
     /// </summary>
     public const string CommandName = "/Collect";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 

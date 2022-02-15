@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 
 using System;
@@ -45,8 +47,6 @@ internal class FilterExpression
     /// </summary>
     private readonly bool _areJoinedByAnd;
 
-    #region Constructors
-
     private FilterExpression(FilterExpression left, FilterExpression right, bool areJoinedByAnd)
     {
         ValidateArg.NotNull(left, nameof(left));
@@ -62,8 +62,6 @@ internal class FilterExpression
         ValidateArg.NotNull(condition, nameof(condition));
         _condition = condition;
     }
-    #endregion
-
     /// <summary>
     /// Create a new filter expression 'And'ing 'this' with 'filter'.
     /// </summary>

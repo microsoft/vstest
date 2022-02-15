@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 using System;
@@ -41,8 +43,6 @@ using CrossPlatEngineResources = Resources.Resources;
 /// </summary>
 internal abstract class BaseRunTests
 {
-    #region private fields
-
     private readonly ITestEventsPublisher _testEventsPublisher;
     private protected string _package;
     private readonly IRequestData _requestData;
@@ -73,10 +73,6 @@ internal abstract class BaseRunTests
     /// The Serializer to clone testcase object in case of user input test source is package. E.g UWP scenario(appx/build.appxrecipe).
     /// </summary>
     private readonly IDataSerializer _dataSerializer;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BaseRunTests"/> class.
@@ -172,10 +168,6 @@ internal abstract class BaseRunTests
         ExecutorUrisThatRanTests = new List<string>();
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets the run settings.
     /// </summary>
@@ -203,10 +195,6 @@ internal abstract class BaseRunTests
     protected FrameworkHandle FrameworkHandle { get; }
 
     protected ICollection<string> ExecutorUrisThatRanTests { get; }
-
-    #endregion
-
-    #region Public methods
 
     public void RunTests()
     {
@@ -285,8 +273,6 @@ internal abstract class BaseRunTests
         }
     }
 
-    #region Abstract methods
-
     protected abstract void BeforeRaisingTestRunComplete(bool exceptionsHitDuringRunTests);
 
     protected abstract IEnumerable<Tuple<Uri, string>> GetExecutorUriExtensionMap(
@@ -318,8 +304,6 @@ internal abstract class BaseRunTests
 
     protected abstract void SendSessionEnd();
 
-    #endregion
-
     private void CancelTestRunInternal(ITestExecutor executor)
     {
         try
@@ -331,10 +315,6 @@ internal abstract class BaseRunTests
             EqtTrace.Info("{0}.Cancel threw an exception: {1} ", executor.GetType().FullName, e);
         }
     }
-    #endregion
-
-    #region Private methods
-
     private void OnTestRunMessage(object sender, TestRunMessageEventArgs e)
     {
         TestRunEventsHandler.HandleLogMessage(e.Level, e.Message);
@@ -737,5 +717,4 @@ internal abstract class BaseRunTests
         return updatedTestCases;
     }
 
-    #endregion
 }

@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 
 using System;
@@ -14,15 +16,9 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 /// </summary>
 public class TestRuntimeProviderManager
 {
-    #region Fields
-
     private static TestRuntimeProviderManager s_testHostManager;
 
     private readonly TestRuntimeExtensionManager _testHostExtensionManager;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRuntimeProviderManager"/> class.
@@ -41,10 +37,6 @@ public class TestRuntimeProviderManager
     /// </summary>
     public static TestRuntimeProviderManager Instance
         => s_testHostManager ??= new TestRuntimeProviderManager(TestSessionMessageLogger.Instance);
-
-    #endregion
-
-    #region Public Methods
 
     public ITestRuntimeProvider GetTestHostManagerByUri(string hostUri)
     {
@@ -66,5 +58,4 @@ public class TestRuntimeProviderManager
         return null;
     }
 
-    #endregion
 }

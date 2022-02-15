@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 using System;
@@ -18,8 +20,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 /// </summary>
 internal class ParallelRunDataAggregator
 {
-    #region PrivateFields
-
 
     private readonly List<string> _executorUris;
 
@@ -29,11 +29,9 @@ internal class ParallelRunDataAggregator
 
     private readonly object _dataUpdateSyncObject = new();
 
-    #endregion
-
-    public ParallelRunDataAggregator(string runSettingsXml)
+    public ParallelRunDataAggregator(string runSettingsXml!!)
     {
-        RunSettings = runSettingsXml ?? throw new ArgumentNullException(nameof(runSettingsXml));
+        RunSettings = runSettingsXml;
         ElapsedTime = TimeSpan.Zero;
         RunContextAttachments = new Collection<AttachmentSet>();
         RunCompleteArgsAttachments = new List<AttachmentSet>();
@@ -47,8 +45,6 @@ internal class ParallelRunDataAggregator
         IsAborted = false;
         IsCanceled = false;
     }
-
-    #region Public Properties
 
     public TimeSpan ElapsedTime { get; set; }
 
@@ -67,10 +63,6 @@ internal class ParallelRunDataAggregator
     public bool IsCanceled { get; private set; }
 
     public string RunSettings { get; }
-
-    #endregion
-
-    #region Public Methods
 
     public ITestRunStatistics GetAggregatedRunStats()
     {
@@ -207,5 +199,4 @@ internal class ParallelRunDataAggregator
         }
     }
 
-    #endregion
 }

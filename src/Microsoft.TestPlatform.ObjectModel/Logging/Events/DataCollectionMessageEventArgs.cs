@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 using System;
@@ -12,7 +14,6 @@ using System.Runtime.Serialization;
 [DataContract]
 public class DataCollectionMessageEventArgs : TestRunMessageEventArgs
 {
-    #region Constructor
     /// <summary>
     /// Constructor
     /// </summary>
@@ -21,10 +22,6 @@ public class DataCollectionMessageEventArgs : TestRunMessageEventArgs
     public DataCollectionMessageEventArgs(TestMessageLevel level, string message) : base(level, message)
     {
     }
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Friendly name of collector
     /// </summary>
@@ -56,5 +53,4 @@ public class DataCollectionMessageEventArgs : TestRunMessageEventArgs
         set;
     }
 
-    #endregion
 }

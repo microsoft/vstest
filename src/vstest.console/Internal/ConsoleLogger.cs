@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 
 using System;
@@ -29,7 +31,6 @@ using CommandLineResources = Resources.Resources;
 [ExtensionUri(ExtensionUri)]
 internal class ConsoleLogger : ITestLoggerWithParameters
 {
-    #region Constants
     private const string TestMessageFormattingPrefix = " ";
 
     /// <summary>
@@ -92,8 +93,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         CommandLineResources.None.Length
     }.Max();
 
-    #endregion
-
     internal enum Verbosity
     {
         Quiet,
@@ -102,18 +101,12 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         Detailed
     }
 
-    #region Fields
-
     private bool _testRunHasErrorMessages;
 
     /// <summary>
     /// Framework on which the test runs.
     /// </summary>
     private string _targetFramework;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -131,10 +124,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         _progressIndicator = progressIndicator;
         _featureFlag = featureFlag;
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets instance of IOutput used for sending output.
@@ -168,7 +157,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// </summary>
     private ConcurrentDictionary<Guid, MinimalTestResult> LeafTestResults { get; set; }
 
-    #endregion
 
     #region ITestLoggerWithParameters
 
@@ -177,13 +165,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="events">Events that can be registered for.</param>
     /// <param name="testRunDirectory">Test Run Directory</param>
-    public void Initialize(TestLoggerEvents events, string testRunDirectory)
+    public void Initialize(TestLoggerEvents events!!, string testRunDirectory)
     {
-        if (events == null)
-        {
-            throw new ArgumentNullException(nameof(events));
-        }
-
         if (Output == null)
         {
             Output = ConsoleOutput.Instance;
@@ -209,13 +192,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         // events.DiscoveredTests += DiscoveredTestsHandler;
     }
 
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters!!)
     {
-        if (parameters == null)
-        {
-            throw new ArgumentNullException(nameof(parameters));
-        }
-
         if (parameters.Count == 0)
         {
             throw new ArgumentException("No default parameters added", nameof(parameters));
@@ -245,8 +223,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         Initialize(events, String.Empty);
     }
     #endregion
-
-    #region Private Methods
 
     /// <summary>
     /// Prints the timespan onto console.
@@ -420,10 +396,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
         return executionId.Equals(Guid.Empty) ? Guid.NewGuid() : executionId;
     }
-
-    #endregion
-
-    #region Event Handlers
 
     /// <summary>
     /// Called when a test run start is received
@@ -893,8 +865,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             }
         }
     }
-    #endregion
-
     /// <summary>
     /// Raises test run warning occurred before console logger starts listening warning events.
     /// </summary>

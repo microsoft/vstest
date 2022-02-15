@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
@@ -36,8 +38,6 @@ using TrxLoggerResources = Resources.TrxResource;
 [ExtensionUri(TrxLoggerConstants.ExtensionUri)]
 public class TrxLogger : ITestLoggerWithParameters
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TrxLogger"/> class.
     /// </summary>
@@ -55,10 +55,6 @@ public class TrxLogger : ITestLoggerWithParameters
         _converter = new Converter(fileHelper, trxFileHelper);
         _trxFileHelper = trxFileHelper;
     }
-
-    #endregion
-
-    #region Fields
 
     /// <summary>
     /// Cache the TRX file path
@@ -96,18 +92,12 @@ public class TrxLogger : ITestLoggerWithParameters
     /// </summary>
     private string _testResultsDirPath;
 
-    #endregion
 
     #region ITestLogger
 
     /// <inheritdoc/>
-    public void Initialize(TestLoggerEvents events, string testResultsDirPath)
+    public void Initialize(TestLoggerEvents events!!, string testResultsDirPath)
     {
-        if (events == null)
-        {
-            throw new ArgumentNullException(nameof(events));
-        }
-
         if (string.IsNullOrEmpty(testResultsDirPath))
         {
             throw new ArgumentNullException(nameof(testResultsDirPath));
@@ -123,13 +113,8 @@ public class TrxLogger : ITestLoggerWithParameters
     }
 
     /// <inheritdoc/>
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters!!)
     {
-        if (parameters == null)
-        {
-            throw new ArgumentNullException(nameof(parameters));
-        }
-
         if (parameters.Count == 0)
         {
             throw new ArgumentException("No default parameters added", nameof(parameters));

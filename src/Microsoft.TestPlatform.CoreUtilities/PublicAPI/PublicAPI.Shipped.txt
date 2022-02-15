@@ -71,6 +71,8 @@ Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper.Cop
 Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper.Delete(string path) -> void
 Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper.DeleteEmptyDirectroy(string directoryPath) -> void
 Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper.DeleteDirectory(string directoryPath, bool recursive) -> void
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper.GetTempPath() -> string
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper.GetFileLength(string path) -> long
 Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper.DirectoryExists(string path) -> bool
 Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper.Exists(string path) -> bool
 Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper.GetCurrentDirectory() -> string

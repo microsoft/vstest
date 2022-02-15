@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 using System;
@@ -15,8 +17,6 @@ using System.Runtime.Serialization;
 public sealed class SessionStartEventArgs : DataCollectionEventArgs
 {
     private readonly IDictionary<string, object> _properties;
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SessionStartEventArgs"/> class.
@@ -55,10 +55,6 @@ public sealed class SessionStartEventArgs : DataCollectionEventArgs
         Debug.Assert(!context.HasTestCase, "Session event has test a case context");
     }
 
-    #endregion
-
-    #region Public Methods
-
     /// <summary>
     /// Gets session start properties enumerator
     /// </summary>
@@ -95,7 +91,6 @@ public sealed class SessionStartEventArgs : DataCollectionEventArgs
         return propertyValue;
     }
 
-    #endregion
 }
 
 /// <summary>
@@ -104,8 +99,6 @@ public sealed class SessionStartEventArgs : DataCollectionEventArgs
 [DataContract]
 public sealed class SessionEndEventArgs : DataCollectionEventArgs
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="SessionEndEventArgs"/> class.
     /// </summary>
@@ -130,5 +123,4 @@ public sealed class SessionEndEventArgs : DataCollectionEventArgs
         Debug.Assert(!context.HasTestCase, "Session event has test a case context");
     }
 
-    #endregion
 }
