@@ -21,9 +21,9 @@ public class DiscoveryCompleteEventArgs : EventArgs
     /// <param name="partiallyDiscoveredSources">List of partially discovered sources</param>
     /// <param name="notDiscoveredSources">List of not discovered sources</param>
     public DiscoveryCompleteEventArgs(long totalTests, bool isAborted,
-        IReadOnlyCollection<string> fullyDiscoveredSources,
-        IReadOnlyCollection<string> partiallyDiscoveredSources,
-        IReadOnlyCollection<string> notDiscoveredSources)
+        IList<string> fullyDiscoveredSources,
+        IList<string> partiallyDiscoveredSources,
+        IList<string> notDiscoveredSources)
     {
         // This event is always raised from the client side, while the total count of tests is maintained
         // only at the testhost end. In case of a discovery abort (various reasons including crash), it is
@@ -66,15 +66,15 @@ public class DiscoveryCompleteEventArgs : EventArgs
     /// <summary>
     /// Gets the list of sources which were fully discovered.
     /// </summary>
-    public IReadOnlyCollection<string> FullyDiscoveredSources { get; }
+    public IList<string> FullyDiscoveredSources { get; set; }
 
     /// <summary>
     /// Gets the list of sources which were partially discovered (started discover tests, but then discovery aborted).
     /// </summary>
-    public IReadOnlyCollection<string> PartiallyDiscoveredSources { get; }
+    public IList<string> PartiallyDiscoveredSources { get; set; }
 
     /// <summary>
     /// Gets the list of sources which were not discovered at all.
     /// </summary>
-    public IReadOnlyCollection<string> NotDiscoveredSources { get; }
+    public IList<string> NotDiscoveredSources { get; set; }
 }

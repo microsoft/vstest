@@ -255,7 +255,10 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     /// <param name="sources">Sources which will be discovered</param>
     private void MarkAllSourcesAsNotDiscovered(IEnumerable<string> sources)
     {
-        if (sources == null || sources.Count() == 0) return;
+        if (sources is null || !sources.Any())
+        {
+            return;
+        }
 
         lock (_enumeratorLockObject)
         {

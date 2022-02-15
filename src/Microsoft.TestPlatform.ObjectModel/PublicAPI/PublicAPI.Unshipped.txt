@@ -1,8 +1,11 @@
 ﻿const Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants.MinimumProtocolVersionWithCancelDiscoveryEventHandlerSupport = 6 -> int
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.DiscoveryCompleteEventArgs(long totalTests, bool isAborted, System.Collections.Generic.IReadOnlyCollection<string> fullyDiscoveredSources, System.Collections.Generic.IReadOnlyCollection<string> partiallyDiscoveredSources, System.Collections.Generic.IReadOnlyCollection<string> notDiscoveredSources) -> void
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.FullyDiscoveredSources.get -> System.Collections.Generic.IReadOnlyCollection<string>
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.NotDiscoveredSources.get -> System.Collections.Generic.IReadOnlyCollection<string>
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.PartiallyDiscoveredSources.get -> System.Collections.Generic.IReadOnlyCollection<string>
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.DiscoveryCompleteEventArgs(long totalTests, bool isAborted, System.Collections.Generic.IList<string> fullyDiscoveredSources, System.Collections.Generic.IList<string> partiallyDiscoveredSources, System.Collections.Generic.IList<string> notDiscoveredSources) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.FullyDiscoveredSources.get -> System.Collections.Generic.IList<string>
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.FullyDiscoveredSources.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.NotDiscoveredSources.get -> System.Collections.Generic.IList<string>
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.NotDiscoveredSources.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.PartiallyDiscoveredSources.get -> System.Collections.Generic.IList<string>
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.PartiallyDiscoveredSources.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria.DiscoveryCriteria(System.Collections.Generic.IEnumerable<string> sources, long frequencyOfDiscoveredTestsEvent, System.TimeSpan discoveredTestEventTimeout, string runSettings, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo testSessionInfo) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria.TestSessionInfo.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria.TestSessionInfo.set -> void

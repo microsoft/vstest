@@ -199,12 +199,12 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
     {
         // Do nothing if the proxy is not initialized yet.
-        if (_proxyOperationManager == null)
+        if (_proxyOperationManager is null)
         {
             return;
         }
 
-        if (_baseTestDiscoveryEventsHandler == null)
+        if (_baseTestDiscoveryEventsHandler is null)
         {
             _baseTestDiscoveryEventsHandler = eventHandler;
         }

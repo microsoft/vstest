@@ -96,9 +96,9 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
 
         if (parallelDiscoveryComplete)
         {
-            var fullyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered) as IReadOnlyCollection<string>;
-            var partiallyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered) as IReadOnlyCollection<string>;
-            var notDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered) as IReadOnlyCollection<string>;
+            var fullyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered);
+            var partiallyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered);
+            var notDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered);
 
             // As we immediately return results to IDE in case of aborting
             // we need to set isAborted = true and totalTests = -1
@@ -127,7 +127,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             testDiscoveryCompletePayload.Metrics = aggregatedDiscoveryDataMetrics;
 
             // Sending discovery complete message to IDE
-            SendMessage(testDiscoveryCompletePayload);
+            ConvertToRawMessageAndSend(testDiscoveryCompletePayload);
 
             var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
                 _discoveryDataAggregator.TotalTests,
@@ -193,20 +193,22 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     /// </summary>
     /// <param name="discoveryDataAggregator">Discovery aggregator to know if we already sent this message</param>
     /// <param name="testDiscoveryCompletePayload">Discovery complete payload to send</param>
-    private void SendMessage(DiscoveryCompletePayload testDiscoveryCompletePayload)
+    private void ConvertToRawMessageAndSend(DiscoveryCompletePayload testDiscoveryCompletePayload)
     {
-        // In case of abort scenario, we need to send raw message to IDE only once after abortion.
-        // All other testhosts which will finish after shouldn't send raw message
-        if (!_discoveryDataAggregator.IsMessageSent)
+        // When we abort we should send raw message to IDE only once.
+        // All other testhosts which will finish after shouldn't send abort raw message.
+        if (_discoveryDataAggregator.IsMessageSent)
         {
-            lock (_sendMessageLock)
+            return;
+        }
+
+        lock (_sendMessageLock)
+        {
+            if (!_discoveryDataAggregator.IsMessageSent)
             {
-                if (!_discoveryDataAggregator.IsMessageSent)
-                {
-                    // we have to send raw messages as we block the discovery complete actual raw messages
-                    ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
-                    _discoveryDataAggregator.AggregateIsMessageSent(true);
-                }
+                // we have to send raw messages as we block the discovery complete actual raw messages
+                ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
+                _discoveryDataAggregator.AggregateIsMessageSent(true);
             }
         }
     }
@@ -218,10 +220,14 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     /// <param name="lastChunk">Last chunk of discovered test cases</param>
     private void AggregateComingSourcesAsFullyDiscovered(IEnumerable<TestCase> lastChunk, DiscoveryCompleteEventArgs discoveryCompleteEventArgs)
     {
-        if (lastChunk == null) return;
+        if (lastChunk is null)
+        {
+            return;
+        }
 
-        // Sometimes we get lastChunk as empty list (when number of tests in project dividable by 10)
-        // Then we will take sources from discoveryCompleteEventArgs coming from testhost
+        // Sometimes we get lastChunk as empty list (when number of tests in project dividable by
+        // the chunk size, e.g. 100 tests and 10 chunk size).
+        // Then we will take sources from discoveryCompleteEventArgs coming from testhost.
         IEnumerable<string> lastChunkSources = !lastChunk.Any()
             ? discoveryCompleteEventArgs.FullyDiscoveredSources
             : lastChunk.Select(testcase => testcase.Source);

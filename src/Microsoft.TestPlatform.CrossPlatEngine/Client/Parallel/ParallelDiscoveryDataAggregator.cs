@@ -186,7 +186,7 @@ internal class ParallelDiscoveryDataAggregator
     /// </summary>
     /// <param name="status">Status to filter</param>
     /// <returns></returns>
-    internal ICollection<string> GetSourcesWithStatus(DiscoveryStatus status)
+    internal List<string> GetSourcesWithStatus(DiscoveryStatus status)
     {
         return SourcesWithDiscoveryStatus == null || SourcesWithDiscoveryStatus.IsEmpty
             ? new List<string>()

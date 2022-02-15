@@ -35,15 +35,15 @@ public class DiscoveryCompletePayload
     /// <summary>
     /// Gets or sets list of sources which were fully discovered.
     /// </summary>
-    public IReadOnlyCollection<string> FullyDiscoveredSources { get; set; } = new List<string>();
+    public IList<string> FullyDiscoveredSources { get; set; } = new List<string>();
 
     /// <summary>
     /// Gets or sets list of sources which were partially discovered (started discover tests, but then discovery aborted).
     /// </summary>
-    public IReadOnlyCollection<string> PartiallyDiscoveredSources { get; set; } = new List<string>();
+    public IList<string> PartiallyDiscoveredSources { get; set; } = new List<string>();
 
     /// <summary>
     /// Gets or sets list of sources which were not discovered at all.
     /// </summary>
-    public IReadOnlyCollection<string> NotDiscoveredSources { get; set; } = new List<string>();
+    public IList<string> NotDiscoveredSources { get; set; } = new List<string>();
 }

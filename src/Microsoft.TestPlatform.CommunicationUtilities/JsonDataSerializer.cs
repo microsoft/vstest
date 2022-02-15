@@ -206,6 +206,15 @@ public class JsonDataSerializer : IDataSerializer
             version = 1;
         }
 
+        // 0: the original protocol with no versioning (Message). It is used during negotiation.
+        // 1: new protocol with versioning (VersionedMessage).
+        // 2: changed serialization because the serialization of properties in bag was too verbose,
+        //    so common properties are considered built-in and serialized without type info.
+        // 3: introduced because of changes to allow attaching debugger to external process.
+        // 4: introduced because 3 did not update this table and ended up using the serializer for protocol v1,
+        //    which is extremely slow. We negotiate 2 or 4, but never 3 unless the flag above is set.
+        // 5: ???
+        // 6: accepts abort and cancel with handlers that report the status.
         return version switch
         {
             // 0 is used during negotiation.
@@ -215,8 +224,8 @@ public class JsonDataSerializer : IDataSerializer
             // env variable.
             0 or 1 or 3 => s_payloadSerializer,
             2 or 4 or 5 or 6 => s_payloadSerializer2,
-            _ => throw new NotSupportedException($"Protocol version {version} is not supported. " +
-                "Ensure it is compatible with the latest serializer or add a new one."),
+            _ => throw new NotSupportedException($"Protocol version {version} is not supported. "
+                + "Ensure it is compatible with the latest serializer or add a new one."),
         };
     }
 }

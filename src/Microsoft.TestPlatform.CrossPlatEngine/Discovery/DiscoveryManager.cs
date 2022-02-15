@@ -141,8 +141,8 @@ public class DiscoveryManager : IDiscoveryManager
                 if (lastChunk != null)
                 {
                     UpdateTestCases(lastChunk, _discoveryCriteria.Package);
-                    /* When discovery is complete we will have case that the last discovered source is still marked as partiallyDiscovered.
-                         * So we need to mark it as fullyDiscovered.*/
+                    // When discovery is complete then the last discovered source is still marked
+                    // as partially discovered, so we need to mark it as fully discovered.
                     MarkTheLastChunkSourcesAsFullyDiscovered(lastChunk);
                 }
 
@@ -358,13 +358,19 @@ public class DiscoveryManager : IDiscoveryManager
     /// <param name="lastChunk">Last chunk of testCases which were discovered</param>
     private void MarkTheLastChunkSourcesAsFullyDiscovered(IEnumerable<TestCase> lastChunk)
     {
-        if (lastChunk == null) return;
+        if (lastChunk is null)
+        {
+            return;
+        }
 
         var lastChunkSources = lastChunk.Select(testcase => testcase.Source);
 
         // When all testcases in project is dividable by 10 then lastChunk is coming as empty
         // So we need to take the lastSource and mark it as FullyDiscovered
-        if (!lastChunk.Any()) lastChunkSources = new List<string>() { _previousSource };
+        if (!lastChunk.Any())
+        {
+            lastChunkSources = new List<string>() { _previousSource };
+        }
 
         MarkSourcesWithStatus(lastChunkSources, DiscoveryStatus.FullyDiscovered);
     }
@@ -376,7 +382,10 @@ public class DiscoveryManager : IDiscoveryManager
     /// <param name="status">DiscoveryStatus to mark for source</param>
     private void MarkSourceWithStatus(string source, DiscoveryStatus status)
     {
-        if (source == null) return;
+        if (source is null)
+        {
+            return;
+        }
 
         if (!_sourcesWithDiscoveryStatus.ContainsKey(source))
         {
@@ -396,26 +405,33 @@ public class DiscoveryManager : IDiscoveryManager
     /// <param name="status">DiscoveryStatus to mark for list of sources</param>
     private void MarkSourcesWithStatus(IEnumerable<string> sources, DiscoveryStatus status)
     {
-        if (sources == null || sources.Count() == 0) return;
+        if (sources is null || !sources.Any())
+        {
+            return;
+        }
 
         foreach (var source in sources)
         {
-            if (source == null) continue;
+            if (source is null)
+            {
+                continue;
+            }
 
             // It is the first time when we fill our map with sources
-            if (status == DiscoveryStatus.NotDiscovered) _sourcesWithDiscoveryStatus[source] = status;
+            if (status == DiscoveryStatus.NotDiscovered)
+            {
+                _sourcesWithDiscoveryStatus[source] = status;
+                continue;
+            }
 
+            if (!_sourcesWithDiscoveryStatus.ContainsKey(source))
+            {
+                EqtTrace.Warning($"DiscoveryManager.MarkSourcesWithStatus: SourcesWithDiscoveryStatus does not contain {source}.");
+            }
             else
             {
-                if (!_sourcesWithDiscoveryStatus.ContainsKey(source))
-                {
-                    EqtTrace.Warning($"DiscoveryManager.MarkSourcesWithStatus : SourcesWithDiscoveryStatus does not contain {source}");
-                }
-                else
-                {
-                    _sourcesWithDiscoveryStatus[source] = status;
-                    EqtTrace.Warning($"DiscoveryManager.MarkSourcesWithStatus : Marking {source} with {status} status");
-                }
+                _sourcesWithDiscoveryStatus[source] = status;
+                EqtTrace.Warning($"DiscoveryManager.MarkSourcesWithStatus: Marking {source} with {status} status.");
             }
         }
     }
@@ -425,10 +441,10 @@ public class DiscoveryManager : IDiscoveryManager
     /// </summary>
     /// <param name="discoveryStatus">discoveryStatus indicates if source was fully/partially/not discovered</param>
     /// <returns></returns>
-    private IReadOnlyList<string> GetFilteredSources(DiscoveryStatus discoveryStatus)
+    private List<string> GetFilteredSources(DiscoveryStatus discoveryStatus)
     {
         // If by some accident SourcesWithDiscoveryStatus map is empty we will return empty list
-        return _sourcesWithDiscoveryStatus == null || _sourcesWithDiscoveryStatus.IsEmpty
+        return _sourcesWithDiscoveryStatus is null || _sourcesWithDiscoveryStatus.IsEmpty
             ? new List<string>()
             : _sourcesWithDiscoveryStatus
                 .Where(source => source.Value == discoveryStatus)
