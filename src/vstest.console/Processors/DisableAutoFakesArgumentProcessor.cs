@@ -62,6 +62,9 @@ internal class DisableAutoFakesArgumentExecutor : IArgumentExecutor
     {
         _commandLineOptions = commandLineOptions;
     }
+
+    #region IArgumentProcessor
+
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -93,4 +96,5 @@ internal class DisableAutoFakesArgumentExecutor : IArgumentExecutor
         return ArgumentProcessorResult.Success;
     }
 
+    #endregion
 }

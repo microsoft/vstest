@@ -821,6 +821,7 @@ public partial class ManagedNameRoundTripTests
             managedMethodName: "Overload0`1(System.Tuple`1<System.Tuple`1<TestClasses.Outer`1+Inner`1<!!0,!!0>>>)");
     }
 
+    #region Helpers
     private void VerifyRoundTrip(
         MethodInfo methodInfo,
         INamedTypeSymbol containingTypeSymbol,
@@ -934,4 +935,5 @@ public partial class ManagedNameRoundTripTests
     //     Assert.AreEqual(fullTypeName, roundTrippedFullTypeName);
     //     Assert.AreEqual(fullMethodName, roundTrippedFullMethodName);
     // }
+    #endregion
 }

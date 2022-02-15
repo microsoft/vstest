@@ -17,6 +17,8 @@ using VisualStudio.TestTools.UnitTesting;
 [TestClass]
 public class XmlUtilitiesTests
 {
+    #region GetNodeXml tests
+
     [TestMethod]
     public void GetNodeXmlShouldThrowIfxmlDocumentIsNull()
     {
@@ -59,6 +61,10 @@ public class XmlUtilitiesTests
         Assert.AreEqual("abc", XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator(), @"/RunSettings/RC"));
     }
 
+    #endregion
+
+    #region IsValidNodeXmlValue tests
+
     [TestMethod]
     public void IsValidNodeXmlValueShouldReturnFalseOnArgumentException()
     {
@@ -86,6 +92,10 @@ public class XmlUtilitiesTests
 
         Assert.IsTrue(XmlUtilities.IsValidNodeXmlValue("foo", validator));
     }
+
+    #endregion
+
+    #region AppendOrModifyChild tests
 
     [TestMethod]
     public void AppendOrModifyChildShouldModifyExistingNode()
@@ -164,6 +174,10 @@ public class XmlUtilitiesTests
         Assert.AreEqual("a&b<c>d\"e'f", rcxmlDocument.InnerText);
     }
 
+    #endregion
+
+    #region RemoveChildNode tests
+
     [TestMethod]
     public void RemoveChildNodeShouldNotModifyExistingXmlIfNodeDoesnotExist()
     {
@@ -187,6 +201,10 @@ public class XmlUtilitiesTests
         Assert.AreEqual(@"<RunSettings></RunSettings>", xmlDocument.OuterXml);
     }
 
+    #endregion
+
+    #region Private Methods
+
     private XmlDocument GetXmlDocument(string settingsXml)
     {
         var doc = new XmlDocument();
@@ -195,4 +213,5 @@ public class XmlUtilitiesTests
         return doc;
     }
 
+    #endregion
 }

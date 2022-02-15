@@ -398,6 +398,8 @@ public class JobQueueTests
         queueThread.Join();
     }
 
+    #region Implementation
+
     /// <summary>
     /// a class that inherits from job queue and over rides the WaitForQueueToEmpty to allow for checking that blocking and
     /// unblocking work as expected.
@@ -455,6 +457,10 @@ public class JobQueueTests
         }
     }
 
+    #endregion
+
+    #region Utility Methods
+
     /// <summary>
     /// Returns a job processing handler which does nothing.
     /// </summary>
@@ -469,4 +475,5 @@ public class JobQueueTests
         return handler;
     }
 
+    #endregion
 }

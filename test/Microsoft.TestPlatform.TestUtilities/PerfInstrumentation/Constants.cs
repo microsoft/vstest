@@ -55,6 +55,8 @@ public class Constants
     /// </summary>
     public const string AdapterDiscoveryTask = "AdapterDiscovery";
 
+    #region PayLoad Property Names
+
     /// <summary>
     /// The execution uri property.
     /// </summary>
@@ -64,4 +66,6 @@ public class Constants
     /// The number of tests property.
     /// </summary>
     public const string NumberOfTestsProperty = "numberOfTests";
+    #endregion
+
 }

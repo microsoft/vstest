@@ -244,6 +244,8 @@ public class TestRequestSender : ITestRequestSender
         }
     }
 
+    #region Discovery Protocol
+
     /// <inheritdoc />
     public void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions)
     {
@@ -274,6 +276,10 @@ public class TestRequestSender : ITestRequestSender
 
         _channel.Send(message);
     }
+    #endregion
+
+    #region Execution Protocol
+
     /// <inheritdoc />
     public void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions)
     {
@@ -400,6 +406,8 @@ public class TestRequestSender : ITestRequestSender
 
         _channel?.Send(_dataSerializer.SerializeMessage(MessageType.AbortTestRun));
     }
+
+    #endregion
 
     /// <inheritdoc />
     public void EndSession()

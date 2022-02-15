@@ -53,6 +53,8 @@ public class VsTestConsoleRequestSenderTests
             new Mock<ITestPlatformEventSource>().Object);
     }
 
+    #region Communication Tests
+
     [TestMethod]
     public void InitializeCommunicationShouldSucceed()
     {
@@ -315,6 +317,10 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Verify(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()), Times.Exactly(2));
         _mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, _protocolVersion), Times.Once);
     }
+
+    #endregion
+
+    #region Discovery Tests
 
     [TestMethod]
     public void DiscoverTestsShouldCompleteWithZeroTests()
@@ -709,6 +715,10 @@ public class VsTestConsoleRequestSenderTests
 
         mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
     }
+
+    #endregion
+
+    #region RunTests
 
     [TestMethod]
     public void StartTestRunShouldCompleteWithZeroTests()
@@ -1849,6 +1859,10 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
     }
 
+    #endregion
+
+    #region Attachments Processing Tests
+
     [TestMethod]
     public async Task ProcessTestRunAttachmentsAsyncShouldCompleteWithZeroAttachments()
     {
@@ -2128,6 +2142,9 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Verify(cm => cm.StopServer(), Times.Never);
     }
 
+    #endregion
+
+    #region Sessions API
     private const int MinimumProtocolVersionWithTestSessionSupport = 5;
     private const int TesthostPid = 5000;
 
@@ -2590,6 +2607,10 @@ public class VsTestConsoleRequestSenderTests
                 It.IsAny<StartTestSessionCompleteEventArgs>()),
             Times.Once);
     }
+    #endregion
+
+    #region Private Methods
+
     /// <summary>
     /// Serialize and Deserialize message as it would happen for real.
     /// </summary>
@@ -2677,4 +2698,5 @@ public class VsTestConsoleRequestSenderTests
         Assert.AreEqual(dummyPortInput, portOutput, "Connection must succeed.");
     }
 
+    #endregion
 }

@@ -113,6 +113,9 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// </summary>
     public override event EventHandler<DiscoveryCompleteEventArgs> DiscoveryComplete;
 
+
+    #region IDisposable
+
     /// <summary>
     /// Waits for all pending messages to be processed by the loggers cleans up.
     /// </summary>
@@ -131,6 +134,8 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
         _loggerEventQueue.Resume();
         _loggerEventQueue.Dispose();
     }
+
+    #endregion
 
     /// <summary>
     /// Enables sending of events to the loggers which are registered and flushes the queue.

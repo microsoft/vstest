@@ -30,6 +30,8 @@ public class TestCaseSerializationTests
         Traits = { new Trait("Priority", "0"), new Trait("Category", "unit") }
     };
 
+    #region v1 Tests
+
     [TestMethod]
     public void TestCaseJsonShouldContainAllPropertiesOnSerialization()
     {
@@ -137,6 +139,10 @@ public class TestCaseSerializationTests
         VerifyDummyPropertyIsRegistered();
     }
 
+    #endregion
+
+    #region v2 Tests
+
     [TestMethod]
     public void TestCaseJsonShouldContainAllPropertiesOnSerializationV2()
     {
@@ -226,6 +232,10 @@ public class TestCaseSerializationTests
         VerifyDummyPropertyIsRegistered();
     }
 
+    #endregion
+
+    #region Common Tests
+
     [TestMethod]
     [DataRow(1)]
     [DataRow(2)]
@@ -242,6 +252,8 @@ public class TestCaseSerializationTests
         Assert.AreEqual(1, traits.Length);
         Assert.AreEqual(@"SDJDDHW>,:&^%//\\\\", traits[0].Value);
     }
+
+    #endregion
 
     private static string Serialize<T>(T data, int version = 1)
     {

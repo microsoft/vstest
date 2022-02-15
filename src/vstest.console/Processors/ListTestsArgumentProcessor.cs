@@ -167,6 +167,9 @@ internal class ListTestsArgumentExecutor : IArgumentExecutor
         _discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output);
     }
 
+
+    #region IArgumentExecutor
+
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -207,6 +210,8 @@ internal class ListTestsArgumentExecutor : IArgumentExecutor
 
         return ArgumentProcessorResult.Success;
     }
+
+    #endregion
 
     private class DiscoveryEventsRegistrar : ITestDiscoveryEventsRegistrar
     {

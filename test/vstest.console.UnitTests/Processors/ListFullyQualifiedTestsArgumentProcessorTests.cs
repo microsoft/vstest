@@ -111,6 +111,8 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is ListFullyQualifiedTestsArgumentExecutor);
     }
 
+    #region ListTestsArgumentProcessorCapabilitiesTests
+
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -124,6 +126,10 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
+    #endregion
+
+    #region ListTestsArgumentExecutorTests
+
     [TestMethod]
     public void ExecutorInitializeWithValidSourceShouldAddItToTestSources()
     {
@@ -282,6 +288,8 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
 
         _mockTestPlatformEventSource.Verify(x => x.DiscoveryRequestStop(), Times.Once);
     }
+    #endregion
+
     private void RunListFullyQualifiedTestArgumentProcessorWithTraits(Mock<IDiscoveryRequest> mockDiscoveryRequest, Mock<IOutput> mockConsoleOutput, bool legitPath = true)
     {
         var mockTestPlatform = new Mock<ITestPlatform>();

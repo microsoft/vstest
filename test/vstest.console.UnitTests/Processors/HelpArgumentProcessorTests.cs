@@ -36,6 +36,8 @@ public class HelpArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is HelpArgumentExecutor);
     }
 
+    #region HelpArgumentProcessorCapabilitiesTests
+
     [TestMethod]
     public void CapabilitiesShouldAppropriateProperties()
     {
@@ -51,6 +53,8 @@ public class HelpArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
+
+    #endregion
 
     [TestMethod]
     public void ExecuterExecuteReturnArgumentProcessorResultAbort()

@@ -101,6 +101,9 @@ internal class TestCaseFilterArgumentExecutor : IArgumentExecutor
         Contract.Requires(options != null);
         _commandLineOptions = options;
     }
+
+    #region IArgumentExecutor
+
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -134,4 +137,5 @@ internal class TestCaseFilterArgumentExecutor : IArgumentExecutor
     {
         return ArgumentProcessorResult.Success;
     }
+    #endregion
 }

@@ -51,6 +51,8 @@ public class DiscoveryManagerTests
         TestPluginCache.Instance = null;
     }
 
+    #region Initialize tests
+
     [TestMethod]
     public void InitializeShouldUpdateAdditionalExtenions()
     {
@@ -67,6 +69,10 @@ public class DiscoveryManagerTests
         Assert.IsNotNull(allDiscoverers);
         Assert.IsTrue(allDiscoverers.Any());
     }
+
+    #endregion
+
+    #region DiscoverTests tests
 
     [TestMethod]
     public void DiscoverTestsShouldLogIfTheSourceDoesNotExist()
@@ -262,4 +268,5 @@ public class DiscoveryManagerTests
         mockLogger.Verify(rd => rd.HandleLogMessage(TestMessageLevel.Warning, "verify that the HandleLogMessage method getting invoked at least once"), Times.Once);
     }
 
+    #endregion
 }

@@ -32,6 +32,8 @@ public class CodeCoverageRunSettingsProcessor
     {
         _defaultSettingsRootNode = defaultSettingsRootNode ?? throw new ArgumentNullException(nameof(defaultSettingsRootNode), "Default settings root node is null.");
     }
+
+    #region Public Interface
     /// <summary>
     /// Processes the current settings for the code coverage data collector.
     /// </summary>
@@ -141,6 +143,8 @@ public class CodeCoverageRunSettingsProcessor
 
         return currentSettingsRootNode;
     }
+    #endregion
+
     /// <summary>
     /// Selects the node from the current settings node using the given
     /// <see cref="XPathNavigator"/> style path. If unable to select the requested node it adds

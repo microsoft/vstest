@@ -134,6 +134,8 @@ public class TestDiscovererPluginInformationTests
     }
 }
 
+#region Implementation
+
 public class DummyTestDiscovererWithNoFileExtensions
 {
 }
@@ -192,3 +194,5 @@ public class DummyTestDiscovererWithOneFileExtensions
 public class DummyTestDiscovererWithTwoFileExtensions
 {
 }
+
+#endregion

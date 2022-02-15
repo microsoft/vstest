@@ -55,6 +55,8 @@ public class RunSettingsArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is RunSettingsArgumentExecutor);
     }
 
+    #region RunSettingsArgumentProcessorCapabilities tests
+
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -71,6 +73,10 @@ public class RunSettingsArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
+
+    #endregion
+
+    #region RunSettingsArgumentExecutor tests
 
     [TestMethod]
     public void InitializeShouldThrowExceptionIfArgumentIsNull()
@@ -402,6 +408,10 @@ public class RunSettingsArgumentProcessorTests
         // Assert.
         Assert.AreEqual(filter, CommandLineOptions.Instance.TestCaseFilterValue);
     }
+    #endregion
+
+    #region Testable Implementations
+
     private class TestableRunSettingsArgumentExecutor : RunSettingsArgumentExecutor
     {
         private readonly string _runSettingsString;
@@ -430,4 +440,5 @@ public class RunSettingsArgumentProcessorTests
         }
     }
 
+    #endregion
 }

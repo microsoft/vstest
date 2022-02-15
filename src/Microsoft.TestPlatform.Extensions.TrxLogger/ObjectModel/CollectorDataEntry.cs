@@ -134,6 +134,9 @@ internal class CollectorDataEntry : IXmlTestStore
         }
     }
 
+
+    #region IXmlTestStore Members
+
     /// <summary>
     /// Saves the state to the XML element
     /// </summary>
@@ -162,6 +165,7 @@ internal class CollectorDataEntry : IXmlTestStore
         helper.SaveIEnumerable(uriAttachments, element, "UriAttachments", "A", "UriAttachment", parameters);
     }
 
+    #endregion
     /// <summary>
     /// Adds a data attachment to the list of data attachments
     /// </summary>

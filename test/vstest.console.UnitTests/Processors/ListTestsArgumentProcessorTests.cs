@@ -109,6 +109,8 @@ public class ListTestsArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is ListTestsArgumentExecutor);
     }
 
+    #region ListTestsArgumentProcessorCapabilitiesTests
+
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -126,6 +128,10 @@ public class ListTestsArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
+    #endregion
+
+    #region ListTestsArgumentExecutorTests
+
     [TestMethod]
     public void ExecutorInitializeWithValidSourceShouldAddItToTestSources()
     {
@@ -254,6 +260,8 @@ public class ListTestsArgumentProcessorTests
 
         _mockTestPlatformEventSource.Verify(x => x.DiscoveryRequestStop(), Times.Once);
     }
+    #endregion
+
     private void RunListTestArgumentProcessorExecuteWithMockSetup(Mock<IDiscoveryRequest> mockDiscoveryRequest, Mock<IOutput> mockConsoleOutput)
     {
         var mockTestPlatform = new Mock<ITestPlatform>();

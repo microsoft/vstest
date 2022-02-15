@@ -30,6 +30,8 @@ public class SettingsProviderExtensionManagerTests
         SettingsProviderExtensionManager.Destroy();
     }
 
+    #region Constructor tests
+
     [TestMethod]
     public void ConstructorShouldPopulateSettingsProviderMap()
     {
@@ -72,6 +74,10 @@ public class SettingsProviderExtensionManagerTests
         Assert.AreEqual("TestableSettings", spm.SettingsProvidersMap.Keys.FirstOrDefault());
     }
 
+    #endregion
+
+    #region Create tests
+
     [TestMethod]
     public void CreateShouldDiscoverSettingsProviderExtensions()
     {
@@ -95,6 +101,10 @@ public class SettingsProviderExtensionManagerTests
         Assert.IsTrue(extensionManager.SettingsProvidersMap.Count > 0);
     }
 
+    #endregion
+
+    #region LoadAndInitialize tests
+
     [TestMethod]
     public void LoadAndInitializeShouldInitializeAllExtensions()
     {
@@ -109,6 +119,10 @@ public class SettingsProviderExtensionManagerTests
             Assert.IsTrue(provider.IsExtensionCreated);
         }
     }
+
+    #endregion
+
+    #region GetSettingsProvider tests
 
     [TestMethod]
     public void GetSettingsProviderShouldThrowIfSettingsNameIsNullOrEmpty()
@@ -164,6 +178,10 @@ public class SettingsProviderExtensionManagerTests
         Assert.IsNotNull(sp.Value);
     }
 
+    #endregion
+
+    #region private methods
+
     private IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> GetMockExtensions(params string[] settingNames)
     {
         var settingsList = new List<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>();
@@ -184,6 +202,10 @@ public class SettingsProviderExtensionManagerTests
         return settingsList;
     }
 
+    #endregion
+
+    #region Testable Implementations
+
     private class TestableSettingsProviderManager : SettingsProviderExtensionManager
     {
         public TestableSettingsProviderManager(
@@ -203,6 +225,7 @@ public class SettingsProviderExtensionManagerTests
         }
     }
 
+    #endregion
 }
 
 [TestClass]

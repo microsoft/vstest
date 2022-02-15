@@ -12,6 +12,7 @@ using System.Xml;
 
 using XML;
 
+#region TestId
 /// <summary>
 /// Class that uniquely identifies a test.
 /// </summary>
@@ -54,6 +55,9 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// </summary>
     public Guid Id { get; }
 
+
+    #region IXmlTestStore Members
+
     /// <summary>
     /// Saves the state to the XML element
     /// </summary>
@@ -93,6 +97,12 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
         }
     }
 
+    #endregion
+
+    #region Equality
+
+    #region IEquatable<TestId> Members
+
     /// <summary>
     /// Compares this instance with the other test ID for value equality
     /// </summary>
@@ -115,6 +125,10 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
         return other is not null && Id == other.Id;
     }
 
+    #endregion
+
+    #region Overrides
+
     /// <summary>
     /// Compares this instance with the other test ID for value equality
     /// </summary>
@@ -133,6 +147,10 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     {
         return Id.GetHashCode();
     }
+
+    #endregion
+
+    #region Operators
 
     /// <summary>
     /// Compares the two test IDs for value equality
@@ -158,6 +176,14 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
         return !(left == right);
     }
 
+    #endregion
+
+    #endregion
+
+    #region Comparison
+
+    #region IComparable<TestId> Members
+
     /// <summary>
     /// Compares this instance with the other test ID
     /// </summary>
@@ -170,6 +196,10 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     {
         return other == null ? throw new ArgumentNullException(nameof(other)) : Id.CompareTo(other.Id);
     }
+
+    #endregion
+
+    #region IComparable Members
 
     /// <summary>
     /// Compares this instance with the other test ID
@@ -184,6 +214,12 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
         return CompareTo(other as TestId);
     }
 
+    #endregion
+
+    #endregion
+
+    #region Overrides
+
     /// <summary>
     /// Override ToString
     /// </summary>
@@ -197,4 +233,6 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
         return string.Format(CultureInfo.InvariantCulture, s);
     }
 
+    #endregion
 }
+#endregion  TestId

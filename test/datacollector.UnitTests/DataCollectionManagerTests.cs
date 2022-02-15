@@ -423,6 +423,8 @@ public class DataCollectionManagerTests
         _mockDataCollectionAttachmentManager.Verify(x => x.Cancel(), Times.Once);
     }
 
+    #region TestCaseEventsTest
+
     [TestMethod]
     public void TestCaseStartedShouldSendEventToDataCollector()
     {
@@ -485,6 +487,7 @@ public class DataCollectionManagerTests
                     It.IsAny<DataCollectionEnvironmentContext>())).Callback<XmlElement, DataCollectionEvents, DataCollectionSink, DataCollectionLogger, DataCollectionEnvironmentContext>(callback.Invoke);
     }
 
+    #endregion
 }
 
 internal class TestableDataCollectionManager : DataCollectionManager

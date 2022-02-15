@@ -50,6 +50,8 @@ public class ResultsDirectoryArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is ResultsDirectoryArgumentExecutor);
     }
 
+    #region ResultsDirectoryArgumentProcessorCapabilities tests
+
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -66,6 +68,10 @@ public class ResultsDirectoryArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
+
+    #endregion
+
+    #region ResultsDirectoryArgumentExecutor Initialize tests
 
     [TestMethod]
     public void InitializeShouldThrowIfArgumentIsNull()
@@ -142,11 +148,17 @@ public class ResultsDirectoryArgumentProcessorTests
         Assert.AreEqual(absolutePath, _runSettingsProvider.QueryRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath));
     }
 
+    #endregion
+
+    #region ResultsDirectoryArgumentExecutor Execute tests
+
     [TestMethod]
     public void ExecuteShouldReturnSuccess()
     {
         Assert.AreEqual(ArgumentProcessorResult.Success, _executor.Execute());
     }
+
+    #endregion
 
     private string TranslatePath(string path)
     {

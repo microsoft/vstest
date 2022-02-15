@@ -135,6 +135,8 @@ internal class TestRequestManager : ITestRequestManager
         }
     }
 
+    #region ITestRequestManager
+
     /// <inheritdoc />
     public void InitializeExtensions(
         IEnumerable<string> pathToAdditionalExtensions,
@@ -581,6 +583,8 @@ internal class TestRequestManager : ITestRequestManager
         EqtTrace.Info("TestRequestManager.CancelTestRunAttachmentsProcessing: Sending cancel request.");
         _currentAttachmentsProcessingCancellationTokenSource?.Cancel();
     }
+
+    #endregion
 
     public void Dispose()
     {

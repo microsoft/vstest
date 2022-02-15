@@ -136,6 +136,9 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         _sessionStarted = false;
     }
 
+
+    #region IVsTestConsoleWrapper
+
     /// <inheritdoc/>
     public void StartSession()
     {
@@ -556,6 +559,10 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 
         _sessionStarted = false;
     }
+
+    #endregion
+
+    #region IVsTestConsoleWrapperAsync
 
     /// <inheritdoc/>
     public async Task StartSessionAsync()
@@ -978,6 +985,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler,
         CancellationToken cancellationToken)
         => ProcessTestRunAttachmentsAsync(attachments, Enumerable.Empty<InvokedDataCollector>(), processingSettings, isLastBatch, collectMetrics, testSessionEventsHandler, cancellationToken);
+
+    #endregion
 
     private void EnsureInitialized()
     {

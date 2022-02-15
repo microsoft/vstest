@@ -140,6 +140,7 @@ public class DataCollectionTestRunEventsHandlerTests
             Times.Once);
     }
 
+    #region Get Combined Attachments
     [TestMethod]
     public void GetCombinedAttachmentSetsShouldReturnCombinedAttachments()
     {
@@ -181,4 +182,5 @@ public class DataCollectionTestRunEventsHandlerTests
         Assert.IsNull(result);
     }
 
+    #endregion
 }

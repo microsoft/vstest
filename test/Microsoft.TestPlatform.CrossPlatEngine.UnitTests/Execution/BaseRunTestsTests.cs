@@ -106,6 +106,8 @@ public class BaseRunTestsTests
         TestPluginCacheHelper.ResetExtensionsCache();
     }
 
+    #region Constructor tests
+
     [TestMethod]
     public void ConstructorShouldInitializeRunContext()
     {
@@ -130,6 +132,10 @@ public class BaseRunTestsTests
         var executorUris = _runTestsInstance.GetExecutorUrisThatRanTests;
         Assert.IsNotNull(executorUris);
     }
+
+    #endregion
+
+    #region RunTests tests
 
     [TestMethod]
     public void RunTestsShouldRaiseTestRunCompleteWithAbortedAsTrueOnException()
@@ -769,6 +775,10 @@ public class BaseRunTestsTests
             "Both RunTests() and Cancel() should create STA thread.");
     }
 
+    #endregion
+
+    #region Private Methods
+
     private void SetupExecutorUriMock()
     {
         var executorUriExtensionMap = new List<Tuple<Uri, string>>
@@ -902,6 +912,10 @@ public class BaseRunTestsTests
                     _receivedExecutorUris = executorUris;
                 });
     }
+
+    #endregion
+
+    #region Testable Implementation
 
     private class TestableBaseRunTests : BaseRunTests
     {
@@ -1039,5 +1053,7 @@ public class BaseRunTestsTests
             throw new NotImplementedException();
         }
     }
+
+    #endregion
 
 }

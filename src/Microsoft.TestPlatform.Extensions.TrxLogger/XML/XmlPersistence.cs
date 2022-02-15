@@ -28,6 +28,8 @@ using System.Text;
 /// </summary>
 internal class XmlPersistence
 {
+    #region Types
+
     /// <summary>
     /// The exception type that is thrown when a duplicate key is added to a hashtable or
     /// dictionary
@@ -66,6 +68,8 @@ internal class XmlPersistence
         }
 
     }
+
+    #endregion
 
     /// <summary>This is how we persist date time except DateTime.MinValue.</summary>
     private const string DateTimePersistenceFormat = "yyyy'-'MM'-'ddTHH':'mm':'ss'.'fffffffzzz";
@@ -149,6 +153,8 @@ internal class XmlPersistence
         dom.AppendChild(dom.CreateXmlDeclaration("1.0", "UTF-8", null));
         return (XmlElement)dom.AppendChild(dom.CreateElement(_prefix, name, namespaceUri));
     }
+
+    #region PublicSaveDataInTrx
 
     /// <summary>
     /// Save single fields.
@@ -366,6 +372,7 @@ internal class XmlPersistence
         }
     }
 
+    #region Lists
     /// <summary>
     /// Save list of object .
     /// </summary>
@@ -436,6 +443,8 @@ internal class XmlPersistence
         }
     }
 
+    #region Counters
+
     public void SaveCounters(XmlElement xml, string location, int[] counters)
     {
         xml = (XmlElement)LocationToXmlNode(xml, location);
@@ -450,11 +459,21 @@ internal class XmlPersistence
         }
     }
 
+    #endregion Counters
+
+    #endregion List
+
     internal static void SaveUsingReflection(XmlElement element, object instance, Type requestedType, XmlTestStoreParameters parameters)
     {
         XmlPersistence helper = new();
         helper.SaveSingleFields(element, instance, requestedType, parameters);
     }
+
+    #endregion PublicSaveDataInTrx
+
+    #region Utilities
+
+    #region Optimization: Reflection caching
 
     /// <summary>
     /// Updates the cache if needed and gets the field info collection
@@ -507,6 +526,8 @@ internal class XmlPersistence
 
         return toReturn;
     }
+
+    #endregion Optimization: Reflection caching
 
     /// <summary>
     /// Convert dateTime to string.
@@ -800,6 +821,10 @@ internal class XmlPersistence
         return queryString;
     }
 
+    #endregion Utilities
+
+    #region Types
+
     private class NewElementCreateData
     {
         public string NamespaceUri { get; set; }
@@ -833,4 +858,5 @@ internal class XmlPersistence
         }
     }
 
+    #endregion
 }

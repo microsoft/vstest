@@ -16,6 +16,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 [TestClass]
 public class TestRunCacheBehaviors
 {
+    #region OnTestStarted tests
+
     [TestMethod]
     public void OnTestStartedShouldAddToInProgressTests()
     {
@@ -80,6 +82,10 @@ public class TestRunCacheBehaviors
         Assert.AreEqual(0, cache.InProgressTests.Count);
         Assert.AreEqual(2, tester.TotalInProgressTestsReceived);
     }
+
+    #endregion
+
+    #region OnNewTestResult tests
 
     [TestMethod]
     public void OnNewTestResultShouldAddToTotalExecutedTests()
@@ -204,6 +210,10 @@ public class TestRunCacheBehaviors
         Assert.AreEqual(5, cache.TestResults.Count);
     }
 
+    #endregion
+
+    #region OnTestCompletion tests
+
     [TestMethod]
     public void OnTestCompletionShouldNotThrowIfCompletedTestIsNull()
     {
@@ -284,6 +294,10 @@ public class TestRunCacheBehaviors
         Assert.AreEqual(1, cache.InProgressTests.Count);
     }
 
+    #endregion
+
+    #region GetLastChunk tests
+
     [TestMethod]
     public void GetLastChunkShouldReturnTestResultsInCache()
     {
@@ -322,6 +336,10 @@ public class TestRunCacheBehaviors
         Assert.AreEqual(0, cache.TestResults.Count);
     }
 
+    #endregion
+
+    #region TestRunStasts tests
+
     [TestMethod]
     public void TestRunStatsShouldReturnCurrentStats()
     {
@@ -344,6 +362,10 @@ public class TestRunCacheBehaviors
         Assert.AreEqual(5, stats.Stats[TestOutcome.Passed]);
         Assert.AreEqual(5, stats.Stats[TestOutcome.Failed]);
     }
+
+    #endregion
+
+    #region Helpers
 
     private Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult GetTestResult(int index)
     {
@@ -376,4 +398,5 @@ public class TestRunCacheBehaviors
         }
     }
 
+    #endregion
 }

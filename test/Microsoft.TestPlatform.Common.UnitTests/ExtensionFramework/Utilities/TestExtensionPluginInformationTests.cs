@@ -56,6 +56,8 @@ public class TestExtensionPluginInformationTests
         CollectionAssert.AreEqual(new object[] { DefaultExtensionUri }, _testPluginInformation.Metadata.ToArray());
     }
 
+    #region Implementation
+
     private class TestableTestExtensionPluginInformation : TestExtensionPluginInformation
     {
         public TestableTestExtensionPluginInformation(Type testExtensionType) : base(testExtensionType)
@@ -72,4 +74,5 @@ public class TestExtensionPluginInformationTests
     {
     }
 
+    #endregion
 }

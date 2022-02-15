@@ -123,6 +123,9 @@ internal class EnableLoggerArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsManager;
     }
 
+
+    #region IArgumentProcessor
+
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -167,4 +170,5 @@ internal class EnableLoggerArgumentExecutor : IArgumentExecutor
         return ArgumentProcessorResult.Success;
     }
 
+    #endregion
 }

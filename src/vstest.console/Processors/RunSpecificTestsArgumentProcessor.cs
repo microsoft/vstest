@@ -168,6 +168,9 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         _testRunEventsRegistrar = new TestRunRequestEventsRegistrar(Output, _commandLineOptions, artifactProcessingManager);
     }
 
+
+    #region IArgumentProcessor
+
     /// <summary>
     /// Splits given the search strings and adds to selectTestNamesCollection.
     /// </summary>
@@ -220,6 +223,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         return treatNoTestsAsError && _selectedTestCases.Count == 0 ? ArgumentProcessorResult.Fail : ArgumentProcessorResult.Success;
     }
 
+    #endregion
     /// <summary>
     /// Discovers tests from the given sources and selects only specified tests.
     /// </summary>

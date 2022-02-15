@@ -123,6 +123,9 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         _fileHelper = fileHelper;
     }
 
+
+    #region IArgumentExecutor
+
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -248,4 +251,5 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         }
     }
 
+    #endregion
 }

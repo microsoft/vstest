@@ -81,6 +81,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         _testPlatformEventSource = testPlatformEventSource;
     }
 
+
+    #region ITranslationLayerRequestSender
+
     /// <inheritdoc/>
     public int InitializeCommunication()
     {
@@ -835,6 +838,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     {
         _communicationManager?.StopServer();
     }
+
+    #endregion
 
     private bool HandShakeWithVsTestConsole()
     {

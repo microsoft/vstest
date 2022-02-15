@@ -44,6 +44,8 @@ public class PlatformArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is PlatformArgumentExecutor);
     }
 
+    #region PlatformArgumentProcessorCapabilities tests
+
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -60,6 +62,10 @@ public class PlatformArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
+
+    #endregion
+
+    #region PlatformArgumentExecutor Initialize tests
 
     [TestMethod]
     public void InitializeShouldThrowIfArgumentIsNull()
@@ -111,10 +117,15 @@ public class PlatformArgumentProcessorTests
         Assert.AreEqual(nameof(ObjectModel.Architecture.ARM), _runSettingsProvider.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath));
     }
 
+    #endregion
+
+    #region PlatformArgumentExecutor Execute tests
+
     [TestMethod]
     public void ExecuteShouldReturnSuccess()
     {
         Assert.AreEqual(ArgumentProcessorResult.Success, _executor.Execute());
     }
 
+    #endregion
 }

@@ -618,6 +618,8 @@ public class DiscovererEnumeratorTests
         _discovererEnumerator.LoadTests(extensionSourceMap, _runSettingsMock.Object, null, _messageLoggerMock.Object);
     }
 
+    #region Implementation
+
     /// <summary>
     /// Placing this before others so that at runtime this would be the first to be discovered as a discoverer.
     /// </summary>
@@ -774,4 +776,5 @@ public class DiscovererEnumeratorTests
         }
     }
 
+    #endregion
 }

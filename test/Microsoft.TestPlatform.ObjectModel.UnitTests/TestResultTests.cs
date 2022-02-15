@@ -42,6 +42,8 @@ public class TestResultTests
         Assert.IsTrue(_result.EndTime.Subtract(DateTimeOffset.UtcNow) < new TimeSpan(0, 0, 0, 10));
     }
 
+    #region GetSetPropertyValue Tests
+
     [TestMethod]
     public void TestResultGetPropertyValueForComputerNameShouldReturnCorrectValue()
     {
@@ -185,5 +187,7 @@ public class TestResultTests
 
         Assert.AreEqual(testStartTime, _result.StartTime);
     }
+
+    #endregion
 
 }

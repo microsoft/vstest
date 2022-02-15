@@ -149,6 +149,8 @@ public class TestHostProviderManagerTests
         Assert.IsNull(manager.GetTestHostManagerByRunConfiguration(runSettingsXml));
     }
 
+    #region Implementations
+
     [ExtensionUri("executor://DesktopTestHost")]
     [FriendlyName("DesktopTestHost")]
     private class CustomTestHost : ITestRuntimeProvider
@@ -295,4 +297,5 @@ public class TestHostProviderManagerTests
         }
     }
 
+    #endregion
 }

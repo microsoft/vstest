@@ -78,6 +78,8 @@ public class TestSession : ITestSession
         StopTestSession();
         _disposed = true;
     }
+
+    #region ITestSession
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void AbortTestRun()
@@ -294,6 +296,9 @@ public class TestSession : ITestSession
             TestSessionInfo = null;
         }
     }
+    #endregion
+
+    #region ITestSessionAsync
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task DiscoverTestsAsync(
@@ -491,4 +496,5 @@ public class TestSession : ITestSession
             TestSessionInfo = null;
         }
     }
+    #endregion
 }

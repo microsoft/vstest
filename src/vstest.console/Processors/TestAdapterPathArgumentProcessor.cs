@@ -118,6 +118,9 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
         _fileHelper = fileHelper;
     }
 
+
+    #region IArgumentExecutor
+
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -201,4 +204,5 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
         return ArgumentProcessorResult.Success;
     }
 
+    #endregion
 }

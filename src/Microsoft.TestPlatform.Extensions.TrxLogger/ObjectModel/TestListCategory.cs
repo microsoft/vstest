@@ -129,6 +129,9 @@ internal class TestListCategory : IXmlTestStore
         }
     }
 
+
+    #region Overrides
+
     /// <summary>
     /// Override function for Equals.
     /// </summary>
@@ -159,6 +162,10 @@ internal class TestListCategory : IXmlTestStore
     {
         return Id.GetHashCode();
     }
+    #endregion
+
+    #region IXmlTestStore Members
+
     /// <summary>
     /// Saves the class under the XmlElement..
     /// </summary>
@@ -177,4 +184,5 @@ internal class TestListCategory : IXmlTestStore
         h.SaveGuid(element, "@parentListId", ParentCategoryId.Id);
     }
 
+    #endregion
 }

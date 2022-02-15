@@ -200,6 +200,8 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// </summary>
     internal ITestLoggerManager LoggerManager { get; }
 
+    #region ITestDiscoveryEventsHandler2 Methods
+
     /// <inheritdoc/>
     public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
     {
@@ -417,6 +419,10 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
         return rawMessage;
     }
 
+    #endregion
+
+    #region IDisposable implementation
+
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or
     /// resetting unmanaged resources.
@@ -453,6 +459,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
         EqtTrace.Info("DiscoveryRequest.Dispose: Completed.");
     }
 
+    #endregion
     /// <summary>
     /// Request Data
     /// </summary>

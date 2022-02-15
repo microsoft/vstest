@@ -170,6 +170,9 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
         _discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output, _testCasefilter, _discoveredTests, _commandLineOptions);
     }
 
+
+    #region IArgumentExecutor
+
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -216,6 +219,8 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
         File.WriteAllLines(_commandLineOptions.ListTestsTargetPath, _discoveredTests);
         return ArgumentProcessorResult.Success;
     }
+
+    #endregion
 
     private class DiscoveryEventsRegistrar : ITestDiscoveryEventsRegistrar
     {

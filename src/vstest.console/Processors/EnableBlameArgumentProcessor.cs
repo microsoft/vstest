@@ -130,6 +130,9 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
 
     internal IOutput Output { get; set; }
 
+
+    #region IArgumentExecutor
+
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -373,4 +376,5 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
         outernode.AppendChild(dumpNode);
     }
 
+    #endregion
 }

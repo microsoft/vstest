@@ -61,6 +61,9 @@ public class BlameLogger : ITestLogger
         _blameReaderWriter = blameReaderWriter;
     }
 
+
+    #region ITestLogger
+
     /// <summary>
     /// Initializes the Logger.
     /// </summary>
@@ -104,6 +107,10 @@ public class BlameLogger : ITestLogger
         _output.Error(false, Resources.Resources.AbortedTestRun, sb.ToString());
     }
 
+    #endregion
+
+    #region Faulty test case fetch
+
     /// <summary>
     /// Fetches faulty test case
     /// </summary>
@@ -139,4 +146,5 @@ public class BlameLogger : ITestLogger
         return faultyTestCaseNames;
     }
 
+    #endregion
 }

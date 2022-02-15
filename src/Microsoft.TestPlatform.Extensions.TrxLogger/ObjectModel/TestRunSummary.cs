@@ -126,6 +126,9 @@ internal class TestRunSummary : IXmlTestStore
         _collectorDataEntries = dataCollectors;
     }
 
+
+    #region IXmlTestStore Members
+
     /// <summary>
     /// Saves the class under the XmlElement..
     /// </summary>
@@ -144,4 +147,5 @@ internal class TestRunSummary : IXmlTestStore
         helper.SaveIEnumerable(_collectorDataEntries, element, "CollectorDataEntries", ".", "Collector", parameters);
     }
 
+    #endregion
 }

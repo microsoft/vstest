@@ -101,6 +101,9 @@ internal class InIsolationArgumentExecutor : IArgumentExecutor
         _commandLineOptions = options;
         _runSettingsManager = runSettingsManager;
     }
+
+    #region IArgumentProcessor
+
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -127,4 +130,5 @@ internal class InIsolationArgumentExecutor : IArgumentExecutor
         return ArgumentProcessorResult.Success;
     }
 
+    #endregion
 }

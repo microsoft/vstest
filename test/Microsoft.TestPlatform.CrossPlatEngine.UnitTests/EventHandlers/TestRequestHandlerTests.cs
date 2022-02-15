@@ -135,6 +135,8 @@ public class TestRequestHandlerTests
         Assert.IsTrue(task.Wait(2000));
     }
 
+    #region Version Check Protocol
+
     [TestMethod]
     public void ProcessRequestsVersionCheckShouldAckMinimumOfGivenAndHighestSupportedVersion()
     {
@@ -164,6 +166,10 @@ public class TestRequestHandlerTests
         VerifyResponseMessageContains(EqtTrace.ErrorOnInitialization);
         SendSessionEnd();
     }
+
+    #endregion
+
+    #region Discovery Protocol
 
     [TestMethod]
     public void ProcessRequestsDiscoveryInitializeShouldSetExtensionPaths()
@@ -204,6 +210,10 @@ public class TestRequestHandlerTests
         VerifyResponseMessageEquals(message);
         SendSessionEnd();
     }
+
+    #endregion
+
+    #region Execution Protocol
 
     [TestMethod]
     public void ProcessRequestsExecutionInitializeShouldSetExtensionPaths()
@@ -378,6 +388,9 @@ public class TestRequestHandlerTests
 
         Assert.AreEqual(123, task.Result);
     }
+    #endregion
+
+    #region Logging Protocol
     [TestMethod]
     public void SendLogShouldSendTestMessageWithLevelOnChannel()
     {
@@ -397,6 +410,8 @@ public class TestRequestHandlerTests
 
         SendSessionEnd();
     }
+    #endregion
+
     [TestMethod]
     public void ProcessRequestsEndSessionShouldCloseRequestHandler()
     {
