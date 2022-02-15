@@ -106,7 +106,7 @@ public class DiscoveryRequestTests
         _discoveryRequest.DiscoverAsync();
         var eventsHandler = _discoveryRequest as ITestDiscoveryEventsHandler2;
 
-        _discoveryRequest.AbortWithEventHandler();
+        _discoveryRequest.Abort();
         _discoveryManager.Verify(dm => dm.Abort(eventsHandler), Times.Once);
     }
 

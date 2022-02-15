@@ -24,6 +24,7 @@ using Utilities;
 public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHandler2
 {
     private readonly IDataSerializer _dataSerializer;
+    private readonly ProtocolConfig _protocolConfig = Constants.DefaultProtocolConfig;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DiscoveryRequest"/> class.
@@ -110,12 +111,21 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
         {
             if (_disposed)
             {
-                throw new ObjectDisposedException("DiscoveryRequest");
+                throw new ObjectDisposedException(nameof(DiscoveryRequest));
             }
 
             if (DiscoveryInProgress)
             {
-                DiscoveryManager.Abort();
+                // If testhost has old version, we should use old cancel logic
+                // to be consistent and not create regression issues
+                if (_protocolConfig.Version < Constants.MinimumProtocolVersionWithCancelDiscoveryEventHandlerSupport)
+                {
+                    DiscoveryManager.Abort();
+                }
+                else
+                {
+                    DiscoveryManager.Abort(this);
+                }
             }
             else
             {
@@ -143,32 +153,6 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
         // This method is not synchronized as it can lead to dead-lock
         // (the discoveryCompletionEvent cannot be raised unless that lock is released)
         return _discoveryCompleted == null || _discoveryCompleted.WaitOne(timeout);
-    }
-
-    /// <inheritdoc/>
-    public void AbortWithEventHandler()
-    {
-        EqtTrace.Verbose("DiscoveryRequest.AbortWithEventHandler: Aborting.");
-
-        lock (_syncObject)
-        {
-            if (_disposed)
-            {
-                throw new ObjectDisposedException(nameof(DiscoveryRequest));
-            }
-
-            if (DiscoveryInProgress)
-            {
-                DiscoveryManager.Abort(this);
-            }
-            else
-            {
-                EqtTrace.Info("DiscoveryRequest.AbortWithEventHandler: No operation to abort.");
-                return;
-            }
-        }
-
-        EqtTrace.Info("DiscoveryRequest.AbortWithEventHandler: Aborted.");
     }
 
     /// <summary>

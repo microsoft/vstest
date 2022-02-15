@@ -573,13 +573,6 @@ internal class TestRequestManager : ITestRequestManager
     }
 
     /// <inheritdoc />
-    public void CancelDiscoveryWithEventHandler()
-    {
-        EqtTrace.Info("TestRequestManager.CancelDiscoveryWithEventHandler: Sending cancel request.");
-        _currentDiscoveryRequest?.AbortWithEventHandler();
-    }
-
-    /// <inheritdoc />
     public void AbortTestRun()
     {
         EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request.");

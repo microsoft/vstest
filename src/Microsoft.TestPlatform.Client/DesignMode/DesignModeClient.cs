@@ -36,7 +36,7 @@ public class DesignModeClient : IDesignModeClient
     private readonly ICommunicationManager _communicationManager;
     private readonly IDataSerializer _dataSerializer;
 
-    private readonly ProtocolConfig _protocolConfig = ObjectModel.Constants.DefaultProtocolConfig;
+    private readonly ProtocolConfig _protocolConfig = Constants.DefaultProtocolConfig;
     private readonly IEnvironment _platformEnvironment;
     private readonly TestSessionMessageLogger _testSessionMessageLogger;
     private readonly object _lockObject = new();
@@ -223,16 +223,7 @@ public class DesignModeClient : IDesignModeClient
 
                     case MessageType.CancelDiscovery:
                         {
-                            // If testhost has old version, we should use old cancel logic
-                            // to be consistent and not create regression issues
-                            if (_protocolConfig.Version < ObjectModel.Constants.MinimumProtocolVersionWithCancelDiscoveryEventHandlerSupport)
-                            {
-                                testRequestManager.CancelDiscovery();
-                            }
-                            else
-                            {
-                                testRequestManager.CancelDiscoveryWithEventHandler();
-                            }
+                            testRequestManager.CancelDiscovery();
                             break;
                         }
 
