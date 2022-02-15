@@ -146,7 +146,7 @@ internal class ParallelDiscoveryDataAggregator
         }
 
         foreach (var source in sources)
-        {            
+        {
             if (!SourcesWithDiscoveryStatus.ContainsKey(source) && status != DiscoveryStatus.NotDiscovered)
             {
                 EqtTrace.Warning("ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus: "

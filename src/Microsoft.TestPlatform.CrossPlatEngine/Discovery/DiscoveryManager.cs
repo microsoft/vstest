@@ -109,14 +109,13 @@ public class DiscoveryManager : IDiscoveryManager
             foreach (var kvp in discoveryCriteria.AdapterSourceMap)
             {
                 var verifiedSources = GetValidSources(kvp.Value, _sessionMessageLogger, discoveryCriteria.Package);
-                if (verifiedSources.Any())
+                if (verifiedSources.Count > 0)
                 {
                     verifiedExtensionSourceMap.Add(kvp.Key, kvp.Value);
                     // Mark all sources as NotDiscovered before actual discovery starts
                     MarkSourcesWithStatus(verifiedSources, DiscoveryStatus.NotDiscovered);
                 }
             }
-
 
             // If there are sources to discover
             if (verifiedExtensionSourceMap.Any())
@@ -230,7 +229,7 @@ public class DiscoveryManager : IDiscoveryManager
     /// <param name="logger">logger</param>
     /// <param name="package">package</param>
     /// <returns> The list of verified sources. </returns>
-    internal static IEnumerable<string> GetValidSources(IEnumerable<string> sources, IMessageLogger logger, string package)
+    internal static HashSet<string> GetValidSources(IEnumerable<string> sources, IMessageLogger logger, string package)
     {
         Debug.Assert(sources != null, "sources");
         var verifiedSources = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -274,7 +273,7 @@ public class DiscoveryManager : IDiscoveryManager
         }
 
         // No valid source is found => we cannot discover.
-        if (!verifiedSources.Any())
+        if (verifiedSources.Count == 0)
         {
             var sourcesString = string.Join(",", sources.ToArray());
             var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.NoValidSourceFoundForDiscovery, sourcesString);
@@ -330,20 +329,23 @@ public class DiscoveryManager : IDiscoveryManager
     /// <param name="testCases">List of testCases which were already discovered</param>
     private void MarkSourcesBasedOnDiscoveredTestCases(IEnumerable<TestCase> testCases)
     {
-        if (testCases == null || testCases.Count() == 0) return;
+        if (testCases is null || !testCases.Any())
+        {
+            return;
+        }
 
         foreach (var testCase in testCases)
         {
             string currentSource = testCase.Source;
 
-            // If it is the first list of testCases which was discovered, we mark sources as partiallyDiscovered.
-            // Or if current source is the same as previous we again mark them as partiallyDiscovered for consistency
+            // If it is the first list of testCases which was discovered or if current source
+            // is the same as previous we mark them as partially discovered.
             if (_previousSource is null || _previousSource == currentSource)
             {
                 MarkSourceWithStatus(currentSource, DiscoveryStatus.PartiallyDiscovered);
             }
-            // If source is changed, we need to mark previous source as already fullyDiscovered
-            // and currentSource should be partiallyDiscovered
+            // If source is changed, we need to mark previous source as already fully discovered
+            // and currentSource as partially discovered.
             else if (currentSource != _previousSource)
             {
                 MarkSourceWithStatus(_previousSource, DiscoveryStatus.FullyDiscovered);
@@ -358,13 +360,8 @@ public class DiscoveryManager : IDiscoveryManager
     /// Mark the last sources as fullyDiscovered
     /// </summary>
     /// <param name="lastChunk">Last chunk of testCases which were discovered</param>
-    private void MarkTheLastChunkSourcesAsFullyDiscovered(IEnumerable<TestCase> lastChunk)
+    private void MarkTheLastChunkSourcesAsFullyDiscovered(IList<TestCase> lastChunk)
     {
-        if (lastChunk is null)
-        {
-            return;
-        }
-
         var lastChunkSources = lastChunk.Select(testcase => testcase.Source);
 
         // When all testcases in project is dividable by 10 then lastChunk is coming as empty
@@ -383,22 +380,7 @@ public class DiscoveryManager : IDiscoveryManager
     /// <param name="source">Sources to mark</param>
     /// <param name="status">DiscoveryStatus to mark for source</param>
     private void MarkSourceWithStatus(string source, DiscoveryStatus status)
-    {
-        if (source is null)
-        {
-            return;
-        }
-
-        if (!_sourcesWithDiscoveryStatus.ContainsKey(source))
-        {
-            EqtTrace.Warning($"DiscoveryManager.MarkSourceWithStatus : SourcesWithDiscoveryStatus does not contain {source}");
-        }
-        else
-        {
-            _sourcesWithDiscoveryStatus[source] = status;
-            EqtTrace.Warning($"DiscoveryManager.MarkSourceWithStatus : Marking {source} with {status} status");
-        }
-    }
+        => MarkSourcesWithStatus(new[] { source }, status);
 
     /// <summary>
     /// Mark sources with particular DiscoveryStatus
@@ -419,21 +401,14 @@ public class DiscoveryManager : IDiscoveryManager
                 continue;
             }
 
-            // It is the first time when we fill our map with sources
-            if (status == DiscoveryStatus.NotDiscovered)
-            {
-                _sourcesWithDiscoveryStatus[source] = status;
-                continue;
-            }
-
-            if (!_sourcesWithDiscoveryStatus.ContainsKey(source))
+            if (status != DiscoveryStatus.NotDiscovered && !_sourcesWithDiscoveryStatus.ContainsKey(source))
             {
                 EqtTrace.Warning($"DiscoveryManager.MarkSourcesWithStatus: SourcesWithDiscoveryStatus does not contain {source}.");
             }
             else
             {
                 _sourcesWithDiscoveryStatus[source] = status;
-                EqtTrace.Warning($"DiscoveryManager.MarkSourcesWithStatus: Marking {source} with {status} status.");
+                EqtTrace.Info($"DiscoveryManager.MarkSourcesWithStatus: Marking {source} with {status} status.");
             }
         }
     }
