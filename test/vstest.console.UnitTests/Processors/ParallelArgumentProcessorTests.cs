@@ -44,6 +44,8 @@ public class ParallelArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is ParallelArgumentExecutor);
     }
 
+    #region ParallelArgumentProcessorCapabilities tests
+
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -60,6 +62,10 @@ public class ParallelArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
+
+    #endregion
+
+    #region ParallelArgumentExecutor Initialize tests
 
     [TestMethod]
     public void InitializeShouldThrowIfArgumentIsNonNull()
@@ -79,10 +85,15 @@ public class ParallelArgumentProcessorTests
         Assert.AreEqual("0", _runSettingsProvider.QueryRunSettingsNode(ParallelArgumentExecutor.RunSettingsPath));
     }
 
+    #endregion
+
+    #region ParallelArgumentExecutor Execute tests
+
     [TestMethod]
     public void ExecuteShouldReturnSuccess()
     {
         Assert.AreEqual(ArgumentProcessorResult.Success, _executor.Execute());
     }
 
+    #endregion
 }

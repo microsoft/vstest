@@ -12,6 +12,7 @@ using Utility;
 
 using XML;
 
+#region WorkItem
 /// <summary>
 /// Stores an int which represents a workitem
 /// </summary>
@@ -40,6 +41,8 @@ internal sealed class WorkItem : IXmlTestStore
         }
     }
 
+
+    #region Methods - overrides
     /// <summary>
     /// Compare the values of the items
     /// </summary>
@@ -67,6 +70,10 @@ internal sealed class WorkItem : IXmlTestStore
     {
         return _id.ToString(CultureInfo.InvariantCulture);
     }
+    #endregion
+
+    #region IXmlTestStore Members
+
     /// <summary>
     /// Saves the class under the XmlElement.
     /// </summary>
@@ -77,7 +84,11 @@ internal sealed class WorkItem : IXmlTestStore
         new XmlPersistence().SaveSingleFields(element, this, parameters);
     }
 
+    #endregion
 }
+#endregion
+
+#region WorkItemCollection
 /// <summary>
 /// A collection of ints represent the workitems
 /// </summary>
@@ -211,3 +222,4 @@ internal sealed class WorkItemCollection : EqtBaseCollection<WorkItem>
         xmlPersistence.SaveHashtable(_container, element, ".", ".", null, "Workitem", parameters);
     }
 }
+#endregion

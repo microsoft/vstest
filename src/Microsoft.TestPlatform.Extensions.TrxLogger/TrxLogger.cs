@@ -92,6 +92,9 @@ public class TrxLogger : ITestLoggerWithParameters
     /// </summary>
     private string _testResultsDirPath;
 
+
+    #region ITestLogger
+
     /// <inheritdoc/>
     public void Initialize(TestLoggerEvents events!!, string testResultsDirPath)
     {
@@ -132,6 +135,10 @@ public class TrxLogger : ITestLoggerWithParameters
         _parametersDictionary = parameters;
         Initialize(events, _parametersDictionary[DefaultLoggerParameterNames.TestRunDirectory]);
     }
+    #endregion
+
+    #region ForTesting
+
     internal string GetRunLevelInformationalMessage()
     {
         return _runLevelStdOut.ToString();
@@ -168,6 +175,10 @@ public class TrxLogger : ITestLoggerWithParameters
     }
 
     internal TrxLoggerObjectModel.TestOutcome TestResultOutcome { get; private set; } = TrxLoggerObjectModel.TestOutcome.Passed;
+
+    #endregion
+
+    #region Event Handlers
 
     /// <summary>
     /// Called when a test message is received.
@@ -723,4 +734,5 @@ public class TrxLogger : ITestLoggerWithParameters
         return outcome;
     }
 
+    #endregion
 }

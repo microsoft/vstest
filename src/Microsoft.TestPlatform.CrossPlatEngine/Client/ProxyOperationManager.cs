@@ -117,6 +117,8 @@ public class ProxyOperationManager
     /// Gets or sets the cancellation token source.
     /// </summary>
     public CancellationTokenSource CancellationTokenSource { get; set; }
+
+    #region IProxyOperationManager implementation.
     /// <summary>
     /// Initializes the proxy.
     /// </summary>
@@ -329,6 +331,8 @@ public class ProxyOperationManager
             TestHostManager.HostLaunched -= TestHostManagerHostLaunched;
         }
     }
+
+    #endregion
 
     /// <summary>
     /// This method is exposed to enable derived classes to modify

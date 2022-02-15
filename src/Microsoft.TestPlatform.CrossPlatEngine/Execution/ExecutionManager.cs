@@ -56,6 +56,8 @@ public class ExecutionManager : IExecutionManager
         _requestData = requestData;
     }
 
+    #region IExecutionManager Implementation
+
     /// <summary>
     /// Initializes the execution manager.
     /// </summary>
@@ -183,6 +185,7 @@ public class ExecutionManager : IExecutionManager
         }
     }
 
+    #endregion
     private void LoadExtensions()
     {
         try

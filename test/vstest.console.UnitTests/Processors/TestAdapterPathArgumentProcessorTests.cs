@@ -54,6 +54,8 @@ public class TestAdapterPathArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is TestAdapterPathArgumentExecutor);
     }
 
+    #region TestAdapterPathArgumentProcessorCapabilities tests
+
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -70,6 +72,10 @@ public class TestAdapterPathArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
+
+    #endregion
+
+    #region TestAdapterPathArgumentExecutor tests
 
     [TestMethod]
     public void InitializeShouldThrowIfArgumentIsNull()
@@ -302,6 +308,10 @@ public class TestAdapterPathArgumentProcessorTests
 
     }
 
+    #endregion
+
+    #region Testable implementations
+
     private class TestableTestAdapterPathArgumentExecutor : TestAdapterPathArgumentExecutor
     {
         internal TestableTestAdapterPathArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsProvider, IOutput output, IFileHelper fileHelper)
@@ -312,4 +322,5 @@ public class TestAdapterPathArgumentProcessorTests
         internal Func<string, IEnumerable<string>> TestAdapters { get; set; }
     }
 
+    #endregion
 }

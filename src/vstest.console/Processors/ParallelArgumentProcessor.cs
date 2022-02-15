@@ -108,6 +108,9 @@ internal class ParallelArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsManager;
     }
 
+
+    #region IArgumentExecutor
+
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -134,4 +137,5 @@ internal class ParallelArgumentExecutor : IArgumentExecutor
         return ArgumentProcessorResult.Success;
     }
 
+    #endregion
 }

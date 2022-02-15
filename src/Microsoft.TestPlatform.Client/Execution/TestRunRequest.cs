@@ -94,6 +94,8 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
         _requestData = requestData;
     }
 
+    #region ITestRunRequest
+
     /// <summary>
     /// Execute the test run asynchronously
     /// </summary>
@@ -327,6 +329,10 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
         get; private set;
     }
 
+    #endregion
+
+    #region IDisposable implementation
+
     // Summary:
     // Performs application-defined tasks associated with freeing, releasing, or
     // resetting unmanaged resources.
@@ -336,6 +342,8 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
 
         GC.SuppressFinalize(this);
     }
+
+    #endregion
 
     /// <summary>
     /// The criteria/config for this test run request.

@@ -151,6 +151,9 @@ internal class PortArgumentExecutor : IArgumentExecutor
         _processHelper = processHelper;
     }
 
+
+    #region IArgumentExecutor
+
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -184,6 +187,8 @@ internal class PortArgumentExecutor : IArgumentExecutor
 
         return ArgumentProcessorResult.Success;
     }
+
+    #endregion
 
     private static IDesignModeClient InitializeDesignMode(int parentProcessId, IProcessHelper processHelper)
     {

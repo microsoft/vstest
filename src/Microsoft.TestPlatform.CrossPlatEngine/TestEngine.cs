@@ -50,6 +50,8 @@ public class TestEngine : ITestEngine
         _processHelper = processHelper;
     }
 
+    #region ITestEngine implementation
+
     /// <inheritdoc/>
     public IProxyDiscoveryManager GetDiscoveryManager(
         IRequestData requestData,
@@ -358,6 +360,8 @@ public class TestEngine : ITestEngine
             TestSessionMessageLogger.Instance,
             new InternalTestLoggerEvents(TestSessionMessageLogger.Instance));
     }
+
+    #endregion
 
     private static int GetDistinctNumberOfSources(TestRunCriteria testRunCriteria)
     {

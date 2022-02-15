@@ -115,6 +115,9 @@ public class TestProperty : IEquatable<TestProperty>
     [DataMember]
     public string ValueType { get; set; }
 
+
+    #region IEquatable
+
     /// <inheritdoc/>
     public override int GetHashCode()
     {
@@ -132,6 +135,8 @@ public class TestProperty : IEquatable<TestProperty>
     {
         return (other != null) && (Id == other.Id);
     }
+
+    #endregion IEquatable
 
     /// <inheritdoc/>
     public override string ToString()

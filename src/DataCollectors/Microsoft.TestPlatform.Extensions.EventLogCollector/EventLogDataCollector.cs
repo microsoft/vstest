@@ -131,6 +131,9 @@ public class EventLogDataCollector : DataCollector
     /// </summary>
     internal Dictionary<DataCollectionContext, EventLogSessionContext> ContextMap { get; }
 
+
+    #region DataCollector Members
+
     /// <summary>
     /// Initializes the data collector
     /// </summary>
@@ -179,6 +182,7 @@ public class EventLogDataCollector : DataCollector
         events.TestCaseEnd += _testCaseEndEventHandler;
     }
 
+    #endregion
     /// <summary>
     /// The write event logs.
     /// </summary>
@@ -275,6 +279,9 @@ public class EventLogDataCollector : DataCollector
 
         return eventLogPath;
     }
+
+    #region IDisposable Members
+
     /// <summary>
     /// Cleans up resources allocated by the data collector
     /// </summary>
@@ -298,6 +305,8 @@ public class EventLogDataCollector : DataCollector
         // Delete all the temp event log directories
         RemoveTempEventLogDirs(_eventLogDirectories);
     }
+
+    #endregion
 
     private static ISet<string> ParseCommaSeparatedList(string commaSeparatedList)
     {

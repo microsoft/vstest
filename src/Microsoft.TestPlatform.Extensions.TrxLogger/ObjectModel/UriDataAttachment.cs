@@ -40,6 +40,8 @@ internal class UriDataAttachment : IDataAttachment, IXmlTestStore
         Initialize(description, uri);
     }
 
+    #region IDataAttachment Members
+
     /// <summary>
     /// Gets short description for the attachment.
     /// </summary>
@@ -49,6 +51,10 @@ internal class UriDataAttachment : IDataAttachment, IXmlTestStore
     /// Gets the URI that can be used to obtain the data of this attachment
     /// </summary>
     public Uri Uri { get; private set; }
+
+    #endregion
+
+    #region IXmlTestStore Members
 
     /// <summary>
     /// Saves the class under the XmlElement.
@@ -76,6 +82,10 @@ internal class UriDataAttachment : IDataAttachment, IXmlTestStore
         helper.SaveSimpleField(element, "@href", Uri.OriginalString, null);
     }
 
+    #endregion
+
+    #region Internal Methods
+
     /// <summary>
     /// Clones the instance and makes the URI in the clone absolute using the specified base directory
     /// </summary>
@@ -99,6 +109,7 @@ internal class UriDataAttachment : IDataAttachment, IXmlTestStore
         return this;
     }
 
+    #endregion
     private void Initialize(string desc, Uri uri)
     {
         EqtAssert.ParameterNotNull(desc, nameof(desc));

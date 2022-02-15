@@ -112,6 +112,9 @@ internal class PlatformArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsManager;
     }
 
+
+    #region IArgumentExecutor
+
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -161,4 +164,5 @@ internal class PlatformArgumentExecutor : IArgumentExecutor
         return ArgumentProcessorResult.Success;
     }
 
+    #endregion
 }

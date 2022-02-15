@@ -112,6 +112,9 @@ internal class FrameworkArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsManager;
     }
 
+
+    #region IArgumentExecutor
+
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -157,4 +160,5 @@ internal class FrameworkArgumentExecutor : IArgumentExecutor
         return ArgumentProcessorResult.Success;
     }
 
+    #endregion
 }

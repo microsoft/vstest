@@ -93,6 +93,9 @@ internal sealed class TestEntry : IXmlTestStore
         return ExecutionId.GetHashCode();
     }
 
+
+    #region IXmlTestStore Members
+
     /// <summary>
     /// Saves the class under the XmlElement..
     /// </summary>
@@ -116,4 +119,5 @@ internal sealed class TestEntry : IXmlTestStore
             helper.SaveIEnumerable(TestEntries, element, "TestEntries", ".", "TestEntry", parameters);
     }
 
+    #endregion
 }

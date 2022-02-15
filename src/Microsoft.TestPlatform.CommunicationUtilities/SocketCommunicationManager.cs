@@ -89,6 +89,8 @@ public class SocketCommunicationManager : ICommunicationManager
         _dataSerializer = dataSerializer;
     }
 
+    #region ServerMethods
+
     /// <summary>
     /// Host TCP Socket Server and start listening
     /// </summary>
@@ -153,6 +155,10 @@ public class SocketCommunicationManager : ICommunicationManager
         _binaryReader?.Dispose();
         _binaryWriter?.Dispose();
     }
+
+    #endregion
+
+    #region ClientMethods
 
     /// <summary>
     /// Connects to server async
@@ -232,6 +238,8 @@ public class SocketCommunicationManager : ICommunicationManager
         _binaryReader?.Dispose();
         _binaryWriter?.Dispose();
     }
+
+    #endregion
 
     /// <summary>
     /// Writes message to the binary writer.

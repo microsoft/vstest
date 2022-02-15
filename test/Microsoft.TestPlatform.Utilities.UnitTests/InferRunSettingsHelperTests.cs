@@ -392,6 +392,7 @@ public class InferRunSettingsHelperTests
     [TestMethod]
     public void FilterCompatibleSourcesShouldIdentifyIncomaptiableSourcesAndConstructWarningMessage()
     {
+        #region Arrange
         _sourceArchitectures["AnyCPU1net46.dll"] = Architecture.AnyCPU;
         _sourceArchitectures["x64net47.exe"] = Architecture.X64;
         _sourceArchitectures["x86net45.dll"] = Architecture.X86;
@@ -409,6 +410,7 @@ public class InferRunSettingsHelperTests
         var expected = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, _frameworkNet45, Constants.DefaultPlatform, sb.ToString(), MultiTargettingForwardLink);
 
 
+        #endregion
         var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, Constants.DefaultPlatform, _frameworkNet45, _sourceArchitectures, _sourceFrameworks, out string warningMessage);
 
         // None of the DLLs passed are compatible to the chosen settings
@@ -627,6 +629,8 @@ public class InferRunSettingsHelperTests
         Assert.IsNull(envVars);
     }
 
+    #region RunSettingsIncompatibeWithTestSettings Tests
+
     [TestMethod]
     public void RunSettingsWithCodeCoverageAndInlineTestSettingsXml()
     {
@@ -797,6 +801,10 @@ public class InferRunSettingsHelperTests
             ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithDisabledCollectionSettingsAndInlineTestSettingsXml)), "Invalid response");
     }
 
+    #endregion
+
+    #region Private Methods
+
     private string GetSourceIncompatibleMessage(string source)
     {
         return string.Format(CultureInfo.CurrentCulture, OMResources.SourceIncompatible, source, _sourceFrameworks[source].Name, _sourceArchitectures[source]);
@@ -824,4 +832,5 @@ public class InferRunSettingsHelperTests
             .Replace("</DataCollector>", "</InProcDataCollector>");
     }
 
+    #endregion
 }

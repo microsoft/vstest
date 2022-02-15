@@ -62,6 +62,9 @@ internal sealed class TestResultId : IXmlTestStore
     /// </summary>
     public Guid TestId { get; }
 
+
+    #region Overrides
+
     /// <summary>
     /// Override function for Equals
     /// </summary>
@@ -97,6 +100,10 @@ internal sealed class TestResultId : IXmlTestStore
     {
         return ExecutionId.ToString("B");
     }
+    #endregion
+
+    #region IXmlTestStore Members
+
     /// <summary>
     /// Saves the class under the XmlElement..
     /// </summary>
@@ -118,6 +125,7 @@ internal sealed class TestResultId : IXmlTestStore
         helper.SaveGuid(element, "@testId", TestId);
     }
 
+    #endregion
 }
 
 /// <summary>
@@ -150,6 +158,8 @@ internal sealed class TestResultErrorInfo : IXmlTestStore
         set { _stackTrace = value; }
     }
 
+    #region IXmlTestStore Members
+
     /// <summary>
     /// Saves the class under the XmlElement..
     /// </summary>
@@ -164,6 +174,7 @@ internal sealed class TestResultErrorInfo : IXmlTestStore
         XmlPersistence.SaveUsingReflection(element, this, typeof(TestResultErrorInfo), parameters);
     }
 
+    #endregion
 }
 
 /// <summary>
@@ -390,6 +401,8 @@ internal class TestResult : ITestResult, IXmlTestStore
     /// </summary>
     public string ResultType { get; set; }
 
+
+    #region Overrides
     public override bool Equals(object obj)
     {
         if (obj is not TestResult trm)
@@ -406,6 +419,8 @@ internal class TestResult : ITestResult, IXmlTestStore
         Debug.Assert(Id != null, "id is null");
         return Id.GetHashCode();
     }
+
+    #endregion
 
     /// <summary>
     /// Helper function to add a text message info to the test result
@@ -464,6 +479,8 @@ internal class TestResult : ITestResult, IXmlTestStore
     }
 
 
+    #region IXmlTestStore Members
+
     /// <summary>
     /// Saves the class under the XmlElement..
     /// </summary>
@@ -508,6 +525,8 @@ internal class TestResult : ITestResult, IXmlTestStore
         if (!string.IsNullOrEmpty(ResultType))
             helper.SaveSimpleField(element, "@resultType", ResultType, string.Empty);
     }
+
+    #endregion
 
     private void Initialize()
     {

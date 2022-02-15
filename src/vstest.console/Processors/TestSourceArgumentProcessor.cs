@@ -94,6 +94,9 @@ internal class TestSourceArgumentExecutor : IArgumentExecutor
         _testSources = testSources;
     }
 
+
+    #region IArgumentExecutor
+
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -115,5 +118,7 @@ internal class TestSourceArgumentExecutor : IArgumentExecutor
         // Nothing to do. Our work was done during initialize.
         return ArgumentProcessorResult.Success;
     }
+
+    #endregion
 
 }

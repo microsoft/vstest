@@ -43,6 +43,8 @@ public class TestSourceArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is TestSourceArgumentExecutor);
     }
 
+    #region TestSourceArgumentProcessorCapabilitiesTests
+
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -58,6 +60,10 @@ public class TestSourceArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsTrue(capabilities.IsSpecialCommand);
     }
+
+    #endregion
+
+    #region TestSourceArgumentExecutorTests
 
     [TestMethod]
     public void ExecuterInitializeWithInvalidSourceShouldThrowCommandLineException()
@@ -111,4 +117,5 @@ public class TestSourceArgumentProcessorTests
         Assert.AreEqual(ArgumentProcessorResult.Success, result);
     }
 
+    #endregion
 }

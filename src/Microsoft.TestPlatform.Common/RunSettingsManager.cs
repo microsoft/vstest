@@ -27,11 +27,15 @@ internal class RunSettingsManager : IRunSettingsProvider
     }
 
 
+
+    #region IRunSettingsProvider
+
     /// <summary>
     /// Gets the active run settings.
     /// </summary>
     public RunSettings ActiveRunSettings { get; private set; }
 
+    #endregion
     public static RunSettingsManager Instance
     {
         get

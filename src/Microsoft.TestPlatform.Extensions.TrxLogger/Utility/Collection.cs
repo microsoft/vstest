@@ -19,6 +19,7 @@ using System.Xml;
 /// </summary>
 internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
 {
+    #region private classes
     /// <summary>
     /// Wraps non-generic enumerator.
     /// </summary>
@@ -57,6 +58,8 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
         {
         }
     }
+    #endregion
+
     protected Hashtable _container;
 
     private string _childElementName;
@@ -83,6 +86,8 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
         EqtAssert.ParameterNotNull(other, nameof(other));
         _container = new Hashtable(other._container);
     }
+
+    #region Methods: ICollection<T>
     // TODO: Consider putting check for null to derived classes.
     public virtual void Add(T item)
     {
@@ -148,6 +153,9 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
     {
         get { return false; }
     }
+    #endregion
+
+    #region IEnumerable
     public virtual IEnumerator GetEnumerator()
     {
         return _container.Keys.GetEnumerator();
@@ -157,6 +165,10 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
     {
         return new EqtBaseCollectionEnumerator<T>(GetEnumerator());
     }
+    #endregion
+
+    #region IXmlTestStore Members
+
     /// <summary>
     /// Default behavior is to create child elements with name same as name of type T.
     /// Does not respect IXmlTestStoreCustom.
@@ -166,6 +178,8 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
         XmlPersistence xmlPersistence = new();
         xmlPersistence.SaveHashtable(_container, element, ".", ".", null, ChildElementName, parameters);
     }
+
+    #endregion
 
     private string ChildElementName
     {

@@ -25,10 +25,17 @@ public abstract class BasicTransferInformation
         Description = string.Empty;
     }
 
+
+    #region  Required Parameters.
+
     /// <summary>
     /// Gets the data collection context the transfer will be associated with.
     /// </summary>
     public DataCollectionContext Context { get; private set; }
+
+    #endregion
+
+    #region Optional Parameters.
 
     /// <summary>
     /// Gets or sets a short description of the data being sent.
@@ -79,4 +86,5 @@ public abstract class BasicTransferInformation
         get;
     }
 
+    #endregion
 }

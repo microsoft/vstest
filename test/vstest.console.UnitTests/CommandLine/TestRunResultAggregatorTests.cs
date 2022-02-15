@@ -108,6 +108,8 @@ public class TestRunResultAggregatorTests
         Assert.AreEqual(TestOutcome.Failed, _resultAggregator.Outcome);
     }
 
+    #region Implementation
+
     private class TestableTestRunStats : ITestRunStatistics
     {
         public TestableTestRunStats(Dictionary<TestOutcome, long> stats)
@@ -137,4 +139,5 @@ public class TestRunResultAggregatorTests
         }
     }
 
+    #endregion
 }

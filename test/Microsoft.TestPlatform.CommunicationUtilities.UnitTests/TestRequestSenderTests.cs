@@ -239,6 +239,8 @@ public class TestRequestSenderTests
         _mockExecutionEventsHandler.Verify(eh => eh.HandleRawMessage(It.IsAny<string>()), Times.Never);
     }
 
+    #region Version Check Tests
+
     [TestMethod]
     public void CheckVersionWithTestHostShouldSendHighestSupportedVersion()
     {
@@ -284,6 +286,9 @@ public class TestRequestSenderTests
         Assert.AreEqual(message, TimoutErrorMessage);
     }
 
+    #endregion
+
+    #region Discovery Protocol Tests
     [TestMethod]
     public void InitializeDiscoveryShouldSendCommunicationMessageWithCorrectParameters()
     {
@@ -475,6 +480,10 @@ public class TestRequestSenderTests
 
         _mockDiscoveryEventsHandler.Verify(eh => eh.HandleDiscoveryComplete(It.Is<DiscoveryCompleteEventArgs>(dc => dc.IsAborted == true && dc.TotalCount == -1), null));
     }
+
+    #endregion
+
+    #region Execution Protocol Tests
 
     [TestMethod]
     public void InitializeExecutionShouldSendCommunicationMessageWithCorrectParameters()
@@ -771,6 +780,8 @@ public class TestRequestSenderTests
         _mockDataSerializer.Verify(ds => ds.SerializeMessage(MessageType.AbortTestRun), Times.Once);
         _mockChannel.Verify(c => c.Send(It.IsAny<string>()), Times.Once);
     }
+
+    #endregion
 
     private string SetupFakeCommunicationChannel(string connectionArgs = "123")
     {

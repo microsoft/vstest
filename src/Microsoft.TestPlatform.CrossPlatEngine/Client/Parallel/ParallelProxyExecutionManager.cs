@@ -31,6 +31,8 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
 {
     private readonly IDataSerializer _dataSerializer;
 
+    #region TestRunSpecificData
+
     // This variable id to differentiate between implicit (abort requested by testPlatform) and explicit (test host aborted) abort.
     private bool _abortRequested;
 
@@ -56,10 +58,16 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
     /// <inheritdoc/>
     public bool IsInitialized { get; private set; }
 
+    #endregion
+
+    #region Concurrency Keeper Objects
+
     /// <summary>
     /// LockObject to update execution status in parallel
     /// </summary>
     private readonly object _executionStatusLockObject = new();
+
+    #endregion
 
     public ParallelProxyExecutionManager(IRequestData requestData, Func<IProxyExecutionManager> actualProxyManagerCreator, int parallelLevel)
         : this(requestData, actualProxyManagerCreator, JsonDataSerializer.Instance, parallelLevel, true)
@@ -77,6 +85,8 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
         _requestData = requestData;
         _dataSerializer = dataSerializer;
     }
+
+    #region IProxyExecutionManager
 
     public void Initialize(bool skipDefaultAdapters)
     {
@@ -140,6 +150,10 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
     {
         DoActionOnAllManagers(proxyManager => proxyManager.Close(), doActionsInParallel: true);
     }
+
+    #endregion
+
+    #region IParallelProxyExecutionManager methods
 
     /// <summary>
     /// Handles Partial Run Complete event coming from a specific concurrent proxy execution manager
@@ -206,6 +220,8 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
 
         return false;
     }
+
+    #endregion
 
     private int StartTestRunPrivate(ITestRunEventsHandler runEventsHandler)
     {

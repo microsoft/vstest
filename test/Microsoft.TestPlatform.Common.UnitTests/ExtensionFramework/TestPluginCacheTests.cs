@@ -38,6 +38,8 @@ public class TestPluginCacheTests
         _mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
     }
 
+    #region Properties tests
+
     [TestMethod]
     public void InstanceShouldNotReturnANull()
     {
@@ -49,6 +51,10 @@ public class TestPluginCacheTests
     {
         Assert.IsNull(TestPluginCache.Instance.TestExtensions);
     }
+
+    #endregion
+
+    #region UpdateAdditionalExtensions tests
 
     [TestMethod]
     public void UpdateAdditionalExtensionsShouldNotThrowIfExtensionPathIsNull()
@@ -120,6 +126,10 @@ public class TestPluginCacheTests
     {
     }
 
+    #endregion
+
+    #region ClearExtensions
+
     [TestMethod]
     public void ClearExtensionsShouldClearPathToExtensions()
     {
@@ -129,6 +139,10 @@ public class TestPluginCacheTests
 
         Assert.AreEqual(0, TestPluginCache.Instance.GetExtensionPaths(string.Empty).Count);
     }
+
+    #endregion
+
+    #region GetExtensionPaths
 
     [TestMethod]
     public void GetExtensionPathsShouldConsolidateAllExtensions()
@@ -187,6 +201,10 @@ public class TestPluginCacheTests
         InvokeGetExtensionPaths(expectedExtensions, false);
     }
 
+    #endregion
+
+    #region GetDefaultResolutionPaths tests
+
     [TestMethod]
     public void GetDefaultResolutionPathsShouldReturnCurrentDirectoryByDefault()
     {
@@ -237,6 +255,10 @@ public class TestPluginCacheTests
         Assert.IsTrue(resolutionPaths.Contains(Path.GetDirectoryName(defaultExtensionsFile)));
     }
 
+    #endregion
+
+    #region GetResolutionPaths tests
+
     [TestMethod]
     public void GetResolutionPathsShouldThrowIfExtensionAssemblyIsNull()
     {
@@ -266,6 +288,10 @@ public class TestPluginCacheTests
 
         CollectionAssert.AreEqual(expectedPaths, resolutionPaths.ToList());
     }
+
+    #endregion
+
+    #region GetTestExtensions tests
 
     [TestMethod]
     public void GetTestExtensionsShouldReturnExtensionsInAssembly()
@@ -314,6 +340,10 @@ public class TestPluginCacheTests
         Assert.ThrowsException<Exception>(() => _testablePluginCache.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(extensionAssembly));
     }
 
+    #endregion
+
+    #region DiscoverTestExtensions tests
+
     [TestMethod]
     public void DiscoverTestExtensionsShouldDiscoverExtensionsFromExtensionsFolder()
     {
@@ -337,6 +367,8 @@ public class TestPluginCacheTests
         Assert.IsTrue(TestPluginCache.Instance.TestExtensions.AreTestDiscoverersCached);
         Assert.IsTrue(TestPluginCache.Instance.TestExtensions.AreTestExtensionsCached<TestDiscovererPluginInformation>());
     }
+
+    #endregion
 
     private void InvokeGetExtensionPaths(List<string> expectedExtensions, bool skipDefaultExtensions)
     {

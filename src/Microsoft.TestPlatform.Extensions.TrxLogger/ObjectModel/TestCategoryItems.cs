@@ -13,6 +13,7 @@ using Utility;
 
 using XML;
 
+#region TestCategoryItem
 /// <summary>
 /// Stores a string which categorizes the Test
 /// </summary>
@@ -92,6 +93,9 @@ internal sealed class TestCategoryItem : IXmlTestStore
         Debug.Assert(_category != null, "category is null");
         return _category;
     }
+
+    #region IXmlTestStore Members
+
     /// <summary>
     /// Saves the class under the XmlElement.
     /// </summary>
@@ -102,7 +106,11 @@ internal sealed class TestCategoryItem : IXmlTestStore
         new XmlPersistence().SaveSingleFields(element, this, parameters);
     }
 
+    #endregion
 }
+#endregion
+
+#region TestCategoryItemCollection
 /// <summary>
 /// A collection of strings which categorize the test.
 /// </summary>
@@ -240,3 +248,4 @@ internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategor
         return base.GetHashCode();
     }
 }
+#endregion

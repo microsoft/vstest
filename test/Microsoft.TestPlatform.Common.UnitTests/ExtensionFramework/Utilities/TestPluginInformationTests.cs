@@ -40,9 +40,13 @@ public class TestPluginInformationTests
     }
 }
 
+#region Implementation
+
 public class TestableTestPluginInformation : TestPluginInformation
 {
     public TestableTestPluginInformation(Type testExtensionType) : base(testExtensionType)
     {
     }
 }
+
+#endregion

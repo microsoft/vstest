@@ -56,6 +56,9 @@ internal sealed class RunInfo : IXmlTestStore
         _timestamp = DateTime.UtcNow;
     }
 
+
+    #region IXmlTestStore Members
+
     /// <summary>
     /// Saves the class under the XmlElement..
     /// </summary>
@@ -72,4 +75,5 @@ internal sealed class RunInfo : IXmlTestStore
         helper.SaveSimpleField(element, "Exception", _exception, null);
     }
 
+    #endregion
 }

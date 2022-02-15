@@ -64,6 +64,8 @@ public class TestCaseTests
         Assert.AreEqual("foo", _testCase.LocalExtensionData);
     }
 
+    #region GetSetPropertyValue Tests
+
     [TestMethod]
     public void TestCaseGetPropertyValueForCodeFilePathShouldReturnCorrectValue()
     {
@@ -190,4 +192,5 @@ public class TestCaseTests
         Assert.AreEqual(testSource, _testCase.Source);
     }
 
+    #endregion
 }

@@ -18,6 +18,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 [TestClass]
 public class XmlRunSettingsUtilitiesTests
 {
+    #region Private Variables
+
     private readonly string _runSettingsXmlWithDataCollectors = @"<RunSettings>
 <RunConfiguration>
 </RunConfiguration>
@@ -79,6 +81,10 @@ public class XmlRunSettingsUtilitiesTests
 </RunSettings>";
 
     private readonly string _emptyRunSettings = "<RunSettings></RunSettings>";
+
+    #endregion
+
+    #region GetTestRunParameters tests
 
     [TestMethod]
     public void GetTestRunParametersReturnsEmptyDictionaryOnNullRunSettings()
@@ -279,6 +285,10 @@ public class XmlRunSettingsUtilitiesTests
         Assert.ThrowsException<SettingsException>(
             () => XmlRunSettingsUtilities.GetInProcDataCollectionRunSettings(settingsXml));
     }
+    #endregion
+
+    #region CreateDefaultRunSettings tests
+
     [TestMethod]
     public void CreateDefaultRunSettingsShouldReturnABasicRunSettings()
     {
@@ -293,6 +303,10 @@ public class XmlRunSettingsUtilitiesTests
 
         Assert.AreEqual(expectedRunSettings, defaultRunSettings);
     }
+
+    #endregion
+
+    #region IsDataCollectionEnabled tests
 
     [TestMethod]
     public void IsDataCollectionEnabledShouldReturnFalseIfRunSettingsIsNull()
@@ -319,6 +333,10 @@ public class XmlRunSettingsUtilitiesTests
         Assert.IsTrue(XmlRunSettingsUtilities.IsDataCollectionEnabled(_runSettingsXmlWithDataCollectors));
     }
 
+    #endregion
+
+    #region IsInProcDataCollectionEnabled tests.
+
     [TestMethod]
     public void IsInProcDataCollectionEnabledShouldReturnFalseIfRunSettingsIsNull()
     {
@@ -342,6 +360,10 @@ public class XmlRunSettingsUtilitiesTests
     {
         Assert.IsTrue(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(_runSettingsXmlWithDataCollectors)));
     }
+
+    #endregion
+
+    #region GetLoggerRunsettings tests
 
     [TestMethod]
     public void GetLoggerRunSettingsShouldReturnNullWhenSettingsIsnull()
@@ -1117,6 +1139,10 @@ public class XmlRunSettingsUtilitiesTests
             loggerRunSettings.LoggerSettingsList.First().Configuration.InnerXml);
     }
 
+    #endregion
+
+    #region GetDataCollectionRunSettings tests
+
     [TestMethod]
     public void GetDataCollectionRunSettingsShouldReturnNullIfSettingsIsNull()
     {
@@ -1146,6 +1172,8 @@ public class XmlRunSettingsUtilitiesTests
     {
         Assert.ThrowsException<SettingsException>(() => XmlRunSettingsUtilities.GetDataCollectionRunSettings(_runSettingsXmlWithIncorrectDataCollectorSettings));
     }
+
+    #endregion
 
     [TestMethod]
     public void GetDataCollectorsFriendlyNameShouldReturnListOfFriendlyName()

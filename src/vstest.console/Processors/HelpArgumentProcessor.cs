@@ -107,6 +107,9 @@ internal class HelpArgumentExecutor : IArgumentExecutor
     /// </summary>
     internal IOutput Output { get; set; }
 
+
+    #region IArgumentExecutor Members
+
     public void Initialize(string argument)
     {
     }
@@ -148,6 +151,7 @@ internal class HelpArgumentExecutor : IArgumentExecutor
         return ArgumentProcessorResult.Abort;
     }
 
+    #endregion
     /// <summary>
     /// Lookup the help description for the argument processor.
     /// </summary>

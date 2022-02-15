@@ -157,6 +157,9 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// </summary>
     private ConcurrentDictionary<Guid, MinimalTestResult> LeafTestResults { get; set; }
 
+
+    #region ITestLoggerWithParameters
+
     /// <summary>
     /// Initializes the Test Logger.
     /// </summary>
@@ -219,6 +222,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
         Initialize(events, String.Empty);
     }
+    #endregion
+
     /// <summary>
     /// Prints the timespan onto console.
     /// </summary>
