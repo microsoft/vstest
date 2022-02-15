@@ -12,9 +12,21 @@ jobs:
     displayName: 'Run script build.cmd'
     inputs:
       filename: build.cmd
-      arguments: '-verbose -configuration $(buildConfiguration) -steps "InstallDotnet, Restore, UpdateLocalization, Build, Publish"'
+      arguments: '-verbose -configuration $(buildConfiguration) -ci -steps "InstallDotnet, Restore, UpdateLocalization, Build, Publish"'
       modifyEnvironment: false
       failOnStandardError: true
+
+  - task: PowerShell@2
+    displayName: 'Disable Strong Name Validation'
+    inputs:
+      targetType: 'inline'
+      script: |
+        Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\.NETFramework" -Name "AllowStrongNameBypass" -Value 1 -Force
+        Set-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\Microsoft\.NETFramework" -Name "AllowStrongNameBypass" -Value 1 -Force
+        reg DELETE "HKLM\Software\Microsoft\StrongName\Verification" /f
+        reg DELETE "HKLM\Software\Wow6432Node\Microsoft\StrongName\Verification" /f
+        reg ADD "HKLM\Software\Microsoft\StrongName\Verification\*,*" /f
+        reg ADD "HKLM\Software\Wow6432Node\Microsoft\StrongName\Verification\*,*" /f
 
   - task: BatchScript@1
     displayName: 'Run Unit Tests'
@@ -63,7 +75,7 @@ jobs:
       # build should not be needed in the end, we are copying the build task from the build folder, but we should get
       # it either from artifacts, if present, or from extracted package file
       # Adding it at the moment to avoid this error: #[error]Copy-Item : Cannot find path 'D:\a\1\s\src\Microsoft.TestPlatform.Build\bin\Release\netstandard2.0' because it does  not exist.
-      arguments: '-verbose -configuration $(buildConfiguration) -steps "InstallDotnet, Restore, Build, PrepareAcceptanceTests"'
+      arguments: '-verbose -configuration $(buildConfiguration) -ci -steps "InstallDotnet, Restore, Build, PrepareAcceptanceTests"'
       modifyEnvironment: false
       failOnStandardError: true
 
