@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
 
 using System;
 using System.Collections.Generic;
@@ -23,18 +24,16 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
-
 internal class ArtifactProcessingManager : IArtifactProcessingManager
 {
     private const string RunsettingsFileName = "runsettings.xml";
     private const string ExecutionCompleteFileName = "executionComplete.json";
 
-    private readonly string _testSessionCorrelationId;
+    private readonly string? _testSessionCorrelationId;
     private readonly IFileHelper _fileHelper;
     private readonly ITestRunAttachmentsProcessingManager _testRunAttachmentsProcessingManager;
-    private readonly string _testSessionProcessArtifactFolder;
-    private readonly string _processArtifactFolder;
+    private readonly string? _testSessionProcessArtifactFolder;
+    private readonly string? _processArtifactFolder;
     private readonly IDataSerializer _dataSerialized;
     private readonly ITestRunAttachmentsProcessingEventsHandler _testRunAttachmentsProcessingEventsHandler;
     private readonly IFeatureFlag _featureFlag;
@@ -48,28 +47,29 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
             FeatureFlag.Instance)
     { }
 
-    public ArtifactProcessingManager(string testSessionCorrelationId,
-        IFileHelper fileHelper,
-        ITestRunAttachmentsProcessingManager testRunAttachmentsProcessingManager,
-        IDataSerializer dataSerialized,
-        ITestRunAttachmentsProcessingEventsHandler testRunAttachmentsProcessingEventsHandler,
-        IFeatureFlag featureFlag)
+    public ArtifactProcessingManager(string? testSessionCorrelationId,
+        IFileHelper fileHelper!!,
+        ITestRunAttachmentsProcessingManager testRunAttachmentsProcessingManager!!,
+        IDataSerializer dataSerialized!!,
+        ITestRunAttachmentsProcessingEventsHandler testRunAttachmentsProcessingEventsHandler!!,
+        IFeatureFlag featureFlag!!)
     {
-        // We don't validate for null, it's expected, we'll have testSessionCorrelationId only in case of .NET SDK run.
-        if (testSessionCorrelationId is not null)
-        {
-            _testSessionCorrelationId = testSessionCorrelationId;
-            _processArtifactFolder = Path.Combine(Path.GetTempPath(), _testSessionCorrelationId);
-            _testSessionProcessArtifactFolder = Path.Combine(_processArtifactFolder, $"{Process.GetCurrentProcess().Id}_{Guid.NewGuid()}");
-        }
         _fileHelper = fileHelper;
         _testRunAttachmentsProcessingManager = testRunAttachmentsProcessingManager;
         _dataSerialized = dataSerialized;
         _testRunAttachmentsProcessingEventsHandler = testRunAttachmentsProcessingEventsHandler;
         _featureFlag = featureFlag;
+
+        // We don't validate for null, it's expected, we'll have testSessionCorrelationId only in case of .NET SDK run.
+        if (testSessionCorrelationId is not null)
+        {
+            _testSessionCorrelationId = testSessionCorrelationId;
+            _processArtifactFolder = Path.Combine(_fileHelper.GetTempPath(), _testSessionCorrelationId);
+            _testSessionProcessArtifactFolder = Path.Combine(_processArtifactFolder, $"{Process.GetCurrentProcess().Id}_{Guid.NewGuid()}");
+        }
     }
 
-    public void CollectArtifacts(TestRunCompleteEventArgs testRunCompleteEventArgs, string runSettingsXml)
+    public void CollectArtifacts(TestRunCompleteEventArgs testRunCompleteEventArgs!!, string runSettingsXml!!)
     {
         if (!_featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING))
         {
@@ -158,14 +158,12 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
     {
         // We take the biggest runsettings in size, it should be the one with more configuration.
         // In future we can think to merge...but it's not easy for custom config, we could break something.
-        string runsettingsFile = testArtifacts
+        string? runsettingsFile = testArtifacts
             .SelectMany(x => x.Artifacts.Where(x => x.Type == ArtifactType.Runsettings))
-            .Select(x => new FileInfo(x.FileName))
-            .OrderByDescending(x => x.Length)
-            .FirstOrDefault()?
-            .FullName;
+            .OrderByDescending(x => _fileHelper.GetFileLength(x.FileName))
+            .FirstOrDefault()?.FileName;
 
-        string runsettingsXml = null;
+        string? runsettingsXml = null;
         if (runsettingsFile is not null)
         {
             using var artifactStream = _fileHelper.GetStream(runsettingsFile, FileMode.Open, FileAccess.Read);
@@ -189,11 +187,11 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
             string executionCompleteMessage = await streamReader.ReadToEndAsync();
             EqtTrace.Verbose($"ArtifactProcessingManager.MergeDataCollectorAttachments: ExecutionComplete message \n{executionCompleteMessage}");
             TestRunCompleteEventArgs eventArgs = _dataSerialized.DeserializePayload<TestRunCompleteEventArgs>(_dataSerialized.DeserializeMessage(executionCompleteMessage));
-            foreach (var invokedDataCollector in eventArgs?.InvokedDataCollectors)
+            foreach (var invokedDataCollector in eventArgs?.InvokedDataCollectors ?? Enumerable.Empty<InvokedDataCollector>())
             {
                 invokedDataCollectors.Add(invokedDataCollector);
             }
-            foreach (var attachmentSet in eventArgs?.AttachmentSets)
+            foreach (var attachmentSet in eventArgs?.AttachmentSets ?? Enumerable.Empty<AttachmentSet>())
             {
                 attachments.Add(attachmentSet);
             }
@@ -203,7 +201,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
             new RequestData()
             {
                 IsTelemetryOptedIn = IsTelemetryOptedIn(),
-                ProtocolConfig = ObjectModel.Constants.DefaultProtocolConfig
+                ProtocolConfig = Constants.DefaultProtocolConfig
             },
             attachments,
             invokedDataCollectors,
@@ -218,11 +216,11 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
         .Select(testSessionArtifact => new TestArtifacts(testSessionArtifact.Key, testSessionArtifact.Select(x => ParseArtifact(x.Artifact)).Where(x => x is not null).ToArray()))
         .ToArray();
 
-    private static Artifact ParseArtifact(string fileName) =>
+    private static Artifact? ParseArtifact(string fileName!!) =>
         Path.GetFileName(fileName) switch
         {
-            RunsettingsFileName => new Artifact(fileName, ArtifactType.ExecutionComplete),
-            ExecutionCompleteFileName => new Artifact(fileName, ArtifactType.Runsettings),
+            RunsettingsFileName => new Artifact(fileName, ArtifactType.Runsettings),
+            ExecutionCompleteFileName => new Artifact(fileName, ArtifactType.ExecutionComplete),
             _ => null
         };
 

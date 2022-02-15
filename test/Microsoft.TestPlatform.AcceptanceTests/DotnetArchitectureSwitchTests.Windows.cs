@@ -3,6 +3,8 @@
 
 #if !NET451
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 using TestUtilities;
@@ -50,6 +52,8 @@ public class DotnetArchitectureSwitchTestsWindowsOnly : AcceptanceTestBase
 @"
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+
+#nullable disable
 
 namespace cfebbc5339cf4c22854e79824e938c74;
 

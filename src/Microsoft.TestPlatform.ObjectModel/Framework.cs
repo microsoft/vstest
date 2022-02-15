@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 #if !NETSTANDARD1_0
@@ -21,13 +23,11 @@ public class Framework
     /// <summary>
     /// Default .Net target framework.
     /// </summary>
-    public static Framework DefaultFramework { get; } =
+    public static Framework DefaultFramework { get; }
 #if NETFRAMEWORK
-        Framework.FromString(".NETFramework,Version=v4.0");
-#elif NETSTANDARD1_0
-        null;
-#else
-        Framework.FromString(".NETCoreApp,Version=v1.0");
+        = Framework.FromString(".NETFramework,Version=v4.0");
+#elif !NETSTANDARD1_0
+        = Framework.FromString(".NETCoreApp,Version=v1.0");
 #endif
 
     /// <summary>

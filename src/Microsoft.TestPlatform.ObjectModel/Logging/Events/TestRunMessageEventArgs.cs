@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 using System;
@@ -28,7 +30,7 @@ public class TestRunMessageEventArgs : EventArgs
             throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, nameof(message));
         }
 
-        if (level < TestMessageLevel.Informational || level > TestMessageLevel.Error)
+        if (level is < TestMessageLevel.Informational or > TestMessageLevel.Error)
         {
             throw new ArgumentOutOfRangeException(nameof(level));
         }

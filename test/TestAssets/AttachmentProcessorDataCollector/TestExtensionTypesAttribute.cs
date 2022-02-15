@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform
         public Type ExtensionImplementation { get; }
         public int Version { get; }
 
-        public TestExtensionTypesV2Attribute(string extensionType, string extensionIdentifier, Type extensionImplementation, int version, string unused = null)
+        public TestExtensionTypesV2Attribute(string extensionType, string extensionIdentifier, Type extensionImplementation, int version, string _ = null)
         {
             ExtensionType = extensionType;
             ExtensionIdentifier = extensionIdentifier;

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
@@ -37,7 +39,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         var sources = new List<string>
@@ -61,7 +63,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithFastFilter(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         var sources = new List<string>

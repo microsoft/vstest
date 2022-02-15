@@ -1,19 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Xml;
+#nullable disable
 
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 public class XmlRunSettingsUtilitiesTests

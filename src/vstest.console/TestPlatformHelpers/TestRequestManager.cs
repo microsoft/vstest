@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 
 using System;
@@ -692,7 +694,7 @@ internal class TestRequestManager : ITestRequestManager
                 registrar);
             settingsUpdated |= UpdateDesignMode(document, runConfiguration);
             settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
-            settingsUpdated |= UpdateTargetDevice(navigator, document, runConfiguration);
+            settingsUpdated |= UpdateTargetDevice(navigator, document);
             settingsUpdated |= AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
 
             updatedRunSettingsXml = navigator.OuterXml;
@@ -752,8 +754,7 @@ internal class TestRequestManager : ITestRequestManager
 
     private bool UpdateTargetDevice(
         XPathNavigator navigator,
-        XmlDocument document,
-        RunConfiguration runConfiguration)
+        XmlDocument document)
     {
         bool updateRequired = InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml);
         if (updateRequired)

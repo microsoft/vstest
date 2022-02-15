@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 using System;
@@ -274,7 +276,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
         }
         else
         {
-            filename = _environment.OperatingSystem == PlatformOperatingSystem.Unix || _environment.OperatingSystem == PlatformOperatingSystem.OSX
+            filename = _environment.OperatingSystem is PlatformOperatingSystem.Unix or PlatformOperatingSystem.OSX
                 ? Constants.ProcdumpUnixProcess
                 : throw new NotSupportedException($"Not supported platform {_environment.OperatingSystem}");
         }

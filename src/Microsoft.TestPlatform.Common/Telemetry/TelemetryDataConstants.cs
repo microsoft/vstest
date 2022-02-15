@@ -1,11 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
 /// <summary>
 /// The Telemetry data constants.
 /// </summary>
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Non-constant fields should not be visible", Justification = "Part of the public API.")]
 public static class TelemetryDataConstants
 {
     // ******************** Execution ***********************

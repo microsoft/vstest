@@ -3,6 +3,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using System;
@@ -99,9 +101,9 @@ public class JobQueue<T> : IDisposable
     /// <param name="maxQueueSize">The max Queue Size.</param>
     /// <param name="enableBounds">The enable Bounds.</param>
     /// <param name="exceptionLogger">The exception Logger.</param>
-    public JobQueue(Action<T> processJob, string displayName, int maxQueueLength, int maxQueueSize, bool enableBounds, Action<string> exceptionLogger)
+    public JobQueue(Action<T> processJob!!, string displayName, int maxQueueLength, int maxQueueSize, bool enableBounds, Action<string> exceptionLogger)
     {
-        _processJob = processJob ?? throw new ArgumentNullException(nameof(processJob));
+        _processJob = processJob;
 
         if (string.IsNullOrWhiteSpace(displayName))
         {

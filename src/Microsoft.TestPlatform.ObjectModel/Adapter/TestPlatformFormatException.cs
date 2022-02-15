@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 using System;
@@ -87,13 +89,8 @@ public class TestPlatformFormatException : Exception
     /// </summary>
     /// <param name="info">Serialization info to add to</param>
     /// <param name="context">not used</param>
-    public override void GetObjectData(SerializationInfo info, StreamingContext context)
+    public override void GetObjectData(SerializationInfo info!!, StreamingContext context)
     {
-        if (info == null)
-        {
-            throw new ArgumentNullException(nameof(info));
-        }
-
         base.GetObjectData(info, context);
         info.AddValue("FilterValue", FilterValue);
     }

@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 using System.Globalization;
 using System.Text;
@@ -153,11 +155,11 @@ internal sealed class WorkItemCollection : EqtBaseCollection<WorkItem>
         StringBuilder returnString = new();
         if (Count > 0)
         {
-            returnString.Append(",");
+            returnString.Append(',');
             foreach (WorkItem item in this)
             {
                 returnString.Append(item);
-                returnString.Append(",");
+                returnString.Append(',');
             }
         }
 

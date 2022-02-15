@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 using System;
@@ -182,13 +184,8 @@ internal class CollectorDataEntry : IXmlTestStore
     /// Adds a data attachment to the list of data attachments
     /// </summary>
     /// <param name="attachment">The attachment to add</param>
-    internal void AddAttachment(IDataAttachment attachment)
+    internal void AddAttachment(IDataAttachment attachment!!)
     {
-        if (attachment == null)
-        {
-            throw new ArgumentNullException(nameof(attachment));
-        }
-
         _attachments.Add(attachment);
     }
 

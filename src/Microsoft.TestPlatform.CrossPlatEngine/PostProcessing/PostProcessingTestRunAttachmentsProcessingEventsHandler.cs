@@ -1,6 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
 
 using CommandLineResources = Resources.Resources;
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests;
 
 using System;
@@ -11,7 +13,7 @@ using VisualStudio.TestTools.UnitTesting;
 [TestClass]
 public class InactivityTimerTests
 {
-    private int _callBackCount = 0;
+    private int _callBackCount;
     private readonly ManualResetEventSlim _timerEvent = new();
 
     [TestMethod]

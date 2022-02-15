@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 using System;
@@ -36,7 +38,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// <summary>
     /// Keeps track if we are disposed.
     /// </summary>
-    private bool _isDisposed = false;
+    private bool _isDisposed;
 
     /// <summary>
     /// Used to keep track of which loggers have been initialized.

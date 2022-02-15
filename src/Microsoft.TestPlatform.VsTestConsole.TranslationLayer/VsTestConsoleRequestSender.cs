@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
 using System;
@@ -42,7 +44,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
     private readonly ManualResetEvent _handShakeComplete = new(false);
 
-    private bool _handShakeSuccessful = false;
+    private bool _handShakeSuccessful;
 
     private int _protocolVersion = 5;
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 using System;
@@ -15,8 +17,8 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 /// <summary>
 /// The blame logger.
 /// </summary>
-[FriendlyName(BlameLogger.FriendlyName)]
-[ExtensionUri(BlameLogger.ExtensionUri)]
+[FriendlyName(FriendlyName)]
+[ExtensionUri(ExtensionUri)]
 public class BlameLogger : ITestLogger
 {
     #region Constants
@@ -74,13 +76,8 @@ public class BlameLogger : ITestLogger
     /// </summary>
     /// <param name="events">Events that can be registered for.</param>
     /// <param name="testRunDictionary">Test Run Directory</param>
-    public void Initialize(TestLoggerEvents events, string testRunDictionary)
+    public void Initialize(TestLoggerEvents events!!, string testRunDictionary)
     {
-        if (events == null)
-        {
-            throw new ArgumentNullException(nameof(events));
-        }
-
         events.TestRunComplete += TestRunCompleteHandler;
     }
 
@@ -89,13 +86,8 @@ public class BlameLogger : ITestLogger
     /// </summary>
     /// <param name="sender">Sender</param>
     /// <param name="e">TestRunCompleteEventArgs</param>
-    private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
+    private void TestRunCompleteHandler(object sender!!, TestRunCompleteEventArgs e)
     {
-        if (sender == null)
-        {
-            throw new ArgumentNullException(nameof(sender));
-        }
-
         ValidateArg.NotNull<object>(sender, nameof(sender));
         ValidateArg.NotNull<TestRunCompleteEventArgs>(e, nameof(e));
 

@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 using System;
@@ -319,7 +321,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
                     else
                     {
                         var flag = Environment.GetEnvironmentVariable("VSTEST_DISABLE_PROTOCOL_3_VERSION_DOWNGRADE");
-                        var flagIsEnabled = flag != null && flag != "0";
+                        var flagIsEnabled = flag is not null and not "0";
                         var dowgradeIsDisabled = flagIsEnabled;
                         _protocolVersion = dowgradeIsDisabled ? negotiatedVersion : 2;
                     }

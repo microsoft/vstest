@@ -4,6 +4,8 @@
 
 #if NETFRAMEWORK
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;
@@ -20,7 +22,7 @@ internal class RegistryFreeActivationContext : IDisposable
 
     private IntPtr _hActCtx = IntPtr.Zero;
 
-    private bool _disposed = false;
+    private bool _disposed;
 
     private readonly string _manifestFilePath = string.Empty;
 
