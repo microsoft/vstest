@@ -22,6 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     /// --ListTests
     /// --Parallel
     /// --TestAdapterPath
+    /// --TestAdapterLoadingStrategy
     ///
     /// Diagnose/Report
     /// --Diag
@@ -33,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     /// --Port
     ///
     /// Help
-    /// -–Help
+    /// -ï¿½Help
     /// </summary>
     internal enum HelpContentPriority
     {
@@ -96,6 +97,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// TestAdapterPathArgumentProcessor Help
         /// </summary>
         TestAdapterPathArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// TestAdapterLoadingStrategyArgumentProcessor Help
+        /// </summary>
+        TestAdapterLoadingStrategyArgumentProcessorHelpPriority,
 
         /// <summary>
         /// EnableDiagArgumentProcessor Help

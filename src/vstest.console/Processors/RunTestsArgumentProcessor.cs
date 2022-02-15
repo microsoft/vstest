@@ -257,7 +257,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     var testsFoundInAnySource = (e.TestRunStatistics == null) ? false : (e.TestRunStatistics.ExecutedTests > 0);
 
                     // Indicate the user to use test adapter path command if there are no tests found
-                    if (!testsFoundInAnySource && string.IsNullOrEmpty(CommandLineOptions.Instance.TestAdapterPath) && this.commandLineOptions.TestCaseFilterValue == null)
+                    if (!testsFoundInAnySource && !CommandLineOptions.Instance.TestAdapterPathsSet && this.commandLineOptions.TestCaseFilterValue == null)
                     {
                         this.output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
                     }

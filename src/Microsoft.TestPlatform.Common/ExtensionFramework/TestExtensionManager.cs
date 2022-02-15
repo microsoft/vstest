@@ -126,7 +126,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </summary>
         /// <param name="extensionUri">The URI of the test extension to be looked up.</param>
         /// <returns>The test extension or null if one was not found.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1057:StringUriOverloadsCallSystemUriOverloads", Justification = "Case insensitiveness needs to be supported.")]
         public LazyExtension<TExtension, TMetadata> TryGetTestExtension(string extensionUri)
         {
             ValidateArg.NotNull<string>(extensionUri, nameof(extensionUri));
