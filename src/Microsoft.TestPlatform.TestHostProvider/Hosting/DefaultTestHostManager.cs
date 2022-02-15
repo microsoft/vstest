@@ -192,33 +192,17 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             testHostProcessName += targetFrameworkSuffix;
         }
 
-        // If the incoming architecture is default or anyCPU we use the architecture of the currently running process, so when user
-        // starts vstest.console by running x86 dotnet test, we will attempt to run tests as x86 unless they forced other preference
-        //
-        // TODO: Add a general converter from PlatformArchitecture to Architecture and vice versa. We do the translation in multiple places.
-        // Here I am just avoiding it because I don't want to mix those two issues.
-        Architecture processArchitectureAsArchitecture;
-        switch (processArchitecture)
+        var processArchitectureAsArchitecture = processArchitecture switch
         {
-            case PlatformArchitecture.X86:
-                processArchitectureAsArchitecture = Architecture.X86;
-                break;
-            case PlatformArchitecture.X64:
-                processArchitectureAsArchitecture = Architecture.X64;
-                break;
-            case PlatformArchitecture.ARM:
-                processArchitectureAsArchitecture = Architecture.ARM;
-                break;
-            case PlatformArchitecture.ARM64:
-                processArchitectureAsArchitecture = Architecture.ARM64;
-                break;
-            case PlatformArchitecture.S390x:
-                processArchitectureAsArchitecture = Architecture.S390x;
-                break;
-            default:
-                throw new NotSupportedException();
+            PlatformArchitecture.X86 => Architecture.X86,
+            PlatformArchitecture.X64 => Architecture.X64,
+            PlatformArchitecture.ARM => Architecture.ARM,
+            PlatformArchitecture.ARM64 => Architecture.ARM64,
+            PlatformArchitecture.S390x => Architecture.S390x,
+            _ => throw new NotSupportedException(),
         };
-        var actualArchitecture = architecture == Architecture.Default || architecture == Architecture.AnyCPU
+
+        var actualArchitecture = architecture is Architecture.Default or Architecture.AnyCPU
             ? processArchitectureAsArchitecture
             : architecture;
 
