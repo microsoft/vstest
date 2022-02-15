@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
 
 using System;
@@ -262,7 +264,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             && !IsWinOnArm())
         {
             // testhost.exe is 64-bit and has no suffix other versions have architecture suffix.
-            var exeName = _architecture == Architecture.X64 || _architecture == Architecture.Default || _architecture == Architecture.AnyCPU
+            var exeName = _architecture is Architecture.X64 or Architecture.Default or Architecture.AnyCPU
                 ? "testhost.exe"
                 : $"testhost.{_architecture.ToString().ToLowerInvariant()}.exe";
 
@@ -283,7 +285,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 {
                     // testhost.dll is present in path {testHostNugetRoot}\lib\netcoreapp2.1\testhost.dll
                     // testhost.(x86).exe is present in location {testHostNugetRoot}\build\netcoreapp2.1\{x86/x64}\{testhost.x86.exe/testhost.exe}
-                    var folderName = _architecture == Architecture.X64 || _architecture == Architecture.Default || _architecture == Architecture.AnyCPU
+                    var folderName = _architecture is Architecture.X64 or Architecture.Default or Architecture.AnyCPU
                         ? Architecture.X64.ToString().ToLowerInvariant()
                         : _architecture.ToString().ToLowerInvariant();
 

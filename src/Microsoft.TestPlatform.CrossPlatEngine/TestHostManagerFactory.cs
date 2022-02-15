@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
 using Discovery;
@@ -26,9 +28,9 @@ public class TestHostManagerFactory : ITestHostManagerFactory
     /// <param name="requestData">
     /// Provide common services and data for a discovery/run request.
     /// </param>
-    public TestHostManagerFactory(IRequestData requestData)
+    public TestHostManagerFactory(IRequestData requestData!!)
     {
-        _requestData = requestData ?? throw new System.ArgumentNullException(nameof(requestData));
+        _requestData = requestData;
     }
 
     /// <summary>

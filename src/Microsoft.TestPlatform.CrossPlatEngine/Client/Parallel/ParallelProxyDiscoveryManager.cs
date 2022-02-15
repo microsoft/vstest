@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 using System;
@@ -25,7 +27,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
 
     #region DiscoverySpecificData
 
-    private int _discoveryCompletedClients = 0;
+    private int _discoveryCompletedClients;
     private int _availableTestSources = -1;
 
     private DiscoveryCriteria _actualDiscoveryCriteria;
@@ -39,7 +41,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     private readonly IRequestData _requestData;
 
     // This field indicates if abort was requested by testplatform (user)
-    private bool _discoveryAbortRequested = false;
+    private bool _discoveryAbortRequested;
 
     #endregion
 

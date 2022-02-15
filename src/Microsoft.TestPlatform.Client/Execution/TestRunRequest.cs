@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Client.Execution;
 
 using System;
@@ -189,10 +191,9 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
             throw new ObjectDisposedException("testRunRequest");
         }
 
-        if (State != TestRunState.InProgress
-            && !(State == TestRunState.Completed
-                 || State == TestRunState.Canceled
-                 || State == TestRunState.Aborted))
+        if (State
+            is not TestRunState.InProgress
+            and not (TestRunState.Completed or TestRunState.Canceled or TestRunState.Aborted))
         {
             // If run is already terminated, then we should not throw an exception.
             throw new InvalidOperationException(ClientResources.WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive);
@@ -352,13 +353,8 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     /// <summary>
     /// Invoked when test run is complete
     /// </summary>
-    public void HandleTestRunComplete(TestRunCompleteEventArgs runCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
+    public void HandleTestRunComplete(TestRunCompleteEventArgs runCompleteArgs!!, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
     {
-        if (runCompleteArgs == null)
-        {
-            throw new ArgumentNullException(nameof(runCompleteArgs));
-        }
-
         bool isAborted = runCompleteArgs.IsAborted;
         bool isCanceled = runCompleteArgs.IsCanceled;
 

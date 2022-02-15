@@ -1,6 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using ObjectModel;
@@ -701,12 +705,13 @@ public class InferRunSettingsHelper
     /// </summary>
     private static bool IsPlatformIncompatible(Architecture sourcePlatform, Architecture targetPlatform)
     {
-        if (sourcePlatform == Architecture.Default ||
-            sourcePlatform == Architecture.AnyCPU)
+        if (sourcePlatform is Architecture.Default or Architecture.AnyCPU)
         {
             return false;
         }
+
         return targetPlatform == Architecture.X64 && !Is64BitOperatingSystem() || sourcePlatform != targetPlatform;
+
         static bool Is64BitOperatingSystem()
         {
 #if !NETSTANDARD1_3

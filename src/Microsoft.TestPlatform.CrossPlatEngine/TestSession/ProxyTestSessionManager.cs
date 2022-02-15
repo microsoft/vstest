@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
 using System;
@@ -32,7 +34,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
 
     private readonly object _lockObject = new();
     private readonly object _proxyOperationLockObject = new();
-    private volatile bool _proxySetupFailed = false;
+    private volatile bool _proxySetupFailed;
     private readonly StartTestSessionCriteria _testSessionCriteria;
     private readonly int _testhostCount;
     private TestSessionInfo _testSessionInfo;

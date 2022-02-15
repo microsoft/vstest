@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
 using System;
@@ -249,7 +251,7 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
 
                     // magic number.32bit or 64bit assembly.
                     var magic = reader.ReadUInt16();
-                    if (magic != 0x010B && magic != 0x020B)
+                    if (magic is not 0x010B and not 0x020B)
                     {
                         validImage = false;
                     }

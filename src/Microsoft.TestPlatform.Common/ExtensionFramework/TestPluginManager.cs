@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 using System;
@@ -55,13 +57,8 @@ internal class TestPluginManager
     /// <typeparam name="T">Return type of the test extension</typeparam>
     /// <param name="extensionType">Data type of the extension to be instantiated</param>
     /// <returns>Test extension instance</returns>
-    public static T CreateTestExtension<T>(Type extensionType)
+    public static T CreateTestExtension<T>(Type extensionType!!)
     {
-        if (extensionType == null)
-        {
-            throw new ArgumentNullException(nameof(extensionType));
-        }
-
         EqtTrace.Info("TestPluginManager.CreateTestExtension: Attempting to load test extension: " + extensionType);
 
         try

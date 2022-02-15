@@ -3,10 +3,12 @@
 
 #if !NETSTANDARD1_0
 
-using System;
-using System.Collections.Generic;
+#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
+
+using System;
+using System.Collections.Generic;
 
 internal partial class FeatureFlag : IFeatureFlag
 {

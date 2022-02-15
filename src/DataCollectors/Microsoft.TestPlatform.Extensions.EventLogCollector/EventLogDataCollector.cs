@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
 
 using System;
@@ -305,6 +307,8 @@ public class EventLogDataCollector : DataCollector
     /// <param name="disposing">Not used since this class does not have a finalizer.</param>
     protected override void Dispose(bool disposing)
     {
+        base.Dispose(disposing);
+
         // Unregister events
         _events.SessionStart -= _sessionStartEventHandler;
         _events.SessionEnd -= _sessionEndEventHandler;

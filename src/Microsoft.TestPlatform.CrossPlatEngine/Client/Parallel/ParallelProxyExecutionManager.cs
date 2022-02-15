@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 using System;
@@ -32,10 +34,10 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
     #region TestRunSpecificData
 
     // This variable id to differentiate between implicit (abort requested by testPlatform) and explicit (test host aborted) abort.
-    private bool _abortRequested = false;
+    private bool _abortRequested;
 
-    private int _runCompletedClients = 0;
-    private int _runStartedClients = 0;
+    private int _runCompletedClients;
+    private int _runStartedClients;
     private int _availableTestSources = -1;
 
     private TestRunCriteria _actualTestRunCriteria;
@@ -44,7 +46,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
 
     private IEnumerator _testCaseListEnumerator;
 
-    private bool _hasSpecificTestsRun = false;
+    private bool _hasSpecificTestsRun;
 
     private ITestRunEventsHandler _currentRunEventsHandler;
 
@@ -54,7 +56,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
     private bool _skipDefaultAdapters;
 
     /// <inheritdoc/>
-    public bool IsInitialized { get; private set; } = false;
+    public bool IsInitialized { get; private set; }
 
     #endregion
 

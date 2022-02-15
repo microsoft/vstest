@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using Utilities;
@@ -435,7 +437,7 @@ public class RunConfiguration : TestRunSettings
     /// <summary>
     /// Collect source information
     /// </summary>
-    public bool CollectSourceInformationSet { get; private set; } = false;
+    public bool CollectSourceInformationSet { get; private set; }
 
     /// <summary>
     /// Default filter to use to filter tests

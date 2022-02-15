@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -309,18 +311,8 @@ internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
     /// <param name="runSettingDocument"> XPathNavigable representation of a runsettings file </param>
     /// <param name="dataCollectorFriendlyName"> The data Collector friendly name. </param>
     /// <returns> True if there is a datacollector configured. </returns>
-    private static bool ContainsDataCollectorWithFriendlyName(IXPathNavigable runSettingDocument, string dataCollectorFriendlyName)
+    private static bool ContainsDataCollectorWithFriendlyName(IXPathNavigable runSettingDocument!!, string dataCollectorFriendlyName!!)
     {
-        if (runSettingDocument == null)
-        {
-            throw new ArgumentNullException(nameof(runSettingDocument));
-        }
-
-        if (dataCollectorFriendlyName == null)
-        {
-            throw new ArgumentNullException(nameof(dataCollectorFriendlyName));
-        }
-
         var navigator = runSettingDocument.CreateNavigator();
         var nodes = navigator.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
 

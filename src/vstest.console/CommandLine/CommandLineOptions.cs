@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
 using System;
@@ -79,7 +81,7 @@ internal class CommandLineOptions
     /// <summary>
     /// Default constructor.
     /// </summary>
-    protected CommandLineOptions()
+    internal CommandLineOptions()
     {
         BatchSize = DefaultBatchSize;
         TestStatsEventTimeout = _defaultRetrievalTimeout;
@@ -123,7 +125,7 @@ internal class CommandLineOptions
     /// <summary>
     /// Specifies whether the Fakes automatic configuration should be disabled.
     /// </summary>
-    public bool DisableAutoFakes { get; set; } = false;
+    public bool DisableAutoFakes { get; set; }
 
     /// <summary>
     /// Specifies whether vsixExtensions is enabled or not.

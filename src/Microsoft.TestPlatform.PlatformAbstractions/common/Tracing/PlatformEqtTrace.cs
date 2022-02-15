@@ -3,6 +3,8 @@
 
 #if NETFRAMEWORK || NETCOREAPP || NETSTANDARD2_0
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;
@@ -87,14 +89,14 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     /// <summary>
     /// Specifies whether the trace is initialized or not
     /// </summary>
-    private static bool s_isInitialized = false;
+    private static bool s_isInitialized;
 
     /// <summary>
     /// Lock over initialization
     /// </summary>
     private static readonly object IsInitializationLock = new();
 
-    private static int s_traceFileSize = 0;
+    private static int s_traceFileSize;
     private static readonly int DefaultTraceFileSize = 10240; // 10Mb.
 
     public static string LogFile

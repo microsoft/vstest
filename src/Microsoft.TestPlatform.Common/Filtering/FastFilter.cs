@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 
 using System;
@@ -128,10 +130,10 @@ internal sealed class FastFilter
 
     internal sealed class Builder
     {
-        private bool _operatorEncountered = false;
+        private bool _operatorEncountered;
         private Operator _fastFilterOperator = Operator.None;
 
-        private bool _conditionEncountered = false;
+        private bool _conditionEncountered;
         private Operation _fastFilterOperation;
         private readonly ImmutableDictionary<string, ImmutableHashSet<string>.Builder>.Builder _filterDictionaryBuilder = ImmutableDictionary.CreateBuilder<string, ImmutableHashSet<string>.Builder>(StringComparer.OrdinalIgnoreCase);
 
@@ -189,7 +191,7 @@ internal sealed class FastFilter
                 AddProperty(condition.Name, condition.Value);
 
                 // Don't support `Contains`.
-                if (_fastFilterOperation != Operation.Equal && _fastFilterOperation != Operation.NotEqual)
+                if (_fastFilterOperation is not Operation.Equal and not Operation.NotEqual)
                 {
                     _containsValidFilter = false;
                 }

@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace TestPlatform.CoreUtilities.UnitTests;
 
 #if NETFRAMEWORK
@@ -14,8 +16,8 @@ using System;
 [TestClass]
 public class EqtTraceTests
 {
-    private static string s_dirPath = null;
-    private static string s_logFile = null;
+    private static string s_dirPath;
+    private static string s_logFile;
 
     [ClassInitialize]
     public static void Init(TestContext testContext)

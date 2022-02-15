@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using System;
@@ -37,13 +39,8 @@ public static class MulticastDelegateUtilities
     /// <param name="sender">Sender to use when raising the event.</param>
     /// <param name="args">Arguments to provide.</param>
     /// <param name="traceDisplayName">Name to use when tracing out errors.</param>
-    public static void SafeInvoke(this Delegate delegates, object sender, object args, string traceDisplayName)
+    public static void SafeInvoke(this Delegate delegates, object sender, object args!!, string traceDisplayName)
     {
-        if (args == null)
-        {
-            throw new ArgumentNullException(nameof(args));
-        }
-
         if (string.IsNullOrWhiteSpace(traceDisplayName))
         {
             throw new ArgumentNullException(nameof(traceDisplayName));

@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;
@@ -245,26 +247,18 @@ public sealed class TestCase : TestObject
     {
         ValidateArg.NotNull(property, nameof(property));
 
-        switch (property.Id)
+        return property.Id switch
         {
-            case "TestCase.CodeFilePath":
-                return CodeFilePath;
-            case "TestCase.DisplayName":
-                return DisplayName;
-            case "TestCase.ExecutorUri":
-                return ExecutorUri;
-            case "TestCase.FullyQualifiedName":
-                return FullyQualifiedName;
-            case "TestCase.Id":
-                return Id;
-            case "TestCase.LineNumber":
-                return LineNumber;
-            case "TestCase.Source":
-                return Source;
-        }
-
-        // It is a custom test case property. Should be retrieved from the TestObject store.
-        return base.ProtectedGetPropertyValue(property, defaultValue);
+            "TestCase.CodeFilePath" => CodeFilePath,
+            "TestCase.DisplayName" => DisplayName,
+            "TestCase.ExecutorUri" => ExecutorUri,
+            "TestCase.FullyQualifiedName" => FullyQualifiedName,
+            "TestCase.Id" => Id,
+            "TestCase.LineNumber" => LineNumber,
+            "TestCase.Source" => Source,
+            // It is a custom test case property. Should be retrieved from the TestObject store.
+            _ => base.ProtectedGetPropertyValue(property, defaultValue),
+        };
     }
 
     /// <summary>
@@ -398,7 +392,7 @@ public static class TestCaseProperties
     {
         try
         {
-            new Guid(value.ToString());
+            _ = new Guid(value.ToString());
             return true;
         }
         catch (ArgumentNullException)

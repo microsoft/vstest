@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;
@@ -23,9 +25,9 @@ public sealed class TestResult : TestObject
     /// Initializes a new instance of the <see cref="TestResult"/> class.
     /// </summary>
     /// <param name="testCase">The test case the result is for.</param>
-    public TestResult(TestCase testCase)
+    public TestResult(TestCase testCase!!)
     {
-        TestCase = testCase ?? throw new ArgumentNullException(nameof(testCase));
+        TestCase = testCase;
         Messages = new Collection<TestResultMessage>();
         Attachments = new Collection<AttachmentSet>();
 
@@ -357,6 +359,6 @@ public static class TestResultProperties
 
     private static bool ValidateOutcome(object value)
     {
-        return (TestOutcome)value <= TestOutcome.NotFound && (TestOutcome)value >= TestOutcome.None;
+        return (TestOutcome)value is <= TestOutcome.NotFound and >= TestOutcome.None;
     }
 }

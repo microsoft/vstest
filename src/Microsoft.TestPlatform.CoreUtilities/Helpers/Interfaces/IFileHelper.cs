@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using System;
@@ -155,4 +157,16 @@ public interface IFileHelper
     /// </summary>
     /// <param name="path"></param>
     void Delete(string path);
+
+    /// <summary>
+    /// Get temporary file path
+    /// </summary>
+    /// <param name="path"></param>
+    public string GetTempPath();
+
+    /// <summary>
+    /// Get file length
+    /// </summary>
+    /// <param name="path"></param>
+    public long GetFileLength(string path);
 }

@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Client;
 
 using System;
@@ -82,13 +84,9 @@ internal class TestPlatform : ITestPlatform
     /// <inheritdoc/>
     public IDiscoveryRequest CreateDiscoveryRequest(
         IRequestData requestData,
-        DiscoveryCriteria discoveryCriteria,
+        DiscoveryCriteria discoveryCriteria!!,
         TestPlatformOptions options)
     {
-        if (discoveryCriteria == null)
-        {
-            throw new ArgumentNullException(nameof(discoveryCriteria));
-        }
 
         // Update cache with Extension folder's files.
         AddExtensionAssemblies(discoveryCriteria.RunSettings);
@@ -118,14 +116,9 @@ internal class TestPlatform : ITestPlatform
     /// <inheritdoc/>
     public ITestRunRequest CreateTestRunRequest(
         IRequestData requestData,
-        TestRunCriteria testRunCriteria,
+        TestRunCriteria testRunCriteria!!,
         TestPlatformOptions options)
     {
-        if (testRunCriteria == null)
-        {
-            throw new ArgumentNullException(nameof(testRunCriteria));
-        }
-
         AddExtensionAssemblies(testRunCriteria.TestRunSettings);
 
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
@@ -160,14 +153,9 @@ internal class TestPlatform : ITestPlatform
     /// <inheritdoc/>
     public bool StartTestSession(
         IRequestData requestData,
-        StartTestSessionCriteria testSessionCriteria,
+        StartTestSessionCriteria testSessionCriteria!!,
         ITestSessionEventsHandler eventsHandler)
     {
-        if (testSessionCriteria == null)
-        {
-            throw new ArgumentNullException(nameof(testSessionCriteria));
-        }
-
         AddExtensionAssemblies(testSessionCriteria.RunSettings);
 
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testSessionCriteria.RunSettings);

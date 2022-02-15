@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 using System;
@@ -37,7 +39,7 @@ internal class WindowsHangDumper : IHangDumper
     public void Dump(int processId, string outputDirectory, DumpTypeOption type)
     {
         var process = Process.GetProcessById(processId);
-        var processTree = process.GetProcessTree().Where(p => p.Process.ProcessName != "conhost" && p.Process.ProcessName != "WerFault").ToList();
+        var processTree = process.GetProcessTree().Where(p => p.Process.ProcessName is not "conhost" and not "WerFault").ToList();
 
         if (processTree.Count > 1)
         {

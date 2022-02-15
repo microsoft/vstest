@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -17,7 +19,7 @@ public class MultitargetingTestHostTests : AcceptanceTestBase
     [NetFrameworkRunner(NETFX452_48)]
     public void RunningTestWithAFailingDebugAssertDoesNotCrashTheHostingProcess(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         var assemblyPath = BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll").Trim('\"');
