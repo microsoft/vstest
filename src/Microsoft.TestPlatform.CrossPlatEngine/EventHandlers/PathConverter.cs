@@ -26,8 +26,11 @@ internal class PathConverter : IPathConverter
         _deploymentPath = fileHelper.GetFullPath(deploymentPath).TrimEnd('\\').TrimEnd('/') + Path.DirectorySeparatorChar;
     }
 
-    public string UpdatePath(string path, PathConversionDirection updateDirection)
+    public string? UpdatePath(string? path, PathConversionDirection updateDirection)
     {
+        if (path == null)
+            return path;
+
         string find;
         string replaceWith;
         if (updateDirection == PathConversionDirection.Receive)
@@ -82,23 +85,23 @@ internal class PathConverter : IPathConverter
 
     public Collection<AttachmentSet> UpdateAttachmentSets(Collection<AttachmentSet> attachmentSets, PathConversionDirection updateDirection)
     {
-        attachmentSets.Select(i => UpdateAttachmentSet(i, updateDirection)).ToList();
+        attachmentSets.ToList().ForEach(i => UpdateAttachmentSet(i, updateDirection));
         return attachmentSets;
     }
 
     public ICollection<AttachmentSet> UpdateAttachmentSets(ICollection<AttachmentSet> attachmentSets, PathConversionDirection updateDirection)
     {
-        attachmentSets.Select(i => UpdateAttachmentSet(i, updateDirection)).ToList();
+        attachmentSets.ToList().ForEach(i => UpdateAttachmentSet(i, updateDirection));
         return attachmentSets;
     }
 
     private AttachmentSet UpdateAttachmentSet(AttachmentSet attachmentSet, PathConversionDirection updateDirection)
     {
-        attachmentSet.Attachments.Select(a => UpdateAttachment(a, updateDirection)).ToList();
+        attachmentSet.Attachments.ToList().ForEach(a => UpdateAttachment(a, updateDirection));
         return attachmentSet;
     }
 
-    private UriDataAttachment UpdateAttachment(UriDataAttachment attachment, PathConversionDirection updateDirection)
+    private UriDataAttachment UpdateAttachment(UriDataAttachment attachment, PathConversionDirection _)
     {
         // todo: convert uri?
         return attachment;

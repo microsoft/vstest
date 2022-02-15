@@ -10,58 +10,25 @@ using System.Collections.ObjectModel;
 
 internal class NullPathConverter : IPathConverter
 {
-    Collection<AttachmentSet> IPathConverter.UpdateAttachmentSets(Collection<AttachmentSet> attachmentSets, PathConversionDirection updateDirection)
-    {
-        return attachmentSets;
-    }
+    Collection<AttachmentSet> IPathConverter.UpdateAttachmentSets(Collection<AttachmentSet> attachmentSets, PathConversionDirection _) => attachmentSets;
 
-    ICollection<AttachmentSet> IPathConverter.UpdateAttachmentSets(ICollection<AttachmentSet> attachmentSets, PathConversionDirection updateDirection)
-    {
-        return attachmentSets;
-    }
+    ICollection<AttachmentSet> IPathConverter.UpdateAttachmentSets(ICollection<AttachmentSet> attachmentSets, PathConversionDirection _) => attachmentSets;
 
-    DiscoveryCriteria IPathConverter.UpdateDiscoveryCriteria(DiscoveryCriteria discoveryCriteria, PathConversionDirection updateDirection)
-    {
-        return discoveryCriteria;
-    }
+    DiscoveryCriteria IPathConverter.UpdateDiscoveryCriteria(DiscoveryCriteria discoveryCriteria, PathConversionDirection _) => discoveryCriteria;
 
-    string IPathConverter.UpdatePath(string path, PathConversionDirection updateDirection)
-    {
-        return path;
-    }
+    string IPathConverter.UpdatePath(string path, PathConversionDirection _) => path;
 
-    IEnumerable<string> IPathConverter.UpdatePaths(IEnumerable<string> enumerable, PathConversionDirection updateDirection)
-    {
-        return enumerable;
-    }
+    IEnumerable<string> IPathConverter.UpdatePaths(IEnumerable<string> enumerable, PathConversionDirection _) => enumerable;
 
-    TestCase IPathConverter.UpdateTestCase(TestCase testCase, PathConversionDirection updateDirection)
-    {
-        return testCase;
-    }
+    TestCase IPathConverter.UpdateTestCase(TestCase testCase, PathConversionDirection _) => testCase;
 
-    IEnumerable<TestCase> IPathConverter.UpdateTestCases(IEnumerable<TestCase> testCases, PathConversionDirection updateDirection)
-    {
-        return testCases;
-    }
+    IEnumerable<TestCase> IPathConverter.UpdateTestCases(IEnumerable<TestCase> testCases, PathConversionDirection _) => testCases;
 
-    TestRunChangedEventArgs IPathConverter.UpdateTestRunChangedEventArgs(TestRunChangedEventArgs testRunChangedArgs, PathConversionDirection updateDirection)
-    {
-        return testRunChangedArgs;
-    }
+    TestRunChangedEventArgs IPathConverter.UpdateTestRunChangedEventArgs(TestRunChangedEventArgs testRunChangedArgs, PathConversionDirection _) => testRunChangedArgs;
 
-    TestRunCompleteEventArgs IPathConverter.UpdateTestRunCompleteEventArgs(TestRunCompleteEventArgs testRunCompleteEventArgs, PathConversionDirection updateDirection)
-    {
-        return testRunCompleteEventArgs;
-    }
+    TestRunCompleteEventArgs IPathConverter.UpdateTestRunCompleteEventArgs(TestRunCompleteEventArgs testRunCompleteEventArgs, PathConversionDirection _) => testRunCompleteEventArgs;
 
-    TestRunCriteriaWithSources IPathConverter.UpdateTestRunCriteriaWithSources(TestRunCriteriaWithSources testRunCriteriaWithSources, PathConversionDirection updateDirection)
-    {
-        return testRunCriteriaWithSources;
-    }
+    TestRunCriteriaWithSources IPathConverter.UpdateTestRunCriteriaWithSources(TestRunCriteriaWithSources testRunCriteriaWithSources, PathConversionDirection _) => testRunCriteriaWithSources;
 
-    TestRunCriteriaWithTests IPathConverter.UpdateTestRunCriteriaWithTests(TestRunCriteriaWithTests testRunCriteriaWithTests, PathConversionDirection updateDirection)
-    {
-        return testRunCriteriaWithTests;
-    }
+    TestRunCriteriaWithTests IPathConverter.UpdateTestRunCriteriaWithTests(TestRunCriteriaWithTests testRunCriteriaWithTests, PathConversionDirection _) => testRunCriteriaWithTests;
 }
