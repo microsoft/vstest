@@ -16,8 +16,6 @@ using XML;
 /// </summary>
 internal class TestRunSummary : IXmlTestStore
 {
-    #region Fields
-
     [StoreXmlSimpleField("Counters/@total")]
     private readonly int _totalTests;
     [StoreXmlSimpleField("Counters/@executed")]
@@ -60,10 +58,6 @@ internal class TestRunSummary : IXmlTestStore
     private readonly List<CollectorDataEntry> _collectorDataEntries;
 
     private readonly IList<String> _resultFiles;
-
-    #endregion
-
-    #region constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRunSummary"/> class.
@@ -132,10 +126,6 @@ internal class TestRunSummary : IXmlTestStore
         _collectorDataEntries = dataCollectors;
     }
 
-    #endregion
-
-    #region IXmlTestStore Members
-
     /// <summary>
     /// Saves the class under the XmlElement..
     /// </summary>
@@ -154,5 +144,4 @@ internal class TestRunSummary : IXmlTestStore
         helper.SaveIEnumerable(_collectorDataEntries, element, "CollectorDataEntries", ".", "Collector", parameters);
     }
 
-    #endregion
 }

@@ -129,8 +129,6 @@ internal class InProcDataCollector : IInProcDataCollector
         }
     }
 
-    #region Private Methods
-
     private void InitializeDataCollector(object obj, IDataCollectionSink inProcDataCollectionSink)
     {
         var initializeMethodInfo = GetMethodInfoFromType(obj.GetType(), "Initialize", new Type[] { typeof(IDataCollectionSink) });
@@ -170,5 +168,4 @@ internal class InProcDataCollector : IInProcDataCollector
         return assembly;
     }
 
-    #endregion
 }

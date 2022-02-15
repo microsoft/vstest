@@ -14,15 +14,9 @@ using ObjectModel;
 /// </summary>
 internal class RunSettingsManager : IRunSettingsProvider
 {
-    #region private members
-
     private static readonly object LockObject = new();
 
     private static RunSettingsManager s_runSettingsManagerInstance;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -33,18 +27,10 @@ internal class RunSettingsManager : IRunSettingsProvider
     }
 
 
-    #endregion
-
-    #region IRunSettingsProvider
-
     /// <summary>
     /// Gets the active run settings.
     /// </summary>
     public RunSettings ActiveRunSettings { get; private set; }
-
-    #endregion
-
-    #region Public Methods
 
     public static RunSettingsManager Instance
     {
@@ -81,5 +67,4 @@ internal class RunSettingsManager : IRunSettingsProvider
         ActiveRunSettings = runSettings;
     }
 
-    #endregion
 }

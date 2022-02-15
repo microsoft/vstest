@@ -18,21 +18,14 @@ using VisualStudio.TestTools.UnitTesting;
 [TestClass]
 public class CodeCoverageRunSettingsProcessorTests
 {
-    #region Members
     private readonly XmlElement _defaultSettings;
 
     private readonly CodeCoverageRunSettingsProcessor _processor;
-    #endregion
-
-    #region Constructors
     public CodeCoverageRunSettingsProcessorTests()
     {
         _defaultSettings = GetDefaultConfiguration();
         _processor = new CodeCoverageRunSettingsProcessor(_defaultSettings);
     }
-    #endregion
-
-    #region Test Methods
     [TestMethod]
     public void ProcessingShouldReturnNullForNullOrEmptySettings()
     {
@@ -216,9 +209,6 @@ public class CodeCoverageRunSettingsProcessorTests
         CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Attributes/Exclude");
         CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Sources/Exclude");
     }
-    #endregion
-
-    #region Helpers
     private XmlNode ExtractNode(XmlNode node, string path)
     {
         try
@@ -283,5 +273,4 @@ public class CodeCoverageRunSettingsProcessorTests
 
         Assert.AreEqual(0, set.Count);
     }
-    #endregion
 }

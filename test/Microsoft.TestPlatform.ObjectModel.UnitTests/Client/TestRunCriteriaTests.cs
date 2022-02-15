@@ -17,8 +17,6 @@ using VisualStudio.TestPlatform.ObjectModel.Client;
 [TestClass]
 public class TestRunCriteriaTests
 {
-    #region Constructor tests.
-
     [TestMethod]
     public void ConstructorForSourcesShouldInitializeAdapterSourceMap()
     {
@@ -58,10 +56,6 @@ public class TestRunCriteriaTests
         CollectionAssert.AreEqual(sourceSet2, testRunCriteria.AdapterSourceMap.Values.ToArray()[1].ToList());
     }
 
-    #endregion
-
-    #region Sources tests.
-
     [TestMethod]
     public void SourcesShouldEnumerateThroughAllSourcesInTheAdapterSourceMap()
     {
@@ -89,10 +83,6 @@ public class TestRunCriteriaTests
         Assert.IsNull(testRunCriteria.Sources);
     }
 
-    #endregion
-
-    #region HasSpecificSources tests
-
     [TestMethod]
     public void HasSpecificSourcesReturnsFalseIfSourcesAreNotSpecified()
     {
@@ -112,10 +102,6 @@ public class TestRunCriteriaTests
 
         Assert.IsTrue(testRunCriteria.HasSpecificSources);
     }
-
-    #endregion
-
-    #region HasSpecificTests tests
 
     [TestMethod]
     public void HasSpecificTestsReturnsTrueIfTestsAreSpecified()
@@ -137,10 +123,6 @@ public class TestRunCriteriaTests
         Assert.IsFalse(testRunCriteria.HasSpecificTests);
     }
 
-    #endregion
-
-    #region TestCaseFilter tests
-
     [TestMethod]
     public void TestCaseFilterSetterShouldSetFilterCriteriaForSources()
     {
@@ -150,5 +132,4 @@ public class TestRunCriteriaTests
         Assert.AreEqual("foo", testRunCriteria.TestCaseFilter);
     }
 
-    #endregion 
 }

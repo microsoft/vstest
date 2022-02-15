@@ -44,8 +44,6 @@ public class PortArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is PortArgumentExecutor);
     }
 
-    #region PortArgumentProcessorCapabilitiesTests
-
     [TestMethod]
     public void CapabilitiesShouldAppropriateProperties()
     {
@@ -61,8 +59,6 @@ public class PortArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
-
-    #endregion
 
     [TestMethod]
     public void ExecutorInitializeWithNullOrEmptyPortShouldThrowCommandLineException()

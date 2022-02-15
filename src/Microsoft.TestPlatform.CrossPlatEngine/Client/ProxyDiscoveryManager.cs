@@ -41,8 +41,6 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     private ITestDiscoveryEventsHandler2 _baseTestDiscoveryEventsHandler;
     private bool _skipDefaultAdapters;
 
-    #region Constructors
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
     /// </summary>
@@ -117,10 +115,6 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         // Create a new proxy operation manager.
         _proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
     }
-
-    #endregion
-
-    #region IProxyDiscoveryManager implementation.
 
     /// <inheritdoc/>
     public void Initialize(bool skipDefaultAdapters)
@@ -251,9 +245,6 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         _baseTestDiscoveryEventsHandler.HandleLogMessage(level, message);
     }
 
-    #endregion
-
-    #region IBaseProxy implementation.
     /// <inheritdoc/>
     public virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
     {
@@ -262,8 +253,6 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         testProcessStartInfo.Arguments += " --telemetryoptedin " + telemetryOptedIn;
         return testProcessStartInfo;
     }
-    #endregion
-
     private void InitializeExtensions(IEnumerable<string> sources)
     {
         var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, _skipDefaultAdapters);

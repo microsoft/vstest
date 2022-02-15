@@ -15,14 +15,10 @@ using CommandLine;
 /// </summary>
 internal class TestSourceArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The command name.
     /// </summary>
     public const string CommandName = "/TestSource";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -81,16 +77,10 @@ internal class TestSourceArgumentProcessorCapabilities : BaseArgumentProcessorCa
 /// </summary>
 internal class TestSourceArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for adding sources to the test manager.
     /// </summary>
     private readonly CommandLineOptions _testSources;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -103,10 +93,6 @@ internal class TestSourceArgumentExecutor : IArgumentExecutor
         Contract.Requires(testSources != null);
         _testSources = testSources;
     }
-
-    #endregion
-
-    #region IArgumentExecutor
 
     /// <summary>
     /// Initializes with the argument that was provided with the command.
@@ -129,7 +115,5 @@ internal class TestSourceArgumentExecutor : IArgumentExecutor
         // Nothing to do. Our work was done during initialize.
         return ArgumentProcessorResult.Success;
     }
-
-    #endregion
 
 }

@@ -21,11 +21,7 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class InIsolationArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     public const string CommandName = "/InIsolation";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -94,7 +90,6 @@ internal class InIsolationArgumentExecutor : IArgumentExecutor
 
     public const string RunSettingsPath = "RunConfiguration.InIsolation";
 
-    #region Constructors
     /// <summary>
     /// Constructor
     /// </summary>
@@ -106,10 +101,6 @@ internal class InIsolationArgumentExecutor : IArgumentExecutor
         _commandLineOptions = options;
         _runSettingsManager = runSettingsManager;
     }
-    #endregion
-
-    #region IArgumentProcessor
-
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -136,5 +127,4 @@ internal class InIsolationArgumentExecutor : IArgumentExecutor
         return ArgumentProcessorResult.Success;
     }
 
-    #endregion
 }

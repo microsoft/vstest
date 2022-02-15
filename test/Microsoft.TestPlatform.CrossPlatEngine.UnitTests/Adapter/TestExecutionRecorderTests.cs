@@ -110,7 +110,6 @@ public class TestExecutionRecorderTests
         CollectionAssert.AreEqual(attachmentSet, attachments);
     }
 
-    #region TestCaseResult caching tests.
     [TestMethod]
     public void RecordStartShouldInvokeSendTestCaseStart()
     {
@@ -222,5 +221,4 @@ public class TestExecutionRecorderTests
         Assert.IsTrue(_testableTestRunCache.TestResultList.Contains(_testResult));
     }
 
-    #endregion
 }

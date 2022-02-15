@@ -48,7 +48,6 @@ public class TestSessionTests
             _mockVsTestConsoleWrapper.Object);
     }
 
-    #region ITestSession
     [TestMethod]
     public void AbortTestRunShouldCallConsoleWrapperAbortTestRun()
     {
@@ -342,9 +341,6 @@ public class TestSessionTests
                 mockTestSessionEventsHandler2.Object),
             Times.Once);
     }
-    #endregion
-
-    #region ITestSessionAsync
     [TestMethod]
     public async Task DiscoverTestsAsyncShouldCallConsoleWrapperDiscoverTestsWithCorrectArguments1()
     {
@@ -623,5 +619,4 @@ public class TestSessionTests
                 mockTestSessionEventsHandler2.Object),
             Times.Once);
     }
-    #endregion
 }

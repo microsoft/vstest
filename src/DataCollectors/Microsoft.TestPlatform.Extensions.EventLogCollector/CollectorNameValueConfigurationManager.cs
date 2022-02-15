@@ -16,23 +16,14 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 /// </summary>
 internal class CollectorNameValueConfigurationManager
 {
-    #region Private constants
     // Configuration XML constants
     private const string SettingNameAttributeName = "name";
 
     private const string SettingValueAttributeName = "value";
 
-    #endregion
-
-    #region Private fields
-
     /// <summary>
     /// The name/value pairs loaded from the configuration XML element
     /// </summary>
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CollectorNameValueConfigurationManager"/> class.
@@ -88,10 +79,6 @@ internal class CollectorNameValueConfigurationManager
         }
     }
 
-    #endregion
-
-    #region Public properties
-
     internal IDictionary<string, string> NameValuePairs { get; } = new Dictionary<string, string>();
 
     /// <summary>
@@ -114,5 +101,4 @@ internal class CollectorNameValueConfigurationManager
 
         set => NameValuePairs[name] = value;
     }
-    #endregion
 }

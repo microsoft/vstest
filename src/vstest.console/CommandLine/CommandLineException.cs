@@ -13,8 +13,6 @@ using System;
 /// </summary>
 public class CommandLineException : Exception
 {
-    #region Constructors
-
     /// <summary>
     /// Creates a new CommandLineException
     /// </summary>
@@ -41,5 +39,4 @@ public class CommandLineException : Exception
     {
     }
 
-    #endregion
 }

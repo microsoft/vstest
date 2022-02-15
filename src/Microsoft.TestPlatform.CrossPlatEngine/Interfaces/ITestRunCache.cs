@@ -16,8 +16,6 @@ using System;
 /// </summary>
 internal interface ITestRunCache : IDisposable
 {
-    #region Properties
-
     ICollection<TestResult> TestResults { get; }
 
     ICollection<TestCase> InProgressTests { get; }
@@ -27,10 +25,6 @@ internal interface ITestRunCache : IDisposable
 
     IDictionary<string, int> AdapterTelemetry { get; }
 
-    #endregion
-
-    #region Methods
-
     void OnTestStarted(TestCase testCase);
 
     void OnNewTestResult(TestResult testResult);
@@ -39,5 +33,4 @@ internal interface ITestRunCache : IDisposable
 
     ICollection<TestResult> GetLastChunk();
 
-    #endregion
 }

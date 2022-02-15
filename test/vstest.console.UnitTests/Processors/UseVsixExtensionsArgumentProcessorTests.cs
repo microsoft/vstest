@@ -47,8 +47,6 @@ public class UseVsixExtensionsArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is UseVsixExtensionsArgumentExecutor);
     }
 
-    #region UseVsixExtensionsArgumentProcessorCapabilities tests
-
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -64,10 +62,6 @@ public class UseVsixExtensionsArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
-
-    #endregion
-
-    #region UseVsixExtensionsArgumentExecutor tests
 
     [TestMethod]
     public void InitializeShouldThrowExceptionIfArgumentIsNull()
@@ -108,5 +102,4 @@ public class UseVsixExtensionsArgumentProcessorTests
         _testRequestManager.Verify(trm => trm.InitializeExtensions(It.IsAny<IEnumerable<string>>(), true), Times.Never);
     }
 
-    #endregion
 }

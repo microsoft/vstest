@@ -52,8 +52,6 @@ public class EnableCodeCoverageArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is EnableCodeCoverageArgumentExecutor);
     }
 
-    #region EnableCodeCoverageArgumentProcessorCapabilities tests
-
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -67,10 +65,6 @@ public class EnableCodeCoverageArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
-
-    #endregion
-
-    #region EnableCodeCoverageArgumentExecutor tests
 
     [TestMethod]
     public void InitializeShouldSetEnableCodeCoverageOfCommandLineOption()
@@ -175,5 +169,4 @@ public class EnableCodeCoverageArgumentProcessorTests
             "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
     }
 
-    #endregion
 }

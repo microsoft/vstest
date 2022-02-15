@@ -16,8 +16,6 @@ internal class TestRunResultAggregator
 {
     private static TestRunResultAggregator s_instance;
 
-    #region Constructor
-
     /// <summary>
     /// Initializes the TestRunResultAggregator
     /// </summary>
@@ -27,10 +25,6 @@ internal class TestRunResultAggregator
         // Outcome is passed until we see a failure.
         Outcome = TestOutcome.Passed;
     }
-
-    #endregion
-
-    #region Static Methods
 
     /// <summary>
     /// Gets the instance of the test run result aggregator.
@@ -49,18 +43,10 @@ internal class TestRunResultAggregator
         }
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// The current test run outcome.
     /// </summary>
     public TestOutcome Outcome { get; private set; }
-
-    #endregion
-
-    #region Event Handlers
 
     /// <summary>
     /// Registers to receive events from the provided test run request.
@@ -130,5 +116,4 @@ internal class TestRunResultAggregator
         }
     }
 
-    #endregion
 }

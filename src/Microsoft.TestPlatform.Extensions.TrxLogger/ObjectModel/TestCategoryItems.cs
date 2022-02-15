@@ -13,19 +13,14 @@ using Utility;
 
 using XML;
 
-#region TestCategoryItem
 /// <summary>
 /// Stores a string which categorizes the Test
 /// </summary>
 internal sealed class TestCategoryItem : IXmlTestStore
 {
-    #region Fields
     [StoreXmlSimpleField(Location = "@TestCategory", DefaultValue = "")]
     private readonly string _category = string.Empty;
 
-    #endregion
-
-    #region Constructors
     /// <summary>
     /// Create a new item with the category set
     /// </summary>
@@ -42,9 +37,6 @@ internal sealed class TestCategoryItem : IXmlTestStore
         _category = StripIllegalChars(category);
     }
 
-    #endregion
-
-    #region Properties/Methods
     /// <summary>
     /// Gets the category for this TestCategory
     /// </summary>
@@ -66,9 +58,6 @@ internal sealed class TestCategoryItem : IXmlTestStore
         return ret;
     }
 
-    #endregion
-
-    #region Methods - overrides
     /// <summary>
     /// Compare the values of the items
     /// </summary>
@@ -103,10 +92,6 @@ internal sealed class TestCategoryItem : IXmlTestStore
         Debug.Assert(_category != null, "category is null");
         return _category;
     }
-    #endregion
-
-    #region IXmlTestStore Members
-
     /// <summary>
     /// Saves the class under the XmlElement.
     /// </summary>
@@ -117,17 +102,12 @@ internal sealed class TestCategoryItem : IXmlTestStore
         new XmlPersistence().SaveSingleFields(element, this, parameters);
     }
 
-    #endregion
 }
-#endregion
-
-#region TestCategoryItemCollection
 /// <summary>
 /// A collection of strings which categorize the test.
 /// </summary>
 internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategoryItem>
 {
-    #region Constructors
     /// <summary>
     /// Creates an empty TestCategoryItemCollection.
     /// </summary>
@@ -147,10 +127,6 @@ internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategor
             Add(s);
         }
     }
-
-    #endregion
-
-    #region Methods
 
     /// <summary>
     /// Adds the category.
@@ -263,6 +239,4 @@ internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategor
     {
         return base.GetHashCode();
     }
-    #endregion
 }
-#endregion

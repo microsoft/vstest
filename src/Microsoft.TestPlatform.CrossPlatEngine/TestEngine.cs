@@ -34,13 +34,9 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 /// </summary>
 public class TestEngine : ITestEngine
 {
-    #region Private Fields
-
     private readonly TestRuntimeProviderManager _testHostProviderManager;
     private ITestExtensionManager _testExtensionManager;
     private readonly IProcessHelper _processHelper;
-
-    #endregion
 
     public TestEngine() : this(TestRuntimeProviderManager.Instance, new ProcessHelper())
     {
@@ -53,8 +49,6 @@ public class TestEngine : ITestEngine
         _testHostProviderManager = testHostProviderManager;
         _processHelper = processHelper;
     }
-
-    #region ITestEngine implementation
 
     /// <inheritdoc/>
     public IProxyDiscoveryManager GetDiscoveryManager(
@@ -364,8 +358,6 @@ public class TestEngine : ITestEngine
             TestSessionMessageLogger.Instance,
             new InternalTestLoggerEvents(TestSessionMessageLogger.Instance));
     }
-
-    #endregion
 
     private static int GetDistinctNumberOfSources(TestRunCriteria testRunCriteria)
     {

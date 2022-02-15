@@ -22,13 +22,7 @@ using TrxLoggerResources = VisualStudio.TestPlatform.Extensions.TrxLogger.Resour
 /// </summary>
 internal sealed class TestResultId : IXmlTestStore
 {
-    #region Fields
-
     private Guid _runId;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestResultId"/> class.
@@ -53,10 +47,6 @@ internal sealed class TestResultId : IXmlTestStore
         TestId = testId;
     }
 
-    #endregion
-
-    #region properties
-
     /// <summary>
     /// Gets the execution id.
     /// </summary>
@@ -71,10 +61,6 @@ internal sealed class TestResultId : IXmlTestStore
     /// Gets the test id.
     /// </summary>
     public Guid TestId { get; }
-
-    #endregion
-
-    #region Overrides
 
     /// <summary>
     /// Override function for Equals
@@ -111,10 +97,6 @@ internal sealed class TestResultId : IXmlTestStore
     {
         return ExecutionId.ToString("B");
     }
-    #endregion
-
-    #region IXmlTestStore Members
-
     /// <summary>
     /// Saves the class under the XmlElement..
     /// </summary>
@@ -136,7 +118,6 @@ internal sealed class TestResultId : IXmlTestStore
         helper.SaveGuid(element, "@testId", TestId);
     }
 
-    #endregion
 }
 
 /// <summary>
@@ -169,8 +150,6 @@ internal sealed class TestResultErrorInfo : IXmlTestStore
         set { _stackTrace = value; }
     }
 
-    #region IXmlTestStore Members
-
     /// <summary>
     /// Saves the class under the XmlElement..
     /// </summary>
@@ -185,7 +164,6 @@ internal sealed class TestResultErrorInfo : IXmlTestStore
         XmlPersistence.SaveUsingReflection(element, this, typeof(TestResultErrorInfo), parameters);
     }
 
-    #endregion
 }
 
 /// <summary>
@@ -193,8 +171,6 @@ internal sealed class TestResultErrorInfo : IXmlTestStore
 /// </summary>
 internal class TestResult : ITestResult, IXmlTestStore
 {
-    #region Fields
-
     private readonly string _resultName;
     private string _stdOut;
     private string _stdErr;
@@ -216,10 +192,6 @@ internal class TestResult : ITestResult, IXmlTestStore
     /// Information provided by data collectors for the test case
     /// </summary>
     private readonly List<CollectorDataEntry> _collectorDataEntries = new();
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestResult"/> class.
@@ -263,10 +235,6 @@ internal class TestResult : ITestResult, IXmlTestStore
         RelativeTestResultsDirectory = TestRunDirectories.GetRelativeTestResultsDirectory(executionId);
         _trxFileHelper = trxFileHelper;
     }
-
-    #endregion
-
-    #region properties
 
     /// <summary>
     /// Gets or sets the end time.
@@ -422,9 +390,6 @@ internal class TestResult : ITestResult, IXmlTestStore
     /// </summary>
     public string ResultType { get; set; }
 
-    #endregion
-
-    #region Overrides
     public override bool Equals(object obj)
     {
         if (obj is not TestResult trm)
@@ -441,8 +406,6 @@ internal class TestResult : ITestResult, IXmlTestStore
         Debug.Assert(Id != null, "id is null");
         return Id.GetHashCode();
     }
-
-    #endregion
 
     /// <summary>
     /// Helper function to add a text message info to the test result
@@ -501,8 +464,6 @@ internal class TestResult : ITestResult, IXmlTestStore
     }
 
 
-    #region IXmlTestStore Members
-
     /// <summary>
     /// Saves the class under the XmlElement..
     /// </summary>
@@ -547,8 +508,6 @@ internal class TestResult : ITestResult, IXmlTestStore
         if (!string.IsNullOrEmpty(ResultType))
             helper.SaveSimpleField(element, "@resultType", ResultType, string.Empty);
     }
-
-    #endregion
 
     private void Initialize()
     {

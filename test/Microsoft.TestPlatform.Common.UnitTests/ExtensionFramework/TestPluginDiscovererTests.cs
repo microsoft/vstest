@@ -146,10 +146,6 @@ public class TestPluginDiscovererTests
         Assert.That.DoesNotThrow(() => _testPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions));
     }
 
-    #region Implementations
-
-    #region Discoverers
-
     private abstract class AbstractTestDiscoverer : ITestDiscoverer
     {
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
@@ -173,10 +169,6 @@ public class TestPluginDiscovererTests
             throw new NotImplementedException();
         }
     }
-
-    #endregion
-
-    #region Executors
 
     [ExtensionUri("ValidExecutor")]
     private class ValidExecutor : ITestExecutor
@@ -235,10 +227,6 @@ public class TestPluginDiscovererTests
         }
     }
 
-    #endregion
-
-    #region Loggers
-
     [ExtensionUri("csv")]
     private class ValidLogger : ITestLogger
     {
@@ -266,10 +254,6 @@ public class TestPluginDiscovererTests
         }
     }
 
-    #endregion
-
-    #region Settings Providers
-
     [SettingsName("ValidSettingsProvider")]
     private class ValidSettingsProvider : ISettingsProvider
     {
@@ -296,10 +280,6 @@ public class TestPluginDiscovererTests
             throw new NotImplementedException();
         }
     }
-
-    #endregion
-
-    #region  DataCollectors
 
     public class InvalidDataCollector : DataCollector
     {
@@ -351,8 +331,6 @@ public class TestPluginDiscovererTests
             throw new NotImplementedException();
         }
     }
-    #endregion
-
     internal class FaultyTestExecutorPluginInformation : TestExtensionPluginInformation
     {
         /// <summary>
@@ -364,5 +342,4 @@ public class TestPluginDiscovererTests
             throw new Exception();
         }
     }
-    #endregion
 }

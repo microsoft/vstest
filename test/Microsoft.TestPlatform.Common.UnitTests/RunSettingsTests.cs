@@ -26,8 +26,6 @@ public class RunSettingsTests
         TestSessionMessageLogger.Instance = null;
     }
 
-    #region LoadSettingsXML Tests
-
     [TestMethod]
     public void LoadSettingsXmlShouldThrowOnNullSettings()
     {
@@ -69,10 +67,6 @@ public class RunSettingsTests
             () => runSettings.LoadSettingsXml(invalidSettings),
             "An error occurred while loading the run settings.");
     }
-
-    #endregion
-
-    #region InitializeSettingsProviders and GetSettings tests
 
     [TestMethod]
     public void InitializeSettingsProvidersShouldThrowOnNullSettings()
@@ -204,10 +198,6 @@ public class RunSettingsTests
             receivedWarningMessage);
     }
 
-    #endregion
-
-    #region GetSettings tests
-
     [TestMethod]
     public void GetSettingsShouldThrowIfSettingsNameIsNull()
     {
@@ -225,10 +215,6 @@ public class RunSettingsTests
     }
 
     // The remaining GetSettings tests are covered in the InitializeSettingsProviders tests above.
-    #endregion
-
-    #region Private methods
-
     private string GetEmptyRunSettings()
     {
         return @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -297,10 +283,6 @@ public class RunSettingsTests
 </RunSettingsInvalid>";
     }
 
-    #endregion
-
-    #region Testable Implementations
-
     [SettingsName("RunConfiguration")]
     private class RunConfigurationSettingsProvider : ISettingsProvider
     {
@@ -334,5 +316,4 @@ public class RunSettingsTests
         }
     }
 
-    #endregion
 }

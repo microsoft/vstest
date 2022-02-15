@@ -561,8 +561,6 @@ public class DesignModeClient : IDesignModeClient
         });
     }
 
-    #region IDisposable Support
-
     private bool _disposedValue; // To detect redundant calls
 
     protected virtual void Dispose(bool disposing)
@@ -584,5 +582,4 @@ public class DesignModeClient : IDesignModeClient
         // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
         Dispose(true);
     }
-    #endregion
 }

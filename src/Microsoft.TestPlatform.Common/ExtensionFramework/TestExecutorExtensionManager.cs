@@ -21,14 +21,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 /// </summary>
 internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor, ITestExecutorCapabilities>
 {
-    #region Fields
-
     private static TestExecutorExtensionManager s_testExecutorExtensionManager;
     private static readonly object Synclock = new();
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -48,9 +42,6 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
     {
     }
 
-    #endregion
-
-    #region Private Methods
     /// <summary>
     /// Merges two test extension lists.
     /// </summary>
@@ -101,10 +92,6 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
 
         return mergedTestExtensions;
     }
-
-    #endregion
-
-    #region Factory Methods
 
     /// <summary>
     /// Creates the TestExecutorExtensionManager.
@@ -236,7 +223,6 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
         }
     }
 
-    #endregion
 }
 
 /// <summary>

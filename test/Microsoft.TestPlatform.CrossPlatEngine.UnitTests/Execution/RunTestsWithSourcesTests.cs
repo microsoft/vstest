@@ -338,8 +338,6 @@ public class RunTestsWithSourcesTests
             _mockRequestData.Object);
     }
 
-    #region Testable Implementations
-
     private class TestableRunTestsWithSources : RunTestsWithSources
     {
         public TestableRunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string runSettings,
@@ -415,5 +413,4 @@ public class RunTestsWithSourcesTests
         }
     }
 
-    #endregion
 }

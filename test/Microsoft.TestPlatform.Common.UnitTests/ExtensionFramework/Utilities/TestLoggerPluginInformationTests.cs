@@ -56,8 +56,6 @@ public class TestLoggerPluginInformationTests
         CollectionAssert.AreEqual(new object[] { DefaultExtensionUri, DefaultFriendlyName }, _testPluginInformation.Metadata.ToArray());
     }
 
-    #region Implementation
-
     private class DummyTestExtensionWithNoFriendlyName
     {
     }
@@ -68,5 +66,4 @@ public class TestLoggerPluginInformationTests
     {
     }
 
-    #endregion
 }

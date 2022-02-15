@@ -53,8 +53,6 @@ public class TestSettingsProviderPluginInformationTests
         Assert.AreEqual(DefaultSettingsName, _testPluginInformation.SettingsName);
     }
 
-    #region Implementation
-
     private class DummySettingProviderWithoutSettingsName
     {
     }
@@ -64,5 +62,4 @@ public class TestSettingsProviderPluginInformationTests
     {
     }
 
-    #endregion
 }

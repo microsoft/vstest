@@ -25,8 +25,6 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
 {
     private readonly IDataSerializer _dataSerializer;
 
-    #region DiscoverySpecificData
-
     private int _discoveryCompletedClients;
     private int _availableTestSources = -1;
 
@@ -43,16 +41,10 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     // This field indicates if abort was requested by testplatform (user)
     private bool _discoveryAbortRequested;
 
-    #endregion
-
-    #region Concurrency Keeper Objects
-
     /// <summary>
     /// LockObject to update discovery status in parallel
     /// </summary>
     private readonly object _discoveryStatusLockObject = new();
-
-    #endregion
 
     public ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
         : this(requestData, actualProxyManagerCreator, JsonDataSerializer.Instance, parallelLevel, sharedHosts)
@@ -65,8 +57,6 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         _requestData = requestData;
         _dataSerializer = dataSerializer;
     }
-
-    #region IProxyDiscoveryManager
 
     /// <inheritdoc/>
     public void Initialize(bool skipDefaultAdapters)
@@ -100,10 +90,6 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     {
         DoActionOnAllManagers(proxyManager => proxyManager.Close(), doActionsInParallel: true);
     }
-
-    #endregion
-
-    #region IParallelProxyDiscoveryManager methods
 
     /// <inheritdoc/>
     public bool HandlePartialDiscoveryComplete(IProxyDiscoveryManager proxyDiscoveryManager, long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
@@ -165,8 +151,6 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
 
         return false;
     }
-
-    #endregion
 
     private void DiscoverTestsPrivate(ITestDiscoveryEventsHandler2 discoveryEventsHandler)
     {

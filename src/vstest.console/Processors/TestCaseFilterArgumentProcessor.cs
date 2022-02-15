@@ -18,14 +18,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class TestCaseFilterArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the TestCaseFilterArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/TestCaseFilter";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -89,16 +85,10 @@ internal class TestCaseFilterArgumentProcessorCapabilities : BaseArgumentProcess
 /// </summary>
 internal class TestCaseFilterArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
     private readonly CommandLineOptions _commandLineOptions;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -111,10 +101,6 @@ internal class TestCaseFilterArgumentExecutor : IArgumentExecutor
         Contract.Requires(options != null);
         _commandLineOptions = options;
     }
-    #endregion
-
-    #region IArgumentExecutor
-
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -148,5 +134,4 @@ internal class TestCaseFilterArgumentExecutor : IArgumentExecutor
     {
         return ArgumentProcessorResult.Success;
     }
-    #endregion
 }

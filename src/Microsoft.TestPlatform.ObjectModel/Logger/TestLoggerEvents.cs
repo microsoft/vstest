@@ -14,18 +14,12 @@ using Logging;
 /// </summary>
 public abstract class TestLoggerEvents
 {
-    #region Constructor
-
     /// <summary>
     /// Default constructor.
     /// </summary>
     protected TestLoggerEvents()
     {
     }
-
-    #endregion
-
-    #region Events
 
     /// <summary>
     /// Raised when a test message is received.
@@ -67,5 +61,4 @@ public abstract class TestLoggerEvents
     /// </summary>
     public abstract event EventHandler<DiscoveryCompleteEventArgs> DiscoveryComplete;
 
-    #endregion
 }

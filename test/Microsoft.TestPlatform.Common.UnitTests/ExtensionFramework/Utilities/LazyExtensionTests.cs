@@ -23,8 +23,6 @@ using Moq;
 [TestClass]
 public class LazyExtensionTests
 {
-    #region Value tests
-
     [TestMethod]
     public void ValueShouldCreateExtensionViaTheCallback()
     {
@@ -70,10 +68,6 @@ public class LazyExtensionTests
         Assert.AreEqual(1, numberOfTimesExtensionCreated);
     }
 
-    #endregion
-
-    #region metadata tests
-
     [TestMethod]
     public void MetadataShouldReturnMetadataSpecified()
     {
@@ -103,10 +97,6 @@ public class LazyExtensionTests
         Assert.AreEqual("executor://unittestexecutor/", (metadata as ITestDiscovererCapabilities).DefaultExecutorUri.AbsoluteUri);
         Assert.AreEqual(AssemblyType.Native, (metadata as ITestDiscovererCapabilities).AssemblyType);
     }
-
-    #endregion
-
-    #region Implementation
 
     private class DummyDiscovererCapability : ITestDiscovererCapabilities
     {
@@ -147,5 +137,4 @@ public class LazyExtensionTests
         }
     }
 
-    #endregion
 }

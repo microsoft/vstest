@@ -81,8 +81,6 @@ public class CliRunSettingsArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is CliRunSettingsArgumentExecutor);
     }
 
-    #region CLIRunSettingsArgumentProcessorCapabilities tests
-
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -100,10 +98,6 @@ public class CliRunSettingsArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
-
-    #endregion
-
-    #region CLIRunSettingsArgumentExecutor tests
 
     [TestMethod]
     public void InitializeShouldNotThrowExceptionIfArgumentIsNull()
@@ -425,8 +419,6 @@ public class CliRunSettingsArgumentProcessorTests
                 "</RunSettings>")
         },
     };
-    #endregion
-
     [TestMethod]
     public void InitializeShouldMergeTestRunParametersWithSpaces()
     {

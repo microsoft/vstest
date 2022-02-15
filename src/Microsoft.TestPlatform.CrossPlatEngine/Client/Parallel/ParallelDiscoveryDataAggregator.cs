@@ -17,12 +17,8 @@ using System.Linq;
 /// </summary>
 internal class ParallelDiscoveryDataAggregator
 {
-    #region PrivateFields
-
     private readonly object _dataUpdateSyncObject = new();
     private readonly ConcurrentDictionary<string, object> _metricsAggregator;
-
-    #endregion
 
     public ParallelDiscoveryDataAggregator()
     {
@@ -30,8 +26,6 @@ internal class ParallelDiscoveryDataAggregator
         TotalTests = 0;
         _metricsAggregator = new ConcurrentDictionary<string, object>();
     }
-
-    #region Public Properties
 
     /// <summary>
     /// Set to true if any of the request is aborted
@@ -42,10 +36,6 @@ internal class ParallelDiscoveryDataAggregator
     /// Aggregate total test count
     /// </summary>
     public long TotalTests { get; private set; }
-
-    #endregion
-
-    #region Public Methods
 
     /// <summary>
     /// Returns the Aggregated Metrics.
@@ -130,5 +120,4 @@ internal class ParallelDiscoveryDataAggregator
         }
     }
 
-    #endregion
 }

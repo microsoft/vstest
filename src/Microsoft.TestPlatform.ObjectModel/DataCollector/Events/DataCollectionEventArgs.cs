@@ -16,8 +16,6 @@ using System.Diagnostics;
 #endif
 public abstract class DataCollectionEventArgs : EventArgs
 {
-    #region Constructor
-
     /// <summary>
     /// Default constructor added for serialization/deserialization.
     /// </summary>
@@ -34,10 +32,6 @@ public abstract class DataCollectionEventArgs : EventArgs
         Context = context;
     }
 
-    #endregion
-
-    #region Public properties
-
     /// <summary>
     /// Gets the context information for the event
     /// </summary>
@@ -46,10 +40,6 @@ public abstract class DataCollectionEventArgs : EventArgs
         get;
         internal set;
     }
-
-    #endregion
-
-    #region Private Methods
 
     /// <summary>
     /// Updates the data collection context stored by this instance.
@@ -67,5 +57,4 @@ public abstract class DataCollectionEventArgs : EventArgs
         Context = context;
     }
 
-    #endregion
 }

@@ -16,15 +16,9 @@ using XML;
 /// </summary>
 internal sealed class TestEntry : IXmlTestStore
 {
-    #region Fields
-
     private readonly TestId _testId;
     private readonly TestListCategoryId _categoryId;
     private List<TestEntry> _testEntries;
-
-    #endregion
-
-    #region Constructors
 
     /// <summary>
     /// Constructor.
@@ -38,10 +32,6 @@ internal sealed class TestEntry : IXmlTestStore
         _testId = testId;
         _categoryId = catId;
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets or sets the exec id.
@@ -65,10 +55,6 @@ internal sealed class TestEntry : IXmlTestStore
             return _testEntries;
         }
     }
-
-    #endregion
-
-    #region Overrides
 
     /// <summary>
     /// Override function for Equals.
@@ -107,10 +93,6 @@ internal sealed class TestEntry : IXmlTestStore
         return ExecutionId.GetHashCode();
     }
 
-    #endregion
-
-    #region IXmlTestStore Members
-
     /// <summary>
     /// Saves the class under the XmlElement..
     /// </summary>
@@ -134,5 +116,4 @@ internal sealed class TestEntry : IXmlTestStore
             helper.SaveIEnumerable(TestEntries, element, "TestEntries", ".", "TestEntry", parameters);
     }
 
-    #endregion
 }

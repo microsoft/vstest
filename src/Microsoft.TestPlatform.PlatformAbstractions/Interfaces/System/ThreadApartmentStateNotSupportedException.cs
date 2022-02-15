@@ -12,8 +12,6 @@ using System;
 /// </summary>
 public class ThreadApartmentStateNotSupportedException : Exception
 {
-    #region Constructors
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ThreadApartmentStateNotSupportedException"/> class.
     /// Initializes with the message.
@@ -43,7 +41,5 @@ public class ThreadApartmentStateNotSupportedException : Exception
         : base(message, innerException)
     {
     }
-
-    #endregion
 
 }

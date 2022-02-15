@@ -89,8 +89,6 @@ public class RunTestsArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is RunTestsArgumentExecutor);
     }
 
-    #region RunTestsArgumentProcessorCapabilitiesTests
-
     [TestMethod]
     public void CapabilitiesShouldReturnAppropriateProperties()
     {
@@ -107,10 +105,6 @@ public class RunTestsArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsTrue(capabilities.IsSpecialCommand);
     }
-    #endregion
-
-    #region RunTestsArgumentExecutorTests
-
     [TestMethod]
     public void ExecutorExecuteShouldReturnSuccessWithoutExecutionInDesignMode()
     {
@@ -244,8 +238,6 @@ public class RunTestsArgumentProcessorTests
         _mockTestPlatformEventSource.Verify(x => x.ExecutionRequestStop(), Times.Once);
     }
 
-    #endregion
-
     private ArgumentProcessorResult RunRunArgumentProcessorExecuteWithMockSetup(ITestRunRequest testRunRequest)
     {
         var mockTestPlatform = new Mock<ITestPlatform>();
@@ -330,10 +322,6 @@ public class RunTestsArgumentProcessorTests
     }
 }
 
-#region Testable implementation
-
 public class TestableTestPluginCache : TestPluginCache
 {
 }
-
-#endregion

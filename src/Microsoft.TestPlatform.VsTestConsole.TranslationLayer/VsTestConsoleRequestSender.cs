@@ -53,8 +53,6 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// </summary>
     private CancellationTokenSource _processExitCancellationTokenSource;
 
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="VsTestConsoleRequestSender"/> class.
     /// </summary>
@@ -82,10 +80,6 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         _dataSerializer = dataSerializer;
         _testPlatformEventSource = testPlatformEventSource;
     }
-
-    #endregion
-
-    #region ITranslationLayerRequestSender
 
     /// <inheritdoc/>
     public int InitializeCommunication()
@@ -841,8 +835,6 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     {
         _communicationManager?.StopServer();
     }
-
-    #endregion
 
     private bool HandShakeWithVsTestConsole()
     {

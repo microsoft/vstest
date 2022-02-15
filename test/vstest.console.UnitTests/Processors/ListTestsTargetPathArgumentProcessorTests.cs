@@ -28,8 +28,6 @@ public class ListTestsTargetPathArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is ListTestsTargetPathArgumentExecutor);
     }
 
-    #region TestCaseFilterArgumentProcessorCapabilitiesTests
-
     [TestMethod]
     public void CapabilitiesShouldAppropriateProperties()
     {
@@ -43,8 +41,6 @@ public class ListTestsTargetPathArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
-
-    #endregion
 
     [TestMethod]
     public void ExecutorInitializeWithNullOrEmptyListTestsTargetPathShouldThrowCommandLineException()

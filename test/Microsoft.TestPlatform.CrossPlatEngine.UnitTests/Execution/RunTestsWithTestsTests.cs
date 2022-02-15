@@ -195,8 +195,6 @@ public class RunTestsWithTestsTests
         mockTestCaseEventsHandler.Verify(x => x.SendSessionEnd());
     }
 
-    #region Testable Implementations
-
     private class TestableRunTestsWithTests : RunTestsWithTests
     {
         public TestableRunTestsWithTests(IEnumerable<TestCase> testCases,
@@ -237,7 +235,5 @@ public class RunTestsWithTestsTests
             SendSessionEnd();
         }
     }
-
-    #endregion
 
 }

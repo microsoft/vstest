@@ -83,7 +83,6 @@ internal abstract class ListExtensionsArgumentProcessor : IArgumentProcessor
     }
 }
 
-#region List discoverers
 /// <summary>
 /// Argument Executor for the "/ListDiscoverers" command line argument.
 /// </summary>
@@ -118,9 +117,6 @@ internal class ListDiscoverersArgumentExecutor : IArgumentExecutor
         return ArgumentProcessorResult.Success;
     }
 }
-#endregion
-
-#region List executors
 /// <summary>
 /// Argument Executor for the "/ListExecutors" command line argument.
 /// </summary>
@@ -154,9 +150,6 @@ internal class ListExecutorsArgumentExecutor : IArgumentExecutor
         return ArgumentProcessorResult.Success;
     }
 }
-#endregion
-
-#region List loggers
 /// <summary>
 /// Argument Executor for the "/ListLoggers" command line argument.
 /// </summary>
@@ -198,9 +191,6 @@ internal class ListLoggersArgumentExecutor : IArgumentExecutor
         }
     }
 }
-#endregion
-
-#region List settings providers
 /// <summary>
 /// Argument Executor for the "/ListSettingsProviders" command line argument.
 /// </summary>
@@ -234,4 +224,3 @@ internal class ListSettingsProvidersArgumentExecutor : IArgumentExecutor
         return ArgumentProcessorResult.Success;
     }
 }
-#endregion

@@ -15,8 +15,6 @@ using MSTest.TestFramework.AssertExtensions;
 [TestClass]
 public class MsTestSettingsUtilitiesTests
 {
-    #region IsLegacyTestSettingsFile tests
-
     [TestMethod]
     public void IsLegacyTestSettingsFileShouldReturnTrueIfTestSettingsExtension()
     {
@@ -34,10 +32,6 @@ public class MsTestSettingsUtilitiesTests
     {
         Assert.IsTrue(MSTestSettingsUtilities.IsLegacyTestSettingsFile("C:\\temp\\t.vsmdi"));
     }
-
-    #endregion
-
-    #region Import tests
 
     [TestMethod]
     public void ImportShouldThrowIfNotLegacySettingsFile()
@@ -119,5 +113,4 @@ public class MsTestSettingsUtilitiesTests
         Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
     }
 
-    #endregion
 }

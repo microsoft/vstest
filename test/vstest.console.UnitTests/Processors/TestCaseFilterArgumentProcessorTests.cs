@@ -28,8 +28,6 @@ public class TestCaseFilterArgumentProcessorTests
         Assert.IsTrue(processor.Executor.Value is TestCaseFilterArgumentExecutor);
     }
 
-    #region TestCaseFilterArgumentProcessorCapabilitiesTests
-
     [TestMethod]
     public void CapabilitiesShouldAppropriateProperties()
     {
@@ -45,8 +43,6 @@ public class TestCaseFilterArgumentProcessorTests
         Assert.IsFalse(capabilities.AlwaysExecute);
         Assert.IsFalse(capabilities.IsSpecialCommand);
     }
-
-    #endregion
 
     [TestMethod]
     public void ExecutorInitializeWithNullOrEmptyTestCaseFilterShouldThrowCommandLineException()

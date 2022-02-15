@@ -19,8 +19,6 @@ internal class TestPluginManager
 {
     private static TestPluginManager s_instance;
 
-    #region Public Static Methods
-
     /// <summary>
     /// Gets the singleton instance of TestPluginManager.
     /// </summary>
@@ -88,10 +86,6 @@ internal class TestPluginManager
         }
     }
 
-    #endregion
-
-    #region Public Methods
-
     /// <summary>
     /// Retrieves the test extension collections of given extension type.
     /// </summary>
@@ -158,10 +152,6 @@ internal class TestPluginManager
         GetExtensions<TPluginInfo, TExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
     }
 
-    #endregion
-
-    #region Private Methods
-
     /// <summary>
     /// Prepares a List of TestPluginInformation&gt;
     /// </summary>
@@ -227,5 +217,4 @@ internal class TestPluginManager
         filtered = filteredExtensions;
     }
 
-    #endregion
 }

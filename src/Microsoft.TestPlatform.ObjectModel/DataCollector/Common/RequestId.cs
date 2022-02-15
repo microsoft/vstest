@@ -17,16 +17,10 @@ using Resources;
 [DataContract]
 public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, IComparable
 {
-    #region Constants
-
     /// <summary>
     /// A request ID with an empty GUID
     /// </summary>
     public static readonly RequestId Empty = new(Guid.Empty);
-
-    #endregion
-
-    #region Constructors
 
     /// <summary>
     /// Initializes the instance by creating a new GUID
@@ -44,10 +38,6 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
     {
         Id = id;
     }
-
-    #endregion
-
-    #region Overrides
 
     /// <summary>
     /// Compares this instance with the provided object for value equality
@@ -88,12 +78,6 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
         return Id.ToString("B");
     }
 
-    #endregion
-
-    #region Interface implementations
-
-    #region IEquatable<RequestId> Members
-
     /// <summary>
     /// Compares this instance with the provided request ID for value equality
     /// </summary>
@@ -108,10 +92,6 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
             );
     }
 
-    #endregion
-
-    #region IComparable<RequestId> Members
-
     /// <summary>
     /// Compares this instance with the provided request ID
     /// </summary>
@@ -121,10 +101,6 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
     {
         return other == null ? 1 : Id.CompareTo(other.Id);
     }
-
-    #endregion
-
-    #region IComparable Members
 
     /// <summary>
     /// Compares this instance with the provided object
@@ -146,12 +122,6 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
             ? throw new ArgumentException(string.Format(Resources.Common_ObjectMustBeOfType, new object[] { typeof(RequestId).Name }), nameof(obj))
             : Id.CompareTo(other.Id);
     }
-
-    #endregion
-
-    #endregion
-
-    #region Operators
 
     /// <summary>
     /// Compares the two request IDs for value equality
@@ -179,10 +149,6 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
         return !(left == right);
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets the underlying GUID that represents the request ID
     /// </summary>
@@ -193,5 +159,4 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
         private set;
     }
 
-    #endregion
 }
