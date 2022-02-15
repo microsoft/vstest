@@ -69,6 +69,8 @@ internal class XmlPersistence
 
     }
 
+    #endregion
+
     /// <summary>This is how we persist date time except DateTime.MinValue.</summary>
     private const string DateTimePersistenceFormat = "yyyy'-'MM'-'ddTHH':'mm':'ss'.'fffffffzzz";
 
