@@ -16,6 +16,18 @@ jobs:
       modifyEnvironment: false
       failOnStandardError: true
 
+  - task: PowerShell@2
+    displayName: 'Disable Strong Name Validation'
+    inputs:
+      targetType: 'inline'
+      script: |
+        Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\.NETFramework" -Name "AllowStrongNameBypass" -Value 1 -Force
+        Set-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\Microsoft\.NETFramework" -Name "AllowStrongNameBypass" -Value 1 -Force
+        reg DELETE "HKLM\Software\Microsoft\StrongName\Verification" /f
+        reg DELETE "HKLM\Software\Wow6432Node\Microsoft\StrongName\Verification" /f
+        reg ADD "HKLM\Software\Microsoft\StrongName\Verification\*,*" /f
+        reg ADD "HKLM\Software\Wow6432Node\Microsoft\StrongName\Verification\*,*" /f
+
   - task: BatchScript@1
     displayName: 'Run Unit Tests'
     inputs:
