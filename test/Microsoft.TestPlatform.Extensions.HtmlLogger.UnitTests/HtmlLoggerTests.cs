@@ -468,14 +468,14 @@ public class HtmlLoggerTests
         var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
         var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
 
-        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
+        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
         {
         }).Returns(new Mock<Stream>().Object);
 
         _htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
         _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
-        _mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite), Times.Once);
+        _mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite), Times.Once);
     }
 
     [TestMethod]
@@ -514,14 +514,14 @@ public class HtmlLoggerTests
         var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
         var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
 
-        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
+        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
         {
         }).Returns(new Mock<Stream>().Object);
 
         _htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
         _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
-        _mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite), Times.Once);
+        _mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite), Times.Once);
     }
 
     [TestMethod]
@@ -548,7 +548,7 @@ public class HtmlLoggerTests
         var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
         var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
 
-        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
+        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
         {
         }).Returns(new Mock<Stream>().Object);
 
@@ -564,7 +564,7 @@ public class HtmlLoggerTests
         var testCase1 = CreateTestCase("TestCase1") ?? throw new ArgumentNullException($"CreateTestCase(\"TestCase1\")");
         var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
         var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
-        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
+        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
         {
         }).Returns(new Mock<Stream>().Object);
 
@@ -579,7 +579,7 @@ public class HtmlLoggerTests
     [TestMethod]
     public void TestCompleteHandlerShouldNotDivideByZeroWhenThereAre0TestResults()
     {
-        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
+        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
         {
         }).Returns(new Mock<Stream>().Object);
 
