@@ -140,13 +140,14 @@ internal class ParallelDiscoveryDataAggregator
     /// <param name="sorce">Fully discovered source</param>
     internal void AggregateTheSourcesWithDiscoveryStatus(IEnumerable<string> sources, DiscoveryStatus status)
     {
-        if (sources == null || sources.Count() == 0) return;
+        if (sources is null || !sources.Any())
+        {
+            return;
+        }
 
         foreach (var source in sources)
-        {
-            if (status == DiscoveryStatus.NotDiscovered) SourcesWithDiscoveryStatus[source] = status;
-
-            if (!SourcesWithDiscoveryStatus.ContainsKey(source))
+        {            
+            if (!SourcesWithDiscoveryStatus.ContainsKey(source) && status != DiscoveryStatus.NotDiscovered)
             {
                 EqtTrace.Warning("ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus: "
                     + $"{source} is not present in SourcesWithDiscoveryStatus dictionary.");
