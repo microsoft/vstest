@@ -27,11 +27,6 @@
         <note></note>
         <target state="translated">설정을 로드하는 동안 오류가 발생했습니다. 오류: {0}.</target>
       </trans-unit>
-      <trans-unit id="SystemArchitectureIncompatibleWithTargetPlatform">
-        <source>Incompatible Target platform settings '{0}' with system architecture '{1}'.</source>
-        <note></note>
-        <target state="translated">대상 플랫폼 설정 '{0}'이(가) 시스템 아키텍처 '{1}'과(와) 호환되지 않습니다.</target>
-      </trans-unit>
       <trans-unit id="UnExpectedSettingsFile">
         <source>Unexpected settings file specified.</source>
         <note></note>

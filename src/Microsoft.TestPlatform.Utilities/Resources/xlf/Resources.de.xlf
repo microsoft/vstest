@@ -27,11 +27,6 @@
         <note></note>
         <target state="translated">Fehler beim Laden der Einstellungen. Fehler: {0}.</target>
       </trans-unit>
-      <trans-unit id="SystemArchitectureIncompatibleWithTargetPlatform">
-        <source>Incompatible Target platform settings '{0}' with system architecture '{1}'.</source>
-        <note></note>
-        <target state="translated">Inkompatible Zielplattformeinstellungen "{0}" mit der Systemarchitektur "{1}".</target>
-      </trans-unit>
       <trans-unit id="UnExpectedSettingsFile">
         <source>Unexpected settings file specified.</source>
         <note></note>
