@@ -33,6 +33,7 @@ using PlatformAbstractions.Interfaces;
 using Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using System.Collections.Immutable;
 
 /// <summary>
 /// The default test host launcher for the engine.
@@ -45,6 +46,10 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     private const string DefaultTestHostUri = "HostProvider://DefaultTestHost";
     private const string DefaultTestHostFriendlyName = "DefaultTestHost";
     private const string TestAdapterEndsWithPattern = @"TestAdapter.dll";
+
+    // Any version (older or newer) that is not in this list will use the default testhost.exe that is built using net451.
+    // TODO: Add net481 when it is published, if it uses a new moniker.
+    private static readonly ImmutableArray<string> SupportedTargetFrameworks = ImmutableArray.Create("net452", "net46", "net461", "net462", "net47", "net471", "net472", "net48");
 
     private Architecture _architecture;
     private Framework _targetFramework;
@@ -179,17 +184,37 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
     private string GetTestHostName(Architecture architecture, Framework targetFramework, PlatformArchitecture processArchitecture)
     {
-        string testHostProcessName = "testhost";
+        // We ship multiple executables for testhost that follow this naming schema:
+        // testhost<.tfm><.architecture>.exe
+        // e.g.: testhost.net472.x86.exe -> 32-bit testhost for .NET Framework 4.7.2
+        //
+        // The tfm is omitted for .NET Framework 4.5.1 testhost.
+        // testhost.x86.exe -> 64-bit testhost for .NET Framework 4.5.1
+        //
+        // The architecture is omitted for 64-bit (x64) testhost.
+        // testhost.net472.exe -> 64-bit testhost for .NET Framework 4.7.2
+        // testhost.exe -> 64-bit testhost for .NET Framework 4.5.1
+        //
+        // These omissions are done for backwards compatibility because orinally there were
+        // only testhost.exe and testhost.x86.exe, both built against .NET Framework 4.5.1.
+
+        StringBuilder testHostProcessName = new("testhost");
 
         if (targetFramework.Name.StartsWith(".NETFramework,Version=v"))
         {
+            // Transform target framework name into moniker.
+            // e.g. ".NETFramework,Version=v4.7.2" -> "net472".
             var targetFrameworkMoniker = "net" + targetFramework.Name.Replace(".NETFramework,Version=v", string.Empty).Replace(".", string.Empty);
 
-            // Net451 or older will use the default testhost.exe that is compiled against net451.
-            var isSupportedNetTarget = new[] { "net452", "net46", "net461", "net462", "net47", "net471", "net472", "net48" }.Contains(targetFrameworkMoniker);
-            var targetFrameworkSuffix = isSupportedNetTarget ? $".{targetFrameworkMoniker}" : string.Empty;
-
-            testHostProcessName += targetFrameworkSuffix;
+            var isSupportedTargetFramework = SupportedTargetFrameworks.Contains(targetFrameworkMoniker);
+            if (isSupportedTargetFramework)
+            {
+                testHostProcessName.Append('.').Append(targetFrameworkMoniker);
+            }
+            else
+            {
+                // The .NET Framework 4.5.1 testhost that does not have moniker in the name is used as fallback.
+            }
         }
 
         var processArchitectureAsArchitecture = processArchitecture switch
@@ -202,24 +227,28 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             _ => throw new NotSupportedException(),
         };
 
+        // Default architecture, or AnyCPU architecture will use the architecture of the current process,
+        // so when you run from 32-bit vstest.console, or from 32-bit dotnet test, you will get 32-bit testhost
+        // as the preferred testhost.
         var actualArchitecture = architecture is Architecture.Default or Architecture.AnyCPU
             ? processArchitectureAsArchitecture
             : architecture;
 
-        if (actualArchitecture == Architecture.X64)
-        {
-            // testhost.exe (and testhost.net###.exe) is a 64-bit executable, and has no architecture suffix in the name.
-        }
-        else
+        if (actualArchitecture != Architecture.X64)
         {
             // Append .<architecture> to the name, such as .x86. It is possible that we are not shipping the
             // executable for the architecture with VS, and that will fail later with file not found exception,
             // which is okay.
-            testHostProcessName += $".{architecture.ToString().ToLowerInvariant()}";
+            testHostProcessName.Append('.').Append(architecture.ToString().ToLowerInvariant());
+        }
+        else
+        {
+            // 64-bit (x64) executable, uses no architecture suffix in the name.
+            // E.g.: testhost.exe or testhost.net472.exe
         }
 
-        testHostProcessName += ".exe";
-        return testHostProcessName;
+        testHostProcessName.Append(".exe");
+        return testHostProcessName.ToString();
     }
 
     /// <inheritdoc/>
