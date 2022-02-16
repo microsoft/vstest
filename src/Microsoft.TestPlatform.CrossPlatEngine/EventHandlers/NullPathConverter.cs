@@ -12,7 +12,7 @@ using System;
 
 internal class NullPathConverter : IPathConverter
 {
-    private static readonly Lazy<NullPathConverter> LazyInstance= new(() => new NullPathConverter());
+    private static readonly Lazy<NullPathConverter> LazyInstance = new(() => new NullPathConverter());
 
     private NullPathConverter() { }
 
