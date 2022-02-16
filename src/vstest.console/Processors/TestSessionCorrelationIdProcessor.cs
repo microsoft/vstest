@@ -86,9 +86,9 @@ internal class TestSessionCorrelationIdProcessorModeProcessorExecutor : IArgumen
 {
     private readonly CommandLineOptions _commandLineOptions;
 
-    public TestSessionCorrelationIdProcessorModeProcessorExecutor(CommandLineOptions options)
+    public TestSessionCorrelationIdProcessorModeProcessorExecutor(CommandLineOptions options!!)
     {
-        _commandLineOptions = options ?? throw new ArgumentNullException(nameof(options));
+        _commandLineOptions = options;
     }
 
     public void Initialize(string argument)

@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.CommandLine;
-
-using vstest.ProgrammerTests.CommandLine.Fakes;
-
 namespace vstest.ProgrammerTests.CommandLine;
 
-internal class VstestConsole
+using Microsoft.VisualStudio.TestPlatform.CommandLine;
+using vstest.ProgrammerTests.CommandLine.Fakes;
+
+internal class VstestConsoleBuilder
 {
     public List<string> Sources { get; } = new();
 
@@ -15,13 +14,13 @@ internal class VstestConsole
 
     internal FakeOutput Output { get; } = new();
 
-    internal VstestConsole WithSource(params string[] sources)
+    internal VstestConsoleBuilder WithSource(params string[] sources)
     {
         Sources.AddRange(sources);
         return this;
     }
 
-    internal VstestConsole WithArguments(params string[] arguments)
+    internal VstestConsoleBuilder WithArguments(params string[] arguments)
     {
         Arguments.AddRange(arguments);
         return this;

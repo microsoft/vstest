@@ -1,10 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-
-#pragma warning disable IDE1006 // Naming Styles
 namespace vstest.ProgrammerTests.CommandLine.Fakes;
+
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 internal class FakeFileHelper : IFileHelper
 {
@@ -31,6 +30,11 @@ internal class FakeFileHelper : IFileHelper
         throw new NotImplementedException();
     }
 
+    public void DeleteDirectory(string directoryPath, bool recursive)
+    {
+        throw new NotImplementedException();
+    }
+
     public void DeleteEmptyDirectroy(string directoryPath)
     {
         throw new NotImplementedException();
@@ -39,7 +43,7 @@ internal class FakeFileHelper : IFileHelper
     public bool DirectoryExists(string path)
     {
         // TODO: Check if any file has the directory in name. This will improve.
-        var directoryExists = Files.Select(f => Path.GetDirectoryName(f.Path)).Any(p => p.StartsWith(path));
+        var directoryExists = Files.Select(f => Path.GetDirectoryName(f.Path)).Any(p => p != null && p.StartsWith(path));
         return directoryExists;
     }
 
@@ -68,6 +72,11 @@ internal class FakeFileHelper : IFileHelper
         throw new NotImplementedException();
     }
 
+    public long GetFileLength(string path)
+    {
+        throw new NotImplementedException();
+    }
+
     public string[] GetFiles(string path, string searchPattern, SearchOption searchOption)
     {
         throw new NotImplementedException();
@@ -89,6 +98,11 @@ internal class FakeFileHelper : IFileHelper
     }
 
     public Stream GetStream(string filePath, FileMode mode, FileAccess access, FileShare share)
+    {
+        throw new NotImplementedException();
+    }
+
+    public string GetTempPath()
     {
         throw new NotImplementedException();
     }

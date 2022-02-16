@@ -91,9 +91,9 @@ internal class ArtifactProcessingCollectModeProcessorExecutor : IArgumentExecuto
 {
     private readonly CommandLineOptions _commandLineOptions;
 
-    public ArtifactProcessingCollectModeProcessorExecutor(CommandLineOptions options)
+    public ArtifactProcessingCollectModeProcessorExecutor(CommandLineOptions options!!)
     {
-        _commandLineOptions = options ?? throw new ArgumentNullException(nameof(options));
+        _commandLineOptions = options;
     }
 
     public void Initialize(string argument)

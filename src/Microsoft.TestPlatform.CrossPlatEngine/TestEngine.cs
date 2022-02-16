@@ -34,7 +34,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 /// </summary>
 public class TestEngine : ITestEngine
 {
-    private readonly TestRuntimeProviderManager _testHostProviderManager;
+    private readonly ITestRuntimeProviderManager _testHostProviderManager;
     private ITestExtensionManager _testExtensionManager;
     private readonly IProcessHelper _processHelper;
 
