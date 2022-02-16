@@ -23,8 +23,9 @@ internal class FakeProcess
     public int ExitCode { get; init; } = -1;
     public bool Exited { get; private set; }
 
-    public FakeProcess(string path, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<object, string> errorCallback, Action<object> exitCallBack, Action<object, string> outputCallback, FakeErrorAggregator fakeErrorAggregator)
+    public FakeProcess(FakeErrorAggregator fakeErrorAggregator, string path, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<object, string> errorCallback, Action<object> exitCallBack, Action<object, string> outputCallback)
     {
+        FakeErrorAggregator = fakeErrorAggregator;
         Path = path;
         Name = System.IO.Path.GetFileName(path);
         Arguments = arguments;
@@ -33,7 +34,6 @@ internal class FakeProcess
         ErrorCallback = errorCallback;
         ExitCallback = exitCallBack;
         OutputCallback = outputCallback;
-        FakeErrorAggregator = fakeErrorAggregator;
     }
 
     internal static FakeProcess EnsureFakeProcess(object process)

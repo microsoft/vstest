@@ -107,7 +107,7 @@ public class TestRequestSender : ITestRequestSender
         // resort of getting the dependency into the execution flow.
         // TODO: I am not sure if we need multiple instances of ICommunicationEndpoint, in that case we should register
         // and resolve Func<ICommunicationEndPoint> and invoke that.
-        _communicationEndpoint = communicationEndPoint ?? TestServiceLocator.Get<ICommunicationEndPoint>() ?? SetCommunicationEndPoint();
+        _communicationEndpoint = communicationEndPoint ?? TestServiceLocator.Get<ICommunicationEndPoint>(connectionInfo.Endpoint) ?? SetCommunicationEndPoint();
         _connectionInfo.Endpoint = connectionInfo.Endpoint;
         _connectionInfo.Role = connectionInfo.Role == ConnectionRole.Host
             ? ConnectionRole.Client
@@ -170,6 +170,7 @@ public class TestRequestSender : ITestRequestSender
         // Server start returns the listener port
         // return int.Parse(this.communicationServer.Start());
         var endpoint = _communicationEndpoint.Start(_connectionInfo.Endpoint);
+        // TODO: This is forcing us to use ip and port for communication
         return endpoint.GetIpEndPoint().Port;
     }
 

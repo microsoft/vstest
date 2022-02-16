@@ -1,19 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+namespace vstest.ProgrammerTests.Fakes;
+
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 using vstest.ProgrammerTests.CommandLine;
-
-namespace vstest.ProgrammerTests.Fakes;
 
 internal class FakeCommunicationChannel : ICommunicationChannel
 {
@@ -46,15 +44,16 @@ internal class FakeCommunicationChannel : ICommunicationChannel
     public Queue<RequestResponsePair<string, FakeMessage>> NextResponses { get; } = new();
     public FakeErrorAggregator FakeErrorAggregator { get; }
     public FakeMessage? OutgoingMessage { get; private set; }
+    public int Id { get; }
 
     public CancellationTokenSource CancellationTokenSource = new();
 
     public event EventHandler<MessageReceivedEventArgs>? MessageReceived;
 
-    public FakeCommunicationChannel(List<RequestResponsePair<string, FakeMessage>> responses, FakeErrorAggregator fakeErrorAggregator)
+    public FakeCommunicationChannel(List<RequestResponsePair<string, FakeMessage>> responses, FakeErrorAggregator fakeErrorAggregator, int id)
     {
         FakeErrorAggregator = fakeErrorAggregator;
-
+        Id = id;
         responses.ForEach(NextResponses.Enqueue);
 
         ProcessIncomingMessages = Task.Run(() =>

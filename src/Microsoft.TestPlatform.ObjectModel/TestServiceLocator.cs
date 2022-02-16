@@ -9,21 +9,21 @@ using System.Collections.Generic;
 // TODO: Make this internal, I am just trying to have easier time trying this out.
 public static class TestServiceLocator
 {
-    public static Dictionary<Type, object> Instances { get; } = new Dictionary<Type, object>();
+    public static Dictionary<string, object> Instances { get; } = new Dictionary<string, object>();
     public static List<Resolve> Resolves { get; } = new();
 
-    public static void Register<TRegistration>(TRegistration instance)
+    public static void Register<TRegistration>(string name, TRegistration instance)
     {
-        Instances.Add(typeof(TRegistration), instance);
+        Instances.Add(name, instance);
     }
 
-    public static TRegistration Get<TRegistration>()
+    public static TRegistration Get<TRegistration>(string name)
     {
-        if (!Instances.TryGetValue(typeof(TRegistration), out var instance))
-            throw new InvalidOperationException($"Cannot find instance for type {typeof(TRegistration)}.");
+        if (!Instances.TryGetValue(name, out var instance))
+            throw new InvalidOperationException($"Cannot find an instance for name {name}.");
 
 #if !NETSTANDARD1_0
-        Resolves.Add(new Resolve(typeof(TRegistration).FullName, Environment.StackTrace));
+        Resolves.Add(new Resolve(name, typeof(TRegistration).FullName, Environment.StackTrace));
 #endif
         return (TRegistration)instance;
     }
@@ -38,12 +38,14 @@ public static class TestServiceLocator
 // TODO: Make this internal, I am just trying to have easier time trying this out.
 public class Resolve
 {
-    public Resolve(string type, string stackTrace)
+    public Resolve(string name, string type, string stackTrace)
     {
+        Name = name;
         Type = type;
         StackTrace = stackTrace;
     }
 
+    public string Name { get; }
     public string Type { get; }
     public string StackTrace { get; }
 }

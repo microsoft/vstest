@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+namespace vstest.ProgrammerTests.CommandLine.Fakes;
+
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
-#pragma warning disable IDE1006 // Naming Styles
-namespace vstest.ProgrammerTests.CommandLine.Fakes;
 
 internal class FakeTestRuntimeProvider : ITestRuntimeProvider
 {
@@ -21,7 +20,7 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
     public event EventHandler<HostProviderEventArgs> HostLaunched;
     public event EventHandler<HostProviderEventArgs> HostExited;
 
-    public FakeTestRuntimeProvider(FakeProcessHelper fakeProcessHelper, FakeCommunicationEndpoint fakeCommunicationEndpoint)
+    public FakeTestRuntimeProvider(FakeProcessHelper fakeProcessHelper, FakeCommunicationEndpoint fakeCommunicationEndpoint, FakeErrorAggregator fakeErrorAggregator)
     {
         FakeProcessHelper = fakeProcessHelper;
         FakeCommunicationEndpoint = fakeCommunicationEndpoint;
@@ -42,14 +41,7 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
 
     public TestHostConnectionInfo GetTestHostConnectionInfo()
     {
-        // TODO: Makes this configurable?
-        return new TestHostConnectionInfo
-        {
-            // using 9090 for no particular reason, apart from knowing that port 0 is ignored somewhere in our codebase
-            Endpoint = "127.0.0.1:9090",
-            Role = ConnectionRole.Client,
-            Transport = Transport.Sockets,
-        };
+        return FakeCommunicationEndpoint.TestHostConnectionInfo;
     }
 
     public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)

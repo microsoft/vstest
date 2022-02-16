@@ -20,11 +20,11 @@ internal class FakeProcessHelper : IProcessHelper
 
     public FakeErrorAggregator FakeErrorAggregator { get; }
 
-    public FakeProcessHelper(FakeProcess currentProcess, FakeErrorAggregator fakeErrorAggregator)
+    public FakeProcessHelper(FakeErrorAggregator fakeErrorAggregator, FakeProcess currentProcess)
     {
+        FakeErrorAggregator = fakeErrorAggregator;
         CurrentProcess = currentProcess;
         AddProcess(currentProcess);
-        FakeErrorAggregator = fakeErrorAggregator;
     }
 
     private void AddProcess(FakeProcess currentProcess)
@@ -84,7 +84,7 @@ internal class FakeProcessHelper : IProcessHelper
 
     public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<object, string> errorCallback, Action<object> exitCallBack, Action<object, string> outputCallback)
     {
-        var process = new FakeProcess(processPath, arguments, workingDirectory, environmentVariables, errorCallback, exitCallBack, outputCallback, FakeErrorAggregator);
+        var process = new FakeProcess(FakeErrorAggregator, processPath, arguments, workingDirectory, environmentVariables, errorCallback, exitCallBack, outputCallback);
         Processes.Add(process);
 
         return process;

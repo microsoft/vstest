@@ -1,26 +1,36 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-
 #pragma warning disable IDE1006 // Naming Styles
 namespace vstest.ProgrammerTests.CommandLine.Fakes;
 
+using System.Collections.Concurrent;
+
+using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+
 internal class FakeTestRuntimeProviderManager : ITestRuntimeProviderManager
 {
-    public FakeTestRuntimeProviderManager(FakeProcessHelper fakeProcessHelper, FakeCommunicationEndpoint fakeCommunicationEndpoint, FakeErrorAggregator fakeErrorAggregator)
+    public FakeTestRuntimeProviderManager(List<FakeTestRuntimeProvider> testRuntimeProviders, FakeErrorAggregator fakeErrorAggregator)
     {
-        TestRuntimeProvider = new FakeTestRuntimeProvider(fakeProcessHelper, fakeCommunicationEndpoint);
+        testRuntimeProviders.ForEach(TestRuntimeProviders.Enqueue);
         FakeErrorAggregator = fakeErrorAggregator;
     }
 
-    public FakeTestRuntimeProvider TestRuntimeProvider { get; private set; }
+    public ConcurrentQueue<FakeTestRuntimeProvider> TestRuntimeProviders { get; } = new();
+    public List<FakeTestRuntimeProvider> ProvidedTestRuntimeProviders { get; } = new();
+
     public FakeErrorAggregator FakeErrorAggregator { get; }
 
     public ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration)
     {
-        return TestRuntimeProvider;
+        if (!TestRuntimeProviders.TryDequeue(out var next))
+        {
+            throw new InvalidOperationException("There are no more TestRuntimeProviders to be provided");
+        }
+
+        ProvidedTestRuntimeProviders.Add(next);
+        return next;
     }
 
     public ITestRuntimeProvider GetTestHostManagerByUri(string hostUri)

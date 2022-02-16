@@ -52,8 +52,8 @@ public class TestDiscoveryTests
         var fakeErrorAggregator = new FakeErrorAggregator();
         var commandLineOptions = CommandLineOptions.Instance;
 
-        var fakeCurrentProcess = new FakeProcess(@"X:\fake\vstest.console.exe", string.Empty, null, null, null, null, null, fakeErrorAggregator);
-        var fakeProcessHelper = new FakeProcessHelper(fakeCurrentProcess, fakeErrorAggregator);
+        var fakeCurrentProcess = new FakeProcess(fakeErrorAggregator, @"X:\fake\vstest.console.exe", string.Empty, null, null, null, null, null);
+        var fakeProcessHelper = new FakeProcessHelper(fakeErrorAggregator, fakeCurrentProcess);
 
         var fakeFileHelper = new FakeFileHelper(fakeErrorAggregator);
         // TODO: Get framework name from constants
@@ -92,10 +92,11 @@ public class TestDiscoveryTests
         };
 
 
-        var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(new FakeCommunicationChannel(responses, fakeErrorAggregator), fakeErrorAggregator);
+        var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(new FakeCommunicationChannel(responses, fakeErrorAggregator, 1), fakeErrorAggregator);
         TestServiceLocator.Clear();
-        TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint);
-        var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(fakeProcessHelper, fakeCommunicationEndpoint, fakeErrorAggregator);
+        TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint.TestHostConnectionInfo.Endpoint, fakeCommunicationEndpoint);
+        var fakeTestRuntimeProvider = new FakeTestRuntimeProvider(fakeProcessHelper, fakeCommunicationEndpoint, fakeErrorAggregator);
+        var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(new[] { fakeTestRuntimeProvider, fakeTestRuntimeProvider }.ToList(), fakeErrorAggregator);
         var testEngine = new TestEngine(fakeTestRuntimeProviderManager, fakeProcessHelper);
 
         var testPlatform = new TestPlatform(testEngine, fakeFileHelper, fakeTestRuntimeProviderManager);
@@ -150,7 +151,7 @@ public class TestDiscoveryTests
         var cancelAbort = new CancellationTokenSource();
         var task = Task.Run(async () =>
         {
-            await Task.Delay(TimeSpan.FromSeconds(10), cancelAbort.Token);
+            await Task.Delay(TimeSpan.FromSeconds(Debugger.IsAttached ? 100 : 10), cancelAbort.Token);
             if (Debugger.IsAttached)
             {
                 // we will abort because we are hanging, look at stacks to see what the problem is
@@ -175,23 +176,24 @@ public class TestDiscoveryTests
 
     public async Task GivenMultipleMsTestAssembliesThatUseTheSameTargetFrameworkAndArchitecture_WhenTestsAreRun_ThenAllTestsFromAllAssembliesAreRun()
     {
-        // -- arrange
-        var fakeErrorAggregator = new FakeErrorAggregator();
-        var commandLineOptions = CommandLineOptions.Instance;
-
-        var fakeCurrentProcess = new FakeProcess(@"X:\fake\vstest.console.exe", string.Empty, null, null, null, null, null, fakeErrorAggregator);
-        var fakeProcessHelper = new FakeProcessHelper(fakeCurrentProcess, fakeErrorAggregator);
-
-        var fakeFileHelper = new FakeFileHelper(fakeErrorAggregator);
-        // TODO: Get framework name from constants
-        // TODO: have mstest1dll canned
-        var tests = new FakeTestBatchBuilder()
-            .WithTotalCount(108)
-            .WithDuration(100.Milliseconds())
-            .WithBatchSize(10)
+        using var fixture = new FixtureBuilder()
             .Build();
-        var mstest1Dll = new FakeTestDllFile(@"X:\fake\mstest1.dll", new FrameworkName(".NETCoreApp,Version=v5.0"), Architecture.X64, tests);
-        fakeFileHelper.AddFile(mstest1Dll);
+
+        // -- arrange
+        var testhost1 = new FakeTestHostBuilder()
+            .WithTestDll()
+            .Build();
+        
+        var commandLineOptions = CommandLineOptions.Instance;
+        // TODO: have mstest1dll canned
+        var mstest1Dll = new FakeTestDllBuilder()
+            .WithPath(@"X:\fake\mstest1.dll")
+            .WithFramework(KnownFramework.Net50)
+            .WithArchitecture(Architecture.X64)
+            .WithTestCount(108, 10)
+            .Build();
+        var tests = mstest1Dll.TestResultBatches;
+        fixture.FileHelper.AddFile(mstest1Dll);
 
         var tests2 = new FakeTestBatchBuilder()
             .WithTotalCount(108)
@@ -199,8 +201,9 @@ public class TestDiscoveryTests
             .WithBatchSize(10)
             .Build();
         var mstest2Dll = new FakeTestDllFile(@"X:\fake\mstest2.dll", new FrameworkName(".NETCoreApp,Version=v5.0"), Architecture.X64, tests2);
-        fakeFileHelper.AddFile(mstest2Dll);
+        fixture.FileHelper.AddFile(mstest2Dll);
 
+        // ---
         List<FakeMessage> changeMessages = tests.Take(tests.Count - 1).Select(batch =>  // TODO: make the stats agree with the tests below
             new FakeMessage<TestRunChangedEventArgs>(MessageType.TestRunStatsChange,
                   new TestRunChangedEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = batch.Count }), batch, new List<TestCase>())
@@ -219,34 +222,66 @@ public class TestDiscoveryTests
         new RequestResponsePair<string, FakeMessage>(MessageType.SessionEnd, message =>
             {
                 // TODO: how do we associate this to the correct process?
-                var fp = fakeProcessHelper.Processes.Last();
-                fakeProcessHelper.TerminateProcess(fp);
+                var fp = fixture.ProcessHelper.Processes.Last();
+                fixture.ProcessHelper.TerminateProcess(fp);
+
+                return new List<FakeMessage> { FakeMessage.NoResponse };
+            }),
+        };
+
+        var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(new FakeCommunicationChannel(responses, fixture.ErrorAggregator, 1), fixture.ErrorAggregator);
+        var fakeTestRuntimeProvider = new FakeTestRuntimeProvider(fixture.ProcessHelper, fakeCommunicationEndpoint, fixture.ErrorAggregator);
+
+        // ---
+        List<FakeMessage> changeMessages2 = tests2.Take(tests2.Count - 1).Select(batch =>  // TODO: make the stats agree with the tests below
+    new FakeMessage<TestRunChangedEventArgs>(MessageType.TestRunStatsChange,
+          new TestRunChangedEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = batch.Count }), batch, new List<TestCase>())
+         )).ToList<FakeMessage>();
+        FakeMessage completedMessage2 = new FakeMessage<TestRunCompletePayload>(MessageType.ExecutionComplete, new TestRunCompletePayload
+        {
+            // TODO: make the stats agree with the tests below
+            TestRunCompleteArgs = new TestRunCompleteEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = 1 }), false, false, null, new System.Collections.ObjectModel.Collection<AttachmentSet>(), TimeSpan.Zero),
+            LastRunTests = new TestRunChangedEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = 1 }), tests.Last(), new List<TestCase>()),
+        });
+        List<FakeMessage> messages2 = changeMessages2.Concat(new[] { completedMessage2 }).ToList();
+        var responses2 = new List<RequestResponsePair<string, FakeMessage>> {
+        new RequestResponsePair<string, FakeMessage>(MessageType.VersionCheck, new FakeMessage<int>(MessageType.VersionCheck, 5)),
+        new RequestResponsePair<string, FakeMessage>(MessageType.ExecutionInitialize, FakeMessage.NoResponse),
+        new RequestResponsePair<string, FakeMessage>(MessageType.StartTestExecutionWithSources, messages),
+        new RequestResponsePair<string, FakeMessage>(MessageType.SessionEnd, message =>
+            {
+                // TODO: how do we associate this to the correct process?
+                var fp = fixture.ProcessHelper.Processes.Last();
+                fixture.ProcessHelper.TerminateProcess(fp);
 
                 return new List<FakeMessage> { FakeMessage.NoResponse };
             }),
         };
 
 
-        var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(new FakeCommunicationChannel(responses, fakeErrorAggregator), fakeErrorAggregator);
-        TestServiceLocator.Clear();
-        TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint);
-        var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(fakeProcessHelper, fakeCommunicationEndpoint, fakeErrorAggregator);
-        var testEngine = new TestEngine(fakeTestRuntimeProviderManager, fakeProcessHelper);
+        var fakeCommunicationEndpoint2 = new FakeCommunicationEndpoint(new FakeCommunicationChannel(responses2, fixture.ErrorAggregator, 2), fixture.ErrorAggregator);
+        var fakeTestRuntimeProvider2 = new FakeTestRuntimeProvider(fixture.ProcessHelper, fakeCommunicationEndpoint2, fixture.ErrorAggregator);
 
-        var testPlatform = new TestPlatform(testEngine, fakeFileHelper, fakeTestRuntimeProviderManager);
+        TestServiceLocator.Clear();
+        TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint.TestHostConnectionInfo.Endpoint, fakeCommunicationEndpoint);
+        TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint2.TestHostConnectionInfo.Endpoint, fakeCommunicationEndpoint2);
+        var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(new[] { fakeTestRuntimeProvider, fakeTestRuntimeProvider, fakeTestRuntimeProvider2, fakeTestRuntimeProvider2 }.ToList(), fixture.ErrorAggregator);
+        var testEngine = new TestEngine(fakeTestRuntimeProviderManager, fixture.ProcessHelper);
+
+        var testPlatform = new TestPlatform(testEngine, fixture.FileHelper, fakeTestRuntimeProviderManager);
 
         var testRunResultAggregator = new TestRunResultAggregator();
-        var fakeTestPlatformEventSource = new FakeTestPlatformEventSource(fakeErrorAggregator);
+        var fakeTestPlatformEventSource = new FakeTestPlatformEventSource(fixture.ErrorAggregator);
 
-        var fakeAssemblyMetadataProvider = new FakeAssemblyMetadataProvider(fakeFileHelper, fakeErrorAggregator);
+        var fakeAssemblyMetadataProvider = new FakeAssemblyMetadataProvider(fixture.FileHelper, fixture.ErrorAggregator);
         var inferHelper = new InferHelper(fakeAssemblyMetadataProvider);
 
         // This is most likely not the correctl place where to cut this off, plugin cache is probably the better place,
         // but it is not injected, and I don't want to investigate this now.
-        var fakeDataCollectorAttachmentsProcessorsFactory = new FakeDataCollectorAttachmentsProcessorsFactory(fakeErrorAggregator);
+        var fakeDataCollectorAttachmentsProcessorsFactory = new FakeDataCollectorAttachmentsProcessorsFactory(fixture.ErrorAggregator);
         var testRunAttachmentsProcessingManager = new TestRunAttachmentsProcessingManager(fakeTestPlatformEventSource, fakeDataCollectorAttachmentsProcessorsFactory);
 
-        Task<IMetricsPublisher> fakeMetricsPublisherTask = Task.FromResult<IMetricsPublisher>(new FakeMetricsPublisher(fakeErrorAggregator));
+        Task<IMetricsPublisher> fakeMetricsPublisherTask = Task.FromResult<IMetricsPublisher>(new FakeMetricsPublisher(fixture.ErrorAggregator));
         TestRequestManager testRequestManager = new(
             commandLineOptions,
             testPlatform,
@@ -254,7 +289,7 @@ public class TestDiscoveryTests
             fakeTestPlatformEventSource,
             inferHelper,
             fakeMetricsPublisherTask,
-            fakeProcessHelper,
+            fixture.ProcessHelper,
             testRunAttachmentsProcessingManager
             );
 
@@ -276,7 +311,7 @@ public class TestDiscoveryTests
         };
 
         // var fakeTestHostLauncher = new FakeTestHostLauncher();
-        var fakeTestRunEventsRegistrar = new FakeTestRunEventsRegistrar(fakeErrorAggregator);
+        var fakeTestRunEventsRegistrar = new FakeTestRunEventsRegistrar(fixture.ErrorAggregator);
         var protocolConfig = new ProtocolConfig();
 
         // TODO: we make sure the test is running 10 minutes at max and then we try to abort
@@ -285,14 +320,14 @@ public class TestDiscoveryTests
         var cancelAbort = new CancellationTokenSource();
         var task = Task.Run(async () =>
         {
-            await Task.Delay(TimeSpan.FromSeconds(5), cancelAbort.Token);
+            await Task.Delay(TimeSpan.FromSeconds(Debugger.IsAttached ? 50 : 5), cancelAbort.Token);
             if (Debugger.IsAttached)
             {
-                var errors = fakeErrorAggregator.Errors;
+                var errors = fixture.ErrorAggregator.Errors;
                 // we will abort because we are hanging, look at stacks to see what the problem is
                 Debugger.Break();
             }
-            fakeErrorAggregator.Add(new Exception("errr we aborted"));
+            fixture.ErrorAggregator.Add(new Exception("errr we aborted"));
             testRequestManager.AbortTestRun();
 
         });
@@ -305,31 +340,18 @@ public class TestDiscoveryTests
         // pattern end
 
         // -- assert
-        fakeErrorAggregator.Errors.Should().BeEmpty();
-        fakeTestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults).Should().HaveCount(110);
+        fixture.ErrorAggregator.Errors.Should().BeEmpty();
+        fakeTestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults).Should().HaveCount(216);
     }
 }
 
-internal class Fixture : IDisposable
+internal class FixtureBuilder
 {
-    public Fixture()
+    internal Fixture Build()
     {
-
-    }
-
-    public List<FakeProcess> Processes { get; } = new();
-
-    public VstestConsoleBuilder VstestConsole { get; } = new();
-
-    public FakeTestExtensionManager TestExtensionManager { get; } = new();
-
-    public void Dispose()
-    {
-
+        return new Fixture();
     }
 }
-
-
 
 internal class CapturedRunSettings
 {

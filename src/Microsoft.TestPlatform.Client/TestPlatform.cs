@@ -133,6 +133,11 @@ internal class TestPlatform : ITestPlatform
         var loggerManager = TestEngine.GetLoggerManager(requestData);
         loggerManager.Initialize(testRunCriteria.TestRunSettings);
 
+        // TODO: PERF: this will create a testhost manager, and then it will pass that to GetExecutionManager, where it will
+        // be used only when we will run in-process. If we don't run in process, we will throw away the manager we just
+        // created and let the proxy parallel callbacks to create a new one. This seems to be very easy to move to the GetExecutionManager,
+        // and safe as well, so we create the manager only once.
+        // TODO: Of course TestEngine.GetExecutionManager is public api :D
         var testHostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
         ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
 
