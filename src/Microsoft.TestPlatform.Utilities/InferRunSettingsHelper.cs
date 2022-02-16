@@ -182,9 +182,6 @@ public class InferRunSettingsHelper
 
         EqtTrace.Verbose("Using effective platform:{0} effective framework:{1}", architecture, framework);
 
-        // check if platform is compatible with current system architecture.
-        VerifyCompatibilityWithOsArchitecture(architecture);
-
         // Check if inputRunSettings has results directory configured.
         var hasResultsDirectory = runSettingsDocument.SelectSingleNode(ResultsDirectoryNodePath) != null;
 
@@ -557,27 +554,6 @@ public class InferRunSettingsHelper
                             TargetFrameworkNodeName)));
             }
         }
-    }
-
-    /// <summary>
-    /// Throws SettingsException if platform is incompatible with system architecture.
-    /// </summary>
-    /// <param name="architecture"></param>
-    private static void VerifyCompatibilityWithOsArchitecture(Architecture architecture)
-    {
-        var osArchitecture = XmlRunSettingsUtilities.OSArchitecture;
-
-        if (architecture == Architecture.X86 && osArchitecture == Architecture.X64)
-        {
-            return;
-        }
-
-        if (architecture == osArchitecture)
-        {
-            return;
-        }
-
-        throw new SettingsException(string.Format(CultureInfo.CurrentCulture, UtilitiesResources.SystemArchitectureIncompatibleWithTargetPlatform, architecture, osArchitecture));
     }
 
     /// <summary>

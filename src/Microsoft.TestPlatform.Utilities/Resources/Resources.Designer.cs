@@ -11,8 +11,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Resources {
     using System;
     using System.Reflection;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -103,15 +103,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Resources {
         internal static string RunSettingsParseError {
             get {
                 return ResourceManager.GetString("RunSettingsParseError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Incompatible Target platform settings &apos;{0}&apos; with system architecture &apos;{1}&apos;..
-        /// </summary>
-        internal static string SystemArchitectureIncompatibleWithTargetPlatform {
-            get {
-                return ResourceManager.GetString("SystemArchitectureIncompatibleWithTargetPlatform", resourceCulture);
             }
         }
         
