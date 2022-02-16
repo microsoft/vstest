@@ -564,14 +564,14 @@
     <value>--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
       This affects adapter loading behavior.
 
-      Currently supported behaviours:
-        - Explicit: Test Plarform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). 
+      Currently supported behaviors:
+        - Explicit: Test Platform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). 
                     If a specific adapter path is provided, adapter will be loaded; if a directory path is provided adapters directly in that folder will be loaded, unless Recursive option is also specified.
                     If no adapter path is specified, test run will fail.
                     This will imply /InIsolation switch and force the tests to be run in an isolated process.
         
-        - Default: Test Platfrom will load adapters is if this argument has not beed specified. 
-                   It will pick up extensions from next to source, provided aditional adapter paths and from the default directory.
+        - Default: Test Platform will load adapters is if this argument has not been specified. 
+                   It will pick up extensions from next to source, provided additional adapter paths and from the default directory.
 
         - DefaultRuntimeProviders: Load default runtime providers shipped with Test Platform. 
                                    If this is not specified when "Explicit" option is set, a test host provider need to be specified explicitly.

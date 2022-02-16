@@ -12,12 +12,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     internal enum TestAdapterLoadingStrategy
     {
         /// <summary>
-        /// A strategy not defined, Test Platfrom will load adapters normally. 
+        /// A strategy not defined, Test Platform will load adapters normally. 
         /// </summary>
         Default = 0b0000_0000_0000_0000,
 
         /// <summary>
-        /// Test Plarform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). 
+        /// Test Platform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). 
         /// If a specific adapter path is provided, adapter will be loaded; if a directory path is provided adapters directly in that folder will be loaded. 
         /// If no adapter path is specified, test run will fail.
         /// This will imply /InIsolation switch and force the tests to be run in an isolated process.

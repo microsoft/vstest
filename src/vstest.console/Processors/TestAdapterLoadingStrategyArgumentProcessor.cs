@@ -162,9 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             if (string.IsNullOrWhiteSpace(argument))
-            {
-
-
+            {            
                 InitializeDefaultStrategy();
                 return;
             }

@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 /// --Port
 ///
 /// Help
-/// -�Help
+/// --Help
 /// </summary>
 internal enum HelpContentPriority
 {
