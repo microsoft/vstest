@@ -104,7 +104,7 @@ public class DiscoveryRequestTests
         _discoveryRequest.DiscoverAsync();
 
         // Set the protocol version to a version not supporting new abort overload.
-        _discoveryRequest._protocolConfig.Version = version;
+        _discoveryRequest.ProtocolConfig.Version = version;
 
         _discoveryRequest.Abort();
         _discoveryManager.Verify(dm => dm.Abort(), Times.Once);
