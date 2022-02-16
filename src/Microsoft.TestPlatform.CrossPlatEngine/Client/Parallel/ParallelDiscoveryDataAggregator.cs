@@ -138,14 +138,14 @@ internal class ParallelDiscoveryDataAggregator
     /// Aggregate the source as fully discovered
     /// </summary>
     /// <param name="sorce">Fully discovered source</param>
-    internal void MarkSourcesWithStatus(ICollection<string> sources, DiscoveryStatus status)
+    public void MarkSourcesWithStatus(ICollection<string> sources, DiscoveryStatus status)
         => DiscoveryManager.MarkSourcesWithStatus(sources, status, _sourcesWithDiscoveryStatus);
 
     /// <summary>
     /// Aggregates the value indicating if we already sent message to IDE.
     /// </summary>
     /// <param name="isMessageSent">Boolean value if we already sent message to IDE</param>
-    internal void AggregateIsMessageSent(bool isMessageSent)
+    public void AggregateIsMessageSent(bool isMessageSent)
     {
         IsMessageSent = IsMessageSent || isMessageSent;
     }
@@ -155,6 +155,6 @@ internal class ParallelDiscoveryDataAggregator
     /// </summary>
     /// <param name="status">Status to filter</param>
     /// <returns></returns>
-    internal List<string> GetSourcesWithStatus(DiscoveryStatus status)
+    public List<string> GetSourcesWithStatus(DiscoveryStatus status)
         => DiscoveryManager.GetSourcesWithStatus(status, _sourcesWithDiscoveryStatus);
 }
