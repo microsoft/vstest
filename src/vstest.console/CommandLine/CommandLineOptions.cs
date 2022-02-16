@@ -132,7 +132,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <summary>
         /// Path to the custom test adapters.
         /// </summary>
-        public string TestAdapterPath { get; set; }
+        public string[] TestAdapterPath { get; set; }
+
+        /// <summary>
+        /// Test adapter loading strategy.
+        /// </summary>
+        public TestAdapterLoadingStrategy TestAdapterLoadingStrategy { get; set; }
 
         /// <summary>
         /// Process Id of the process which launched vstest runner
@@ -303,6 +308,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             // Add the matching files to source list
             this.sources = this.sources.Union(matchingFiles).ToList();
         }
+
+        public bool TestAdapterPathsSet => (TestAdapterPath?.Length ?? 0) != 0;
 
         #endregion
 

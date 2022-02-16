@@ -123,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Separators for multiple paths in argument.
         /// </summary>
-        private readonly char[] argumentSeparators = new[] { ';' };
+        private static readonly char[] argumentSeparators = new[] { ';' };
 
         #endregion
 
@@ -154,60 +154,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            string invalidAdapterPathArgument = argument;
-
             if (string.IsNullOrWhiteSpace(argument))
             {
                 throw new CommandLineException(
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestAdapterPathValueRequired));
             }
 
-            string customAdaptersPath;
+            string[] customAdaptersPath;
 
-            try
+            var testAdapterPaths = new List<string>();
+
+            // VSTS task add double quotes around TestAdapterpath. For example if user has given TestAdapter path C:\temp,
+            // Then VSTS task will add TestAdapterPath as "/TestAdapterPath:\"C:\Temp\"".
+            // Remove leading and trailing ' " ' chars...
+            argument = argument.Trim().Trim(new char[] { '\"' });
+
+            // Get test adapter paths from RunSettings.
+            var testAdapterPathsInRunSettings = this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestAdaptersPaths");
+
+            if (!string.IsNullOrWhiteSpace(testAdapterPathsInRunSettings))
             {
-                var testAdapterPaths = new List<string>();
-                var testAdapterFullPaths = new List<string>();
-
-                // VSTS task add double quotes around TestAdapterpath. For example if user has given TestAdapter path C:\temp,
-                // Then VSTS task will add TestAdapterPath as "/TestAdapterPath:\"C:\Temp\"".
-                // Remove leading and trailing ' " ' chars...
-                argument = argument.Trim().Trim(new char[] { '\"' });
-
-                // Get test adapter paths from RunSettings.
-                var testAdapterPathsInRunSettings = this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestAdaptersPaths");
-
-                if (!string.IsNullOrWhiteSpace(testAdapterPathsInRunSettings))
-                {
-                    testAdapterPaths.AddRange(SplitPaths(testAdapterPathsInRunSettings));
-                }
-
-                testAdapterPaths.AddRange(SplitPaths(argument));
-
-                foreach (var testadapterPath in testAdapterPaths)
-                {
-                    // TestAdaptersPaths could contain environment variables
-                    var testAdapterFullPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(testadapterPath));
-
-                    if (!this.fileHelper.DirectoryExists(testAdapterFullPath))
-                    {
-                        invalidAdapterPathArgument = testadapterPath;
-                        throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
-                    }
-
-                    testAdapterFullPaths.Add(testAdapterFullPath);
-                }
-
-                customAdaptersPath = string.Join(";", testAdapterFullPaths.Distinct().ToArray());
-
-                this.runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdaptersPaths", customAdaptersPath);
-            }
-            catch (Exception e)
-            {
-                throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestAdapterPathCommand, invalidAdapterPathArgument, e.Message));
+                testAdapterPaths.AddRange(SplitPaths(testAdapterPathsInRunSettings));
             }
 
+            testAdapterPaths.AddRange(SplitPaths(argument));
+            customAdaptersPath = testAdapterPaths.Distinct().ToArray();
+
+            this.runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdaptersPaths", string.Join(";", customAdaptersPath));
             this.commandLineOptions.TestAdapterPath = customAdaptersPath;
         }
 
@@ -216,7 +189,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         /// <param name="paths">Source paths joined by semicolons.</param>
         /// <returns>Paths.</returns>
-        private string[] SplitPaths(string paths)
+        public static string[] SplitPaths(string paths)
         {
             if (string.IsNullOrWhiteSpace(paths))
             {

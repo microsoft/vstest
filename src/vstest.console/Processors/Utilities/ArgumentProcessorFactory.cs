@@ -202,11 +202,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// Gets the argument processors that are tagged as special and to be always executed.
         /// The Lazy's that are returned will initialize the underlying argument processor when first accessed.
         /// </summary>
-        /// <returns>The argument processors that are tagged as special and to be always executed.</returns>
+        /// <returns>The argument processors that are tagged as to be always executed.</returns>
         public IEnumerable<IArgumentProcessor> GetArgumentProcessorsToAlwaysExecute()
         {
-            return SpecialCommandToProcessorMap.Values
-                .Where(lazyProcessor => lazyProcessor.Metadata.Value.IsSpecialCommand && lazyProcessor.Metadata.Value.AlwaysExecute);
+            return argumentProcessors.Where(lazyProcessor => lazyProcessor.Metadata.Value.AlwaysExecute);
         }
 
         #endregion
@@ -220,6 +219,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new RunTestsArgumentProcessor(),
                 new RunSpecificTestsArgumentProcessor(),
                 new TestAdapterPathArgumentProcessor(),
+                new TestAdapterLoadingStrategyArgumentProcessor(),
                 new TestCaseFilterArgumentProcessor(),
                 new ParentProcessIdArgumentProcessor(),
                 new PortArgumentProcessor(),
@@ -287,7 +287,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="processor">The lazy processor.</param>
         /// <param name="initArg">The argument with which the real processor should be initialized.</param>
         /// <returns>The decorated lazy processor.</returns>
-        private static IArgumentProcessor WrapLazyProcessorToInitializeOnInstantiation(
+        public static IArgumentProcessor WrapLazyProcessorToInitializeOnInstantiation(
             IArgumentProcessor processor,
             string initArg = null)
         {

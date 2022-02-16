@@ -26,6 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
     using ClientResources = Resources.Resources;
 
     /// <summary>
@@ -89,15 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 throw new ArgumentNullException(nameof(discoveryCriteria));
             }
 
-            // Update cache with Extension folder's files.
-            this.AddExtensionAssemblies(discoveryCriteria.RunSettings);
-
-            // Update extension assemblies from source when design mode is false.
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
-            if (!runConfiguration.DesignMode)
-            {
-                this.AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
-            }
+            PopulateExtensions(discoveryCriteria.RunSettings, discoveryCriteria.Sources);
 
             // Initialize loggers.
             var loggerManager = this.TestEngine.GetLoggerManager(requestData);
@@ -125,15 +118,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 throw new ArgumentNullException(nameof(testRunCriteria));
             }
 
-            this.AddExtensionAssemblies(testRunCriteria.TestRunSettings);
-
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
-
-            // Update extension assemblies from source when design mode is false.
-            if (!runConfiguration.DesignMode)
-            {
-                this.AddExtensionAssembliesFromSource(testRunCriteria);
-            }
+            var sources = GetSources(testRunCriteria);
+            PopulateExtensions(testRunCriteria.TestRunSettings, sources);
 
             // Initialize loggers.
             var loggerManager = this.TestEngine.GetLoggerManager(requestData);
@@ -156,6 +142,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             return new TestRunRequest(requestData, testRunCriteria, executionManager, loggerManager);
         }
 
+        private void PopulateExtensions(string runSettings, IEnumerable<string> sources)
+        {
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
+            var strategy = runConfiguration.TestAdapterLoadingStrategy;
+
+            // Update cache with Extension folder's files.
+            this.AddExtensionAssemblies(runSettings, strategy);
+
+            // Update extension assemblies from source when design mode is false.
+            if (!runConfiguration.DesignMode)
+            {
+                this.AddExtensionAssembliesFromSource(sources, strategy);
+            }
+        }
+
         /// <inheritdoc/>
         public bool StartTestSession(
             IRequestData requestData,
@@ -167,9 +168,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 throw new ArgumentNullException(nameof(testSessionCriteria));
             }
 
-            this.AddExtensionAssemblies(testSessionCriteria.RunSettings);
-
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testSessionCriteria.RunSettings);
+            var strategy = runConfiguration.TestAdapterLoadingStrategy;
+
+            this.AddExtensionAssemblies(testSessionCriteria.RunSettings, strategy);
+
             if (!runConfiguration.DesignMode)
             {
                 return false;
@@ -222,13 +225,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
         }
 
-        /// <summary>
-        /// Updates the test adapter paths provided through run settings to be used by the test
-        /// service.
-        /// </summary>
-        ///
-        /// <param name="runSettings">The run settings.</param>
-        private void AddExtensionAssemblies(string runSettings)
+        private void AddExtensionAssemblies(string runSettings, TestAdapterLoadingStrategy adapterLoadingStrategy)
         {
             IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings);
 
@@ -236,49 +233,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             {
                 foreach (string customTestAdaptersPath in customTestAdaptersPaths)
                 {
-                    var adapterPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(customTestAdaptersPath));
-                    if (!Directory.Exists(adapterPath))
-                    {
-                        if (EqtTrace.IsWarningEnabled)
-                        {
-                            EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
-                        }
+                    var extensionAssemblies = ExpandTestAdapterPaths(customTestAdaptersPath, this.fileHelper, adapterLoadingStrategy);
 
-                        continue;
-                    }
-
-                    var extensionAssemblies = new List<string>(
-                        this.fileHelper.EnumerateFiles(
-                            adapterPath,
-                            SearchOption.AllDirectories,
-                            TestPlatformConstants.TestAdapterEndsWithPattern,
-                            TestPlatformConstants.TestLoggerEndsWithPattern,
-                            TestPlatformConstants.DataCollectorEndsWithPattern,
-                            TestPlatformConstants.RunTimeEndsWithPattern));
-
-                    if (extensionAssemblies.Count > 0)
+                    if (extensionAssemblies.Any())
                     {
                         this.UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
                     }
+
                 }
             }
-        }
-
-        /// <summary>
-        /// Updates the extension assemblies from source directory.
-        /// </summary>
-        ///
-        /// <param name="testRunCriteria">The test run criteria.</param>
-        private void AddExtensionAssembliesFromSource(TestRunCriteria testRunCriteria)
-        {
-            IEnumerable<string> sources = testRunCriteria.Sources;
-            if (testRunCriteria.HasSpecificTests)
-            {
-                // If the test execution is with a test filter, group them by sources.
-                sources = testRunCriteria.Tests.Select(tc => tc.Source).Distinct();
-            }
-
-            AddExtensionAssembliesFromSource(sources);
         }
 
         /// <summary>
@@ -286,21 +249,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// </summary>
         ///
         /// <param name="sources">The list of sources.</param>
-        private void AddExtensionAssembliesFromSource(IEnumerable<string> sources)
+        private void AddExtensionAssembliesFromSource(IEnumerable<string> sources, TestAdapterLoadingStrategy strategy)
         {
+            // Skip discovery unless we're using the default behavior, or NextToSource is specified.
+            if (strategy != TestAdapterLoadingStrategy.Default 
+                && (strategy & TestAdapterLoadingStrategy.NextToSource) != TestAdapterLoadingStrategy.NextToSource)
+            {
+                return;
+            }
+
             // Currently we support discovering loggers only from Source directory.
             var loggersToUpdate = new List<string>();
 
             foreach (var source in sources)
             {
                 var sourceDirectory = Path.GetDirectoryName(source);
-                if (!string.IsNullOrEmpty(sourceDirectory)
-                    && this.fileHelper.DirectoryExists(sourceDirectory))
+                if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
                 {
+                    var searchOption = GetSearchOption(strategy, SearchOption.TopDirectoryOnly);
+
                     loggersToUpdate.AddRange(
                         this.fileHelper.EnumerateFiles(
                             sourceDirectory,
-                            SearchOption.TopDirectoryOnly,
+                            searchOption,
                             TestPlatformConstants.TestLoggerEndsWithPattern));
                 }
             }
@@ -318,22 +289,134 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// </summary>
         private static void AddExtensionAssembliesFromExtensionDirectory()
         {
-            var fileHelper = new FileHelper();
-            var extensionsFolder = Path.Combine(
-                Path.GetDirectoryName(
-                    typeof(TestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()),
-                "Extensions");
+            // This method runs before adapter initialization path, ideally we should replace this mechanism
+            // this is currently required because we need TestHostProvider to be able to resolve.
+            var runSettings = RunSettingsManager.Instance.ActiveRunSettings.SettingsXml;
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
+            var strategy = runConfiguration.TestAdapterLoadingStrategy;
 
+            var fileHelper = new FileHelper();
+            var defaultExtensionPaths = Enumerable.Empty<string>();
+
+            // Explicit adapter loading
+            if ((strategy & TestAdapterLoadingStrategy.Explicit) == TestAdapterLoadingStrategy.Explicit)
+            {
+                defaultExtensionPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings)
+                    .SelectMany(path => ExpandTestAdapterPaths(path, fileHelper, strategy))
+                    .Union(defaultExtensionPaths);
+            }
+
+            var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()), "Extensions");
             if (fileHelper.DirectoryExists(extensionsFolder))
             {
-                var defaultExtensionPaths = fileHelper.EnumerateFiles(
-                    extensionsFolder,
-                    SearchOption.TopDirectoryOnly,
-                    ".dll",
-                    ".exe");
+                // Load default runtime providers
+                if ((strategy & TestAdapterLoadingStrategy.DefaultRuntimeProviders) == TestAdapterLoadingStrategy.DefaultRuntimeProviders)
+                {
+                    defaultExtensionPaths = fileHelper
+                        .EnumerateFiles(extensionsFolder, SearchOption.TopDirectoryOnly, TestPlatformConstants.RunTimeEndsWithPattern)
+                        .Union(defaultExtensionPaths);
+                }
 
-                TestPluginCache.Instance.DefaultExtensionPaths = defaultExtensionPaths;
+                // Default extension loader
+                if (strategy == TestAdapterLoadingStrategy.Default
+                    || (strategy & TestAdapterLoadingStrategy.ExtensionsDirectory) == TestAdapterLoadingStrategy.ExtensionsDirectory)
+                {
+                    defaultExtensionPaths = fileHelper
+                        .EnumerateFiles(extensionsFolder, SearchOption.TopDirectoryOnly, ".dll", ".exe")
+                        .Union(defaultExtensionPaths);
+                }
             }
+
+            TestPluginCache.Instance.DefaultExtensionPaths = defaultExtensionPaths.Distinct();
+        }
+
+        private static SearchOption GetSearchOption(TestAdapterLoadingStrategy strategy, SearchOption defaultStrategyOption) {
+            if (strategy == TestAdapterLoadingStrategy.Default) {
+                return defaultStrategyOption;
+            }
+
+            var searchOption = SearchOption.TopDirectoryOnly;
+            if ((strategy & TestAdapterLoadingStrategy.Recursive) == TestAdapterLoadingStrategy.Recursive)
+            {
+                searchOption = SearchOption.AllDirectories;
+            }
+
+            return searchOption;     
+        }
+
+        private static IEnumerable<string> ExpandTestAdapterPaths(string path, IFileHelper fileHelper, TestAdapterLoadingStrategy strategy)
+        {
+            var adapterPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(path));
+
+            // Default behavior is to only accept directories!
+            if (strategy == TestAdapterLoadingStrategy.Default)
+            {
+                return ExpandAdaptersWithDefaultStrategy(adapterPath, fileHelper);
+            }
+
+            var adapters = ExpandAdaptersWithExplicitStrategy(adapterPath, fileHelper, strategy);
+
+            return adapters.Distinct();
+        }
+
+        private static IEnumerable<string> ExpandAdaptersWithExplicitStrategy(string path, IFileHelper fileHelper, TestAdapterLoadingStrategy strategy)
+        {
+            if ((strategy & TestAdapterLoadingStrategy.Explicit) != TestAdapterLoadingStrategy.Explicit)
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            if (fileHelper.Exists(path))
+            {
+                return new[] { path };
+            }
+            else if (fileHelper.DirectoryExists(path))
+            {
+                var searchOption = GetSearchOption(strategy, SearchOption.TopDirectoryOnly);
+
+                var adapterPaths = fileHelper.EnumerateFiles(
+                    path,
+                    searchOption,
+                    TestPlatformConstants.TestAdapterEndsWithPattern,
+                    TestPlatformConstants.TestLoggerEndsWithPattern,
+                    TestPlatformConstants.DataCollectorEndsWithPattern,
+                    TestPlatformConstants.RunTimeEndsWithPattern);
+
+                return adapterPaths;
+            }
+
+            EqtTrace.Warning(string.Format("AdapterPath Not Found:", path));
+            return Enumerable.Empty<string>();
+        }
+
+        private static IEnumerable<string> ExpandAdaptersWithDefaultStrategy(string path, IFileHelper fileHelper)
+        {
+            if (!fileHelper.DirectoryExists(path))
+            {
+                EqtTrace.Warning(string.Format("AdapterPath Not Found:", path));
+
+                return Enumerable.Empty<string>();
+            }
+
+            return fileHelper.EnumerateFiles(
+                    path,
+                    SearchOption.AllDirectories,
+                    TestPlatformConstants.TestAdapterEndsWithPattern,
+                    TestPlatformConstants.TestLoggerEndsWithPattern,
+                    TestPlatformConstants.DataCollectorEndsWithPattern,
+                    TestPlatformConstants.RunTimeEndsWithPattern);
+        }
+
+        private static IEnumerable<string> GetSources(TestRunCriteria testRunCriteria)
+        {
+            IEnumerable<string> sources = testRunCriteria.Sources;
+            if (testRunCriteria.HasSpecificTests)
+            {
+                // If the test execution is with a test filter, group them by sources.
+                sources = testRunCriteria.Tests.Select(tc => tc.Source).Distinct();
+            }
+
+            return sources;
         }
     }
 }

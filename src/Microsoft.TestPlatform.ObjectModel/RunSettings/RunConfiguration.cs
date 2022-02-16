@@ -386,6 +386,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
+        /// Gets or sets the test adapter loading strategy.
+        /// </summary>
+        internal TestAdapterLoadingStrategy TestAdapterLoadingStrategy { get; set; }
+
+        /// <summary>
         /// Gets or sets the execution thread apartment state.
         /// </summary>
         [CLSCompliant(false)]
@@ -569,6 +574,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 XmlElement testAdaptersPaths = doc.CreateElement("TestAdaptersPaths");
                 testAdaptersPaths.InnerXml = this.TestAdaptersPaths;
                 root.AppendChild(testAdaptersPaths);
+            }
+
+            if(this.TestAdapterLoadingStrategy != TestAdapterLoadingStrategy.Default) 
+            {
+                XmlElement adapterLoadingStrategy = doc.CreateElement("TestAdapterLoadingStrategy");
+                adapterLoadingStrategy.InnerXml = this.TestAdapterLoadingStrategy.ToString();
+                root.AppendChild(adapterLoadingStrategy);
             }
 
             XmlElement treatTestAdapterErrorsAsWarnings = doc.CreateElement("TreatTestAdapterErrorsAsWarnings");
@@ -838,6 +850,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             runConfiguration.TestAdaptersPaths = reader.ReadElementContentAsString();
                             break;
 
+                        case "TestAdapterLoadingStrategy":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            value = reader.ReadElementContentAsString();
+                            if (Enum.TryParse<TestAdapterLoadingStrategy>(value, out var loadingStrategy)) {
+                                runConfiguration.TestAdapterLoadingStrategy = loadingStrategy;
+                            }
+                            else {
+                                throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                                        Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
+                            }
+
+                            break;
+
                         case "TreatTestAdapterErrorsAsWarnings":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             bool treatTestAdapterErrorsAsWarnings = false;
@@ -925,6 +950,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.DotnetHostPath = reader.ReadElementContentAsString();
                             break;
+
                         case "TreatNoTestsAsError":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             string treatNoTestsAsErrorValueString = reader.ReadElementContentAsString();

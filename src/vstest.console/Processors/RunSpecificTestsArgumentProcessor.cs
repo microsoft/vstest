@@ -283,7 +283,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     // No tests were discovered from the given sources.
                     warningMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.NoTestsAvailableInSources, string.Join(", ", this.commandLineOptions.Sources));
 
-                    if (string.IsNullOrEmpty(this.commandLineOptions.TestAdapterPath))
+                    if (!commandLineOptions.TestAdapterPathsSet)
                     {
                         warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.StringFormatToJoinTwoStrings, warningMessage, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
                     }
@@ -385,7 +385,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     var testsFoundInAnySource = (e.TestRunStatistics == null) ? false : (e.TestRunStatistics.ExecutedTests > 0);
 
                     // Indicate the user to use testadapterpath command if there are no tests found
-                    if (!testsFoundInAnySource && string.IsNullOrEmpty(CommandLineOptions.Instance.TestAdapterPath) && this.commandLineOptions.TestCaseFilterValue == null)
+                    if (!testsFoundInAnySource && !CommandLineOptions.Instance.TestAdapterPathsSet && this.commandLineOptions.TestCaseFilterValue == null)
                     {
                         this.output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
                     }
