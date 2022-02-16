@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 using System;
@@ -25,7 +27,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 /// </summary>
 public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDiscoveryEventsHandler2
 {
-    private readonly TestSessionInfo _testSessionInfo = null;
+    private readonly TestSessionInfo _testSessionInfo;
     readonly Func<string, ProxyDiscoveryManager, ProxyOperationManager> _proxyOperationManagerCreator;
 
     private ITestRuntimeProvider _testHostManager;
@@ -35,11 +37,9 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     private readonly IDataSerializer _dataSerializer;
     private bool _isCommunicationEstablished;
 
-    private ProxyOperationManager _proxyOperationManager = null;
+    private ProxyOperationManager _proxyOperationManager;
     private ITestDiscoveryEventsHandler2 _baseTestDiscoveryEventsHandler;
     private bool _skipDefaultAdapters;
-
-    #region Constructors
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
@@ -116,7 +116,6 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         _proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
     }
 
-    #endregion
 
     #region IProxyDiscoveryManager implementation.
 

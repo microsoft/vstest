@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 
 using System;
@@ -85,6 +87,18 @@ public interface ITestRequestManager : IDisposable
     void StartTestSession(
         StartTestSessionPayload payload,
         ITestHostLauncher testHostLauncher,
+        ITestSessionEventsHandler eventsHandler,
+        ProtocolConfig protocolConfig);
+
+    /// <summary>
+    /// Stops a test session.
+    /// </summary>
+    /// 
+    /// <param name="testSessionInfo">The stop test session payload.</param>
+    /// <param name="eventsHandler">The events handler.</param>
+    /// <param name="protocolConfig">Protocol related information.</param>
+    void StopTestSession(
+        StopTestSessionPayload payload,
         ITestSessionEventsHandler eventsHandler,
         ProtocolConfig protocolConfig);
 

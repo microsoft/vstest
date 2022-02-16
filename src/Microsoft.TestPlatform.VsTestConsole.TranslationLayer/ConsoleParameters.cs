@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 #if NETFRAMEWORK
 using System.Collections.Generic;
@@ -20,7 +22,7 @@ public class ConsoleParameters
 {
     internal static readonly ConsoleParameters Default = new();
 
-    private string _logFilePath = null;
+    private string _logFilePath;
     private readonly IFileHelper _fileHelper;
 
     /// <summary>

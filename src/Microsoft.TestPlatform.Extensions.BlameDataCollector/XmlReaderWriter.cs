@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 using System;
@@ -22,8 +24,6 @@ public class XmlReaderWriter : IBlameReaderWriter
     /// </summary>
     private readonly IFileHelper _fileHelper;
 
-    #region  Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlReaderWriter"/> class.
     /// </summary>
@@ -43,8 +43,6 @@ public class XmlReaderWriter : IBlameReaderWriter
     {
         _fileHelper = fileHelper;
     }
-
-    #endregion
 
     /// <summary>
     /// Writes test Sequence to file.

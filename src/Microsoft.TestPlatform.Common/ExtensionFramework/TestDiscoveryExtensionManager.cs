@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 using System;
@@ -17,13 +19,7 @@ using ObjectModel.Adapter;
 /// </summary>
 internal class TestDiscoveryExtensionManager
 {
-    #region Fields
-
     private static TestDiscoveryExtensionManager s_testDiscoveryExtensionManager;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -40,10 +36,6 @@ internal class TestDiscoveryExtensionManager
         UnfilteredDiscoverers = unfilteredDiscoverers;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets the unfiltered list of test discoverers which are available.
     /// </summary>
@@ -56,10 +48,6 @@ internal class TestDiscoveryExtensionManager
     /// Gets the discoverers which are available for discovering tests.
     /// </summary>
     public IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> Discoverers { get; private set; }
-
-    #endregion
-
-    #region Factory
 
     /// <summary>
     /// Gets an instance of the Test Discovery Extension Manager.
@@ -132,10 +120,7 @@ internal class TestDiscoveryExtensionManager
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("TestDiscoveryManager: LoadExtensions: Exception occurred while loading extensions {0}", ex);
-            }
+            EqtTrace.Error("TestDiscoveryManager: LoadExtensions: Exception occurred while loading extensions {0}", ex);
 
             if (throwOnError)
             {
@@ -152,7 +137,6 @@ internal class TestDiscoveryExtensionManager
         s_testDiscoveryExtensionManager = null;
     }
 
-    #endregion
 }
 
 /// <summary>

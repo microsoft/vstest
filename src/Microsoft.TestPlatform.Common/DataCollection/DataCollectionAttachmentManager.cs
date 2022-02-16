@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 using System;
@@ -41,8 +43,6 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
 {
     private readonly object _attachmentTaskLock = new();
 
-    #region Fields
-
     /// <summary>
     /// Default results directory to be used when user didn't specify.
     /// </summary>
@@ -68,10 +68,6 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     /// </summary>
     private readonly IFileHelper _fileHelper;
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="DataCollectionAttachmentManager"/> class.
     /// </summary>
@@ -92,10 +88,6 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
         AttachmentSets = new ConcurrentDictionary<DataCollectionContext, ConcurrentDictionary<Uri, AttachmentSet>>();
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets the session output directory.
     /// </summary>
@@ -108,10 +100,6 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     {
         get; private set;
     }
-    #endregion
-
-    #region public methods
-
     /// <inheritdoc/>
     public void Initialize(SessionId id, string outputDirectory, IMessageSink messageSink)
     {
@@ -183,12 +171,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
 
         if (string.IsNullOrEmpty(SessionOutputDirectory))
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error(
-                    "DataCollectionAttachmentManager.AddAttachment: Initialize not invoked.");
-            }
-
+            EqtTrace.Error("DataCollectionAttachmentManager.AddAttachment: Initialize not invoked.");
             return;
         }
 
@@ -212,10 +195,6 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     {
         _cancellationTokenSource.Cancel();
     }
-
-    #endregion
-
-    #region private methods
 
     /// <summary>
     /// Sanity checks on CopyRequestData 
@@ -294,31 +273,19 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
                 {
                     if (fileTransferInfo.PerformCleanup)
                     {
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Moving file {0} to {1}", fileTransferInfo.FileName, localFilePath);
-                        }
+                        EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer: Moving file {0} to {1}", fileTransferInfo.FileName, localFilePath);
 
                         _fileHelper.MoveFile(fileTransferInfo.FileName, localFilePath);
 
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Moved file {0} to {1}", fileTransferInfo.FileName, localFilePath);
-                        }
+                        EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer: Moved file {0} to {1}", fileTransferInfo.FileName, localFilePath);
                     }
                     else
                     {
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Copying file {0} to {1}", fileTransferInfo.FileName, localFilePath);
-                        }
+                        EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer: Copying file {0} to {1}", fileTransferInfo.FileName, localFilePath);
 
                         _fileHelper.CopyFile(fileTransferInfo.FileName, localFilePath);
 
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Copied file {0} to {1}", fileTransferInfo.FileName, localFilePath);
-                        }
+                        EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer: Copied file {0} to {1}", fileTransferInfo.FileName, localFilePath);
                     }
                 }
                 catch (Exception ex)
@@ -351,13 +318,10 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
                 }
                 catch (Exception e)
                 {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error(
-                            "DataCollectionAttachmentManager.TriggerCallBack: Error occurred while raising the file transfer completed callback for {0}. Error: {1}",
-                            localFilePath,
-                            e.ToString());
-                    }
+                    EqtTrace.Error(
+                        "DataCollectionAttachmentManager.TriggerCallBack: Error occurred while raising the file transfer completed callback for {0}. Error: {1}",
+                        localFilePath,
+                        e.ToString());
                 }
             },
             _cancellationTokenSource.Token);
@@ -396,5 +360,4 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
         _messageSink.SendMessage(args);
     }
 
-    #endregion
 }

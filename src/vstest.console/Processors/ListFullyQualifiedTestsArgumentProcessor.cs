@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -27,14 +29,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class ListFullyQualifiedTestsArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the ListFullyQualifiedTestsArgumentProcessor handles.
     /// </summary>
     public const string CommandName = "/ListFullyQualifiedTests";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -100,8 +98,6 @@ internal class ListFullyQualifiedTestsArgumentProcessorCapabilities : BaseArgume
 /// </summary>
 internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -136,10 +132,6 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
     /// List to store the discovered tests
     /// </summary>
     private readonly List<string> _discoveredTests = new();
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -178,7 +170,6 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
         _discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output, _testCasefilter, _discoveredTests, _commandLineOptions);
     }
 
-    #endregion
 
     #region IArgumentExecutor
 

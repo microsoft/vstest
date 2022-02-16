@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -24,14 +26,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class PortArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the PortArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/Port";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -96,8 +94,6 @@ internal class PortArgumentProcessorCapabilities : BaseArgumentProcessorCapabili
 /// </summary>
 internal class PortArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -122,10 +118,6 @@ internal class PortArgumentExecutor : IArgumentExecutor
     /// Process helper for process management actions.
     /// </summary>
     private readonly IProcessHelper _processHelper;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -159,7 +151,6 @@ internal class PortArgumentExecutor : IArgumentExecutor
         _processHelper = processHelper;
     }
 
-    #endregion
 
     #region IArgumentExecutor
 

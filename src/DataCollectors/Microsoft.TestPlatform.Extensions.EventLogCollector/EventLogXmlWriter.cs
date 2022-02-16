@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
 
 using System;
@@ -18,8 +20,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 /// </summary>
 internal static class EventLogXmlWriter
 {
-    #region Public methods
-
     /// <summary>
     /// The write event log entries to xml file.
     /// </summary>
@@ -81,4 +81,3 @@ internal static class EventLogXmlWriter
         fileHelper.WriteAllTextToFile(xmlFilePath, stringBuilder.ToString());
     }
 }
-#endregion

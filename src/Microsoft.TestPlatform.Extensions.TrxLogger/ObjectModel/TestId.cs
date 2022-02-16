@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 using System;
@@ -16,8 +18,6 @@ using XML;
 /// </summary>
 internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, IComparable, IXmlTestStore
 {
-    #region Constants
-
     /// <summary>
     /// Key in <see cref="XmlTestStoreParameters"/> for specifying the location where the test ID is stored, under an XML element
     /// </summary>
@@ -27,10 +27,6 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// Location where the test ID is stored, under an XML element
     /// </summary>
     private const string DefaultIdLocation = "@testId";
-
-    #endregion
-
-    #region Constructors
 
     /// <summary>
     /// Generates a new test ID
@@ -49,10 +45,6 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
         Id = id;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets an empty test ID
     /// </summary>
@@ -63,7 +55,6 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// </summary>
     public Guid Id { get; }
 
-    #endregion
 
     #region IXmlTestStore Members
 

@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
@@ -8,13 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 /// </summary>
 public abstract class BasicTransferInformation
 {
-    #region Fields
-
     private string _description;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BasicTransferInformation"/> class.
@@ -29,7 +25,6 @@ public abstract class BasicTransferInformation
         Description = string.Empty;
     }
 
-    #endregion
 
     #region  Required Parameters.
 

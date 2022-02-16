@@ -2,6 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #if NETFRAMEWORK
+
+#nullable disable
+
 namespace testhost.UnitTests;
 
 using Microsoft.VisualStudio.TestPlatform.TestHost;

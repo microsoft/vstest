@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 using System;
@@ -19,7 +21,6 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
 {
     internal static readonly string DeploymentInDirectorySuffix = "In";
 
-    #region  Fields
     private readonly TestRunConfigurationId _id;
     private readonly TrxFileHelper _trxFileHelper;
 
@@ -27,8 +28,6 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
     private readonly string _name;
 
     private string _runDeploymentRoot;
-
-    #endregion
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRunConfiguration"/> class.

@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using System.Globalization;
 using System.Xml;
@@ -10,13 +12,7 @@ using System.Xml;
 /// </summary>
 public static class XmlReaderUtilities
 {
-    #region Constants
-
     private const string RunSettingsRootNodeName = "RunSettings";
-
-    #endregion
-
-    #region Utility Methods
 
     /// <summary>
     /// Reads up to the next Element in the document.
@@ -67,5 +63,4 @@ public static class XmlReaderUtilities
         }
     }
 
-    #endregion
 }

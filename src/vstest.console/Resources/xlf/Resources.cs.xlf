@@ -1108,6 +1108,11 @@
         <target state="translated">Testovací běh se přerušil s chybou {0}.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidTestSessionCorrelationId">
+        <source>Invalid testSessionCorrelationId</source>
+        <target state="translated">Neplatné testSessionCorrelationId</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -118,8 +120,6 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// </summary>
     private readonly IFileHelper _fileHelper;
 
-    #region Constructor
-
     internal EnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, IEnvironment environment, IFileHelper fileHelper)
     {
         _runSettingsManager = runSettingsManager;
@@ -128,13 +128,8 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
         _fileHelper = fileHelper;
     }
 
-    #endregion
-
-    #region Properties
-
     internal IOutput Output { get; set; }
 
-    #endregion
 
     #region IArgumentExecutor
 
@@ -295,10 +290,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
             }
             catch (SettingsException se)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("EnableBlameArgumentProcessor: Unable to get the test results directory: Error {0}", se);
-                }
+                EqtTrace.Error("EnableBlameArgumentProcessor: Unable to get the test results directory: Error {0}", se);
             }
         }
 

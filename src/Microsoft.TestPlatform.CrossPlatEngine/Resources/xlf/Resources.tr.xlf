@@ -167,6 +167,16 @@
         <target state="translated">runsettings, test oturumunun kurulduğu zamanla mevcut çalıştırma/keşif isteği zamanı arasında değişti.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="translated">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="translated">Ekler:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

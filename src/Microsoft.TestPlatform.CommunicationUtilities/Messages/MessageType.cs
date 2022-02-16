@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
 /// <summary>
@@ -213,8 +215,6 @@ public static class MessageType
     /// </summary>
     public const string StopTestSessionCallback = "TestSession.StopTestSessionCallback";
 
-    #region DataCollector messages
-
     /// <summary>
     /// Event message type sent to datacollector process right after test host process has started.
     /// </summary>
@@ -260,5 +260,4 @@ public static class MessageType
     /// </summary>
     public const string DataCollectionTestStartAck = "DataCollection.TestStartAck";
 
-    #endregion
 }

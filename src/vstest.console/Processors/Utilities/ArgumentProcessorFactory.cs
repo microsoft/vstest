@@ -1,12 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using ObjectModel;
 
@@ -15,8 +19,6 @@ using ObjectModel;
 /// </summary>
 internal class ArgumentProcessorFactory
 {
-    #region Constants
-
     /// <summary>
     /// The command starter.
     /// </summary>
@@ -27,25 +29,19 @@ internal class ArgumentProcessorFactory
     /// </summary>
     internal const string XplatCommandStarter = "-";
 
-    #endregion
-
-    #region Fields
-
     /// <summary>
     /// Available argument processors.
     /// </summary>
     private Dictionary<string, IArgumentProcessor> _commandToProcessorMap;
     private Dictionary<string, IArgumentProcessor> _specialCommandToProcessorMap;
 
-    #endregion
-
-    #region Constructor
-
-    /// <summary>
     /// Initializes the argument processor factory.
     /// </summary>
     /// <param name="argumentProcessors">
     /// The argument Processors.
+    /// </param>
+    /// <param name="featureFlag">
+    /// The feature flag support.
     /// </param>
     /// <remarks>
     /// This is not public because the static Create method should be used to access the instance.
@@ -56,23 +52,27 @@ internal class ArgumentProcessorFactory
         AllArgumentProcessors = argumentProcessors;
     }
 
-    #endregion
-
-    #region Static Methods
-
     /// <summary>
     /// Creates ArgumentProcessorFactory.
     /// </summary>
+    /// <param name="featureFlag">
+    /// The feature flag support.
+    /// </param>
     /// <returns>ArgumentProcessorFactory.</returns>
-    internal static ArgumentProcessorFactory Create()
+    internal static ArgumentProcessorFactory Create(IFeatureFlag featureFlag = null)
     {
+        var defaultArgumentProcessor = DefaultArgumentProcessors;
+
+        if ((featureFlag ?? FeatureFlag.Instance).IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING))
+        {
+            defaultArgumentProcessor.Add(new ArtifactProcessingCollectModeProcessor());
+            defaultArgumentProcessor.Add(new ArtifactProcessingPostProcessModeProcessor());
+            defaultArgumentProcessor.Add(new TestSessionCorrelationIdProcessor());
+        }
+
         // Get the ArgumentProcessorFactory
-        return new ArgumentProcessorFactory(DefaultArgumentProcessors);
+        return new ArgumentProcessorFactory(defaultArgumentProcessor);
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Returns all of the available argument processors.
@@ -112,10 +112,6 @@ internal class ArgumentProcessorFactory
             return _specialCommandToProcessorMap;
         }
     }
-
-    #endregion
-
-    #region Public Methods
 
     /// <summary>
     /// Creates the argument processor associated with the provided command line argument.
@@ -203,11 +199,7 @@ internal class ArgumentProcessorFactory
             .Where(lazyProcessor => lazyProcessor.Metadata.Value.IsSpecialCommand && lazyProcessor.Metadata.Value.AlwaysExecute);
     }
 
-    #endregion
-
-    #region Private Methods
-
-    private static IEnumerable<IArgumentProcessor> DefaultArgumentProcessors => new List<IArgumentProcessor> {
+    private static IList<IArgumentProcessor> DefaultArgumentProcessors => new List<IArgumentProcessor> {
         new HelpArgumentProcessor(),
         new TestSourceArgumentProcessor(),
         new ListTestsArgumentProcessor(),
@@ -295,10 +287,7 @@ internal class ArgumentProcessorFactory
             }
             catch (Exception e)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception creating argument processor: {0}", e);
-                }
+                EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception creating argument processor: {0}", e);
                 throw;
             }
 
@@ -310,10 +299,7 @@ internal class ArgumentProcessorFactory
                 }
                 catch (Exception e)
                 {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception initializing argument processor: {0}", e);
-                    }
+                    EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception initializing argument processor: {0}", e);
                     throw;
                 }
             }
@@ -345,10 +331,7 @@ internal class ArgumentProcessorFactory
             }
             catch (Exception e)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception creating argument processor: {0}", e);
-                }
+                EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception creating argument processor: {0}", e);
                 throw;
             }
 
@@ -360,10 +343,7 @@ internal class ArgumentProcessorFactory
                 }
                 catch (Exception e)
                 {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception initializing argument processor: {0}", e);
-                    }
+                    EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception initializing argument processor: {0}", e);
                     throw;
                 }
             }
@@ -374,5 +354,4 @@ internal class ArgumentProcessorFactory
         return processor;
     }
 
-    #endregion
 }

@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
 using System;
@@ -14,16 +16,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class CommandArgumentPair
 {
-    #region Constants
-
     /// <summary>
     /// The separator.
     /// </summary>
     internal const string Separator = ":";
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// The command portion of the input.
@@ -34,10 +30,6 @@ internal class CommandArgumentPair
     /// The argument portion of the input.
     /// </summary>
     public string Argument { get; private set; }
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Breaks the provided command line switch into the command and argument pair.
@@ -73,10 +65,6 @@ internal class CommandArgumentPair
         Argument = argument;
     }
 
-    #endregion
-
-    #region Private Methods
-
     /// <summary>
     /// Parses the input into the command and argument parts.
     /// </summary>
@@ -104,5 +92,4 @@ internal class CommandArgumentPair
         }
     }
 
-    #endregion
 }

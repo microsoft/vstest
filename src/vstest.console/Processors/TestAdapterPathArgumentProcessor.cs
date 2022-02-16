@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -25,14 +27,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class TestAdapterPathArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the ListTestsArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/TestAdapterPath";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -80,8 +78,6 @@ internal class TestAdapterPathArgumentProcessorCapabilities : BaseArgumentProces
 /// </summary>
 internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -107,10 +103,6 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
     /// </summary>
     private readonly char[] _argumentSeparators = new[] { ';' };
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Default constructor.
     /// </summary>
@@ -126,7 +118,6 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
         _fileHelper = fileHelper;
     }
 
-    #endregion
 
     #region IArgumentExecutor
 

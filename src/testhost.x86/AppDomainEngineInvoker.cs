@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.TestHost;
 
 #if NETFRAMEWORK
@@ -27,7 +29,7 @@ internal class AppDomainEngineInvoker<T> : IEngineInvoker where T : MarshalByRef
 
     protected readonly IEngineInvoker _actualInvoker;
 
-    private string _mergedTempConfigFile = null;
+    private string _mergedTempConfigFile;
 
     public AppDomainEngineInvoker(string testSourcePath)
     {

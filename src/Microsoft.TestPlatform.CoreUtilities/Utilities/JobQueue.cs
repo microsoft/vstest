@@ -3,6 +3,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using System;
@@ -22,8 +24,6 @@ using ObjectModel;
 /// <typeparam name="T">The type of the job that is being processed.</typeparam>
 public class JobQueue<T> : IDisposable
 {
-    #region Fields
-
     /// <summary>
     /// Handler which processes the individual jobs.
     /// </summary>
@@ -86,10 +86,6 @@ public class JobQueue<T> : IDisposable
     /// </summary>
     private readonly Action<string> _exceptionLogger;
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="JobQueue{T}"/> class.
     /// </summary>
@@ -99,9 +95,9 @@ public class JobQueue<T> : IDisposable
     /// <param name="maxQueueSize">The max Queue Size.</param>
     /// <param name="enableBounds">The enable Bounds.</param>
     /// <param name="exceptionLogger">The exception Logger.</param>
-    public JobQueue(Action<T> processJob, string displayName, int maxQueueLength, int maxQueueSize, bool enableBounds, Action<string> exceptionLogger)
+    public JobQueue(Action<T> processJob!!, string displayName, int maxQueueLength, int maxQueueSize, bool enableBounds, Action<string> exceptionLogger)
     {
-        _processJob = processJob ?? throw new ArgumentNullException(nameof(processJob));
+        _processJob = processJob;
 
         if (string.IsNullOrWhiteSpace(displayName))
         {
@@ -137,10 +133,6 @@ public class JobQueue<T> : IDisposable
         _backgroundJobProcessor = new Task(() => BackgroundJobProcessor(), TaskCreationOptions.LongRunning);
         _backgroundJobProcessor.Start();
     }
-
-    #endregion
-
-    #region Methods
 
     /// <summary>
     /// Adds a job to the queue.
@@ -232,10 +224,6 @@ public class JobQueue<T> : IDisposable
         _jobAdded.Dispose();
         _queueProcessing.Dispose();
     }
-
-    #endregion
-
-    #region Private Methods
 
     /// <summary>
     /// Block the queue call.
@@ -367,5 +355,4 @@ public class JobQueue<T> : IDisposable
         }
     }
 
-    #endregion
 }

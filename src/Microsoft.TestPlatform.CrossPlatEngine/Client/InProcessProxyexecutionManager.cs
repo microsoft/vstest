@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 using System;
@@ -25,7 +27,7 @@ internal class InProcessProxyExecutionManager : IProxyExecutionManager
     private readonly IExecutionManager _executionManager;
     private readonly ITestRuntimeProvider _testHostManager;
 
-    public bool IsInitialized { get; private set; } = false;
+    public bool IsInitialized { get; private set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InProcessProxyexecutionManager"/> class.

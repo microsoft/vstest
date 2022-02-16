@@ -21,6 +21,8 @@
 //   Required
 //   Single or multiple
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
 using System;
@@ -51,8 +53,6 @@ internal class Executor
     private readonly ITestPlatformEventSource _testPlatformEventSource;
     private bool _showHelp;
 
-    #region Constructor
-
     /// <summary>
     /// Default constructor.
     /// </summary>
@@ -67,18 +67,10 @@ internal class Executor
         _showHelp = true;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Instance to use for sending output.
     /// </summary>
     private IOutput Output { get; set; }
-
-    #endregion
-
-    #region Methods
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
@@ -103,7 +95,11 @@ internal class Executor
         }
         else
         {
-            PrintSplashScreen(isDiag);
+            // If we're postprocessing we don't need to show the splash
+            if (!ArtifactProcessingPostProcessModeProcessor.ContainsPostProcessCommand(args))
+            {
+                PrintSplashScreen(isDiag);
+            }
         }
 
         int exitCode = 0;
@@ -180,10 +176,6 @@ internal class Executor
         return exitCode;
     }
 
-    #endregion
-
-    #region Private Methods
-
     /// <summary>
     /// Get the list of argument processors for the arguments.
     /// </summary>
@@ -251,7 +243,7 @@ internal class Executor
             }
             catch (Exception ex)
             {
-                if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException)
+                if (ex is CommandLineException or TestPlatformException or SettingsException)
                 {
                     Output.Error(false, ex.Message);
                     result = 1;
@@ -355,7 +347,7 @@ internal class Executor
         }
         catch (Exception ex)
         {
-            if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException || ex is InvalidOperationException)
+            if (ex is CommandLineException or TestPlatformException or SettingsException or InvalidOperationException)
             {
                 EqtTrace.Error("ExecuteArgumentProcessor: failed to execute argument process: {0}", ex);
                 Output.Error(false, ex.Message);
@@ -378,7 +370,7 @@ internal class Executor
         }
 
         Debug.Assert(
-            result >= ArgumentProcessorResult.Success && result <= ArgumentProcessorResult.Abort,
+            result is >= ArgumentProcessorResult.Success and <= ArgumentProcessorResult.Abort,
             "Invalid argument processor result.");
 
         if (result == ArgumentProcessorResult.Fail)
@@ -490,5 +482,4 @@ internal class Executor
         return false;
     }
 
-    #endregion
 }

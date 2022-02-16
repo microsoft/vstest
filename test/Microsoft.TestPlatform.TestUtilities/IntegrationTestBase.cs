@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.TestUtilities;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
@@ -45,7 +47,7 @@ public class IntegrationTestBase
     private readonly string _xUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
     private readonly string _chutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools".Replace('\\', Path.DirectorySeparatorChar);
 
-    protected static readonly bool IsWindows = System.Environment.OSVersion.Platform.ToString().StartsWith("Win");
+    protected static readonly bool IsWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
 
     public enum UnitTestFramework
     {
@@ -365,8 +367,8 @@ public class IntegrationTestBase
             var flag = _standardTestOutput.Contains(test)
                        || _standardTestOutput.Contains(GetTestMethodName(test));
             Assert.IsTrue(flag, $"Test {test} does not appear in discovered tests list." +
-                                $"{System.Environment.NewLine}Std Output: {_standardTestOutput}" +
-                                $"{System.Environment.NewLine}Std Error: { _standardTestError}");
+                                $"{Environment.NewLine}Std Output: {_standardTestOutput}" +
+                                $"{Environment.NewLine}Std Error: { _standardTestError}");
         }
     }
 
@@ -381,8 +383,8 @@ public class IntegrationTestBase
             var flag = _standardTestOutput.Contains(test)
                        || _standardTestOutput.Contains(GetTestMethodName(test));
             Assert.IsFalse(flag, $"Test {test} should not appear in discovered tests list." +
-                                $"{System.Environment.NewLine}Std Output: {_standardTestOutput}" +
-                                $"{System.Environment.NewLine}Std Error: { _standardTestError}");
+                                $"{Environment.NewLine}Std Output: {_standardTestOutput}" +
+                                $"{Environment.NewLine}Std Error: { _standardTestError}");
         }
     }
 
@@ -396,8 +398,8 @@ public class IntegrationTestBase
             var flag = fileOutput.Contains(test)
                        || fileOutput.Contains(GetTestMethodName(test));
             Assert.IsTrue(flag, $"Test {test} does not appear in discovered tests list." +
-                                $"{System.Environment.NewLine}Std Output: {_standardTestOutput}" +
-                                $"{System.Environment.NewLine}Std Error: { _standardTestError}");
+                                $"{Environment.NewLine}Std Output: {_standardTestOutput}" +
+                                $"{Environment.NewLine}Std Error: { _standardTestError}");
         }
     }
 
@@ -453,12 +455,12 @@ public class IntegrationTestBase
 
     protected bool IsDesktopRunner()
     {
-        return _testEnvironment.RunnerFramework == IntegrationTestBase.DesktopRunnerFramework;
+        return _testEnvironment.RunnerFramework == DesktopRunnerFramework;
     }
 
     protected bool IsNetCoreRunner()
     {
-        return _testEnvironment.RunnerFramework == IntegrationTestBase.CoreRunnerFramework;
+        return _testEnvironment.RunnerFramework == CoreRunnerFramework;
     }
 
     /// <summary>
@@ -776,7 +778,7 @@ public class IntegrationTestBase
 
     protected static string GetDownloadedDotnetMuxerFromTools(string architecture)
     {
-        if (architecture != "X86" && architecture != "X64")
+        if (architecture is not "X86" and not "X64")
         {
             throw new NotSupportedException(nameof(architecture));
         }

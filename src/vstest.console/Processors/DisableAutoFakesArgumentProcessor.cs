@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -13,15 +15,11 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class DisableAutoFakesArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     public const string CommandName = "/DisableAutoFakes";
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
     private Lazy<IArgumentExecutor> _executor;
-
-    #endregion
 
     public Lazy<IArgumentExecutor> Executor
     {
@@ -60,12 +58,10 @@ internal class DisableAutoFakesArgumentExecutor : IArgumentExecutor
 {
     private readonly CommandLineOptions _commandLineOptions;
 
-    #region Constructors
     public DisableAutoFakesArgumentExecutor(CommandLineOptions commandLineOptions)
     {
         _commandLineOptions = commandLineOptions;
     }
-    #endregion
 
     #region IArgumentProcessor
 

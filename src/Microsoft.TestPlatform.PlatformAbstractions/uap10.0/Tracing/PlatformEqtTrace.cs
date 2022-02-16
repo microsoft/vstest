@@ -3,6 +3,8 @@
 
 #if WINDOWS_UWP
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;
@@ -26,7 +28,7 @@ public class PlatformEqtTrace : IPlatformEqtTrace
 {
     private static readonly object InitLock = new();
 
-    private static bool s_isInitialized = false;
+    private static bool s_isInitialized;
 
     public static string ErrorOnInitialization { get; set; }
 

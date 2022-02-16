@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using System.ComponentModel;
 
@@ -9,8 +11,6 @@ using System.ComponentModel;
 /// </summary>
 public abstract class DataCollectionSink
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="DataCollectionSink"/> class.
     /// </summary>
@@ -18,18 +18,10 @@ public abstract class DataCollectionSink
     {
     }
 
-    #endregion
-
-    #region Events
-
     /// <summary>
     /// Called when sending of a file has completed.
     /// </summary>
     public abstract event AsyncCompletedEventHandler SendFileCompleted;
-
-    #endregion
-
-    #region SendFileAsync
 
     /// <summary>
     /// Sends a file to up-stream components.
@@ -63,5 +55,4 @@ public abstract class DataCollectionSink
     /// <param name="fileTransferInformation">Information about the file to be transferred.</param>
     public abstract void SendFileAsync(FileTransferInformation fileTransferInformation);
 
-    #endregion
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 using System;
@@ -23,7 +25,7 @@ public class AppDomainTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void RunTestExecutionWithDisableAppDomain(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
         var testAppDomainDetailFileName = Path.Combine(tempDir.Path, "appdomain_test.txt");

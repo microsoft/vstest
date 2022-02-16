@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 
 using System;
@@ -79,10 +81,7 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
             switch (message.MessageType)
             {
                 case MessageType.DataCollectionTestStart:
-                    if (EqtTrace.IsInfoEnabled)
-                    {
-                        EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case starting.");
-                    }
+                    EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case starting.");
 
                     var testCaseStartEventArgs = _dataSerializer.DeserializePayload<TestCaseStartEventArgs>(message);
 
@@ -98,18 +97,12 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
 
                     _communicationManager.SendMessage(MessageType.DataCollectionTestStartAck);
 
-                    if (EqtTrace.IsInfoEnabled)
-                    {
-                        EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case '{0} - {1}' started.", testCaseStartEventArgs.TestCaseName, testCaseStartEventArgs.TestCaseId);
-                    }
+                    EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case '{0} - {1}' started.", testCaseStartEventArgs?.TestCaseName, testCaseStartEventArgs?.TestCaseId);
 
                     break;
 
                 case MessageType.DataCollectionTestEnd:
-                    if (EqtTrace.IsInfoEnabled)
-                    {
-                        EqtTrace.Info("DataCollectionTestCaseEventHandler : Test case completing.");
-                    }
+                    EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case completing.");
 
                     var testCaseEndEventArgs = _dataSerializer.DeserializePayload<TestCaseEndEventArgs>(message);
 
@@ -127,20 +120,13 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
 
                     _communicationManager.SendMessage(MessageType.DataCollectionTestEndResult, attachmentSets);
 
-                    if (EqtTrace.IsInfoEnabled)
-                    {
-                        EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case '{0} - {1}' completed", testCaseEndEventArgs.TestCaseName, testCaseEndEventArgs.TestCaseId);
-                    }
-
+                    EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case '{0} - {1}' completed", testCaseEndEventArgs?.TestCaseName, testCaseEndEventArgs?.TestCaseId);
                     break;
 
                 case MessageType.SessionEnd:
                     isSessionEnd = true;
 
-                    if (EqtTrace.IsInfoEnabled)
-                    {
-                        EqtTrace.Info("DataCollectionTestCaseEventHandler: Test session ended");
-                    }
+                    EqtTrace.Info("DataCollectionTestCaseEventHandler: Test session ended");
 
                     try
                     {
@@ -155,10 +141,7 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
                     break;
 
                 default:
-                    if (EqtTrace.IsInfoEnabled)
-                    {
-                        EqtTrace.Info("DataCollectionTestCaseEventHandler: Invalid Message type '{0}'", message.MessageType);
-                    }
+                    EqtTrace.Info("DataCollectionTestCaseEventHandler: Invalid Message type '{0}'", message.MessageType);
 
                     break;
             }

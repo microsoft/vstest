@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -20,6 +22,8 @@ using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using CommandLineResources = Resources.Resources;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
 
 internal class RunSpecificTestsArgumentProcessor : IArgumentProcessor
 {
@@ -53,6 +57,7 @@ internal class RunSpecificTestsArgumentProcessor : IArgumentProcessor
                         CommandLineOptions.Instance,
                         RunSettingsManager.Instance,
                         TestRequestManager.Instance,
+                        new ArtifactProcessingManager(CommandLineOptions.Instance.TestSessionCorrelationId),
                         ConsoleOutput.Instance));
             }
 
@@ -86,8 +91,6 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     public const char SplitDelimiter = ',';
     public const char EscapeDelimiter = '\\';
 
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -116,7 +119,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     /// <summary>
     /// Used for tracking the total no. of tests discovered from the given sources.
     /// </summary>
-    private long _discoveredTestCount = 0;
+    private long _discoveredTestCount;
 
     /// <summary>
     /// Collection of test cases that match at least one of the given search strings
@@ -126,7 +129,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     /// <summary>
     /// Effective run settings applicable to test run after inferring the multi-targeting settings.
     /// </summary>
-    private string _effectiveRunSettings = null;
+    private string _effectiveRunSettings;
 
     /// <summary>
     /// List of filters that have not yet been discovered
@@ -143,10 +146,6 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     /// </summary>
     private readonly ITestRunEventsRegistrar _testRunEventsRegistrar;
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Default constructor.
     /// </summary>
@@ -154,6 +153,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         CommandLineOptions options,
         IRunSettingsProvider runSettingsProvider,
         ITestRequestManager testRequestManager,
+        IArtifactProcessingManager artifactProcessingManager,
         IOutput output)
     {
         Contract.Requires(options != null);
@@ -165,10 +165,9 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsProvider;
         Output = output;
         _discoveryEventsRegistrar = new DiscoveryEventsRegistrar(DiscoveryRequest_OnDiscoveredTests);
-        _testRunEventsRegistrar = new TestRunRequestEventsRegistrar(Output, _commandLineOptions);
+        _testRunEventsRegistrar = new TestRunRequestEventsRegistrar(Output, _commandLineOptions, artifactProcessingManager);
     }
 
-    #endregion
 
     #region IArgumentProcessor
 
@@ -225,9 +224,6 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     }
 
     #endregion
-
-    #region Private Methods
-
     /// <summary>
     /// Discovers tests from the given sources and selects only specified tests.
     /// </summary>
@@ -313,8 +309,6 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         }
     }
 
-    #endregion
-
     private class DiscoveryEventsRegistrar : ITestDiscoveryEventsRegistrar
     {
         private readonly EventHandler<DiscoveredTestsEventArgs> _discoveredTestsHandler;
@@ -344,11 +338,13 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     {
         private readonly IOutput _output;
         private readonly CommandLineOptions _commandLineOptions;
+        private readonly IArtifactProcessingManager _artifactProcessingManager;
 
-        public TestRunRequestEventsRegistrar(IOutput output, CommandLineOptions commandLineOptions)
+        public TestRunRequestEventsRegistrar(IOutput output, CommandLineOptions commandLineOptions, IArtifactProcessingManager artifactProcessingManager)
         {
             _output = output;
             _commandLineOptions = commandLineOptions;
+            _artifactProcessingManager = artifactProcessingManager;
         }
 
         public void LogWarning(string message)
@@ -383,6 +379,12 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
                 if (!testsFoundInAnySource && string.IsNullOrEmpty(CommandLineOptions.Instance.TestAdapterPath) && _commandLineOptions.TestCaseFilterValue == null)
                 {
                     _output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
+                }
+
+                // Collect tests session artifacts for post processing
+                if (_commandLineOptions.ArtifactProcessingMode == ArtifactProcessingMode.Collect)
+                {
+                    _artifactProcessingManager.CollectArtifacts(e, RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
                 }
             }
         }

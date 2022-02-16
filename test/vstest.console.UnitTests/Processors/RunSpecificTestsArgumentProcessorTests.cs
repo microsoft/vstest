@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 using System;
@@ -48,12 +50,13 @@ public class RunSpecificTestsArgumentProcessorTests
     private readonly Mock<IMetricsPublisher> _mockMetricsPublisher;
     private readonly Mock<IProcessHelper> _mockProcessHelper;
     private readonly Mock<ITestRunAttachmentsProcessingManager> _mockAttachmentsProcessingManager;
+    private readonly Mock<IArtifactProcessingManager> _mockArtifactProcessingManager;
 
     private RunSpecificTestsArgumentExecutor GetExecutor(ITestRequestManager testRequestManager)
     {
         var runSettingsProvider = new TestableRunSettingsProvider();
         runSettingsProvider.AddDefaultRunSettings();
-        return new RunSpecificTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, _mockOutput.Object);
+        return new RunSpecificTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, _mockArtifactProcessingManager.Object, _mockOutput.Object);
     }
 
     public RunSpecificTestsArgumentProcessorTests()
@@ -73,6 +76,7 @@ public class RunSpecificTestsArgumentProcessorTests
         _mockProcessHelper.Setup(x => x.GetCurrentProcessId()).Returns(1234);
         _mockProcessHelper.Setup(x => x.GetProcessName(It.IsAny<int>())).Returns("dotnet.exe");
         _mockAttachmentsProcessingManager = new Mock<ITestRunAttachmentsProcessingManager>();
+        _mockArtifactProcessingManager = new Mock<IArtifactProcessingManager>();
     }
 
     [TestMethod]

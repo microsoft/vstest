@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 using Common.Telemetry;
@@ -15,12 +17,8 @@ using System.Linq;
 /// </summary>
 internal class ParallelDiscoveryDataAggregator
 {
-    #region PrivateFields
-
     private readonly object _dataUpdateSyncObject = new();
     private readonly ConcurrentDictionary<string, object> _metricsAggregator;
-
-    #endregion
 
     public ParallelDiscoveryDataAggregator()
     {
@@ -28,8 +26,6 @@ internal class ParallelDiscoveryDataAggregator
         TotalTests = 0;
         _metricsAggregator = new ConcurrentDictionary<string, object>();
     }
-
-    #region Public Properties
 
     /// <summary>
     /// Set to true if any of the request is aborted
@@ -41,17 +37,13 @@ internal class ParallelDiscoveryDataAggregator
     /// </summary>
     public long TotalTests { get; private set; }
 
-    #endregion
-
-    #region Public Methods
-
     /// <summary>
     /// Returns the Aggregated Metrics.
     /// </summary>
     /// <returns></returns>
     public IDictionary<string, object> GetAggregatedDiscoveryDataMetrics()
     {
-        if (_metricsAggregator == null || _metricsAggregator.Count == 0)
+        if (_metricsAggregator == null || _metricsAggregator.IsEmpty)
         {
             return new ConcurrentDictionary<string, object>();
         }
@@ -128,5 +120,4 @@ internal class ParallelDiscoveryDataAggregator
         }
     }
 
-    #endregion
 }

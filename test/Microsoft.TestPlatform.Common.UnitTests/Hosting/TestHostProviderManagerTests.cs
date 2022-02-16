@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace TestPlatform.Common.UnitTests.Logging;
 
 using System;
@@ -196,12 +198,12 @@ public class TestHostProviderManagerTests
             throw new NotImplementedException();
         }
 
-        public void OnHostExited(HostProviderEventArgs e)
+        public void OnHostExited(HostProviderEventArgs _)
         {
             HostExited.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
-        public void OnHostLaunched(HostProviderEventArgs e)
+        public void OnHostLaunched(HostProviderEventArgs _)
         {
             HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
         }
@@ -264,12 +266,12 @@ public class TestHostProviderManagerTests
             throw new NotImplementedException();
         }
 
-        public void OnHostExited(HostProviderEventArgs e)
+        public void OnHostExited(HostProviderEventArgs _)
         {
             HostExited.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
-        public void OnHostLaunched(HostProviderEventArgs e)
+        public void OnHostLaunched(HostProviderEventArgs _)
         {
             HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
         }

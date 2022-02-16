@@ -1108,6 +1108,11 @@
         <target state="translated">测试运行已中止，出现错误 {0}。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidTestSessionCorrelationId">
+        <source>Invalid testSessionCorrelationId</source>
+        <target state="translated">testSessionCorrelationId 无效</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

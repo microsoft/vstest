@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 using System;
@@ -32,12 +34,12 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
     /// <summary>
     /// Singleton Instance of this class
     /// </summary>
-    protected static T s_instance = default;
+    protected static T s_instance;
 
     /// <summary>
     /// Default number of Processes
     /// </summary>
-    private int _currentParallelLevel = 0;
+    private int _currentParallelLevel;
 
     #endregion
 
@@ -226,10 +228,7 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
             // Exception can occur if we are trying to cancel a test run on an executor where test run is not even fired
             // we can safely ignore that as user is just canceling the test run and we don't care about additional parallel executors
             // as we will be disposing them off soon anyway
-            if (EqtTrace.IsWarningEnabled)
-            {
-                EqtTrace.Warning("AbstractParallelOperationManager: Exception while invoking an action on Proxy Manager instance: {0}", ex);
-            }
+            EqtTrace.Warning("AbstractParallelOperationManager: Exception while invoking an action on Proxy Manager instance: {0}", ex);
         }
     }
 

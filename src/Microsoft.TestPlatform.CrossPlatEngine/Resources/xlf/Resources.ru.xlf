@@ -167,6 +167,16 @@
         <target state="translated">Параметры runsettings изменились между временем начала тестового сеанса и временем текущего запроса на запуск или обнаружение.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="translated">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="translated">Вложения:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

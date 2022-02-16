@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Utilities.UnitTests;
 
 using System;
@@ -8,7 +10,6 @@ using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using OMResources = VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using VisualStudio.TestTools.UnitTesting;
 using MSTest.TestFramework.AssertExtensions;
@@ -213,21 +214,6 @@ public class InferRunSettingsHelperTests
         var expectedRunSettings = string.Format("<RunSettings><RunConfiguration><ResultsDirectory>temp</ResultsDirectory><TargetPlatform>X64</TargetPlatform><TargetFrameworkVersion>{0}</TargetFrameworkVersion></RunConfiguration></RunSettings>", Framework.DefaultFramework.Name);
 
         Assert.AreEqual(expectedRunSettings, xml);
-    }
-
-    [TestMethod]
-    public void UpdateRunSettingsShouldThrowIfArchitectureSetIsIncompatibleWithCurrentSystemArchitecture()
-    {
-        var settings = @"<RunSettings></RunSettings>";
-        var xmlDocument = GetXmlDocument(settings);
-
-        Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.ARM, Framework.DefaultFramework, "temp");
-
-        Assert.That.Throws<SettingsException>(action)
-            .WithMessage(string.Format(
-                "Incompatible Target platform settings '{0}' with system architecture '{1}'.",
-                "ARM",
-                XmlRunSettingsUtilities.OSArchitecture.ToString()));
     }
 
     [TestMethod]

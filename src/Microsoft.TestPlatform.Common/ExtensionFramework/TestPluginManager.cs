@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 using System;
@@ -16,8 +18,6 @@ using ObjectModel;
 internal class TestPluginManager
 {
     private static TestPluginManager s_instance;
-
-    #region Public Static Methods
 
     /// <summary>
     /// Gets the singleton instance of TestPluginManager.
@@ -55,13 +55,8 @@ internal class TestPluginManager
     /// <typeparam name="T">Return type of the test extension</typeparam>
     /// <param name="extensionType">Data type of the extension to be instantiated</param>
     /// <returns>Test extension instance</returns>
-    public static T CreateTestExtension<T>(Type extensionType)
+    public static T CreateTestExtension<T>(Type extensionType!!)
     {
-        if (extensionType == null)
-        {
-            throw new ArgumentNullException(nameof(extensionType));
-        }
-
         EqtTrace.Info("TestPluginManager.CreateTestExtension: Attempting to load test extension: " + extensionType);
 
         try
@@ -75,34 +70,21 @@ internal class TestPluginManager
         {
             if (ex is TargetInvocationException)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
-                }
+                EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
                 throw;
             }
 #if NETFRAMEWORK
             else if (ex is SystemException)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
-                }
+                EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
                 throw;
             }
 #endif
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
-            }
+            EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
 
             throw;
         }
     }
-
-    #endregion
-
-    #region Public Methods
 
     /// <summary>
     /// Retrieves the test extension collections of given extension type.
@@ -170,10 +152,6 @@ internal class TestPluginManager
         GetExtensions<TPluginInfo, TExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
     }
 
-    #endregion
-
-    #region Private Methods
-
     /// <summary>
     /// Prepares a List of TestPluginInformation&gt;
     /// </summary>
@@ -239,5 +217,4 @@ internal class TestPluginManager
         filtered = filteredExtensions;
     }
 
-    #endregion
 }

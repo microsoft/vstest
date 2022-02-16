@@ -1,6 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using ObjectModel;
@@ -119,11 +123,8 @@ public class InferRunSettingsHelper
                 // Delete all invalid RunConfiguration Settings
                 if (listOfInValidRunConfigurationSettings.Count > 0)
                 {
-                    if (EqtTrace.IsWarningEnabled)
-                    {
-                        string settingsName = string.Join(", ", listOfInValidRunConfigurationSettings);
-                        EqtTrace.Warning(string.Format("InferRunSettingsHelper.MakeRunsettingsCompatible: Removing the following settings: {0} from RunSettings file. To use those settings please move to latest version of Microsoft.NET.Test.Sdk", settingsName));
-                    }
+                    string settingsName = string.Join(", ", listOfInValidRunConfigurationSettings);
+                    EqtTrace.Warning("InferRunSettingsHelper.MakeRunsettingsCompatible: Removing the following settings: {0} from RunSettings file. To use those settings please move to latest version of Microsoft.NET.Test.Sdk", settingsName);
 
                     // move navigator to RunConfiguration node
                     runSettingsNavigator.MoveToParent();
@@ -180,9 +181,6 @@ public class InferRunSettingsHelper
         }
 
         EqtTrace.Verbose("Using effective platform:{0} effective framework:{1}", architecture, framework);
-
-        // check if platform is compatible with current system architecture.
-        VerifyCompatibilityWithOsArchitecture(architecture);
 
         // Check if inputRunSettings has results directory configured.
         var hasResultsDirectory = runSettingsDocument.SelectSingleNode(ResultsDirectoryNodePath) != null;
@@ -559,27 +557,6 @@ public class InferRunSettingsHelper
     }
 
     /// <summary>
-    /// Throws SettingsException if platform is incompatible with system architecture.
-    /// </summary>
-    /// <param name="architecture"></param>
-    private static void VerifyCompatibilityWithOsArchitecture(Architecture architecture)
-    {
-        var osArchitecture = XmlRunSettingsUtilities.OSArchitecture;
-
-        if (architecture == Architecture.X86 && osArchitecture == Architecture.X64)
-        {
-            return;
-        }
-
-        if (architecture == osArchitecture)
-        {
-            return;
-        }
-
-        throw new SettingsException(string.Format(CultureInfo.CurrentCulture, UtilitiesResources.SystemArchitectureIncompatibleWithTargetPlatform, architecture, osArchitecture));
-    }
-
-    /// <summary>
     /// Regenerates the RunConfiguration node with new values under runsettings.
     /// </summary>
     private static void UpdateRunConfiguration(
@@ -704,12 +681,13 @@ public class InferRunSettingsHelper
     /// </summary>
     private static bool IsPlatformIncompatible(Architecture sourcePlatform, Architecture targetPlatform)
     {
-        if (sourcePlatform == Architecture.Default ||
-            sourcePlatform == Architecture.AnyCPU)
+        if (sourcePlatform is Architecture.Default or Architecture.AnyCPU)
         {
             return false;
         }
+
         return targetPlatform == Architecture.X64 && !Is64BitOperatingSystem() || sourcePlatform != targetPlatform;
+
         static bool Is64BitOperatingSystem()
         {
 #if !NETSTANDARD1_3

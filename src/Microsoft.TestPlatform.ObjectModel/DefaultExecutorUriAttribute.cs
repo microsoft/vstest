@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;
@@ -13,8 +15,6 @@ using Resources;
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public sealed class DefaultExecutorUriAttribute : Attribute
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes with the Uri of the executor.
     /// </summary>
@@ -29,15 +29,9 @@ public sealed class DefaultExecutorUriAttribute : Attribute
         ExecutorUri = executorUri;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// The Uri of the Test Executor.
     /// </summary>
     public string ExecutorUri { get; private set; }
-
-    #endregion
 
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 using System;
@@ -113,11 +115,7 @@ internal sealed class TestPlatformDataCollectionEvents : DataCollectionEvents
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("TestPlatformDataCollectionEvents.AreTestCaseLevelEventsRequired: Exception occurred while checking whether event {0} has any listeners or not. {1}", eventToCheck, ex);
-            }
-
+            EqtTrace.Error("TestPlatformDataCollectionEvents.AreTestCaseLevelEventsRequired: Exception occurred while checking whether event {0} has any listeners or not. {1}", eventToCheck, ex);
             return valueOnFailure;
         }
     }

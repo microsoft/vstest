@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -20,16 +22,12 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class ResultsDirectoryArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the ListTestsArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/ResultsDirectory";
 
     private const string RunSettingsPath = "RunConfiguration.ResultsDirectory";
-    #endregion
-
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
     private Lazy<IArgumentExecutor> _executor;
@@ -95,8 +93,6 @@ internal class ResultsDirectoryArgumentProcessorCapabilities : BaseArgumentProce
 /// </summary>
 internal class ResultsDirectoryArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -105,10 +101,6 @@ internal class ResultsDirectoryArgumentExecutor : IArgumentExecutor
     private readonly IRunSettingsProvider _runSettingsManager;
 
     public const string RunSettingsPath = "RunConfiguration.ResultsDirectory";
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -124,7 +116,6 @@ internal class ResultsDirectoryArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsManager;
     }
 
-    #endregion
 
     #region IArgumentExecutor
 
@@ -148,7 +139,7 @@ internal class ResultsDirectoryArgumentExecutor : IArgumentExecutor
 
             var di = Directory.CreateDirectory(argument);
         }
-        catch (Exception ex) when (ex is NotSupportedException || ex is SecurityException || ex is ArgumentException || ex is PathTooLongException || ex is IOException)
+        catch (Exception ex) when (ex is NotSupportedException or SecurityException or ArgumentException or PathTooLongException or IOException)
         {
             throw new CommandLineException(string.Format(CommandLineResources.InvalidResultsDirectoryPathCommand, argument, ex.Message));
         }

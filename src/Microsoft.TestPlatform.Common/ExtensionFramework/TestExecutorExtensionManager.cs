@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 using System;
@@ -19,14 +21,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 /// </summary>
 internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor, ITestExecutorCapabilities>
 {
-    #region Fields
-
     private static TestExecutorExtensionManager s_testExecutorExtensionManager;
     private static readonly object Synclock = new();
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -46,9 +42,6 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
     {
     }
 
-    #endregion
-
-    #region Private Methods
     /// <summary>
     /// Merges two test extension lists.
     /// </summary>
@@ -99,10 +92,6 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
 
         return mergedTestExtensions;
     }
-
-    #endregion
-
-    #region Factory Methods
 
     /// <summary>
     /// Creates the TestExecutorExtensionManager.
@@ -223,12 +212,9 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error(
-                    "TestExecutorExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}",
-                    ex);
-            }
+            EqtTrace.Error(
+                "TestExecutorExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}",
+                ex);
 
             if (shouldThrowOnError)
             {
@@ -237,7 +223,6 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
         }
     }
 
-    #endregion
 }
 
 /// <summary>

@@ -167,6 +167,16 @@
         <target state="translated">テスト セッションが確立された時刻と現在の実行/検出要求の時刻の間で、実行設定が変更されました。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="translated">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="translated">添付ファイル:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

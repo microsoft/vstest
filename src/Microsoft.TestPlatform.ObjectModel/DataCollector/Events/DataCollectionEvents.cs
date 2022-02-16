@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 using System;
@@ -10,18 +12,12 @@ using System;
 /// </summary>
 public abstract class DataCollectionEvents
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="DataCollectionEvents"/> class.
     /// </summary>
     protected DataCollectionEvents()
     {
     }
-
-    #endregion
-
-    #region Events
 
     /// <summary>
     /// Raised when test host initialized
@@ -48,5 +44,4 @@ public abstract class DataCollectionEvents
     /// </summary>
     public abstract event EventHandler<TestCaseEndEventArgs> TestCaseEnd;
 
-    #endregion
 }

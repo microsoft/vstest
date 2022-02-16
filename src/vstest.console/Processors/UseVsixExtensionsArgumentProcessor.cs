@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -19,14 +21,10 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 /// </summary>
 internal class UseVsixExtensionsArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of command
     /// </summary>
     public const string CommandName = "/UseVsixExtensions";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 

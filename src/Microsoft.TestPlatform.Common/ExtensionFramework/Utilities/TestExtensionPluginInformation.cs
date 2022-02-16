@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 
 using System;
@@ -79,7 +81,7 @@ internal abstract class TestExtensionPluginInformation : TestPluginInformation
             }
         }
 
-        if (EqtTrace.IsErrorEnabled && string.IsNullOrEmpty(extensionUri))
+        if (string.IsNullOrEmpty(extensionUri))
         {
             EqtTrace.Error("The type \"{0}\" defined in \"{1}\" does not have ExtensionUri attribute.", testLoggerType.ToString(), testLoggerType.GetTypeInfo().Module.Name);
         }
