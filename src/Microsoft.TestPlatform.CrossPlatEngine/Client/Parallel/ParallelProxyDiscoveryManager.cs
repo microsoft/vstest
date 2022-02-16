@@ -25,8 +25,6 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
 {
     private readonly IDataSerializer _dataSerializer;
 
-    #region DiscoverySpecificData
-
     private int _discoveryCompletedClients;
     private int _availableTestSources = -1;
 
@@ -42,18 +40,10 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
 
     public bool IsAbortRequested { get; private set; }
 
-    #endregion
-
-    #region Concurrency Keeper Objects
-
     /// <summary>
     /// LockObject to update discovery status in parallel
     /// </summary>
     private readonly object _discoveryStatusLockObject = new();
-
-    private readonly object _enumeratorLockObject = new();
-
-    #endregion
 
     public ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
         : this(requestData, actualProxyManagerCreator, JsonDataSerializer.Instance, parallelLevel, sharedHosts)
@@ -91,7 +81,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         _currentDiscoveryDataAggregator = new ParallelDiscoveryDataAggregator();
 
         // Marking all sources as not discovered before starting actual discovery
-        MarkAllSourcesAsNotDiscovered(discoveryCriteria.Sources);
+        _currentDiscoveryDataAggregator.MarkSourcesWithStatus(discoveryCriteria.Sources.ToList(), DiscoveryStatus.NotDiscovered);
 
         DiscoverTestsPrivate(eventHandler);
     }
@@ -249,25 +239,5 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         }
 
         EqtTrace.Verbose("ProxyParallelDiscoveryManager: No sources available for discovery.");
-    }
-
-    /// <summary>
-    /// Mark all sources as not discovered before starting actual discovery
-    /// </summary>
-    /// <param name="sources">Sources which will be discovered</param>
-    private void MarkAllSourcesAsNotDiscovered(IEnumerable<string> sources)
-    {
-        if (sources is null || !sources.Any())
-        {
-            return;
-        }
-
-        lock (_enumeratorLockObject)
-        {
-            foreach (string source in sources)
-            {
-                _currentDiscoveryDataAggregator.SourcesWithDiscoveryStatus[source] = DiscoveryStatus.NotDiscovered;
-            }
-        }
     }
 }

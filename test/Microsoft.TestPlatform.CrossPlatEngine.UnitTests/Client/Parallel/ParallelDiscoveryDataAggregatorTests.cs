@@ -261,14 +261,14 @@ public class ParallelDiscoveryDataAggregatorTests
         var sources = new List<string>() { "sample.dll" };
 
         // Act
-        aggregator.AggregateTheSourcesWithDiscoveryStatus(sources, DiscoveryStatus.NotDiscovered);
+        aggregator.MarkSourcesWithStatus(sources, DiscoveryStatus.NotDiscovered);
         var sourcesWithNotDiscoveredStatus = aggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered);
 
         // Assert
         Assert.AreEqual(1, sourcesWithNotDiscoveredStatus.Count);
 
         // Act
-        aggregator.AggregateTheSourcesWithDiscoveryStatus(sources, DiscoveryStatus.FullyDiscovered);
+        aggregator.MarkSourcesWithStatus(sources, DiscoveryStatus.FullyDiscovered);
         var sourcesWithFullyDiscoveryStatus = aggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered);
 
         // Assert

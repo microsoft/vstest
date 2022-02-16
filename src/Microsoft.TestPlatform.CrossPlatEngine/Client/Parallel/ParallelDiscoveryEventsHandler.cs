@@ -230,10 +230,10 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         // Sometimes we get lastChunk as empty list (when number of tests in project dividable by
         // the chunk size, e.g. 100 tests and 10 chunk size).
         // Then we will take sources from discoveryCompleteEventArgs coming from testhost.
-        IEnumerable<string> lastChunkSources = !lastChunk.Any()
+        var lastChunkSources = !lastChunk.Any()
             ? discoveryCompleteEventArgs.FullyDiscoveredSources
-            : lastChunk.Select(testcase => testcase.Source);
+            : lastChunk.Select(testcase => testcase.Source).ToList();
 
-        _discoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus(lastChunkSources, DiscoveryStatus.FullyDiscovered);
+        _discoveryDataAggregator.MarkSourcesWithStatus(lastChunkSources, DiscoveryStatus.FullyDiscovered);
     }
 }

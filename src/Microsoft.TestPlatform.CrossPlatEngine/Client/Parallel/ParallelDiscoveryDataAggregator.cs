@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 using Common.Telemetry;
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 using System;
@@ -44,7 +44,7 @@ internal class ParallelDiscoveryDataAggregator
     /// <summary>
     /// Dictionary which stores source with corresponding discoveryStatus
     /// </summary>
-    internal ConcurrentDictionary<string, DiscoveryStatus> SourcesWithDiscoveryStatus { get; } = new();
+    private readonly ConcurrentDictionary<string, DiscoveryStatus> _sourcesWithDiscoveryStatus = new();
 
     /// <summary>
     /// Indicates if discovery complete payload already sent back to IDE
@@ -138,29 +138,8 @@ internal class ParallelDiscoveryDataAggregator
     /// Aggregate the source as fully discovered
     /// </summary>
     /// <param name="sorce">Fully discovered source</param>
-    internal void AggregateTheSourcesWithDiscoveryStatus(IEnumerable<string> sources, DiscoveryStatus status)
-    {
-        if (sources is null || !sources.Any())
-        {
-            return;
-        }
-
-        foreach (var source in sources)
-        {
-            if (!SourcesWithDiscoveryStatus.ContainsKey(source) && status != DiscoveryStatus.NotDiscovered)
-            {
-                EqtTrace.Warning("ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus: "
-                    + $"{source} is not present in SourcesWithDiscoveryStatus dictionary.");
-            }
-            else
-            {
-                SourcesWithDiscoveryStatus[source] = status;
-
-                EqtTrace.Info("ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus: "
-                    + $"{source} is marked with {status} status.");
-            }
-        }
-    }
+    internal void MarkSourcesWithStatus(ICollection<string> sources, DiscoveryStatus status)
+        => DiscoveryManager.MarkSourcesWithStatus(sources, status, _sourcesWithDiscoveryStatus);
 
     /// <summary>
     /// Aggregates the value indicating if we already sent message to IDE.
@@ -177,13 +156,5 @@ internal class ParallelDiscoveryDataAggregator
     /// <param name="status">Status to filter</param>
     /// <returns></returns>
     internal List<string> GetSourcesWithStatus(DiscoveryStatus status)
-    {
-        return SourcesWithDiscoveryStatus == null || SourcesWithDiscoveryStatus.IsEmpty
-            ? new List<string>()
-            : SourcesWithDiscoveryStatus
-                .Where(source => source.Value == status)
-                .Select(source => source.Key)
-                .ToList();
-    }
-
+        => DiscoveryManager.GetSourcesWithStatus(status, _sourcesWithDiscoveryStatus);
 }
