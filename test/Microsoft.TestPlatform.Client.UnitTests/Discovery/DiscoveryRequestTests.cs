@@ -91,25 +91,33 @@ public class DiscoveryRequestTests
         Assert.ThrowsException<ObjectDisposedException>(() => _discoveryRequest.Abort());
     }
 
-    [TestMethod]
-    public void AbortIfDiscoveryIsinProgressShouldCallDiscoveryManagerAbort()
+    [DataTestMethod]
+    [DataRow(0)]
+    [DataRow(1)]
+    [DataRow(2)]
+    [DataRow(3)]
+    [DataRow(4)]
+    [DataRow(5)]
+    public void AbortIfDiscoveryIsinProgressShouldCallDiscoveryManagerAbort(int version)
     {
         // Just to set the IsDiscoveryInProgress flag
         _discoveryRequest.DiscoverAsync();
+
+        // Set the protocol version to a version not supporting new abort overload.
+        _discoveryRequest._protocolConfig.Version = version;
 
         _discoveryRequest.Abort();
         _discoveryManager.Verify(dm => dm.Abort(), Times.Once);
     }
 
     [TestMethod]
-    public void AbortWithEventHandlerIfDiscoveryIsinProgressShouldCallDiscoveryManagerAbortWithEventHandler()
+    public void AbortIfDiscoveryIsinProgressShouldAndSufficientProtocolVersionCallsDiscoveryManagerAbortThis()
     {
         // Just to set the IsDiscoveryInProgress flag
         _discoveryRequest.DiscoverAsync();
-        var eventsHandler = _discoveryRequest as ITestDiscoveryEventsHandler2;
 
         _discoveryRequest.Abort();
-        _discoveryManager.Verify(dm => dm.Abort(eventsHandler), Times.Once);
+        _discoveryManager.Verify(dm => dm.Abort(_discoveryRequest), Times.Once);
     }
 
     [TestMethod]

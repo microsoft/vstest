@@ -26,7 +26,7 @@ using Utilities;
 public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHandler2
 {
     private readonly IDataSerializer _dataSerializer;
-    private readonly ProtocolConfig _protocolConfig = Constants.DefaultProtocolConfig;
+    internal /* for testing purposes */ readonly ProtocolConfig _protocolConfig = Constants.DefaultProtocolConfig;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DiscoveryRequest"/> class.
