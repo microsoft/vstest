@@ -27,11 +27,6 @@
         <note></note>
         <target state="translated">載入設定時發生錯誤。錯誤: {0}。</target>
       </trans-unit>
-      <trans-unit id="SystemArchitectureIncompatibleWithTargetPlatform">
-        <source>Incompatible Target platform settings '{0}' with system architecture '{1}'.</source>
-        <note></note>
-        <target state="translated">目標平台設定 '{0}' 與系統架構 '{1}' 不相容。</target>
-      </trans-unit>
       <trans-unit id="UnExpectedSettingsFile">
         <source>Unexpected settings file specified.</source>
         <note></note>
