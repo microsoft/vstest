@@ -580,8 +580,7 @@
 
         - NextToSource: Load adapters next to source. 
 
-        - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.
-    </value>
+        - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</value>
     <comment>Do not translate "Default", "DefaultRuntimeProviders", "ExtensionsDirectory", "NextToSource" or "Recursive".</comment>
   </data>
   <data name="TestAdapterLoadingStrategyValueInvalid" xml:space="preserve">
