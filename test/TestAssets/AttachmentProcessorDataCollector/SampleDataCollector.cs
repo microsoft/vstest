@@ -78,7 +78,7 @@ namespace AttachmentProcessorDataCollector
                         finalFolder = Path.GetDirectoryName(attachment.Uri.AbsolutePath);
                     }
 
-                    stringBuilder.AppendLine(File.ReadAllText(attachment.Uri.AbsolutePath));
+                    stringBuilder.AppendLine(File.ReadAllText(attachment.Uri.AbsolutePath).Trim());
                 }
             }
 
