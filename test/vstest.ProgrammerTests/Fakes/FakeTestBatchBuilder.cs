@@ -1,12 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
-
-#pragma warning disable IDE1006 // Naming Styles
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 namespace vstest.ProgrammerTests.CommandLine;
+
+using System.Runtime.CompilerServices;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 internal class FakeTestBatchBuilder
 {
@@ -61,7 +60,7 @@ internal class FakeTestBatchBuilder
 
         if (remainder > 0)
         {
-            var reminderBatch = Enumerable.Range(0, BatchSize)
+            var reminderBatch = Enumerable.Range(0, remainder)
                 .Select((index) => new TestResult(new TestCase($"Test{numberOfBatches + 1}-{index}", new Uri("some://uri"), "DummySourceFileName"))).ToList();
 
             batches.Add(reminderBatch);

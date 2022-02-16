@@ -52,7 +52,7 @@ public class TestDiscoveryTests
         var fakeErrorAggregator = new FakeErrorAggregator();
         var commandLineOptions = CommandLineOptions.Instance;
 
-        var fakeCurrentProcess = new FakeProcess(@"C:\temp\vstest.console.exe", string.Empty, null, null, null, null, null, fakeErrorAggregator);
+        var fakeCurrentProcess = new FakeProcess(@"X:\fake\vstest.console.exe", string.Empty, null, null, null, null, null, fakeErrorAggregator);
         var fakeProcessHelper = new FakeProcessHelper(fakeCurrentProcess, fakeErrorAggregator);
 
         var fakeFileHelper = new FakeFileHelper(fakeErrorAggregator);
@@ -63,7 +63,7 @@ public class TestDiscoveryTests
             .WithDuration(100.Milliseconds())
             .WithBatchSize(10)
             .Build();
-        var mstest1Dll = new FakeTestDllFile(@"C:\temp\mstest1.dll", new FrameworkName(".NETCoreApp,Version=v5.0"), Architecture.X64, tests);
+        var mstest1Dll = new FakeTestDllFile(@"X:\fake\mstest1.dll", new FrameworkName(".NETCoreApp,Version=v5.0"), Architecture.X64, tests);
         fakeFileHelper.AddFile(mstest1Dll);
 
         List<FakeMessage> changeMessages = tests.Take(tests.Count - 1).Select(batch =>  // TODO: make the stats agree with the tests below
@@ -93,6 +93,7 @@ public class TestDiscoveryTests
 
 
         var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(new FakeCommunicationChannel(responses, fakeErrorAggregator), fakeErrorAggregator);
+        TestServiceLocator.Clear();
         TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint);
         var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(fakeProcessHelper, fakeCommunicationEndpoint, fakeErrorAggregator);
         var testEngine = new TestEngine(fakeTestRuntimeProviderManager, fakeProcessHelper);
@@ -133,7 +134,7 @@ public class TestDiscoveryTests
         var testRunRequestPayload = new TestRunRequestPayload
         {
             // TODO: passing null sources and null testcases does not fail fast
-            Sources = mstest1Dll.Path.ToList(),
+            Sources = mstest1Dll.Path.AsList(),
             // TODO: passing null runsettings does not fail fast, instead it fails in Fakes settings code
             // TODO: passing empty string fails in the xml parser code
             RunSettings = $"<RunSettings>{runConfiguration}</RunSettings>"
@@ -149,7 +150,7 @@ public class TestDiscoveryTests
         var cancelAbort = new CancellationTokenSource();
         var task = Task.Run(async () =>
         {
-            await Task.Delay(TimeSpan.FromMinutes(10), cancelAbort.Token);
+            await Task.Delay(TimeSpan.FromSeconds(10), cancelAbort.Token);
             if (Debugger.IsAttached)
             {
                 // we will abort because we are hanging, look at stacks to see what the problem is
@@ -169,16 +170,16 @@ public class TestDiscoveryTests
 
         // -- assert
         fakeErrorAggregator.Errors.Should().BeEmpty();
-        fakeTestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults).Should().HaveCount(110);
+        fakeTestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults).Should().HaveCount(108);
     }
 
-    public async Task GivenMultipleMsTestAssembliesThatUseTheSameTargetFramework_WhenTestsAreRun_ThenAllTestsFromAllTargetFrameworksAreRun()
+    public async Task GivenMultipleMsTestAssembliesThatUseTheSameTargetFrameworkAndArchitecture_WhenTestsAreRun_ThenAllTestsFromAllAssembliesAreRun()
     {
         // -- arrange
         var fakeErrorAggregator = new FakeErrorAggregator();
         var commandLineOptions = CommandLineOptions.Instance;
 
-        var fakeCurrentProcess = new FakeProcess(@"C:\temp\vstest.console.exe", string.Empty, null, null, null, null, null, fakeErrorAggregator);
+        var fakeCurrentProcess = new FakeProcess(@"X:\fake\vstest.console.exe", string.Empty, null, null, null, null, null, fakeErrorAggregator);
         var fakeProcessHelper = new FakeProcessHelper(fakeCurrentProcess, fakeErrorAggregator);
 
         var fakeFileHelper = new FakeFileHelper(fakeErrorAggregator);
@@ -189,8 +190,16 @@ public class TestDiscoveryTests
             .WithDuration(100.Milliseconds())
             .WithBatchSize(10)
             .Build();
-        var mstest1Dll = new FakeTestDllFile(@"C:\temp\mstest1.dll", new FrameworkName(".NETCoreApp,Version=v5.0"), Architecture.X64, tests);
+        var mstest1Dll = new FakeTestDllFile(@"X:\fake\mstest1.dll", new FrameworkName(".NETCoreApp,Version=v5.0"), Architecture.X64, tests);
         fakeFileHelper.AddFile(mstest1Dll);
+
+        var tests2 = new FakeTestBatchBuilder()
+            .WithTotalCount(108)
+            .WithDuration(100.Milliseconds())
+            .WithBatchSize(10)
+            .Build();
+        var mstest2Dll = new FakeTestDllFile(@"X:\fake\mstest2.dll", new FrameworkName(".NETCoreApp,Version=v5.0"), Architecture.X64, tests2);
+        fakeFileHelper.AddFile(mstest2Dll);
 
         List<FakeMessage> changeMessages = tests.Take(tests.Count - 1).Select(batch =>  // TODO: make the stats agree with the tests below
             new FakeMessage<TestRunChangedEventArgs>(MessageType.TestRunStatsChange,
@@ -219,6 +228,7 @@ public class TestDiscoveryTests
 
 
         var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(new FakeCommunicationChannel(responses, fakeErrorAggregator), fakeErrorAggregator);
+        TestServiceLocator.Clear();
         TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint);
         var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(fakeProcessHelper, fakeCommunicationEndpoint, fakeErrorAggregator);
         var testEngine = new TestEngine(fakeTestRuntimeProviderManager, fakeProcessHelper);
@@ -259,7 +269,7 @@ public class TestDiscoveryTests
         var testRunRequestPayload = new TestRunRequestPayload
         {
             // TODO: passing null sources and null testcases does not fail fast
-            Sources = mstest1Dll.Path.ToList(),
+            Sources = new List<string> { mstest1Dll.Path, mstest2Dll.Path },
             // TODO: passing null runsettings does not fail fast, instead it fails in Fakes settings code
             // TODO: passing empty string fails in the xml parser code
             RunSettings = $"<RunSettings>{runConfiguration}</RunSettings>"
@@ -275,9 +285,10 @@ public class TestDiscoveryTests
         var cancelAbort = new CancellationTokenSource();
         var task = Task.Run(async () =>
         {
-            await Task.Delay(TimeSpan.FromMinutes(10), cancelAbort.Token);
+            await Task.Delay(TimeSpan.FromSeconds(5), cancelAbort.Token);
             if (Debugger.IsAttached)
             {
+                var errors = fakeErrorAggregator.Errors;
                 // we will abort because we are hanging, look at stacks to see what the problem is
                 Debugger.Break();
             }

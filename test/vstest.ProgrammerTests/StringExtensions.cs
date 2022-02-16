@@ -15,7 +15,7 @@ internal static class StringExtensions
         return string.Join(" ", value);
     }
 
-    public static List<string> ToList(this string value)
+    public static List<string> AsList(this string value)
     {
         return new List<string> { value };
     }

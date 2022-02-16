@@ -27,6 +27,12 @@ public static class TestServiceLocator
 #endif
         return (TRegistration)instance;
     }
+
+    public static void Clear()
+    {
+        Instances.Clear();
+        Resolves.Clear();
+    }
 }
 
 // TODO: Make this internal, I am just trying to have easier time trying this out.
