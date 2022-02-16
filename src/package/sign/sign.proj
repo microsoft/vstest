@@ -109,7 +109,7 @@
 
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net452.x86.exe" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net46.x86.exe" />x
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net46.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net461.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net462.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net47.x86.exe" />
