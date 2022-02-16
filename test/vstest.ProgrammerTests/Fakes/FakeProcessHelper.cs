@@ -24,14 +24,14 @@ internal class FakeProcessHelper : IProcessHelper
     {
         FakeErrorAggregator = fakeErrorAggregator;
         CurrentProcess = currentProcess;
-        AddProcess(currentProcess);
+        AddFakeProcess(currentProcess);
     }
 
-    private void AddProcess(FakeProcess currentProcess)
+    public void AddFakeProcess(FakeProcess process)
     {
         var id = Interlocked.Increment(ref _lastProcessId);
-        currentProcess.SetId(id);
-        Processes.Add(currentProcess);
+        process.SetId(id);
+        Processes.Add(process);
     }
 
     public PlatformArchitecture GetCurrentProcessArchitecture()

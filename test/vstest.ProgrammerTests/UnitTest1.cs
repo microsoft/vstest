@@ -176,14 +176,13 @@ public class TestDiscoveryTests
 
     public async Task GivenMultipleMsTestAssembliesThatUseTheSameTargetFrameworkAndArchitecture_WhenTestsAreRun_ThenAllTestsFromAllAssembliesAreRun()
     {
+        // We need to use static class to find the communication endpoint, this clears all the registrations of previous tests.
+        TestServiceLocator.Clear();
         using var fixture = new FixtureBuilder()
             .Build();
 
         // -- arrange
-        var testhost1 = new FakeTestHostBuilder()
-            .WithTestDll()
-            .Build();
-        
+
         var commandLineOptions = CommandLineOptions.Instance;
         // TODO: have mstest1dll canned
         var mstest1Dll = new FakeTestDllBuilder()
@@ -192,79 +191,47 @@ public class TestDiscoveryTests
             .WithArchitecture(Architecture.X64)
             .WithTestCount(108, 10)
             .Build();
-        var tests = mstest1Dll.TestResultBatches;
-        fixture.FileHelper.AddFile(mstest1Dll);
 
-        var tests2 = new FakeTestBatchBuilder()
-            .WithTotalCount(108)
-            .WithDuration(100.Milliseconds())
-            .WithBatchSize(10)
+        var testhost1Process = new FakeProcess(fixture.ErrorAggregator, @"X:\fake\testhost1.exe", string.Empty, null, null, null, null, null);
+
+        var runTests1 = new FakeMessagesBuilder()
+            .VersionCheck(5)
+            .ExecutionInitialize(FakeMessage.NoResponse)
+            .StartTestExecutionWithSources(mstest1Dll.TestResultBatches)
+            .SessionEnd(FakeMessage.NoResponse, _ => testhost1Process.Exit())
             .Build();
-        var mstest2Dll = new FakeTestDllFile(@"X:\fake\mstest2.dll", new FrameworkName(".NETCoreApp,Version=v5.0"), Architecture.X64, tests2);
-        fixture.FileHelper.AddFile(mstest2Dll);
+
+        var testhost1 = new FakeTestHostBuilder(fixture)
+            .WithTestDll(mstest1Dll)
+            .WithProcess(testhost1Process)
+            .WithResponses(runTests1)
+            .Build();
+
+        var mstest2Dll = new FakeTestDllBuilder()
+            .WithPath(@"X:\fake\mstest1.dll")
+            .WithFramework(KnownFramework.Net50)
+            .WithArchitecture(Architecture.X64)
+            .WithTestCount(50, 8)
+            .Build();
+
+        var testhost2Process = new FakeProcess(fixture.ErrorAggregator, @"X:\fake\testhost1.exe", string.Empty, null, null, null, null, null);
+
+        var runTests2 = new FakeMessagesBuilder()
+            .VersionCheck(5)
+            .ExecutionInitialize(FakeMessage.NoResponse)
+            .StartTestExecutionWithSources(mstest2Dll.TestResultBatches)
+            .SessionEnd(FakeMessage.NoResponse, _ => testhost1Process.Exit())
+            .Build();
+
+        var testhost2 = new FakeTestHostBuilder(fixture)
+            .WithTestDll(mstest2Dll)
+            .WithProcess(testhost2Process)
+            .WithResponses(runTests2)
+            .Build();
 
         // ---
-        List<FakeMessage> changeMessages = tests.Take(tests.Count - 1).Select(batch =>  // TODO: make the stats agree with the tests below
-            new FakeMessage<TestRunChangedEventArgs>(MessageType.TestRunStatsChange,
-                  new TestRunChangedEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = batch.Count }), batch, new List<TestCase>())
-                 )).ToList<FakeMessage>();
-        FakeMessage completedMessage = new FakeMessage<TestRunCompletePayload>(MessageType.ExecutionComplete, new TestRunCompletePayload
-        {
-            // TODO: make the stats agree with the tests below
-            TestRunCompleteArgs = new TestRunCompleteEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = 1 }), false, false, null, new System.Collections.ObjectModel.Collection<AttachmentSet>(), TimeSpan.Zero),
-            LastRunTests = new TestRunChangedEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = 1 }), tests.Last(), new List<TestCase>()),
-        });
-        List<FakeMessage> messages = changeMessages.Concat(new[] { completedMessage }).ToList();
-        var responses = new List<RequestResponsePair<string, FakeMessage>> {
-        new RequestResponsePair<string, FakeMessage>(MessageType.VersionCheck, new FakeMessage<int>(MessageType.VersionCheck, 5)),
-        new RequestResponsePair<string, FakeMessage>(MessageType.ExecutionInitialize, FakeMessage.NoResponse),
-        new RequestResponsePair<string, FakeMessage>(MessageType.StartTestExecutionWithSources, messages),
-        new RequestResponsePair<string, FakeMessage>(MessageType.SessionEnd, message =>
-            {
-                // TODO: how do we associate this to the correct process?
-                var fp = fixture.ProcessHelper.Processes.Last();
-                fixture.ProcessHelper.TerminateProcess(fp);
 
-                return new List<FakeMessage> { FakeMessage.NoResponse };
-            }),
-        };
-
-        var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(new FakeCommunicationChannel(responses, fixture.ErrorAggregator, 1), fixture.ErrorAggregator);
-        var fakeTestRuntimeProvider = new FakeTestRuntimeProvider(fixture.ProcessHelper, fakeCommunicationEndpoint, fixture.ErrorAggregator);
-
-        // ---
-        List<FakeMessage> changeMessages2 = tests2.Take(tests2.Count - 1).Select(batch =>  // TODO: make the stats agree with the tests below
-    new FakeMessage<TestRunChangedEventArgs>(MessageType.TestRunStatsChange,
-          new TestRunChangedEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = batch.Count }), batch, new List<TestCase>())
-         )).ToList<FakeMessage>();
-        FakeMessage completedMessage2 = new FakeMessage<TestRunCompletePayload>(MessageType.ExecutionComplete, new TestRunCompletePayload
-        {
-            // TODO: make the stats agree with the tests below
-            TestRunCompleteArgs = new TestRunCompleteEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = 1 }), false, false, null, new System.Collections.ObjectModel.Collection<AttachmentSet>(), TimeSpan.Zero),
-            LastRunTests = new TestRunChangedEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = 1 }), tests.Last(), new List<TestCase>()),
-        });
-        List<FakeMessage> messages2 = changeMessages2.Concat(new[] { completedMessage2 }).ToList();
-        var responses2 = new List<RequestResponsePair<string, FakeMessage>> {
-        new RequestResponsePair<string, FakeMessage>(MessageType.VersionCheck, new FakeMessage<int>(MessageType.VersionCheck, 5)),
-        new RequestResponsePair<string, FakeMessage>(MessageType.ExecutionInitialize, FakeMessage.NoResponse),
-        new RequestResponsePair<string, FakeMessage>(MessageType.StartTestExecutionWithSources, messages),
-        new RequestResponsePair<string, FakeMessage>(MessageType.SessionEnd, message =>
-            {
-                // TODO: how do we associate this to the correct process?
-                var fp = fixture.ProcessHelper.Processes.Last();
-                fixture.ProcessHelper.TerminateProcess(fp);
-
-                return new List<FakeMessage> { FakeMessage.NoResponse };
-            }),
-        };
-
-
-        var fakeCommunicationEndpoint2 = new FakeCommunicationEndpoint(new FakeCommunicationChannel(responses2, fixture.ErrorAggregator, 2), fixture.ErrorAggregator);
-        var fakeTestRuntimeProvider2 = new FakeTestRuntimeProvider(fixture.ProcessHelper, fakeCommunicationEndpoint2, fixture.ErrorAggregator);
-
-        TestServiceLocator.Clear();
-        TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint.TestHostConnectionInfo.Endpoint, fakeCommunicationEndpoint);
-        TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint2.TestHostConnectionInfo.Endpoint, fakeCommunicationEndpoint2);
+       
         var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(new[] { fakeTestRuntimeProvider, fakeTestRuntimeProvider, fakeTestRuntimeProvider2, fakeTestRuntimeProvider2 }.ToList(), fixture.ErrorAggregator);
         var testEngine = new TestEngine(fakeTestRuntimeProviderManager, fixture.ProcessHelper);
 
@@ -341,9 +308,10 @@ public class TestDiscoveryTests
 
         // -- assert
         fixture.ErrorAggregator.Errors.Should().BeEmpty();
-        fakeTestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults).Should().HaveCount(216);
+        fakeTestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults).Should().HaveCount(158);
     }
 }
+
 
 internal class FixtureBuilder
 {
