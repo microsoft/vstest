@@ -189,13 +189,13 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         // e.g.: testhost.net472.x86.exe -> 32-bit testhost for .NET Framework 4.7.2
         //
         // The tfm is omitted for .NET Framework 4.5.1 testhost.
-        // testhost.x86.exe -> 64-bit testhost for .NET Framework 4.5.1
+        // testhost.x86.exe -> 32-bit testhost for .NET Framework 4.5.1
         //
         // The architecture is omitted for 64-bit (x64) testhost.
         // testhost.net472.exe -> 64-bit testhost for .NET Framework 4.7.2
         // testhost.exe -> 64-bit testhost for .NET Framework 4.5.1
         //
-        // These omissions are done for backwards compatibility because orinally there were
+        // These omissions are done for backwards compatibility because originally there were
         // only testhost.exe and testhost.x86.exe, both built against .NET Framework 4.5.1.
 
         StringBuilder testHostProcessName = new("testhost");
