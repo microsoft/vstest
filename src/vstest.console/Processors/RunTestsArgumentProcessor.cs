@@ -89,8 +89,6 @@ internal class RunTestsArgumentProcessorCapabilities : BaseArgumentProcessorCapa
 
 internal class RunTestsArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting tests to run.
     /// </summary>
@@ -121,10 +119,6 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
     /// </summary>
     private static long s_numberOfExecutedTests;
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Default constructor.
     /// </summary>
@@ -143,8 +137,6 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
         Output = output;
         _testRunEventsRegistrar = new TestRunRequestEventsRegistrar(Output, _commandLineOptions, artifactProcessingManager);
     }
-
-    #endregion
 
     public void Initialize(string argument)
     {

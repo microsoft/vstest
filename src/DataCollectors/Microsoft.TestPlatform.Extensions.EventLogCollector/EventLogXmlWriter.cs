@@ -20,8 +20,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 /// </summary>
 internal static class EventLogXmlWriter
 {
-    #region Public methods
-
     /// <summary>
     /// The write event log entries to xml file.
     /// </summary>
@@ -83,4 +81,3 @@ internal static class EventLogXmlWriter
         fileHelper.WriteAllTextToFile(xmlFilePath, stringBuilder.ToString());
     }
 }
-#endregion

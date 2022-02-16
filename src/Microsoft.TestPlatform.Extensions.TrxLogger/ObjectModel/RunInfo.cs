@@ -16,8 +16,6 @@ using XML;
 /// </summary>
 internal sealed class RunInfo : IXmlTestStore
 {
-    #region Fields
-
     [StoreXmlSimpleField("Text", "")]
     private readonly string _text;
 
@@ -31,10 +29,6 @@ internal sealed class RunInfo : IXmlTestStore
 
     [StoreXmlSimpleField("@timestamp")]
     private readonly DateTime _timestamp;
-
-    #endregion
-
-    #region Constructors
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RunInfo"/> class.
@@ -62,7 +56,6 @@ internal sealed class RunInfo : IXmlTestStore
         _timestamp = DateTime.UtcNow;
     }
 
-    #endregion
 
     #region IXmlTestStore Members
 

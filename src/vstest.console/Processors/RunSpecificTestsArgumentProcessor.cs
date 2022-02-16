@@ -91,8 +91,6 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     public const char SplitDelimiter = ',';
     public const char EscapeDelimiter = '\\';
 
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -148,10 +146,6 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     /// </summary>
     private readonly ITestRunEventsRegistrar _testRunEventsRegistrar;
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Default constructor.
     /// </summary>
@@ -174,7 +168,6 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         _testRunEventsRegistrar = new TestRunRequestEventsRegistrar(Output, _commandLineOptions, artifactProcessingManager);
     }
 
-    #endregion
 
     #region IArgumentProcessor
 
@@ -231,9 +224,6 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     }
 
     #endregion
-
-    #region Private Methods
-
     /// <summary>
     /// Discovers tests from the given sources and selects only specified tests.
     /// </summary>
@@ -318,8 +308,6 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
             }
         }
     }
-
-    #endregion
 
     private class DiscoveryEventsRegistrar : ITestDiscoveryEventsRegistrar
     {

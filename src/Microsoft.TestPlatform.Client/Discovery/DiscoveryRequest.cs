@@ -460,9 +460,6 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     }
 
     #endregion
-
-    #region privates fields
-
     /// <summary>
     /// Request Data
     /// </summary>
@@ -488,5 +485,4 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// </summary>
     private DateTime _discoveryStartTime;
 
-    #endregion
 }

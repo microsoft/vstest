@@ -19,13 +19,9 @@ using XML;
 /// </summary>
 internal sealed class TestCategoryItem : IXmlTestStore
 {
-    #region Fields
     [StoreXmlSimpleField(Location = "@TestCategory", DefaultValue = "")]
     private readonly string _category = string.Empty;
 
-    #endregion
-
-    #region Constructors
     /// <summary>
     /// Create a new item with the category set
     /// </summary>
@@ -42,9 +38,6 @@ internal sealed class TestCategoryItem : IXmlTestStore
         _category = StripIllegalChars(category);
     }
 
-    #endregion
-
-    #region Properties/Methods
     /// <summary>
     /// Gets the category for this TestCategory
     /// </summary>
@@ -66,9 +59,6 @@ internal sealed class TestCategoryItem : IXmlTestStore
         return ret;
     }
 
-    #endregion
-
-    #region Methods - overrides
     /// <summary>
     /// Compare the values of the items
     /// </summary>
@@ -103,7 +93,6 @@ internal sealed class TestCategoryItem : IXmlTestStore
         Debug.Assert(_category != null, "category is null");
         return _category;
     }
-    #endregion
 
     #region IXmlTestStore Members
 
@@ -127,7 +116,6 @@ internal sealed class TestCategoryItem : IXmlTestStore
 /// </summary>
 internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategoryItem>
 {
-    #region Constructors
     /// <summary>
     /// Creates an empty TestCategoryItemCollection.
     /// </summary>
@@ -147,10 +135,6 @@ internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategor
             Add(s);
         }
     }
-
-    #endregion
-
-    #region Methods
 
     /// <summary>
     /// Adds the category.
@@ -263,6 +247,5 @@ internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategor
     {
         return base.GetHashCode();
     }
-    #endregion
 }
 #endregion

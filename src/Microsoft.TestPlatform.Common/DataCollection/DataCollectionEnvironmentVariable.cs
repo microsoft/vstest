@@ -17,8 +17,6 @@ using ObjectModel;
 /// </summary>
 internal class DataCollectionEnvironmentVariable
 {
-    #region Fields
-
     /// <summary>
     /// Variable name and requested value
     /// </summary>
@@ -28,10 +26,6 @@ internal class DataCollectionEnvironmentVariable
     /// Friendly names of data collectors that requested this environment variable
     /// </summary>
     private readonly List<string> _dataCollectorsThatRequested;
-
-    #endregion
-
-    #region Constructors
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DataCollectionEnvironmentVariable"/> class.
@@ -52,10 +46,6 @@ internal class DataCollectionEnvironmentVariable
         _variable = variable;
         _dataCollectorsThatRequested = new List<string> { requestingDataCollectorFriendlyName };
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets variable name.
@@ -90,10 +80,6 @@ internal class DataCollectionEnvironmentVariable
         }
     }
 
-    #endregion
-
-    #region Methods
-
     /// <summary>
     /// Adds the data collector to the list of data collectors that requested this variable. 
     /// </summary>
@@ -104,5 +90,4 @@ internal class DataCollectionEnvironmentVariable
         _dataCollectorsThatRequested.Add(requestingDataCollectorFriendlyName);
     }
 
-    #endregion
 }

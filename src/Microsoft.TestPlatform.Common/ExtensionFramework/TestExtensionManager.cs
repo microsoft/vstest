@@ -24,16 +24,10 @@ using CommonResources = Resources.Resources;
 internal abstract class TestExtensionManager<TExtension, TMetadata>
     where TMetadata : ITestExtensionCapabilities
 {
-    #region Fields
-
     /// <summary>
     /// Used for logging errors.
     /// </summary>
     private readonly IMessageLogger _logger;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -63,10 +57,6 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
         // Populate the map to avoid threading issues
         PopulateMap();
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets unfiltered list of test extensions which are available.
@@ -106,10 +96,6 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
         private set;
     }
 
-    #endregion
-
-    #region Public Methods
-
     /// <summary>
     /// Looks up the test extension by its URI.
     /// </summary>
@@ -144,8 +130,6 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
         }
         return testExtension;
     }
-
-    #endregion
 
     /// <summary>
     /// Populate the extension map.

@@ -81,8 +81,6 @@ internal class TestRequestManager : ITestRequestManager
     /// </summary>
     private CancellationTokenSource _currentAttachmentsProcessingCancellationTokenSource;
 
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRequestManager"/> class.
     /// </summary>
@@ -120,8 +118,6 @@ internal class TestRequestManager : ITestRequestManager
         _processHelper = processHelper;
         _attachmentsProcessingManager = attachmentsProcessingManager;
     }
-
-    #endregion
 
     /// <summary>
     /// Gets the test request manager instance.

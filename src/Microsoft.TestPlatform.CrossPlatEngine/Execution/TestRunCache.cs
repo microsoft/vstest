@@ -21,8 +21,6 @@ using ObjectModel.Client;
 /// </summary>
 internal class TestRunCache : ITestRunCache
 {
-    #region Private Members
-
     /// <summary>
     /// Specifies whether the object is disposed or not.
     /// </summary>
@@ -78,10 +76,6 @@ internal class TestRunCache : ITestRunCache
     /// </summary>
     private readonly object _syncObject;
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRunCache"/> class.
     /// </summary>
@@ -111,18 +105,10 @@ internal class TestRunCache : ITestRunCache
         _timer = new Timer(OnCacheTimeHit, this, cacheTimeout, cacheTimeout);
     }
 
-    #endregion
-
-    #region Delegates
-
     /// <summary>
     /// Called when the cache is ready to report on the current status.
     /// </summary>
     internal delegate void OnCacheHit(TestRunStatistics testRunStats, ICollection<TestResult> results, ICollection<TestCase> inProgressTests);
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets the test results present in the cache currently.
@@ -184,10 +170,6 @@ internal class TestRunCache : ITestRunCache
     }
 
     public IDictionary<string, int> AdapterTelemetry { get; set; } = new Dictionary<string, int>();
-    #endregion
-
-    #region Public/internal methods
-
     /// <summary>
     /// Disposes the cache
     /// </summary>
@@ -325,10 +307,6 @@ internal class TestRunCache : ITestRunCache
         }
     }
 
-    #endregion
-
-    #region Private methods.
-
     /// <summary>
     /// Checks if the cache timeout/size has been met.
     /// </summary>
@@ -398,5 +376,4 @@ internal class TestRunCache : ITestRunCache
         }
     }
 
-    #endregion
 }

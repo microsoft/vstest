@@ -215,8 +215,6 @@ public static class MessageType
     /// </summary>
     public const string StopTestSessionCallback = "TestSession.StopTestSessionCallback";
 
-    #region DataCollector messages
-
     /// <summary>
     /// Event message type sent to datacollector process right after test host process has started.
     /// </summary>
@@ -262,5 +260,4 @@ public static class MessageType
     /// </summary>
     public const string DataCollectionTestStartAck = "DataCollection.TestStartAck";
 
-    #endregion
 }

@@ -13,8 +13,6 @@ using System;
 /// </summary>
 public class TestSourceException : Exception
 {
-    #region Constructors
-
     /// <summary>
     /// Creates a new TestSourceException
     /// </summary>
@@ -41,5 +39,4 @@ public class TestSourceException : Exception
     {
     }
 
-    #endregion
 }

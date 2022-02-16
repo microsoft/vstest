@@ -15,8 +15,6 @@ using System.Runtime.Serialization;
 [DataContract]
 public abstract class TestCaseEventArgs : DataCollectionEventArgs
 {
-    #region Constructor
-
     /// <summary>
     /// Default constructor added for serialization/deserialization.
     /// </summary>
@@ -82,10 +80,6 @@ public abstract class TestCaseEventArgs : DataCollectionEventArgs
         // !testElement.ParentExecId.Equals(TestExecId.Empty);
     }
 
-    #endregion
-
-    #region Public properties
-
     /// <summary>
     /// Gets the test case ID
     /// </summary>
@@ -126,7 +120,6 @@ public abstract class TestCaseEventArgs : DataCollectionEventArgs
         internal set;
     }
 
-    #endregion
 }
 
 /// <summary>
@@ -135,8 +128,6 @@ public abstract class TestCaseEventArgs : DataCollectionEventArgs
 [DataContract]
 public sealed class TestCaseStartEventArgs : TestCaseEventArgs
 {
-    #region Constructor
-
     /// <summary>
     /// Default constructor for serialization/deserialization
     /// </summary>
@@ -203,7 +194,6 @@ public sealed class TestCaseStartEventArgs : TestCaseEventArgs
         Debug.Assert(context.HasTestCase, "Context is not for a test case");
     }
 
-    #endregion
 }
 
 /// <summary>
@@ -212,7 +202,6 @@ public sealed class TestCaseStartEventArgs : TestCaseEventArgs
 [DataContract]
 public sealed class TestCaseEndEventArgs : TestCaseEventArgs
 {
-    #region Constructor
     /// <summary>
     /// Default constructor added for serialization/deserialization.
     /// </summary>
@@ -320,10 +309,6 @@ public sealed class TestCaseEndEventArgs : TestCaseEventArgs
         TestOutcome = testOutcome;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets the outcome of the test.
     /// </summary>
@@ -333,7 +318,6 @@ public sealed class TestCaseEndEventArgs : TestCaseEventArgs
         get;
         private set;
     }
-    #endregion
 }
 
 /// <summary>
@@ -342,8 +326,6 @@ public sealed class TestCaseEndEventArgs : TestCaseEventArgs
 [DataContract]
 public sealed class TestResultEventArgs : TestCaseEventArgs
 {
-    #region Constructor
-
     /// <summary>
     /// Default constructor for serialization/deserialization
     /// </summary>
@@ -421,10 +403,6 @@ public sealed class TestResultEventArgs : TestCaseEventArgs
         TestResult = testResult;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets the outcome of the test.
     /// </summary>
@@ -434,5 +412,4 @@ public sealed class TestResultEventArgs : TestCaseEventArgs
         get;
         private set;
     }
-    #endregion
 }

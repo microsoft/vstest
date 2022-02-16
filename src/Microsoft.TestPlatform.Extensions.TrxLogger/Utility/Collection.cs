@@ -60,13 +60,9 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
     }
     #endregion
 
-    #region Fields
     protected Hashtable _container;
 
     private string _childElementName;
-    #endregion
-
-    #region Constructors
     protected EqtBaseCollection()
     {
         _container = new Hashtable();
@@ -90,7 +86,6 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
         EqtAssert.ParameterNotNull(other, nameof(other));
         _container = new Hashtable(other._container);
     }
-    #endregion
 
     #region Methods: ICollection<T>
     // TODO: Consider putting check for null to derived classes.
@@ -186,7 +181,6 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
 
     #endregion
 
-    #region Private
     private string ChildElementName
     {
         get
@@ -199,5 +193,4 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
             return _childElementName;
         }
     }
-    #endregion
 }

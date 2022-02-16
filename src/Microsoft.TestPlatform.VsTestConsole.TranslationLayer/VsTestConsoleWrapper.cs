@@ -34,8 +34,6 @@ using CoreUtilitiesConstants = VisualStudio.TestPlatform.CoreUtilities.Constants
 /// </summary>
 public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 {
-    #region Private Members
-
     private readonly IProcessManager _vstestConsoleProcessManager;
 
     private readonly ITranslationLayerRequestSender _requestSender;
@@ -55,10 +53,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     private readonly ConsoleParameters _consoleParameters;
 
     private readonly ITestPlatformEventSource _testPlatformEventSource;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="VsTestConsoleWrapper"/> class.
@@ -142,7 +136,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         _sessionStarted = false;
     }
 
-    #endregion
 
     #region IVsTestConsoleWrapper
 

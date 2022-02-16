@@ -22,16 +22,12 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class ResultsDirectoryArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the ListTestsArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/ResultsDirectory";
 
     private const string RunSettingsPath = "RunConfiguration.ResultsDirectory";
-    #endregion
-
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
     private Lazy<IArgumentExecutor> _executor;
@@ -97,8 +93,6 @@ internal class ResultsDirectoryArgumentProcessorCapabilities : BaseArgumentProce
 /// </summary>
 internal class ResultsDirectoryArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -107,10 +101,6 @@ internal class ResultsDirectoryArgumentExecutor : IArgumentExecutor
     private readonly IRunSettingsProvider _runSettingsManager;
 
     public const string RunSettingsPath = "RunConfiguration.ResultsDirectory";
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -126,7 +116,6 @@ internal class ResultsDirectoryArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsManager;
     }
 
-    #endregion
 
     #region IArgumentExecutor
 

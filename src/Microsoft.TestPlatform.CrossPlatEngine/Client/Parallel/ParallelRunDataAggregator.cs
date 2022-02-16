@@ -20,8 +20,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 /// </summary>
 internal class ParallelRunDataAggregator
 {
-    #region PrivateFields
-
 
     private readonly List<string> _executorUris;
 
@@ -30,8 +28,6 @@ internal class ParallelRunDataAggregator
     private readonly ConcurrentDictionary<string, object> _metricsAggregator;
 
     private readonly object _dataUpdateSyncObject = new();
-
-    #endregion
 
     public ParallelRunDataAggregator(string runSettingsXml!!)
     {
@@ -50,8 +46,6 @@ internal class ParallelRunDataAggregator
         IsCanceled = false;
     }
 
-    #region Public Properties
-
     public TimeSpan ElapsedTime { get; set; }
 
     public Collection<AttachmentSet> RunContextAttachments { get; set; }
@@ -69,10 +63,6 @@ internal class ParallelRunDataAggregator
     public bool IsCanceled { get; private set; }
 
     public string RunSettings { get; }
-
-    #endregion
-
-    #region Public Methods
 
     public ITestRunStatistics GetAggregatedRunStats()
     {
@@ -209,5 +199,4 @@ internal class ParallelRunDataAggregator
         }
     }
 
-    #endregion
 }

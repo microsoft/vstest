@@ -21,8 +21,6 @@ using XML;
 /// </summary>
 internal class CollectorDataEntry : IXmlTestStore
 {
-    #region Private Fields
-
     /// <summary>
     /// List of data attachments. These attachments can be things such as files that the
     /// collector wants to make available to the publishers.
@@ -53,10 +51,6 @@ internal class CollectorDataEntry : IXmlTestStore
     /// Name of the collector that should be displayed to the user.
     /// </summary>
     private string _collectorDisplayName;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Used by the aggregator to put collector Uri, agentName, string agentDisplayName, whether it's remote data, and
@@ -129,10 +123,6 @@ internal class CollectorDataEntry : IXmlTestStore
         }
     }
 
-    #endregion
-
-    #region Public Properties
-
     /// <summary>
     /// Gets the read-only list of data attachments
     /// </summary>
@@ -144,7 +134,6 @@ internal class CollectorDataEntry : IXmlTestStore
         }
     }
 
-    #endregion
 
     #region IXmlTestStore Members
 
@@ -177,9 +166,6 @@ internal class CollectorDataEntry : IXmlTestStore
     }
 
     #endregion
-
-    #region Internal Methods
-
     /// <summary>
     /// Adds a data attachment to the list of data attachments
     /// </summary>
@@ -202,10 +188,6 @@ internal class CollectorDataEntry : IXmlTestStore
 
         return new CollectorDataEntry(this, resultsDirectory, useAbsolutePaths);
     }
-
-    #endregion
-
-    #region Private Methods
 
     private void Initialize(Uri uri, string collectorDisplayName, string agentName, string agentDisplayName, bool isFromRemoteAgent, IEnumerable<IDataAttachment> attachments)
     {
@@ -231,5 +213,4 @@ internal class CollectorDataEntry : IXmlTestStore
         _isFromRemoteAgent = isFromRemoteAgent;
     }
 
-    #endregion
 }

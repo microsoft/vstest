@@ -47,8 +47,6 @@ internal class FilterExpression
     /// </summary>
     private readonly bool _areJoinedByAnd;
 
-    #region Constructors
-
     private FilterExpression(FilterExpression left, FilterExpression right, bool areJoinedByAnd)
     {
         ValidateArg.NotNull(left, nameof(left));
@@ -64,8 +62,6 @@ internal class FilterExpression
         ValidateArg.NotNull(condition, nameof(condition));
         _condition = condition;
     }
-    #endregion
-
     /// <summary>
     /// Create a new filter expression 'And'ing 'this' with 'filter'.
     /// </summary>

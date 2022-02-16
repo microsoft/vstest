@@ -16,8 +16,6 @@ using ObjectModel;
 /// </summary>
 internal class DiscoveryResultCache
 {
-    #region private members
-
     /// <summary>
     /// Callback used when cache is full.
     /// </summary>
@@ -47,8 +45,6 @@ internal class DiscoveryResultCache
     /// Sync object
     /// </summary>
     private readonly object _syncObject = new();
-
-    #endregion
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DiscoveryResultCache"/> class.

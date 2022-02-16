@@ -10,13 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 /// </summary>
 public abstract class BasicTransferInformation
 {
-    #region Fields
-
     private string _description;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BasicTransferInformation"/> class.
@@ -31,7 +25,6 @@ public abstract class BasicTransferInformation
         Description = string.Empty;
     }
 
-    #endregion
 
     #region  Required Parameters.
 

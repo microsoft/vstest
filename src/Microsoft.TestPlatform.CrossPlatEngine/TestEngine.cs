@@ -34,13 +34,9 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 /// </summary>
 public class TestEngine : ITestEngine
 {
-    #region Private Fields
-
     private readonly TestRuntimeProviderManager _testHostProviderManager;
     private ITestExtensionManager _testExtensionManager;
     private readonly IProcessHelper _processHelper;
-
-    #endregion
 
     public TestEngine() : this(TestRuntimeProviderManager.Instance, new ProcessHelper())
     {

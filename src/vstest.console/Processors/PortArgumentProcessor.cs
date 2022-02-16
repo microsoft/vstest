@@ -26,14 +26,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class PortArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the PortArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/Port";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -98,8 +94,6 @@ internal class PortArgumentProcessorCapabilities : BaseArgumentProcessorCapabili
 /// </summary>
 internal class PortArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -124,10 +118,6 @@ internal class PortArgumentExecutor : IArgumentExecutor
     /// Process helper for process management actions.
     /// </summary>
     private readonly IProcessHelper _processHelper;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -161,7 +151,6 @@ internal class PortArgumentExecutor : IArgumentExecutor
         _processHelper = processHelper;
     }
 
-    #endregion
 
     #region IArgumentExecutor
 

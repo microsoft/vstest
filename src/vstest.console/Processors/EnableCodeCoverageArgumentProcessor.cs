@@ -24,14 +24,10 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 /// </summary>
 internal class EnableCodeCoverageArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of command for enabling code coverage.
     /// </summary>
     public const string CommandName = "/EnableCodeCoverage";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -96,8 +92,6 @@ internal class EnableCodeCoverageArgumentProcessorCapabilities : BaseArgumentPro
 /// </summary>
 internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
 {
-    #region private variables
-
     private readonly IRunSettingsProvider _runSettingsManager;
     private readonly CommandLineOptions _commandLineOptions;
     private readonly IFileHelper _fileHelper;
@@ -186,8 +180,6 @@ internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
         @"          </CodeCoverage>" + Environment.NewLine +
         @"        </Configuration>" + Environment.NewLine +
         @"      </DataCollector>";
-
-    #endregion
 
     #endregion
 

@@ -21,14 +21,10 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 /// </summary>
 internal class UseVsixExtensionsArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of command
     /// </summary>
     public const string CommandName = "/UseVsixExtensions";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 

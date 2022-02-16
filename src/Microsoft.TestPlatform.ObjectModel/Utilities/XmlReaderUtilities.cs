@@ -12,13 +12,7 @@ using System.Xml;
 /// </summary>
 public static class XmlReaderUtilities
 {
-    #region Constants
-
     private const string RunSettingsRootNodeName = "RunSettings";
-
-    #endregion
-
-    #region Utility Methods
 
     /// <summary>
     /// Reads up to the next Element in the document.
@@ -69,5 +63,4 @@ public static class XmlReaderUtilities
         }
     }
 
-    #endregion
 }

@@ -41,8 +41,6 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     private ITestDiscoveryEventsHandler2 _baseTestDiscoveryEventsHandler;
     private bool _skipDefaultAdapters;
 
-    #region Constructors
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
     /// </summary>
@@ -118,7 +116,6 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         _proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
     }
 
-    #endregion
 
     #region IProxyDiscoveryManager implementation.
 

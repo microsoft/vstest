@@ -15,14 +15,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class ParentProcessIdArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the ParentProcessIdArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/ParentProcessId";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -87,16 +83,10 @@ internal class ParentProcessIdArgumentProcessorCapabilities : BaseArgumentProces
 /// </summary>
 internal class ParentProcessIdArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
     private readonly CommandLineOptions _commandLineOptions;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -109,8 +99,6 @@ internal class ParentProcessIdArgumentExecutor : IArgumentExecutor
         Contract.Requires(options != null);
         _commandLineOptions = options;
     }
-
-    #endregion
 
     /// <summary>
     /// Initializes with the argument that was provided with the command.

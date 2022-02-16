@@ -53,8 +53,6 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// </summary>
     private CancellationTokenSource _processExitCancellationTokenSource;
 
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="VsTestConsoleRequestSender"/> class.
     /// </summary>
@@ -83,7 +81,6 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         _testPlatformEventSource = testPlatformEventSource;
     }
 
-    #endregion
 
     #region ITranslationLayerRequestSender
 

@@ -23,14 +23,10 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 /// </summary>
 internal class CliRunSettingsArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the PortArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "--";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 

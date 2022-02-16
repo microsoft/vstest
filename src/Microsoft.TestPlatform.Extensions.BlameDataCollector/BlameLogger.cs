@@ -21,8 +21,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 [ExtensionUri(ExtensionUri)]
 public class BlameLogger : ITestLogger
 {
-    #region Constants
-
     /// <summary>
     /// Uri used to uniquely identify the Blame logger.
     /// </summary>
@@ -42,10 +40,6 @@ public class BlameLogger : ITestLogger
     /// The output.
     /// </summary>
     private readonly IOutput _output;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BlameLogger"/> class.
@@ -67,7 +61,6 @@ public class BlameLogger : ITestLogger
         _blameReaderWriter = blameReaderWriter;
     }
 
-    #endregion
 
     #region ITestLogger
 

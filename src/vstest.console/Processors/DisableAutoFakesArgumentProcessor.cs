@@ -15,15 +15,11 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class DisableAutoFakesArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     public const string CommandName = "/DisableAutoFakes";
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
     private Lazy<IArgumentExecutor> _executor;
-
-    #endregion
 
     public Lazy<IArgumentExecutor> Executor
     {
@@ -62,12 +58,10 @@ internal class DisableAutoFakesArgumentExecutor : IArgumentExecutor
 {
     private readonly CommandLineOptions _commandLineOptions;
 
-    #region Constructors
     public DisableAutoFakesArgumentExecutor(CommandLineOptions commandLineOptions)
     {
         _commandLineOptions = commandLineOptions;
     }
-    #endregion
 
     #region IArgumentProcessor
 

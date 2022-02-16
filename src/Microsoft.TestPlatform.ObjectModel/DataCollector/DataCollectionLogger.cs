@@ -19,8 +19,6 @@ public abstract class DataCollectionLogger
     {
     }
 
-    #region Public Members
-
     /// <summary>
     /// Logs an error message.
     /// </summary>
@@ -78,5 +76,4 @@ public abstract class DataCollectionLogger
     {
     }
 
-    #endregion
 }

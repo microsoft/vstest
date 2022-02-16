@@ -15,14 +15,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class ResponseFileArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the OutputArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "@";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 

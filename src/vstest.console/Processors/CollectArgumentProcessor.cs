@@ -29,14 +29,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class CollectArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of command for enabling code coverage.
     /// </summary>
     public const string CommandName = "/Collect";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
