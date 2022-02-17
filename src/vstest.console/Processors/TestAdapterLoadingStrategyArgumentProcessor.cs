@@ -132,6 +132,7 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
 
     #endregion
 
+    public const string RunSettingsPath = "RunConfiguration.TestAdapterLoadingStrategy";
     public const string DefaultStrategy = "Default";
     public const string ExplicitStrategy = "Explicit";
 
@@ -158,25 +159,36 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
     /// <param name="argument">Argument that was provided with the command.</param>
     public void Initialize(string argument)
     {
-        var strategy = TestAdapterLoadingStrategy.Default;
-
-        if (!string.IsNullOrEmpty(argument) && !Enum.TryParse(argument, out strategy))
-        {
-            throw new CommandLineException(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestAdapterLoadingStrategyValueInvalid, argument));
-        }
+        ExtractStrategy(argument, out var strategy);
 
         if (strategy == TestAdapterLoadingStrategy.Recursive)
         {
             throw new CommandLineException(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestAdapterLoadingStrategyValueInvalidRecursive, $"{nameof(TestAdapterLoadingStrategy.Explicit)}, {nameof(TestAdapterLoadingStrategy.NextToSource)}"));
         }
 
-        if (string.IsNullOrWhiteSpace(argument))
+        if (strategy == TestAdapterLoadingStrategy.Default)
         {
             InitializeDefaultStrategy();
             return;
         }
 
         InitializeStrategy(strategy);
+    }
+
+    private void ExtractStrategy(string value, out TestAdapterLoadingStrategy strategy)
+    {
+        value ??= _runSettingsManager.QueryRunSettingsNode(RunSettingsPath);
+
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            strategy = TestAdapterLoadingStrategy.Default;
+            return;
+        }
+
+        if (!Enum.TryParse(value, out strategy))
+        {
+            throw new CommandLineException(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestAdapterLoadingStrategyValueInvalid, value));
+        }
     }
 
     private void InitializeDefaultStrategy()
@@ -214,7 +226,7 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
         var testAdapterPaths = _commandLineOptions.TestAdapterPath ?? EmptyStringArray;
         if (!_commandLineOptions.TestAdapterPathsSet)
         {
-            testAdapterPaths = TestAdapterPathArgumentExecutor.SplitPaths(_runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestAdaptersPaths")).Union(testAdapterPaths).Distinct().ToArray();
+            testAdapterPaths = TestAdapterPathArgumentExecutor.SplitPaths(_runSettingsManager.QueryRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath)).Union(testAdapterPaths).Distinct().ToArray();
         }
 
         for (var i = 0; i < testAdapterPaths.Length; i++)
@@ -235,7 +247,7 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
             testAdapterPaths[i] = testAdapterPath;
         }
 
-        _runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdaptersPaths", string.Join(";", testAdapterPaths));
+        _runSettingsManager.UpdateRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath, string.Join(";", testAdapterPaths));
     }
 
     private void SetStrategy(TestAdapterLoadingStrategy strategy)
@@ -243,7 +255,7 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
         var adapterStrategy = strategy.ToString();
 
         _commandLineOptions.TestAdapterLoadingStrategy = strategy;
-        _runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdapterLoadingStrategy", adapterStrategy);
+        _runSettingsManager.UpdateRunSettingsNode(RunSettingsPath, adapterStrategy);
         if ((strategy & TestAdapterLoadingStrategy.Explicit) == TestAdapterLoadingStrategy.Explicit)
         {
             ForceIsolation();

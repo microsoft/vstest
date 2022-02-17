@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 
 using Common;
@@ -103,6 +102,15 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
     /// </summary>
     internal readonly static char[] ArgumentSeparators = new[] { ';' };
 
+    private static readonly string[] EmptyStringArray =
+#if NET451
+                                                        new string[0];
+#else
+                                                        Array.Empty<string>();
+#endif
+
+    public const string RunSettingsPath = "RunConfiguration.TestAdaptersPaths";
+
     /// <summary>
     /// Default constructor.
     /// </summary>
@@ -143,7 +151,7 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
         argument = argument.Trim().Trim(new char[] { '\"' });
 
         // Get test adapter paths from RunSettings.
-        var testAdapterPathsInRunSettings = _runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestAdaptersPaths");
+        var testAdapterPathsInRunSettings = _runSettingsManager.QueryRunSettingsNode(RunSettingsPath);
 
         if (!string.IsNullOrWhiteSpace(testAdapterPathsInRunSettings))
         {
@@ -153,7 +161,7 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
         testAdapterPaths.AddRange(SplitPaths(argument));
         customAdaptersPath = testAdapterPaths.Distinct().ToArray();
 
-        _runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdaptersPaths", string.Join(";", customAdaptersPath));
+        _runSettingsManager.UpdateRunSettingsNode(RunSettingsPath, string.Join(";", customAdaptersPath));
         _commandLineOptions.TestAdapterPath = customAdaptersPath;
     }
 
@@ -164,7 +172,7 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
     /// <returns>Paths.</returns>
     internal static string[] SplitPaths(string paths)
     {
-        return string.IsNullOrWhiteSpace(paths) ? (new string[] { }) : paths.Split(ArgumentSeparators, StringSplitOptions.RemoveEmptyEntries);
+        return string.IsNullOrWhiteSpace(paths) ? EmptyStringArray : paths.Split(ArgumentSeparators, StringSplitOptions.RemoveEmptyEntries);
     }
 
     /// <summary>
