@@ -216,7 +216,7 @@ public class TestDiscoveryTests
             .VersionCheck(5)
             .ExecutionInitialize(FakeMessage.NoResponse)
             .StartTestExecutionWithSources(mstest2Dll.TestResultBatches)
-            .SessionEnd(FakeMessage.NoResponse, _ => testhost1Process.Exit())
+            .SessionEnd(FakeMessage.NoResponse, _ => testhost2Process.Exit())
             .Build();
 
         var testhost2 = new FakeTestHostFixtureBuilder(fixture)
