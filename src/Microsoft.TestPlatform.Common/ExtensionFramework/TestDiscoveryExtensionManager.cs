@@ -64,8 +64,7 @@ internal class TestDiscoveryExtensionManager
         if (s_testDiscoveryExtensionManager == null)
         {
 
-            TestPluginManager.Instance
-                .GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+            TestPluginManager.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                     TestPlatformConstants.TestAdapterEndsWithPattern,
                     out var unfilteredTestExtensions,
                     out var testExtensions);
@@ -90,8 +89,7 @@ internal class TestDiscoveryExtensionManager
     public static TestDiscoveryExtensionManager GetDiscoveryExtensionManager(string extensionAssembly)
     {
 
-        TestPluginManager.Instance
-            .GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+        TestPluginManager.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                 extensionAssembly,
                 out var unfilteredTestExtensions,
                 out var testExtensions);

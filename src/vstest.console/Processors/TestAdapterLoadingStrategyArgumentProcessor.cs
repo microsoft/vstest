@@ -6,7 +6,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
@@ -117,18 +116,7 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
     /// </summary>
     private readonly IFileHelper _fileHelper;
 
-    private static readonly string[] EmptyStringArray =
-#if NET451
-        new string[0];
-#else
-        Array.Empty<string>();
-#endif
-
-    #endregion
-
     public const string RunSettingsPath = "RunConfiguration.TestAdapterLoadingStrategy";
-    public const string DefaultStrategy = "Default";
-    public const string ExplicitStrategy = "Explicit";
 
     /// <summary>
     /// Default constructor.
@@ -137,8 +125,6 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
     /// <param name="testPlatform">The test platform</param>
     public TestAdapterLoadingStrategyArgumentExecutor(CommandLineOptions options!!, IRunSettingsProvider runSettingsManager!!, IOutput output!!, IFileHelper fileHelper!!)
     {
-        Contract.Requires(options != null);
-
         _commandLineOptions = options;
         _runSettingsManager = runSettingsManager;
         _output = output;
@@ -146,7 +132,6 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
     }
 
     #region IArgumentExecutor
-
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
@@ -168,6 +153,17 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
 
         InitializeStrategy(strategy);
     }
+
+    /// <summary>
+    /// Executes the argument processor.
+    /// </summary>
+    /// <returns> The <see cref="ArgumentProcessorResult"/>. </returns>
+    public ArgumentProcessorResult Execute()
+    {
+        // Nothing to do since we updated the parameter during initialize parameter
+        return ArgumentProcessorResult.Success;
+    }
+    #endregion
 
     private void ExtractStrategy(string value, out TestAdapterLoadingStrategy strategy)
     {
@@ -196,9 +192,9 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
     {
         ValidateTestAdapterPaths(strategy);
 
-        if (!_commandLineOptions.TestAdapterPathsSet && (strategy & TestAdapterLoadingStrategy.Explicit) == TestAdapterLoadingStrategy.Explicit)
+        if (!_commandLineOptions.TestAdapterPathsSet && strategy.HasFlag(TestAdapterLoadingStrategy.Explicit))
         {
-            throw new CommandLineException(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestAdapterPathValueRequiredWhenStrategyXIsUsed, ExplicitStrategy));
+            throw new CommandLineException(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestAdapterPathValueRequiredWhenStrategyXIsUsed, nameof(TestAdapterLoadingStrategy.Explicit)));
         }
 
         SetStrategy(strategy);
@@ -211,13 +207,19 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
             return;
         }
 
+        EqtTrace.Warning(
+            $"{nameof(TestAdapterLoadingStrategyArgumentExecutor)}.{nameof(ForceIsolation)}: InIsolation setting is forced when {nameof(TestAdapterLoadingStrategy.Explicit)} strategy is used." +
+            "Test's will run in isolation."
+        );
         _commandLineOptions.InIsolation = true;
         _runSettingsManager.UpdateRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath, "true");
     }
 
     private void ValidateTestAdapterPaths(TestAdapterLoadingStrategy strategy)
     {
-        var testAdapterPaths = _commandLineOptions.TestAdapterPath ?? EmptyStringArray;
+#pragma warning disable CA1825 // Avoid zero-length array allocations
+        var testAdapterPaths = _commandLineOptions.TestAdapterPath ?? new string[0];
+#pragma warning restore CA1825 // Avoid zero-length array allocations
         if (!_commandLineOptions.TestAdapterPathsSet)
         {
             testAdapterPaths = TestAdapterPathArgumentExecutor.SplitPaths(_runSettingsManager.QueryRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath)).Union(testAdapterPaths).Distinct().ToArray();
@@ -245,21 +247,9 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
     {
         _commandLineOptions.TestAdapterLoadingStrategy = strategy;
         _runSettingsManager.UpdateRunSettingsNode(RunSettingsPath, strategy.ToString());
-        if ((strategy & TestAdapterLoadingStrategy.Explicit) == TestAdapterLoadingStrategy.Explicit)
+        if (strategy.HasFlag(TestAdapterLoadingStrategy.Explicit))
         {
             ForceIsolation();
         }
     }
-
-    /// <summary>
-    /// Executes the argument processor.
-    /// </summary>
-    /// <returns> The <see cref="ArgumentProcessorResult"/>. </returns>
-    public ArgumentProcessorResult Execute()
-    {
-        // Nothing to do since we updated the parameter during initialize parameter
-        return ArgumentProcessorResult.Success;
-    }
-
-    #endregion
 }

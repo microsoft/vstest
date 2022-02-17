@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
@@ -102,13 +101,6 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
     /// </summary>
     internal readonly static char[] ArgumentSeparators = new[] { ';' };
 
-    private static readonly string[] EmptyStringArray =
-#if NET451
-        new string[0];
-#else
-        Array.Empty<string>();
-#endif
-
     public const string RunSettingsPath = "RunConfiguration.TestAdaptersPaths";
 
     /// <summary>
@@ -116,16 +108,13 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="options"> The options. </param>
     /// <param name="testPlatform">The test platform</param>
-    public TestAdapterPathArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager, IOutput output, IFileHelper fileHelper)
+    public TestAdapterPathArgumentExecutor(CommandLineOptions options!!, IRunSettingsProvider runSettingsManager!!, IOutput output!!, IFileHelper fileHelper!!)
     {
-        Contract.Requires(options != null);
-
         _commandLineOptions = options;
         _runSettingsManager = runSettingsManager;
         _output = output;
         _fileHelper = fileHelper;
     }
-
 
     #region IArgumentExecutor
 
@@ -166,16 +155,6 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
     }
 
     /// <summary>
-    /// Splits provided paths into array.
-    /// </summary>
-    /// <param name="paths">Source paths joined by semicolons.</param>
-    /// <returns>Paths.</returns>
-    internal static string[] SplitPaths(string paths)
-    {
-        return string.IsNullOrWhiteSpace(paths) ? EmptyStringArray : paths.Split(ArgumentSeparators, StringSplitOptions.RemoveEmptyEntries);
-    }
-
-    /// <summary>
     /// Executes the argument processor.
     /// </summary>
     /// <returns> The <see cref="ArgumentProcessorResult"/>. </returns>
@@ -184,6 +163,17 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
         // Nothing to do since we updated the parameter during initialize parameter
         return ArgumentProcessorResult.Success;
     }
-
     #endregion
+
+    /// <summary>
+    /// Splits provided paths into array.
+    /// </summary>
+    /// <param name="paths">Source paths joined by semicolons.</param>
+    /// <returns>Paths.</returns>
+    internal static string[] SplitPaths(string paths)
+    {
+#pragma warning disable CA1825 // Avoid zero-length array allocations
+        return string.IsNullOrWhiteSpace(paths) ? new string[0] : paths.Split(ArgumentSeparators, StringSplitOptions.RemoveEmptyEntries);
+#pragma warning restore CA1825 // Avoid zero-length array allocations
+    }
 }

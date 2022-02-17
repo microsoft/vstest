@@ -74,7 +74,7 @@ public class TestPluginManagerTests
     {
         TestPluginCacheHelper.SetupMockExtensions(typeof(TestPluginManagerTests));
 
-        TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+        TestPluginManager.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
             TestPlatformConstants.TestAdapterEndsWithPattern,
             out var unfilteredTestExtensions,
             out var testExtensions);
@@ -90,13 +90,13 @@ public class TestPluginManagerTests
         var discoveryCount = 0;
         TestPluginCacheHelper.SetupMockExtensions(typeof(TestPluginManagerTests), () => discoveryCount++);
 
-        TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+        TestPluginManager.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
             TestPlatformConstants.TestAdapterEndsWithPattern,
             out var unfilteredTestExtensions,
             out var testExtensions);
 
         // Call this again to verify that discovery is not called again.
-        TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+        TestPluginManager.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
             TestPlatformConstants.TestAdapterEndsWithPattern,
             out unfilteredTestExtensions,
             out testExtensions);
@@ -110,8 +110,7 @@ public class TestPluginManagerTests
     [TestMethod]
     public void GetTestExtensionsForAnExtensionAssemblyShouldReturnExtensionsInThatAssembly()
     {
-        TestPluginManager.Instance
-            .GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+        TestPluginManager.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                 typeof(TestPluginManagerTests).GetTypeInfo().Assembly.Location,
                 out _,
                 out var testExtensions);

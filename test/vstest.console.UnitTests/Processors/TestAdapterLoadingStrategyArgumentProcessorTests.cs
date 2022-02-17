@@ -10,6 +10,7 @@ using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -51,7 +52,7 @@ public class TestAdapterLoadingStrategyArgumentProcessorTests
 
         var executor = new TestAdapterLoadingStrategyArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, mockOutput.Object, mockFileHelper.Object);
 
-        executor.Initialize(TestAdapterLoadingStrategyArgumentExecutor.DefaultStrategy);
+        executor.Initialize(nameof(TestAdapterLoadingStrategy.Default));
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
 
         var tempPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables("%temp%"));
@@ -81,7 +82,7 @@ public class TestAdapterLoadingStrategyArgumentProcessorTests
         var isExceptionThrown = false;
         try
         {
-            executor.Initialize(TestAdapterLoadingStrategyArgumentExecutor.DefaultStrategy);
+            executor.Initialize(nameof(TestAdapterLoadingStrategy.Default));
         }
         catch (Exception ex)
         {
@@ -116,7 +117,7 @@ public class TestAdapterLoadingStrategyArgumentProcessorTests
 
         try
         {
-            executor.Initialize(TestAdapterLoadingStrategyArgumentExecutor.DefaultStrategy);
+            executor.Initialize(nameof(TestAdapterLoadingStrategy.Default));
         }
         catch (Exception ex)
         {

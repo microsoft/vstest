@@ -106,8 +106,7 @@ public class SettingsProviderExtensionManager
                 if (s_settingsProviderExtensionManager == null)
                 {
 
-                    TestPluginManager.Instance
-                        .GetSpecificTestExtensions<TestSettingsProviderPluginInformation, ISettingsProvider, ISettingsProviderCapabilities, TestSettingsProviderMetadata>(
+                    TestPluginManager.GetSpecificTestExtensions<TestSettingsProviderPluginInformation, ISettingsProvider, ISettingsProviderCapabilities, TestSettingsProviderMetadata>(
                             TestPlatformConstants.TestAdapterEndsWithPattern,
                             out var unfilteredTestExtensions,
                             out var testExtensions);
