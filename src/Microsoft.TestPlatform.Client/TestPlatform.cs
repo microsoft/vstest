@@ -333,7 +333,7 @@ internal class TestPlatform : ITestPlatform
     {
         string adapterPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(path));
 
-        // Default behavior is to only accept directories!
+        // Default behavior is to only accept directories.
         if (strategy == TestAdapterLoadingStrategy.Default)
         {
             return ExpandAdaptersWithDefaultStrategy(adapterPath, fileHelper);
