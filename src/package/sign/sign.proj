@@ -96,24 +96,37 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)datacollector.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)vstest.console.exe" />
+
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.exe" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net452.exe" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net452.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net46.exe" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net46.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net461.exe" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net461.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net462.exe" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net462.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net47.exe" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net47.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net471.exe" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net471.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net472.exe" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net472.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net48.exe" />
+
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net452.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net46.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net461.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net462.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net47.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net471.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net472.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net48.x86.exe" />
+
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.arm64.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net452.arm64.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net46.arm64.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net461.arm64.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net462.arm64.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net47.arm64.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net471.arm64.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net472.arm64.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net48.arm64.exe" />
+
       <AssembliesToSign Include="$(ArtifactsDirectory)SettingsMigrator.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Interop.dll" />
 
@@ -177,24 +190,37 @@
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\Microsoft.TestPlatform.Utilities.dll" />
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll" />
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.exe" />
-      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.x86.exe" />
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net452.exe" />
-      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net452.x86.exe" />
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net46.exe" />
-      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net46.x86.exe" />
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net461.exe" />
-      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net461.x86.exe" />
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net462.exe" />
-      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net462.x86.exe" />
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net47.exe" />
-      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net47.x86.exe" />
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net471.exe" />
-      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net471.x86.exe" />
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net472.exe" />
-      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net472.x86.exe" />
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net48.exe" />
+      
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net452.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net46.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net461.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net462.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net47.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net471.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net472.x86.exe" />
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net48.x86.exe" />
+
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.arm64.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net452.arm64.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net46.arm64.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net461.arm64.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net462.arm64.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net47.arm64.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net471.arm64.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net472.arm64.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net48.arm64.exe" />
+
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\datacollector.exe" />
 
       <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
@@ -298,24 +324,36 @@
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Microsoft.TestPlatform.Utilities.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Microsoft.VisualStudio.TestPlatform.Common.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.exe" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.x86.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net452.exe" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net452.x86.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net46.exe" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net46.x86.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net461.exe" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net461.x86.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net462.exe" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net462.x86.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net47.exe" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net47.x86.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net471.exe" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net471.x86.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net472.exe" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net472.x86.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net48.exe" />
+
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net452.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net46.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net461.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net462.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net47.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net471.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net472.x86.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net48.x86.exe" />
+
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.arm64.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net452.arm64.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net46.arm64.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net461.arm64.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net462.arm64.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net47.arm64.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net471.arm64.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net472.arm64.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net48.arm64.exe" />
 
       <!-- Localized resources -->
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\%(ResxLang.Identity)\*.*" />
