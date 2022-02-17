@@ -14,7 +14,7 @@ internal enum TestAdapterLoadingStrategy
     /// <summary>
     /// A strategy not defined, Test Platform will load adapters normally. 
     /// </summary>
-    Default = 0b0000_0000_0000_0000,
+    Default = 0,
 
     /// <summary>
     /// Test Platform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). 
@@ -22,25 +22,25 @@ internal enum TestAdapterLoadingStrategy
     /// If no adapter path is specified, test run will fail.
     /// This will imply /InIsolation switch and force the tests to be run in an isolated process.
     /// </summary>
-    Explicit = 0b0000_0000_0000_0001,
+    Explicit = 1,
 
     /// <summary>
     /// Load adapters next to source. 
     /// </summary>
-    NextToSource = 0b0000_0000_0000_0010,
+    NextToSource = 2,
 
     /// <summary>
     /// Default runtime providers inside Extensions folder will be included.
     /// </summary>
-    DefaultRuntimeProviders = 0b0000_0000_0000_0100,
+    DefaultRuntimeProviders = 4,
 
     /// <summary>
     /// Load adapters inside Extensions folder.
     /// </summary>
-    ExtensionsDirectory  = 0b0000_0000_0000_1000,
+    ExtensionsDirectory  = 8,
 
     /// <summary>
     /// Directory wide searches will be recursive, this is required to be used with <see cref="NextToSource" /> or <see cref="Explicit" />.
     /// </summary>
-    Recursive = 0b0001_0000_0000_0000,
+    Recursive = 16,
 }

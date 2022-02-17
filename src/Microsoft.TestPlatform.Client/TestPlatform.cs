@@ -207,7 +207,7 @@ internal class TestPlatform : ITestPlatform
     {
         if (testHostManager == null)
         {
-            EqtTrace.Error($"{nameof(TestPlatform)}.{nameof(ThrowExceptionIfTestHostManagerIsNull)}: No suitable testHostProvider found for runsettings : {settingsXml}");
+            EqtTrace.Error($"{nameof(TestPlatform)}.{nameof(ThrowExceptionIfTestHostManagerIsNull)}: No suitable testHostProvider found for runsettings: {settingsXml}");
             throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, ClientResources.NoTestHostProviderFound));
         }
     }
@@ -281,7 +281,7 @@ internal class TestPlatform : ITestPlatform
         // requires DefaultExtensionPaths to be set to resolve a TestHostProvider.
         // Since it's static, it forces us to set the adapter paths.
         //
-        // Otherwise we will always get an "No suitable test runtime provider found for this run." error.
+        // Otherwise we will always get a "No suitable test runtime provider found for this run." error.
         // I (@haplois) will modify this behavior later on, but we also need to consider legacy adapters
         // and make sure they still work after modification.
         string runSettings = RunSettingsManager.Instance.ActiveRunSettings.SettingsXml;
@@ -376,6 +376,8 @@ internal class TestPlatform : ITestPlatform
 
     private static IEnumerable<string> ExpandAdaptersWithDefaultStrategy(string path, IFileHelper fileHelper)
     {
+        // This is the legacy behavior, please do not modify this method unless you're sure of 
+        // side effect when running tests with legacy adapters.
         if (!fileHelper.DirectoryExists(path))
         {
             EqtTrace.Warning($"{nameof(TestPlatform)}.{nameof(ExpandAdaptersWithDefaultStrategy)} AdapterPath Not Found: {path}");

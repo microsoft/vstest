@@ -172,8 +172,6 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
     /// <returns>Paths.</returns>
     internal static string[] SplitPaths(string paths)
     {
-#pragma warning disable CA1825 // Avoid zero-length array allocations
         return string.IsNullOrWhiteSpace(paths) ? new string[0] : paths.Split(ArgumentSeparators, StringSplitOptions.RemoveEmptyEntries);
-#pragma warning restore CA1825 // Avoid zero-length array allocations
     }
 }

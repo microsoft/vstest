@@ -209,7 +209,7 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
 
         EqtTrace.Warning(
             $"{nameof(TestAdapterLoadingStrategyArgumentExecutor)}.{nameof(ForceIsolation)}: InIsolation setting is forced when {nameof(TestAdapterLoadingStrategy.Explicit)} strategy is used." +
-            "Test's will run in isolation."
+            "Tests will run in isolation."
         );
         _commandLineOptions.InIsolation = true;
         _runSettingsManager.UpdateRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath, "true");
@@ -217,9 +217,7 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
 
     private void ValidateTestAdapterPaths(TestAdapterLoadingStrategy strategy)
     {
-#pragma warning disable CA1825 // Avoid zero-length array allocations
         var testAdapterPaths = _commandLineOptions.TestAdapterPath ?? new string[0];
-#pragma warning restore CA1825 // Avoid zero-length array allocations
         if (!_commandLineOptions.TestAdapterPathsSet)
         {
             testAdapterPaths = TestAdapterPathArgumentExecutor.SplitPaths(_runSettingsManager.QueryRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath)).Union(testAdapterPaths).Distinct().ToArray();
