@@ -104,9 +104,9 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
 
     private static readonly string[] EmptyStringArray =
 #if NET451
-                                                        new string[0];
+        new string[0];
 #else
-                                                        Array.Empty<string>();
+        Array.Empty<string>();
 #endif
 
     public const string RunSettingsPath = "RunConfiguration.TestAdaptersPaths";

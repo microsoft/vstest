@@ -224,7 +224,8 @@ internal class Executor
         var processorsToAlwaysExecute = processorFactory.GetArgumentProcessorsToAlwaysExecute();
         foreach (var processor in processorsToAlwaysExecute)
         {
-            if (processors.Any(i => i.Metadata.Value.CommandName == processor.Metadata.Value.CommandName)) {
+            if (processors.Any(i => i.Metadata.Value.CommandName == processor.Metadata.Value.CommandName)) 
+            {
                 continue;
             }
 

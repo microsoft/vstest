@@ -25,14 +25,10 @@ using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Res
 /// </summary>
 internal class TestAdapterLoadingStrategyArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the TestAdapterLoadingStrategyArgumentProcessor handles.
     /// </summary>
     public const string CommandName = "/TestAdapterLoadingStrategy";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -101,7 +97,6 @@ internal class TestAdapterLoadingStrategyArgumentProcessorCapabilities : BaseArg
 /// </summary>
 internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -122,12 +117,11 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
     /// </summary>
     private readonly IFileHelper _fileHelper;
 
-
     private static readonly string[] EmptyStringArray =
 #if NET451
-                                                        new string[0];
+        new string[0];
 #else
-                                                        Array.Empty<string>();
+        Array.Empty<string>();
 #endif
 
     #endregion
@@ -234,14 +228,11 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
             var adapterPath = testAdapterPaths[i];
             var testAdapterPath = _fileHelper.GetFullPath(Environment.ExpandEnvironmentVariables(adapterPath));
 
-            if (strategy == TestAdapterLoadingStrategy.Default)
+            if (strategy == TestAdapterLoadingStrategy.Default && !_fileHelper.DirectoryExists(testAdapterPath))
             {
-                if (!_fileHelper.DirectoryExists(testAdapterPath))
-                {
-                    throw new CommandLineException(
-                        string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestAdapterPathCommand, adapterPath, CommandLineResources.TestAdapterPathDoesNotExist)
-                    );
-                }
+                throw new CommandLineException(
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestAdapterPathCommand, adapterPath, CommandLineResources.TestAdapterPathDoesNotExist)
+                );
             }
 
             testAdapterPaths[i] = testAdapterPath;
@@ -252,10 +243,8 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
 
     private void SetStrategy(TestAdapterLoadingStrategy strategy)
     {
-        var adapterStrategy = strategy.ToString();
-
         _commandLineOptions.TestAdapterLoadingStrategy = strategy;
-        _runSettingsManager.UpdateRunSettingsNode(RunSettingsPath, adapterStrategy);
+        _runSettingsManager.UpdateRunSettingsNode(RunSettingsPath, strategy.ToString());
         if ((strategy & TestAdapterLoadingStrategy.Explicit) == TestAdapterLoadingStrategy.Explicit)
         {
             ForceIsolation();

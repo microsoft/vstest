@@ -502,7 +502,7 @@ public class RunConfiguration : TestRunSettings
             root.AppendChild(testAdaptersPaths);
         }
 
-        if(this.TestAdapterLoadingStrategy != TestAdapterLoadingStrategy.Default) 
+        if (this.TestAdapterLoadingStrategy != TestAdapterLoadingStrategy.Default) 
         {
             XmlElement adapterLoadingStrategy = doc.CreateElement("TestAdapterLoadingStrategy");
             adapterLoadingStrategy.InnerXml = this.TestAdapterLoadingStrategy.ToString();
@@ -510,7 +510,7 @@ public class RunConfiguration : TestRunSettings
         }
 
         XmlElement treatTestAdapterErrorsAsWarnings = doc.CreateElement("TreatTestAdapterErrorsAsWarnings");
-        treatTestAdapterErrorsAsWarnings.InnerXml = this.TreatTestAdapterErrorsAsWarnings.ToString();
+        treatTestAdapterErrorsAsWarnings.InnerXml = TreatTestAdapterErrorsAsWarnings.ToString();
         root.AppendChild(treatTestAdapterErrorsAsWarnings);
 
         if (BinariesRoot != null)
@@ -772,10 +772,12 @@ public class RunConfiguration : TestRunSettings
                     case "TestAdapterLoadingStrategy":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                         value = reader.ReadElementContentAsString();
-                        if (Enum.TryParse<TestAdapterLoadingStrategy>(value, out var loadingStrategy)) {
+                        if (Enum.TryParse<TestAdapterLoadingStrategy>(value, out var loadingStrategy)) 
+                        {
                             runConfiguration.TestAdapterLoadingStrategy = loadingStrategy;
                         }
-                        else {
+                        else 
+                        {
                             throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
                         }

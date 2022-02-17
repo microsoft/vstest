@@ -195,9 +195,10 @@ public static class RunSettingsUtilities
     /// </summary>
     /// <param name="runSettings">Test run settings</param>
     /// <returns>Test adapter loading strategy</returns>
-    internal static TestAdapterLoadingStrategy GetLoadingStrategy(string runSettings) {
+    internal static TestAdapterLoadingStrategy GetLoadingStrategy(string runSettings) 
+    {
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
         
-        return runConfiguration?.TestAdapterLoadingStrategy ?? TestAdapterLoadingStrategy.Default;
+        return runConfiguration.TestAdapterLoadingStrategy;
     }
 }

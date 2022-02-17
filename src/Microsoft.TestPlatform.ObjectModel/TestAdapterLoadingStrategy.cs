@@ -30,7 +30,7 @@ internal enum TestAdapterLoadingStrategy
     NextToSource = 0b0000_0000_0000_0010,
 
     /// <summary>
-    /// Default runtime providers inside Extensions folder will be included
+    /// Default runtime providers inside Extensions folder will be included.
     /// </summary>
     DefaultRuntimeProviders = 0b0000_0000_0000_0100,
 
@@ -40,7 +40,7 @@ internal enum TestAdapterLoadingStrategy
     ExtensionsDirectory  = 0b0000_0000_0000_1000,
 
     /// <summary>
-    /// Directory wide searches will be recursive, this is required to be with with NextToSource or Explicit.
+    /// Directory wide searches will be recursive, this is required to be used with <see cref="NextToSource" /> or <see cref="Explicit" />.
     /// </summary>
     Recursive = 0b0001_0000_0000_0000,
 }
