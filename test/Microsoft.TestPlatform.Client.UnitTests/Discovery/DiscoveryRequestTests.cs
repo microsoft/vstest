@@ -44,6 +44,10 @@ public class DiscoveryRequestTests
         _discoveryRequest = new DiscoveryRequest(_mockRequestData.Object, _discoveryCriteria, _discoveryManager.Object, _loggerManager.Object, _mockDataSerializer.Object);
     }
 
+    public static IEnumerable<object[]> ProtocolConfigVersionProvider
+        => Enumerable.Range(0, Constants.DefaultProtocolConfig.Version + 1)
+            .Select(x => new object[] { x });
+
     [TestMethod]
     public void ConstructorSetsDiscoveryCriteriaAndDiscoveryManager()
     {
@@ -92,32 +96,26 @@ public class DiscoveryRequestTests
     }
 
     [DataTestMethod]
-    [DataRow(0)]
-    [DataRow(1)]
-    [DataRow(2)]
-    [DataRow(3)]
-    [DataRow(4)]
-    [DataRow(5)]
+    [DynamicData(nameof(ProtocolConfigVersionProvider))]
     public void AbortIfDiscoveryIsinProgressShouldCallDiscoveryManagerAbort(int version)
     {
         // Just to set the IsDiscoveryInProgress flag
         _discoveryRequest.DiscoverAsync();
-
         // Set the protocol version to a version not supporting new abort overload.
-        _discoveryRequest.ProtocolConfig.Version = version;
+        Constants.DefaultProtocolConfig.Version = version;
 
         _discoveryRequest.Abort();
-        _discoveryManager.Verify(dm => dm.Abort(), Times.Once);
-    }
 
-    [TestMethod]
-    public void AbortIfDiscoveryIsinProgressShouldAndSufficientProtocolVersionCallsDiscoveryManagerAbortThis()
-    {
-        // Just to set the IsDiscoveryInProgress flag
-        _discoveryRequest.DiscoverAsync();
-
-        _discoveryRequest.Abort();
-        _discoveryManager.Verify(dm => dm.Abort(_discoveryRequest), Times.Once);
+        if (version < Constants.MinimumProtocolVersionWithCancelDiscoveryEventHandlerSupport)
+        {
+            _discoveryManager.Verify(dm => dm.Abort(), Times.Once);
+            _discoveryManager.Verify(dm => dm.Abort(_discoveryRequest), Times.Never);
+        }
+        else
+        {
+            _discoveryManager.Verify(dm => dm.Abort(), Times.Never);
+            _discoveryManager.Verify(dm => dm.Abort(_discoveryRequest), Times.Once);
+        }
     }
 
     [TestMethod]

@@ -26,7 +26,6 @@ using Utilities;
 public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHandler2
 {
     private readonly IDataSerializer _dataSerializer;
-    internal /* for testing purposes */ readonly ProtocolConfig ProtocolConfig = Constants.DefaultProtocolConfig;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DiscoveryRequest"/> class.
@@ -120,7 +119,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             {
                 // If testhost has old version, we should use old cancel logic
                 // to be consistent and not create regression issues
-                if (ProtocolConfig.Version < Constants.MinimumProtocolVersionWithCancelDiscoveryEventHandlerSupport)
+                if (Constants.DefaultProtocolConfig.Version < Constants.MinimumProtocolVersionWithCancelDiscoveryEventHandlerSupport)
                 {
                     DiscoveryManager.Abort();
                 }
