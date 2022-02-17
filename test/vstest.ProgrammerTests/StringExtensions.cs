@@ -3,20 +3,27 @@
 
 namespace vstest.ProgrammerTests.CommandLine;
 
-internal static class StringExtensions
+using System.Linq;
+
+internal static class EnumerableExtensions
 {
-    public static string Join(this IEnumerable<string> value, string separator)
+    public static string JoinBySpace<T>(this IEnumerable<T> value)
     {
-        return string.Join(separator, value);
+        return value.JoinBy(" ");
     }
 
-    public static string JoinBySpace(this IEnumerable<string> value)
+    public static string JoinByComma<T>(this IEnumerable<T> value)
     {
-        return string.Join(" ", value);
+        return value.JoinBy(", ");
     }
 
-    public static List<string> AsList(this string value)
+    public static string JoinBy<T>(this IEnumerable<T> value, string delimiter)
     {
-        return new List<string> { value };
+        return string.Join(delimiter, value.Select(v => v?.ToString()));
+    }
+
+    public static List<T> AsList<T>(this T value)
+    {
+        return new List<T> { value };
     }
 }

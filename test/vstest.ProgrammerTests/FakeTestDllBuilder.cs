@@ -11,7 +11,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 internal class FakeTestDllBuilder
 {
     private string _path = @$"X:\fake\mstest_{Guid.NewGuid()}.dll";
-    private FrameworkName _framework = KnownFramework.Net50;
+    private FrameworkName _framework = KnownFramework.Net5;
     private Architecture _architecture = Architecture.X64;
     private List<List<TestResult>>? _testBatches;
 

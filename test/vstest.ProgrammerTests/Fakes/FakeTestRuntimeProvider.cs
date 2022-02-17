@@ -7,7 +7,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 internal class FakeTestRuntimeProvider : ITestRuntimeProvider
 {
@@ -15,6 +14,8 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
     public FakeCommunicationEndpoint FakeCommunicationEndpoint { get; }
     public FakeErrorAggregator FakeErrorAggregator { get; }
     public FakeProcess TestHostProcess { get; private set; }
+    public FakeFileHelper FileHelper { get; }
+    public List<FakeTestDllFile> TestDlls { get; }
 
     // TODO: make this configurable?
     public bool Shared => false;
@@ -22,10 +23,27 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
     public event EventHandler<HostProviderEventArgs>? HostLaunched;
     public event EventHandler<HostProviderEventArgs>? HostExited;
 
-    public FakeTestRuntimeProvider(FakeProcessHelper fakeProcessHelper, FakeProcess fakeTestHostProcess, FakeCommunicationEndpoint fakeCommunicationEndpoint, FakeErrorAggregator fakeErrorAggregator)
+    public FakeTestRuntimeProvider(FakeProcessHelper fakeProcessHelper, FakeProcess fakeTestHostProcess, FakeFileHelper fakeFileHelper, List<FakeTestDllFile> fakeTestDlls, FakeCommunicationEndpoint fakeCommunicationEndpoint, FakeErrorAggregator fakeErrorAggregator)
     {
         FakeProcessHelper = fakeProcessHelper;
         TestHostProcess = fakeTestHostProcess;
+        FileHelper = fakeFileHelper;
+        TestDlls = fakeTestDlls;
+        FakeCommunicationEndpoint = fakeCommunicationEndpoint;
+        FakeErrorAggregator = fakeErrorAggregator;
+
+        var architectures = fakeTestDlls.Select(dll => dll.Architecture).Distinct().ToList();
+        var frameworks = fakeTestDlls.Select(dll => dll.FrameworkName).Distinct().ToList();
+
+        if (architectures.Count > 1)
+            throw new InvalidOperationException($"The provided dlls have more than 1 architecture {architectures.JoinByComma()}. Fake TestRuntimeProvider cannot have dlls with mulitple architectures, because real testhost process can also run just with a single architecture.");
+
+        if (frameworks.Count > 1)
+            throw new InvalidOperationException($"The provided dlls have more than 1 target framework {frameworks.JoinByComma()}. Fake TestRuntimeProvider cannot have dlls with mulitple target framework, because real testhost process can also run just a single target framework.");
+
+        fakeTestDlls.ForEach(FileHelper.AddFile);
+
+        fakeProcessHelper.AddFakeProcess(fakeTestHostProcess);
         TestHostProcess.ExitCallback = p =>
         {
             // TODO: Validate the process we are passed is actually the same as TestHostProcess
@@ -37,13 +55,13 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
                 HostExited(this, new HostProviderEventArgs(process.ErrorOutput, process.ExitCode, process.Id));
             }
         };
-
-        FakeCommunicationEndpoint = fakeCommunicationEndpoint;
-        FakeErrorAggregator = fakeErrorAggregator;
     }
 
     public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
     {
+        // <TargetPlatform>x86</TargetPlatform>
+        // <TargetFrameworkVersion>Framework40</TargetFrameworkVersion>
+
         return true;
     }
 

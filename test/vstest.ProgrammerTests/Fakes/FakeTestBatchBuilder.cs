@@ -48,6 +48,9 @@ internal class FakeTestBatchBuilder
 
     internal List<List<TestResult>> Build()
     {
+        if (TotalCount == 0 || BatchSize == 0)
+            throw new InvalidOperationException("There must be at least one batch with at least one test.");
+
         var numberOfBatches = Math.DivRem(TotalCount, BatchSize, out int remainder);
 
         // TODO: Add adapter uri, and dll name

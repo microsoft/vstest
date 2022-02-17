@@ -34,6 +34,8 @@ internal class FakeTestRuntimeProviderManager : ITestRuntimeProviderManager
 
     public ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration)
     {
+      
+
         if (!TestRuntimeProviders.TryDequeue(out var next))
         {
             throw new InvalidOperationException("There are no more TestRuntimeProviders to be provided");

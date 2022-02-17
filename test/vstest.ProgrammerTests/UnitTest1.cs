@@ -9,6 +9,8 @@ using System.Runtime.Versioning;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 
+using Intent;
+
 using Microsoft.VisualStudio.TestPlatform.Client;
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
@@ -20,6 +22,7 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 using vstest.ProgrammerTests.CommandLine.Fakes;
 using vstest.ProgrammerTests.Fakes;
@@ -96,7 +99,7 @@ public class TestDiscoveryTests
         TestServiceLocator.Clear();
         TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint.TestHostConnectionInfo.Endpoint, fakeCommunicationEndpoint);
         var fakeTestHostProcess = new FakeProcess(fakeErrorAggregator, @"C:\temp\testhost.exe");
-        var fakeTestRuntimeProvider = new FakeTestRuntimeProvider(fakeProcessHelper, fakeTestHostProcess, fakeCommunicationEndpoint, fakeErrorAggregator);
+        var fakeTestRuntimeProvider = new FakeTestRuntimeProvider(fakeProcessHelper, fakeTestHostProcess, fakeFileHelper, mstest1Dll.AsList(), fakeCommunicationEndpoint, fakeErrorAggregator);
         var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(fakeErrorAggregator);
         fakeTestRuntimeProviderManager.AddTestRuntimeProviders(fakeTestRuntimeProvider);
         var testEngine = new TestEngine(fakeTestRuntimeProviderManager, fakeProcessHelper);
@@ -183,7 +186,7 @@ public class TestDiscoveryTests
 
         var mstest1Dll = new FakeTestDllBuilder()
             .WithPath(@"X:\fake\mstest1.dll")
-            .WithFramework(KnownFramework.Net50)
+            .WithFramework(KnownFramework.Net5)
             .WithArchitecture(Architecture.X64)
             .WithTestCount(108, 10)
             .Build();
@@ -204,13 +207,13 @@ public class TestDiscoveryTests
             .Build();
 
         var mstest2Dll = new FakeTestDllBuilder()
-            .WithPath(@"X:\fake\mstest1.dll")
-            .WithFramework(KnownFramework.Net50)
+            .WithPath(@"X:\fake\mstest2.dll")
+            .WithFramework(KnownFramework.Net5)
             .WithArchitecture(Architecture.X64)
             .WithTestCount(50, 8)
             .Build();
 
-        var testhost2Process = new FakeProcess(fixture.ErrorAggregator, @"X:\fake\testhost1.exe");
+        var testhost2Process = new FakeProcess(fixture.ErrorAggregator, @"X:\fake\testhost2.exe");
 
         var runTests2 = new FakeMessagesBuilder()
             .VersionCheck(5)
@@ -225,11 +228,9 @@ public class TestDiscoveryTests
             .WithResponses(runTests2)
             .Build();
 
-        // ---
-
         fixture.AddTestHostFixtures(testhost1, testhost2);
 
-        var testRequestManager = fixture.BuildTestRequestManager(5, 50, true);
+        var testRequestManager = fixture.BuildTestRequestManager();
 
         // -- act
         var runConfiguration = string.Empty;
@@ -244,6 +245,101 @@ public class TestDiscoveryTests
 
         // -- assert
         fixture.AssertNoErrors();
+        fixture.ExecutedTests.Should().HaveCount(mstest1Dll.TestCount + mstest2Dll.TestCount);
+    }
+
+    [Only]
+    public async Task GivenMultipleMsTestAssembliesThatUseDifferentTargetFrameworkAndTheSameArchitecture_WhenTestsAreRun_ThenTwoTesthostsAreStartedBothForTheSameTFM()
+    {
+        // TODO: make vstest.console not start testhosts for incompatible sources.
+
+        // -- arrange
+        using var fixture = new Fixture();
+
+        var mstest1Dll = new FakeTestDllBuilder()
+            .WithPath(@"X:\fake\mstest1.dll")
+            .WithFramework(KnownFramework.Net5) // <---
+            .WithArchitecture(Architecture.X64)
+            .WithTestCount(2)
+            .Build();
+
+        var testhost1Process = new FakeProcess(fixture.ErrorAggregator, @"X:\fake\testhost1.exe");
+
+        var runTests1 = new FakeMessagesBuilder()
+            .VersionCheck(5)
+            .ExecutionInitialize(FakeMessage.NoResponse)
+            .StartTestExecutionWithSources(mstest1Dll.TestResultBatches)
+            .SessionEnd(FakeMessage.NoResponse, _ => testhost1Process.Exit())
+            .Build();
+
+        var testhost1 = new FakeTestHostFixtureBuilder(fixture)
+            .WithTestDll(mstest1Dll)
+            .WithProcess(testhost1Process)
+            .WithResponses(runTests1)
+            .Build();
+
+        // --
+
+        var mstest2Dll = new FakeTestDllBuilder()
+            .WithPath(@"X:\fake\mstest2.dll")
+            .WithFramework(KnownFramework.Net48) // <---
+            .WithArchitecture(Architecture.X64)
+            .WithTestCount(1)
+            .Build();
+
+        var testhost2Process = new FakeProcess(fixture.ErrorAggregator, @"X:\fake\testhost2.exe");
+
+        var runTests2 = new FakeMessagesBuilder()
+            .VersionCheck(5)
+            .ExecutionInitialize(FakeMessage.NoResponse)
+            // .StartTestExecutionWithSources(new FakeMessage<TestMessagePayload>(MessageType.TestMessage, new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = "Loading type failed." }), _ => testhost2Process.Exit())
+            .StartTestExecutionWithSources(mstest2Dll.TestResultBatches)
+            .SessionEnd(FakeMessage.NoResponse, _ => testhost2Process.Exit())
+            .Build();
+
+        var testhost2 = new FakeTestHostFixtureBuilder(fixture)
+            .WithTestDll(mstest2Dll)
+            .WithProcess(testhost2Process)
+            .WithResponses(runTests2)
+            .Build();
+
+        fixture.AddTestHostFixtures(testhost1, testhost2);
+
+        var testRequestManager = fixture.BuildTestRequestManager();
+
+        mstest1Dll.FrameworkName.Should().NotBe(mstest2Dll.FrameworkName);
+
+        // -- act
+        var runConfiguration = new Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration { TestSessionTimeout = 40_000 }.ToXml().OuterXml;
+        var testRunRequestPayload = new TestRunRequestPayload
+        {
+            Sources = new List<string> { mstest1Dll.Path, mstest2Dll.Path },
+
+            RunSettings = $"<RunSettings>{runConfiguration}</RunSettings>"
+        };
+
+        await testRequestManager.ExecuteWithAbort(tm => tm.RunTests(testRunRequestPayload, testHostLauncher: null, fixture.TestRunEventsRegistrar, fixture.ProtocolConfig));
+
+        // -- assert
+        fixture.AssertNoErrors();
+        // We started both testhosts, even thought we know one of them is incompatible.
+        fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
+        var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
+        var startWithSources1Text = startWithSources1.Request.Payload.Select(t => t.ToString()).JoinBySpace();
+        // We sent mstest1.dll
+        startWithSources1Text.Should().Contain("mstest1.dll");
+        // And we sent netcoreapp1.0 as the target framework
+        startWithSources1Text.Should().Contain(KnownFramework.Netcoreapp1.ToString());
+
+        var startWithSources2 = testhost2.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
+        var startWithSources2Text = startWithSources2.Request.Payload.Select(t => t.ToString()).JoinBySpace();
+        // We sent mstest2.dll
+        startWithSources2Text.Should().Contain("mstest2.dll");
+        // And we sent netcoreapp1.0 as the target framework, even though it is incompatible
+        startWithSources2Text.Should().Contain(KnownFramework.Netcoreapp1.ToString());
+
+        // In reality, the dll would fail to load, and no tests would run
+        // in our simulation we sent tests back anyway, so we get all tests results
         fixture.ExecutedTests.Should().HaveCount(mstest1Dll.TestCount + mstest2Dll.TestCount);
     }
 }

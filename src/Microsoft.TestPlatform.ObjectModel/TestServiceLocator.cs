@@ -17,10 +17,14 @@ public static class TestServiceLocator
         Instances.Add(name, instance);
     }
 
-    public static TRegistration Get<TRegistration>(string name)
+    public static TRegistration? Get<TRegistration>(string name)
     {
         if (!Instances.TryGetValue(name, out var instance))
-            throw new InvalidOperationException($"Cannot find an instance for name {name}.");
+        {
+            return default;
+            // TODO: Add enable flag for the whole provider to activate so I can leverage throwing in programmer tests, but not run into it in Playground, or other debug builds.
+            // throw new InvalidOperationException($"Cannot find an instance for name {name}.");
+        }
 
 #if !NETSTANDARD1_0
         Resolves.Add(new Resolve(name, typeof(TRegistration).FullName, Environment.StackTrace));

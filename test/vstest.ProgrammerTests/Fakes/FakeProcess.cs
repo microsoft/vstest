@@ -24,6 +24,7 @@ internal class FakeProcess
     public FakeErrorAggregator FakeErrorAggregator { get; }
     public string? ErrorOutput { get; init; }
     public int ExitCode { get; init; } = -1;
+    public bool Started { get; private set; }
     public bool Exited { get; private set; }
     public TestProcessStartInfo TestProcessStartInfo { get; internal set; }
 
@@ -63,8 +64,19 @@ internal class FakeProcess
         Id = id;
     }
 
+    internal void Start()
+    {
+        if (Started)
+            throw new InvalidOperationException($"Cannot start process {Name} - {Id} because it was already started before.");
+
+        Started = true;
+    }
+
     internal void Exit()
     {
+        if (!Started)
+            throw new InvalidOperationException($"Cannot exit process {Name} - {Id} because it was not started before.");
+
         // We want to call the exit callback just once. This is behavior inherent to being a real process,
         // that also exits only once.
         var exited = Exited;

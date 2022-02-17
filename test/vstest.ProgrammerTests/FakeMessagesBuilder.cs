@@ -45,7 +45,7 @@ internal class FakeMessagesBuilder
     /// </summary>
     /// <param name="message"></param>
     /// <returns></returns>
-    internal FakeMessagesBuilder VersionCheck(Action<string> beforeAction, FakeMessage message, Action<string> afterAction)
+    internal FakeMessagesBuilder VersionCheck(FakeMessage message, Action<string>? beforeAction = null, Action<string>? afterAction = null)
     {
         AddPairWithFakeMessage(MessageType.VersionCheck, message, beforeAction, afterAction);
         return this;
@@ -57,8 +57,17 @@ internal class FakeMessagesBuilder
         return this;
     }
 
-    internal FakeMessagesBuilder StartTestExecutionWithSources(List<List<TestResult>> testResultBatches)
+    internal FakeMessagesBuilder StartTestExecutionWithSources(FakeMessage message, Action<string>? beforeAction = null, Action<string>? afterAction = null)
     {
+        AddPairWithFakeMessage(MessageType.StartTestExecutionWithSources, message, beforeAction, afterAction);
+        return this;
+    }
+
+    internal FakeMessagesBuilder StartTestExecutionWithSources(List<List<TestResult>> testResultBatches!!)
+    {
+        if (testResultBatches.Count == 0)
+            throw new InvalidOperationException("There must be at least one batch with at least one test. If you you wish to not respond with any tests, or respond with broken data, create that fake message from scratch.");
+
         var tests = testResultBatches;
         // this will create as many test stats changes messages, as there are batches -1
         // the last batch will be sent as test run complete event
@@ -80,7 +89,7 @@ internal class FakeMessagesBuilder
         return this;
     }
 
-    
+
     internal FakeMessagesBuilder SessionEnd(FakeMessage fakeMessage)
     {
         AddPairWithFakeMessage(MessageType.SessionEnd, fakeMessage);

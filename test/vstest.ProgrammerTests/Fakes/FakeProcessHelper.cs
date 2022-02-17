@@ -86,6 +86,7 @@ internal class FakeProcessHelper : IProcessHelper
         // TODO: Throw if setting says we can't start new processes;
         var process = new FakeProcess(FakeErrorAggregator, processPath, arguments, workingDirectory, environmentVariables, errorCallback, exitCallBack, outputCallback);
         Processes.Add(process);
+        process.Start();
 
         return process;
     }
@@ -112,8 +113,12 @@ internal class FakeProcessHelper : IProcessHelper
         // todo: implement for timeouts?
     }
 
-    internal void StartFakeProcess(FakeProcess testHostProcess)
+    internal void StartFakeProcess(FakeProcess process)
     {
         // TODO: mark the process as started. Do not add a new process if it did not exist.
+        if (!Processes.Contains(process))
+            throw new InvalidOperationException($"Cannot start process {process.Name} - {process.Id} because it was not found in the list of known fake processes.");
+
+        process.Start();
     }
 }

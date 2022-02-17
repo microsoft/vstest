@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Reflection;
-
 namespace Intent;
+
+using System.Reflection;
 
 public static class Extensions
 {

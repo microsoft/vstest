@@ -47,13 +47,11 @@ internal class FakeTestHostFixtureBuilder
         var id = Id.Next();
         var fakeCommunicationChannel = new FakeCommunicationChannel(_responses, _fixture.ErrorAggregator, id);
         var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(fakeCommunicationChannel, _fixture.ErrorAggregator);
-        var fakeTestRuntimeProvider = new FakeTestRuntimeProvider(_fixture.ProcessHelper, _process, fakeCommunicationEndpoint, _fixture.ErrorAggregator);
+        var fakeTestRuntimeProvider = new FakeTestRuntimeProvider(_fixture.ProcessHelper, _process, _fixture.FileHelper, _dlls, fakeCommunicationEndpoint, _fixture.ErrorAggregator);
 
         // This registers the endpoint so we can look it up later using the address, the Id from here is propagated to
         // testhost connection info, and is used as port in 127.0.0.1:<id>, address so we can lookup the correct channel.
         TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint.TestHostConnectionInfo.Endpoint, fakeCommunicationEndpoint);
-
-        _dlls.ForEach(_fixture.FileHelper.AddFile);
 
         return new FakeTestFixtureHost(_fixture, id, _dlls, fakeTestRuntimeProvider, fakeCommunicationEndpoint, fakeCommunicationChannel, _process, _responses);
     }

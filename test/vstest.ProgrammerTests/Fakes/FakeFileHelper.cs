@@ -119,6 +119,11 @@ internal class FakeFileHelper : IFileHelper
 
     internal void AddFile<T>(T file) where T : FakeFile
     {
+        if (Files.Any(f => f.Path.Equals(file.Path, StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidOperationException($"Fake file '{file.Path}' already exists.");
+        }
+
         Files.Add(file);
     }
 }

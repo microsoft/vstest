@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Reflection;
-
 namespace Intent;
+
+using System.Reflection;
 
 public class Runner
 {
@@ -21,6 +21,14 @@ public class Runner
                 foreach (var t in ts)
                 {
                     var ms = t.GetMethods().SkipExcluded();
+
+                    // This chooses the Only tests only for single assembly and single class,
+                    // to support this full we would have to enumerate all classes and methods first,
+                    // it is easy, I just don't need it right now.
+                    var only = ms.Where(m => m.GetCustomAttribute<OnlyAttribute>() != null).ToList();
+                    if (only.Any())
+                        ms = only;
+
                     foreach (var m in ms)
                     {
                         try

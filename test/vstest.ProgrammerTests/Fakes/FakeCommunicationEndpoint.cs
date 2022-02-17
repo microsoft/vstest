@@ -55,15 +55,18 @@ internal class FakeCommunicationEndpoint : ICommunicationEndPoint
         return endPoint;
     }
 
+    public void Abort()
+    {
+        Disconnected?.Invoke(this, new DisconnectedEventArgs());
+        _stopped = true;
+    }
+
     public void Stop()
     {
         if (!_stopped)
         {
             // Do not allow stop to be called multiple times, because it will end up calling us back and stack overflows.
             _stopped = true;
-
-            // TODO: notify this in case of error in the process, so we can initiate abort flow
-            // Disconnected?.Invoke(this, new DisconnectedEventArgs());
         }
     }
 }

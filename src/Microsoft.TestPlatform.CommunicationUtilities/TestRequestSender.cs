@@ -107,7 +107,11 @@ public class TestRequestSender : ITestRequestSender
         // resort of getting the dependency into the execution flow.
         // TODO: I am not sure if we need multiple instances of ICommunicationEndpoint, in that case we should register
         // and resolve Func<ICommunicationEndPoint> and invoke that.
-        _communicationEndpoint = communicationEndPoint ?? TestServiceLocator.Get<ICommunicationEndPoint>(connectionInfo.Endpoint) ?? SetCommunicationEndPoint();
+        _communicationEndpoint = communicationEndPoint
+#if DEBUG
+            ?? TestServiceLocator.Get<ICommunicationEndPoint>(connectionInfo.Endpoint)
+#endif
+            ?? SetCommunicationEndPoint();
         _connectionInfo.Endpoint = connectionInfo.Endpoint;
         _connectionInfo.Role = connectionInfo.Role == ConnectionRole.Host
             ? ConnectionRole.Client

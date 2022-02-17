@@ -3,7 +3,7 @@
 
 namespace vstest.ProgrammerTests.CommandLine;
 
-public class Id
+internal class Id
 {
     private int _id;
 
