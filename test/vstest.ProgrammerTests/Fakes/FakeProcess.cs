@@ -1,39 +1,53 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
 namespace vstest.ProgrammerTests.CommandLine.Fakes;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 internal class FakeProcess
 {
     public int Id { get; internal set; }
     public string Name { get; init; }
     public string Path { get; }
-    public string Arguments { get; set; }
+    public string? Arguments { get; set; }
     public string WorkingDirectory { get; }
     public IDictionary<string, string> EnvironmentVariables { get; }
-    public Action<object, string> ErrorCallback { get; }
-    public Action<object> ExitCallback { get; }
-    public Action<object, string> OutputCallback { get; }
+    // TODO: Throw if already set
+    public Action<object, string>? ErrorCallback { get; set; }
+    // TODO: Throw if already set
+    public Action<object>? ExitCallback { get; set; }
+    // TODO: Throw if already set
+    public Action<object, string>? OutputCallback { get; set; }
     public PlatformArchitecture Architecture { get; init; } = PlatformArchitecture.X64;
     public FakeErrorAggregator FakeErrorAggregator { get; }
     public string? ErrorOutput { get; init; }
     public int ExitCode { get; init; } = -1;
     public bool Exited { get; private set; }
+    public TestProcessStartInfo TestProcessStartInfo { get; internal set; }
 
-    public FakeProcess(FakeErrorAggregator fakeErrorAggregator, string path, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<object, string> errorCallback, Action<object> exitCallBack, Action<object, string> outputCallback)
+    public FakeProcess(FakeErrorAggregator fakeErrorAggregator, string path, string? arguments = null, string? workingDirectory = null, IDictionary<string, string>? environmentVariables = null, Action<object, string>? errorCallback = null, Action<object>? exitCallBack = null, Action<object, string>? outputCallback = null)
     {
         FakeErrorAggregator = fakeErrorAggregator;
         Path = path;
         Name = System.IO.Path.GetFileName(path);
         Arguments = arguments;
-        WorkingDirectory = workingDirectory;
-        EnvironmentVariables = environmentVariables;
+        WorkingDirectory = workingDirectory ?? System.IO.Path.GetDirectoryName(path) ?? throw new InvalidOperationException($"Path {path} does not have a parent directory.");
+        EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
         ErrorCallback = errorCallback;
         ExitCallback = exitCallBack;
         OutputCallback = outputCallback;
+
+        TestProcessStartInfo = new TestProcessStartInfo()
+        {
+            FileName = Path,
+            Arguments = Arguments,
+            WorkingDirectory = WorkingDirectory,
+            EnvironmentVariables = EnvironmentVariables,
+            // TODO: is this even used anywhere
+            CustomProperties = new Dictionary<string, string>(),
+        };
     }
 
     internal static FakeProcess EnsureFakeProcess(object process)

@@ -11,16 +11,26 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
 internal class FakeTestRuntimeProviderManager : ITestRuntimeProviderManager
 {
-    public FakeTestRuntimeProviderManager(List<FakeTestRuntimeProvider> testRuntimeProviders, FakeErrorAggregator fakeErrorAggregator)
+    public FakeTestRuntimeProviderManager(FakeErrorAggregator fakeErrorAggregator)
     {
-        testRuntimeProviders.ForEach(TestRuntimeProviders.Enqueue);
         FakeErrorAggregator = fakeErrorAggregator;
     }
 
     public ConcurrentQueue<FakeTestRuntimeProvider> TestRuntimeProviders { get; } = new();
-    public List<FakeTestRuntimeProvider> ProvidedTestRuntimeProviders { get; } = new();
+    public List<FakeTestRuntimeProvider> UsedTestRuntimeProviders { get; } = new();
 
     public FakeErrorAggregator FakeErrorAggregator { get; }
+
+    public void AddTestRuntimeProviders(params FakeTestRuntimeProvider[] runtimeProviders)
+    {
+        // This is not a bug, I am registering each provider twice because TestPlatform resolves
+        // them twice for every request that does not run in-process.
+        foreach (var runtimeProvider in runtimeProviders)
+        {
+            TestRuntimeProviders.Enqueue(runtimeProvider);
+            TestRuntimeProviders.Enqueue(runtimeProvider);
+        }
+    }
 
     public ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration)
     {
@@ -29,7 +39,7 @@ internal class FakeTestRuntimeProviderManager : ITestRuntimeProviderManager
             throw new InvalidOperationException("There are no more TestRuntimeProviders to be provided");
         }
 
-        ProvidedTestRuntimeProviders.Add(next);
+        UsedTestRuntimeProviders.Add(next);
         return next;
     }
 

@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+namespace vstest.ProgrammerTests.CommandLine.Fakes;
+
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-
-#pragma warning disable IDE1006 // Naming Styles
-namespace vstest.ProgrammerTests.CommandLine.Fakes;
 
 internal class FakeProcessHelper : IProcessHelper
 {
@@ -84,6 +83,7 @@ internal class FakeProcessHelper : IProcessHelper
 
     public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<object, string> errorCallback, Action<object> exitCallBack, Action<object, string> outputCallback)
     {
+        // TODO: Throw if setting says we can't start new processes;
         var process = new FakeProcess(FakeErrorAggregator, processPath, arguments, workingDirectory, environmentVariables, errorCallback, exitCallBack, outputCallback);
         Processes.Add(process);
 
@@ -110,5 +110,10 @@ internal class FakeProcessHelper : IProcessHelper
     public void WaitForProcessExit(object process)
     {
         // todo: implement for timeouts?
+    }
+
+    internal void StartFakeProcess(FakeProcess testHostProcess)
+    {
+        // TODO: mark the process as started. Do not add a new process if it did not exist.
     }
 }

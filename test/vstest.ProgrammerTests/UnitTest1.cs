@@ -52,7 +52,7 @@ public class TestDiscoveryTests
         var fakeErrorAggregator = new FakeErrorAggregator();
         var commandLineOptions = CommandLineOptions.Instance;
 
-        var fakeCurrentProcess = new FakeProcess(fakeErrorAggregator, @"X:\fake\vstest.console.exe", string.Empty, null, null, null, null, null);
+        var fakeCurrentProcess = new FakeProcess(fakeErrorAggregator, @"X:\fake\vstest.console.exe");
         var fakeProcessHelper = new FakeProcessHelper(fakeErrorAggregator, fakeCurrentProcess);
 
         var fakeFileHelper = new FakeFileHelper(fakeErrorAggregator);
@@ -95,8 +95,10 @@ public class TestDiscoveryTests
         var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(new FakeCommunicationChannel(responses, fakeErrorAggregator, 1), fakeErrorAggregator);
         TestServiceLocator.Clear();
         TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint.TestHostConnectionInfo.Endpoint, fakeCommunicationEndpoint);
-        var fakeTestRuntimeProvider = new FakeTestRuntimeProvider(fakeProcessHelper, fakeCommunicationEndpoint, fakeErrorAggregator);
-        var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(new[] { fakeTestRuntimeProvider, fakeTestRuntimeProvider }.ToList(), fakeErrorAggregator);
+        var fakeTestHostProcess = new FakeProcess(fakeErrorAggregator, @"C:\temp\testhost.exe");
+        var fakeTestRuntimeProvider = new FakeTestRuntimeProvider(fakeProcessHelper, fakeTestHostProcess, fakeCommunicationEndpoint, fakeErrorAggregator);
+        var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(fakeErrorAggregator);
+        fakeTestRuntimeProviderManager.AddTestRuntimeProviders(fakeTestRuntimeProvider);
         var testEngine = new TestEngine(fakeTestRuntimeProviderManager, fakeProcessHelper);
 
         var testPlatform = new TestPlatform(testEngine, fakeFileHelper, fakeTestRuntimeProviderManager);
@@ -176,15 +178,9 @@ public class TestDiscoveryTests
 
     public async Task GivenMultipleMsTestAssembliesThatUseTheSameTargetFrameworkAndArchitecture_WhenTestsAreRun_ThenAllTestsFromAllAssembliesAreRun()
     {
-        // We need to use static class to find the communication endpoint, this clears all the registrations of previous tests.
-        TestServiceLocator.Clear();
-        using var fixture = new FixtureBuilder()
-            .Build();
-
         // -- arrange
+        using var fixture = new Fixture();
 
-        var commandLineOptions = CommandLineOptions.Instance;
-        // TODO: have mstest1dll canned
         var mstest1Dll = new FakeTestDllBuilder()
             .WithPath(@"X:\fake\mstest1.dll")
             .WithFramework(KnownFramework.Net50)
@@ -192,7 +188,7 @@ public class TestDiscoveryTests
             .WithTestCount(108, 10)
             .Build();
 
-        var testhost1Process = new FakeProcess(fixture.ErrorAggregator, @"X:\fake\testhost1.exe", string.Empty, null, null, null, null, null);
+        var testhost1Process = new FakeProcess(fixture.ErrorAggregator, @"X:\fake\testhost1.exe");
 
         var runTests1 = new FakeMessagesBuilder()
             .VersionCheck(5)
@@ -201,7 +197,7 @@ public class TestDiscoveryTests
             .SessionEnd(FakeMessage.NoResponse, _ => testhost1Process.Exit())
             .Build();
 
-        var testhost1 = new FakeTestHostBuilder(fixture)
+        var testhost1 = new FakeTestHostFixtureBuilder(fixture)
             .WithTestDll(mstest1Dll)
             .WithProcess(testhost1Process)
             .WithResponses(runTests1)
@@ -214,7 +210,7 @@ public class TestDiscoveryTests
             .WithTestCount(50, 8)
             .Build();
 
-        var testhost2Process = new FakeProcess(fixture.ErrorAggregator, @"X:\fake\testhost1.exe", string.Empty, null, null, null, null, null);
+        var testhost2Process = new FakeProcess(fixture.ErrorAggregator, @"X:\fake\testhost1.exe");
 
         var runTests2 = new FakeMessagesBuilder()
             .VersionCheck(5)
@@ -223,7 +219,7 @@ public class TestDiscoveryTests
             .SessionEnd(FakeMessage.NoResponse, _ => testhost1Process.Exit())
             .Build();
 
-        var testhost2 = new FakeTestHostBuilder(fixture)
+        var testhost2 = new FakeTestHostFixtureBuilder(fixture)
             .WithTestDll(mstest2Dll)
             .WithProcess(testhost2Process)
             .WithResponses(runTests2)
@@ -231,126 +227,28 @@ public class TestDiscoveryTests
 
         // ---
 
-       
-        var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(new[] { fakeTestRuntimeProvider, fakeTestRuntimeProvider, fakeTestRuntimeProvider2, fakeTestRuntimeProvider2 }.ToList(), fixture.ErrorAggregator);
-        var testEngine = new TestEngine(fakeTestRuntimeProviderManager, fixture.ProcessHelper);
+        fixture.AddTestHostFixtures(testhost1, testhost2);
 
-        var testPlatform = new TestPlatform(testEngine, fixture.FileHelper, fakeTestRuntimeProviderManager);
-
-        var testRunResultAggregator = new TestRunResultAggregator();
-        var fakeTestPlatformEventSource = new FakeTestPlatformEventSource(fixture.ErrorAggregator);
-
-        var fakeAssemblyMetadataProvider = new FakeAssemblyMetadataProvider(fixture.FileHelper, fixture.ErrorAggregator);
-        var inferHelper = new InferHelper(fakeAssemblyMetadataProvider);
-
-        // This is most likely not the correctl place where to cut this off, plugin cache is probably the better place,
-        // but it is not injected, and I don't want to investigate this now.
-        var fakeDataCollectorAttachmentsProcessorsFactory = new FakeDataCollectorAttachmentsProcessorsFactory(fixture.ErrorAggregator);
-        var testRunAttachmentsProcessingManager = new TestRunAttachmentsProcessingManager(fakeTestPlatformEventSource, fakeDataCollectorAttachmentsProcessorsFactory);
-
-        Task<IMetricsPublisher> fakeMetricsPublisherTask = Task.FromResult<IMetricsPublisher>(new FakeMetricsPublisher(fixture.ErrorAggregator));
-        TestRequestManager testRequestManager = new(
-            commandLineOptions,
-            testPlatform,
-            testRunResultAggregator,
-            fakeTestPlatformEventSource,
-            inferHelper,
-            fakeMetricsPublisherTask,
-            fixture.ProcessHelper,
-            testRunAttachmentsProcessingManager
-            );
+        var testRequestManager = fixture.BuildTestRequestManager(5, 50, true);
 
         // -- act
-
-        // TODO: this gives me run configuration that is way too complete, do we a way to generate "bare" runsettings? if not we should add them. Would be also useful to get
-        // runsettings from parameter set so people can use it
-        // TODO: TestSessionTimeout gives me way to abort the run without having to cancel it externally, but could probably still lead to hangs if that funtionality is broken
-        // TODO: few tries later, that is exactly the case when we abort, it still hangs on waiting to complete request, because test run complete was not sent
-        // var runConfiguration = new Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration { TestSessionTimeout = 40_000 }.ToXml().OuterXml;
         var runConfiguration = string.Empty;
         var testRunRequestPayload = new TestRunRequestPayload
         {
-            // TODO: passing null sources and null testcases does not fail fast
             Sources = new List<string> { mstest1Dll.Path, mstest2Dll.Path },
-            // TODO: passing null runsettings does not fail fast, instead it fails in Fakes settings code
-            // TODO: passing empty string fails in the xml parser code
+
             RunSettings = $"<RunSettings>{runConfiguration}</RunSettings>"
         };
 
-        // var fakeTestHostLauncher = new FakeTestHostLauncher();
-        var fakeTestRunEventsRegistrar = new FakeTestRunEventsRegistrar(fixture.ErrorAggregator);
-        var protocolConfig = new ProtocolConfig();
-
-        // TODO: we make sure the test is running 10 minutes at max and then we try to abort
-        // if we aborted we write the error to aggregator, this needs to be made into a pattern
-        // so we can avoid hanging if the run does not complete correctly
-        var cancelAbort = new CancellationTokenSource();
-        var task = Task.Run(async () =>
-        {
-            await Task.Delay(TimeSpan.FromSeconds(Debugger.IsAttached ? 50 : 5), cancelAbort.Token);
-            if (Debugger.IsAttached)
-            {
-                var errors = fixture.ErrorAggregator.Errors;
-                // we will abort because we are hanging, look at stacks to see what the problem is
-                Debugger.Break();
-            }
-            fixture.ErrorAggregator.Add(new Exception("errr we aborted"));
-            testRequestManager.AbortTestRun();
-
-        });
-        testRequestManager.RunTests(testRunRequestPayload, testHostLauncher: null, fakeTestRunEventsRegistrar, protocolConfig);
-        cancelAbort.Cancel();
-        if (!task.IsCanceled)
-        {
-            await task;
-        }
-        // pattern end
+        await testRequestManager.ExecuteWithAbort(tm => tm.RunTests(testRunRequestPayload, testHostLauncher: null, fixture.TestRunEventsRegistrar, fixture.ProtocolConfig));
 
         // -- assert
-        fixture.ErrorAggregator.Errors.Should().BeEmpty();
-        fakeTestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults).Should().HaveCount(158);
+        fixture.AssertNoErrors();
+        fixture.ExecutedTests.Should().HaveCount(mstest1Dll.TestCount + mstest2Dll.TestCount);
     }
 }
 
-
-internal class FixtureBuilder
-{
-    internal Fixture Build()
-    {
-        return new Fixture();
-    }
-}
-
-internal class CapturedRunSettings
-{
-    public int MaxParallelLevel { get; internal set; }
-}
-
-internal static class RunConfiguration
-{
-    public static ConfigurationEntry MaxParallelLevel { get; } = new(nameof(MaxParallelLevel));
-}
-
-internal class ConfigurationEntry
-{
-    public ConfigurationEntry(string name)
-    {
-        Name = name;
-    }
-
-    public string Name { get; }
-
-    public string InlinePath => $"RunConfiguration.{Name}";
-
-    public string FullPath => $"RunSettings.{InlinePath}";
-
-    public override string ToString()
-    {
-        return Name;
-    }
-}
-
-internal class TestDlls
-{
-    public static string MSTest1 { get; } = $"{nameof(MSTest1)}.dll";
-}
+// Test and improvmement ideas:
+// TODO: passing null runsettings does not fail fast, instead it fails in Fakes settings code
+// TODO: passing empty string fails in the xml parser code
+// TODO: passing null sources and null testcases does not fail fast

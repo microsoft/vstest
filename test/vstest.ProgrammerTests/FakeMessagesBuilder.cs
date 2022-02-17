@@ -24,7 +24,7 @@ internal class FakeMessagesBuilder
     /// <returns></returns>
     internal FakeMessagesBuilder VersionCheck(int version)
     {
-        AddPair(MessageType.VersionCheck, version);
+        AddPairWithValue(MessageType.VersionCheck, version);
         return this;
     }
 
@@ -35,7 +35,7 @@ internal class FakeMessagesBuilder
     /// <returns></returns>
     internal FakeMessagesBuilder VersionCheck(FakeMessage message)
     {
-        AddPair(MessageType.VersionCheck, message);
+        AddPairWithFakeMessage(MessageType.VersionCheck, message);
         return this;
     }
 
@@ -47,13 +47,13 @@ internal class FakeMessagesBuilder
     /// <returns></returns>
     internal FakeMessagesBuilder VersionCheck(Action<string> beforeAction, FakeMessage message, Action<string> afterAction)
     {
-        AddPair(MessageType.VersionCheck, message, beforeAction, afterAction);
+        AddPairWithFakeMessage(MessageType.VersionCheck, message, beforeAction, afterAction);
         return this;
     }
 
     internal FakeMessagesBuilder ExecutionInitialize(FakeMessage message)
     {
-        AddPair(MessageType.ExecutionInitialize, message);
+        AddPairWithFakeMessage(MessageType.ExecutionInitialize, message);
         return this;
     }
 
@@ -76,37 +76,34 @@ internal class FakeMessagesBuilder
         });
         List<FakeMessage> messages = changeMessages.Concat(new[] { completedMessage }).ToList();
 
-        AddPairWithMultipleMessages(MessageType.StartTestExecutionWithSources, messages);
+        AddPairWithMultipleFakeMessages(MessageType.StartTestExecutionWithSources, messages);
         return this;
     }
 
     
     internal FakeMessagesBuilder SessionEnd(FakeMessage fakeMessage)
     {
-        AddPair(MessageType.SessionEnd, fakeMessage);
+        AddPairWithFakeMessage(MessageType.SessionEnd, fakeMessage);
         return this;
     }
 
     internal FakeMessagesBuilder SessionEnd(FakeMessage message, Action<string>? beforeAction = null, Action<string>? afterAction = null)
     {
-        AddPair(MessageType.SessionEnd, message, beforeAction, afterAction);
+        AddPairWithFakeMessage(MessageType.SessionEnd, message, beforeAction, afterAction);
         return this;
     }
 
-    private void AddPair<T>(string messageType, T value, Action<string>? beforeAction = null, Action<string>? afterAction = null)
+    private void AddPairWithValue<T>(string messageType, T value, Action<string>? beforeAction = null, Action<string>? afterAction = null)
     {
-        // TODO: add actions
-        AddPair(messageType, new FakeMessage<T>(messageType, value), beforeAction, afterAction);
+        AddPairWithFakeMessage(messageType, new FakeMessage<T>(messageType, value), beforeAction, afterAction);
     }
 
-    private void AddPair(string messageType, FakeMessage message, Action<string>? beforeAction = null, Action<string>? afterAction = null)
+    private void AddPairWithFakeMessage(string messageType, FakeMessage message, Action<string>? beforeAction = null, Action<string>? afterAction = null)
     {
-        // TODO: add actions
-        AddPairWithMultipleMessages(messageType, new[] { message }, beforeAction, afterAction);
+        AddPairWithMultipleFakeMessages(messageType, new[] { message }, beforeAction, afterAction);
     }
 
-    // TODO: this uses different name, because it would never be chosen when we provide IEnumerable, the overload with T value is used instead. This is error prone, better design?
-    private void AddPairWithMultipleMessages(string messageType, IEnumerable<FakeMessage> messages, Action<string>? beforeAction = null, Action<string>? afterAction = null)
+    private void AddPairWithMultipleFakeMessages(string messageType, IEnumerable<FakeMessage> messages, Action<string>? beforeAction = null, Action<string>? afterAction = null)
     {
         // TODO: add after actions
         Func<string, List<FakeMessage>> callActionAndReturnMessages = m =>

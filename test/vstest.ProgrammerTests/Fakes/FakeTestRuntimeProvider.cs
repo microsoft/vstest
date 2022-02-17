@@ -7,23 +7,39 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 internal class FakeTestRuntimeProvider : ITestRuntimeProvider
 {
     public FakeProcessHelper FakeProcessHelper { get; }
     public FakeCommunicationEndpoint FakeCommunicationEndpoint { get; }
-    public FakeProcess? TestHostProcess { get; private set; }
+    public FakeErrorAggregator FakeErrorAggregator { get; }
+    public FakeProcess TestHostProcess { get; private set; }
 
     // TODO: make this configurable?
     public bool Shared => false;
 
-    public event EventHandler<HostProviderEventArgs> HostLaunched;
-    public event EventHandler<HostProviderEventArgs> HostExited;
+    public event EventHandler<HostProviderEventArgs>? HostLaunched;
+    public event EventHandler<HostProviderEventArgs>? HostExited;
 
-    public FakeTestRuntimeProvider(FakeProcessHelper fakeProcessHelper, FakeCommunicationEndpoint fakeCommunicationEndpoint, FakeErrorAggregator fakeErrorAggregator)
+    public FakeTestRuntimeProvider(FakeProcessHelper fakeProcessHelper, FakeProcess fakeTestHostProcess, FakeCommunicationEndpoint fakeCommunicationEndpoint, FakeErrorAggregator fakeErrorAggregator)
     {
         FakeProcessHelper = fakeProcessHelper;
+        TestHostProcess = fakeTestHostProcess;
+        TestHostProcess.ExitCallback = p =>
+        {
+            // TODO: Validate the process we are passed is actually the same as TestHostProcess
+            // TODO: Validate we already started the process.
+            var process = (FakeProcess)p;
+            if (HostExited != null)
+            {
+                // TODO: When we exit, eventually there are no subscribers, maybe we should review if we don't lose the error output sometimes, in unnecessary way
+                HostExited(this, new HostProviderEventArgs(process.ErrorOutput, process.ExitCode, process.Id));
+            }
+        };
+
         FakeCommunicationEndpoint = fakeCommunicationEndpoint;
+        FakeErrorAggregator = fakeErrorAggregator;
     }
 
     public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
@@ -47,7 +63,7 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
     public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
     {
         // TODO: do we need to do more here? How to link testhost to the fake one we "start"?
-        return new TestProcessStartInfo();
+        return TestHostProcess.TestProcessStartInfo;
     }
 
     public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions)
@@ -73,23 +89,15 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
 
     public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
     {
-        TestHostProcess = (FakeProcess)FakeProcessHelper.LaunchProcess(
-            testHostStartInfo.FileName,
-            testHostStartInfo.Arguments,
-            testHostStartInfo.WorkingDirectory,
-            testHostStartInfo.EnvironmentVariables,
-            errorCallback: (_, _) => { },
-            exitCallBack: p => {
-                var process = (FakeProcess)p;
-                if (HostExited != null)
-                {
-                    // TODO: When we exit, eventually there are no subscribers, maybe we should review if we don't lose the error output sometimes, in unnecessary way
-                    HostExited(this, new HostProviderEventArgs(process.ErrorOutput, process.ExitCode, process.Id));
-                }
-            },
-            outputCallback: (_, _) => { }
-            );
-        HostLaunched(this, new HostProviderEventArgs("Fake testhost launched", 0, TestHostProcess.Id));
+        if (TestHostProcess.TestProcessStartInfo.FileName != testHostStartInfo.FileName)
+            throw new InvalidOperationException($"Tried to start a different process than the one associated with this provider: File name is {testHostStartInfo.FileName} is not the same as the fake process associated with this provider {TestHostProcess.TestProcessStartInfo.FileName}.");
+
+        FakeProcessHelper.StartFakeProcess(TestHostProcess);
+
+        if (HostLaunched != null)
+        {
+            HostLaunched(this, new HostProviderEventArgs("Fake testhost launched", 0, TestHostProcess.Id));
+        }
         return Task.FromResult(true);
     }
 

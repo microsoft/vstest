@@ -14,11 +14,16 @@ internal class FakeTestDllFile : FakeFile
     public FrameworkName FrameworkName { get; }
     public Architecture Architecture { get; }
     public List<List<TestResult>> TestResultBatches { get; }
+    public int TestCount { get; }
+    public int BatchCount { get; }
 
     public FakeTestDllFile(string path, FrameworkName frameworkName, Architecture architecture, List<List<TestResult>> testResultBatches) : base(path)
     {
         FrameworkName = frameworkName;
         Architecture = architecture;
         TestResultBatches = testResultBatches;
+
+        TestCount = testResultBatches.SelectMany(tr => tr).Count();
+        BatchCount = testResultBatches.Count;
     }
 }

@@ -6,7 +6,7 @@ namespace vstest.ProgrammerTests.CommandLine;
 using vstest.ProgrammerTests.CommandLine.Fakes;
 using vstest.ProgrammerTests.Fakes;
 
-internal class FakeTestHost
+internal class FakeTestFixtureHost
 {
     private readonly Fixture _fixture;
 
@@ -18,7 +18,7 @@ internal class FakeTestHost
     public List<RequestResponsePair<string, FakeMessage>> Responses { get; }
     public FakeProcess Process { get; internal set; }
 
-    public FakeTestHost(
+    public FakeTestFixtureHost(
         Fixture fixture,
         int id, List<FakeTestDllFile> dlls,
         FakeTestRuntimeProvider fakeTestRuntimeProvider,
