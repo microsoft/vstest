@@ -228,6 +228,7 @@ internal class Executor
                 continue;
             }
 
+            // We need to initialize the argument executor if it's set to always execute. This ensures it will be initialized with other executors.
             processors.Add(ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation(processor));
         }
 

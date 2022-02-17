@@ -141,7 +141,7 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="options"> The options. </param>
     /// <param name="testPlatform">The test platform</param>
-    public TestAdapterLoadingStrategyArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager, IOutput output, IFileHelper fileHelper)
+    public TestAdapterLoadingStrategyArgumentExecutor(CommandLineOptions options!!, IRunSettingsProvider runSettingsManager!!, IOutput output!!, IFileHelper fileHelper!!)
     {
         Contract.Requires(options != null);
 

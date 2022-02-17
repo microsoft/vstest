@@ -216,7 +216,6 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     internal TestAdapterLoadingStrategy TestAdapterLoadingStrategy { get; set; }
 
-
     /// <summary>
     /// Gets a value indicating whether parallelism needs to be disabled by the adapters.
     /// </summary>
