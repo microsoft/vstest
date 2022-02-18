@@ -663,7 +663,12 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         var runLevelAttachementCount = (e.AttachmentSets == null) ? 0 : e.AttachmentSets.Sum(attachmentSet => attachmentSet.Attachments.Count);
         if (runLevelAttachementCount > 0)
         {
-            if (!_featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING) || _featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX))
+            // If ARTIFACTS_POSTPROCESSING is disabled
+            if (!_featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING) ||
+                // ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX(old UX) is enabled
+                _featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX) ||
+                // TestSessionCorrelationId is null(we're not running through the dotnet SDK).
+                CommandLineOptions.Instance.TestSessionCorrelationId is null)
             {
                 Output.Information(false, CommandLineResources.AttachmentsBanner);
                 foreach (var attachmentSet in e.AttachmentSets)
