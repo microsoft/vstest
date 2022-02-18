@@ -26,8 +26,6 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class ListTestsArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The short name of the command line argument that the ListTestsArgumentExecutor handles.
     /// </summary>
@@ -37,8 +35,6 @@ internal class ListTestsArgumentProcessor : IArgumentProcessor
     /// The name of the command line argument that the ListTestsArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/ListTests";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -110,8 +106,6 @@ internal class ListTestsArgumentProcessorCapabilities : BaseArgumentProcessorCap
 /// </summary>
 internal class ListTestsArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -136,10 +130,6 @@ internal class ListTestsArgumentExecutor : IArgumentExecutor
     /// Registers for discovery events during discovery
     /// </summary>
     private readonly ITestDiscoveryEventsRegistrar _discoveryEventsRegistrar;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -177,7 +167,6 @@ internal class ListTestsArgumentExecutor : IArgumentExecutor
         _discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output);
     }
 
-    #endregion
 
     #region IArgumentExecutor
 

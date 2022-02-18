@@ -17,7 +17,6 @@ public class FileTransferInformation : BasicTransferInformation
 {
     private readonly IFileHelper _fileHelper;
 
-    #region Constructor
     /// <summary>
     /// Initializes a new instance of the <see cref="FileTransferInformation"/> class.
     /// </summary>
@@ -71,10 +70,6 @@ public class FileTransferInformation : BasicTransferInformation
         PerformCleanup = deleteFile;
     }
 
-    #endregion
-
-    #region  Required Parameters.
-
     /// <summary>
     /// Gets the path to the file on the local file system.
     /// </summary>
@@ -90,5 +85,4 @@ public class FileTransferInformation : BasicTransferInformation
     /// </summary>
     protected internal override string FileName => Path;
 
-    #endregion
 }

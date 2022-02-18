@@ -27,8 +27,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 /// <remarks>Making this a singleton to offer better unit testing.</remarks>
 public class TestPluginCache
 {
-    #region Private Members
-
     private readonly Dictionary<string, Assembly> _resolvedAssemblies;
 
     private List<string> _filterableExtensionPaths;
@@ -48,10 +46,6 @@ public class TestPluginCache
 
     private readonly List<string> _defaultExtensionPaths = new();
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TestPluginCache"/> class.
     /// </summary>
@@ -63,10 +57,6 @@ public class TestPluginCache
         _lockForExtensionsUpdate = new object();
         TestExtensions = null;
     }
-
-    #endregion
-
-    #region Public Properties
 
     public static TestPluginCache Instance
     {
@@ -86,10 +76,6 @@ public class TestPluginCache
     /// </summary>
     /// <remarks>Returns null if discovery of extensions is not done.</remarks>
     internal TestExtensions TestExtensions { get; private set; }
-
-    #endregion
-
-    #region Public Methods
 
     /// <summary>
     /// Gets a list of all extension paths filtered by input string.
@@ -287,10 +273,6 @@ public class TestPluginCache
     {
         _assemblyResolver.AddSearchDirectories(directories);
     }
-
-    #endregion
-
-    #region Utility methods
 
     internal IEnumerable<string> DefaultExtensionPaths
     {
@@ -563,5 +545,4 @@ public class TestPluginCache
         }
     }
 
-    #endregion
 }

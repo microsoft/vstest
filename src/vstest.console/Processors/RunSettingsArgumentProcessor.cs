@@ -25,14 +25,10 @@ using CommandLineResources = Resources.Resources;
 
 internal class RunSettingsArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the PortArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/Settings";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 

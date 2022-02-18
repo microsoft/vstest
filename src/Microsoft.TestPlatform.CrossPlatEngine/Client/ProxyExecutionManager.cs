@@ -58,8 +58,6 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
         get { return _proxyOperationManager.CancellationTokenSource; }
         set { _proxyOperationManager.CancellationTokenSource = value; }
     }
-    #region Constructors
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class.
     /// </summary>
@@ -138,7 +136,6 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
         _proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
     }
 
-    #endregion
 
     #region IProxyExecutionManager implementation.
 

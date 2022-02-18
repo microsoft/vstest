@@ -14,7 +14,6 @@ using System.Runtime.Serialization;
 [DataContract]
 public class DataCollectionMessageEventArgs : TestRunMessageEventArgs
 {
-    #region Constructor
     /// <summary>
     /// Constructor
     /// </summary>
@@ -23,10 +22,6 @@ public class DataCollectionMessageEventArgs : TestRunMessageEventArgs
     public DataCollectionMessageEventArgs(TestMessageLevel level, string message) : base(level, message)
     {
     }
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Friendly name of collector
     /// </summary>
@@ -58,5 +53,4 @@ public class DataCollectionMessageEventArgs : TestRunMessageEventArgs
         set;
     }
 
-    #endregion
 }

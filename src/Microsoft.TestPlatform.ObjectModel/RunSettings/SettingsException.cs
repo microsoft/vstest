@@ -20,8 +20,6 @@ using System.Runtime.Serialization;
 #endif
 public class SettingsException : Exception
 {
-    #region Constructors
-
     /// <summary>
     /// Default Constructor
     /// </summary>
@@ -58,5 +56,4 @@ public class SettingsException : Exception
     }
 
 #endif
-    #endregion
 }

@@ -18,13 +18,9 @@ using XML;
 /// </summary>
 internal sealed class WorkItem : IXmlTestStore
 {
-    #region Fields
     [StoreXmlField(Location = ".")]
     private readonly int _id = 0;
 
-    #endregion
-
-    #region Constructors
     /// <summary>
     /// Create a new item with the workitem set
     /// </summary>
@@ -34,9 +30,6 @@ internal sealed class WorkItem : IXmlTestStore
         _id = workitemId;
     }
 
-    #endregion
-
-    #region Properties/Methods
     /// <summary>
     /// Gets the id for this WorkItem
     /// </summary>
@@ -48,7 +41,6 @@ internal sealed class WorkItem : IXmlTestStore
         }
     }
 
-    #endregion
 
     #region Methods - overrides
     /// <summary>
@@ -102,7 +94,6 @@ internal sealed class WorkItem : IXmlTestStore
 /// </summary>
 internal sealed class WorkItemCollection : EqtBaseCollection<WorkItem>
 {
-    #region Constructors
     /// <summary>
     /// Creates an empty WorkItemCollection.
     /// </summary>
@@ -123,9 +114,6 @@ internal sealed class WorkItemCollection : EqtBaseCollection<WorkItem>
         }
     }
 
-    #endregion
-
-    #region Methods
     /// <summary>
     /// Adds the workitem.
     /// </summary>
@@ -233,6 +221,5 @@ internal sealed class WorkItemCollection : EqtBaseCollection<WorkItem>
         XmlPersistence xmlPersistence = new();
         xmlPersistence.SaveHashtable(_container, element, ".", ".", null, "Workitem", parameters);
     }
-    #endregion
 }
 #endregion

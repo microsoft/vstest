@@ -33,8 +33,6 @@ using CommonResources = Common.Resources.Resources;
 /// </summary>
 internal class TestLoggerManager : ITestLoggerManager
 {
-    #region FieldsLog
-
     /// <summary>
     /// Keeps track if we are disposed.
     /// </summary>
@@ -85,10 +83,6 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     private readonly IAssemblyLoadContext _assemblyLoadContext;
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Test logger manager.
     /// </summary>
@@ -116,10 +110,6 @@ internal class TestLoggerManager : ITestLoggerManager
         _assemblyLoadContext = assemblyLoadContext;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Loggers initialized flag.
     /// </summary>
@@ -137,10 +127,6 @@ internal class TestLoggerManager : ITestLoggerManager
             return _testLoggerExtensionManager;
         }
     }
-
-    #endregion
-
-    #region Public Methods
 
     /// <summary>
     /// Initializes all the loggers passed by user
@@ -362,8 +348,6 @@ internal class TestLoggerManager : ITestLoggerManager
         // of this type implements a finalizer.
         GC.SuppressFinalize(this);
     }
-
-    #endregion
 
     /// <summary>
     /// Initializes logger with the specified URI and parameters.

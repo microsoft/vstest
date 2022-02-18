@@ -19,8 +19,6 @@ using ObjectModel;
 /// </summary>
 internal class ArgumentProcessorFactory
 {
-    #region Constants
-
     /// <summary>
     /// The command starter.
     /// </summary>
@@ -31,19 +29,11 @@ internal class ArgumentProcessorFactory
     /// </summary>
     internal const string XplatCommandStarter = "-";
 
-    #endregion
-
-    #region Fields
-
     /// <summary>
     /// Available argument processors.
     /// </summary>
     private Dictionary<string, IArgumentProcessor> _commandToProcessorMap;
     private Dictionary<string, IArgumentProcessor> _specialCommandToProcessorMap;
-
-    #endregion
-
-    #region Constructor
 
     /// Initializes the argument processor factory.
     /// </summary>
@@ -61,10 +51,6 @@ internal class ArgumentProcessorFactory
         Contract.Requires(argumentProcessors != null);
         AllArgumentProcessors = argumentProcessors;
     }
-
-    #endregion
-
-    #region Static Methods
 
     /// <summary>
     /// Creates ArgumentProcessorFactory.
@@ -87,10 +73,6 @@ internal class ArgumentProcessorFactory
         // Get the ArgumentProcessorFactory
         return new ArgumentProcessorFactory(defaultArgumentProcessor);
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Returns all of the available argument processors.
@@ -130,10 +112,6 @@ internal class ArgumentProcessorFactory
             return _specialCommandToProcessorMap;
         }
     }
-
-    #endregion
-
-    #region Public Methods
 
     /// <summary>
     /// Creates the argument processor associated with the provided command line argument.
@@ -221,10 +199,6 @@ internal class ArgumentProcessorFactory
             .Where(lazyProcessor => lazyProcessor.Metadata.Value.IsSpecialCommand && lazyProcessor.Metadata.Value.AlwaysExecute);
     }
 
-    #endregion
-
-    #region Private Methods
-
     private static IList<IArgumentProcessor> DefaultArgumentProcessors => new List<IArgumentProcessor> {
         new HelpArgumentProcessor(),
         new TestSourceArgumentProcessor(),
@@ -232,6 +206,7 @@ internal class ArgumentProcessorFactory
         new RunTestsArgumentProcessor(),
         new RunSpecificTestsArgumentProcessor(),
         new TestAdapterPathArgumentProcessor(),
+        new TestAdapterLoadingStrategyArgumentProcessor(),
         new TestCaseFilterArgumentProcessor(),
         new ParentProcessIdArgumentProcessor(),
         new PortArgumentProcessor(),
@@ -299,9 +274,7 @@ internal class ArgumentProcessorFactory
     /// <param name="processor">The lazy processor.</param>
     /// <param name="initArg">The argument with which the real processor should be initialized.</param>
     /// <returns>The decorated lazy processor.</returns>
-    private static IArgumentProcessor WrapLazyProcessorToInitializeOnInstantiation(
-        IArgumentProcessor processor,
-        string initArg = null)
+    public static IArgumentProcessor WrapLazyProcessorToInitializeOnInstantiation(IArgumentProcessor processor, string initArg = null)
     {
         var processorExecutor = processor.Executor;
         var lazyArgumentProcessor = new Lazy<IArgumentExecutor>(() =>
@@ -380,5 +353,4 @@ internal class ArgumentProcessorFactory
         return processor;
     }
 
-    #endregion
 }

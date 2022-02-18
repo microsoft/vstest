@@ -18,8 +18,6 @@ using CommandLineResources = Resources.Resources;
 // </summary>
 internal class HelpArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the HelpArgumentExecutor handles.
     /// </summary>
@@ -30,8 +28,6 @@ internal class HelpArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string ShortCommandName = "/?";
 
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -98,8 +94,6 @@ internal class HelpArgumentProcessorCapabilities : BaseArgumentProcessorCapabili
 /// </summary>
 internal class HelpArgumentExecutor : IArgumentExecutor
 {
-    #region Constructor
-
     /// <summary>
     /// Constructs the HelpArgumentExecutor
     /// </summary>
@@ -108,16 +102,11 @@ internal class HelpArgumentExecutor : IArgumentExecutor
         Output = ConsoleOutput.Instance;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets the output object
     /// </summary>
     internal IOutput Output { get; set; }
 
-    #endregion
 
     #region IArgumentExecutor Members
 
@@ -163,9 +152,6 @@ internal class HelpArgumentExecutor : IArgumentExecutor
     }
 
     #endregion
-
-    #region Private Methods
-
     /// <summary>
     /// Lookup the help description for the argument processor.
     /// </summary>
@@ -203,5 +189,4 @@ internal class HelpArgumentExecutor : IArgumentExecutor
         Output.WriteLine(string.Empty, OutputLevel.Information);
     }
 
-    #endregion
 }

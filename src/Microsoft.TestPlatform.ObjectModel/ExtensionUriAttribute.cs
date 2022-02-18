@@ -18,8 +18,6 @@ using Resources;
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public sealed class ExtensionUriAttribute : Attribute
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes with the Uri of the extension.
     /// </summary>
@@ -34,15 +32,9 @@ public sealed class ExtensionUriAttribute : Attribute
         ExtensionUri = extensionUri;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// The Uri of the Test Executor.
     /// </summary>
     public string ExtensionUri { get; private set; }
-
-    #endregion
 
 }

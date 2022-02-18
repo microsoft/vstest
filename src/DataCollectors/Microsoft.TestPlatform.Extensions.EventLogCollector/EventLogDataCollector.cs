@@ -27,8 +27,6 @@ using Resource = Resources.Resources;
 [DataCollectorFriendlyName("Event Log")]
 public class EventLogDataCollector : DataCollector
 {
-    #region Constants
-
     /// <summary>
     /// The event log file name.
     /// </summary>
@@ -38,10 +36,6 @@ public class EventLogDataCollector : DataCollector
     /// DataCollector URI.
     /// </summary>
     private const string DefaultUri = @"datacollector://Microsoft/EventLog/2.0";
-
-    #endregion
-
-    #region Private fields
 
     /// <summary>
     /// Event handler delegate for the SessionStart event
@@ -98,10 +92,6 @@ public class EventLogDataCollector : DataCollector
     /// </summary>
     private readonly IDictionary<string, IEventLogContainer> _eventLogContainerMap = new Dictionary<string, IEventLogContainer>();
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="EventLogDataCollector"/> class.
     /// </summary>
@@ -128,10 +118,6 @@ public class EventLogDataCollector : DataCollector
         _fileHelper = fileHelper;
     }
 
-    #endregion
-
-    #region Internal Fields
-
     internal int MaxEntries { get; private set; }
 
     internal ISet<string> EventSources { get; private set; }
@@ -145,7 +131,6 @@ public class EventLogDataCollector : DataCollector
     /// </summary>
     internal Dictionary<DataCollectionContext, EventLogSessionContext> ContextMap { get; }
 
-    #endregion
 
     #region DataCollector Members
 
@@ -198,9 +183,6 @@ public class EventLogDataCollector : DataCollector
     }
 
     #endregion
-
-    #region Internal
-
     /// <summary>
     /// The write event logs.
     /// </summary>
@@ -297,7 +279,6 @@ public class EventLogDataCollector : DataCollector
 
         return eventLogPath;
     }
-    #endregion
 
     #region IDisposable Members
 
@@ -338,8 +319,6 @@ public class EventLogDataCollector : DataCollector
 
         return strings;
     }
-
-    #region Event Handlers
 
     private void OnSessionStart(object sender, SessionStartEventArgs e)
     {
@@ -391,10 +370,6 @@ public class EventLogDataCollector : DataCollector
 
         WriteCollectedEventLogEntries(e.Context, false, TimeSpan.MaxValue, DateTime.UtcNow);
     }
-
-    #endregion
-
-    #region Private methods
 
     private void RemoveTempEventLogDirs(List<string> tempDirs)
     {
@@ -596,5 +571,4 @@ public class EventLogDataCollector : DataCollector
         return eventLogSessionContext;
     }
 
-    #endregion
 }

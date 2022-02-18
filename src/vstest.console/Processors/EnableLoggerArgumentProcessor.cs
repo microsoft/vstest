@@ -22,16 +22,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class EnableLoggerArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The command name.
     /// </summary>
     public const string CommandName = "/Logger";
-
-    #endregion
-
-    #region Fields
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -74,7 +68,6 @@ internal class EnableLoggerArgumentProcessor : IArgumentProcessor
         }
     }
 
-    #endregion
 }
 
 internal class EnableLoggerArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
@@ -121,8 +114,6 @@ internal class EnableLoggerArgumentExecutor : IArgumentExecutor
 {
     private readonly IRunSettingsProvider _runSettingsManager;
 
-    #region Constructors
-
     /// <summary>
     /// Initializes a new instance of the <see cref="EnableLoggerArgumentExecutor"/> class.
     /// </summary>
@@ -132,7 +123,6 @@ internal class EnableLoggerArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsManager;
     }
 
-    #endregion
 
     #region IArgumentProcessor
 

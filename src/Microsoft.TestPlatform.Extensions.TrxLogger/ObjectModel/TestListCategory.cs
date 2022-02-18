@@ -18,8 +18,6 @@ using TrxLoggerResources = VisualStudio.TestPlatform.Extensions.TrxLogger.Resour
 /// </summary>
 internal class TestListCategory : IXmlTestStore
 {
-    #region Fields
-
     private static TestListCategory s_uncategorizedResults;
 
     private static TestListCategory s_allResults;
@@ -29,8 +27,6 @@ internal class TestListCategory : IXmlTestStore
     private readonly string _name = string.Empty;
 
     private TestListCategoryId _parentCategoryId;
-
-    #endregion
 
     /// <summary>
     /// Constructor for TestListCategory .
@@ -63,8 +59,6 @@ internal class TestListCategory : IXmlTestStore
         EqtAssert.ParameterNotNull(id, nameof(id));
         Id = id;
     }
-
-    #region Properties
 
     /// <summary>
     /// Gets the uncategorized results.
@@ -135,7 +129,6 @@ internal class TestListCategory : IXmlTestStore
         }
     }
 
-    #endregion
 
     #region Overrides
 

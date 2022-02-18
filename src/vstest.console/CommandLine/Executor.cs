@@ -53,8 +53,6 @@ internal class Executor
     private readonly ITestPlatformEventSource _testPlatformEventSource;
     private bool _showHelp;
 
-    #region Constructor
-
     /// <summary>
     /// Default constructor.
     /// </summary>
@@ -69,18 +67,10 @@ internal class Executor
         _showHelp = true;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Instance to use for sending output.
     /// </summary>
     private IOutput Output { get; set; }
-
-    #endregion
-
-    #region Methods
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
@@ -186,10 +176,6 @@ internal class Executor
         return exitCode;
     }
 
-    #endregion
-
-    #region Private Methods
-
     /// <summary>
     /// Get the list of argument processors for the arguments.
     /// </summary>
@@ -236,7 +222,16 @@ internal class Executor
         // Examples: processors to enable loggers that are statically configured, and to start logging,
         // should always be executed.
         var processorsToAlwaysExecute = processorFactory.GetArgumentProcessorsToAlwaysExecute();
-        processors.AddRange(processorsToAlwaysExecute);
+        foreach (var processor in processorsToAlwaysExecute)
+        {
+            if (processors.Any(i => i.Metadata.Value.CommandName == processor.Metadata.Value.CommandName)) 
+            {
+                continue;
+            }
+
+            // We need to initialize the argument executor if it's set to always execute. This ensures it will be initialized with other executors.
+            processors.Add(ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation(processor));
+        }
 
         // Initialize Runsettings with defaults
         RunSettingsManager.Instance.AddDefaultRunSettings();
@@ -496,5 +491,4 @@ internal class Executor
         return false;
     }
 
-    #endregion
 }

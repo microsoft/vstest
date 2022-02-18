@@ -22,11 +22,7 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class ParallelArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     public const string CommandName = "/Parallel";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -90,8 +86,6 @@ internal class ParallelArgumentProcessorCapabilities : BaseArgumentProcessorCapa
 /// </summary>
 internal class ParallelArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -100,10 +94,6 @@ internal class ParallelArgumentExecutor : IArgumentExecutor
     private readonly IRunSettingsProvider _runSettingsManager;
 
     public const string RunSettingsPath = "RunConfiguration.MaxCpuCount";
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -118,7 +108,6 @@ internal class ParallelArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsManager;
     }
 
-    #endregion
 
     #region IArgumentExecutor
 

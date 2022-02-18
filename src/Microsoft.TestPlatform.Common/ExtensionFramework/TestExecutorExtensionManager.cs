@@ -21,14 +21,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 /// </summary>
 internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor, ITestExecutorCapabilities>
 {
-    #region Fields
-
     private static TestExecutorExtensionManager s_testExecutorExtensionManager;
     private static readonly object Synclock = new();
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -48,9 +42,6 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
     {
     }
 
-    #endregion
-
-    #region Private Methods
     /// <summary>
     /// Merges two test extension lists.
     /// </summary>
@@ -102,10 +93,6 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
         return mergedTestExtensions;
     }
 
-    #endregion
-
-    #region Factory Methods
-
     /// <summary>
     /// Creates the TestExecutorExtensionManager.
     /// </summary>
@@ -120,15 +107,13 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
                 {
 
                     // Get all extensions for ITestExecutor.
-                    TestPluginManager.Instance
-                        .GetSpecificTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
+                    TestPluginManager.GetSpecificTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
                             TestPlatformConstants.TestAdapterEndsWithPattern,
                             out var unfilteredTestExtensions1,
                             out var testExtensions1);
 
                     // Get all extensions for ITestExecutor2.
-                    TestPluginManager.Instance
-                        .GetSpecificTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
+                    TestPluginManager.GetSpecificTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
                             TestPlatformConstants.TestAdapterEndsWithPattern,
                             out var unfilteredTestExtensions2,
                             out var testExtensions2);
@@ -165,15 +150,13 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
     {
 
         // Get all extensions for ITestExecutor.
-        TestPluginManager.Instance
-            .GetTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
+        TestPluginManager.GetTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
                 extensionAssembly,
                 out var unfilteredTestExtensions1,
                 out var testExtensions1);
 
         // Get all extensions for ITestExecutor2.
-        TestPluginManager.Instance
-            .GetTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
+        TestPluginManager.GetTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
                 extensionAssembly,
                 out var unfilteredTestExtensions2,
                 out var testExtensions2);
@@ -236,7 +219,6 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
         }
     }
 
-    #endregion
 }
 
 /// <summary>

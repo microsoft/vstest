@@ -24,8 +24,6 @@ using System.Configuration;
 /// </summary>
 internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
 {
-    #region Fields
-
     /// <summary>
     /// Queue used for events which are to be sent to the loggers.
     /// </summary>
@@ -50,10 +48,6 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     private readonly bool _isBoundsOnLoggerEventQueueEnabled;
 
     private readonly TestSessionMessageLogger _testSessionMessageLogger;
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Default constructor.
     /// </summary>
@@ -78,10 +72,6 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
         _testSessionMessageLogger = testSessionMessageLogger;
         _testSessionMessageLogger.TestRunMessage += TestRunMessageHandler;
     }
-
-    #endregion
-
-    #region Events
 
     /// <summary>
     /// Raised when a test message is received.
@@ -123,7 +113,6 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// </summary>
     public override event EventHandler<DiscoveryCompleteEventArgs> DiscoveryComplete;
 
-    #endregion
 
     #region IDisposable
 
@@ -147,8 +136,6 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     }
 
     #endregion
-
-    #region Internal Methods
 
     /// <summary>
     /// Enables sending of events to the loggers which are registered and flushes the queue.
@@ -320,10 +307,6 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
         _loggerEventQueue.Flush();
     }
 
-    #endregion
-
-    #region Private Members
-
     /// <summary>
     /// Called when a test run message is sent through the ITestRunMessageLogger which is exported.
     /// </summary>
@@ -463,5 +446,4 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
         return value;
     }
 
-    #endregion
 }

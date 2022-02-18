@@ -43,7 +43,7 @@ public class DesignModeClientTests
 
     private readonly DesignModeClient _designModeClient;
 
-    private readonly int _protocolVersion = 5;
+    private readonly int _protocolVersion = 6;
 
     private readonly AutoResetEvent _completeEvent;
 
@@ -136,7 +136,7 @@ public class DesignModeClientTests
     [TestMethod]
     public void DesignModeClientDuringConnectShouldHighestCommonVersionWhenReceivedVersionIsGreaterThanSupportedVersion()
     {
-        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = 5 };
+        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = 6 };
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);

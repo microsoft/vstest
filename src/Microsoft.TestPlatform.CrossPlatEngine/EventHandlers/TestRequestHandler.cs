@@ -32,7 +32,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
 
     // Must be in sync with the highest supported version in
     // src/Microsoft.TestPlatform.CommunicationUtilities/TestRequestSender.cs file.
-    private readonly int _highestSupportedVersion = 5;
+    private readonly int _highestSupportedVersion = 6;
 
     private readonly IDataSerializer _dataSerializer;
     private ITestHostManagerFactory _testHostManagerFactory;
@@ -225,7 +225,10 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
                 TotalTests = discoveryCompleteEventArgs.TotalCount,
                 LastDiscoveredTests = discoveryCompleteEventArgs.IsAborted ? null : _pathConverter.UpdateTestCases(lastChunk, PathConversionDirection.Send),
                 IsAborted = discoveryCompleteEventArgs.IsAborted,
-                Metrics = discoveryCompleteEventArgs.Metrics
+                Metrics = discoveryCompleteEventArgs.Metrics,
+                FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources,
+                PartiallyDiscoveredSources = discoveryCompleteEventArgs.PartiallyDiscoveredSources,
+                NotDiscoveredSources = discoveryCompleteEventArgs.NotDiscoveredSources,
             },
             _protocolVersion);
         SendData(data);
@@ -494,6 +497,12 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
 
             case MessageType.AttachDebuggerCallback:
                 _onAttachDebuggerAckRecieved?.Invoke(message);
+                break;
+
+            case MessageType.CancelDiscovery:
+                _jobQueue.Pause();
+                _testHostManagerFactoryReady.Wait();
+                _testHostManagerFactory.GetDiscoveryManager().Abort(new TestDiscoveryEventHandler(this));
                 break;
 
             case MessageType.AbortTestRun:

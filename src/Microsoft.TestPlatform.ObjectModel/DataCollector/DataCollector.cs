@@ -13,8 +13,6 @@ using System.Xml;
 /// </summary>
 public abstract class DataCollector : IDisposable
 {
-    #region Methods
-
     /// <summary>
     /// Initializes the data collector
     /// </summary>
@@ -57,5 +55,4 @@ public abstract class DataCollector : IDisposable
     {
     }
 
-    #endregion
 }

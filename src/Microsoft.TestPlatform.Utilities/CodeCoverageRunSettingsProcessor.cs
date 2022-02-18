@@ -19,14 +19,10 @@ using ObjectModel;
 /// </summary>
 public class CodeCoverageRunSettingsProcessor
 {
-    #region Members
     /// <summary>
     /// Represents the default settings loaded as an <see cref="XmlNode"/>.
     /// </summary>
     private readonly XmlNode _defaultSettingsRootNode;
-    #endregion
-
-    #region Constructors & Helpers
     /// <summary>
     /// Constructs an <see cref="CodeCoverageRunSettingsProcessor"/> object.
     /// </summary>
@@ -36,7 +32,6 @@ public class CodeCoverageRunSettingsProcessor
     {
         _defaultSettingsRootNode = defaultSettingsRootNode ?? throw new ArgumentNullException(nameof(defaultSettingsRootNode), "Default settings root node is null.");
     }
-    #endregion
 
     #region Public Interface
     /// <summary>
@@ -150,7 +145,6 @@ public class CodeCoverageRunSettingsProcessor
     }
     #endregion
 
-    #region Private Methods
     /// <summary>
     /// Selects the node from the current settings node using the given
     /// <see cref="XPathNavigator"/> style path. If unable to select the requested node it adds
@@ -305,5 +299,4 @@ public class CodeCoverageRunSettingsProcessor
             currentNode.AppendChild(importedChild);
         }
     }
-    #endregion
 }

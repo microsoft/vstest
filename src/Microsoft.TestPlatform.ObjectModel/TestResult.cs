@@ -19,8 +19,6 @@ using System.Text;
 [DataContract]
 public sealed class TestResult : TestObject
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TestResult"/> class.
     /// </summary>
@@ -36,10 +34,6 @@ public sealed class TestResult : TestObject
         StartTime = DateTimeOffset.UtcNow;
         EndTime = DateTimeOffset.UtcNow;
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets the test case that this result is for.
@@ -118,10 +112,6 @@ public sealed class TestResult : TestObject
         }
     }
 
-    #endregion
-
-    #region Methods
-
     /// <inheritdoc/>
     public override string ToString()
     {
@@ -177,10 +167,6 @@ public sealed class TestResult : TestObject
 
         return result.ToString();
     }
-
-    #endregion
-
-    #region Protected Methods
 
     /// <summary>
     /// Return TestProperty's value
@@ -242,7 +228,6 @@ public sealed class TestResult : TestObject
         base.ProtectedSetPropertyValue(property, value);
     }
 
-    #endregion
 }
 
 /// <summary>

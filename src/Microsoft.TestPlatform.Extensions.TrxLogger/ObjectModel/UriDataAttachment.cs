@@ -21,13 +21,9 @@ using XML;
 internal class UriDataAttachment : IDataAttachment, IXmlTestStore
 {
     private readonly TrxFileHelper _trxFileHelper;
-    #region Private fields
-
     /// <summary>
     /// The name for the attachment
     /// </summary>
-
-    #endregion
 
     /// <summary>
     /// Initializes the URI data attachment
@@ -114,9 +110,6 @@ internal class UriDataAttachment : IDataAttachment, IXmlTestStore
     }
 
     #endregion
-
-    #region Private Methods
-
     private void Initialize(string desc, Uri uri)
     {
         EqtAssert.ParameterNotNull(desc, nameof(desc));
@@ -126,5 +119,4 @@ internal class UriDataAttachment : IDataAttachment, IXmlTestStore
         Uri = uri;
     }
 
-    #endregion
 }

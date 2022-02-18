@@ -17,16 +17,10 @@ using Resources;
 [DataContract]
 public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, IComparable
 {
-    #region Constants
-
     /// <summary>
     /// A request ID with an empty GUID
     /// </summary>
     public static readonly RequestId Empty = new(Guid.Empty);
-
-    #endregion
-
-    #region Constructors
 
     /// <summary>
     /// Initializes the instance by creating a new GUID
@@ -45,7 +39,6 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
         Id = id;
     }
 
-    #endregion
 
     #region Overrides
 
@@ -180,9 +173,6 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
     }
 
     #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets the underlying GUID that represents the request ID
     /// </summary>
@@ -193,5 +183,4 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
         private set;
     }
 
-    #endregion
 }

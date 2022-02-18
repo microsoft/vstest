@@ -16,8 +16,6 @@ using Resources;
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public sealed class SettingsNameAttribute : Attribute
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes with the name of the settings.
     /// </summary>
@@ -32,14 +30,9 @@ public sealed class SettingsNameAttribute : Attribute
         SettingsName = settingsName;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// The name of the settings.
     /// </summary>
     public string SettingsName { get; private set; }
 
-    #endregion
 }

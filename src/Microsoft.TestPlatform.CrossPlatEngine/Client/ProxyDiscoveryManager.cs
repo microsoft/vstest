@@ -41,12 +41,10 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     private ITestDiscoveryEventsHandler2 _baseTestDiscoveryEventsHandler;
     private bool _skipDefaultAdapters;
 
-    #region Constructors
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
     /// </summary>
-    /// 
+    ///
     /// <param name="testSessionInfo">The test session info.</param>
     /// <param name="proxyOperationManagerCreator">The proxy operation manager creator.</param>
     public ProxyDiscoveryManager(
@@ -67,7 +65,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
     /// </summary>
-    /// 
+    ///
     /// <param name="requestData">
     /// The request data for providing discovery services and data.
     /// </param>
@@ -88,11 +86,11 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
     /// </summary>
-    /// 
+    ///
     /// <remarks>
     /// Constructor with dependency injection. Used for unit testing.
     /// </remarks>
-    /// 
+    ///
     /// <param name="requestData">
     /// The request data for providing discovery services and data.
     /// </param>
@@ -118,7 +116,6 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         _proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
     }
 
-    #endregion
 
     #region IProxyDiscoveryManager implementation.
 
@@ -195,6 +192,26 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         // Cancel fast, try to stop testhost deployment/launch
         _proxyOperationManager.CancellationTokenSource.Cancel();
         Close();
+    }
+
+    // <inheritdoc/>
+    public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
+    {
+        // Do nothing if the proxy is not initialized yet.
+        if (_proxyOperationManager is null)
+        {
+            return;
+        }
+
+        if (_baseTestDiscoveryEventsHandler is null)
+        {
+            _baseTestDiscoveryEventsHandler = eventHandler;
+        }
+
+        if (_isCommunicationEstablished)
+        {
+            _proxyOperationManager.RequestSender.SendDiscoveryAbort();
+        }
     }
 
     /// <inheritdoc/>

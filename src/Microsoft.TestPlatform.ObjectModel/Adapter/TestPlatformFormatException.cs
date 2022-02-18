@@ -19,8 +19,6 @@ using System.Runtime.Serialization;
 #endif
 public class TestPlatformFormatException : Exception
 {
-    #region Constructors
-
     /// <summary>
     /// Creates a new TestPlatformFormatException
     /// </summary>
@@ -72,8 +70,6 @@ public class TestPlatformFormatException : Exception
     }
 
 #endif
-    #endregion
-
     /// <summary>
     /// Filter expression.
     /// </summary>

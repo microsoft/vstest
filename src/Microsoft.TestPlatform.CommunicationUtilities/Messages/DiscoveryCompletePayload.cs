@@ -33,4 +33,19 @@ public class DiscoveryCompletePayload
     /// Gets or sets the Metrics
     /// </summary>
     public IDictionary<string, object> Metrics { get; set; }
+
+    /// <summary>
+    /// Gets or sets list of sources which were fully discovered.
+    /// </summary>
+    public IList<string> FullyDiscoveredSources { get; set; } = new List<string>();
+
+    /// <summary>
+    /// Gets or sets list of sources which were partially discovered (started discover tests, but then discovery aborted).
+    /// </summary>
+    public IList<string> PartiallyDiscoveredSources { get; set; } = new List<string>();
+
+    /// <summary>
+    /// Gets or sets list of sources which were not discovered at all.
+    /// </summary>
+    public IList<string> NotDiscoveredSources { get; set; } = new List<string>();
 }

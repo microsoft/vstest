@@ -36,8 +36,6 @@ internal class XmlPersistence
     /// </summary>
     public class DuplicateKeyLoadException : Exception
     {
-        #region Constructors
-
         /// <summary>
         /// Initializes the instance
         /// </summary>
@@ -60,10 +58,6 @@ internal class XmlPersistence
             Key = key;
         }
 
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets the key that was a duplicate
         /// </summary>
@@ -73,12 +67,9 @@ internal class XmlPersistence
             private set;
         }
 
-        #endregion
     }
 
     #endregion
-
-    #region Fields
 
     /// <summary>This is how we persist date time except DateTime.MinValue.</summary>
     private const string DateTimePersistenceFormat = "yyyy'-'MM'-'ddTHH':'mm':'ss'.'fffffffzzz";
@@ -109,10 +100,6 @@ internal class XmlPersistence
     private readonly string _namespaceUri;
     private readonly XmlNamespaceManager _xmlNamespaceManager = new(new NameTable());
 
-    #endregion Fields
-
-    #region Constructors
-
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlPersistence"/> class.
     /// </summary>
@@ -140,8 +127,6 @@ internal class XmlPersistence
             _xmlNamespaceManager.AddNamespace(DefaultNamespacePrefixEquivalent, _namespaceUri);
         }
     }
-
-    #endregion Constructors
 
     /// <summary>
     /// Create root element.

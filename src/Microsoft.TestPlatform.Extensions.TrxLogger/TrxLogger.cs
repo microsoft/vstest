@@ -38,8 +38,6 @@ using TrxLoggerResources = Resources.TrxResource;
 [ExtensionUri(TrxLoggerConstants.ExtensionUri)]
 public class TrxLogger : ITestLoggerWithParameters
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TrxLogger"/> class.
     /// </summary>
@@ -57,10 +55,6 @@ public class TrxLogger : ITestLoggerWithParameters
         _converter = new Converter(fileHelper, trxFileHelper);
         _trxFileHelper = trxFileHelper;
     }
-
-    #endregion
-
-    #region Fields
 
     /// <summary>
     /// Cache the TRX file path
@@ -98,7 +92,6 @@ public class TrxLogger : ITestLoggerWithParameters
     /// </summary>
     private string _testResultsDirPath;
 
-    #endregion
 
     #region ITestLogger
 

@@ -13,20 +13,10 @@ using System.Runtime.Serialization;
 [DataContract]
 public sealed class TestHostLaunchedEventArgs : DataCollectionEventArgs
 {
-    #region Private members
-
     /// <summary>
     /// Process id of the test host
     /// </summary>
-    #endregion
-
-    #region Public properties
-
     public int TestHostProcessId { get; }
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestHostLaunchedEventArgs"/> class.
@@ -43,5 +33,4 @@ public sealed class TestHostLaunchedEventArgs : DataCollectionEventArgs
         TestHostProcessId = processId;
     }
 
-    #endregion
 }

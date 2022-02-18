@@ -19,7 +19,6 @@ using Logging;
 /// </summary>
 public interface ITestRuntimeProvider
 {
-    #region events
     /// <summary>
     /// Raised when host is launched successfully
     /// Consumed by TestPlatform to initialize connection b/w test host and test platform
@@ -30,8 +29,6 @@ public interface ITestRuntimeProvider
     /// Raised when host is cleaned up and removes all it's dependencies
     /// </summary>
     event EventHandler<HostProviderEventArgs> HostExited;
-
-    #endregion
 
     /// <summary>
     /// Gets a value indicating whether the test host is specific to a test source. If yes, each test source

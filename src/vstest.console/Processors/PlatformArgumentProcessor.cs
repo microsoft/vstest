@@ -24,14 +24,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class PlatformArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the OutputArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/Platform";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -94,8 +90,6 @@ internal class PlatformArgumentProcessorCapabilities : BaseArgumentProcessorCapa
 /// </summary>
 internal class PlatformArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -104,10 +98,6 @@ internal class PlatformArgumentExecutor : IArgumentExecutor
     private readonly IRunSettingsProvider _runSettingsManager;
 
     public const string RunSettingsPath = "RunConfiguration.TargetPlatform";
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -122,7 +112,6 @@ internal class PlatformArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsManager;
     }
 
-    #endregion
 
     #region IArgumentExecutor
 

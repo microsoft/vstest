@@ -186,9 +186,6 @@ public class ExecutionManager : IExecutionManager
     }
 
     #endregion
-
-    #region private methods
-
     private void LoadExtensions()
     {
         try
@@ -243,5 +240,4 @@ public class ExecutionManager : IExecutionManager
         }
     }
 
-    #endregion
 }
