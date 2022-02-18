@@ -3,16 +3,23 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
+// We don't want this in our shipped code. Build only for debug until I am able to remove it.
+#if DEBUG
+
+#if !NETSTANDARD1_0
 using System;
+#endif
 using System.Collections.Generic;
 
-// TODO: Make this internal, I am just trying to have easier time trying this out.
+#pragma warning disable RS0016 // Add public types and members to the declared API
+#pragma warning disable RS0037 // Enable tracking of nullability of reference types in the declared API
+
 public static class TestServiceLocator
 {
     public static Dictionary<string, object> Instances { get; } = new Dictionary<string, object>();
     public static List<Resolve> Resolves { get; } = new();
 
-    public static void Register<TRegistration>(string name, TRegistration instance)
+    public static void Register<TRegistration>(string name, TRegistration instance) where TRegistration : notnull
     {
         Instances.Add(name, instance);
     }
@@ -53,3 +60,7 @@ public class Resolve
     public string Type { get; }
     public string StackTrace { get; }
 }
+
+#pragma warning restore RS0037 // Enable tracking of nullability of reference types in the declared API
+#pragma warning restore RS0016 // Add public types and members to the declared API
+#endif

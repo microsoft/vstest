@@ -22,29 +22,8 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 using vstest.ProgrammerTests.Fakes;
-
-// exluded from run
-internal class InlineRunSettingsTests
-{
-    public void GivenInlineRunsettingsWhenCallingVstestConsoleThenTheyPropagateToTestHost()
-    {
-        //using Fixture fixture = new();
-        //fixture.VstestConsole
-        //    .WithSource(TestDlls.MSTest1)
-        //    .WithArguments($" -- {RunConfiguration.MaxParallelLevel.InlinePath}=3")
-        //    .Execute();
-
-        //fixture.Processes.Should().HaveCount(1);
-        //var process = fixture.Processes.First();
-        //process.Should().BeAssignableTo<FakeTestHostProcess>();
-        //var testhost = (FakeTestHostProcess)process;
-        //testhost.RunSettings.Should().NotBeNull();
-        //testhost.RunSettings!.MaxParallelLevel.Should().Be(3);
-    }
-}
 
 public class TestDiscoveryTests
 {
@@ -66,7 +45,6 @@ public class TestDiscoveryTests
             .WithBatchSize(10)
             .Build();
         var mstest1Dll = new FakeTestDllFile(@"X:\fake\mstest1.dll", new FrameworkName(".NETCoreApp,Version=v5.0"), Architecture.X64, tests);
-        fakeFileHelper.AddFile(mstest1Dll);
 
         List<FakeMessage> changeMessages = tests.Take(tests.Count - 1).Select(batch =>  // TODO: make the stats agree with the tests below
             new FakeMessage<TestRunChangedEventArgs>(MessageType.TestRunStatsChange,
@@ -91,8 +69,9 @@ public class TestDiscoveryTests
             }),
         };
 
-
-        var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(new FakeCommunicationChannel<object>(responses, fakeErrorAggregator, 1), fakeErrorAggregator);
+        var fakeCommunicationChannel = new FakeCommunicationChannel<object>(responses, fakeErrorAggregator, 1);
+        fakeCommunicationChannel.Start(new object());
+        var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(fakeCommunicationChannel, fakeErrorAggregator);
         TestServiceLocator.Clear();
         TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint.TestHostConnectionInfo.Endpoint, fakeCommunicationEndpoint);
         var fakeTestHostProcess = new FakeProcess(fakeErrorAggregator, @"C:\temp\testhost.exe");
@@ -245,7 +224,6 @@ public class TestDiscoveryTests
         fixture.ExecutedTests.Should().HaveCount(mstest1Dll.TestCount + mstest2Dll.TestCount);
     }
 
-    [Only]
     public async Task GivenMultipleMsTestAssembliesThatUseDifferentTargetFrameworkAndTheSameArchitecture_WhenTestsAreRun_ThenTwoTesthostsAreStartedBothForTheSameTFM()
     {
         // TODO: make vstest.console not start testhosts for incompatible sources.
@@ -281,12 +259,13 @@ public class TestDiscoveryTests
             .WithPath(@"X:\fake\mstest2.dll")
             .WithFramework(KnownFrameworkNames.Net48) // <---
             .WithArchitecture(Architecture.X64)
-            .WithTestCount(1)
+            // In reality, the dll would fail to load, and no tests would run from this dll,
+            // we simulate that by making it have 0 tests.
+            .WithTestCount(0)
             .Build();
 
         var testhost2Process = new FakeProcess(fixture.ErrorAggregator, @"X:\fake\testhost2.exe");
 
-        var container = new List<FakeTestHostFixture>();
         var runTests2 = new FakeTestHostResponsesBuilder()
             .VersionCheck(5)
             .ExecutionInitialize(FakeMessage.NoResponse)
@@ -299,8 +278,6 @@ public class TestDiscoveryTests
             .WithProcess(testhost2Process)
             .WithResponses(runTests2)
             .Build();
-
-        container.Add(testhost2);
 
         fixture.AddTestHostFixtures(testhost1, testhost2);
 
@@ -343,9 +320,7 @@ public class TestDiscoveryTests
         // And we sent netcoreapp1.0 as the target framework, even though it is incompatible
         startWithSources2Text.Should().Contain(KnownFrameworkStrings.Netcoreapp1);
 
-        // In reality, the dll would fail to load, and no tests would run
-        // in our simulation we sent tests back anyway, so we get all tests results
-        fixture.ExecutedTests.Should().HaveCount(mstest1Dll.TestCount + mstest2Dll.TestCount);
+        fixture.ExecutedTests.Should().HaveCount(mstest1Dll.TestCount);
     }
 }
 

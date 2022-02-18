@@ -63,16 +63,14 @@ internal class FakeTestHostResponsesBuilder
 
     internal FakeTestHostResponsesBuilder StartTestExecutionWithSources(List<List<TestResult>> testResultBatches!!)
     {
-        var tests = testResultBatches;
-
         List<FakeMessage> messages;
-        if (testResultBatches.Count == 0)
+        if (testResultBatches.Count != 0)
         {
             // this will create as many test stats changes messages, as there are batches -1
             // the last batch will be sent as test run complete event
 
             // TODO: make the stats agree with the tests below
-            List<FakeMessage> changeMessages = tests.Take(tests.Count - 1).Select(batch =>
+            List<FakeMessage> changeMessages = testResultBatches.Take(testResultBatches.Count - 1).Select(batch =>
                 new FakeMessage<TestRunChangedEventArgs>(MessageType.TestRunStatsChange,
                       new TestRunChangedEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = batch.Count }), batch, new List<TestCase>())
                      )).ToList<FakeMessage>();
@@ -82,7 +80,7 @@ internal class FakeTestHostResponsesBuilder
             {
                 // TODO: make the stats agree with the tests below
                 TestRunCompleteArgs = new TestRunCompleteEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = 1 }), false, false, null, new System.Collections.ObjectModel.Collection<AttachmentSet>(), TimeSpan.Zero),
-                LastRunTests = new TestRunChangedEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = 1 }), tests.Last(), new List<TestCase>()),
+                LastRunTests = new TestRunChangedEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = 1 }), testResultBatches.Last(), new List<TestCase>()),
             });
             messages = changeMessages.Concat(new[] { completedMessage }).ToList();
         }
@@ -90,9 +88,8 @@ internal class FakeTestHostResponsesBuilder
         {
             var completedMessage = new FakeMessage<TestRunCompletePayload>(MessageType.ExecutionComplete, new TestRunCompletePayload
             {
-                // TODO: make the stats agree with the tests below
                 TestRunCompleteArgs = new TestRunCompleteEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = 0 }), false, false, null, new System.Collections.ObjectModel.Collection<AttachmentSet>(), TimeSpan.Zero),
-                LastRunTests = new TestRunChangedEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = 0 }), tests.Last(), new List<TestCase>()),
+                LastRunTests = new TestRunChangedEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = 0 }), new List<TestResult>(), new List<TestCase>()),
             });
 
             messages = completedMessage.AsList<FakeMessage>();
