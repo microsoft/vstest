@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -21,9 +19,9 @@ internal class TestSessionCorrelationIdProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/TestSessionCorrelationId";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
 
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -76,7 +74,7 @@ internal class TestSessionCorrelationIdProcessorCapabilities : BaseArgumentProce
     public override HelpContentPriority HelpPriority => HelpContentPriority.None;
 
     // We want to be sure that this command won't show in user help
-    public override string HelpContentResourceName => null;
+    public override string? HelpContentResourceName => null;
 }
 
 /// <summary>
@@ -86,12 +84,12 @@ internal class TestSessionCorrelationIdProcessorModeProcessorExecutor : IArgumen
 {
     private readonly CommandLineOptions _commandLineOptions;
 
-    public TestSessionCorrelationIdProcessorModeProcessorExecutor(CommandLineOptions options)
+    public TestSessionCorrelationIdProcessorModeProcessorExecutor(CommandLineOptions options!!)
     {
-        _commandLineOptions = options ?? throw new ArgumentNullException(nameof(options));
+        _commandLineOptions = options;
     }
 
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
         if (string.IsNullOrEmpty(argument))
         {

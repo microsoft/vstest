@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using System;
@@ -23,9 +21,9 @@ internal class ArtifactProcessingPostProcessModeProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/ArtifactsProcessingMode-PostProcess";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
 
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -65,7 +63,7 @@ internal class ArtifactProcessingPostProcessModeProcessor : IArgumentProcessor
         }
     }
 
-    public static bool ContainsPostProcessCommand(string[] args, IFeatureFlag featureFlag = null)
+    public static bool ContainsPostProcessCommand(string[]? args, IFeatureFlag? featureFlag = null)
         => (featureFlag ?? FeatureFlag.Instance).IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING) &&
             (args?.Contains("--artifactsProcessingMode-postprocess", StringComparer.OrdinalIgnoreCase) == true ||
             args?.Contains(CommandName, StringComparer.OrdinalIgnoreCase) == true);
@@ -82,7 +80,7 @@ internal class ArtifactProcessingPostProcessModeProcessorCapabilities : BaseArgu
     public override HelpContentPriority HelpPriority => HelpContentPriority.None;
 
     // We want to be sure that this command won't show in user help
-    public override string HelpContentResourceName => null;
+    public override string? HelpContentResourceName => null;
 
     public override bool IsAction => true;
 }
@@ -95,13 +93,13 @@ internal class ArtifactProcessingPostProcessModeProcessorExecutor : IArgumentExe
     private readonly CommandLineOptions _commandLineOptions;
     private readonly IArtifactProcessingManager _artifactProcessingManage;
 
-    public ArtifactProcessingPostProcessModeProcessorExecutor(CommandLineOptions options, IArtifactProcessingManager artifactProcessingManager)
+    public ArtifactProcessingPostProcessModeProcessorExecutor(CommandLineOptions options!!, IArtifactProcessingManager artifactProcessingManager!!)
     {
-        _commandLineOptions = options ?? throw new ArgumentNullException(nameof(options));
-        _artifactProcessingManage = artifactProcessingManager ?? throw new ArgumentNullException(nameof(artifactProcessingManager)); ;
+        _commandLineOptions = options;
+        _artifactProcessingManage = artifactProcessingManager; ;
     }
 
-    public void Initialize(string argument)
+    public void Initialize(string? _)
     {
         _commandLineOptions.ArtifactProcessingMode = ArtifactProcessingMode.PostProcess;
         EqtTrace.Verbose($"ArtifactProcessingPostProcessModeProcessorExecutor.Initialize: ArtifactProcessingMode.PostProcess");
