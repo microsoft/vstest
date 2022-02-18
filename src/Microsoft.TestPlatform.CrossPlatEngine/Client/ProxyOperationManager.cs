@@ -416,7 +416,7 @@ public class ProxyOperationManager
         var properties = TestHostManager.GetType().GetRuntimeProperties();
 
         // The field is actually defaulting to true, so this is just a complicated way to set or not set
-        // this to true (modern testhosts shoul have it set to true). Bad thing about this is that we are checking
+        // this to true (modern testhosts should have it set to true). Bad thing about this is that we are checking
         // internal "undocumented" property. Good thing is that if you don't implement it you get the modern behavior.
         var versionCheckProperty = properties.FirstOrDefault(p => string.Equals(p.Name, _versionCheckPropertyName, StringComparison.OrdinalIgnoreCase));
         if (versionCheckProperty != null)

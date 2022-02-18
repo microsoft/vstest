@@ -22,7 +22,7 @@ public class Runner
                 {
                     var ms = t.GetMethods().SkipExcluded();
 
-                    // This chooses the Only tests only for single assembly and single class,
+                    // TODO: This chooses the Only tests only for single assembly and single class,
                     // to support this full we would have to enumerate all classes and methods first,
                     // it is easy, I just don't need it right now.
                     var only = ms.Where(m => m.GetCustomAttribute<OnlyAttribute>() != null).ToList();

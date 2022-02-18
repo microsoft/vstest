@@ -359,7 +359,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     /// <inheritdoc/>
     public void HandleRawMessage(string rawMessage)
     {
-        // TODO: perf - why do we have to deserialize the messages here only to read that this is
+        // TODO: PERF: - why do we have to deserialize the messages here only to read that this is
         // execution complete? Why can't we act on it somewhere else where the result of deserialization is not
         // thrown away?
         var message = _dataSerializer.DeserializeMessage(rawMessage);

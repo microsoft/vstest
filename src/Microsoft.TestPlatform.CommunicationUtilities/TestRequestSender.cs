@@ -29,8 +29,6 @@ using ObjectModelConstants = TestPlatform.ObjectModel.Constants;
 public class TestRequestSender : ITestRequestSender
 {
     // Time to wait for test host exit
-    // DONOTMERGE: this was 10s, I made it 1 second, because it makes my tests pass faster when I get in error state
-    // REVIEW: this was 10s, I made it 1 seconds
     private const int ClientProcessExitWaitTimeout = 10 * 1000;
 
     private readonly IDataSerializer _dataSerializer;
@@ -105,8 +103,6 @@ public class TestRequestSender : ITestRequestSender
 
         // TODO: In various places TestRequest sender is instantiated, and we can't easily inject the factory, so this is last
         // resort of getting the dependency into the execution flow.
-        // TODO: I am not sure if we need multiple instances of ICommunicationEndpoint, in that case we should register
-        // and resolve Func<ICommunicationEndPoint> and invoke that.
         _communicationEndpoint = communicationEndPoint
 #if DEBUG
             ?? TestServiceLocator.Get<ICommunicationEndPoint>(connectionInfo.Endpoint)
@@ -174,7 +170,7 @@ public class TestRequestSender : ITestRequestSender
         // Server start returns the listener port
         // return int.Parse(this.communicationServer.Start());
         var endpoint = _communicationEndpoint.Start(_connectionInfo.Endpoint);
-        // TODO: This is forcing us to use ip and port for communication
+        // TODO: This is forcing us to use IP address and port for communication
         return endpoint.GetIpEndPoint().Port;
     }
 
@@ -656,7 +652,7 @@ public class TestRequestSender : ITestRequestSender
             EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Client has disconnected. Wait for standard error.");
 
             // Wait for test host to exit for a moment
-            // TODO: this timeout is 10 seconds, make it also configurable like the other famous 
+            // TODO: this timeout is 10 seconds, make it also configurable like the other famous timeout that is 100ms
             if (_clientExited.Wait(_clientExitedWaitTime))
             {
                 // Set a default message of test host process exited and additionally specify the error if we were able to get it

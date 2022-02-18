@@ -160,7 +160,6 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
         // the .Instance. This is a very complicated way of solving the circular dependency,
         // and should be replaced by adding a property to Message and assigning it.
         // .Instance can then be removed.
-
         if (Instance == null)
         {
             lock (SyncObject)
