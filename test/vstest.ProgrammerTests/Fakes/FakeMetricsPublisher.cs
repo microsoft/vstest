@@ -4,7 +4,7 @@
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
 
 #pragma warning disable IDE1006 // Naming Styles
-namespace vstest.ProgrammerTests.CommandLine.Fakes;
+namespace vstest.ProgrammerTests.Fakes;
 
 internal class FakeMetricsPublisher : IMetricsPublisher
 {

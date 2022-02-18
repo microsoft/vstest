@@ -3,7 +3,8 @@
 
 
 #pragma warning disable IDE1006 // Naming Styles
-namespace vstest.ProgrammerTests.CommandLine.Fakes;
+
+namespace vstest.ProgrammerTests.Fakes;
 
 // TODO: was used in first test but is not correct design
 //internal class FakeTestHostProcess : FakeProcess

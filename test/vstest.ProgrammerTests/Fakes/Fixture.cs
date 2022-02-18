@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace vstest.ProgrammerTests.CommandLine;
+namespace vstest.ProgrammerTests.Fakes;
 
 using FluentAssertions;
 
@@ -14,8 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-
-using vstest.ProgrammerTests.CommandLine.Fakes;
 
 internal class Fixture : IDisposable
 {
@@ -55,7 +53,7 @@ internal class Fixture : IDisposable
 
     }
 
-    internal void AddTestHostFixtures(params FakeTestFixtureHost[] testhosts)
+    internal void AddTestHostFixtures(params FakeTestHostFixture[] testhosts)
     {
         var providers = testhosts.Select(t => t.FakeTestRuntimeProvider).ToArray();
         TestRuntimeProviderManager.AddTestRuntimeProviders(providers);

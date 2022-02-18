@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace vstest.ProgrammerTests.CommandLine;
+namespace vstest.ProgrammerTests;
 
 using System.Diagnostics;
 using System.Runtime.Versioning;
@@ -24,7 +24,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-using vstest.ProgrammerTests.CommandLine.Fakes;
 using vstest.ProgrammerTests.Fakes;
 
 // exluded from run
@@ -80,22 +79,20 @@ public class TestDiscoveryTests
             LastRunTests = new TestRunChangedEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long> { [TestOutcome.Passed] = 1 }), tests.Last(), new List<TestCase>()),
         });
         List<FakeMessage> messages = changeMessages.Concat(new[] { completedMessage }).ToList();
-        var responses = new List<RequestResponsePair<string, FakeMessage>> {
-        new RequestResponsePair<string, FakeMessage>(MessageType.VersionCheck, new FakeMessage<int>(MessageType.VersionCheck, 5)),
-        new RequestResponsePair<string, FakeMessage>(MessageType.ExecutionInitialize, FakeMessage.NoResponse),
-        new RequestResponsePair<string, FakeMessage>(MessageType.StartTestExecutionWithSources, messages),
-        new RequestResponsePair<string, FakeMessage>(MessageType.SessionEnd, message =>
+        var responses = new List<RequestResponsePair<string, FakeMessage, object>> {
+        new RequestResponsePair<string, FakeMessage, object>(MessageType.VersionCheck, new FakeMessage<int>(MessageType.VersionCheck, 5)),
+        new RequestResponsePair<string, FakeMessage, object>(MessageType.ExecutionInitialize, FakeMessage.NoResponse),
+        new RequestResponsePair<string, FakeMessage, object>(MessageType.StartTestExecutionWithSources, messages, false),
+        new RequestResponsePair<string, FakeMessage, object>(MessageType.SessionEnd, new [] { FakeMessage.NoResponse }, message =>
             {
                 // TODO: how do we associate this to the correct process?
                 var fp = fakeProcessHelper.Processes.Last();
                 fakeProcessHelper.TerminateProcess(fp);
-
-                return new List<FakeMessage> { FakeMessage.NoResponse };
             }),
         };
 
 
-        var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(new FakeCommunicationChannel(responses, fakeErrorAggregator, 1), fakeErrorAggregator);
+        var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(new FakeCommunicationChannel<object>(responses, fakeErrorAggregator, 1), fakeErrorAggregator);
         TestServiceLocator.Clear();
         TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint.TestHostConnectionInfo.Endpoint, fakeCommunicationEndpoint);
         var fakeTestHostProcess = new FakeProcess(fakeErrorAggregator, @"C:\temp\testhost.exe");
@@ -186,14 +183,14 @@ public class TestDiscoveryTests
 
         var mstest1Dll = new FakeTestDllBuilder()
             .WithPath(@"X:\fake\mstest1.dll")
-            .WithFramework(KnownFramework.Net5)
+            .WithFramework(KnownFrameworkNames.Net5)
             .WithArchitecture(Architecture.X64)
             .WithTestCount(108, 10)
             .Build();
 
         var testhost1Process = new FakeProcess(fixture.ErrorAggregator, @"X:\fake\testhost1.exe");
 
-        var runTests1 = new FakeMessagesBuilder()
+        var runTests1 = new FakeTestHostResponsesBuilder()
             .VersionCheck(5)
             .ExecutionInitialize(FakeMessage.NoResponse)
             .StartTestExecutionWithSources(mstest1Dll.TestResultBatches)
@@ -208,14 +205,14 @@ public class TestDiscoveryTests
 
         var mstest2Dll = new FakeTestDllBuilder()
             .WithPath(@"X:\fake\mstest2.dll")
-            .WithFramework(KnownFramework.Net5)
+            .WithFramework(KnownFrameworkNames.Net5)
             .WithArchitecture(Architecture.X64)
             .WithTestCount(50, 8)
             .Build();
 
         var testhost2Process = new FakeProcess(fixture.ErrorAggregator, @"X:\fake\testhost2.exe");
 
-        var runTests2 = new FakeMessagesBuilder()
+        var runTests2 = new FakeTestHostResponsesBuilder()
             .VersionCheck(5)
             .ExecutionInitialize(FakeMessage.NoResponse)
             .StartTestExecutionWithSources(mstest2Dll.TestResultBatches)
@@ -258,18 +255,18 @@ public class TestDiscoveryTests
 
         var mstest1Dll = new FakeTestDllBuilder()
             .WithPath(@"X:\fake\mstest1.dll")
-            .WithFramework(KnownFramework.Net5) // <---
+            .WithFramework(KnownFrameworkNames.Net5) // <---
             .WithArchitecture(Architecture.X64)
             .WithTestCount(2)
             .Build();
 
         var testhost1Process = new FakeProcess(fixture.ErrorAggregator, @"X:\fake\testhost1.exe");
 
-        var runTests1 = new FakeMessagesBuilder()
+        var runTests1 = new FakeTestHostResponsesBuilder()
             .VersionCheck(5)
             .ExecutionInitialize(FakeMessage.NoResponse)
             .StartTestExecutionWithSources(mstest1Dll.TestResultBatches)
-            .SessionEnd(FakeMessage.NoResponse, _ => testhost1Process.Exit())
+            .SessionEnd(FakeMessage.NoResponse, afterAction: _ => testhost1Process.Exit())
             .Build();
 
         var testhost1 = new FakeTestHostFixtureBuilder(fixture)
@@ -282,17 +279,17 @@ public class TestDiscoveryTests
 
         var mstest2Dll = new FakeTestDllBuilder()
             .WithPath(@"X:\fake\mstest2.dll")
-            .WithFramework(KnownFramework.Net48) // <---
+            .WithFramework(KnownFrameworkNames.Net48) // <---
             .WithArchitecture(Architecture.X64)
             .WithTestCount(1)
             .Build();
 
         var testhost2Process = new FakeProcess(fixture.ErrorAggregator, @"X:\fake\testhost2.exe");
 
-        var runTests2 = new FakeMessagesBuilder()
+        var container = new List<FakeTestHostFixture>();
+        var runTests2 = new FakeTestHostResponsesBuilder()
             .VersionCheck(5)
             .ExecutionInitialize(FakeMessage.NoResponse)
-            // .StartTestExecutionWithSources(new FakeMessage<TestMessagePayload>(MessageType.TestMessage, new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = "Loading type failed." }), _ => testhost2Process.Exit())
             .StartTestExecutionWithSources(mstest2Dll.TestResultBatches)
             .SessionEnd(FakeMessage.NoResponse, _ => testhost2Process.Exit())
             .Build();
@@ -303,6 +300,8 @@ public class TestDiscoveryTests
             .WithResponses(runTests2)
             .Build();
 
+        container.Add(testhost2);
+
         fixture.AddTestHostFixtures(testhost1, testhost2);
 
         var testRequestManager = fixture.BuildTestRequestManager();
@@ -310,7 +309,9 @@ public class TestDiscoveryTests
         mstest1Dll.FrameworkName.Should().NotBe(mstest2Dll.FrameworkName);
 
         // -- act
-        var runConfiguration = new Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration { TestSessionTimeout = 40_000 }.ToXml().OuterXml;
+        // TODO: Building whole default runconfiguration is needed here, because TestRequestManager does not ensure the basic settings are populated,
+        // and all methods that populate them just silently fail, so TestHostProvider does not get any useful settings.
+        var runConfiguration = new RunConfiguration().ToXml().OuterXml;
         var testRunRequestPayload = new TestRunRequestPayload
         {
             Sources = new List<string> { mstest1Dll.Path, mstest2Dll.Path },
@@ -329,14 +330,14 @@ public class TestDiscoveryTests
         // We sent mstest1.dll
         startWithSources1Text.Should().Contain("mstest1.dll");
         // And we sent netcoreapp1.0 as the target framework
-        startWithSources1Text.Should().Contain(KnownFramework.Netcoreapp1.ToString());
+        startWithSources1Text.Should().Contain(KnownFrameworkStrings.Netcoreapp1);
 
         var startWithSources2 = testhost2.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
         var startWithSources2Text = startWithSources2.Request.Payload.Select(t => t.ToString()).JoinBySpace();
         // We sent mstest2.dll
         startWithSources2Text.Should().Contain("mstest2.dll");
         // And we sent netcoreapp1.0 as the target framework, even though it is incompatible
-        startWithSources2Text.Should().Contain(KnownFramework.Netcoreapp1.ToString());
+        startWithSources2Text.Should().Contain(KnownFrameworkStrings.Netcoreapp1);
 
         // In reality, the dll would fail to load, and no tests would run
         // in our simulation we sent tests back anyway, so we get all tests results
@@ -348,3 +349,6 @@ public class TestDiscoveryTests
 // TODO: passing null runsettings does not fail fast, instead it fails in Fakes settings code
 // TODO: passing empty string fails in the xml parser code
 // TODO: passing null sources and null testcases does not fail fast
+
+            // TODO: Just calling Exit, Close won't stop the run, we will keep waiting for test run to complete, I think in real life when we exit then Disconnected will be called on the vstest.console side, leading to abort flow.
+            //.StartTestExecutionWithSources(new FakeMessage<TestMessagePayload>(MessageType.TestMessage, new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = "Loading type failed." }), afterAction: f => { /*f.Process.Exit();*/ f.FakeCommunicationEndpoint.Disconnect(); })

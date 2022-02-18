@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 #pragma warning disable IDE1006 // Naming Styles
-namespace vstest.ProgrammerTests.CommandLine.Fakes;
+namespace vstest.ProgrammerTests.Fakes;
 
 internal class FakeDataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachmentsProcessorsFactory
 {

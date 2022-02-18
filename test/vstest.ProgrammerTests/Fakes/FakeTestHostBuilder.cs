@@ -1,28 +1,25 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace vstest.ProgrammerTests.CommandLine;
+namespace vstest.ProgrammerTests.Fakes;
 
 using System;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-using vstest.ProgrammerTests.CommandLine.Fakes;
-using vstest.ProgrammerTests.Fakes;
-
 internal class FakeTestHostFixtureBuilder
 {
     // This will be also used as a port number, don't start from 0
     // it skips some paths in the real code, because port 0 has special meaning.
-    private static readonly Id Id = new(1000);
+    private static readonly SequentialId Id = new(1000);
 
     private readonly Fixture _fixture;
 
     // TODO: this would correctly be any test holding container, but let's not get ahead of myself.
     private readonly List<FakeTestDllFile> _dlls = new();
     private FakeProcess? _process;
-    private List<RequestResponsePair<string, FakeMessage>>? _responses;
+    private List<RequestResponsePair<string, FakeMessage, FakeTestHostFixture>>? _responses;
 
     public FakeTestHostFixtureBuilder(Fixture fixture)
     {
@@ -35,7 +32,7 @@ internal class FakeTestHostFixtureBuilder
         return this;
     }
 
-    internal FakeTestFixtureHost Build()
+    internal FakeTestHostFixture Build()
     {
 
         if (_responses == null)
@@ -45,7 +42,7 @@ internal class FakeTestHostFixtureBuilder
             throw new InvalidOperationException("Add some process to the testhost by using WithProcess.");
 
         var id = Id.Next();
-        var fakeCommunicationChannel = new FakeCommunicationChannel(_responses, _fixture.ErrorAggregator, id);
+        var fakeCommunicationChannel = new FakeCommunicationChannel<FakeTestHostFixture>(_responses, _fixture.ErrorAggregator, id);
         var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(fakeCommunicationChannel, _fixture.ErrorAggregator);
         var fakeTestRuntimeProvider = new FakeTestRuntimeProvider(_fixture.ProcessHelper, _process, _fixture.FileHelper, _dlls, fakeCommunicationEndpoint, _fixture.ErrorAggregator);
 
@@ -53,7 +50,7 @@ internal class FakeTestHostFixtureBuilder
         // testhost connection info, and is used as port in 127.0.0.1:<id>, address so we can lookup the correct channel.
         TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint.TestHostConnectionInfo.Endpoint, fakeCommunicationEndpoint);
 
-        return new FakeTestFixtureHost(_fixture, id, _dlls, fakeTestRuntimeProvider, fakeCommunicationEndpoint, fakeCommunicationChannel, _process, _responses);
+        return new FakeTestHostFixture(id, _dlls, fakeTestRuntimeProvider, fakeCommunicationEndpoint, fakeCommunicationChannel, _process, _responses);
     }
 
     internal FakeTestHostFixtureBuilder WithProcess(FakeProcess process)
@@ -62,7 +59,7 @@ internal class FakeTestHostFixtureBuilder
         return this;
     }
 
-    internal FakeTestHostFixtureBuilder WithResponses(List<RequestResponsePair<string, FakeMessage>> responses)
+    internal FakeTestHostFixtureBuilder WithResponses(List<RequestResponsePair<string, FakeMessage, FakeTestHostFixture>> responses)
     {
         _responses = responses;
         return this;

@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
 #pragma warning disable IDE1006 // Naming Styles
-namespace vstest.ProgrammerTests.CommandLine.Fakes;
+namespace vstest.ProgrammerTests.Fakes;
 
 internal class FakeTestHostLauncher : ITestHostLauncher
 {

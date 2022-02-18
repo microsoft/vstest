@@ -1,13 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace vstest.ProgrammerTests.CommandLine;
+namespace vstest.ProgrammerTests.Fakes;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-
-using vstest.ProgrammerTests.Fakes;
 
 internal class FakeCommunicationEndpoint : ICommunicationEndPoint
 {
@@ -28,6 +26,19 @@ internal class FakeCommunicationEndpoint : ICommunicationEndPoint
     public FakeErrorAggregator FakeErrorAggregator { get; }
     public FakeCommunicationChannel Channel { get; }
     public TestHostConnectionInfo TestHostConnectionInfo { get; }
+
+    /// <summary>
+    /// Notify the caller that we disconnected, this happens if process exits unexpectedly and leads to abort flow.
+    /// In success case use Stop instead, to just "close" the channel, because the other side already disconnected from us
+    /// and told us to tear down.
+    /// </summary>
+    public void Disconnect()
+    {
+        Disconnected?.Invoke(this, new DisconnectedEventArgs());
+        _stopped = true;
+    }
+
+    #region ICommunicationEndPoint
 
     public event EventHandler<ConnectedEventArgs>? Connected;
     public event EventHandler<DisconnectedEventArgs>? Disconnected;
@@ -55,12 +66,6 @@ internal class FakeCommunicationEndpoint : ICommunicationEndPoint
         return endPoint;
     }
 
-    public void Abort()
-    {
-        Disconnected?.Invoke(this, new DisconnectedEventArgs());
-        _stopped = true;
-    }
-
     public void Stop()
     {
         if (!_stopped)
@@ -69,4 +74,6 @@ internal class FakeCommunicationEndpoint : ICommunicationEndPoint
             _stopped = true;
         }
     }
+
+    #endregion
 }

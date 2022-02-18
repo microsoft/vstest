@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace vstest.ProgrammerTests.CommandLine;
+namespace vstest.ProgrammerTests.Fakes;
 
 using System;
 using System.Runtime.Versioning;
@@ -11,7 +11,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 internal class FakeTestDllBuilder
 {
     private string _path = @$"X:\fake\mstest_{Guid.NewGuid()}.dll";
-    private FrameworkName _framework = KnownFramework.Net5;
+    private FrameworkName _framework = KnownFrameworkNames.Net5;
     private Architecture _architecture = Architecture.X64;
     private List<List<TestResult>>? _testBatches;
 

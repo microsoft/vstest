@@ -1,9 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace vstest.ProgrammerTests.CommandLine;
-
-using System.Runtime.CompilerServices;
+namespace vstest.ProgrammerTests.Fakes;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -12,6 +10,7 @@ internal class FakeTestBatchBuilder
     public int TotalCount { get; private set; }
     public TimeSpan Duration { get; private set; }
     public int BatchSize { get; private set; }
+    public static List<List<TestResult>> Empty => new();
 
     public FakeTestBatchBuilder()
     {
@@ -48,17 +47,18 @@ internal class FakeTestBatchBuilder
 
     internal List<List<TestResult>> Build()
     {
-        if (TotalCount == 0 || BatchSize == 0)
-            throw new InvalidOperationException("There must be at least one batch with at least one test.");
+        if (BatchSize == 0 && TotalCount != 0)
+            throw new InvalidOperationException("Batch size cannot be 0, unless TotalCount is also 0. Splitting non-zero amount of tests into 0 sized batches does not make sense.");
+
+        if (TotalCount == 0)
+            return Empty;
 
         var numberOfBatches = Math.DivRem(TotalCount, BatchSize, out int remainder);
 
         // TODO: Add adapter uri, and dll name
         // TODO: set duration
-        var batches =
-            Enumerable.Range(0, numberOfBatches)
-            .Select(batchNumber =>
-                Enumerable.Range(0, BatchSize)
+        var batches = Enumerable.Range(0, numberOfBatches)
+            .Select(batchNumber => Enumerable.Range(0, BatchSize)
                 .Select((index) => new TestResult(new TestCase($"Test{batchNumber}-{index}", new Uri("some://uri"), "DummySourceFileName"))).ToList()).ToList();
 
         if (remainder > 0)

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace vstest.ProgrammerTests.CommandLine;
+namespace vstest.ProgrammerTests.Fakes;
 
 using System.Diagnostics;
 
@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 internal class TestRequestManagerTestHelper
 {
     private readonly FakeErrorAggregator _errorAggregator;
-    private TestRequestManager _testRequestManager;
+    private readonly TestRequestManager _testRequestManager;
     private readonly DebugOptions _debugOptions;
 
     public TestRequestManagerTestHelper(FakeErrorAggregator errorAggregator, TestRequestManager testRequestManager, DebugOptions debugOptions)

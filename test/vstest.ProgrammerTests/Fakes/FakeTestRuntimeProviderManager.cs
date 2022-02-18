@@ -2,7 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #pragma warning disable IDE1006 // Naming Styles
-namespace vstest.ProgrammerTests.CommandLine.Fakes;
+
+namespace vstest.ProgrammerTests.Fakes;
 
 using System.Collections.Concurrent;
 
@@ -34,7 +35,7 @@ internal class FakeTestRuntimeProviderManager : ITestRuntimeProviderManager
 
     public ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration)
     {
-      
+
 
         if (!TestRuntimeProviders.TryDequeue(out var next))
         {
