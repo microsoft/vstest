@@ -42,6 +42,12 @@ public class TestEngine : ITestEngine
     {
     }
 
+    protected internal TestEngine(
+        TestRuntimeProviderManager testHostProviderManager,
+        IProcessHelper processHelper) : this((ITestRuntimeProviderManager) testHostProviderManager, processHelper)
+    {
+    }
+
     internal TestEngine(
         ITestRuntimeProviderManager testHostProviderManager,
         IProcessHelper processHelper)

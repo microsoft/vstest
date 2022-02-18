@@ -20,7 +20,7 @@ internal class TestRunResultAggregator
     /// Initializes the TestRunResultAggregator
     /// </summary>
     /// <remarks>Constructor is private since the factory method should be used to get the instance.</remarks>
-    internal TestRunResultAggregator()
+    protected internal TestRunResultAggregator()
     {
         // Outcome is passed until we see a failure.
         Outcome = TestOutcome.Passed;

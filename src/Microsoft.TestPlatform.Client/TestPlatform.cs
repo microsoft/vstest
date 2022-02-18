@@ -66,7 +66,7 @@ internal class TestPlatform : ITestPlatform
     /// <param name="testEngine">The test engine.</param>
     /// <param name="filehelper">The file helper.</param>
     /// <param name="testHostProviderManager">The data.</param>
-    internal TestPlatform(
+    protected internal TestPlatform(
         ITestEngine testEngine,
         IFileHelper filehelper,
         ITestRuntimeProviderManager testHostProviderManager)
