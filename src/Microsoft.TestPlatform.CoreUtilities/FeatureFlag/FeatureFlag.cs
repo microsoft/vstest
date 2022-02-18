@@ -14,7 +14,7 @@ internal partial class FeatureFlag : IFeatureFlag
 
     private const string Prefix = "VSTEST_FEATURE_";
 
-    public static IFeatureFlag Instance => new FeatureFlag();
+    public static IFeatureFlag Instance { get; } = new FeatureFlag();
 
     static FeatureFlag()
     {
