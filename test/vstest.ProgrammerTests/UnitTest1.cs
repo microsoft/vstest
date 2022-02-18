@@ -323,6 +323,10 @@ public class TestDiscoveryTests
 
         // -- assert
         fixture.AssertNoErrors();
+        // We unify the frameworks to netcoreapp1.0 (because the vstest.console dll we are loading is built for netcoreapp and prefers netcoreapp), and because the
+        // behavior is to choose the common oldest framework. We then log warning about incompatible sources.
+        fixture.TestRunEventsRegistrar.LoggedWarnings.Should().ContainMatch($"Test run detected DLL(s) which were built for different framework and platform versions*{KnownFrameworkNames.Netcoreapp1}*");
+
         // We started both testhosts, even thought we know one of them is incompatible.
         fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
         var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
@@ -349,6 +353,5 @@ public class TestDiscoveryTests
 // TODO: passing null runsettings does not fail fast, instead it fails in Fakes settings code
 // TODO: passing empty string fails in the xml parser code
 // TODO: passing null sources and null testcases does not fail fast
-
-            // TODO: Just calling Exit, Close won't stop the run, we will keep waiting for test run to complete, I think in real life when we exit then Disconnected will be called on the vstest.console side, leading to abort flow.
-            //.StartTestExecutionWithSources(new FakeMessage<TestMessagePayload>(MessageType.TestMessage, new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = "Loading type failed." }), afterAction: f => { /*f.Process.Exit();*/ f.FakeCommunicationEndpoint.Disconnect(); })
+// TODO: Just calling Exit, Close won't stop the run, we will keep waiting for test run to complete, I think in real life when we exit then Disconnected will be called on the vstest.console side, leading to abort flow.
+//.StartTestExecutionWithSources(new FakeMessage<TestMessagePayload>(MessageType.TestMessage, new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = "Loading type failed." }), afterAction: f => { /*f.Process.Exit();*/ f.FakeCommunicationEndpoint.Disconnect(); })
