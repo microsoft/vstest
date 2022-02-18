@@ -212,6 +212,11 @@ public class RunConfiguration : TestRunSettings
     }
 
     /// <summary>
+    /// Gets or sets the test adapter loading strategy.
+    /// </summary>
+    internal TestAdapterLoadingStrategy TestAdapterLoadingStrategy { get; set; }
+
+    /// <summary>
     /// Gets a value indicating whether parallelism needs to be disabled by the adapters.
     /// </summary>
     public bool DisableParallelization
@@ -323,11 +328,7 @@ public class RunConfiguration : TestRunSettings
     /// Gets or sets the execution thread apartment state.
     /// </summary>
     [CLSCompliant(false)]
-    public PlatformApartmentState ExecutionThreadApartmentState
-    {
-        get;
-        set;
-    }
+    public PlatformApartmentState ExecutionThreadApartmentState { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to treat the errors from test adapters as warnings.
@@ -499,6 +500,13 @@ public class RunConfiguration : TestRunSettings
             XmlElement testAdaptersPaths = doc.CreateElement("TestAdaptersPaths");
             testAdaptersPaths.InnerXml = TestAdaptersPaths;
             root.AppendChild(testAdaptersPaths);
+        }
+
+        if (this.TestAdapterLoadingStrategy != TestAdapterLoadingStrategy.Default) 
+        {
+            XmlElement adapterLoadingStrategy = doc.CreateElement("TestAdapterLoadingStrategy");
+            adapterLoadingStrategy.InnerXml = this.TestAdapterLoadingStrategy.ToString();
+            root.AppendChild(adapterLoadingStrategy);
         }
 
         XmlElement treatTestAdapterErrorsAsWarnings = doc.CreateElement("TreatTestAdapterErrorsAsWarnings");
@@ -759,6 +767,21 @@ public class RunConfiguration : TestRunSettings
                     case "TestAdaptersPaths":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                         runConfiguration.TestAdaptersPaths = reader.ReadElementContentAsString();
+                        break;
+
+                    case "TestAdapterLoadingStrategy":
+                        XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                        value = reader.ReadElementContentAsString();
+                        if (Enum.TryParse<TestAdapterLoadingStrategy>(value, out var loadingStrategy)) 
+                        {
+                            runConfiguration.TestAdapterLoadingStrategy = loadingStrategy;
+                        }
+                        else 
+                        {
+                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
+                        }
+
                         break;
 
                     case "TreatTestAdapterErrorsAsWarnings":

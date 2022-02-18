@@ -53,7 +53,7 @@ internal class TestLoggerExtensionManager : TestExtensionManager<ITestLogger, IT
     public static TestLoggerExtensionManager Create(IMessageLogger messageLogger)
     {
 
-        TestPluginManager.Instance.GetSpecificTestExtensions<TestLoggerPluginInformation, ITestLogger, ITestLoggerCapabilities, TestLoggerMetadata>(
+        TestPluginManager.GetSpecificTestExtensions<TestLoggerPluginInformation, ITestLogger, ITestLoggerCapabilities, TestLoggerMetadata>(
             TestPlatformConstants.TestLoggerEndsWithPattern,
             out IEnumerable<LazyExtension<ITestLogger, Dictionary<string, object>>> unfilteredTestExtensions,
             out IEnumerable<LazyExtension<ITestLogger, ITestLoggerCapabilities>> filteredTestExtensions);

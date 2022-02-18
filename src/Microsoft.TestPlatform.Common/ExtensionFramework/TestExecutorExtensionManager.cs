@@ -107,15 +107,13 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
                 {
 
                     // Get all extensions for ITestExecutor.
-                    TestPluginManager.Instance
-                        .GetSpecificTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
+                    TestPluginManager.GetSpecificTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
                             TestPlatformConstants.TestAdapterEndsWithPattern,
                             out var unfilteredTestExtensions1,
                             out var testExtensions1);
 
                     // Get all extensions for ITestExecutor2.
-                    TestPluginManager.Instance
-                        .GetSpecificTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
+                    TestPluginManager.GetSpecificTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
                             TestPlatformConstants.TestAdapterEndsWithPattern,
                             out var unfilteredTestExtensions2,
                             out var testExtensions2);
@@ -152,15 +150,13 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
     {
 
         // Get all extensions for ITestExecutor.
-        TestPluginManager.Instance
-            .GetTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
+        TestPluginManager.GetTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
                 extensionAssembly,
                 out var unfilteredTestExtensions1,
                 out var testExtensions1);
 
         // Get all extensions for ITestExecutor2.
-        TestPluginManager.Instance
-            .GetTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
+        TestPluginManager.GetTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
                 extensionAssembly,
                 out var unfilteredTestExtensions2,
                 out var testExtensions2);
