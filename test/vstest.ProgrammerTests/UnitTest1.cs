@@ -25,6 +25,9 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 using vstest.ProgrammerTests.Fakes;
 
+// Tests are run by Intent library that is executed from our Program.Main. To debug press F5 in VS, and maybe mark just a single test with [Only].
+// To just run, press Ctrl+F5 to run without debugging. It will use short timeout for abort in case something is wrong with your test.
+
 public class TestDiscoveryTests
 {
     public async Task GivenAnMSTestAssemblyWith108Tests_WhenTestsAreRun_Then108TestsAreExecuted()
@@ -195,7 +198,7 @@ public class TestDiscoveryTests
             .VersionCheck(5)
             .ExecutionInitialize(FakeMessage.NoResponse)
             .StartTestExecutionWithSources(mstest2Dll.TestResultBatches)
-            .SessionEnd(FakeMessage.NoResponse, _ => testhost2Process.Exit())
+            .SessionEnd(FakeMessage.NoResponse, f => f.Process.Exit())
             .Build();
 
         var testhost2 = new FakeTestHostFixtureBuilder(fixture)
