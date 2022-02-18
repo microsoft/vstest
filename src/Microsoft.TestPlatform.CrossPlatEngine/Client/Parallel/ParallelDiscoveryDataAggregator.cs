@@ -7,6 +7,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 using Common.Telemetry;
 
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -36,6 +39,17 @@ internal class ParallelDiscoveryDataAggregator
     /// Aggregate total test count
     /// </summary>
     public long TotalTests { get; private set; }
+
+
+    /// <summary>
+    /// Dictionary which stores source with corresponding discoveryStatus
+    /// </summary>
+    private readonly ConcurrentDictionary<string, DiscoveryStatus> _sourcesWithDiscoveryStatus = new();
+
+    /// <summary>
+    /// Indicates if discovery complete payload already sent back to IDE
+    /// </summary>
+    internal bool IsMessageSent { get; private set; }
 
     /// <summary>
     /// Returns the Aggregated Metrics.
@@ -120,4 +134,27 @@ internal class ParallelDiscoveryDataAggregator
         }
     }
 
+    /// <summary>
+    /// Aggregate the source as fully discovered
+    /// </summary>
+    /// <param name="sorce">Fully discovered source</param>
+    public void MarkSourcesWithStatus(ICollection<string> sources, DiscoveryStatus status)
+        => DiscoveryManager.MarkSourcesWithStatus(sources, status, _sourcesWithDiscoveryStatus);
+
+    /// <summary>
+    /// Aggregates the value indicating if we already sent message to IDE.
+    /// </summary>
+    /// <param name="isMessageSent">Boolean value if we already sent message to IDE</param>
+    public void AggregateIsMessageSent(bool isMessageSent)
+    {
+        IsMessageSent = IsMessageSent || isMessageSent;
+    }
+
+    /// <summary>
+    /// Returns sources with particular discovery status.
+    /// </summary>
+    /// <param name="status">Status to filter</param>
+    /// <returns></returns>
+    public List<string> GetSourcesWithStatus(DiscoveryStatus status)
+        => DiscoveryManager.GetSourcesWithStatus(status, _sourcesWithDiscoveryStatus);
 }

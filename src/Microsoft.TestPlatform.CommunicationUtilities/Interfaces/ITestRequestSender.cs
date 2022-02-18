@@ -90,6 +90,11 @@ public interface ITestRequestSender : IDisposable
     void SendTestRunAbort();
 
     /// <summary>
+    /// Sends the request to abort the discovery.
+    /// </summary>
+    void SendDiscoveryAbort();
+
+    /// <summary>
     /// Handle client process exit
     /// </summary>
     /// <param name="stdError">Standard error output</param>

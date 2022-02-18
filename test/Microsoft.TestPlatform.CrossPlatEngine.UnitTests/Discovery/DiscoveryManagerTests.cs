@@ -268,5 +268,28 @@ public class DiscoveryManagerTests
         mockLogger.Verify(rd => rd.HandleLogMessage(TestMessageLevel.Warning, "verify that the HandleLogMessage method getting invoked at least once"), Times.Once);
     }
 
+    [TestMethod]
+    public void DiscoveryTestsShouldSendAbortValuesCorrectlyIfAbortionHappened()
+    {
+        // Arrange
+        var sources = new List<string> { typeof(DiscoveryManagerTests).GetTypeInfo().Assembly.Location };
+
+        var criteria = new DiscoveryCriteria(sources, 100, null);
+        var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
+
+        DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
+
+        mockHandler.Setup(ml => ml.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
+            .Callback((DiscoveryCompleteEventArgs complete, IEnumerable<TestCase> tests) => receivedDiscoveryCompleteEventArgs = complete);
+
+        // Act
+        _discoveryManager.DiscoverTests(criteria, mockHandler.Object);
+        _discoveryManager.Abort(mockHandler.Object);
+
+        // Assert
+        Assert.AreEqual(true, receivedDiscoveryCompleteEventArgs.IsAborted);
+        Assert.AreEqual(-1, receivedDiscoveryCompleteEventArgs.TotalCount);
+    }
+
     #endregion
 }

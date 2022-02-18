@@ -97,6 +97,12 @@ internal class InProcessProxyDiscoveryManager : IProxyDiscoveryManager
         Task.Run(() => _testHostManagerFactory.GetDiscoveryManager().Abort());
     }
 
+    /// <inheritdoc/>
+    public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
+    {
+        Task.Run(() => _testHostManagerFactory.GetDiscoveryManager().Abort(eventHandler));
+    }
+
     private void InitializeExtensions(IEnumerable<string> sources)
     {
         var extensionsFromSource = _testHostManager.GetTestPlatformExtensions(sources, Enumerable.Empty<string>());

@@ -62,7 +62,7 @@ public class ParallelDiscoveryEventsHandlerTests
 
         _parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
 
-        // Raw message must be sent 
+        // Raw message must be sent
         _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Never);
 
         _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleDiscoveredTests(null), Times.Never);
@@ -147,6 +147,27 @@ public class ParallelDiscoveryEventsHandlerTests
 
         _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Once);
 
+        _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once);
+    }
+
+    [TestMethod]
+    public void HandleDiscoveryCompleteShouldCallConvertToRawMessageAndSendOnceIfDiscoveryIsComplete()
+    {
+        string payload = "DiscoveryComplete";
+        int totalTests = 10;
+        bool aborted = false;
+
+        _mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
+            _mockProxyDiscoveryManager.Object, totalTests, null, aborted)).Returns(true);
+
+        _mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.DiscoveryComplete)).Returns(payload);
+
+        // Act
+        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted, It.IsAny<List<string>>(), It.IsAny<List<string>>(), It.IsAny<List<string>>());
+        _parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
+
+        // Verify
+        _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Once);
         _mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once);
     }
 
