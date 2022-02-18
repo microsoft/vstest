@@ -55,8 +55,7 @@ internal class Program
                 </RunSettings>
             ";
         var sources = new[] {
-            Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"),
-            Path.Combine(playground, "MSTest1", "bin", "Debug", "netcoreapp3.1", "MSTest1.dll"),
+            Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll")
         };
 
         var options = new TestPlatformOptions();
