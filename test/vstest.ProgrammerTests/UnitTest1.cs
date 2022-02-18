@@ -9,8 +9,6 @@ using System.Runtime.Versioning;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 
-using Intent;
-
 using Microsoft.VisualStudio.TestPlatform.Client;
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
