@@ -3,8 +3,6 @@
 
 #if !NETSTANDARD1_0
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using System;
@@ -20,7 +18,7 @@ internal partial class FeatureFlag : IFeatureFlag
 
     static FeatureFlag()
     {
-        FeatureFlags.Add(ARTIFACTS_POSTPROCESSING, false);
+        FeatureFlags.Add(ARTIFACTS_POSTPROCESSING, true);
         FeatureFlags.Add(ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX, false);
     }
 

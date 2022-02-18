@@ -241,7 +241,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
                 var testsFoundInAnySource = e.TestRunStatistics != null && (e.TestRunStatistics.ExecutedTests > 0);
 
                 // Indicate the user to use test adapter path command if there are no tests found
-                if (!testsFoundInAnySource && string.IsNullOrEmpty(CommandLineOptions.Instance.TestAdapterPath) && _commandLineOptions.TestCaseFilterValue == null)
+                if (!testsFoundInAnySource && !CommandLineOptions.Instance.TestAdapterPathsSet && _commandLineOptions.TestCaseFilterValue == null)
                 {
                     _output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
                 }

@@ -6,6 +6,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 using System.Collections.Generic;
+using System.Linq;
 
 using Common.Telemetry;
 using CommunicationUtilities;
@@ -34,6 +35,8 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     private readonly IDataSerializer _dataSerializer;
 
     private readonly IRequestData _requestData;
+
+    private readonly object _sendMessageLock = new();
 
     public ParallelDiscoveryEventsHandler(IRequestData requestData,
         IProxyDiscoveryManager proxyDiscoveryManager,
@@ -65,6 +68,12 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         var totalTests = discoveryCompleteEventArgs.TotalCount;
         var isAborted = discoveryCompleteEventArgs.IsAborted;
 
+        // Aggregate for final discovery complete
+        _discoveryDataAggregator.Aggregate(totalTests, isAborted);
+
+        // Aggregate Discovery Data Metrics
+        _discoveryDataAggregator.AggregateDiscoveryDataMetrics(discoveryCompleteEventArgs.Metrics);
+
         // we get discovery complete events from each host process
         // so we cannot "complete" the actual operation until all sources are consumed
         // We should not block last chunk results while we aggregate overall discovery data
@@ -72,13 +81,12 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         {
             ConvertToRawMessageAndSend(MessageType.TestCasesFound, lastChunk);
             HandleDiscoveredTests(lastChunk);
+            // If we come here it means that some source was already fully discovered so we can mark it
+            if (!_discoveryDataAggregator.IsAborted)
+            {
+                AggregateComingSourcesAsFullyDiscovered(lastChunk, discoveryCompleteEventArgs);
+            }
         }
-
-        // Aggregate for final discovery complete
-        _discoveryDataAggregator.Aggregate(totalTests, isAborted);
-
-        // Aggregate Discovery Data Metrics
-        _discoveryDataAggregator.AggregateDiscoveryDataMetrics(discoveryCompleteEventArgs.Metrics);
 
         // Do not send TestDiscoveryComplete to actual test discovery handler
         // We need to see if there are still sources left - let the parallel manager decide
@@ -90,13 +98,27 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
 
         if (parallelDiscoveryComplete)
         {
+            var fullyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered);
+            var partiallyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered);
+            var notDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered);
+
+            // As we immediately return results to IDE in case of aborting
+            // we need to set isAborted = true and totalTests = -1
+            if (_parallelProxyDiscoveryManager.IsAbortRequested)
+            {
+                _discoveryDataAggregator.Aggregate(-1, true);
+            }
+
             // In case of sequential discovery - RawMessage would have contained a 'DiscoveryCompletePayload' object
             // To send a raw message - we need to create raw message from an aggregated payload object
             var testDiscoveryCompletePayload = new DiscoveryCompletePayload()
             {
                 TotalTests = _discoveryDataAggregator.TotalTests,
                 IsAborted = _discoveryDataAggregator.IsAborted,
-                LastDiscoveredTests = null
+                LastDiscoveredTests = null,
+                FullyDiscoveredSources = fullyDiscovered,
+                PartiallyDiscoveredSources = partiallyDiscovered,
+                NotDiscoveredSources = notDiscovered
             };
 
             // Collecting Final Discovery State
@@ -106,11 +128,16 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             var aggregatedDiscoveryDataMetrics = _discoveryDataAggregator.GetAggregatedDiscoveryDataMetrics();
             testDiscoveryCompletePayload.Metrics = aggregatedDiscoveryDataMetrics;
 
-            // we have to send raw messages as we block the discovery complete actual raw messages
-            ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
+            // Sending discovery complete message to IDE
+            ConvertToRawMessageAndSend(testDiscoveryCompletePayload);
 
-            var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(_discoveryDataAggregator.TotalTests,
-                _discoveryDataAggregator.IsAborted);
+            var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
+                _discoveryDataAggregator.TotalTests,
+                _discoveryDataAggregator.IsAborted,
+                fullyDiscovered,
+                partiallyDiscovered,
+                notDiscovered);
+
             finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
 
             // send actual test discovery complete to clients
@@ -161,5 +188,52 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     {
         var rawMessage = _dataSerializer.SerializePayload(messageType, payload);
         _actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
+    }
+
+    /// <summary>
+    /// Sending discovery complete message to IDE
+    /// </summary>
+    /// <param name="discoveryDataAggregator">Discovery aggregator to know if we already sent this message</param>
+    /// <param name="testDiscoveryCompletePayload">Discovery complete payload to send</param>
+    private void ConvertToRawMessageAndSend(DiscoveryCompletePayload testDiscoveryCompletePayload)
+    {
+        // When we abort we should send raw message to IDE only once.
+        // All other testhosts which will finish after shouldn't send abort raw message.
+        if (_discoveryDataAggregator.IsMessageSent)
+        {
+            return;
+        }
+
+        lock (_sendMessageLock)
+        {
+            if (!_discoveryDataAggregator.IsMessageSent)
+            {
+                // we have to send raw messages as we block the discovery complete actual raw messages
+                ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
+                _discoveryDataAggregator.AggregateIsMessageSent(true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Aggregate source as fully discovered
+    /// </summary>
+    /// <param name="discoveryDataAggregator">Aggregator to aggregate results</param>
+    /// <param name="lastChunk">Last chunk of discovered test cases</param>
+    private void AggregateComingSourcesAsFullyDiscovered(IEnumerable<TestCase> lastChunk, DiscoveryCompleteEventArgs discoveryCompleteEventArgs)
+    {
+        if (lastChunk is null)
+        {
+            return;
+        }
+
+        // Sometimes we get lastChunk as empty list (when number of tests in project dividable by
+        // the chunk size, e.g. 100 tests and 10 chunk size).
+        // Then we will take sources from discoveryCompleteEventArgs coming from testhost.
+        var lastChunkSources = !lastChunk.Any()
+            ? discoveryCompleteEventArgs.FullyDiscoveredSources
+            : lastChunk.Select(testcase => testcase.Source).ToList();
+
+        _discoveryDataAggregator.MarkSourcesWithStatus(lastChunkSources, DiscoveryStatus.FullyDiscovered);
     }
 }

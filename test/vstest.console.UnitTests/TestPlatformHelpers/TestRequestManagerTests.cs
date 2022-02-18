@@ -234,7 +234,7 @@ public class TestRequestManagerTests
             RunSettings = DefaultRunsettings
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 
         IRequestData actualRequestData = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
@@ -258,7 +258,7 @@ public class TestRequestManagerTests
         _testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
         // Verify.
-        Assert.AreEqual(5, actualRequestData.ProtocolConfig.Version);
+        Assert.AreEqual(6, actualRequestData.ProtocolConfig.Version);
     }
 
 
@@ -284,7 +284,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -333,7 +333,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -376,7 +376,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -419,7 +419,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -462,7 +462,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -517,7 +517,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -564,7 +564,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -611,7 +611,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -887,7 +887,7 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a" },
             RunSettings = DefaultRunsettings
         };
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         IRequestData actualRequestData = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -897,7 +897,7 @@ public class TestRequestManagerTests
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
         // Verify.
-        Assert.AreEqual(5, actualRequestData.ProtocolConfig.Version);
+        Assert.AreEqual(6, actualRequestData.ProtocolConfig.Version);
     }
 
     [TestMethod]
@@ -911,7 +911,7 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a" },
             RunSettings = DefaultRunsettings
         };
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         IRequestData actualRequestData = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -975,7 +975,7 @@ public class TestRequestManagerTests
                                     </LegacySettings>
                                </RunSettings>"
         };
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         IRequestData actualRequestData = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -1022,7 +1022,7 @@ public class TestRequestManagerTests
                                        </MSTest>
                                </RunSettings>"
         };
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         IRequestData actualRequestData = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -1067,7 +1067,7 @@ public class TestRequestManagerTests
                                 </MSPhoneTest>
                             </RunSettings>"
         };
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         IRequestData actualRequestData = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(

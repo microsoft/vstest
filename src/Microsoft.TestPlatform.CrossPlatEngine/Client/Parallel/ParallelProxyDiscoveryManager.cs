@@ -25,8 +25,6 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
 {
     private readonly IDataSerializer _dataSerializer;
 
-    #region DiscoverySpecificData
-
     private int _discoveryCompletedClients;
     private int _availableTestSources = -1;
 
@@ -40,19 +38,12 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
 
     private readonly IRequestData _requestData;
 
-    // This field indicates if abort was requested by testplatform (user)
-    private bool _discoveryAbortRequested;
-
-    #endregion
-
-    #region Concurrency Keeper Objects
+    public bool IsAbortRequested { get; private set; }
 
     /// <summary>
     /// LockObject to update discovery status in parallel
     /// </summary>
     private readonly object _discoveryStatusLockObject = new();
-
-    #endregion
 
     public ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
         : this(requestData, actualProxyManagerCreator, JsonDataSerializer.Instance, parallelLevel, sharedHosts)
@@ -85,14 +76,28 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         _availableTestSources = discoveryCriteria.Sources.Count();
 
         EqtTrace.Verbose("ParallelProxyDiscoveryManager: Start discovery. Total sources: " + _availableTestSources);
+
+        // One data aggregator per parallel discovery
+        _currentDiscoveryDataAggregator = new ParallelDiscoveryDataAggregator();
+
+        // Marking all sources as not discovered before starting actual discovery
+        _currentDiscoveryDataAggregator.MarkSourcesWithStatus(discoveryCriteria.Sources.ToList(), DiscoveryStatus.NotDiscovered);
+
         DiscoverTestsPrivate(eventHandler);
     }
 
     /// <inheritdoc/>
     public void Abort()
     {
-        _discoveryAbortRequested = true;
+        IsAbortRequested = true;
         DoActionOnAllManagers((proxyManager) => proxyManager.Abort(), doActionsInParallel: true);
+    }
+
+    /// <inheritdoc/>
+    public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
+    {
+        IsAbortRequested = true;
+        DoActionOnAllManagers((proxyManager) => proxyManager.Abort(eventHandler), doActionsInParallel: true);
     }
 
     /// <inheritdoc/>
@@ -127,7 +132,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
          when testhost crashed by itself and when user requested it (f.e. through TW)
          Schedule the clean up for managers and handlers.
         */
-        if (allDiscoverersCompleted || _discoveryAbortRequested)
+        if (allDiscoverersCompleted || IsAbortRequested)
         {
             // Reset enumerators
             _sourceEnumerator = null;
@@ -174,9 +179,6 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
 
         // Reset the discovery complete data
         _discoveryCompletedClients = 0;
-
-        // One data aggregator per parallel discovery
-        _currentDiscoveryDataAggregator = new ParallelDiscoveryDataAggregator();
 
         foreach (var concurrentManager in GetConcurrentManagerInstances())
         {

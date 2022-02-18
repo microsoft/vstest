@@ -1,4 +1,5 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #nullable disable
@@ -145,6 +146,26 @@ public class DiscoverTests : AcceptanceTestBase
         // Assert.
         Assert.AreEqual(6, discoveryEventHandlerForBatchSize.DiscoveredTestCases.Count);
         Assert.AreEqual(3, discoveryEventHandlerForBatchSize.BatchSize);
+    }
+
+    [TestMethod]
+    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSource]
+    public void DisoverTestUsingEventHandler2ShouldContainAllSourcesAsFullyDiscovered(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        Setup();
+
+        var eventHandler2 = new DiscoveryEventHandler2();
+
+        _vstestConsoleWrapper.DiscoverTests(
+            GetTestAssemblies(),
+            GetDefaultRunSettings(),
+            null,
+            eventHandler2);
+
+        // Assert.
+        Assert.AreEqual(2, eventHandler2.FullyDiscoveredSources.Count);
     }
 
     [TestMethod]

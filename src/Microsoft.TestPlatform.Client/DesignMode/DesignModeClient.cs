@@ -38,7 +38,7 @@ public class DesignModeClient : IDesignModeClient
     private readonly ICommunicationManager _communicationManager;
     private readonly IDataSerializer _dataSerializer;
 
-    private readonly ProtocolConfig _protocolConfig = ObjectModel.Constants.DefaultProtocolConfig;
+    private readonly ProtocolConfig _protocolConfig = Constants.DefaultProtocolConfig;
     private readonly IEnvironment _platformEnvironment;
     private readonly TestSessionMessageLogger _testSessionMessageLogger;
     private readonly object _lockObject = new();

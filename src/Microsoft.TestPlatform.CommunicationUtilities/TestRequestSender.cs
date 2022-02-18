@@ -60,7 +60,7 @@ public class TestRequestSender : ITestRequestSender
 
     // Must be in sync with the highest supported version in
     // src/Microsoft.TestPlatform.CrossPlatEngine/EventHandlers/TestRequestHandler.cs file.
-    private readonly int _highestSupportedVersion = 5;
+    private readonly int _highestSupportedVersion = 6;
 
     private readonly TestHostConnectionInfo _connectionInfo;
 
@@ -289,6 +289,19 @@ public class TestRequestSender : ITestRequestSender
         EqtTrace.Verbose("TestRequestSender.DiscoverTests: Sending discover tests with message: {0}", message);
 
         _channel.Send(message);
+    }
+
+    /// <inheritdoc/>
+    public void SendDiscoveryAbort()
+    {
+        if (IsOperationComplete())
+        {
+            EqtTrace.Verbose("TestRequestSender.SendDiscoveryAbort: Operation is already complete. Skip error message.");
+            return;
+        }
+
+        EqtTrace.Verbose("TestRequestSender.SendDiscoveryAbort: Sending discovery abort.");
+        _channel?.Send(_dataSerializer.SerializeMessage(MessageType.CancelDiscovery));
     }
     #endregion
 
@@ -559,7 +572,12 @@ public class TestRequestSender : ITestRequestSender
                 case MessageType.DiscoveryComplete:
                     var discoveryCompletePayload =
                         _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(data);
-                    var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
+                    var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
+                        discoveryCompletePayload.TotalTests,
+                        discoveryCompletePayload.IsAborted,
+                        discoveryCompletePayload.FullyDiscoveredSources,
+                        discoveryCompletePayload.PartiallyDiscoveredSources,
+                        discoveryCompletePayload.NotDiscoveredSources);
                     discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
                     discoveryEventsHandler.HandleDiscoveryComplete(
                         discoveryCompleteEventArgs,

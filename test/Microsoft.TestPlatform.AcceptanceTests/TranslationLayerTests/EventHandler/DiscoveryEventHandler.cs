@@ -72,6 +72,10 @@ public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
     /// </summary>
     public List<TestCase> DiscoveredTestCases { get; }
 
+    public IList<string> FullyDiscoveredSources { get; private set; }
+    public IList<string> PartiallyDiscoveredSources { get; private set; }
+    public IList<string> NotDiscoveredSources { get; private set; }
+
     public List<TestMessage> TestMessages;
 
     /// <summary>
@@ -103,6 +107,9 @@ public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
         }
 
         Metrics = discoveryCompleteEventArgs.Metrics;
+        FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources;
+        PartiallyDiscoveredSources = discoveryCompleteEventArgs.PartiallyDiscoveredSources;
+        NotDiscoveredSources = discoveryCompleteEventArgs.NotDiscoveredSources;
     }
 
     public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)

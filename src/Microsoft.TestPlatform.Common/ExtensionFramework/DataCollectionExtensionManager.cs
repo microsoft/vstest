@@ -53,7 +53,7 @@ internal class DataCollectorExtensionManager : TestExtensionManager<DataCollecto
     /// </returns>
     public static DataCollectorExtensionManager Create(IMessageLogger messageLogger)
     {
-        TestPluginManager.Instance.GetSpecificTestExtensions<DataCollectorConfig, DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
+        TestPluginManager.GetSpecificTestExtensions<DataCollectorConfig, DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
             TestPlatformConstants.DataCollectorEndsWithPattern,
             out var unfilteredTestExtensions,
             out var filteredTestExtensions);
@@ -78,7 +78,7 @@ internal class DataCollectorExtensionManager : TestExtensionManager<DataCollecto
     /// </returns>
     public static DataCollectorExtensionManager Create(string extensionAssemblyFilePath, bool skipCache, IMessageLogger messageLogger)
     {
-        TestPluginManager.Instance.GetTestExtensions<DataCollectorConfig, DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
+        TestPluginManager.GetTestExtensions<DataCollectorConfig, DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
             extensionAssemblyFilePath,
             out var unfilteredTestExtensions,
             out var filteredTestExtensions,

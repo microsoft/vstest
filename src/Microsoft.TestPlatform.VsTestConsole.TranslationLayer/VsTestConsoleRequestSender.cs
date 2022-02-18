@@ -46,7 +46,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
     private bool _handShakeSuccessful;
 
-    private int _protocolVersion = 5;
+    private int _protocolVersion = 6;
 
     /// <summary>
     /// Used to cancel blocking tasks associated with the vstest.console process.
@@ -67,7 +67,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <summary>
     /// Initializes a new instance of the <see cref="VsTestConsoleRequestSender"/> class.
     /// </summary>
-    /// 
+    ///
     /// <param name="communicationManager">The communication manager.</param>
     /// <param name="dataSerializer">The data serializer.</param>
     /// <param name="testPlatformEventSource">The test platform event source.</param>
@@ -974,7 +974,10 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
                     var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
                         discoveryCompletePayload.TotalTests,
-                        discoveryCompletePayload.IsAborted);
+                        discoveryCompletePayload.IsAborted,
+                        discoveryCompletePayload.FullyDiscoveredSources,
+                        discoveryCompletePayload.PartiallyDiscoveredSources,
+                        discoveryCompletePayload.NotDiscoveredSources);
 
                     // Adding metrics from vstest.console.
                     discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
@@ -1061,7 +1064,10 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
                     var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
                         discoveryCompletePayload.TotalTests,
-                        discoveryCompletePayload.IsAborted);
+                        discoveryCompletePayload.IsAborted,
+                        discoveryCompletePayload.FullyDiscoveredSources,
+                        discoveryCompletePayload.PartiallyDiscoveredSources,
+                        discoveryCompletePayload.NotDiscoveredSources);
 
                     // Adding Metrics from VsTestConsole
                     discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
@@ -1089,7 +1095,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 TestMessageLevel.Error,
                 TranslationLayerResources.AbortedTestsDiscovery);
 
-            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
+            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true, new List<string>(), new List<string>(), new List<string>());
             eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
 
             // Earlier we were closing the connection with vstest.console in case of exceptions.

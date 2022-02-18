@@ -206,6 +206,7 @@ internal class ArgumentProcessorFactory
         new RunTestsArgumentProcessor(),
         new RunSpecificTestsArgumentProcessor(),
         new TestAdapterPathArgumentProcessor(),
+        new TestAdapterLoadingStrategyArgumentProcessor(),
         new TestCaseFilterArgumentProcessor(),
         new ParentProcessIdArgumentProcessor(),
         new PortArgumentProcessor(),
@@ -273,9 +274,7 @@ internal class ArgumentProcessorFactory
     /// <param name="processor">The lazy processor.</param>
     /// <param name="initArg">The argument with which the real processor should be initialized.</param>
     /// <returns>The decorated lazy processor.</returns>
-    private static IArgumentProcessor WrapLazyProcessorToInitializeOnInstantiation(
-        IArgumentProcessor processor,
-        string initArg = null)
+    public static IArgumentProcessor WrapLazyProcessorToInitializeOnInstantiation(IArgumentProcessor processor, string initArg = null)
     {
         var processorExecutor = processor.Executor;
         var lazyArgumentProcessor = new Lazy<IArgumentExecutor>(() =>

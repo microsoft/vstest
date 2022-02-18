@@ -568,7 +568,7 @@ internal class TestRequestManager : ITestRequestManager
     /// <inheritdoc />
     public void CancelDiscovery()
     {
-        EqtTrace.Info("TestRequestManager.CancelTestDiscovery: Sending cancel request.");
+        EqtTrace.Info("TestRequestManager.CancelDiscovery: Sending cancel request.");
         _currentDiscoveryRequest?.Abort();
     }
 
