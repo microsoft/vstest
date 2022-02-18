@@ -107,7 +107,6 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
     /// Default constructor.
     /// </summary>
     /// <param name="options"> The options. </param>
-    /// <param name="testPlatform">The test platform</param>
     public TestAdapterPathArgumentExecutor(CommandLineOptions options!!, IRunSettingsProvider runSettingsManager!!, IOutput output!!, IFileHelper fileHelper!!)
     {
         _commandLineOptions = options;

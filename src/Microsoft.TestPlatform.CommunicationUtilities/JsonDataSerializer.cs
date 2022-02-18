@@ -90,7 +90,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="json">JSON string.</param>
     /// <param name="version">Version of serializer to be used.</param>
     /// <typeparam name="T">Target type to deserialize.</typeparam>
-    /// <returns>An instance of <see cref="T"/>.</returns>
+    /// <returns>An instance of T.</returns>
     public T Deserialize<T>(string json, int version = 1)
     {
         var payloadSerializer = GetPayloadSerializer(version);

@@ -47,6 +47,8 @@ indent_size = 2
 
 #### Core EditorConfig Options ####
 
+## NOTE: Some IDE rules will never run outside of VS (see https://github.com/dotnet/roslyn/blob/9f87b444da9c48a4d492b19f8337339056bf2b95/src/Analyzers/Core/Analyzers/EnforceOnBuildValues.cs#L95)
+
 # Do not set 'end_of_line = crlf' otherwise the rule IDE0055: Fix formatting will trigger on Linux/MAC OS.
 
 # Indentation and spacing

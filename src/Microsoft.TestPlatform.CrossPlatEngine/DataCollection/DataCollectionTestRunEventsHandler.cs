@@ -194,7 +194,6 @@ internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
     /// The run context attachments.
     /// </param>
     /// <returns>
-    /// The <see cref="Collection"/>.
     /// </returns>
     internal static ICollection<AttachmentSet> GetCombinedAttachmentSets(Collection<AttachmentSet> originalAttachmentSets, ICollection<AttachmentSet> newAttachments)
     {

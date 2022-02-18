@@ -435,6 +435,7 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     public string TestCaseFilter { get; private set; }
 
+    /// <summary>
     /// Path to dotnet executable to be used to invoke testhost.dll. Specifying this will skip looking up testhost.exe and will force usage of the testhost.dll.
     /// </summary>
     public string DotnetHostPath { get; private set; }
@@ -502,7 +503,7 @@ public class RunConfiguration : TestRunSettings
             root.AppendChild(testAdaptersPaths);
         }
 
-        if (this.TestAdapterLoadingStrategy != TestAdapterLoadingStrategy.Default) 
+        if (this.TestAdapterLoadingStrategy != TestAdapterLoadingStrategy.Default)
         {
             XmlElement adapterLoadingStrategy = doc.CreateElement("TestAdapterLoadingStrategy");
             adapterLoadingStrategy.InnerXml = this.TestAdapterLoadingStrategy.ToString();
@@ -772,11 +773,11 @@ public class RunConfiguration : TestRunSettings
                     case "TestAdapterLoadingStrategy":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                         value = reader.ReadElementContentAsString();
-                        if (Enum.TryParse<TestAdapterLoadingStrategy>(value, out var loadingStrategy)) 
+                        if (Enum.TryParse<TestAdapterLoadingStrategy>(value, out var loadingStrategy))
                         {
                             runConfiguration.TestAdapterLoadingStrategy = loadingStrategy;
                         }
-                        else 
+                        else
                         {
                             throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));

@@ -207,18 +207,6 @@ internal class TestResult : ITestResult, IXmlTestStore
     /// <summary>
     /// Initializes a new instance of the <see cref="TestResult"/> class.
     /// </summary>
-    /// <param name="computerName">
-    /// The computer name.
-    /// </param>
-    /// <param name="runId">
-    /// The run id.
-    /// </param>
-    /// <param name="test">
-    /// The test.
-    /// </param>
-    /// <param name="outcome">
-    /// The outcome.
-    /// </param>
     public TestResult(
         Guid runId,
         Guid testId,

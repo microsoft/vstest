@@ -95,8 +95,6 @@ internal class AppDomainEngineInvoker<T> : IEngineInvoker where T : MarshalByRef
     /// <summary>
     /// Create the Engine Invoker in new AppDomain based on test source path
     /// </summary>
-    /// <param name="testSourcePath">Test Source to run/discover tests for</param>
-    /// <param name="mergedConfigFile">Merged config file if there is any merging of test config and test host config</param>
     /// <returns></returns>
     private IEngineInvoker CreateInvokerInAppDomain(AppDomain appDomain)
     {
@@ -233,7 +231,7 @@ internal class AppDomainEngineInvoker<T> : IEngineInvoker where T : MarshalByRef
 }
 
 /// <summary>
-/// Custom domain setup that sets UICulture and an Assembly resolver for child app domain to resolve testplatform assemblies    
+/// Custom domain setup that sets UICulture and an Assembly resolver for child app domain to resolve testplatform assemblies
 /// </summary>
 // The normal AppDomainInitializer api was not used to do this because it cannot load the assemblies for testhost. --JJR
 internal class CustomAssemblySetup : MarshalByRefObject

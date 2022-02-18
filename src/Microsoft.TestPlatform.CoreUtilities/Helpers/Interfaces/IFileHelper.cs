@@ -161,7 +161,6 @@ public interface IFileHelper
     /// <summary>
     /// Get temporary file path
     /// </summary>
-    /// <param name="path"></param>
     public string GetTempPath();
 
     /// <summary>

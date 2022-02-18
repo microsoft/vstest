@@ -93,8 +93,8 @@ public interface ITestRequestManager : IDisposable
     /// <summary>
     /// Stops a test session.
     /// </summary>
-    /// 
-    /// <param name="testSessionInfo">The stop test session payload.</param>
+    ///
+    /// <param name="payload">The stop test session payload.</param>
     /// <param name="eventsHandler">The events handler.</param>
     /// <param name="protocolConfig">Protocol related information.</param>
     void StopTestSession(

@@ -198,7 +198,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     /// Triggers the discovery for the next data object on the concurrent discoverer
     /// Each concurrent discoverer calls this method, once its completed working on previous data
     /// </summary>
-    /// <param name="ProxyDiscoveryManager">Proxy discovery manager instance.</param>
+    /// <param name="proxyDiscoveryManager">Proxy discovery manager instance.</param>
     private void DiscoverTestsOnConcurrentManager(IProxyDiscoveryManager proxyDiscoveryManager)
     {
         // Peek to see if we have sources to trigger a discovery

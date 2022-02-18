@@ -96,7 +96,7 @@ internal class InProcDataCollectionExtensionManager
     /// <summary>
     /// Creates data collector instance based on datacollector settings provided.
     /// </summary>
-    /// <param name="dataCollectorSettings">
+    /// <param name="configuration">
     /// Settings to be used for creating DataCollector.
     /// </param>
     /// <param name="interfaceTypeInfo">

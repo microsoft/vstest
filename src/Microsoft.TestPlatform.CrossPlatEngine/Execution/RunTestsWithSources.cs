@@ -52,7 +52,6 @@ internal class RunTestsWithSources : BaseRunTests
     /// <param name="testCaseEventsHandler"></param>
     /// <param name="testRunEventsHandler"></param>
     /// <param name="executorUriVsSourceList"></param>
-    /// <param name="testRunCache"></param>
     internal RunTestsWithSources(IRequestData requestData, Dictionary<string, IEnumerable<string>> adapterSourceMap, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, IEnumerable<string>> executorUriVsSourceList)
         : base(requestData, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
     {
@@ -142,7 +141,7 @@ internal class RunTestsWithSources : BaseRunTests
 
         var verifiedExtensionSourceMap = new Dictionary<string, IEnumerable<string>>();
 
-        // Validate the sources 
+        // Validate the sources
         foreach (var kvp in _adapterSourceMap)
         {
             var verifiedSources = DiscoveryManager.GetValidSources(kvp.Value, logger, _package);

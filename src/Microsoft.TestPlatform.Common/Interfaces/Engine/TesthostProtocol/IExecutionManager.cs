@@ -51,12 +51,12 @@ public interface IExecutionManager
     /// <summary>
     /// Cancel the test execution.
     /// </summary>
-    /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
+    /// <param name="testRunEventsHandler"> EventHandler for handling execution events from Engine. </param>
     void Cancel(ITestRunEventsHandler testRunEventsHandler);
 
     /// <summary>
     /// Aborts the test execution.
     /// </summary>
-    /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
+    /// <param name="testRunEventsHandler"> EventHandler for handling execution events from Engine. </param>
     void Abort(ITestRunEventsHandler testRunEventsHandler);
 }

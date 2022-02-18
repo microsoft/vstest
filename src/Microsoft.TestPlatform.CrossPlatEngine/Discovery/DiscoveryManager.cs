@@ -420,7 +420,6 @@ public class DiscoveryManager : IDiscoveryManager
     /// <summary>
     /// Returns sources with particular discovery status.
     /// </summary>
-    /// <param name="status">Status to filter</param>
     /// <returns></returns>
     internal static List<string> GetSourcesWithStatus(DiscoveryStatus discoveryStatus,
         ConcurrentDictionary<string, DiscoveryStatus> sourcesWithDiscoveryStatus)

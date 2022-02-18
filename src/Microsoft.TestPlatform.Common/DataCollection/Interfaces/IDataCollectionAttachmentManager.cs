@@ -37,9 +37,6 @@ internal interface IDataCollectionAttachmentManager
     /// <param name="dataCollectionContext">
     /// The data collection context.
     /// </param>
-    /// <returns>
-    /// The <see cref="List"/>.
-    /// </returns>
     List<AttachmentSet> GetAttachments(DataCollectionContext dataCollectionContext);
 
     /// <summary>

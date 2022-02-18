@@ -121,8 +121,10 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
     /// <summary>
     /// Default constructor.
     /// </summary>
-    /// <param name="options"> The options. </param>
-    /// <param name="testPlatform">The test platform</param>
+    /// <param name="options"></param>
+    /// <param name="runSettingsManager"></param>
+    /// <param name="output"></param>
+    /// <param name="fileHelper"></param>
     public TestAdapterLoadingStrategyArgumentExecutor(CommandLineOptions options!!, IRunSettingsProvider runSettingsManager!!, IOutput output!!, IFileHelper fileHelper!!)
     {
         _commandLineOptions = options;

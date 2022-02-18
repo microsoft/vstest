@@ -92,7 +92,7 @@ internal class TestPluginManager
     /// <typeparam name="TExtension">
     /// Type of the required extensions
     /// </typeparam>
-    /// <typeparam name="TMetadata">
+    /// <typeparam name="IMetadata">
     /// Type of metadata of required extensions
     /// </typeparam>
     /// <typeparam name="TMetadata">
@@ -127,7 +127,7 @@ internal class TestPluginManager
     /// <typeparam name="TExtension">
     /// Type of the required extensions
     /// </typeparam>
-    /// <typeparam name="TMetadata">
+    /// <typeparam name="IMetadata">
     /// Type of metadata of required extensions
     /// </typeparam>
     /// <typeparam name="TMetadata">
@@ -178,7 +178,7 @@ internal class TestPluginManager
     /// <typeparam name="TExtension">
     /// Type of the required extensions
     /// </typeparam>
-    /// <typeparam name="TMetadata">
+    /// <typeparam name="IMetadata">
     /// Type of metadata of required extensions
     /// </typeparam>
     /// <typeparam name="TMetadata">

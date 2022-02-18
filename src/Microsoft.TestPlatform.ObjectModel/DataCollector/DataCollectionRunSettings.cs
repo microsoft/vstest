@@ -183,9 +183,6 @@ public class DataCollectionRunSettings : TestRunSettings
     /// <param name="reader">
     /// The reader.
     /// </param>
-    /// <returns>
-    /// The <see cref="List"/>.
-    /// </returns>
     /// <exception cref="SettingsException">
     /// </exception>
     internal static List<DataCollectorSettings> ReadListElementFromXml(XmlReader reader, string dataCollectorsName)

@@ -18,7 +18,7 @@ public sealed class DefaultExecutorUriAttribute : Attribute
     /// <summary>
     /// Initializes with the Uri of the executor.
     /// </summary>
-    /// <param name="defaultExecutorUri">The Uri of the executor</param>
+    /// <param name="executorUri">The Uri of the executor</param>
     public DefaultExecutorUriAttribute(string executorUri)
     {
         if (string.IsNullOrWhiteSpace(executorUri))

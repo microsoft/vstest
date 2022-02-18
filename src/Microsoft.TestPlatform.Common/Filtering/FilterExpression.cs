@@ -21,7 +21,7 @@ using CommonResources = Resources.Resources;
 /// <summary>
 /// Represents an expression tree.
 /// Supports:
-///     Logical Operators:  &, |
+///     Logical Operators:  <![CDATA[&, |]]>
 ///     Equality Operators: =, !=
 ///     Parenthesis (, ) for grouping.
 /// </summary>
@@ -43,7 +43,7 @@ internal class FilterExpression
     private readonly FilterExpression _right;
 
     /// <summary>
-    /// If logical expression is using logical And ('&') operator.
+    /// If logical expression is using logical And (<![CDATA['&']]>) operator.
     /// </summary>
     private readonly bool _areJoinedByAnd;
 

@@ -137,7 +137,7 @@ internal class ParallelDiscoveryDataAggregator
     /// <summary>
     /// Aggregate the source as fully discovered
     /// </summary>
-    /// <param name="sorce">Fully discovered source</param>
+    /// <param name="sources">Fully discovered source</param>
     public void MarkSourcesWithStatus(ICollection<string> sources, DiscoveryStatus status)
         => DiscoveryManager.MarkSourcesWithStatus(sources, status, _sourcesWithDiscoveryStatus);
 

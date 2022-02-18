@@ -193,7 +193,6 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     /// <summary>
     /// Sending discovery complete message to IDE
     /// </summary>
-    /// <param name="discoveryDataAggregator">Discovery aggregator to know if we already sent this message</param>
     /// <param name="testDiscoveryCompletePayload">Discovery complete payload to send</param>
     private void ConvertToRawMessageAndSend(DiscoveryCompletePayload testDiscoveryCompletePayload)
     {
@@ -218,8 +217,8 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     /// <summary>
     /// Aggregate source as fully discovered
     /// </summary>
-    /// <param name="discoveryDataAggregator">Aggregator to aggregate results</param>
     /// <param name="lastChunk">Last chunk of discovered test cases</param>
+    /// <param name="discoveryCompleteEventArgs">Aggregator to aggregate results</param>
     private void AggregateComingSourcesAsFullyDiscovered(IEnumerable<TestCase> lastChunk, DiscoveryCompleteEventArgs discoveryCompleteEventArgs)
     {
         if (lastChunk is null)

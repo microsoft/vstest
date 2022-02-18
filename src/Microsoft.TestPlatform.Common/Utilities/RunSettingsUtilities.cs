@@ -43,7 +43,7 @@ public static class RunSettingsUtilities
         string resultsDirectory = null;
         if (runConfiguration != null)
         {
-            // It will try to get path from runsettings, if not found then it will return default path. 
+            // It will try to get path from runsettings, if not found then it will return default path.
             resultsDirectory = Environment.ExpandEnvironmentVariables(runConfiguration.ResultsDirectory);
         }
 
@@ -172,7 +172,6 @@ public static class RunSettingsUtilities
     /// Gets the test adapters path from the run configuration
     /// </summary>
     /// <param name="runSettings">Test run settings</param>
-    /// <param name="returnNullIfNotSet">True to return null, if adapter paths is not set.</param>
     /// <returns>Test adapters paths</returns>
     public static IEnumerable<string> GetTestAdaptersPaths(string runSettings)
     {
@@ -195,10 +194,10 @@ public static class RunSettingsUtilities
     /// </summary>
     /// <param name="runSettings">Test run settings</param>
     /// <returns>Test adapter loading strategy</returns>
-    internal static TestAdapterLoadingStrategy GetLoadingStrategy(string runSettings) 
+    internal static TestAdapterLoadingStrategy GetLoadingStrategy(string runSettings)
     {
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
-        
+
         return runConfiguration.TestAdapterLoadingStrategy;
     }
 }

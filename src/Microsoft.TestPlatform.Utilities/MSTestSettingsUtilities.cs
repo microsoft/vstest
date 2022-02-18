@@ -23,7 +23,7 @@ public static class MSTestSettingsUtilities
     /// Imports the parameter settings file in the default runsettings.
     /// </summary>
     /// <param name="settingsFile">
-    /// Settings file which need to be imported. The file extension of the settings file will be specified by <paramref name="SettingsFileExtension"/> property.
+    /// Settings file which need to be imported. The file extension of the settings file will be specified by "SettingsFileExtension" property.
     /// </param>
     /// <param name="defaultRunSettings"> Input RunSettings document to which settings file need to be imported. </param>
     /// <returns> Updated RunSetting Xml document with imported settings. </returns>

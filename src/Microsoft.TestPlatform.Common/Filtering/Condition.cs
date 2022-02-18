@@ -169,8 +169,10 @@ internal class Condition
     }
 
     /// <summary>
-    /// Returns a condition object after parsing input string of format '<propertyName>Operation<propertyValue>'
+    /// Returns a condition object after parsing input string of format <![CDATA["<Name><Operation><Value>"]]>
     /// </summary>
+    /// <param name="conditionString"></param>
+    /// <returns></returns>
     internal static Condition Parse(string conditionString)
     {
         if (string.IsNullOrWhiteSpace(conditionString))

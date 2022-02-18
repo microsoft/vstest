@@ -121,7 +121,7 @@ internal class DiscovererEnumerator
     /// <param name="extensionAssembly"> The extension Assembly. </param>
     /// <param name="sources"> The sources.   </param>
     /// <param name="settings"> The settings.   </param>
-    /// <param name="settings"> The test case filter. </param>
+    /// <param name="testCaseFilter"> The test case filter. </param>
     /// <param name="logger"> The logger.  </param>
     private void LoadTestsFromAnExtension(string extensionAssembly, IEnumerable<string> sources, IRunSettings settings, string testCaseFilter, IMessageLogger logger)
     {
@@ -427,7 +427,6 @@ internal class DiscovererEnumerator
     /// Get assembly type to sources map.
     /// </summary>
     /// <param name="sources">Sources.</param>
-    /// <param name="assemblyType">Assembly type.</param>
     /// <returns>Sources with matching assembly type.</returns>
     private static IDictionary<AssemblyType, IList<string>> GetAssemblyTypeToSoucesMap(IEnumerable<string> sources, IAssemblyProperties assemblyProperties)
     {

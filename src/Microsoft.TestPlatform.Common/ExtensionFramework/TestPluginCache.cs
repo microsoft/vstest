@@ -114,7 +114,7 @@ public class TestPluginCache
     /// Pattern used to select files using String.EndsWith
     /// </param>
     /// <returns>
-    /// The <see cref="Dictionary"/>. of test plugin info.
+    /// The Dictionary of test plugin info.
     /// </returns>
     public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(string endsWithPattern)
         where TPluginInfo : TestPluginInformation
@@ -306,7 +306,6 @@ public class TestPluginCache
     /// Type of extension.
     /// </typeparam>
     /// <returns>
-    /// The <see cref="Dictionary"/>.
     /// </returns>
     internal Dictionary<string, TPluginInfo> GetTestExtensions<TPluginInfo, TExtension>(string extensionAssembly, bool skipCache = false) where TPluginInfo : TestPluginInformation
     {

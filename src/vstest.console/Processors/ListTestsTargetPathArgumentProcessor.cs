@@ -10,7 +10,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 
 /// <summary>
-//  An argument processor to provide path to the file for listing fully qualified tests.
+///  An argument processor to provide path to the file for listing fully qualified tests.
 /// To be used only with ListFullyQualifiedTests
 /// </summary>
 internal class ListTestsTargetPathArgumentProcessor : IArgumentProcessor

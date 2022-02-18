@@ -191,7 +191,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// Initialize blame.
     /// </summary>
     /// <param name="enableCrashDump">Enable dump.</param>
-    /// <param name="blameParameters">Blame parameters.</param>
+    /// <param name="collectDumpParameters">Blame parameters.</param>
     private void InitializeBlame(bool enableCrashDump, bool enableHangDump, Dictionary<string, string> collectDumpParameters)
     {
         // Add Blame Logger
