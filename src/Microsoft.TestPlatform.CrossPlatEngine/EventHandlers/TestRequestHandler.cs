@@ -78,7 +78,9 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
         _onLaunchAdapterProcessWithDebuggerAttachedAckReceived = onLaunchAdapterProcessWithDebuggerAttachedAckReceived;
         _onAttachDebuggerAckRecieved = onAttachDebuggerAckRecieved;
         _jobQueue = jobQueue;
+
         _fileHelper = new FileHelper();
+        _pathConverter = NullPathConverter.Instance;
     }
 
     protected TestRequestHandler(IDataSerializer dataSerializer, ICommunicationEndpointFactory communicationEndpointFactory)
@@ -91,7 +93,6 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
         _onLaunchAdapterProcessWithDebuggerAttachedAckReceived = (message) => throw new NotImplementedException();
         _onAttachDebuggerAckRecieved = (message) => throw new NotImplementedException();
 
-        _pathConverter = NullPathConverter.Instance;
         _jobQueue = new JobQueue<Action>(
             (action) => action(),
             "TestHostOperationQueue",
@@ -99,7 +100,9 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
             25000000,
             true,
             (message) => EqtTrace.Error(message));
+
         _fileHelper = new FileHelper();
+        _pathConverter = NullPathConverter.Instance;
     }
 
     /// <inheritdoc />
