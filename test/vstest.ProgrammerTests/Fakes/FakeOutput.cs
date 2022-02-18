@@ -9,10 +9,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 internal class FakeOutput : IOutput
 {
-    public FakeOutput()
-    {
-    }
-
     public List<OutputMessage> Messages { get; } = new();
     public StringBuilder CurrentLine { get; } = new();
     public List<string> Lines { get; } = new();

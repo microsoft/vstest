@@ -23,23 +23,26 @@ internal class Fixture : IDisposable
     public FakeFileHelper FileHelper { get; }
     public FakeTestRuntimeProviderManager TestRuntimeProviderManager { get; }
     public FakeTestRunEventsRegistrar TestRunEventsRegistrar { get; }
-    public TestEngine TestEngine { get; private set; }
-    public TestPlatform TestPlatform { get; private set; }
-    public TestRunResultAggregator TestRunResultAggregator { get; private set; }
-    public FakeTestPlatformEventSource TestPlatformEventSource { get; private set; }
-    public FakeAssemblyMetadataProvider AssemblyMetadataProvider { get; private set; }
-    public InferHelper InferHelper { get; private set; }
-    public FakeDataCollectorAttachmentsProcessorsFactory DataCollectorAttachmentsProcessorsFactory { get; private set; }
-    public TestRunAttachmentsProcessingManager TestRunAttachmentsProcessingManager { get; private set; }
-    public TestRequestManager TestRequestManager { get; private set; }
+    public TestEngine? TestEngine { get; private set; }
+    public TestPlatform? TestPlatform { get; private set; }
+    public TestRunResultAggregator? TestRunResultAggregator { get; private set; }
+    public FakeTestPlatformEventSource? TestPlatformEventSource { get; private set; }
+    public FakeAssemblyMetadataProvider? AssemblyMetadataProvider { get; private set; }
+    public InferHelper? InferHelper { get; private set; }
+    public FakeDataCollectorAttachmentsProcessorsFactory? DataCollectorAttachmentsProcessorsFactory { get; private set; }
+    public TestRunAttachmentsProcessingManager? TestRunAttachmentsProcessingManager { get; private set; }
+    public TestRequestManager? TestRequestManager { get; private set; }
     public List<TestResult> ExecutedTests => TestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults).ToList();
 
     public ProtocolConfig ProtocolConfig { get; internal set; }
 
     public Fixture()
     {
+// This type is compiled only in DEBUG, and won't exist otherwise.
+#if DEBUG
         // We need to use static class to find the communication endpoint, this clears all the registrations of previous tests.
         TestServiceLocator.Clear();
+#endif
 
         CurrentProcess = new FakeProcess(ErrorAggregator, @"X:\fake\vstest.console.exe", string.Empty, null, null, null, null, null);
         ProcessHelper = new FakeProcessHelper(ErrorAggregator, CurrentProcess);
@@ -110,20 +113,4 @@ internal class Fixture : IDisposable
     {
         ErrorAggregator.Errors.Should().BeEmpty();
     }
-}
-
-internal class DebugOptions
-{
-    public const int DefaultTimeout = 5;
-    // TODO: This setting is actually quite pointless, because I cannot come up with
-    // a useful way to abort quickly enough when debugger is attached and I am just running my tests (pressing F5)
-    // but at the same time not abort when I am in the middle of debugging some behavior. Maybe looking at debugger,
-    // and asking it if any breakpoints were hit / are set. But that is difficult.
-    //
-    // So normally I press F5 to investigate, but Ctrl+F5 (run without debugger), to run tests.
-    public const int DefaultDebugTimeout = 30 * 60;
-    public const bool DefaultBreakOnAbort = true;
-    public int Timeout { get; init; } = DefaultTimeout;
-    public int DebugTimeout { get; init; } = DefaultDebugTimeout;
-    public bool BreakOnAbort { get; init; } = DefaultBreakOnAbort;
 }

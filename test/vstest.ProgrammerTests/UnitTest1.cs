@@ -73,8 +73,10 @@ public class TestDiscoveryTests
         var fakeCommunicationChannel = new FakeCommunicationChannel<object>(responses, fakeErrorAggregator, 1);
         fakeCommunicationChannel.Start(new object());
         var fakeCommunicationEndpoint = new FakeCommunicationEndpoint(fakeCommunicationChannel, fakeErrorAggregator);
+#if DEBUG
         TestServiceLocator.Clear();
         TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint.TestHostConnectionInfo.Endpoint, fakeCommunicationEndpoint);
+#endif
         var fakeTestHostProcess = new FakeProcess(fakeErrorAggregator, @"C:\temp\testhost.exe");
         var fakeTestRuntimeProvider = new FakeTestRuntimeProvider(fakeProcessHelper, fakeTestHostProcess, fakeFileHelper, mstest1Dll.AsList(), fakeCommunicationEndpoint, fakeErrorAggregator);
         var fakeTestRuntimeProviderManager = new FakeTestRuntimeProviderManager(fakeErrorAggregator);
