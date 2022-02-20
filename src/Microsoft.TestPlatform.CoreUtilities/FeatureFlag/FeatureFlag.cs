@@ -12,9 +12,9 @@ internal partial class FeatureFlag : IFeatureFlag
 {
     private static readonly Dictionary<string, bool> FeatureFlags = new();
 
-    private const string Prefix = "VSTEST_FEATURE_";
+    private const string VSTEST_FEATURE = nameof(VSTEST_FEATURE);
 
-    public static IFeatureFlag Instance => new FeatureFlag();
+    public static IFeatureFlag Instance { get; } = new FeatureFlag();
 
     static FeatureFlag()
     {
@@ -24,12 +24,12 @@ internal partial class FeatureFlag : IFeatureFlag
 
     // Added for artifact porst-processing, it enable/disable the post processing.
     // Added in 17.2-preview 7.0-preview
-    public static string ARTIFACTS_POSTPROCESSING = Prefix + "ARTIFACTS_POSTPROCESSING";
+    public static string ARTIFACTS_POSTPROCESSING = VSTEST_FEATURE + "_" + "ARTIFACTS_POSTPROCESSING";
 
     // Added for artifact porst-processing, it will show old output for dotnet sdk scenario.
     // It can be useful if we need to restore old UX in case users are parsing the console output.
     // Added in 17.2-preview 7.0-preview
-    public static string ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX = Prefix + "ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX";
+    public static string ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX = VSTEST_FEATURE + "_" + "ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX";
 
     // For now we're checking env var.
     // We could add it also to some section inside the runsettings.
