@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 public class FeatureFlagTests
 {
     [TestMethod]
-    public void SingletonWorksAsExpected()
+    public void SingletonAlwaysReturnsTheSameInstance()
     {
         Assert.IsTrue(ReferenceEquals(FeatureFlag.Instance, FeatureFlag.Instance));
     }
