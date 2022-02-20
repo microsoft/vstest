@@ -18,7 +18,8 @@
                 url="https://github.com/microsoft/vstest" 
                 branch="$BranchName$" 
                 commit="$CommitId$" />
-                
+    <developmentdependency>true</developmentdependency>
+
     <dependencies>
       <group targetFramework="net45">
         <dependency id="System.Reflection.Metadata" version="[1.6.0, )" />

@@ -18,7 +18,8 @@
                 url="https://github.com/microsoft/vstest" 
                 branch="$BranchName$" 
                 commit="$CommitId$" />
-                
+    <developmentdependency>true</developmentdependency>
+
     <dependencies>
       <group targetFramework="net45"></group>
       <group targetFramework="netcoreapp1.0"></group>
