@@ -70,7 +70,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
         {
             if (_disposed)
             {
-                throw new ObjectDisposedException("DiscoveryRequest");
+                throw new ObjectDisposedException(nameof(DiscoveryRequest));
             }
 
             // Reset the discovery completion event
@@ -112,12 +112,21 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
         {
             if (_disposed)
             {
-                throw new ObjectDisposedException("DiscoveryRequest");
+                throw new ObjectDisposedException(nameof(DiscoveryRequest));
             }
 
             if (DiscoveryInProgress)
             {
-                DiscoveryManager.Abort();
+                // If testhost has old version, we should use old cancel logic
+                // to be consistent and not create regression issues
+                if (Constants.DefaultProtocolConfig.Version < Constants.MinimumProtocolVersionWithCancelDiscoveryEventHandlerSupport)
+                {
+                    DiscoveryManager.Abort();
+                }
+                else
+                {
+                    DiscoveryManager.Abort(this);
+                }
             }
             else
             {

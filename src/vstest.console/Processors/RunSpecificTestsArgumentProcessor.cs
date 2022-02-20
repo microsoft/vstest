@@ -274,7 +274,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
                 // No tests were discovered from the given sources.
                 warningMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.NoTestsAvailableInSources, string.Join(", ", _commandLineOptions.Sources));
 
-                if (string.IsNullOrEmpty(_commandLineOptions.TestAdapterPath))
+                if (!_commandLineOptions.TestAdapterPathsSet)
                 {
                     warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.StringFormatToJoinTwoStrings, warningMessage, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
                 }
@@ -376,7 +376,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
                 var testsFoundInAnySource = e.TestRunStatistics != null && (e.TestRunStatistics.ExecutedTests > 0);
 
                 // Indicate the user to use testadapterpath command if there are no tests found
-                if (!testsFoundInAnySource && string.IsNullOrEmpty(CommandLineOptions.Instance.TestAdapterPath) && _commandLineOptions.TestCaseFilterValue == null)
+                if (!testsFoundInAnySource && !CommandLineOptions.Instance.TestAdapterPathsSet && _commandLineOptions.TestCaseFilterValue == null)
                 {
                     _output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
                 }

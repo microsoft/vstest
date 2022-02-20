@@ -121,7 +121,12 @@ internal class CommandLineOptions
     /// <summary>
     /// Path to the custom test adapters.
     /// </summary>
-    public string TestAdapterPath { get; set; }
+    public string[] TestAdapterPath { get; set; }
+
+    /// <summary>
+    /// Test adapter loading strategy.
+    /// </summary>
+    public TestAdapterLoadingStrategy TestAdapterLoadingStrategy { get; set; }
 
     /// <summary>
     /// Process Id of the process which launched vstest runner
@@ -176,13 +181,9 @@ internal class CommandLineOptions
     /// <summary>
     /// Specifies whether the target device has a Windows Phone context or not
     /// </summary>
-    public bool HasPhoneContext
-    {
-        get
-        {
-            return !string.IsNullOrEmpty(TargetDevice);
-        }
-    }
+    public bool HasPhoneContext => !string.IsNullOrEmpty(TargetDevice);
+
+    public bool TestAdapterPathsSet => (TestAdapterPath?.Length ?? 0) != 0;
 
     /// <summary>
     /// Specifies the target platform type for test run.

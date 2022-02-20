@@ -128,6 +128,7 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
                 break;
             }
         }
+
         return testExtension;
     }
 

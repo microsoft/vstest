@@ -41,7 +41,7 @@ public class VsTestConsoleRequestSenderTests
 
     private readonly int _waitTimeout = 2000;
 
-    private readonly int _protocolVersion = 5;
+    private readonly int _protocolVersion = 6;
     private readonly IDataSerializer _serializer = JsonDataSerializer.Instance;
 
     public VsTestConsoleRequestSenderTests()
@@ -430,6 +430,90 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
         mockHandler.Verify(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()), Times.Once, "DiscoveredTests must be called");
         mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Never, "TestMessage event must not be called");
+    }
+
+    [TestMethod]
+    public void DiscoverTestsShouldCompleteWithSingleFullyDiscoveredSource()
+    {
+        InitializeCommunication();
+
+        var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
+
+        List<string> sources = new() { "1.dll" };
+
+        var testCase = new TestCase("hello", new Uri("world://how"), source: sources[0]);
+        var testsFound = new Message()
+        {
+            MessageType = MessageType.TestCasesFound,
+            Payload = JToken.FromObject(new List<TestCase>() { testCase })
+        };
+
+        var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = null, IsAborted = false, FullyDiscoveredSources = sources };
+        var discoveryComplete = new Message()
+        {
+            MessageType = MessageType.DiscoveryComplete,
+            Payload = JToken.FromObject(payload)
+        };
+
+        DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
+
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
+        mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
+            .Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
+
+        mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
+            .Callback((DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> tests) => receivedDiscoveryCompleteEventArgs = discoveryCompleteEventArgs);
+
+        _requestSender.DiscoverTests(sources, null, new TestPlatformOptions(), null, mockHandler.Object);
+
+        mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
+        Assert.IsNotNull(receivedDiscoveryCompleteEventArgs.FullyDiscoveredSources);
+        Assert.AreEqual(1, receivedDiscoveryCompleteEventArgs.FullyDiscoveredSources.Count);
+    }
+
+    [TestMethod]
+    public void DiscoverTestsShouldCompleteWithCorrectAbortedValuesIfAbortingWasRequested()
+    {
+        // Arrange
+        InitializeCommunication();
+
+        var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
+
+        List<string> sources = new() { "1.dll" };
+
+        var testCase = new TestCase("hello", new Uri("world://how"), source: sources[0]);
+        var testsFound = new Message()
+        {
+            MessageType = MessageType.TestCasesFound,
+            Payload = JToken.FromObject(new List<TestCase>() { testCase })
+        };
+
+        var payload = new DiscoveryCompletePayload() { TotalTests = -1, LastDiscoveredTests = null, IsAborted = true, FullyDiscoveredSources = sources };
+        var discoveryComplete = new Message()
+        {
+            MessageType = MessageType.DiscoveryComplete,
+            Payload = JToken.FromObject(payload)
+        };
+
+        DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
+
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
+        mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
+            .Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
+
+        mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
+            .Callback((DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> tests) => receivedDiscoveryCompleteEventArgs = discoveryCompleteEventArgs);
+
+        // Act
+        _requestSender.DiscoverTests(sources, null, new TestPlatformOptions(), null, mockHandler.Object);
+        _requestSender.CancelDiscovery();
+
+        // Assert
+        mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
+        Assert.IsNotNull(receivedDiscoveryCompleteEventArgs.FullyDiscoveredSources);
+        Assert.AreEqual(1, receivedDiscoveryCompleteEventArgs.FullyDiscoveredSources.Count);
+        Assert.AreEqual(-1, receivedDiscoveryCompleteEventArgs.TotalCount);
+        Assert.AreEqual(true, receivedDiscoveryCompleteEventArgs.IsAborted);
     }
 
     [TestMethod]

@@ -31,7 +31,7 @@ public class TestExtensionManagerTests
     {
         TestPluginCacheHelper.SetupMockExtensions(typeof(TestExtensionManagerTests));
         _messageLogger = TestSessionMessageLogger.Instance;
-        TestPluginManager.Instance.GetSpecificTestExtensions<TestLoggerPluginInformation, ITestLogger, ITestLoggerCapabilities, TestLoggerMetadata>
+        TestPluginManager.GetSpecificTestExtensions<TestLoggerPluginInformation, ITestLogger, ITestLoggerCapabilities, TestLoggerMetadata>
             (TestPlatformConstants.TestLoggerEndsWithPattern, out _unfilteredTestExtensions, out _filteredTestExtensions);
     }
 
