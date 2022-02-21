@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,27 +10,30 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-using CoreUtilities.Helpers;
-
-using Common;
+using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
-using Common.DataCollector;
+using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
-using Common.ExtensionFramework;
-using Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-using CommunicationUtilitiesResources = Resources.Resources;
-using CoreUtilitiesConstants = CoreUtilities.Constants;
+using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 
 /// <summary>
 /// Handles test session events received from vstest console process.

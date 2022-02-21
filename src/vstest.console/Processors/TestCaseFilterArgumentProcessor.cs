@@ -1,17 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 
-using CommandLine;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-using CommandLineResources = Resources.Resources;
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// Argument Executor for the "/TestCaseFilter" command line argument.

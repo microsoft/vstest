@@ -1,17 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
-
-using Discovery;
-
-using Execution;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-using ObjectModel.Engine.TesthostProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
 /// <summary>
 /// The factory that provides discovery and execution managers to the test host.

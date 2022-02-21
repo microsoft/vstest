@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
-using System;
-
-using CommandLineResources = Resources.Resources;
 
 /// <summary>
 /// An argument processor that allows the user to disable fakes

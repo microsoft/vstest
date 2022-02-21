@@ -1,19 +1,19 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.AcceptanceTests;
-
-using Microsoft.TestPlatform.TestUtilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
+
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 // this whole thing is complicated and depends on versions of OS and the target runtime

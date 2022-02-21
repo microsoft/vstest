@@ -1,17 +1,19 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
 #if NETFRAMEWORK
 
 #nullable disable
 
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities;
-
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
 
 [TestClass]
 public class AssemblyHelperTests

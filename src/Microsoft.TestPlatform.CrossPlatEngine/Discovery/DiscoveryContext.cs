@@ -1,20 +1,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-using Common.Filtering;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
-using CrossPlatEngineResources = Resources.Resources;
+using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 
 /// <summary>
 /// Specifies the user specified RunSettings and framework provided context of the discovery.

@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.IO;
+
 #if !NETSTANDARD1_0 && !WINDOWS_UWP
 
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
-
-using System;
-using System.IO;
 
 /// <summary>
 /// Sends output to the console.

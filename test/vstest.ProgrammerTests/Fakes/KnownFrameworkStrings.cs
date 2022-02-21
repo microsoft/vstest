@@ -17,7 +17,7 @@ internal static class KnownFrameworkStrings
     public static string Net6 = NetCore(6);
     public static string Net7 = NetCore(7);
 
-    public static string Net4 = NetFramework(4,0);
+    public static string Net4 = NetFramework(4, 0);
     public static string Net45 = NetFramework(4, 5);
     public static string Net451 = NetFramework(4, 5, 1);
     public static string Net452 = NetFramework(4, 5, 2);

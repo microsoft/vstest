@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -17,6 +13,10 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
 /// Facilitates communication using sockets

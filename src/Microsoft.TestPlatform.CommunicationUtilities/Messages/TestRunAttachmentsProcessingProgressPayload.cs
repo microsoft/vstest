@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
 /// Test run attachments processing complete payload.

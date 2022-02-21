@@ -1,25 +1,22 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 
-using Client.DesignMode;
-using Client.RequestHelper;
+using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
+using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-using ObjectModel;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-using PlatformAbstractions;
-using PlatformAbstractions.Interfaces;
+#nullable disable
 
-using TestPlatformHelpers;
-
-using CommandLineResources = Resources.Resources;
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// Argument Processor for the "--Port|/Port" command line argument.

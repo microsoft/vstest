@@ -1,25 +1,25 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Common.ExtensionFramework;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
-using ObjectModel.Engine.ClientProtocol;
-using ObjectModel.Engine.TesthostProtocol;
-using ObjectModel.Host;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 internal class InProcessProxyExecutionManager : IProxyExecutionManager
 {

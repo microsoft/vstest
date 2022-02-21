@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -12,17 +8,21 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
-using Client.RequestHelper;
-using Internal;
-using TestPlatformHelpers;
-using Common;
-using Common.Filtering;
-using Common.Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// Argument Executor for the "--ListFullyQualifiedTests|/ListFullyQualifiedTests" command line argument.

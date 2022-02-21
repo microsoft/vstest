@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-using Utilities;
-using PlatformAbstractions;
-
 using System;
 using System.Globalization;
 using System.Xml;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Stores information about a test settings.
@@ -772,11 +772,11 @@ public class RunConfiguration : TestRunSettings
                     case "TestAdapterLoadingStrategy":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                         value = reader.ReadElementContentAsString();
-                        if (Enum.TryParse<TestAdapterLoadingStrategy>(value, out var loadingStrategy)) 
+                        if (Enum.TryParse<TestAdapterLoadingStrategy>(value, out var loadingStrategy))
                         {
                             runConfiguration.TestAdapterLoadingStrategy = loadingStrategy;
                         }
-                        else 
+                        else
                         {
                             throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));

@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter;
-
 using System;
 using System.Collections.Generic;
 
@@ -15,7 +11,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using TestableImplementations;
+using TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations;
+
+#nullable disable
+
+namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter;
 
 [TestClass]
 public class TestExecutionRecorderTests

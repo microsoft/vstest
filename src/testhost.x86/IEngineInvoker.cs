@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.TestHost;
-
-using System.Collections.Generic;
 
 /// <summary>
 /// Interface contract for invoking the engine

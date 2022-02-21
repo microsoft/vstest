@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Runtime.Versioning;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
-using System.Runtime.Versioning;
-
-using ObjectModel;
 
 /// <summary>
 /// Defines interface for assembly properties.

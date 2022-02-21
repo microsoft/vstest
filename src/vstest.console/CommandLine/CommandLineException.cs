@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
-
-using System;
 
 /// <summary>
 /// Exception thrown by argument processors when they encounter an error with

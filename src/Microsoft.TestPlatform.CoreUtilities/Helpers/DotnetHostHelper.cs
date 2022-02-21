@@ -3,23 +3,23 @@
 
 #if !NETSTANDARD1_0
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
-
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
-using CoreUtilities.Resources;
-using Interfaces;
-using ObjectModel;
-using PlatformAbstractions;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-using Win32;
-
 using System;
 using System.IO;
 using System.Reflection.PortableExecutable;
+
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.Win32;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
 
 public class DotnetHostHelper : IDotnetHostHelper
 {

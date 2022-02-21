@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
-
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -21,6 +17,10 @@ using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 [TestClass]
 //Code coverage only supported on windows (based on the message in output)
@@ -160,7 +160,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         for (int i = 0; i < _testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
         {
-            VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingProgressEventArgs progressArgs = _testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
+            TestRunAttachmentsProcessingProgressEventArgs progressArgs = _testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
             Assert.AreEqual(i + 1, progressArgs.CurrentAttachmentProcessorIndex);
             Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorUris.Count);
             Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentAttachmentProcessorUris.First().AbsoluteUri);
@@ -215,7 +215,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         for (int i = 0; i < _testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
         {
-            VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingProgressEventArgs progressArgs = _testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
+            TestRunAttachmentsProcessingProgressEventArgs progressArgs = _testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
             Assert.AreEqual(i + 1, progressArgs.CurrentAttachmentProcessorIndex);
             Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorUris.Count);
             Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentAttachmentProcessorUris.First().AbsoluteUri);
@@ -268,7 +268,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         for (int i = 0; i < _testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
         {
-            VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingProgressEventArgs progressArgs = _testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
+            TestRunAttachmentsProcessingProgressEventArgs progressArgs = _testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
             Assert.AreEqual(i + 1, progressArgs.CurrentAttachmentProcessorIndex);
             Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentAttachmentProcessorUris.First().AbsoluteUri);
             Assert.AreEqual(2, progressArgs.AttachmentProcessorsCount);
@@ -325,7 +325,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         for (int i = 0; i < _testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
         {
-            VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingProgressEventArgs progressArgs = _testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
+            TestRunAttachmentsProcessingProgressEventArgs progressArgs = _testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
             Assert.AreEqual(i + 1, progressArgs.CurrentAttachmentProcessorIndex);
             Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentAttachmentProcessorUris.First().AbsoluteUri);
             Assert.AreEqual(2, progressArgs.AttachmentProcessorsCount);
@@ -386,7 +386,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         for (int i = 0; i < _testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
         {
-            VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingProgressEventArgs progressArgs = _testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
+            TestRunAttachmentsProcessingProgressEventArgs progressArgs = _testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
             Assert.AreEqual(i + 1, progressArgs.CurrentAttachmentProcessorIndex);
             Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentAttachmentProcessorUris.First().AbsoluteUri);
 

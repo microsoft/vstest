@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger;
-
 using System;
 using System.Xml;
 using System.Xml.Xsl;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger;
 
 /// <summary>
 /// Html transformer transforms the xml file to html file using xslt file.

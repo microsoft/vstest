@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace TestPlatform.Common.UnitTests.ExtensionFramework;
-
 using System;
 using System.Collections.Generic;
 
@@ -18,6 +14,10 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace TestPlatform.Common.UnitTests.ExtensionFramework;
 
 [TestClass]
 public class TestExtensionManagerTests

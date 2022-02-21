@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,14 +10,19 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Logging;
-using Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using NuGet.Frameworks;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+
 /// <summary>
 /// Logger for sending output to the console.
 /// All the console logger messages prints to Standard Output with respective color, except OutputLevel.Error messages

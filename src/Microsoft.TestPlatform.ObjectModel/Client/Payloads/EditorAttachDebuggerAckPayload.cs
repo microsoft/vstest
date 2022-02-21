@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Runtime.Serialization;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-
-using System.Runtime.Serialization;
 
 /// <summary>
 /// Class used to define the <see cref="EditorAttachDebuggerAckPayload"/> sent by the

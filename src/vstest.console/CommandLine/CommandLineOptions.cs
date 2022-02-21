@@ -1,23 +1,23 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+using vstest.console.Internal;
+
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using ObjectModel;
-
-using Utilities.Helpers;
-using Utilities.Helpers.Interfaces;
-
-using CommandLineResources = Resources.Resources;
-using vstest.console.Internal;
-using System.Globalization;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// Provides access to the command-line options.

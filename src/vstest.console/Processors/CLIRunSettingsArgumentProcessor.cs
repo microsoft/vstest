@@ -1,22 +1,22 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.Xml.XPath;
+
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
-using System;
-using System.Diagnostics.Contracts;
-using System.Xml.XPath;
-using System.Collections.Generic;
-
-using Common;
-using Common.Interfaces;
-using ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-
-using CommandLineResources = Resources.Resources;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 /// <summary>
 /// The argument processor for runsettings passed as argument through cli

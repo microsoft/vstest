@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Interfaces;
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -25,8 +21,12 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
-using CommunicationUtilitiesResources = VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
-using CoreUtilitiesConstants = VisualStudio.TestPlatform.CoreUtilities.Constants;
+using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
 /// <summary>
 /// An implementation of <see cref="IVsTestConsoleWrapper"/> to invoke test operations
