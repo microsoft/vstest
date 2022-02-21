@@ -7,52 +7,52 @@ using System.Reflection;
 
 public class Runner
 {
-    public static void Run(IEnumerable<string> path, IRunLogger logger)
+    public static void Run(IEnumerable<string> paths, IRunLogger logger)
     {
-        foreach (var p in path)
+        foreach (var path in paths)
         {
             try
             {
-                var asm = Assembly.LoadFrom(p);
-                if (asm.IsExcluded())
+                var assembly = Assembly.LoadFrom(path);
+                if (assembly.IsExcluded())
                     continue;
 
-                var ts = asm.GetTypes().SkipNonPublic().SkipExcluded();
-                foreach (var t in ts)
+                var types = assembly.GetTypes().SkipNonPublic().SkipExcluded();
+                foreach (var type in types)
                 {
-                    var ms = t.GetMethods().SkipExcluded();
+                    var methods = type.GetMethods().SkipExcluded();
 
                     // TODO: This chooses the Only tests only for single assembly and single class,
                     // to support this full we would have to enumerate all classes and methods first,
                     // it is easy, I just don't need it right now.
-                    var only = ms.Where(m => m.GetCustomAttribute<OnlyAttribute>() != null).ToList();
-                    if (only.Any())
-                        ms = only;
+                    var methodsWithOnly = methods.Where(m => m.GetCustomAttribute<OnlyAttribute>() != null).ToList();
+                    if (methodsWithOnly.Count > 0)
+                        methods = methodsWithOnly;
 
-                    foreach (var m in ms)
+                    foreach (var method in methods)
                     {
                         try
                         {
-                            var i = Activator.CreateInstance(t);
-                            var result = m.Invoke(i, Array.Empty<object>());
-                            if (result is Task task)
+                            var instance = Activator.CreateInstance(type);
+                            var testResult = method.Invoke(instance, Array.Empty<object>());
+                            if (testResult is Task task)
                             {
                                 // When the result is a task we need to await it.
                                 // TODO: this can be improved with await, imho
                                 task.GetAwaiter().GetResult();
                             };
 
-                            logger.WriteTestPassed(m);
+                            logger.WriteTestPassed(method);
                         }
                         catch (Exception ex)
                         {
                             if (ex is TargetInvocationException tex && tex.InnerException != null)
                             {
-                                logger.WriteTestFailure(m, tex.InnerException);
+                                logger.WriteTestFailure(method, tex.InnerException);
                             }
                             else
                             {
-                                logger.WriteTestFailure(m, ex);
+                                logger.WriteTestFailure(method, ex);
                             }
                         }
                     }

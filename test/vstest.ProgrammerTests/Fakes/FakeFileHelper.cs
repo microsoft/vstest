@@ -117,7 +117,7 @@ internal class FakeFileHelper : IFileHelper
         throw new NotImplementedException();
     }
 
-    internal void AddFile<T>(T file) where T : FakeFile
+    internal void AddFakeFile<T>(T file) where T : FakeFile
     {
         if (Files.Any(f => f.Path.Equals(file.Path, StringComparison.OrdinalIgnoreCase)))
         {
@@ -125,5 +125,23 @@ internal class FakeFileHelper : IFileHelper
         }
 
         Files.Add(file);
+    }
+
+    internal T GetFakeFile<T>(string path) where T : FakeFile
+    {
+        var matchingFiles = Files.Where(f => f.Path == path).ToList();
+        if (matchingFiles.Count == 0)
+            throw new FileNotFoundException($"Fake file {path}, was not found. Check if file was previously added to FakeFileHelper.");
+
+        // TODO: The public collection of files should probably be made readonly / immutable, and internally be made a concurrent dictionary, because it does not make
+        // sense to have more than 1 file object with the same name, and we check for that in AddFakeFile anyway.
+        if (matchingFiles.Count > 1)
+            throw new InvalidOperationException($"Fake file {path}, exists more than once. Are you modifying the Files collection in FakeFileHelper manually?");
+
+        var file = matchingFiles.Single();
+        if (file is not T result)
+            throw new InvalidOperationException($"Fake file {path}, was supposed to be a {typeof(T)}, but was {file.GetType()}.");
+
+        return result;
     }
 }

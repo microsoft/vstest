@@ -42,6 +42,8 @@ internal class Fixture : IDisposable
 #if DEBUG
         // We need to use static class to find the communication endpoint, this clears all the registrations of previous tests.
         TestServiceLocator.Clear();
+#else
+        throw new InvalidOperationException("Tests cannot run in Release mode, because TestServiceLocator is compiled only for Debug, and so the tests will fail to setup channel and will hang.");
 #endif
 
         CurrentProcess = new FakeProcess(ErrorAggregator, @"X:\fake\vstest.console.exe", string.Empty, null, null, null, null, null);

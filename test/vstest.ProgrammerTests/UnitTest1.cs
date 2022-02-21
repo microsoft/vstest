@@ -9,6 +9,8 @@ using System.Runtime.Versioning;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 
+using Intent;
+
 using Microsoft.VisualStudio.TestPlatform.Client;
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
@@ -76,6 +78,8 @@ public class TestDiscoveryTests
 #if DEBUG
         TestServiceLocator.Clear();
         TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint.TestHostConnectionInfo.Endpoint, fakeCommunicationEndpoint);
+#else
+        throw new InvalidOperationException("Tests cannot run in Release mode, because TestServiceLocator is compiled only for Debug, and so the tests will fail to setup channel and will hang.");
 #endif
         var fakeTestHostProcess = new FakeProcess(fakeErrorAggregator, @"C:\temp\testhost.exe");
         var fakeTestRuntimeProvider = new FakeTestRuntimeProvider(fakeProcessHelper, fakeTestHostProcess, fakeFileHelper, mstest1Dll.AsList(), fakeCommunicationEndpoint, fakeErrorAggregator);

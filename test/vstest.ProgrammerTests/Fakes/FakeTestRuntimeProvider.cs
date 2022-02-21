@@ -41,7 +41,7 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
         if (frameworks.Count > 1)
             throw new InvalidOperationException($"The provided dlls have more than 1 target framework {frameworks.JoinByComma()}. Fake TestRuntimeProvider cannot have dlls with mulitple target framework, because real testhost process can also run just a single target framework.");
 
-        fakeTestDlls.ForEach(FileHelper.AddFile);
+        fakeTestDlls.ForEach(FileHelper.AddFakeFile);
 
         fakeProcessHelper.AddFakeProcess(fakeTestHostProcess);
         TestHostProcess.ExitCallback = p =>

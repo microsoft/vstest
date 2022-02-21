@@ -11,11 +11,10 @@ internal class FakeProcessHelper : IProcessHelper
     // starting from 100 for no particular reason
     // I want to avoid processId 0 and 1 as they are
     // "reserved" on Windows (0) and Linux (both 0 and 1)
-    private int _lastProcessId = 100;
+    private static readonly SequentialId IdSource = new(100);
 
     public FakeProcess CurrentProcess { get; }
     public List<FakeProcess> Processes { get; } = new();
-    public int LastProcessId => _lastProcessId;
 
     public FakeErrorAggregator FakeErrorAggregator { get; }
 
@@ -28,7 +27,7 @@ internal class FakeProcessHelper : IProcessHelper
 
     public void AddFakeProcess(FakeProcess process)
     {
-        var id = Interlocked.Increment(ref _lastProcessId);
+        var id = IdSource.Next();
         process.SetId(id);
         Processes.Add(process);
     }
