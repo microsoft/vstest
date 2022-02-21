@@ -54,5 +54,4 @@ internal class ConsoleLogger : IRunLogger
 
         return newLines.ToLowerInvariant();
     }
-
 }
