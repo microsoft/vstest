@@ -19,7 +19,7 @@ internal abstract class FakeCommunicationChannel : ICommunicationChannel
     }
 
     public int Id { get; }
-    public CancellationTokenSource CancellationTokenSource = new();
+    public CancellationTokenSource CancellationTokenSource { get; } = new();
 
     public BlockingCollection<string> InQueue { get; } = new();
     public BlockingCollection<FakeMessage> OutQueue { get; } = new();
