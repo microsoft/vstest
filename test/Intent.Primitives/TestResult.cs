@@ -5,7 +5,7 @@ namespace Intent;
 
 public enum TestResult
 {
-    None = 0,
+    None,
     Passed,
     Failed,
     Error,

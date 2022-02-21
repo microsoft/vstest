@@ -743,7 +743,6 @@ public class TestRequestSender : ITestRequestSender
         }
         else
         {
-
             EqtTrace.Verbose("TestRequestSender is acting as server.");
             return new SocketServer();
         }
