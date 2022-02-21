@@ -31,6 +31,4 @@ public static class Extensions
             && i.Name != nameof(object.Equals)
             && i.GetCustomAttribute<ExcludeAttribute>() == null).ToList();
     }
-
-
 }
