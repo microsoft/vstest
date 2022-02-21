@@ -9,19 +9,20 @@ using System.Runtime.Versioning;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 
-using Intent;
-
 using Microsoft.VisualStudio.TestPlatform.Client;
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
+# if DEBUG
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+#endif
 
 using vstest.ProgrammerTests.Fakes;
 
@@ -79,7 +80,12 @@ public class TestDiscoveryTests
         TestServiceLocator.Clear();
         TestServiceLocator.Register<ICommunicationEndPoint>(fakeCommunicationEndpoint.TestHostConnectionInfo.Endpoint, fakeCommunicationEndpoint);
 #else
-        throw new InvalidOperationException("Tests cannot run in Release mode, because TestServiceLocator is compiled only for Debug, and so the tests will fail to setup channel and will hang.");
+        // This fools compiler into not being able to tell that the the rest of the code is unreachable.
+        var a = true;
+        if (a)
+        {
+            throw new InvalidOperationException("Tests cannot run in Release mode, because TestServiceLocator is compiled only for Debug, and so the tests will fail to setup channel and will hang.");
+        }
 #endif
         var fakeTestHostProcess = new FakeProcess(fakeErrorAggregator, @"C:\temp\testhost.exe");
         var fakeTestRuntimeProvider = new FakeTestRuntimeProvider(fakeProcessHelper, fakeTestHostProcess, fakeFileHelper, mstest1Dll.AsList(), fakeCommunicationEndpoint, fakeErrorAggregator);
