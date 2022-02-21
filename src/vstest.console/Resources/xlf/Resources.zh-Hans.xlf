@@ -1158,12 +1158,12 @@
       </trans-unit>
       <trans-unit id="TestAdapterLoadingStrategyValueInvalid">
         <source>Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!</source>
-        <target state="new">Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!</target>
+        <target state="translated">为 /TestAdapterLoadingStrategy 指定的值({0})无效!</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestAdapterLoadingStrategyValueInvalidRecursive">
         <source>Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}</source>
-        <target state="new">Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}</target>
+        <target state="translated">递归适配器加载策略不能由自身使用。请与以下一项或多项结合使用: {0}</target>
         <note>
         - Do not translate "Recursive",
         - {0} is the strategy names, seperated by comma: for example "Explicit, NextToSource"
@@ -1171,7 +1171,7 @@
       </trans-unit>
       <trans-unit id="TestAdapterPathValueRequiredWhenStrategyXIsUsed">
         <source>The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!</source>
-        <target state="new">The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!</target>
+        <target state="translated">指定“{0}”测试适配器加载策略时，需要提供 /TestAdapterPath 参数!</target>
         <note>{0} is the strategy name, "Explicit" for example.</note>
       </trans-unit>
     </body>
