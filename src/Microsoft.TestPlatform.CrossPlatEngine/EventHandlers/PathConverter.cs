@@ -4,13 +4,14 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.IO;
+
 using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using System.Collections.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-using System.IO;
 
 /// <summary>
 /// Converts paths in received and sent objects, to make testhost seem like it run a local test,

@@ -4,10 +4,11 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
 using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using System.Collections.ObjectModel;
 
 internal interface IPathConverter
 {
