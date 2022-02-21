@@ -25,12 +25,10 @@ public static class Extensions
     public static List<MethodInfo> SkipExcluded(this IEnumerable<MethodInfo> e)
     {
         return e.Where(i =>
-        i.Name != nameof(object.ToString)
-        && i.Name != nameof(object.GetType)
-        && i.Name != nameof(object.GetHashCode)
-        && i.Name != nameof(object.Equals)
-        && i.GetCustomAttribute<ExcludeAttribute>() == null).ToList();
+            i.Name != nameof(object.ToString)
+            && i.Name != nameof(object.GetType)
+            && i.Name != nameof(object.GetHashCode)
+            && i.Name != nameof(object.Equals)
+            && i.GetCustomAttribute<ExcludeAttribute>() == null).ToList();
     }
-
-
 }
