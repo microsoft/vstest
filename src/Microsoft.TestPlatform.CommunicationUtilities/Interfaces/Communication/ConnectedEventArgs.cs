@@ -15,6 +15,7 @@ public class ConnectedEventArgs : EventArgs
     /// <summary>
     /// Initializes a new instance of the <see cref="ConnectedEventArgs"/> class.
     /// </summary>
+    // TODO: Do we need this constructor?
     public ConnectedEventArgs()
     {
     }

@@ -152,6 +152,14 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
     {
         ValidateArg.NotNull(communicationManager, nameof(communicationManager));
         ValidateArg.NotNull(messageSink, nameof(messageSink));
+        // TODO: The MessageSink and DataCollectionRequestHandler have circular dependency.
+        // Message sink is injected into this Create method and then into constructor
+        // and into the constructor of DataCollectionRequestHandler. Data collection manager
+        // is then assigned to .Instace (which unlike many other .Instance is not populated
+        // directly in that property, but is created here). And then MessageSink depends on
+        // the .Instance. This is a very complicated way of solving the circular dependency,
+        // and should be replaced by adding a property to Message and assigning it.
+        // .Instance can then be removed.
         if (Instance == null)
         {
             lock (SyncObject)

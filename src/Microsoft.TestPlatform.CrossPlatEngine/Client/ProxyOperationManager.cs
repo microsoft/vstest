@@ -324,8 +324,16 @@ public class ProxyOperationManager
         {
             _initialized = false;
 
-            // Please clean up test host.
-            TestHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
+            // This is calling external code, make sure we don't fail when it throws
+            try
+            {
+                // Please clean up test host.
+                TestHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error($"ProxyOperationManager: Cleaning testhost failed: {ex}");
+            }
 
             TestHostManager.HostExited -= TestHostManagerHostExited;
             TestHostManager.HostLaunched -= TestHostManagerHostLaunched;
@@ -407,6 +415,9 @@ public class ProxyOperationManager
     {
         var properties = TestHostManager.GetType().GetRuntimeProperties();
 
+        // The field is actually defaulting to true, so this is just a complicated way to set or not set
+        // this to true (modern testhosts should have it set to true). Bad thing about this is that we are checking
+        // internal "undocumented" property. Good thing is that if you don't implement it you get the modern behavior.
         var versionCheckProperty = properties.FirstOrDefault(p => string.Equals(p.Name, _versionCheckPropertyName, StringComparison.OrdinalIgnoreCase));
         if (versionCheckProperty != null)
         {

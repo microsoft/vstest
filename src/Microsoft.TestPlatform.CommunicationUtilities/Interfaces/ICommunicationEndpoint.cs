@@ -15,7 +15,7 @@ public interface ICommunicationEndPoint
     event EventHandler<ConnectedEventArgs> Connected;
 
     /// <summary>
-    /// Event raised when an endPoint is disconnected.
+    /// Event raised when an endPoint is disconnected on failure. It should not be notified when we are just closing the connection after success.
     /// </summary>
     event EventHandler<DisconnectedEventArgs> Disconnected;
 
