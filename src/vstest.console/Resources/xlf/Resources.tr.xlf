@@ -1158,12 +1158,12 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
       </trans-unit>
       <trans-unit id="TestAdapterLoadingStrategyValueInvalid">
         <source>Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!</source>
-        <target state="new">Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!</target>
+        <target state="translated">/TestAdapterLoadingStrategy için belirtilen değer ({0}) geçersiz!</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestAdapterLoadingStrategyValueInvalidRecursive">
         <source>Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}</source>
-        <target state="new">Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}</target>
+        <target state="translated">Özyinelemeli bağdaştırıcı yükleme stratejisi kendisi tarafından kullanılamaz. Lütfen bir veya daha fazla öğeyle birleştirin: {0}</target>
         <note>
         - Do not translate "Recursive",
         - {0} is the strategy names, seperated by comma: for example "Explicit, NextToSource"
@@ -1171,7 +1171,7 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
       </trans-unit>
       <trans-unit id="TestAdapterPathValueRequiredWhenStrategyXIsUsed">
         <source>The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!</source>
-        <target state="new">The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!</target>
+        <target state="translated">Test bağdaştırıcısı yükleme stratejisi "{0}" belirtilirken /TestAdapterPath parametresi belirtilmelidir!</target>
         <note>{0} is the strategy name, "Explicit" for example.</note>
       </trans-unit>
     </body>
