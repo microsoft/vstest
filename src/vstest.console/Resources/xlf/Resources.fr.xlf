@@ -1134,26 +1134,26 @@
         - NextToSource: Load adapters next to source. 
 
         - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</source>
-        <target state="new">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
-      This affects adapter loading behavior.
+        <target state="translated">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+      Cela affecte le comportement de chargement de l’adaptateur.
 
-      Currently supported behaviors:
-        - Explicit: Test Platform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). 
-                    If a specific adapter path is provided, adapter will be loaded; if a directory path is provided adapters directly in that folder will be loaded, unless Recursive option is also specified.
-                    If no adapter path is specified, test run will fail.
-                    This will imply /InIsolation switch and force the tests to be run in an isolated process.
+Comportements actuellement pris en charge :
+        - Explicite : Test Platform charge uniquement les adaptateurs spécifiés par /TestAdapterPath (ou le nœud RunConfiguration.TestAdaptersPaths). 
+                    Si un chemin d’adaptateur spécifique est fourni, l’adaptateur est chargé ; si un chemin d’accès au répertoire est fourni, les adaptateurs directement dans ce dossier sont chargés, sauf si l’option Récursive est également spécifiée.
+                    Si aucun chemin d’adaptateur n’est spécifié, la série de tests échoue.
+                    Cela implique le commutateur /InIsolation et force l’exécution des tests dans un processus isolé.
         
-        - Default: Test Platform will load adapters is if this argument has not been specified. 
-                   It will pick up extensions from next to source, provided additional adapter paths and from the default directory.
+- Valeur par défaut : la plateforme de test charge les adaptateurs si cet argument n’a pas été spécifié. 
+                   Il va récupérer les extensions à côté de la source, les chemins d’adaptateur supplémentaires fournis et le répertoire par défaut.
 
-        - DefaultRuntimeProviders: Load default runtime providers shipped with Test Platform. 
-                                   If this is not specified when "Explicit" option is set, a test host provider need to be specified explicitly.
+- DefaultRuntimeProviders : chargez les fournisseurs de runtime par défaut livrés avec la plateforme de test. 
+                                   Si cette option n’est pas spécifiée lorsque l’option « Explicit » est définie, un fournisseur d’hôtes de test doit être spécifié explicitement.
 
-        - ExtensionsDirectory: Load adapters inside Extensions folder.
+- ExtensionsDirectory : charge les adaptateurs dans le dossier Extensions.
 
-        - NextToSource: Load adapters next to source. 
+- NextToSource : chargez les adaptateurs à côté de la source. 
 
-        - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</target>
+- Récursif : recherche récursive des dossiers lors du chargement des adaptateurs. Pour ce faire, vous devez spécifier également « Explicit » ou « NextToSource ».</target>
         <note>Do not translate "Default", "DefaultRuntimeProviders", "ExtensionsDirectory", "NextToSource" or "Recursive".</note>
       </trans-unit>
       <trans-unit id="TestAdapterLoadingStrategyValueInvalid">
