@@ -192,6 +192,10 @@ dotnet_diagnostic.CA1806.severity = warning # not default, increased severity to
 # CA1834: Consider using 'StringBuilder.Append(char)' when applicable
 dotnet_diagnostic.CA1834.severity = warning # not default, increased severity to ensure it is always applied
 
+# IDE0190: Null check can be simplified
+# Keep this in sync with the related C# rule: csharp_style_prefer_parameter_null_checking
+dotnet_diagnostic.IDE0190.severity = warning # not default, increased severity to ensure it is applied
+
 # CA1847: Use char literal for a single character lookup
 dotnet_diagnostic.CA1847.severity = warning # not default, increased severity to ensure it is always applied
 
