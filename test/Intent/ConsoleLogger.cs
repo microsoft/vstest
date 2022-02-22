@@ -44,13 +44,14 @@ internal class ConsoleLogger : IRunLogger
 
     private static string FormatMethodName(string methodName)
     {
-        var noUnderscores = methodName.Replace('_', ' ');
         // insert space before every capital letter or number that is after a non-capital letter
-        var spaced = Regex.Replace(noUnderscores, "(?<=[a-z])([A-Z0-9])", " $1");
+        var spaced = Regex.Replace(methodName, "(?<=[a-z])([A-Z0-9])", " $1");
         // insert space before every capital leter that is after a number
         var spaced2 = Regex.Replace(spaced, "(?<=[0-9]|^)([A-Z])", " $1");
-        var newLines = spaced2.Replace("When", $"{Environment.NewLine}     When")
-            .Replace("Then", $"{Environment.NewLine}     Then");
+        var newLines = spaced2
+            .Replace("_When", $"{Environment.NewLine}     When")
+            .Replace("_And", $"{Environment.NewLine}     And")
+            .Replace("_Then", $"{Environment.NewLine}     Then");
 
         return newLines.ToLowerInvariant();
     }

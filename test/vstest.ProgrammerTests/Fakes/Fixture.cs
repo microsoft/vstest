@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 internal class Fixture : IDisposable
 {
@@ -36,7 +37,7 @@ internal class Fixture : IDisposable
 
     public ProtocolConfig ProtocolConfig { get; internal set; }
 
-    public Fixture()
+    public Fixture(FixtureOptions? fixtureOptions = null)
     {
         // This type is compiled only in DEBUG, and won't exist otherwise.
 #if DEBUG
@@ -50,6 +51,12 @@ internal class Fixture : IDisposable
             throw new InvalidOperationException("Tests cannot run in Release mode, because TestServiceLocator is compiled only for Debug, and so the tests will fail to setup channel and will hang.");
         }
 #endif
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        FeatureFlag.Reset();
+        fixtureOptions?.FeatureFlags?.ToList().ForEach(flag => FeatureFlag.SetFlag(flag.Key, flag.Value));
+#pragma warning restore CS0618 // Type or member is obsolete
+
 
         CurrentProcess = new FakeProcess(ErrorAggregator, @"X:\fake\vstest.console.exe", string.Empty, null, null, null, null, null);
         ProcessHelper = new FakeProcessHelper(ErrorAggregator, CurrentProcess);

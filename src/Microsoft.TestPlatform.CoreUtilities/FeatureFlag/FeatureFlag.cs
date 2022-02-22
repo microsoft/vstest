@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 
 // !!! FEATURES MUST BE KEPT IN SYNC WITH https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestFeatureFlag.cs !!!
-internal partial class FeatureFlag : IFeatureFlag
+internal sealed class FeatureFlag : IFeatureFlag
 {
     private static readonly Dictionary<string, bool> FeatureFlags = new();
 
@@ -19,18 +19,40 @@ internal partial class FeatureFlag : IFeatureFlag
 
     static FeatureFlag()
     {
-        FeatureFlags.Add(ARTIFACTS_POSTPROCESSING, true);
-        FeatureFlags.Add(ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX, false);
+#pragma warning disable CS0618 // Type or member is obsolete
+        Reset();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
-    // Added for artifact porst-processing, it enable/disable the post processing.
-    // Added in 17.2-preview 7.0-preview
-    public static string ARTIFACTS_POSTPROCESSING = VSTEST_FEATURE + "_" + "ARTIFACTS_POSTPROCESSING";
+    [Obsolete("Use this only from tests, and ctor.")]
+    internal static void Reset()
+    {
+        FeatureFlags.Clear();
+        FeatureFlags.Add(ARTIFACTS_POSTPROCESSING, true);
+        FeatureFlags.Add(ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX, false);
+        FeatureFlags.Add(MULTI_TFM_RUN, true);
+    }
 
-    // Added for artifact porst-processing, it will show old output for dotnet sdk scenario.
+    [Obsolete("Use this only from tests.")]
+    internal static void SetFlag(string name, bool value)
+    {
+        if (!FeatureFlags.ContainsKey(name))
+            throw new ArgumentException($"Feature flag {name} is a known feature flag.");
+        
+        FeatureFlags[name] = value;
+    }
+
+    // Added for artifact post-processing, it enable/disable the post processing.
+    // Added in 17.2-preview 7.0-preview
+    public static string ARTIFACTS_POSTPROCESSING = VSTEST_FEATURE + "_" + nameof(ARTIFACTS_POSTPROCESSING);
+
+    // Added for artifact post-processing, it will show old output for dotnet sdk scenario.
     // It can be useful if we need to restore old UX in case users are parsing the console output.
     // Added in 17.2-preview 7.0-preview
-    public static string ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX = VSTEST_FEATURE + "_" + "ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX";
+    public static string ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX = VSTEST_FEATURE + "_" + nameof(ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX);
+
+    // Allow vstest.console to sources from multiple TFMs
+    public static string MULTI_TFM_RUN = VSTEST_FEATURE + "_" + nameof(MULTI_TFM_RUN);
 
     // For now we're checking env var.
     // We could add it also to some section inside the runsettings.
