@@ -14,7 +14,7 @@ public class TestSessionCorrelationIdProcessorTests
 {
     [TestMethod]
     public void ProcessorExecutorInitialize_ShouldFailIfNullCommandOption() =>
-        Assert.ThrowsException<ArgumentNullException>(() => new TestSessionCorrelationIdProcessorModeProcessorExecutor(null));
+        Assert.ThrowsException<ArgumentNullException>(() => new TestSessionCorrelationIdProcessorModeProcessorExecutor(null!));
 
     [TestMethod]
     public void ProcessorExecutorInitialize_ShouldFailIfNullSession()

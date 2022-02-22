@@ -1158,12 +1158,12 @@
       </trans-unit>
       <trans-unit id="TestAdapterLoadingStrategyValueInvalid">
         <source>Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!</source>
-        <target state="new">Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!</target>
+        <target state="translated">/TestAdapterLoadingStrategy에 대해 지정된 값({0})이 잘못되었습니다!</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestAdapterLoadingStrategyValueInvalidRecursive">
         <source>Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}</source>
-        <target state="new">Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}</target>
+        <target state="translated">재귀 어댑터 로드 전략은 단독으로 사용할 수 없습니다. 다음 중 하나 이상과 결합하세요. {0}</target>
         <note>
         - Do not translate "Recursive",
         - {0} is the strategy names, seperated by comma: for example "Explicit, NextToSource"
@@ -1171,7 +1171,7 @@
       </trans-unit>
       <trans-unit id="TestAdapterPathValueRequiredWhenStrategyXIsUsed">
         <source>The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!</source>
-        <target state="new">The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!</target>
+        <target state="translated">"{0}" 테스트 어댑터 로드 전략이 지정된 경우 /TestAdapterPath 매개 변수를 제공해야 합니다!</target>
         <note>{0} is the strategy name, "Explicit" for example.</note>
       </trans-unit>
     </body>

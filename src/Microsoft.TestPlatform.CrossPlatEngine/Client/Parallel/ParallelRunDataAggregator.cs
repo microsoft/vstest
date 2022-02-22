@@ -72,6 +72,7 @@ internal class ParallelRunDataAggregator
         {
             foreach (var runStats in _testRunStatsList)
             {
+                // TODO: we get nullref here if the stats are empty.
                 foreach (var outcome in runStats.Stats.Keys)
                 {
                     if (!testOutcomeMap.ContainsKey(outcome))

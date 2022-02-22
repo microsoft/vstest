@@ -14,7 +14,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 /// <summary>
 /// Responsible for managing TestRuntimeProviderManager extensions
 /// </summary>
-public class TestRuntimeProviderManager
+public class TestRuntimeProviderManager : ITestRuntimeProviderManager
 {
     private static TestRuntimeProviderManager s_testHostManager;
 

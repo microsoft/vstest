@@ -52,6 +52,8 @@ internal class TestRequestManager : ITestRequestManager
 
     private readonly ITestPlatform _testPlatform;
     private readonly ITestPlatformEventSource _testPlatformEventSource;
+    // TODO: No idea what is Task supposed to buy us, Tasks start immediately on instantiation
+    // and the work done to produce the metrics publisher is minimal.
     private readonly Task<IMetricsPublisher> _metricsPublisher;
     private readonly object _syncObject = new();
 

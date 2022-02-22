@@ -1,18 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
-
-using System;
 
 internal class TestArtifacts
 {
-    public TestArtifacts(string testSession, Artifact[] artifacts)
+    public TestArtifacts(string testSession!!, Artifact[] artifacts!!)
     {
-        TestSession = testSession ?? throw new ArgumentNullException(nameof(testSession));
-        Artifacts = artifacts ?? throw new ArgumentNullException(nameof(artifacts));
+        TestSession = testSession;
+        Artifacts = artifacts;
     }
 
     public Artifact[] Artifacts { get; set; }
@@ -22,9 +18,9 @@ internal class TestArtifacts
 
 internal class Artifact
 {
-    public Artifact(string fileName, ArtifactType type)
+    public Artifact(string fileName!!, ArtifactType type)
     {
-        FileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
+        FileName = fileName;
         Type = type;
     }
 

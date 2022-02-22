@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 using System;
 using System.Collections.Generic;
 
+// !!! FEATURES MUST BE KEPT IN SYNC WITH https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestFeatureFlag.cs !!!
 internal partial class FeatureFlag : IFeatureFlag
 {
     private static readonly Dictionary<string, bool> FeatureFlags = new();

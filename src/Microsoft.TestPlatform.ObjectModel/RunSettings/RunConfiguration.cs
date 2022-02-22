@@ -502,10 +502,10 @@ public class RunConfiguration : TestRunSettings
             root.AppendChild(testAdaptersPaths);
         }
 
-        if (this.TestAdapterLoadingStrategy != TestAdapterLoadingStrategy.Default) 
+        if (TestAdapterLoadingStrategy != TestAdapterLoadingStrategy.Default)
         {
             XmlElement adapterLoadingStrategy = doc.CreateElement("TestAdapterLoadingStrategy");
-            adapterLoadingStrategy.InnerXml = this.TestAdapterLoadingStrategy.ToString();
+            adapterLoadingStrategy.InnerXml = TestAdapterLoadingStrategy.ToString();
             root.AppendChild(adapterLoadingStrategy);
         }
 
