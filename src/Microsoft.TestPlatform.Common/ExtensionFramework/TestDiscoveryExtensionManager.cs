@@ -63,7 +63,6 @@ internal class TestDiscoveryExtensionManager
     {
         if (s_testDiscoveryExtensionManager == null)
         {
-
             TestPluginManager.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                     TestPlatformConstants.TestAdapterEndsWithPattern,
                     out var unfilteredTestExtensions,
