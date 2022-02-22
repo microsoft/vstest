@@ -20,7 +20,7 @@ public class TestSessionStartArgs : InProcDataCollectionArgs
     /// </summary>
     public TestSessionStartArgs()
     {
-        Configuration = String.Empty;
+        Configuration = string.Empty;
     }
 
     /// <summary>
@@ -31,7 +31,7 @@ public class TestSessionStartArgs : InProcDataCollectionArgs
     /// </param>
     public TestSessionStartArgs(IDictionary<string, object> properties)
     {
-        Configuration = String.Empty;
+        Configuration = string.Empty;
         _properties = properties;
     }
 

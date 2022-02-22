@@ -1116,7 +1116,7 @@ public class ConsoleLoggerTests
         _mockOutput.Verify(o => o.Write(PassedTestIndicator, OutputLevel.Information), Times.Once());
         _mockOutput.Verify(o => o.WriteLine("TestName", OutputLevel.Information), Times.Once());
         _mockOutput.Verify(o => o.WriteLine(" Hello", OutputLevel.Information), Times.Once());
-        _mockOutput.Verify(o => o.WriteLine(String.Empty, OutputLevel.Information), Times.AtLeastOnce);
+        _mockOutput.Verify(o => o.WriteLine(string.Empty, OutputLevel.Information), Times.AtLeastOnce);
     }
 
     [TestMethod]

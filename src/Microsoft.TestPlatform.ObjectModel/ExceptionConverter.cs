@@ -15,7 +15,7 @@ using System;
 #endif
 public class TestPlatformException : Exception
 {
-    public TestPlatformException(String message)
+    public TestPlatformException(string message)
         : base(message)
     {
     }
@@ -57,7 +57,7 @@ public class TestPlatformException : Exception
         /// <param name="innerException">actual exception that is to be wrapped</param>
         /// <returns>actual exception that is represented by the exception name</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Instantiating an instance of Exception class")]
-        private static Exception ConvertException(String exceptionType, String message, Exception innerException)
+        private static Exception ConvertException(string exceptionType, string message, Exception innerException)
         {
             try
             {

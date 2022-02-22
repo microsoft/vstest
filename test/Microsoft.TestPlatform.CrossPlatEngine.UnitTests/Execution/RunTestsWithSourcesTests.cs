@@ -285,7 +285,7 @@ public class RunTestsWithSourcesTests
 
         _runTestsInstance.CallSendSessionStart();
 
-        mockTestCaseEventsHandler.Verify(x => x.SendSessionStart(It.Is<IDictionary<String, object>>(
+        mockTestCaseEventsHandler.Verify(x => x.SendSessionStart(It.Is<IDictionary<string, object>>(
             y => y.ContainsKey("TestSources")
                  && ((IEnumerable<string>)y["TestSources"]).Contains("1.dll")
                  && ((IEnumerable<string>)y["TestSources"]).Contains("2.dll")

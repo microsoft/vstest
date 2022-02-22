@@ -38,7 +38,7 @@ public interface IRunContext : IDiscoveryContext
     /// It is used only with sources. With specific test cases it will always be null.
     /// If there is a parsing error or filter expression has unsupported properties, TestPlatformFormatException() is thrown.
     /// </summary>
-    ITestCaseFilterExpression GetTestCaseFilter(IEnumerable<String> supportedProperties, Func<string, TestProperty> propertyProvider);
+    ITestCaseFilterExpression GetTestCaseFilter(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider);
 
     /// <summary>
     /// Directory which should be used for storing result files/deployment files etc.

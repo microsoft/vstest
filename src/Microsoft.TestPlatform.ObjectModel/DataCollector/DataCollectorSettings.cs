@@ -161,7 +161,7 @@ public class DataCollectorSettings
                         }
                         catch (UriFormatException)
                         {
-                            throw new SettingsException(String.Format(CultureInfo.CurrentCulture, Resources.Resources.InvalidDataCollectorUriInSettings, reader.Value));
+                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.InvalidDataCollectorUriInSettings, reader.Value));
                         }
 
                         break;
@@ -186,7 +186,7 @@ public class DataCollectorSettings
 
                     default:
                         throw new SettingsException(
-                            String.Format(
+                            string.Format(
                                 CultureInfo.CurrentCulture,
                                 Resources.Resources.InvalidSettingsXmlAttribute,
                                 Constants.DataCollectionRunSettingsName,
@@ -212,7 +212,7 @@ public class DataCollectorSettings
 
                     default:
                         throw new SettingsException(
-                            String.Format(
+                            string.Format(
                                 CultureInfo.CurrentCulture,
                                 Resources.Resources.InvalidSettingsXmlElement,
                                 Constants.DataCollectionRunSettingsName,

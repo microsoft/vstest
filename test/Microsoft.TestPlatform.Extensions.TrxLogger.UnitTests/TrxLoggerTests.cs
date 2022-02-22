@@ -236,7 +236,7 @@ public class TrxLoggerTests
 
         _testableTrxLogger.TestResultHandler(new object(), skip1.Object);
 
-        string expectedMessage = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.MessageForSkippedTests, "Skip1");
+        string expectedMessage = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.MessageForSkippedTests, "Skip1");
 
         Assert.AreEqual(expectedMessage + Environment.NewLine, _testableTrxLogger.GetRunLevelInformationalMessage());
     }
@@ -745,9 +745,9 @@ public class TrxLoggerTests
         testCase1.SetPropertyValue(testProperty, new[] { "ClassLevel", "AsmLevel" });
 
         var converter = new Converter(new Mock<IFileHelper>().Object, new TrxFileHelper());
-        List<String> listCategoriesActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "MSTestDiscoverer.TestCategory");
+        List<string> listCategoriesActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "MSTestDiscoverer.TestCategory");
 
-        List<String> listCategoriesExpected = new()
+        List<string> listCategoriesExpected = new()
         {
             "ClassLevel",
             "AsmLevel"

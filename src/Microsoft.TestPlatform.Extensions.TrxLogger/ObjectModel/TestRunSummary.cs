@@ -57,7 +57,7 @@ internal class TestRunSummary : IXmlTestStore
 
     private readonly List<CollectorDataEntry> _collectorDataEntries;
 
-    private readonly IList<String> _resultFiles;
+    private readonly IList<string> _resultFiles;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRunSummary"/> class.
@@ -97,7 +97,7 @@ internal class TestRunSummary : IXmlTestStore
         TestOutcome outcome,
         List<RunInfo> runMessages,
         string stdOut,
-        IList<String> resultFiles,
+        IList<string> resultFiles,
         List<CollectorDataEntry> dataCollectors)
     {
         _totalTests = total;

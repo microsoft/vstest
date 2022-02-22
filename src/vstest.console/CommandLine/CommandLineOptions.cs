@@ -268,7 +268,7 @@ internal class CommandLineOptions
     /// <param name="source">Path to source file to look for tests in.</param>
     public void AddSource(string source)
     {
-        if (String.IsNullOrWhiteSpace(source))
+        if (string.IsNullOrWhiteSpace(source))
         {
             throw new TestSourceException(CommandLineResources.CannotBeNullOrEmpty);
         }

@@ -155,8 +155,8 @@ public class EnvironmentArgumentProcessorTests
         // Arrange
         _settingsProvider.UpdateRunSettingsNode("RunConfiguration.EnvironmentVariables.VARIABLE",
             "Initial value");
-        var warningMessage = String.Format(CommandLineResources.CommandLineWarning,
-            String.Format(CommandLineResources.EnvironmentVariableXIsOverriden, "VARIABLE")
+        var warningMessage = string.Format(CommandLineResources.CommandLineWarning,
+            string.Format(CommandLineResources.EnvironmentVariableXIsOverriden, "VARIABLE")
         );
         _mockOutput.Setup(mock =>
             mock.WriteLine(

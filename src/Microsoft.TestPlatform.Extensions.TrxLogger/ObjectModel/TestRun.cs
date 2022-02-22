@@ -163,13 +163,13 @@ internal sealed class TestRun
         if (RunConfiguration == null)
         {
             Debug.Fail("'RunConfiguration' is null");
-            throw new Exception(String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunConfigInRun));
+            throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunConfigInRun));
         }
 
         if (string.IsNullOrEmpty(RunConfiguration.RunDeploymentRootDirectory))
         {
             Debug.Fail("'RunConfiguration.RunDeploymentRootDirectory' is null or empty");
-            throw new Exception(String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunDeploymentRootInRunConfig));
+            throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunDeploymentRootInRunConfig));
         }
 
         return RunConfiguration.RunDeploymentInDirectory;
@@ -185,7 +185,7 @@ internal sealed class TestRun
     private void Initialize()
     {
         _id = Guid.NewGuid();
-        _name = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_TestRunName, Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
+        _name = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_TestRunName, Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
 
         // Fix for issue (https://github.com/Microsoft/vstest/issues/213). Since there is no way to find current user in linux machine.
         // We are catching PlatformNotSupportedException for non windows machine.

@@ -47,7 +47,7 @@ internal sealed class FileHelper
         {
             if (InvalidFileNameChars.ContainsKey(fileName[i]))
             {
-                invalidCharacters = String.Concat(invalidCharacters, fileName[i]);
+                invalidCharacters = string.Concat(invalidCharacters, fileName[i]);
                 result = false;
             }
         }

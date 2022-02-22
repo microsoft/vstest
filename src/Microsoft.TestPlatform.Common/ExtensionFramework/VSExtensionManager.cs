@@ -90,7 +90,7 @@ public class VSExtensionManager : IVSExtensionManager
             object extensionManager;
             object settingsManager;
 
-            settingsManager = SettingsManagerType.GetMethod("CreateForApplication", new Type[] { typeof(String) }).Invoke(null, new object[] { installContext.GetVisualStudioPath(vsInstallPath) });
+            settingsManager = SettingsManagerType.GetMethod("CreateForApplication", new Type[] { typeof(string) }).Invoke(null, new object[] { installContext.GetVisualStudioPath(vsInstallPath) });
             if (settingsManager != null)
             {
                 try
@@ -100,7 +100,7 @@ public class VSExtensionManager : IVSExtensionManager
 
                     if (extensionManager != null)
                     {
-                        installedExtensions = ExtensionManagerServiceType.GetMethod("GetEnabledExtensionContentLocations", new Type[] { typeof(String) }).Invoke(
+                        installedExtensions = ExtensionManagerServiceType.GetMethod("GetEnabledExtensionContentLocations", new Type[] { typeof(string) }).Invoke(
                             extensionManager, new object[] { extensionType }) as IEnumerable<string>;
                     }
                     else

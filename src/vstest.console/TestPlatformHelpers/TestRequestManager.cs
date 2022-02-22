@@ -1205,7 +1205,7 @@ internal class TestRequestManager : ITestRequestManager
         };
     }
 
-    private List<String> GetSources(TestRunRequestPayload testRunRequestPayload)
+    private List<string> GetSources(TestRunRequestPayload testRunRequestPayload)
     {
         List<string> sources = new();
         if (testRunRequestPayload.Sources != null

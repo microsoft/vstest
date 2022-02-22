@@ -404,9 +404,9 @@ public class JobQueueTests
     /// a class that inherits from job queue and over rides the WaitForQueueToEmpty to allow for checking that blocking and
     /// unblocking work as expected.
     /// </summary>
-    internal class JobQueueWrapper : JobQueue<String>
+    internal class JobQueueWrapper : JobQueue<string>
     {
-        public JobQueueWrapper(Action<String> processJob,
+        public JobQueueWrapper(Action<string> processJob,
             int maxNoOfStringsQueueCanHold,
             int maxNoOfBytesQueueCanHold,
             bool isBoundsEnabled,
@@ -440,9 +440,9 @@ public class JobQueueTests
     /// a class that inherits from job queue and over rides the WaitForQueueToEmpty to simply setting a boolean to tell
     /// whether or not the queue entered the blocking method during the enqueue process.
     /// </summary>
-    internal class JobQueueNonBlocking : JobQueue<String>
+    internal class JobQueueNonBlocking : JobQueue<string>
     {
-        public JobQueueNonBlocking(Action<String> processHandler)
+        public JobQueueNonBlocking(Action<string> processHandler)
             : base(processHandler, "foo", 1, 5, true, (message) => { })
         {
             EnteredBlockingMethod = false;
