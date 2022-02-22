@@ -53,34 +53,13 @@ internal abstract class ListExtensionsArgumentProcessor : IArgumentProcessor
 
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor = new Lazy<IArgumentExecutor>(_getExecutor);
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(_getExecutor);
 
-            return _executor;
-        }
-
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(_getCapabilities);
-            }
-
-            return _metadata;
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(_getCapabilities);
 }
 
 #region List discoverers

@@ -125,17 +125,7 @@ internal class TestRequestManager : ITestRequestManager
     /// Gets the test request manager instance.
     /// </summary>
     public static ITestRequestManager Instance
-    {
-        get
-        {
-            if (s_testRequestManagerInstance == null)
-            {
-                s_testRequestManagerInstance = new TestRequestManager();
-            }
-
-            return s_testRequestManagerInstance;
-        }
-    }
+        => s_testRequestManagerInstance ??= new TestRequestManager();
 
     #region ITestRequestManager
 

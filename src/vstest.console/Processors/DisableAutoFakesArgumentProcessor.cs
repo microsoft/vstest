@@ -23,24 +23,15 @@ internal class DisableAutoFakesArgumentProcessor : IArgumentProcessor
 
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            return _executor ??= new Lazy<IArgumentExecutor>(
-                () => new DisableAutoFakesArgumentExecutor(
-                    CommandLineOptions.Instance));
-        }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new DisableAutoFakesArgumentExecutor(CommandLineOptions.Instance));
 
         set => _executor = value;
     }
 
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            return _metadata ??= new Lazy<IArgumentProcessorCapabilities>(
-                () => new DisableAutoFakesArgumentProcessorCapabilities());
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new DisableAutoFakesArgumentProcessorCapabilities());
 }
 
 internal class DisableAutoFakesArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities

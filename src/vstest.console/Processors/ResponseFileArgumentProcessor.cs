@@ -26,17 +26,8 @@ internal class ResponseFileArgumentProcessor : IArgumentProcessor
     /// Gets the metadata.
     /// </summary>
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ResponseFileArgumentProcessorCapabilities());
-            }
-
-            return _metadata;
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new ResponseFileArgumentProcessorCapabilities());
 
     /// <summary>
     /// Gets or sets the executor.

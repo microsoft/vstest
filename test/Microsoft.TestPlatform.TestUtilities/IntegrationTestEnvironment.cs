@@ -73,17 +73,7 @@ public class IntegrationTestEnvironment
     }
 
     public Dictionary<string, string> DependencyVersions
-    {
-        get
-        {
-            if (s_dependencyVersions == null)
-            {
-                s_dependencyVersions = GetDependencies(TestPlatformRootDirectory);
-            }
-
-            return s_dependencyVersions;
-        }
-    }
+        => s_dependencyVersions ??= GetDependencies(TestPlatformRootDirectory);
 
     /// <summary>
     /// Gets the nuget packages directory for enlistment.

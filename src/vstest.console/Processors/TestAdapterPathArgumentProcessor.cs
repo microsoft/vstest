@@ -38,7 +38,8 @@ internal class TestAdapterPathArgumentProcessor : IArgumentProcessor
     /// Gets the metadata.
     /// </summary>
     public Lazy<IArgumentProcessorCapabilities> Metadata
-        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() => new TestAdapterPathArgumentProcessorCapabilities());
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new TestAdapterPathArgumentProcessorCapabilities());
 
     /// <summary>
     /// Gets or sets the executor.
