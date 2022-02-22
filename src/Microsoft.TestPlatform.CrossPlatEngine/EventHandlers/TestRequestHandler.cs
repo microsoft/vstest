@@ -16,6 +16,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
