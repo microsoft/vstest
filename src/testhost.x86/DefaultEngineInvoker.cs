@@ -61,6 +61,13 @@ internal class DefaultEngineInvoker :
 
     private const string TelemetryOptedIn = "--telemetryoptedin";
 
+    // this path is where the sources were originally located on the source system
+    // we are in a testhost that runs on the remote system, so this local path is
+    // actually remote for us and the remote path is local for us. 
+    private const string LocalPath = "--local-path";
+
+    private const string RemotePath = "--remote-path";
+
     private readonly ITestRequestHandler _requestHandler;
 
     private readonly IDataCollectionTestCaseEventSender _dataCollectionTestCaseEventSender;
@@ -82,6 +89,17 @@ internal class DefaultEngineInvoker :
     public void Invoke(IDictionary<string, string> argsDictionary)
     {
         InitializeEqtTrace(argsDictionary);
+
+        // We don't have a way to pass these values to TestRequestHandler directly
+        // beacuse of it's public interface, we work around that by making it implement a second interface
+        if (_requestHandler is IDeploymentAwareTestRequestHandler deployedHandler)
+        {
+            if (argsDictionary.ContainsKey(RemotePath) && argsDictionary.ContainsKey(LocalPath))
+            {
+                deployedHandler.LocalPath = argsDictionary[LocalPath];
+                deployedHandler.RemotePath = argsDictionary[RemotePath];
+            }
+        }
 
         if (EqtTrace.IsVerboseEnabled)
         {
