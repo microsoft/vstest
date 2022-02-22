@@ -9,6 +9,6 @@
     <Import_RootNamespace>Microsoft.TestPlatform.Polyfill</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)PolyfillStringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StringExtensions.cs" />
   </ItemGroup>
 </Project>
