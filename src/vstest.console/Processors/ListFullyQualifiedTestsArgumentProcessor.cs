@@ -301,7 +301,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
 
             if (filterWrapper.ParseError != null)
             {
-                var fe = new FormatException(String.Format("Invalid Test Case Filter: {0}", filterString));
+                var fe = new FormatException(string.Format("Invalid Test Case Filter: {0}", filterString));
                 EqtTrace.Error("TestCaseFilter.ValidateFilter : Filtering failed with exception : " + fe.Message);
                 throw fe;
             }

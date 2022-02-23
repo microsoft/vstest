@@ -136,7 +136,7 @@ public class RunSpecificTestsArgumentProcessorTests
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object);
         var executor = GetExecutor(testRequestManager);
 
-        Assert.ThrowsException<CommandLineException>(() => executor.Initialize(String.Empty));
+        Assert.ThrowsException<CommandLineException>(() => executor.Initialize(string.Empty));
     }
 
     [TestMethod]

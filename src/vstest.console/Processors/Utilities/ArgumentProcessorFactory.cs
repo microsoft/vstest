@@ -121,7 +121,7 @@ internal class ArgumentProcessorFactory
     /// <returns>The argument processor or null if one was not found.</returns>
     public IArgumentProcessor CreateArgumentProcessor(string argument)
     {
-        if (String.IsNullOrWhiteSpace(argument))
+        if (string.IsNullOrWhiteSpace(argument))
         {
             throw new ArgumentException("Cannot be null or empty", nameof(argument));
         }

@@ -165,7 +165,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
     public void GetPlatformAndFrameworkSettings(string path, out string procArchType, out string frameworkVersion)
     {
         procArchType = nameof(Architecture.Default);
-        frameworkVersion = String.Empty;
+        frameworkVersion = string.Empty;
 
         try
         {

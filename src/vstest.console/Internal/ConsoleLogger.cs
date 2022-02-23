@@ -220,7 +220,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         parameters.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out _targetFramework);
         _targetFramework = !string.IsNullOrEmpty(_targetFramework) ? NuGetFramework.Parse(_targetFramework).GetShortFolderName() : _targetFramework;
 
-        Initialize(events, String.Empty);
+        Initialize(events, string.Empty);
     }
     #endregion
 
@@ -257,7 +257,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             var sb = new StringBuilder();
             foreach (var message in testMessageCollection)
             {
-                var prefix = String.Format(CultureInfo.CurrentCulture, "{0}{1}", Environment.NewLine, TestMessageFormattingPrefix);
+                var prefix = string.Format(CultureInfo.CurrentCulture, "{0}{1}", Environment.NewLine, TestMessageFormattingPrefix);
                 var messageText = message.Text?.Replace(Environment.NewLine, prefix).TrimEnd(TestMessageFormattingPrefix.ToCharArray());
 
                 if (!string.IsNullOrWhiteSpace(messageText))
@@ -267,7 +267,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             }
             return sb.ToString();
         }
-        return String.Empty;
+        return string.Empty;
     }
 
     /// <summary>
@@ -290,19 +290,19 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         var addAdditionalNewLine = false;
 
         Debug.Assert(result != null, "a null result can not be displayed");
-        if (!String.IsNullOrEmpty(result.ErrorMessage))
+        if (!string.IsNullOrEmpty(result.ErrorMessage))
         {
             addAdditionalNewLine = true;
             Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.ErrorMessageBanner));
-            var errorMessage = String.Format(CultureInfo.CurrentCulture, "{0}{1}{2}", TestResultPrefix, TestMessageFormattingPrefix, result.ErrorMessage);
+            var errorMessage = string.Format(CultureInfo.CurrentCulture, "{0}{1}{2}", TestResultPrefix, TestMessageFormattingPrefix, result.ErrorMessage);
             Output.Information(false, ConsoleColor.Red, errorMessage);
         }
 
-        if (!String.IsNullOrEmpty(result.ErrorStackTrace))
+        if (!string.IsNullOrEmpty(result.ErrorStackTrace))
         {
             addAdditionalNewLine = false;
             Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.StacktraceBanner));
-            var stackTrace = String.Format(CultureInfo.CurrentCulture, "{0}{1}", TestResultPrefix, result.ErrorStackTrace);
+            var stackTrace = string.Format(CultureInfo.CurrentCulture, "{0}{1}", TestResultPrefix, result.ErrorStackTrace);
             Output.Information(false, ConsoleColor.Red, stackTrace);
         }
 
@@ -360,7 +360,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
         if (addAdditionalNewLine)
         {
-            Output.WriteLine(String.Empty, OutputLevel.Information);
+            Output.WriteLine(string.Empty, OutputLevel.Information);
         }
     }
 

@@ -307,7 +307,7 @@ public static class XmlRunSettingsUtilities
     /// </summary>
     /// <param name="runSettings">The run Settings Xml.</param>
     /// <returns> The <see cref="LoggerRunSettings"/>. </returns>
-    public static LoggerRunSettings GetLoggerRunSettings(String runSettings)
+    public static LoggerRunSettings GetLoggerRunSettings(string runSettings)
     {
         return GetNodeValue(
             runSettings,

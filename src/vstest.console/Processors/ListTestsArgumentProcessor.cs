@@ -220,7 +220,7 @@ internal class ListTestsArgumentExecutor : IArgumentExecutor
             // List out each of the tests.
             foreach (var test in args.DiscoveredTestCases)
             {
-                _output.WriteLine(String.Format(CultureInfo.CurrentUICulture,
+                _output.WriteLine(string.Format(CultureInfo.CurrentUICulture,
                         CommandLineResources.AvailableTestsFormat,
                         test.DisplayName),
                     OutputLevel.Information);

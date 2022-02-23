@@ -49,7 +49,7 @@ public class TestCaseFilterExpression : ITestCaseFilterExpression
     /// <summary>
     /// Validate if underlying filter expression is valid for given set of supported properties.
     /// </summary>
-    public string[] ValidForProperties(IEnumerable<String> supportedProperties, Func<string, TestProperty> propertyProvider)
+    public string[] ValidForProperties(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider)
     {
         string[] invalidProperties = null;
         if (null != _filterWrapper && _validForMatch)

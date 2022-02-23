@@ -112,7 +112,7 @@ public class FilterExpressionWrapper
     /// <summary>
     /// Validate if underlying filter expression is valid for given set of supported properties.
     /// </summary>
-    public string[] ValidForProperties(IEnumerable<String> supportedProperties, Func<string, TestProperty> propertyProvider)
+    public string[] ValidForProperties(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider)
     {
         return UseFastFilter ? FastFilter.ValidForProperties(supportedProperties) : _filterExpression?.ValidForProperties(supportedProperties, propertyProvider);
     }

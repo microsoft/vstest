@@ -42,7 +42,7 @@ public class RunsettingsTests : AcceptanceTestBase
         // passing different platform
         var additionalArgs = "/Platform:x64";
 
-        var runSettingsArgs = String.Join(
+        var runSettingsArgs = string.Join(
             " ",
             new string[]
             {
@@ -73,7 +73,7 @@ public class RunsettingsTests : AcceptanceTestBase
         var additionalArgs = "/Parallel";
 
         // Pass non parallel
-        var runSettingsArgs = String.Join(
+        var runSettingsArgs = string.Join(
             " ",
             new string[]
             {
@@ -149,7 +149,7 @@ public class RunsettingsTests : AcceptanceTestBase
         var testhostProcessName = new[] { "testhost.x86" };
         var expectedNumOfProcessCreated = 1;
 
-        var runSettingsArgs = String.Join(
+        var runSettingsArgs = string.Join(
             " ",
             new string[]
             {
@@ -180,7 +180,7 @@ public class RunsettingsTests : AcceptanceTestBase
             { "TestAdaptersPaths", GetTestAdapterPath() }
         };
 
-        var runSettingsArgs = String.Join(
+        var runSettingsArgs = string.Join(
             " ",
             new string[]
             {

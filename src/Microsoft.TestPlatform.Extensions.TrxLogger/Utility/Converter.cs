@@ -191,10 +191,10 @@ internal class Converter
         return collectorEntries;
     }
 
-    public IList<String> ToResultFiles(IEnumerable<AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory,
+    public IList<string> ToResultFiles(IEnumerable<AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory,
         List<string> errorMessages)
     {
-        List<String> resultFiles = new();
+        List<string> resultFiles = new();
         if (attachmentSets == null)
         {
             return resultFiles;

@@ -93,7 +93,7 @@ public class CollectArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldNotThrowIfArgumentIsEmpty()
     {
-        Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(String.Empty));
+        Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(string.Empty));
     }
 
     [TestMethod]

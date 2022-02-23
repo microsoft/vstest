@@ -599,7 +599,7 @@ public class RunConfiguration : TestRunSettings
                         bool bCollectSourceInformation = true;
                         if (!bool.TryParse(collectSourceInformationStr, out bCollectSourceInformation))
                         {
-                            throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                 Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, bCollectSourceInformation, elementName));
                         }
 
@@ -666,7 +666,7 @@ public class RunConfiguration : TestRunSettings
                         string designModeValueString = reader.ReadElementContentAsString();
                         if (!bool.TryParse(designModeValueString, out bool designMode))
                         {
-                            throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                 Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, designModeValueString, elementName));
                         }
                         runConfiguration.DesignMode = designMode;
@@ -678,7 +678,7 @@ public class RunConfiguration : TestRunSettings
                         string inIsolationValueString = reader.ReadElementContentAsString();
                         if (!bool.TryParse(inIsolationValueString, out bool inIsolation))
                         {
-                            throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                 Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, inIsolationValueString, elementName));
                         }
                         runConfiguration.InIsolation = inIsolation;
@@ -690,7 +690,7 @@ public class RunConfiguration : TestRunSettings
                         string disableAppDomainValueString = reader.ReadElementContentAsString();
                         if (!bool.TryParse(disableAppDomainValueString, out bool disableAppDomainCheck))
                         {
-                            throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                 Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, disableAppDomainValueString, elementName));
                         }
                         runConfiguration.DisableAppDomain = disableAppDomainCheck;

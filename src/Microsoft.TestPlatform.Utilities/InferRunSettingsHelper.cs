@@ -437,7 +437,7 @@ public class InferRunSettingsHelper
         AddNodeIfNotPresent(runSettingsDocument, TargetPlatformNodePath, TargetPlatformNodeName, platform, overwrite);
     }
 
-    public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, out String deviceXml)
+    public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, out string deviceXml)
     {
         ValidateArg.NotNull(runSettingsNavigator, nameof(runSettingsNavigator));
 
@@ -630,10 +630,10 @@ public class InferRunSettingsHelper
     /// Returns the sources matching the specified platform and framework settings.
     /// For incompatible sources, warning is added to incompatibleSettingWarning.
     /// </summary>
-    public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform, Architecture defaultArchitecture, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks, out String incompatibleSettingWarning)
+    public static IEnumerable<string> FilterCompatibleSources(Architecture chosenPlatform, Architecture defaultArchitecture, Framework chosenFramework, IDictionary<string, Architecture> sourcePlatforms, IDictionary<string, Framework> sourceFrameworks, out string incompatibleSettingWarning)
     {
         incompatibleSettingWarning = string.Empty;
-        List<String> compatibleSources = new();
+        List<string> compatibleSources = new();
         StringBuilder warnings = new();
         warnings.AppendLine();
         bool incompatiblityFound = false;
