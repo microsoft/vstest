@@ -36,38 +36,18 @@ internal class EnableLoggerArgumentProcessor : IArgumentProcessor
     /// </summary>
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor(RunSettingsManager.Instance));
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new EnableLoggerArgumentExecutor(RunSettingsManager.Instance));
 
-            return _executor;
-        }
-
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 
     /// <summary>
     /// Gets the metadata.
     /// </summary>
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new EnableLoggerArgumentProcessorCapabilities());
-            }
-
-            return _metadata;
-        }
-    }
-
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new EnableLoggerArgumentProcessorCapabilities());
 }
 
 internal class EnableLoggerArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities

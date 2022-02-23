@@ -31,17 +31,7 @@ internal class TestRunResultAggregator
     /// </summary>
     /// <returns>Instance of the test run result aggregator.</returns>
     public static TestRunResultAggregator Instance
-    {
-        get
-        {
-            if (s_instance == null)
-            {
-                s_instance = new TestRunResultAggregator();
-            }
-
-            return s_instance;
-        }
-    }
+        => s_instance ??= new TestRunResultAggregator();
 
     /// <summary>
     /// The current test run outcome.

@@ -56,17 +56,7 @@ internal class CommandLineOptions
     /// Gets the instance.
     /// </summary>
     internal static CommandLineOptions Instance
-    {
-        get
-        {
-            if (s_instance == null)
-            {
-                s_instance = new CommandLineOptions();
-            }
-
-            return s_instance;
-        }
-    }
+        => s_instance ??= new CommandLineOptions();
 
     /// <summary>
     /// Default constructor.
@@ -78,7 +68,7 @@ internal class CommandLineOptions
         FileHelper = new FileHelper();
         FilePatternParser = new FilePatternParser();
 #if TODO
-            UseVsixExtensions = Utilities.GetAppSettingValue(UseVsixExtensionsKey, false);
+        UseVsixExtensions = Utilities.GetAppSettingValue(UseVsixExtensionsKey, false);
 #endif
     }
 

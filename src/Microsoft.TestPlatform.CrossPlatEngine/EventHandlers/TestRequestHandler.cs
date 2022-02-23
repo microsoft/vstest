@@ -23,8 +23,10 @@ using Utilities;
 
 using CrossPlatResources = CrossPlatEngine.Resources.Resources;
 using ObjectModelConstants = TestPlatform.ObjectModel.Constants;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
-public class TestRequestHandler : ITestRequestHandler
+public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestRequestHandler
 {
     private int _protocolVersion = 1;
 
@@ -39,14 +41,18 @@ public class TestRequestHandler : ITestRequestHandler
     private ICommunicationChannel _channel;
 
     private readonly JobQueue<Action> _jobQueue;
+    private readonly IFileHelper _fileHelper;
     private readonly ManualResetEventSlim _requestSenderConnected;
     private readonly ManualResetEventSlim _testHostManagerFactoryReady;
     private readonly ManualResetEventSlim _sessionCompleted;
     private Action<Message> _onLaunchAdapterProcessWithDebuggerAttachedAckReceived;
     private Action<Message> _onAttachDebuggerAckRecieved;
+    private IPathConverter _pathConverter;
     private Exception _messageProcessingUnrecoverableError;
 
     public TestHostConnectionInfo ConnectionInfo { get; set; }
+    string IDeploymentAwareTestRequestHandler.LocalPath { get; set; }
+    string IDeploymentAwareTestRequestHandler.RemotePath { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRequestHandler" />.
@@ -72,6 +78,9 @@ public class TestRequestHandler : ITestRequestHandler
         _onLaunchAdapterProcessWithDebuggerAttachedAckReceived = onLaunchAdapterProcessWithDebuggerAttachedAckReceived;
         _onAttachDebuggerAckRecieved = onAttachDebuggerAckRecieved;
         _jobQueue = jobQueue;
+
+        _fileHelper = new FileHelper();
+        _pathConverter = NullPathConverter.Instance;
     }
 
     protected TestRequestHandler(IDataSerializer dataSerializer, ICommunicationEndpointFactory communicationEndpointFactory)
@@ -91,11 +100,21 @@ public class TestRequestHandler : ITestRequestHandler
             25000000,
             true,
             (message) => EqtTrace.Error(message));
+
+        _fileHelper = new FileHelper();
+        _pathConverter = NullPathConverter.Instance;
     }
 
     /// <inheritdoc />
     public virtual void InitializeCommunication()
     {
+        if (this is IDeploymentAwareTestRequestHandler self
+            && !string.IsNullOrWhiteSpace(self.LocalPath)
+            && !string.IsNullOrWhiteSpace(self.RemotePath))
+        {
+            _pathConverter = new PathConverter(self.LocalPath, self.RemotePath, _fileHelper);
+        }
+
         _communicationEndPoint = _communicationEndpointFactory.Create(ConnectionInfo.Role);
         _communicationEndPoint.Connected += (sender, connectedArgs) =>
         {
@@ -143,14 +162,16 @@ public class TestRequestHandler : ITestRequestHandler
     /// <inheritdoc />
     public void SendTestCases(IEnumerable<TestCase> discoveredTestCases)
     {
-        var data = _dataSerializer.SerializePayload(MessageType.TestCasesFound, discoveredTestCases, _protocolVersion);
+        var updatedTestCases = _pathConverter.UpdateTestCases(discoveredTestCases, PathConversionDirection.Send);
+        var data = _dataSerializer.SerializePayload(MessageType.TestCasesFound, updatedTestCases, _protocolVersion);
         SendData(data);
     }
 
     /// <inheritdoc />
     public void SendTestRunStatistics(TestRunChangedEventArgs testRunChangedArgs)
     {
-        var data = _dataSerializer.SerializePayload(MessageType.TestRunStatsChange, testRunChangedArgs, _protocolVersion);
+        var updatedTestRunChangedEventArgs = _pathConverter.UpdateTestRunChangedEventArgs(testRunChangedArgs, PathConversionDirection.Send);
+        var data = _dataSerializer.SerializePayload(MessageType.TestRunStatsChange, updatedTestRunChangedEventArgs, _protocolVersion);
         SendData(data);
     }
 
@@ -181,16 +202,16 @@ public class TestRequestHandler : ITestRequestHandler
                 curentArgs.IsCanceled,
                 curentArgs.IsAborted,
                 _messageProcessingUnrecoverableError,
-                curentArgs.AttachmentSets, curentArgs.InvokedDataCollectors, curentArgs.ElapsedTimeInRunningTests
+                _pathConverter.UpdateAttachmentSets(curentArgs.AttachmentSets, PathConversionDirection.Send), curentArgs.InvokedDataCollectors, curentArgs.ElapsedTimeInRunningTests
             );
         }
         var data = _dataSerializer.SerializePayload(
             MessageType.ExecutionComplete,
             new TestRunCompletePayload
             {
-                TestRunCompleteArgs = testRunCompleteArgs,
-                LastRunTests = lastChunkArgs,
-                RunAttachments = runContextAttachments,
+                TestRunCompleteArgs = _pathConverter.UpdateTestRunCompleteEventArgs(testRunCompleteArgs, PathConversionDirection.Send),
+                LastRunTests = _pathConverter.UpdateTestRunChangedEventArgs(lastChunkArgs, PathConversionDirection.Send),
+                RunAttachments = _pathConverter.UpdateAttachmentSets(runContextAttachments, PathConversionDirection.Send),
                 ExecutorUris = executorUris
             },
             _protocolVersion);
@@ -205,7 +226,7 @@ public class TestRequestHandler : ITestRequestHandler
             new DiscoveryCompletePayload
             {
                 TotalTests = discoveryCompleteEventArgs.TotalCount,
-                LastDiscoveredTests = discoveryCompleteEventArgs.IsAborted ? null : lastChunk,
+                LastDiscoveredTests = discoveryCompleteEventArgs.IsAborted ? null : _pathConverter.UpdateTestCases(lastChunk, PathConversionDirection.Send),
                 IsAborted = discoveryCompleteEventArgs.IsAborted,
                 Metrics = discoveryCompleteEventArgs.Metrics,
                 FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources,
@@ -335,7 +356,7 @@ public class TestRequestHandler : ITestRequestHandler
                     {
                         _testHostManagerFactoryReady.Wait();
                         var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
-                        var pathToAdditionalExtensions = _dataSerializer.DeserializePayload<IEnumerable<string>>(message);
+                        var pathToAdditionalExtensions = _pathConverter.UpdatePaths(_dataSerializer.DeserializePayload<IEnumerable<string>>(message), PathConversionDirection.Receive);
                         Action job = () =>
                         {
                             EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
@@ -359,7 +380,8 @@ public class TestRequestHandler : ITestRequestHandler
                     {
                         _testHostManagerFactoryReady.Wait();
                         var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
-                        var discoveryCriteria = _dataSerializer.DeserializePayload<DiscoveryCriteria>(message);
+                        var discoveryCriteria = _pathConverter.UpdateDiscoveryCriteria(_dataSerializer.DeserializePayload<DiscoveryCriteria>(message), PathConversionDirection.Receive);
+
                         Action job = () =>
                         {
                             EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
@@ -385,7 +407,7 @@ public class TestRequestHandler : ITestRequestHandler
                     {
                         _testHostManagerFactoryReady.Wait();
                         var testInitializeEventsHandler = new TestInitializeEventsHandler(this);
-                        var pathToAdditionalExtensions = _dataSerializer.DeserializePayload<IEnumerable<string>>(message);
+                        var pathToAdditionalExtensions = _pathConverter.UpdatePaths(_dataSerializer.DeserializePayload<IEnumerable<string>>(message), PathConversionDirection.Receive);
                         Action job = () =>
                         {
                             EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
@@ -409,7 +431,7 @@ public class TestRequestHandler : ITestRequestHandler
                     {
                         var testRunEventsHandler = new TestRunEventsHandler(this);
                         _testHostManagerFactoryReady.Wait();
-                        var testRunCriteriaWithSources = _dataSerializer.DeserializePayload<TestRunCriteriaWithSources>(message);
+                        var testRunCriteriaWithSources = _pathConverter.UpdateTestRunCriteriaWithSources(_dataSerializer.DeserializePayload<TestRunCriteriaWithSources>(message), PathConversionDirection.Receive);
                         Action job = () =>
                         {
                             EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
@@ -440,8 +462,7 @@ public class TestRequestHandler : ITestRequestHandler
                     {
                         var testRunEventsHandler = new TestRunEventsHandler(this);
                         _testHostManagerFactoryReady.Wait();
-                        var testRunCriteriaWithTests =
-                            _dataSerializer.DeserializePayload<TestRunCriteriaWithTests>(message);
+                        var testRunCriteriaWithTests = _pathConverter.UpdateTestRunCriteriaWithTests(_dataSerializer.DeserializePayload<TestRunCriteriaWithTests>(message), PathConversionDirection.Receive);
 
                         Action job = () =>
                         {
