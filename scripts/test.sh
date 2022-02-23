@@ -120,7 +120,7 @@ function invoke_test()
     local dotnet=$(_get_dotnet_path)
     local vstest=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore/vstest.console.dll
 
-    find ./test -path $PROJECT_NAME_PATTERNS | xargs $dotnet $vstest --parallel --testcasefilter:"TestCategory!=Windows&TestCategory!=Windows-Review" --logger:"trx"
+    find ./test -ipath $PROJECT_NAME_PATTERNS | xargs $dotnet $vstest --parallel --testcasefilter:"TestCategory!=Windows&TestCategory!=Windows-Review" --logger:"trx"
 }
 
 #
