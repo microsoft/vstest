@@ -3,6 +3,7 @@
 
 using System.IO;
 
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
@@ -11,9 +12,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class ProcessTests : AcceptanceTestBase
 {
     [TestMethod]
-    public void MissingFrameworkTextIsCorrectlyDisplayed()
+    [NetCoreTargetFrameworkDataSource]
+    public void MissingFrameworkTextIsCorrectlyDisplayed(RunnerInfo runnerInfo)
     {
         // Arrange
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
         var assemblyPath = GetAssetFullPath("SimpleTestProjectMessedUpTargetFramework.dll", Core21TargetFramework);
         var runtimeConfigJson = Path.Combine(Path.GetDirectoryName(assemblyPath), "SimpleTestProjectMessedUpTargetFramework.runtimeconfig.json");
         var fileContent = File.ReadAllText(runtimeConfigJson);
@@ -21,7 +25,13 @@ public class ProcessTests : AcceptanceTestBase
         File.WriteAllText(runtimeConfigJson, updatedContent);
 
         // Act
-        InvokeDotnetTest(assemblyPath);
+        var arguments = PrepareArguments(
+           assemblyPath,
+           GetTestAdapterPath(),
+           "",
+           FrameworkArgValue,
+           tempDir.Path);
+        InvokeVsTest(assemblyPath);
 
         // Assert
         ExitCodeEquals(1);
