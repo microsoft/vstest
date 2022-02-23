@@ -1,15 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Utilities;
-
-using ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -18,8 +9,17 @@ using System.Text;
 using System.Xml;
 using System.Xml.XPath;
 
-using OMResources = ObjectModel.Resources.CommonResources;
-using UtilitiesResources = Resources.Resources;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+
+using OMResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
+using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resources;
+
+#nullable disable
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
 /// Utility class for Inferring the runsettings from the current environment and the user specified command line switches.

@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace vstest.console.UnitTests.Internal;
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
@@ -13,11 +13,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-
 using vstest.console.Internal;
+
+#nullable disable
+
+namespace vstest.console.UnitTests.Internal;
 
 [TestClass]
 public class FilePatternParserTests

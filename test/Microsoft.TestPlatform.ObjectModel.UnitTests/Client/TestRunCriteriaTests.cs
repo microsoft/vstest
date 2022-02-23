@@ -1,18 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using VisualStudio.TestPlatform.ObjectModel;
-using VisualStudio.TestPlatform.ObjectModel.Client;
+#nullable disable
+
+namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 
 [TestClass]
 public class TestRunCriteriaTests

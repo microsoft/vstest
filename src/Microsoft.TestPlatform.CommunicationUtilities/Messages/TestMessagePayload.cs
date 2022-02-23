@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 /// <summary>
 /// The test message payload.

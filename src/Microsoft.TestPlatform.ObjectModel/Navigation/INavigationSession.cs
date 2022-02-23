@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
-
-using System;
 
 /// <summary>
 /// Manages the debug data associated with the .exe/.dll file

@@ -1,23 +1,23 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
-
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-using CommonResources = Common.Resources.Resources;
+using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 
 /// <summary>
 /// Utility class that facilitates the IPC communication. Acts as server.

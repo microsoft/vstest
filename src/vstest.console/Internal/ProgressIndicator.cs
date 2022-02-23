@@ -1,15 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Globalization;
+
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+using Timer = System.Timers.Timer;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
-
-using System.Globalization;
-
-using Utilities;
-
-using Timer = System.Timers.Timer;
 
 /// <summary>
 /// Indicates the test run progress

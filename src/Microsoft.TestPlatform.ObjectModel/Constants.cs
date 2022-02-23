@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.IO;
 
-using Utilities;
-using Client;
-using PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Defines the defaults/constants used across different components.

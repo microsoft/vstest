@@ -1,18 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
 using System;
 using System.Diagnostics;
 using System.Text;
 
-using Utility;
+using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
-using XML;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 #region TestCategoryItem
 /// <summary>
 /// Stores a string which categorizes the Test

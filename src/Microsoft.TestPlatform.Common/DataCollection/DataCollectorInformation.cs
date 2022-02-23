@@ -1,19 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Xml;
+
+using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
-
-using System;
-using System.Collections.Generic;
-using System.Xml;
-using System.IO;
-
-using Interfaces;
-using ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
 /// Encapsulates datacollector object and other objects required to facilitate datacollection.
@@ -45,7 +45,7 @@ internal class DataCollectorInformation
     /// The message Sink.
     /// </param>
     /// <param name="settingsXml"></param>
-    internal DataCollectorInformation(DataCollector dataCollector, XmlElement configurationElement, DataCollectorConfig dataCollectorConfig, DataCollectionEnvironmentContext environmentContext, IDataCollectionAttachmentManager attachmentManager, TestPlatformDataCollectionEvents events, IMessageSink messageSink, string settingsXml)
+    internal DataCollectorInformation(ObjectModel.DataCollection.DataCollector dataCollector, XmlElement configurationElement, DataCollectorConfig dataCollectorConfig, DataCollectionEnvironmentContext environmentContext, IDataCollectionAttachmentManager attachmentManager, TestPlatformDataCollectionEvents events, IMessageSink messageSink, string settingsXml)
     {
         DataCollector = dataCollector;
         ConfigurationElement = configurationElement;
@@ -60,7 +60,7 @@ internal class DataCollectorInformation
     /// <summary>
     /// Gets or sets the data collector.
     /// </summary>
-    public DataCollector DataCollector { get; set; }
+    public ObjectModel.DataCollection.DataCollector DataCollector { get; set; }
 
     /// <summary>
     /// Gets or sets the configuration element.

@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
-
 using System;
 using System.Diagnostics.Contracts;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
 /// <summary>
 /// Breaks a string down into command and argument based on the following format:

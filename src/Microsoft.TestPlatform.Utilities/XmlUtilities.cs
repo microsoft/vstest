@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Utilities;
-
 using System;
 #if NETFRAMEWORK
 using System.Security;
 #endif
 using System.Xml;
 using System.Xml.XPath;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
 /// Utilities class to read and operate on Xml content.

@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Threading;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-
-using System.Threading;
 
 /// <summary>
 /// Interface defining contract for custom test host implementations

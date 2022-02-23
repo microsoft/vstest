@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
+using System.Runtime.Serialization;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
-
-using System.Collections.Generic;
-using System.Runtime.Serialization;
 
 /// <summary>
 /// Class used to define the start test session payload sent by the vstest.console translation

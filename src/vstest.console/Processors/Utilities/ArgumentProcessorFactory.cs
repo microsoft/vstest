@@ -1,18 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-using ObjectModel;
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// Used to create the appropriate instance of an argument processor.

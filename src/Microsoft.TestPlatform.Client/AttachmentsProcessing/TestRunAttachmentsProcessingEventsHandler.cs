@@ -1,17 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
+
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
-
-using CommunicationUtilities.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Logging;
-
-using System.Collections.Generic;
 
 /// <summary>
 /// The test run attachments processing events handler.

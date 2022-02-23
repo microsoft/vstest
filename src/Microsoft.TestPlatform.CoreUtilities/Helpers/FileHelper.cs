@@ -1,19 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD1_0
-
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-
-using Interfaces;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#if !NETSTANDARD1_0
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 /// <summary>
 /// The file helper.

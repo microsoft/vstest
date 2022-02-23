@@ -1,24 +1,24 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-using ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-using Interfaces;
-using Logging;
-using ObjectModel;
-using ObjectModel.Adapter;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-using CommonResources = Resources.Resources;
-using ObjectModelCommonResources = ObjectModel.Resources.CommonResources;
+using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+using ObjectModelCommonResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
 
 /// <summary>
 /// Manages the settings provider extensions.

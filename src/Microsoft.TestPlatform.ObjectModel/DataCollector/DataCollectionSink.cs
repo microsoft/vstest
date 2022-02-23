@@ -1,10 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.ComponentModel;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-using System.ComponentModel;
 
 /// <summary>
 /// Class used by data collectors to send data to up-stream components
