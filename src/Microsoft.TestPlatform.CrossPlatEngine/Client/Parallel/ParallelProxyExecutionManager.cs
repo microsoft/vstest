@@ -263,7 +263,9 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
         // One data aggregator per parallel run
         _currentRunDataAggregator = new ParallelRunDataAggregator(_actualTestRunCriteria.TestRunSettings);
 
-        // REVIEW: Create as many handlers as we can, until we reach the parallel level or the number of sources.Originally this was done in the UpdateParallelLevel in base constructor, but we did not know which source will be the next there.
+        // Create as many handlers as we can, until we reach the max parallel level (this is number of logical processors, or the number of sources, or user
+        // preference. Originally this was done in the UpdateParallelLevel in base constructor, but we did not know which source will be the next there. So we could not
+        // start the manager specifically for the source with the correct tfm and platform.
         var parallel = 0;
         while (parallel <= MaxParallelLevel)
         {

@@ -182,7 +182,6 @@ internal class FakeCommunicationChannel<TContext> : FakeCommunicationChannel, IC
                         Debugger.Break();
                     }
 
-                    // TODO: passing the raw message in, is strange
                     responsePair.BeforeAction?.Invoke(context);
                     var responses = responsePair.Responses;
                     ProcessedMessages.Add(new RequestResponsePair<Message, FakeMessage, TContext>(requestMessage, responses, false));

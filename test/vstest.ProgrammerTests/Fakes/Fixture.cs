@@ -24,6 +24,7 @@ internal class Fixture : IDisposable
     public FakeFileHelper FileHelper { get; }
     public FakeTestRuntimeProviderManager TestRuntimeProviderManager { get; }
     public FakeTestRunEventsRegistrar TestRunEventsRegistrar { get; }
+    public FakeTestDiscoveryEventsRegistrar TestDiscoveryEventsRegistrar { get;  }
     public TestEngine? TestEngine { get; private set; }
     public TestPlatform? TestPlatform { get; private set; }
     public TestRunResultAggregator? TestRunResultAggregator { get; private set; }
@@ -62,6 +63,7 @@ internal class Fixture : IDisposable
         ProcessHelper = new FakeProcessHelper(ErrorAggregator, CurrentProcess);
         FileHelper = new FakeFileHelper(ErrorAggregator);
         TestRuntimeProviderManager = new FakeTestRuntimeProviderManager(ErrorAggregator);
+        TestRunEventsRegistrar = new FakeTestRunEventsRegistrar(ErrorAggregator);
         TestRunEventsRegistrar = new FakeTestRunEventsRegistrar(ErrorAggregator);
         ProtocolConfig = new ProtocolConfig();
     }

@@ -197,15 +197,20 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         // Reset the discovery complete data
         _discoveryCompletedClients = 0;
 
-        // REVIEW: what did I meant in the ERR comment below?? :D
-        // ERR: I need to schedule them until I reach maxParallelLevel or until I run out of sources.
-        // This won't schedule any source for discovery, because there are not concurrent managers.
-        foreach (var concurrentManager in GetConcurrentManagerInstances())
+
+        // ERRR: GetConcurrentManagerInstances() was called before that touches proxyOperationManager, not CreateNewConcurrentManager directly
+        // is this still compatible? I guess I am skipping the testhost pool? Or am I getting the manager from the pool via a creator?
+        var parallel = 0;
+        while (parallel <= MaxParallelLevel)
         {
+            parallel++;
             if (!TryFetchNextSource(_sourceEnumerator, out string source))
             {
-                throw new InvalidOperationException("There are no more sources");
+                break;
             }
+
+            var sourceDetail = _sourceToSourceDetailMap[source];
+            var concurrentManager = CreateNewConcurrentManager(sourceDetail);
 
             var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
                 _requestData,
