@@ -85,7 +85,8 @@ internal class TestPlatform : ITestPlatform
     public IDiscoveryRequest CreateDiscoveryRequest(
         IRequestData requestData,
         DiscoveryCriteria discoveryCriteria!!,
-        TestPlatformOptions options)
+        TestPlatformOptions options,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
         PopulateExtensions(discoveryCriteria.RunSettings, discoveryCriteria.Sources);
 
@@ -93,12 +94,7 @@ internal class TestPlatform : ITestPlatform
         ITestLoggerManager loggerManager = TestEngine.GetLoggerManager(requestData);
         loggerManager.Initialize(discoveryCriteria.RunSettings);
 
-        ITestRuntimeProvider testHostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
-        TestPlatform.ThrowExceptionIfTestHostManagerIsNull(testHostManager, discoveryCriteria.RunSettings);
-
-        testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
-
-        IProxyDiscoveryManager discoveryManager = TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria);
+        IProxyDiscoveryManager discoveryManager = TestEngine.GetDiscoveryManager(requestData,  discoveryCriteria, sourceToSourceDetailMap);
         discoveryManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
         return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager, loggerManager);
@@ -108,7 +104,8 @@ internal class TestPlatform : ITestPlatform
     public ITestRunRequest CreateTestRunRequest(
         IRequestData requestData,
         TestRunCriteria testRunCriteria!!,
-        TestPlatformOptions options)
+        TestPlatformOptions options,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
         IEnumerable<string> sources = GetSources(testRunCriteria);
         PopulateExtensions(testRunCriteria.TestRunSettings, sources);
@@ -117,23 +114,7 @@ internal class TestPlatform : ITestPlatform
         ITestLoggerManager loggerManager = TestEngine.GetLoggerManager(requestData);
         loggerManager.Initialize(testRunCriteria.TestRunSettings);
 
-        // TODO: PERF: this will create a testhost manager, and then it will pass that to GetExecutionManager, where it will
-        // be used only when we will run in-process. If we don't run in process, we will throw away the manager we just
-        // created and let the proxy parallel callbacks to create a new one. This seems to be very easy to move to the GetExecutionManager,
-        // and safe as well, so we create the manager only once.
-        // TODO: Of course TestEngine.GetExecutionManager is public api...
-        ITestRuntimeProvider testHostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
-        TestPlatform.ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
-
-        testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
-
-        // NOTE: The custom launcher should not be set when we have test session info available.
-        if (testRunCriteria.TestHostLauncher != null)
-        {
-            testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
-        }
-
-        IProxyExecutionManager executionManager = TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria);
+        IProxyExecutionManager executionManager = TestEngine.GetExecutionManager(requestData, testRunCriteria, sourceToSourceDetailMap);
         executionManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
         return new TestRunRequest(requestData, testRunCriteria, executionManager, loggerManager);

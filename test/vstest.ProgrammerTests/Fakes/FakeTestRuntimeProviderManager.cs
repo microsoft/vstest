@@ -22,11 +22,8 @@ internal class FakeTestRuntimeProviderManager : ITestRuntimeProviderManager
 
     public void AddTestRuntimeProviders(params FakeTestRuntimeProvider[] runtimeProviders)
     {
-        // This is not a bug, I am registering each provider twice because TestPlatform resolves
-        // them twice for every request that does not run in-process.
         foreach (var runtimeProvider in runtimeProviders)
         {
-            TestRuntimeProviders.Enqueue(runtimeProvider);
             TestRuntimeProviders.Enqueue(runtimeProvider);
         }
     }

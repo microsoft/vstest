@@ -45,7 +45,8 @@ public interface ITestPlatform : IDisposable
     IDiscoveryRequest CreateDiscoveryRequest(
         IRequestData requestData,
         DiscoveryCriteria discoveryCriteria,
-        TestPlatformOptions options);
+        TestPlatformOptions options,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap);
 
     /// <summary>
     /// Creates a test run request.
@@ -59,7 +60,8 @@ public interface ITestPlatform : IDisposable
     ITestRunRequest CreateTestRunRequest(
         IRequestData requestData,
         TestRunCriteria testRunCriteria,
-        TestPlatformOptions options);
+        TestPlatformOptions options,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap);
 
     /// <summary>
     /// Starts a test session.

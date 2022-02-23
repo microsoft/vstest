@@ -21,10 +21,10 @@ using ObjectModel.Logging;
 /// <summary>
 /// ParallelProxyDiscoveryManager that manages parallel discovery
 /// </summary>
-internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDiscoveryManager, ITestDiscoveryEventsHandler2>, IParallelProxyDiscoveryManager
+internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDiscoveryManager, ITestDiscoveryEventsHandler2, SourceDetail>, IParallelProxyDiscoveryManager
 {
     private readonly IDataSerializer _dataSerializer;
-
+    private readonly Dictionary<string, SourceDetail> _sourceToSourceDetailMap;
     private int _discoveryCompletedClients;
     private int _availableTestSources = -1;
 
@@ -35,7 +35,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     private ITestDiscoveryEventsHandler2 _currentDiscoveryEventsHandler;
 
     private ParallelDiscoveryDataAggregator _currentDiscoveryDataAggregator;
-
+    private bool _skipDefaultAdapters;
     private readonly IRequestData _requestData;
 
     public bool IsAbortRequested { get; private set; }
@@ -45,16 +45,17 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     /// </summary>
     private readonly object _discoveryStatusLockObject = new();
 
-    public ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
-        : this(requestData, actualProxyManagerCreator, JsonDataSerializer.Instance, parallelLevel, sharedHosts)
+    public ParallelProxyDiscoveryManager(IRequestData requestData, Func<SourceDetail, IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, Dictionary<string, SourceDetail> sourceToSourceDetailMap)
+        : this(requestData, actualProxyManagerCreator, JsonDataSerializer.Instance, parallelLevel, sourceToSourceDetailMap)
     {
     }
 
-    internal ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, IDataSerializer dataSerializer, int parallelLevel, bool sharedHosts)
-        : base(actualProxyManagerCreator, parallelLevel, sharedHosts)
+    internal ParallelProxyDiscoveryManager(IRequestData requestData, Func<SourceDetail, IProxyDiscoveryManager> actualProxyManagerCreator, IDataSerializer dataSerializer, int parallelLevel, Dictionary<string, SourceDetail> sourceToSourceDetailMap)
+        : base(actualProxyManagerCreator, parallelLevel)
     {
         _requestData = requestData;
         _dataSerializer = dataSerializer;
+        _sourceToSourceDetailMap = sourceToSourceDetailMap;
     }
 
     #region IProxyDiscoveryManager
@@ -62,7 +63,9 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     /// <inheritdoc/>
     public void Initialize(bool skipDefaultAdapters)
     {
-        DoActionOnAllManagers((proxyManager) => proxyManager.Initialize(skipDefaultAdapters), doActionsInParallel: true);
+        // The parent ctor does not pre-create any managers, save the info for later.
+        // DoActionOnAllManagers((proxyManager) => proxyManager.Initialize(skipDefaultAdapters), doActionsInParallel: true);
+        _skipDefaultAdapters = skipDefaultAdapters;
     }
 
     /// <inheritdoc/>
@@ -114,6 +117,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     public bool HandlePartialDiscoveryComplete(IProxyDiscoveryManager proxyDiscoveryManager, long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
     {
         var allDiscoverersCompleted = false;
+        // REVIEW: Interlocked.Increment the count, and the condition below probably does not need to be in a lock?
         lock (_discoveryStatusLockObject)
         {
             // Each concurrent Executor calls this method
@@ -146,27 +150,40 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
             return true;
         }
 
+        // REVIEW: this was here before I did multi tfm work, this should be reviewed, because
+        // the comment builds on false premise, so maybe too much work is done here, because we should take shared hosts into account, and schedule
+        // the next source on the same manager if we have the possibility.
+        // and not kill testhost for every source.
         /*  Discovery is not complete.
             Now when both.net framework and.net core projects can run in parallel
             we should clear manager and create new one for both cases.
             Otherwise `proxyDiscoveryManager` instance is alredy closed by now and it will give exception
             when trying to do some operation on it.
         */
+        var SharedHosts = false;
         EqtTrace.Verbose("ParallelProxyDiscoveryManager: HandlePartialDiscoveryComplete: Replace discovery manager. Shared: {0}, Aborted: {1}.", SharedHosts, isAborted);
 
         RemoveManager(proxyDiscoveryManager);
 
-        proxyDiscoveryManager = CreateNewConcurrentManager();
-        var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
-            _requestData,
-            proxyDiscoveryManager,
-            _currentDiscoveryEventsHandler,
-            this,
-            _currentDiscoveryDataAggregator);
-        AddManager(proxyDiscoveryManager, parallelEventsHandler);
+        // If we have more sources, create manager for that source.
+        // The source determines which type of host to create, because it can have a framework
+        // and architecture associated with it.
+        if (TryFetchNextSource(_sourceEnumerator, out string source))
+        {
+            var sourceDetail = _sourceToSourceDetailMap[source];
+            proxyDiscoveryManager = CreateNewConcurrentManager(sourceDetail);
+            var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
+                                           _requestData,
+                                           proxyDiscoveryManager,
+                                           _currentDiscoveryEventsHandler,
+                                           this,
+                                           _currentDiscoveryDataAggregator);
+            AddManager(proxyDiscoveryManager, parallelEventsHandler);
+        }
 
-        // Second, let's attempt to trigger discovery for the next source.
-        DiscoverTestsOnConcurrentManager(proxyDiscoveryManager);
+        // REVIEW: is this really how it should be done? Proxy manager can be if we don't pass any and if we don't have more sources?
+        // Let's attempt to trigger discovery for the source.
+        DiscoverTestsOnConcurrentManager(source, proxyDiscoveryManager);
 
         return false;
     }
@@ -180,8 +197,16 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         // Reset the discovery complete data
         _discoveryCompletedClients = 0;
 
+        // REVIEW: what did I meant in the ERR comment below?? :D
+        // ERR: I need to schedule them until I reach maxParallelLevel or until I run out of sources.
+        // This won't schedule any source for discovery, because there are not concurrent managers.
         foreach (var concurrentManager in GetConcurrentManagerInstances())
         {
+            if (!TryFetchNextSource(_sourceEnumerator, out string source))
+            {
+                throw new InvalidOperationException("There are no more sources");
+            }
+
             var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
                 _requestData,
                 concurrentManager,
@@ -190,7 +215,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
                 _currentDiscoveryDataAggregator);
 
             UpdateHandlerForManager(concurrentManager, parallelEventsHandler);
-            DiscoverTestsOnConcurrentManager(concurrentManager);
+            DiscoverTestsOnConcurrentManager(source, concurrentManager);
         }
     }
 
@@ -199,45 +224,50 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     /// Each concurrent discoverer calls this method, once its completed working on previous data
     /// </summary>
     /// <param name="ProxyDiscoveryManager">Proxy discovery manager instance.</param>
-    private void DiscoverTestsOnConcurrentManager(IProxyDiscoveryManager proxyDiscoveryManager)
+    private void DiscoverTestsOnConcurrentManager(string source, IProxyDiscoveryManager proxyDiscoveryManager)
     {
-        // Peek to see if we have sources to trigger a discovery
-        if (TryFetchNextSource(_sourceEnumerator, out string nextSource))
+        if (source == null)
         {
-            EqtTrace.Verbose("ProxyParallelDiscoveryManager: Triggering test discovery for next source: {0}", nextSource);
-
-            // Kick off another discovery task for the next source
-            var discoveryCriteria = new DiscoveryCriteria(new[] { nextSource }, _actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent, _actualDiscoveryCriteria.DiscoveredTestEventTimeout, _actualDiscoveryCriteria.RunSettings);
-            discoveryCriteria.TestCaseFilter = _actualDiscoveryCriteria.TestCaseFilter;
-            Task.Run(() =>
-                {
-                    EqtTrace.Verbose("ParallelProxyDiscoveryManager: Discovery started.");
-
-                    proxyDiscoveryManager.DiscoverTests(discoveryCriteria, GetHandlerForGivenManager(proxyDiscoveryManager));
-                })
-                .ContinueWith(t =>
-                    {
-                        // Just in case, the actual discovery couldn't start for an instance. Ensure that
-                        // we call discovery complete since we have already fetched a source. Otherwise
-                        // discovery will not terminate
-                        EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
-
-                        var handler = GetHandlerForGivenManager(proxyDiscoveryManager);
-                        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
-                        handler.HandleRawMessage(_dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
-                        handler.HandleLogMessage(TestMessageLevel.Error, t.Exception.ToString());
-
-                        // Send discovery complete. Similar logic is also used in ProxyDiscoveryManager.DiscoverTests.
-                        // Differences:
-                        // Total tests must be zero here since parallel discovery events handler adds the count
-                        // Keep `lastChunk` as null since we don't want a message back to the IDE (discovery didn't even begin)
-                        // Set `isAborted` as true since we want this instance of discovery manager to be replaced
-                        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
-                        handler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
-                    },
-                    TaskContinuationOptions.OnlyOnFaulted);
+            EqtTrace.Verbose("ProxyParallelDiscoveryManager: No sources available for discovery.");
+            return;
         }
 
-        EqtTrace.Verbose("ProxyParallelDiscoveryManager: No sources available for discovery.");
+        EqtTrace.Verbose("ProxyParallelDiscoveryManager: Triggering test discovery for next source: {0}", source);
+
+        // Kick off another discovery task for the next source
+        var discoveryCriteria = new DiscoveryCriteria(
+            new[] { source },
+            _actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent,
+            _actualDiscoveryCriteria.DiscoveredTestEventTimeout,
+            _actualDiscoveryCriteria.RunSettings
+        );
+        discoveryCriteria.TestCaseFilter = _actualDiscoveryCriteria.TestCaseFilter;
+        Task.Run(() =>
+            {
+                EqtTrace.Verbose("ParallelProxyDiscoveryManager: Discovery started.");
+
+                proxyDiscoveryManager.DiscoverTests(discoveryCriteria, GetHandlerForGivenManager(proxyDiscoveryManager));
+            })
+            .ContinueWith(t =>
+                {
+                    // Just in case, the actual discovery couldn't start for an instance. Ensure that
+                    // we call discovery complete since we have already fetched a source. Otherwise
+                    // discovery will not terminate
+                    EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
+
+                    var handler = GetHandlerForGivenManager(proxyDiscoveryManager);
+                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
+                    handler.HandleRawMessage(_dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
+                    handler.HandleLogMessage(TestMessageLevel.Error, t.Exception.ToString());
+
+                    // Send discovery complete. Similar logic is also used in ProxyDiscoveryManager.DiscoverTests.
+                    // Differences:
+                    // Total tests must be zero here since parallel discovery events handler adds the count
+                    // Keep `lastChunk` as null since we don't want a message back to the IDE (discovery didn't even begin)
+                    // Set `isAborted` as true since we want this instance of discovery manager to be replaced
+                    var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
+                    handler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
+                },
+                TaskContinuationOptions.OnlyOnFaulted);
     }
 }

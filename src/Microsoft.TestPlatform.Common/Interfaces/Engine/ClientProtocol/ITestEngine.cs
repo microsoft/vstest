@@ -5,6 +5,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
+using System.Collections.Generic;
+
 using Client;
 
 using Host;
@@ -28,8 +30,8 @@ public interface ITestEngine
     /// <returns>An IProxyDiscoveryManager object that can do discovery.</returns>
     IProxyDiscoveryManager GetDiscoveryManager(
         IRequestData requestData,
-        ITestRuntimeProvider testHostManager,
-        DiscoveryCriteria discoveryCriteria);
+        DiscoveryCriteria discoveryCriteria,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap);
 
     /// <summary>
     /// Fetches the ExecutionManager for this engine. This manager would provide all
@@ -45,8 +47,8 @@ public interface ITestEngine
     /// <returns>An IProxyExecutionManager object that can do execution.</returns>
     IProxyExecutionManager GetExecutionManager(
         IRequestData requestData,
-        ITestRuntimeProvider testHostManager,
-        TestRunCriteria testRunCriteria);
+        TestRunCriteria testRunCriteria,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap);
 
     /// <summary>
     /// Fetches the TestSessionManager for this engine. This manager would provide all

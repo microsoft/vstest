@@ -40,46 +40,46 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectArchitectureShouldReturnDefaultArchitectureOnNullSources()
     {
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(null, _sourceArchitectures, _defaultArchitecture));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(null, _defaultArchitecture, _sourceArchitectures));
     }
 
     [TestMethod]
     public void AutoDetectArchitectureShouldReturnDefaultArchitectureOnEmptySources()
     {
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>(0), _sourceArchitectures, _defaultArchitecture));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>(0), _defaultArchitecture, _sourceArchitectures));
     }
 
     [TestMethod]
     public void AutoDetectArchitectureShouldReturnDefaultArchitectureOnNullItemInSources()
     {
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { null }, _sourceArchitectures, _defaultArchitecture));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { null }, _defaultArchitecture, _sourceArchitectures));
     }
 
     [TestMethod]
     public void AutoDetectArchitectureShouldReturnDefaultArchitectureOnWhiteSpaceItemInSources()
     {
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { " " }, _sourceArchitectures, _defaultArchitecture));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { " " }, _defaultArchitecture, _sourceArchitectures));
     }
 
     [TestMethod]
     public void AutoDetectArchitectureShouldReturnCorrectArchForOneSource()
     {
         _mockAssemblyHelper.Setup(ah => ah.GetArchitecture(It.IsAny<string>())).Returns(Architecture.X86);
-        Assert.AreEqual(Architecture.X86, _inferHelper.AutoDetectArchitecture(new List<string>() { "1.dll" }, _sourceArchitectures, _defaultArchitecture));
+        Assert.AreEqual(Architecture.X86, _inferHelper.AutoDetectArchitecture(new List<string>() { "1.dll" }, _defaultArchitecture, _sourceArchitectures));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()));
     }
 
     [TestMethod]
     public void AutoDetectArchitectureShouldReturnCorrectDefaultArchForNotDotNetAssembly()
     {
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "NotDotNetAssebly.appx" }, _sourceArchitectures, _defaultArchitecture));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "NotDotNetAssebly.appx" }, _defaultArchitecture, _sourceArchitectures));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Never);
     }
 
     [TestMethod]
     public void AutoDetectArchitectureShouldSetAnyCpuArchForNotDotNetAssembly()
     {
-        _inferHelper.AutoDetectArchitecture(new List<string>() { "NotDotNetAssebly.appx" }, _sourceArchitectures, _defaultArchitecture);
+        _inferHelper.AutoDetectArchitecture(new List<string>() { "NotDotNetAssebly.appx" }, _defaultArchitecture, _sourceArchitectures);
         Assert.AreEqual(Architecture.AnyCPU, _sourceArchitectures["NotDotNetAssebly.appx"]);
     }
 
@@ -88,7 +88,7 @@ public class InferHelperTests
     {
         _mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.AnyCPU).Returns(Architecture.AnyCPU).Returns(Architecture.AnyCPU);
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "AnyCPU2.exe", "AnyCPU3.dll" }, _sourceArchitectures, _defaultArchitecture));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "AnyCPU2.exe", "AnyCPU3.dll" }, _defaultArchitecture, _sourceArchitectures));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
     }
 
@@ -97,7 +97,7 @@ public class InferHelperTests
     {
         _mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.AnyCPU).Returns(Architecture.AnyCPU).Returns(Architecture.X86);
-        Assert.AreEqual(Architecture.X86, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "AnyCPU2.exe", "x86.dll" }, _sourceArchitectures, _defaultArchitecture));
+        Assert.AreEqual(Architecture.X86, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "AnyCPU2.exe", "x86.dll" }, _defaultArchitecture, _sourceArchitectures));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
     }
 
@@ -106,7 +106,7 @@ public class InferHelperTests
     {
         _mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM).Returns(Architecture.ARM).Returns(Architecture.ARM);
-        Assert.AreEqual(Architecture.ARM, _inferHelper.AutoDetectArchitecture(new List<string>() { "ARM1.dll", "ARM2.dll", "ARM3.dll" }, _sourceArchitectures, _defaultArchitecture));
+        Assert.AreEqual(Architecture.ARM, _inferHelper.AutoDetectArchitecture(new List<string>() { "ARM1.dll", "ARM2.dll", "ARM3.dll" }, _defaultArchitecture, _sourceArchitectures));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
     }
 
@@ -115,7 +115,7 @@ public class InferHelperTests
     {
         _mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.AnyCPU).Returns(Architecture.AnyCPU).Returns(Architecture.X64);
-        Assert.AreEqual(Architecture.X64, _inferHelper.AutoDetectArchitecture(new List<string>() { "x64.dll", "AnyCPU2.exe", "x64.dll" }, _sourceArchitectures, _defaultArchitecture));
+        Assert.AreEqual(Architecture.X64, _inferHelper.AutoDetectArchitecture(new List<string>() { "x64.dll", "AnyCPU2.exe", "x64.dll" }, _defaultArchitecture, _sourceArchitectures));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
     }
 
@@ -124,7 +124,7 @@ public class InferHelperTests
     {
         _mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.AnyCPU).Returns(Architecture.X64).Returns(Architecture.X86);
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "x64.exe", "x86.dll" }, _sourceArchitectures, _defaultArchitecture));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "x64.exe", "x86.dll" }, _defaultArchitecture, _sourceArchitectures));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
     }
 
@@ -134,7 +134,7 @@ public class InferHelperTests
         _mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.AnyCPU).Returns(Architecture.X64).Returns(Architecture.X86);
 
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "x64.exe", "x86.dll" }, _sourceArchitectures, _defaultArchitecture));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "x64.exe", "x86.dll" }, _defaultArchitecture, _sourceArchitectures));
         Assert.AreEqual(3, _sourceArchitectures.Count);
         Assert.AreEqual(Architecture.AnyCPU, _sourceArchitectures["AnyCPU1.dll"]);
         Assert.AreEqual(Architecture.X64, _sourceArchitectures["x64.exe"]);
@@ -148,7 +148,7 @@ public class InferHelperTests
     {
         _mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.AnyCPU);
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "NotDotNetAssebly.appx" }, _sourceArchitectures, _defaultArchitecture));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "NotDotNetAssebly.appx" }, _defaultArchitecture, _sourceArchitectures));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(1));
     }
 

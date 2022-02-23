@@ -167,6 +167,8 @@ internal class TestRequestManager : ITestRequestManager
     {
         EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests started.");
 
+        // TODO: Normalize rest of the data on the request as well
+        discoveryPayload.Sources = discoveryPayload.Sources?.Distinct().ToList() ?? new List<string>();
         var runsettings = discoveryPayload.RunSettings;
 
         if (discoveryPayload.TestPlatformOptions != null)
@@ -177,12 +179,21 @@ internal class TestRequestManager : ITestRequestManager
         var requestData = GetRequestData(protocolConfig);
         if (UpdateRunSettingsIfRequired(
                 runsettings,
-                discoveryPayload.Sources?.ToList(),
+                discoveryPayload.Sources.ToList(),
                 discoveryEventsRegistrar,
-                out string updatedRunsettings))
+                out string updatedRunsettings,
+                out IDictionary<string, Architecture> sourceToArchitectureMap,
+                out IDictionary<string, Framework> sourceToFrameworkMap))
         {
             runsettings = updatedRunsettings;
         }
+
+        var sourceToSourceDetailMap = discoveryPayload.Sources.Select(source => new SourceDetail
+        {
+            Source = source,
+            Architecture = sourceToArchitectureMap[source],
+            Framework = sourceToFrameworkMap[source],
+        }).ToDictionary(k => k.Source);
 
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
         var batchSize = runConfiguration.BatchSize;
@@ -220,7 +231,8 @@ internal class TestRequestManager : ITestRequestManager
                 _currentDiscoveryRequest = _testPlatform.CreateDiscoveryRequest(
                     requestData,
                     criteria,
-                    discoveryPayload.TestPlatformOptions);
+                    discoveryPayload.TestPlatformOptions,
+                    sourceToSourceDetailMap);
                 discoveryEventsRegistrar?.RegisterDiscoveryEvents(_currentDiscoveryRequest);
 
                 // Notify start of discovery start.
@@ -275,10 +287,19 @@ internal class TestRequestManager : ITestRequestManager
                 runsettings,
                 sources,
                 testRunEventsRegistrar,
-                out string updatedRunsettings))
+                out string updatedRunsettings,
+                out IDictionary<string, Architecture> sourceToArchitectureMap,
+                out IDictionary<string, Framework> sourceToFrameworkMap))
         {
             runsettings = updatedRunsettings;
         }
+
+        var sourceToSourceDetailMap = sources.Select(source => new SourceDetail
+        {
+            Source = source,
+            Architecture = sourceToArchitectureMap[source],
+            Framework = sourceToFrameworkMap[source],
+        }).ToDictionary(k => k.Source);
 
         if (InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(runsettings))
         {
@@ -306,6 +327,10 @@ internal class TestRequestManager : ITestRequestManager
         // Get Fakes data collector settings.
         if (!string.Equals(Environment.GetEnvironmentVariable("VSTEST_SKIP_FAKES_CONFIGURATION"), "1"))
         {
+            // TODO: Are the sources in _commandLineOptions any different from the ones we get on the request?
+            // because why would they be? We never pass that forward to the executor, so this probably should
+            // just look at sources anyway.
+
             // The commandline options do not have sources in design time mode,
             // and so we fall back to using sources instead.
             if (_commandLineOptions.Sources.Any())
@@ -324,6 +349,11 @@ internal class TestRequestManager : ITestRequestManager
             }
         }
 
+        // We can have either a run that contains string as test container (usually a DLL), which is later resolved to the actual path
+        // and all tests that match filter are run from that container.
+        //
+        // OR we already did discovery and have a list of TestCases that have concrete test method information
+        // and so we only pass those. TestCase also has the test container path (usually a DLL).
         TestRunCriteria runCriteria = testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any()
             ? new TestRunCriteria(
                 testRunRequestPayload.Sources,
@@ -355,7 +385,8 @@ internal class TestRequestManager : ITestRequestManager
                 requestData,
                 runCriteria,
                 testRunEventsRegistrar,
-                testRunRequestPayload.TestPlatformOptions);
+                testRunRequestPayload.TestPlatformOptions,
+                sourceToSourceDetailMap);
             EqtTrace.Info("TestRequestManager.RunTests: run tests completed.");
         }
         finally
@@ -438,7 +469,9 @@ internal class TestRequestManager : ITestRequestManager
                 payload.RunSettings,
                 payload.Sources,
                 null,
-                out string updatedRunsettings))
+                out string updatedRunsettings,
+                out IDictionary<string, Architecture> sourceToArchitectureMap,
+                out IDictionary<string, Framework> sourceToFrameworkMap))
         {
             payload.RunSettings = updatedRunsettings;
         }
@@ -614,89 +647,96 @@ internal class TestRequestManager : ITestRequestManager
         string runsettingsXml,
         IList<string> sources,
         IBaseTestEventsRegistrar registrar,
-        out string updatedRunSettingsXml)
+        out string updatedRunSettingsXml,
+        out IDictionary<string, Architecture> sourceToArchitectureMap,
+        out IDictionary<string, Framework> sourceToFrameworkMap)
     {
         bool settingsUpdated = false;
         updatedRunSettingsXml = runsettingsXml;
-        var sourcePlatforms = new Dictionary<string, Architecture>();
-        var sourceFrameworks = new Dictionary<string, Framework>();
 
-        if (!string.IsNullOrEmpty(runsettingsXml))
+        // TODO: maybe check the settings on the edge and normalize the incoming requests rather than
+        // force validating that we even got runsettings in here.
+        if (string.IsNullOrWhiteSpace(runsettingsXml))
         {
-            // TargetFramework is full CLR. Set DesignMode based on current context.
-            using var stream = new StringReader(runsettingsXml);
-            using var reader = XmlReader.Create(
-                stream,
-                XmlRunSettingsUtilities.ReaderSettings);
-            var document = new XmlDocument();
-            document.Load(reader);
-            var navigator = document.CreateNavigator();
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
-            var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml)
-                                    ?? new LoggerRunSettings();
-
-            settingsUpdated |= UpdateFramework(
-                document,
-                navigator,
-                sources,
-                sourceFrameworks,
-                registrar,
-                out Framework chosenFramework);
-
-            // Choose default architecture based on the framework.
-            // For .NET core, the default platform architecture should be based on the process.
-            Architecture defaultArchitecture = Architecture.X86;
-            if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
-                // This is a special case for 1 version of Nuget.Frameworks that was shipped with using identifier NET5 instead of NETCoreApp5 for .NET 5.
-                || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
-            {
-#if NETCOREAPP
-                // We are running in vstest.console that is either started via dotnet.exe
-                // or via vstest.console.exe .NET Core executable. For AnyCPU dlls this
-                // should resolve 32-bit SDK when running from 32-bit dotnet process and
-                // 64-bit SDK when running from 64-bit dotnet process.
-                // As default architecture we specify the expected test host architecture,
-                // it can be specified by user on the command line with --arch or through runsettings.
-                // If it's not specified by user will be filled by current processor architecture;
-                // should be the same as SDK.
-                defaultArchitecture = RunSettingsHelper.Instance.IsDefaultTargetArchitecture ?
-                    TranslateToArchitecture(_processHelper.GetCurrentProcessArchitecture()) :
-                    runConfiguration.TargetPlatform;
-#else
-                // We are running in vstest.console.exe that was built against .NET
-                // Framework. This console prefers 32-bit because it needs to run as 32-bit
-                // to be compatible with QTAgent. It runs as 32-bit both under VS and in
-                // Developer console. Set the default architecture based on the OS
-                // architecture, to find 64-bit dotnet SDK when running AnyCPU dll on 64-bit
-                // system, and 32-bit SDK when running AnyCPU dll on 32-bit OS.
-                // We want to find 64-bit SDK because it is more likely to be installed.
-                defaultArchitecture = Environment.Is64BitOperatingSystem ? Architecture.X64 : Architecture.X86;
-#endif
-                EqtTrace.Verbose($"TestRequestManager.UpdateRunSettingsIfRequired: Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}, Current process architecture: {_processHelper.GetCurrentProcessArchitecture()}.");
-            }
-
-            settingsUpdated |= UpdatePlatform(
-                document,
-                navigator,
-                sources,
-                sourcePlatforms,
-                defaultArchitecture,
-                out Architecture chosenPlatform);
-            CheckSourcesForCompatibility(
-                chosenFramework,
-                chosenPlatform,
-                defaultArchitecture,
-                sourcePlatforms,
-                sourceFrameworks,
-                registrar);
-            settingsUpdated |= UpdateDesignMode(document, runConfiguration);
-            settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
-            settingsUpdated |= UpdateTargetDevice(navigator, document);
-            settingsUpdated |= AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
-
-            updatedRunSettingsXml = navigator.OuterXml;
+            sourceToArchitectureMap = new Dictionary<string, Architecture>();
+            sourceToFrameworkMap = new Dictionary<string, Framework>();
+            return false;
         }
+
+        // TargetFramework is full CLR. Set DesignMode based on current context.
+        using var stream = new StringReader(runsettingsXml);
+        using var reader = XmlReader.Create(
+            stream,
+            XmlRunSettingsUtilities.ReaderSettings);
+        var document = new XmlDocument();
+        document.Load(reader);
+        var navigator = document.CreateNavigator();
+        var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml)
+                                ?? new LoggerRunSettings();
+
+        settingsUpdated |= UpdateFrameworkInRunSettingsIfRequired(
+            document,
+            navigator,
+            sources,
+            registrar,
+            out Framework chosenFramework,
+            out sourceToFrameworkMap);
+
+        // Choose default architecture based on the framework.
+        // For .NET core, the default platform architecture should be based on the process.
+        Architecture defaultArchitecture = Architecture.X86;
+        if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+            || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
+            // This is a special case for 1 version of Nuget.Frameworks that was shipped with using identifier NET5 instead of NETCoreApp5 for .NET 5.
+            || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+#if NETCOREAPP
+            // We are running in vstest.console that is either started via dotnet.exe
+            // or via vstest.console.exe .NET Core executable. For AnyCPU dlls this
+            // should resolve 32-bit SDK when running from 32-bit dotnet process and
+            // 64-bit SDK when running from 64-bit dotnet process.
+            // As default architecture we specify the expected test host architecture,
+            // it can be specified by user on the command line with --arch or through runsettings.
+            // If it's not specified by user will be filled by current processor architecture;
+            // should be the same as SDK.
+            defaultArchitecture = RunSettingsHelper.Instance.IsDefaultTargetArchitecture ?
+                TranslateToArchitecture(_processHelper.GetCurrentProcessArchitecture()) :
+                runConfiguration.TargetPlatform;
+#else
+            // We are running in vstest.console.exe that was built against .NET
+            // Framework. This console prefers 32-bit because it needs to run as 32-bit
+            // to be compatible with QTAgent. It runs as 32-bit both under VS and in
+            // Developer console. Set the default architecture based on the OS
+            // architecture, to find 64-bit dotnet SDK when running AnyCPU dll on 64-bit
+            // system, and 32-bit SDK when running AnyCPU dll on 32-bit OS.
+            // We want to find 64-bit SDK because it is more likely to be installed.
+            defaultArchitecture = Environment.Is64BitOperatingSystem ? Architecture.X64 : Architecture.X86;
+#endif
+            EqtTrace.Verbose($"TestRequestManager.UpdateRunSettingsIfRequired: Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}, Current process architecture: {_processHelper.GetCurrentProcessArchitecture()}.");
+        }
+
+        settingsUpdated |= UpdatePlatform(
+            document,
+            navigator,
+            sources,
+            defaultArchitecture,
+            out Architecture chosenPlatform,
+            out sourceToArchitectureMap);
+
+        CheckSourcesForCompatibility(
+            chosenFramework,
+            chosenPlatform,
+            defaultArchitecture,
+            sourceToArchitectureMap,
+            sourceToFrameworkMap,
+            registrar);
+        settingsUpdated |= UpdateDesignMode(document, runConfiguration);
+        settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
+        settingsUpdated |= UpdateTargetDevice(navigator, document);
+        settingsUpdated |= AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
+
+        updatedRunSettingsXml = navigator.OuterXml;
 
         return settingsUpdated;
 
@@ -822,72 +862,81 @@ internal class TestRequestManager : ITestRequestManager
         XmlDocument document,
         XPathNavigator navigator,
         IList<string> sources,
-        IDictionary<string, Architecture> sourcePlatforms,
         Architecture defaultArchitecture,
-        out Architecture chosenPlatform)
+        out Architecture commonPlatform,
+        out IDictionary<string, Architecture> sourceToPlatformMap)
     {
-        // Get platform from sources.
-        var inferedPlatform = _inferHelper.AutoDetectArchitecture(
-            sources,
-            sourcePlatforms,
-            defaultArchitecture);
+        // Get platform from runsettings. If runsettings specify a platform, we don't need to
+        // auto detect it and update it, because it is forced by run settings to be a single given platform
+        // for all the provided sources.
+        bool platformSetByRunsettings = IsPlatformSetByRunSettings(navigator, out commonPlatform);
 
-        EqtTrace.Info($"Infered platform '{inferedPlatform}'.");
-
-        // Get platform from runsettings.
-        bool updatePlatform = IsAutoPlatformDetectRequired(navigator, out chosenPlatform);
-
-        // Update platform if required. For command line scenario update happens in
-        // ArgumentProcessor.
-        if (updatePlatform)
+        if (platformSetByRunsettings)
         {
-            EqtTrace.Info($"Platform update to '{inferedPlatform}' required.");
-            InferRunSettingsHelper.UpdateTargetPlatform(
-                document,
-                inferedPlatform.ToString(),
-                overwrite: true);
-            chosenPlatform = inferedPlatform;
+            EqtTrace.Info($"Platform is set by runsettings to be '{commonPlatform}' for all sources.");
+            sourceToPlatformMap = new Dictionary<string, Architecture>();
+            foreach (var source in sources)
+            {
+                sourceToPlatformMap.Add(source, commonPlatform);
+            }
+
+            // Return false, because we did not update runsettings.
+            return false;
         }
 
-        return updatePlatform;
+        // REVIEW: this should make the target platform empty, or "default" rather than the inferred platform, and we will then use the sources map to choose the correct testhost provider, and populate the runsettings there
+        // Autodetect platform from sources, and return a single common platform.
+        commonPlatform = _inferHelper.AutoDetectArchitecture(sources, defaultArchitecture, out sourceToPlatformMap);
+        InferRunSettingsHelper.UpdateTargetPlatform(document, commonPlatform.ToString(), overwrite: true);
+
+        EqtTrace.Info($"Platform was updated to '{commonPlatform}'.");
+        // Return true because we updated runsettings.
+        return true;
     }
 
-    private bool UpdateFramework(
+    private bool UpdateFrameworkInRunSettingsIfRequired(
         XmlDocument document,
         XPathNavigator navigator,
         IList<string> sources,
-        IDictionary<string, Framework> sourceFrameworks,
         IBaseTestEventsRegistrar registrar,
-        out Framework chosenFramework)
+        out Framework commonFramework,
+        out IDictionary<string, Framework> sourceToFrameworkMap)
     {
-        // Get framework from sources.
-        // This looks like you can optimize it by moving it down to if (updateFramework), but it has a side-effect of
-        // populating the sourceFrameworks, which is later checked when source compatibility check is done against the value
-        // that we either inferred as the common framework, or that is forced in runsettings.
-        var inferedFramework = _inferHelper.AutoDetectFramework(sources, sourceFrameworks);
+        bool frameworkSetByRunsettings = IsFrameworkSetByRunSettings(navigator, out commonFramework);
 
-        // See if framework is forced by runsettings. If not autodetect it.
-        bool updateFramework = IsAutoFrameworkDetectRequired(navigator, out chosenFramework);
-
-        // Update framework if required. For command line scenario update happens in
-        // ArgumentProcessor.
-        if (updateFramework)
+        if (frameworkSetByRunsettings)
         {
-            InferRunSettingsHelper.UpdateTargetFramework(
-                document,
-                inferedFramework.ToString(),
-                overwrite: true);
-            chosenFramework = inferedFramework;
+            sourceToFrameworkMap = new Dictionary<string, Framework>();
+            foreach (var source in sources)
+            {
+                sourceToFrameworkMap.Add(source, commonFramework);
+            }
+
+            WriteWarningForNetFramework35IsUnsupported(registrar, commonFramework);
+            // Return false because we did not update runsettings.
+            return false;
         }
 
+
+        // REVIEW: this should make the target framework empty, or "default" rather than the inferred framework, and we will then use the sources map to choose the correct testhost provider, and populate the runsettings there
+        // Autodetect framework from sources, and return a single common platform.
+        commonFramework = _inferHelper.AutoDetectFramework(sources, out sourceToFrameworkMap);
+        InferRunSettingsHelper.UpdateTargetFramework(document, commonFramework.ToString(), overwrite: true);
+
+        WriteWarningForNetFramework35IsUnsupported(registrar, commonFramework);
+
+        return frameworkSetByRunsettings;
+    }
+
+    private static void WriteWarningForNetFramework35IsUnsupported(IBaseTestEventsRegistrar registrar, Framework commonFramework)
+    {
         // Raise warnings for unsupported frameworks.
-        if (ObjectModel.Constants.DotNetFramework35.Equals(chosenFramework.Name))
+        // TODO: Look at the sourceToFrameworkMap, and report paths to the sources that use that framework, rather than the chosen framework
+        if (ObjectModel.Constants.DotNetFramework35.Equals(commonFramework.Name))
         {
             EqtTrace.Warning("TestRequestManager.UpdateRunSettingsIfRequired: throw warning on /Framework:Framework35 option.");
             registrar.LogWarning(Resources.Framework35NotSupported);
         }
-
-        return updateFramework;
     }
 
     /// <summary>
@@ -952,7 +1001,8 @@ internal class TestRequestManager : ITestRequestManager
         IRequestData requestData,
         TestRunCriteria testRunCriteria,
         ITestRunEventsRegistrar testRunEventsRegistrar,
-        TestPlatformOptions options)
+        TestPlatformOptions options,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
         // Make sure to run the run request inside a lock as the below section is not thread-safe.
         // TranslationLayer can process faster as it directly gets the raw un-serialized messages
@@ -966,7 +1016,8 @@ internal class TestRequestManager : ITestRequestManager
                 _currentTestRunRequest = _testPlatform.CreateTestRunRequest(
                     requestData,
                     testRunCriteria,
-                    options);
+                    options,
+                    sourceToSourceDetailMap);
 
                 _testRunResultAggregator.RegisterTestRunEvents(_currentTestRunRequest);
                 testRunEventsRegistrar?.RegisterTestRunEvents(_currentTestRunRequest);
@@ -998,61 +1049,79 @@ internal class TestRequestManager : ITestRequestManager
         }
     }
 
-    private bool IsAutoFrameworkDetectRequired(
+    /// <summary>
+    /// Check runsettings, to see if framework was specified by the user, if yes then use that for all sources.
+    /// This method either looks at runsettings directly when running as a server (DesignMode / IDE / via VSTestConsoleWrapper, or how you wanna call it)
+    /// or uses the pre-parsed runsettings when in console mode.
+    /// </summary>
+    /// <param name="navigator"></param>
+    /// <returns></returns>
+    private bool IsFrameworkSetByRunSettings(
         XPathNavigator navigator,
         out Framework chosenFramework)
     {
-        bool required = true;
-        chosenFramework = null;
         if (_commandLineOptions.IsDesignMode)
         {
-            bool isValidFx =
-                InferRunSettingsHelper.TryGetFrameworkXml(
-                    navigator,
-                    out var frameworkFromrunsettingsXml);
-            required = !isValidFx || string.IsNullOrWhiteSpace(frameworkFromrunsettingsXml);
-            if (!required)
+            bool isValidFrameworkXml = InferRunSettingsHelper.TryGetFrameworkXml(navigator, out var frameworkXml);
+            var runSettingsHaveValidFramework = isValidFrameworkXml && !string.IsNullOrWhiteSpace(frameworkXml);
+            if (!runSettingsHaveValidFramework)
             {
-                chosenFramework = Framework.FromString(frameworkFromrunsettingsXml);
+                // TODO: this should just ask the runsettings to give that value so we always parse it the same way
+                chosenFramework = Framework.FromString(frameworkXml);
+                return true;
             }
-        }
-        else if (!_commandLineOptions.IsDesignMode
-                 && _commandLineOptions.FrameworkVersionSpecified)
-        {
-            required = false;
-            chosenFramework = _commandLineOptions.TargetFrameworkVersion;
+
+            chosenFramework = Framework.DefaultFramework;
+            return false;
         }
 
-        return required;
+        if (_commandLineOptions.FrameworkVersionSpecified)
+        {
+            chosenFramework = _commandLineOptions.TargetFrameworkVersion;
+            return true;
+        }
+
+        chosenFramework = Framework.DefaultFramework;
+        return false;
     }
 
-    private bool IsAutoPlatformDetectRequired(
-        XPathNavigator navigator,
-        out Architecture chosenPlatform)
+    /// <summary>
+    /// Check runsettings, to see if platform was specified by the user, if yes then use that for all sources.
+    /// This method either looks at runsettings directly when running as a server (DesignMode / IDE / via VSTestConsoleWrapper, or how you wanna call it)
+    /// or uses the pre-parsed runsettings when in console mode.
+    /// </summary>
+    /// <param name="navigator"></param>
+    /// <returns></returns>
+    private bool IsPlatformSetByRunSettings(
+        XPathNavigator navigator, out Architecture chosenPlatform)
     {
-        bool required = true;
-        chosenPlatform = Architecture.Default;
         if (_commandLineOptions.IsDesignMode)
         {
-            bool isValidPlatform = InferRunSettingsHelper.TryGetPlatformXml(
+            bool isValidPlatformXml = InferRunSettingsHelper.TryGetPlatformXml(
                 navigator,
                 out var platformXml);
 
-            required = !isValidPlatform || string.IsNullOrWhiteSpace(platformXml);
-            if (!required)
+            bool runSettingsHaveValidPlatform = isValidPlatformXml && !string.IsNullOrWhiteSpace(platformXml);
+            if (runSettingsHaveValidPlatform)
             {
-                chosenPlatform = (Architecture)Enum.Parse(
-                    typeof(Architecture),
-                    platformXml, true);
+                // TODO: this should be checking if the enum has the value specified, or ideally just ask the runsettings to give that value
+                // so we parse the same way always
+                chosenPlatform = (Architecture)Enum.Parse(typeof(Architecture), platformXml, ignoreCase: true);
+                return true;
             }
-        }
-        else if (!_commandLineOptions.IsDesignMode && _commandLineOptions.ArchitectureSpecified)
-        {
-            required = false;
-            chosenPlatform = _commandLineOptions.TargetArchitecture;
+
+            chosenPlatform = Architecture.Default;
+            return false;
         }
 
-        return required;
+        if (_commandLineOptions.ArchitectureSpecified)
+        {
+            chosenPlatform = _commandLineOptions.TargetArchitecture;
+            return true;
+        }
+
+        chosenPlatform = Architecture.Default;
+        return false;
     }
 
     /// <summary>
@@ -1217,6 +1286,7 @@ internal class TestRequestManager : ITestRequestManager
 
     private List<String> GetSources(TestRunRequestPayload testRunRequestPayload)
     {
+        // TODO: This should also use hashset to only return distinct sources.
         List<string> sources = new();
         if (testRunRequestPayload.Sources != null
             && testRunRequestPayload.Sources.Count > 0)

@@ -6,7 +6,7 @@ namespace vstest.ProgrammerTests.Fakes;
 internal static class KnownFrameworkStrings
 {
     public static string NetCore(int major, int minor = 0) => $".NETCoreApp,Version=v{major}.{minor}";
-    private static string NetFramework(int major, int minor, int patch = 0) => $".NETFramework,Version=v{major}.{minor}.{patch}";
+    private static string NetFramework(int major, int minor, int patch = 0) => $".NETFramework,Version=v{major}.{minor}{(patch != 0 ? $".{patch}" : null)}";
 
     public static string Netcoreapp1 = NetCore(1);
     public static string Netcoreapp2 = NetCore(2);

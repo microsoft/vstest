@@ -131,6 +131,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         if (_proxyOperationManager == null)
         {
             _proxyOperationManager = _proxyOperationManagerCreator(
+                // REVIEW: why only first? 
                 discoveryCriteria.Sources.First(),
                 this);
 

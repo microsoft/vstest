@@ -27,7 +27,6 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using vstest.ProgrammerTests.Fakes;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Intent;
-using System.Linq.Expressions;
 
 // Tests are run by Intent library that is executed from our Program.Main. To debug press F5 in VS, and maybe mark just a single test with [Only].
 // To just run, press Ctrl+F5 to run without debugging. It will use short timeout for abort in case something is wrong with your test.
@@ -240,7 +239,6 @@ public class TestDiscoveryTests
         fixture.ExecutedTests.Should().HaveCount(mstest1Dll.TestCount + mstest2Dll.TestCount);
     }
 
-    [Only]
     public async Task GivenMultipleMsTestAssembliesThatHaveTheSameArchitecture_AndHaveDifferentTargetFrameworks_AndMULTI_TFM_RUNFeatureFlagIsDisabled_WhenTestsAreRun_ThenTwoTesthostsAreStartedBothForTheSameTFM()
     {
         // -- arrange
@@ -373,6 +371,8 @@ public class TestDiscoveryTests
             .ExecutionInitialize(FakeMessage.NoResponse)
             .StartTestExecutionWithSources(mstest1Dll.TestResultBatches)
             .SessionEnd(FakeMessage.NoResponse, afterAction: _ => testhost1Process.Exit())
+            // We actually do get asked to terminate multiple times.
+            .SessionEnd(FakeMessage.NoResponse)
             .Build();
 
         var testhost1 = new FakeTestHostFixtureBuilder(fixture)
@@ -397,6 +397,8 @@ public class TestDiscoveryTests
             .ExecutionInitialize(FakeMessage.NoResponse)
             .StartTestExecutionWithSources(mstest2Dll.TestResultBatches)
             .SessionEnd(FakeMessage.NoResponse, _ => testhost2Process.Exit())
+            // We actually do get asked to terminate multiple times.
+            .SessionEnd(FakeMessage.NoResponse)
             .Build();
 
         var testhost2 = new FakeTestHostFixtureBuilder(fixture)

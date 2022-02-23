@@ -16,30 +16,31 @@ using ObjectModel;
 using ObjectModel.Engine;
 
 /// <summary>
-/// Abstract class having common parallel manager implementation
+/// Common parallel manager functionality.
 /// </summary>
-internal abstract class ParallelOperationManager<T, TU> : IParallelOperationManager, IDisposable
+internal abstract class ParallelOperationManager<TParallelManager, TEventHandler, TCreationContext> : IParallelOperationManager, IDisposable
 {
     #region ConcurrentManagerInstanceData
 
-    protected Func<T> CreateNewConcurrentManager { get; set; }
+    protected Func<TCreationContext, TParallelManager> CreateNewConcurrentManager { get; }
 
     /// <summary>
-    /// Gets a value indicating whether hosts are shared.
+    /// Holds all active managers, so we can do actions on all of them, like initialize, run, cancel or close.
     /// </summary>
-    protected bool SharedHosts { get; private set; }
-
-    private IDictionary<T, TU> _concurrentManagerHandlerMap;
+    // TODO: make this ConcurrentDictionary and use it's concurrent api, if we have the need.
+    private readonly IDictionary<TParallelManager, TEventHandler> _concurrentManagerHandlerMap = new ConcurrentDictionary<TParallelManager, TEventHandler>();
 
     /// <summary>
     /// Singleton Instance of this class
     /// </summary>
-    protected static T s_instance;
+    protected static TParallelManager s_instance;
 
     /// <summary>
     /// Default number of Processes
     /// </summary>
     private int _currentParallelLevel;
+
+    protected int MaxParallelLevel { get; private set; }
 
     #endregion
 
@@ -53,20 +54,27 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
 
     #endregion
 
-    protected ParallelOperationManager(Func<T> createNewManager, int parallelLevel, bool sharedHosts)
+    protected ParallelOperationManager(Func<TCreationContext, TParallelManager> createNewManager, int parallelLevel)
     {
         CreateNewConcurrentManager = createNewManager;
-        SharedHosts = sharedHosts;
 
         // Update Parallel Level
-        UpdateParallelLevel(parallelLevel);
+        // REVIEW: this "pre-starts" testhosts so we have a pool of them, this is the reason the number or
+        // parallel hosts is capped to the amount of sources so we don't "pre-start" too many of them
+        // instead we should take each source, look if it can be run by shared host, and if so try to
+        // grab a free host, run new one if we are below parallel level, or wait if we are at parallel
+        // level and everyone is busy if we have non-shared host we do just the two last options, run new
+        // one if current count is under parallel level, or wait till we can run new one.
+        // this.UpdateParallelLevel(parallelLevel);
+
+        MaxParallelLevel = parallelLevel;
     }
 
     /// <summary>
     /// Remove and dispose a manager from concurrent list of manager.
     /// </summary>
     /// <param name="manager">Manager to remove</param>
-    public void RemoveManager(T manager)
+    public void RemoveManager(TParallelManager manager)
     {
         _concurrentManagerHandlerMap.Remove(manager);
     }
@@ -76,7 +84,7 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
     /// </summary>
     /// <param name="manager">Manager to add</param>
     /// <param name="handler">eventHandler of the manager</param>
-    public void AddManager(T manager, TU handler)
+    public void AddManager(TParallelManager manager, TEventHandler handler)
     {
         _concurrentManagerHandlerMap.Add(manager, handler);
     }
@@ -87,7 +95,7 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
     /// </summary>
     /// <param name="manager">Manager to update</param>
     /// <param name="handler">event handler to update for manager</param>
-    public void UpdateHandlerForManager(T manager, TU handler)
+    public void UpdateHandlerForManager(TParallelManager manager, TEventHandler handler)
     {
         if (_concurrentManagerHandlerMap.ContainsKey(manager))
         {
@@ -103,7 +111,7 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
     /// Get the event handler associated with the manager.
     /// </summary>
     /// <param name="manager">Manager</param>
-    public TU GetHandlerForGivenManager(T manager)
+    public TEventHandler GetHandlerForGivenManager(TParallelManager manager)
     {
         return _concurrentManagerHandlerMap[manager];
     }
@@ -119,7 +127,7 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
     /// <summary>
     /// Get instances of all active concurrent manager
     /// </summary>
-    public IEnumerable<T> GetConcurrentManagerInstances()
+    public IEnumerable<TParallelManager> GetConcurrentManagerInstances()
     {
         return _concurrentManagerHandlerMap.Keys.ToList();
     }
@@ -133,13 +141,7 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
     {
         if (_concurrentManagerHandlerMap == null)
         {
-            // not initialized yet
-            // create rest of concurrent clients other than default one
-            _concurrentManagerHandlerMap = new ConcurrentDictionary<T, TU>();
-            for (int i = 0; i < newParallelLevel; i++)
-            {
-                AddManager(CreateNewConcurrentManager(), default);
-            }
+            throw new Exception("ParallelOperationManager.UpdateParallelLevel: This should not be used anymore, to pre-start hosts.");
         }
         else if (_currentParallelLevel != newParallelLevel)
         {
@@ -147,10 +149,9 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
             // Create more concurrent clients and update the list
             if (_currentParallelLevel < newParallelLevel)
             {
-                for (int i = 0; i < newParallelLevel - _currentParallelLevel; i++)
-                {
-                    AddManager(CreateNewConcurrentManager(), default);
-                }
+                // This path does not even seem to be used anywhere.
+
+                throw new Exception("ParallelOperationManager.UpdateParallelLevel: This should not be used anymore, to ensure we add more hosts.");
             }
             else
             {
@@ -190,7 +191,7 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
         s_instance = default;
     }
 
-    protected void DoActionOnAllManagers(Action<T> action, bool doActionsInParallel = false)
+    protected void DoActionOnAllManagers(Action<TParallelManager> action, bool doActionsInParallel = false)
     {
         if (_concurrentManagerHandlerMap != null && _concurrentManagerHandlerMap.Count > 0)
         {
@@ -237,15 +238,16 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
     /// </summary>
     /// <param name="source">source data to work on - source file or testCaseList</param>
     /// <returns>True, if data exists. False otherwise</returns>
-    protected bool TryFetchNextSource<TY>(IEnumerator enumerator, out TY source)
+    protected bool TryFetchNextSource<TSource>(IEnumerator enumerator, out TSource source)
     {
+        // TODO: If only something like a concurrent queue existed.
         source = default;
         var hasNext = false;
         lock (_sourceEnumeratorLockObject)
         {
             if (enumerator != null && enumerator.MoveNext())
             {
-                source = (TY)enumerator.Current;
+                source = (TSource)enumerator.Current;
                 hasNext = source != null;
             }
         }
