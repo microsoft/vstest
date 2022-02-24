@@ -17,9 +17,9 @@ public class ProcessesInteractionTests : AcceptanceTestBase
     {
         // Arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        const string TestAssetProjectName = "SimpleTestProjectMessedUpTargetFramework";
-        var assemblyPath = GetAssetFullPath(TestAssetProjectName + ".dll", Core21TargetFramework);
-        UpdateRuntimeConfigJsonWithInvalidFramework(assemblyPath, TestAssetProjectName);
+        const string testAssetProjectName = "SimpleTestProjectMessedUpTargetFramework";
+        var assemblyPath = GetAssetFullPath(testAssetProjectName + ".dll", Core21TargetFramework);
+        UpdateRuntimeConfigJsonWithInvalidFramework(assemblyPath, testAssetProjectName);
         using var tempDir = new TempDirectory();
 
         // Act
