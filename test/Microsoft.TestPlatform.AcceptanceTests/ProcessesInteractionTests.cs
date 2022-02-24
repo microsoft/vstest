@@ -40,7 +40,7 @@ public class ProcessesInteractionTests : AcceptanceTestBase
             // flush its output and error streams).See https://github.com/microsoft/vstest/issues/3375
             var runtimeConfigJson = Path.Combine(Path.GetDirectoryName(assemblyPath), testAssetProjectName + ".runtimeconfig.json");
             var fileContent = File.ReadAllText(runtimeConfigJson);
-            var updatedContent = fileContent.Replace("\"version\": \"2.1.0\"", "\"version\": \"42\"");
+            var updatedContent = fileContent.Replace("\"version\": \"2.1.0\"", "\"version\": \"0.0.0\"");
             File.WriteAllText(runtimeConfigJson, updatedContent);
         }
     }
