@@ -15,6 +15,7 @@
       <!-- Include Assets as Content -->
       <files include="**/*.*" buildAction="None" copyToOutput="true" flatten="false" />
     </contentFiles>
+    <developmentdependency>true</developmentdependency>
   </metadata>
   <files>
     <file src="package\licenses\LICENSE_NET.txt" target="" />

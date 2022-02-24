@@ -19,6 +19,7 @@
                 url="https://github.com/microsoft/vstest"
                 branch="$BranchName$"
                 commit="$CommitId$" />
+    <developmentdependency>true</developmentdependency>
   </metadata>
   <files>
     <file src="Icon.png" target="" />

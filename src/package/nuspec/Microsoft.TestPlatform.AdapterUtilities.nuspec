@@ -20,6 +20,7 @@
                     url="https://github.com/microsoft/vstest" 
                     branch="$BranchName$" 
                     commit="$CommitId$" />
+        <developmentdependency>true</developmentdependency>
 
         <dependencies>
             <group targetFramework="netstandard1.0">

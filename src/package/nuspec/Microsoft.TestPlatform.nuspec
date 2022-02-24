@@ -16,6 +16,7 @@
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <tags>vstest visual-studio unittest testplatform mstest microsoft test testing</tags>
     <repository type="git" url="https://github.com/microsoft/vstest" branch="$BranchName$" commit="$CommitId$" />
+    <developmentdependency>true</developmentdependency>
   </metadata>
   <files>
     <file src="Icon.png" target="" />

@@ -18,7 +18,8 @@
                 url="https://github.com/microsoft/vstest" 
                 branch="$BranchName$" 
                 commit="$CommitId$" />
-                
+    <developmentdependency>true</developmentdependency>
+
     <contentFiles>
       <files include="**/*.*" copyToOutput="true" flatten="false" buildAction="None" />
     </contentFiles>
