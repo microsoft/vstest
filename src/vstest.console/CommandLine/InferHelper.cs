@@ -32,7 +32,7 @@ internal class InferHelper
         if (sources == null || sources.Count == 0)
             return defaultArchitecture;
 
-        var architecture = defaultArchitecture;
+        // Set the default for all sources.
         foreach (var source in sources)
         {
             sourceToPlatformMap.Add(source, defaultArchitecture);
@@ -40,56 +40,84 @@ internal class InferHelper
 
         try
         {
-            // REVIEW: I had changes in this class in my prototype that I could not understand anymore, are there any changes needed?
-            Architecture? finalArch = null;
+            Architecture? commonArchitecture = null;
             foreach (string source in sources)
             {
-                Architecture arch;
-                if (IsDotNetAssembly(source))
+                try
                 {
-                    arch = _assemblyMetadataProvider.GetArchitecture(source);
-                }
-                else
-                {
-                    // Set AnyCPU for non dotnet test sources (js, py and other). Otherwise warning will
-                    // show up if there is mismatch with user provided platform.
-                    arch = Architecture.AnyCPU;
-                }
-                EqtTrace.Info("Determined platform for source '{0}' is '{1}'", source, arch);
-                sourceToPlatformMap[source] = arch;
+                    Architecture detectedArchitecture;
+                    if (IsDllOrExe(source))
+                    {
+                        detectedArchitecture = _assemblyMetadataProvider.GetArchitecture(source);
 
-                if (Architecture.AnyCPU.Equals(arch))
-                {
-                    // If arch is AnyCPU ignore it.
-                    continue;
-                }
+                        if (detectedArchitecture == Architecture.AnyCPU)
+                        {
+                            // This is AnyCPU .NET assembly, this source should run using the default architecture,
+                            // which we've already set for the source.
+                            EqtTrace.Info("Determined platform for source '{0}' was AnyCPU and it will use the default plaform {1}.", source, defaultArchitecture);
+                        }
+                        else
+                        {
+                            sourceToPlatformMap[source] = detectedArchitecture;
+                            EqtTrace.Info("Determined platform for source '{0}' was '{1}'.", source, detectedArchitecture);
+                        }
+                    }
+                    else
+                    {
+                        // This is non-dll source, this source should run using the default architecture,
+                        // which we've already set for the source.
+                        EqtTrace.Info("No platform was determined for source '{0}' because it is not a dll or an executable.", source);
 
-                if (finalArch == null)
-                {
-                    finalArch = arch;
-                    continue;
-                }
+                        // This source has no associated architecture so it does not help use determine a common architecture for
+                        // all the sources, so we continue to next one.
+                        continue;
+                    }
 
-                if (!finalArch.Equals(arch))
+                    if (Architecture.AnyCPU.Equals(detectedArchitecture))
+                    {
+                        // The architecture of the source is AnyCPU and so we can skip to the next one,
+                        // because it does not help use determine a common architecture for all the sources.
+                        continue;
+                    }
+
+                    // This is the first source that provided some architecture use that as a candidate
+                    // for the common architecture.
+                    if (commonArchitecture == null)
+                    {
+                        commonArchitecture = detectedArchitecture;
+                        continue;
+                    }
+
+                    // The detected architecture, is different than the common architecture. So at least
+                    // one of the sources is incompatible with the others. Use the default architecture as the common
+                    // fallback.
+                    if (!commonArchitecture.Equals(detectedArchitecture))
+                    {
+                        commonArchitecture = defaultArchitecture;
+                    }
+                }
+                catch (Exception ex)
                 {
-                    finalArch = defaultArchitecture;
-                    EqtTrace.Info("Conflict in platform architecture, using default platform:{0}", finalArch);
+                    EqtTrace.Error("Failed to determine platform for source: {0}, using default: {1}, exception: {2}", source, defaultArchitecture, ex);
+                    sourceToPlatformMap[source] = defaultArchitecture;
                 }
             }
 
-            if (finalArch != null)
+            if (commonArchitecture != null)
             {
-                architecture = (Architecture)finalArch;
+                EqtTrace.Info("Determined platform for all sources: {0}", commonArchitecture);
+                return commonArchitecture.Value;
             }
+
+            EqtTrace.Info("None of the sources provided any runnable platform, using the default platform: {0}", defaultArchitecture);
+
+            return defaultArchitecture;
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("Failed to determine platform: {0}, using default: {1}", ex, architecture);
+            EqtTrace.Error("Failed to determine platform for all sources: {0}, using default: {1}", ex, defaultArchitecture);
+            return defaultArchitecture;
         }
-
-        EqtTrace.Info("Determined platform for all sources: {0}", architecture);
-
-        return architecture;
     }
 
     /// <summary>
@@ -137,7 +165,7 @@ internal class InferHelper
             try
             {
                 FrameworkName fx;
-                if (IsDotNetAssembly(source))
+                if (IsDllOrExe(source))
                 {
                     fx = _assemblyMetadataProvider.GetFrameWork(source);
                 }
@@ -193,7 +221,7 @@ internal class InferHelper
         return finalFx;
     }
 
-    private bool IsDotNetAssembly(string filePath)
+    private bool IsDllOrExe(string filePath)
     {
         var extType = Path.GetExtension(filePath);
         return extType != null && (extType.Equals(".dll", StringComparison.OrdinalIgnoreCase) ||

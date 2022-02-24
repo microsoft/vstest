@@ -3,7 +3,13 @@
 
 namespace Intent;
 
-[AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Constructor | AttributeTargets.Method)]
+[AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
 public class ExcludeAttribute : Attribute
 {
+    public ExcludeAttribute(string? reason = null)
+    {
+        Reason = reason;
+    }
+
+    public string? Reason { get; }
 }

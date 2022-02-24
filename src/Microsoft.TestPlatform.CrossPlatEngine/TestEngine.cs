@@ -28,8 +28,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using PlatformAbstractions;
 using PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-using System.IO;
-using System.Xml;
 
 /// <summary>
 /// Cross platform test engine entry point for the client.

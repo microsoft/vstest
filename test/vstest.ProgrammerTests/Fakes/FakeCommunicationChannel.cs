@@ -20,7 +20,6 @@ internal abstract class FakeCommunicationChannel : ICommunicationChannel
 
     public int Id { get; }
     public CancellationTokenSource CancellationTokenSource { get; } = new();
-
     public BlockingCollection<string> InQueue { get; } = new();
     public BlockingCollection<FakeMessage> OutQueue { get; } = new();
 
@@ -47,6 +46,7 @@ internal abstract class FakeCommunicationChannel : ICommunicationChannel
     {
         CancellationTokenSource.Cancel();
         InQueue.CompleteAdding();
+        OutQueue.CompleteAdding();
     }
 
     public Task NotifyDataAvailable()
@@ -104,11 +104,12 @@ internal class FakeCommunicationChannel<TContext> : FakeCommunicationChannel, IC
         {
             try
             {
-                // TODO: better name? this is message that we are currently trying to send
-                OutgoingMessage = OutQueue.Take();
+                // TODO: better name for the property? This is message that we are currently trying to send.
+                OutgoingMessage = OutQueue.Take(token);
                 OnMessageReceived(this, new MessageReceivedEventArgs { Data = OutgoingMessage.SerializedMessage });
                 OutgoingMessage = null;
             }
+            catch (OperationCanceledException) { }
             catch (Exception ex)
             {
                 FakeErrorAggregator.Add(ex);
@@ -198,6 +199,7 @@ internal class FakeCommunicationChannel<TContext> : FakeCommunicationChannel, IC
                     responsePair.AfterAction?.Invoke(context);
                 }
             }
+            catch (OperationCanceledException) { }
             catch (Exception ex)
             {
                 FakeErrorAggregator.Add(ex);

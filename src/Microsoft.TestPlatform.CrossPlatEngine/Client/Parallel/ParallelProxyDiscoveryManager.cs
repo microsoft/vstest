@@ -17,6 +17,7 @@ using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using ObjectModel.Engine;
 using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
 
 /// <summary>
 /// ParallelProxyDiscoveryManager that manages parallel discovery
@@ -239,14 +240,20 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
 
         EqtTrace.Verbose("ProxyParallelDiscoveryManager: Triggering test discovery for next source: {0}", source);
 
-        // Kick off another discovery task for the next source
+        var sourceDetail = _sourceToSourceDetailMap[source];
+        var runsettingsXml = SourceDetailHelper.UpdateRunSettingsFromSourceDetail(_actualDiscoveryCriteria.RunSettings, sourceDetail);
+
+        
         var discoveryCriteria = new DiscoveryCriteria(
             new[] { source },
             _actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent,
             _actualDiscoveryCriteria.DiscoveredTestEventTimeout,
-            _actualDiscoveryCriteria.RunSettings
+            runsettingsXml
         );
+
         discoveryCriteria.TestCaseFilter = _actualDiscoveryCriteria.TestCaseFilter;
+
+        // Kick off another discovery task for the next source
         Task.Run(() =>
             {
                 EqtTrace.Verbose("ParallelProxyDiscoveryManager: Discovery started.");

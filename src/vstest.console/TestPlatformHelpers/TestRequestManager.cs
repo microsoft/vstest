@@ -644,7 +644,7 @@ internal class TestRequestManager : ITestRequestManager
     }
 
     private bool UpdateRunSettingsIfRequired(
-        string runsettingsXml,
+        string runsettingsXml!!,
         IList<string> sources,
         IBaseTestEventsRegistrar registrar,
         out string updatedRunSettingsXml,
@@ -653,15 +653,6 @@ internal class TestRequestManager : ITestRequestManager
     {
         bool settingsUpdated = false;
         updatedRunSettingsXml = runsettingsXml;
-
-        // TODO: maybe check the settings on the edge and normalize the incoming requests rather than
-        // force validating that we even got runsettings in here.
-        if (string.IsNullOrWhiteSpace(runsettingsXml))
-        {
-            sourceToArchitectureMap = new Dictionary<string, Architecture>();
-            sourceToFrameworkMap = new Dictionary<string, Framework>();
-            return false;
-        }
 
         // TargetFramework is full CLR. Set DesignMode based on current context.
         using var stream = new StringReader(runsettingsXml);
@@ -925,7 +916,8 @@ internal class TestRequestManager : ITestRequestManager
 
         WriteWarningForNetFramework35IsUnsupported(registrar, commonFramework);
 
-        return frameworkSetByRunsettings;
+        // Return true because we updated runsettings.
+        return true;
     }
 
     private static void WriteWarningForNetFramework35IsUnsupported(IBaseTestEventsRegistrar registrar, Framework commonFramework)
@@ -1060,11 +1052,12 @@ internal class TestRequestManager : ITestRequestManager
         XPathNavigator navigator,
         out Framework chosenFramework)
     {
+
         if (_commandLineOptions.IsDesignMode)
         {
             bool isValidFrameworkXml = InferRunSettingsHelper.TryGetFrameworkXml(navigator, out var frameworkXml);
             var runSettingsHaveValidFramework = isValidFrameworkXml && !string.IsNullOrWhiteSpace(frameworkXml);
-            if (!runSettingsHaveValidFramework)
+            if (runSettingsHaveValidFramework)
             {
                 // TODO: this should just ask the runsettings to give that value so we always parse it the same way
                 chosenFramework = Framework.FromString(frameworkXml);

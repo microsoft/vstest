@@ -131,7 +131,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         if (_proxyOperationManager == null)
         {
             _proxyOperationManager = _proxyOperationManagerCreator(
-                // REVIEW: why only first? 
+                // Passing only first because that is how the testhost pool is keyed.
                 discoveryCriteria.Sources.First(),
                 this);
 

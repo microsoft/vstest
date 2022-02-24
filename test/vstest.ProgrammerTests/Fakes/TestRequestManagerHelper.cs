@@ -36,15 +36,22 @@ internal class TestRequestManagerTestHelper
         var abortOnTimeout = Task.Run(async () =>
         {
             // Wait until timeout or until we are cancelled.
-            await Task.Delay(TimeSpan.FromSeconds(Debugger.IsAttached ? _debugOptions.DebugTimeout : _debugOptions.Timeout), cancelAbort.Token);
-            if (Debugger.IsAttached && _debugOptions.BreakOnAbort)
+            try
             {
-                var errors = _errorAggregator.Errors;
-                // we will abort because we are hanging, look at errors and at concurrent stacks to see where we are hanging.
-                Debugger.Break();
+                await Task.Delay(TimeSpan.FromSeconds(Debugger.IsAttached ? _debugOptions.DebugTimeout : _debugOptions.Timeout), cancelAbort.Token);
+
+                if (Debugger.IsAttached && _debugOptions.BreakOnAbort)
+                {
+                    var errors = _errorAggregator.Errors;
+                    // we will abort because we are hanging, look at errors and at concurrent stacks to see where we are hanging.
+                    Debugger.Break();
+                }
+                _errorAggregator.Add(new Exception("errr we aborted"));
+                _testRequestManager.AbortTestRun();
             }
-            _errorAggregator.Add(new Exception("errr we aborted"));
-            _testRequestManager.AbortTestRun();
+            catch (TaskCanceledException)
+            {
+            }
         });
 
         testRequsestManagerAction(_testRequestManager);
