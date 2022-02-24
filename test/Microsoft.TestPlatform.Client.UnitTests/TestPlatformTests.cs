@@ -1,27 +1,27 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+using Microsoft.VisualStudio.TestPlatform.Client.Execution;
+using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests;
-
-using System;
-using System.IO;
-using System.Collections.Generic;
-
-using Microsoft.VisualStudio.TestPlatform.Client.Execution;
-using Common.Hosting;
-using Common.Logging;
-using ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-using ObjectModel.Engine;
-using ObjectModel.Host;
-using Utilities.Helpers;
-using Utilities.Helpers.Interfaces;
-using TestTools.UnitTesting;
-
-using Moq;
 
 [TestClass]
 public class TestPlatformTests

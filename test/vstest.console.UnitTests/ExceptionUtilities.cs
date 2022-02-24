@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
-
-using System;
-
-using TestTools.UnitTesting;
 
 /// <summary>
 /// This only exists because there is an issue with MSTest v2 and ThrowsException with a message API.

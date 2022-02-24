@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CrossPlatEngine.UnitTests;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,6 +22,8 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+
+namespace TestPlatform.CrossPlatEngine.UnitTests;
 
 [TestClass]
 public class ArtifactProcessingTests

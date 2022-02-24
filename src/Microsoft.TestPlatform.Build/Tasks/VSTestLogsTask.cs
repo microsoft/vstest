@@ -1,17 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Build.Tasks;
 
 using System;
 
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-using Resources;
+#nullable disable
 
+namespace Microsoft.TestPlatform.Build.Tasks;
 public class VSTestLogsTask : Task
 {
     public string LogType
@@ -30,15 +28,15 @@ public class VSTestLogsTask : Task
     {
         if (string.Equals(LogType, "BuildStarted", StringComparison.OrdinalIgnoreCase))
         {
-            Log.LogMessage(MessageImportance.Normal, Resources.BuildStarted);
+            Log.LogMessage(MessageImportance.Normal, Resources.Resources.BuildStarted);
         }
         else if (string.Equals(LogType, "BuildCompleted", StringComparison.OrdinalIgnoreCase))
         {
-            Log.LogMessage(MessageImportance.Normal, Resources.BuildCompleted + Environment.NewLine);
+            Log.LogMessage(MessageImportance.Normal, Resources.Resources.BuildCompleted + Environment.NewLine);
         }
         else if (string.Equals(LogType, "NoIsTestProjectProperty", StringComparison.OrdinalIgnoreCase))
         {
-            Log.LogMessage(MessageImportance.Low, Resources.NoIsTestProjectProperty);
+            Log.LogMessage(MessageImportance.Low, Resources.Resources.NoIsTestProjectProperty);
         }
         else
         {

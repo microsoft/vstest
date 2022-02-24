@@ -1,28 +1,26 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.IO;
+using System.Text;
+using System.Xml;
+
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
+using vstest.console.UnitTests.Processors;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
-
-using System;
-using System.IO;
-using System.Xml;
-
-using Common.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using TestTools.UnitTesting;
-
-using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-using ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using vstest.console.UnitTests.Processors;
-
-using Moq;
-using System.Text;
-
-using ExceptionUtilities = ExceptionUtilities;
 
 [TestClass]
 public class RunSettingsArgumentProcessorTests

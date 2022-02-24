@@ -3,8 +3,6 @@
 
 namespace vstest.ProgrammerTests.Fakes;
 
-using System.Linq;
-
 internal static class EnumerableExtensions
 {
     public static string JoinBySpace<T>(this IEnumerable<T> value)

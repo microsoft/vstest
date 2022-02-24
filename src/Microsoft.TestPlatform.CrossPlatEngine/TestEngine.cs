@@ -1,33 +1,33 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-using Common;
-using Common.Hosting;
-using Common.Logging;
-using Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using CommunicationUtilities;
-using Client;
-using Client.Parallel;
-using DataCollection;
-using Utilities;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
-using ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using PlatformAbstractions;
-using PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
 /// <summary>
 /// Cross platform test engine entry point for the client.
@@ -44,7 +44,7 @@ public class TestEngine : ITestEngine
 
     protected internal TestEngine(
         TestRuntimeProviderManager testHostProviderManager,
-        IProcessHelper processHelper) : this((ITestRuntimeProviderManager) testHostProviderManager, processHelper)
+        IProcessHelper processHelper) : this((ITestRuntimeProviderManager)testHostProviderManager, processHelper)
     {
     }
 

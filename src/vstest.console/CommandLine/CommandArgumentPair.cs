@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
-
 using System;
 using System.Diagnostics.Contracts;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
 /// <summary>
 /// Breaks a string down into command and argument based on the following format:
@@ -37,11 +37,11 @@ internal class CommandArgumentPair
     /// <param name="input">Input to break up.</param>
     public CommandArgumentPair(string input)
     {
-        if (String.IsNullOrWhiteSpace(input))
+        if (string.IsNullOrWhiteSpace(input))
         {
             throw new ArgumentException(CommandLineResources.CannotBeNullOrEmpty, nameof(input));
         }
-        Contract.Ensures(!String.IsNullOrWhiteSpace(Command));
+        Contract.Ensures(!string.IsNullOrWhiteSpace(Command));
 
         Parse(input);
     }
@@ -53,7 +53,7 @@ internal class CommandArgumentPair
     /// <param name="argument">The argument portion of the input.</param>
     public CommandArgumentPair(string command, string argument)
     {
-        if (String.IsNullOrWhiteSpace(command))
+        if (string.IsNullOrWhiteSpace(command))
         {
             throw new ArgumentException(CommandLineResources.CannotBeNullOrEmpty, nameof(command));
         }
@@ -71,8 +71,8 @@ internal class CommandArgumentPair
     /// <param name="input">Input string to parse.</param>
     private void Parse(string input)
     {
-        Contract.Requires(!String.IsNullOrWhiteSpace(input));
-        Contract.Ensures(!String.IsNullOrWhiteSpace(Command));
+        Contract.Requires(!string.IsNullOrWhiteSpace(input));
+        Contract.Ensures(!string.IsNullOrWhiteSpace(Command));
         Contract.Ensures(Argument != null);
 
         // Find the index of the separator (":")
@@ -82,7 +82,7 @@ internal class CommandArgumentPair
         {
             // No separator was found, so use the input as the command.
             Command = input;
-            Argument = String.Empty;
+            Argument = string.Empty;
         }
         else
         {

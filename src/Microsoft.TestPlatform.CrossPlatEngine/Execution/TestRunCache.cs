@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,9 +8,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-using ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 /// <summary>
 /// Maintains a cache of last 'n' test results and maintains stats for the complete run.

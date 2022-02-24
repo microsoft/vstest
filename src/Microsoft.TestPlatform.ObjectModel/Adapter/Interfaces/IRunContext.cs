@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-
-using System;
-using System.Collections.Generic;
 
 /// <summary>
 /// It provides user specified runSettings and framework provided context of the run.
@@ -38,7 +38,7 @@ public interface IRunContext : IDiscoveryContext
     /// It is used only with sources. With specific test cases it will always be null.
     /// If there is a parsing error or filter expression has unsupported properties, TestPlatformFormatException() is thrown.
     /// </summary>
-    ITestCaseFilterExpression GetTestCaseFilter(IEnumerable<String> supportedProperties, Func<string, TestProperty> propertyProvider);
+    ITestCaseFilterExpression GetTestCaseFilter(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider);
 
     /// <summary>
     /// Directory which should be used for storing result files/deployment files etc.

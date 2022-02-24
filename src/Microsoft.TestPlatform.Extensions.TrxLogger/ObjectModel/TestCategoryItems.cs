@@ -1,18 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
 using System;
 using System.Diagnostics;
 using System.Text;
 
-using Utility;
+using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
-using XML;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 #region TestCategoryItem
 /// <summary>
 /// Stores a string which categorizes the Test
@@ -31,7 +30,7 @@ internal sealed class TestCategoryItem : IXmlTestStore
         // Treat null as empty.
         if (category == null)
         {
-            category = String.Empty;
+            category = string.Empty;
         }
 
 
@@ -52,10 +51,10 @@ internal sealed class TestCategoryItem : IXmlTestStore
     private string StripIllegalChars(string category)
     {
         string ret = category.Trim();
-        ret = ret.Replace("&", String.Empty);
-        ret = ret.Replace("|", String.Empty);
-        ret = ret.Replace("!", String.Empty);
-        ret = ret.Replace(",", String.Empty);
+        ret = ret.Replace("&", string.Empty);
+        ret = ret.Replace("|", string.Empty);
+        ret = ret.Replace("!", string.Empty);
+        ret = ret.Replace(",", string.Empty);
         return ret;
     }
 
@@ -71,7 +70,7 @@ internal sealed class TestCategoryItem : IXmlTestStore
             return false;
         }
         Debug.Assert(_category != null, "category is null");
-        return String.Equals(_category, otherItem._category, StringComparison.OrdinalIgnoreCase);
+        return string.Equals(_category, otherItem._category, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -154,7 +153,7 @@ internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategor
         EqtAssert.ParameterNotNull(item, nameof(item));
 
         // Don't add empty items.
-        if (!String.IsNullOrEmpty(item.TestCategory))
+        if (!string.IsNullOrEmpty(item.TestCategory))
         {
             base.Add(item);
         }

@@ -1,14 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics;
+using System.Xml;
+
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+
 #nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
-using System.Diagnostics;
-using System.Xml;
-
-using XML;
 /// <summary>
 /// TestMethod contains information about a unit test method that needs to be executed
 /// </summary>

@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace vstest.console.UnitTests.Publisher;
-
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
@@ -12,6 +8,10 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+
+#nullable disable
+
+namespace vstest.console.UnitTests.Publisher;
 
 [TestClass]
 public class TextFileTelemetryPublisherTests

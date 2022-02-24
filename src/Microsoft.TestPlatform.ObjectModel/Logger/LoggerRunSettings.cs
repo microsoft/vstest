@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,6 +8,10 @@ using System.Globalization;
 using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// The logger run settings.

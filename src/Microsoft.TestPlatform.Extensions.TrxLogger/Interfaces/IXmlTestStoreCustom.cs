@@ -4,6 +4,7 @@
 #nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+
 /// <summary>
 /// Implementing this interface allows you to customize XmlStore persistence.
 /// </summary>

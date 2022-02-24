@@ -1,19 +1,19 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.PerformanceTests;
+using System;
+using System.Diagnostics;
+using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using System;
-using System.Diagnostics;
-using System.IO;
-
 using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.PerformanceTests;
 
 [TestClass]
 public class ProtocolV1Tests

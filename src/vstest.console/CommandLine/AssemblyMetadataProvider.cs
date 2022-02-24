@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-
 using System;
 using System.IO;
 using System.Reflection;
@@ -13,10 +9,14 @@ using System.Reflection.PortableExecutable;
 using System.Runtime.Versioning;
 using System.Text;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-using TestPlatform.Utilities.Helpers;
-using TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
 internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
 {

@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Reflection;
+
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 #nullable disable
 
 namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests;
-
-using TestUtilities;
-using VisualStudio.TestTools.UnitTesting;
-
-using System.Reflection;
 
 [TestClass]
 [TestCategory("Windows")]

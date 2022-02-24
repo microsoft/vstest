@@ -1,22 +1,24 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Utilities.UnitTests;
-
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
 using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using OMResources = VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using MSTest.TestFramework.AssertExtensions;
-using System.Collections.Generic;
-using System.Linq;
-using System.Globalization;
-using System.Text;
+
+using OMResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Utilities.UnitTests;
 
 [TestClass]
 public class InferRunSettingsHelperTests

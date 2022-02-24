@@ -1,20 +1,20 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Newtonsoft.Json.Linq;
+
 #if !NET451
 
 #nullable disable
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
-
-using TestUtilities;
-using VisualStudio.TestTools.UnitTesting;
-
-using Newtonsoft.Json.Linq;
-
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 [TestClass]
 [TestCategory("Windows-Review")]
