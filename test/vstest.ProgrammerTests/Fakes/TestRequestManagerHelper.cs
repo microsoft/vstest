@@ -20,7 +20,7 @@ internal class TestRequestManagerTestHelper
         _debugOptions = debugOptions;
     }
 
-    public async Task ExecuteWithAbort(Action<TestRequestManager> testRequsestManagerAction)
+    public async Task ExecuteWithAbort(Action<TestRequestManager> testRequestManagerAction)
     {
         // We make sure the test is running for the timeout time at max and then we try to abort
         // if we aborted we write the error to aggregator
@@ -54,7 +54,7 @@ internal class TestRequestManagerTestHelper
             }
         });
 
-        testRequsestManagerAction(_testRequestManager);
+        testRequestManagerAction(_testRequestManager);
 
         cancelAbort.Cancel();
         if (!abortOnTimeout.IsCanceled)

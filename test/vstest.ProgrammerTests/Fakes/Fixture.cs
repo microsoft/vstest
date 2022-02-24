@@ -42,6 +42,8 @@ internal class Fixture : IDisposable
     public List<TestResult> ExecutedTests => TestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults).ToList();
     public List<TestCase> DiscoveredTests => TestDiscoveryEventsRegistrar.DiscoveredTestsEvents.SelectMany(er => er.Data.DiscoveredTestCases).ToList();
 
+    public ITestSessionEventsHandler TestSessionEventsHandler { get; }
+
     public Fixture(FixtureOptions? fixtureOptions = null)
     {
         // This type is compiled only in DEBUG, and won't exist otherwise.
@@ -67,12 +69,13 @@ internal class Fixture : IDisposable
         LogName = Path.GetTempPath() + $"/log_{Guid.NewGuid()}.txt";
         //EqtTrace.InitializeVerboseTrace(LogName);
 
-        CurrentProcess = new FakeProcess(ErrorAggregator, @"X:\fake\vstest.console.exe", string.Empty, null, null, null, null, null);
+        CurrentProcess = new FakeProcess(ErrorAggregator, @"X:\fake\vstest.console.exe");
         ProcessHelper = new FakeProcessHelper(ErrorAggregator, CurrentProcess);
         FileHelper = new FakeFileHelper(ErrorAggregator);
         TestRuntimeProviderManager = new FakeTestRuntimeProviderManager(ErrorAggregator);
         TestRunEventsRegistrar = new FakeTestRunEventsRegistrar(ErrorAggregator);
         TestDiscoveryEventsRegistrar = new FakeTestDiscoveryEventsRegistrar(ErrorAggregator);
+        TestSessionEventsHandler = new FakeTestSessionEventsHandler(ErrorAggregator);
         ProtocolConfig = new ProtocolConfig();
     }
 
