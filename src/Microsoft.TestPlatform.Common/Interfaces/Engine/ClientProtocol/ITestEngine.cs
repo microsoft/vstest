@@ -65,7 +65,8 @@ public interface ITestEngine
     /// <returns>An IProxyTestSessionManager object that can manage test sessions.</returns>
     IProxyTestSessionManager GetTestSessionManager(
         IRequestData requestData,
-        StartTestSessionCriteria testSessionCriteria);
+        StartTestSessionCriteria testSessionCriteria,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap);
 
     /// <summary>
     /// Fetches the extension manager for this engine. This manager would provide extensibility

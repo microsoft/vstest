@@ -5,6 +5,8 @@
 
 namespace MSTest1;
 
+using System.Threading;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
@@ -13,5 +15,6 @@ public class UnitTest1
     [TestMethod]
     public void TestMethod1()
     {
+        // Thread.Sleep(1000);
     }
 }

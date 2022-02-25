@@ -136,7 +136,9 @@ internal class TestPlatform : ITestPlatform
             return false;
         }
 
-        IProxyTestSessionManager testSessionManager = TestEngine.GetTestSessionManager(requestData, testSessionCriteria);
+        // REVIEW: TODO: NOMERGE: figure out the details of each source
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap = new();
+        IProxyTestSessionManager testSessionManager = TestEngine.GetTestSessionManager(requestData, testSessionCriteria, sourceToSourceDetailMap);
         if (testSessionManager == null)
         {
             // The test session manager is null because the combination of runsettings and

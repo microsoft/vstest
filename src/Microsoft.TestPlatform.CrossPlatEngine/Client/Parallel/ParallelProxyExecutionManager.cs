@@ -203,7 +203,8 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
 
         var SharedHosts = false;
         EqtTrace.Verbose("ParallelProxyExecutionManager: HandlePartialRunComplete: Replace execution manager. Shared: {0}, Aborted: {1}.", SharedHosts, testRunCompleteArgs.IsAborted);
-        // TODO: this should not always happen, this should happen only if we are going to the next non-shared host
+        // TODO: this should not always happen, this should happen only if we are going to the next non-shared host, but is has been like this forever, so be cautions when changing it.
+        // Maybe it is not as safe to re-use host for execution.
         RemoveManager(proxyExecutionManager);
 
         TestRunCriteria testRunCriteria = null;
@@ -267,7 +268,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
         // preference. Originally this was done in the UpdateParallelLevel in base constructor, but we did not know which source will be the next there. So we could not
         // start the manager specifically for the source with the correct tfm and platform.
         var parallel = 0;
-        while (parallel <= MaxParallelLevel)
+        while (parallel < MaxParallelLevel)
         {
             parallel++;
             TestRunCriteria testRunCriteria = null;

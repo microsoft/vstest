@@ -82,7 +82,7 @@ public class TestEngine : ITestEngine
         // This is a big if that figures out if we can run in process. In process run is very restricted, it is non-parallel run
         // that has the same target framework as the current process, and it also must not be running in DesignMode (server mode / under IDE)
         // and more conditions. In all other cases we run in a separate testhost process.
-        if (ShouldRunInProcess(discoveryCriteria.RunSettings, isParallelRun, isDataCollectorEnabled: false))
+        if (ShouldRunInProcess(discoveryCriteria.RunSettings, isParallelRun, isDataCollectorEnabled: false, sourceToSourceDetailMap))
         {
             // Get testhost manager by configuration, and either use it for in-process run. or for single source run.
             // If there are more sources throw it away. We cannot avoid creating this manager because we don't know if it will be shared or not
@@ -190,7 +190,8 @@ public class TestEngine : ITestEngine
         if (ShouldRunInProcess(
                 testRunCriteria.TestRunSettings,
                 isParallelRun,
-                isDataCollectorEnabled || isInProcDataCollectorEnabled))
+                isDataCollectorEnabled || isInProcDataCollectorEnabled,
+                sourceToSourceDetailMap))
         {
             // Not updating runsettings from source detail on purpose here. We are running in process, so whatever the settings we figured out at the start. They must be compatible
             // with the current process, otherwise we would not be able to run inside of the current process.
@@ -298,7 +299,8 @@ public class TestEngine : ITestEngine
     /// <inheritdoc/>
     public IProxyTestSessionManager GetTestSessionManager(
         IRequestData requestData,
-        StartTestSessionCriteria testSessionCriteria)
+        StartTestSessionCriteria testSessionCriteria,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
         var parallelLevel = VerifyParallelSettingAndCalculateParallelLevel(
             testSessionCriteria.Sources.Count,
@@ -314,7 +316,8 @@ public class TestEngine : ITestEngine
         if (ShouldRunInProcess(
                 testSessionCriteria.RunSettings,
                 parallelLevel > 1,
-                isDataCollectorEnabled || isInProcDataCollectorEnabled))
+                isDataCollectorEnabled || isInProcDataCollectorEnabled,
+                sourceToSourceDetailMap))
         {
             // This condition is the equivalent of the in-process proxy execution manager case.
             // In this case all tests will be run in the vstest.console process, so there's no
@@ -467,8 +470,19 @@ public class TestEngine : ITestEngine
     private bool ShouldRunInProcess(
         string runsettings,
         bool isParallelEnabled,
-        bool isDataCollectorEnabled)
+        bool isDataCollectorEnabled,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
+        var allUseSameFramework = sourceToSourceDetailMap.Values.Select(detail => detail.Framework).Distinct().Count() == 1;
+        var allUseSameArchitecture = sourceToSourceDetailMap.Values.Select(detail => detail.Architecture).Distinct().Count() == 1;
+        var isMixedArchitectureOrFrameworkRun = !allUseSameFramework || !allUseSameArchitecture;
+
+        if (isMixedArchitectureOrFrameworkRun)
+        {
+            EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: This is a run that mixes sources that have different architectures or frameworks, running in isolation (in a separate testhost proces).");
+            return false;
+        }
+
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
 
         if (runConfiguration.InIsolation)

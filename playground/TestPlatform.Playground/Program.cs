@@ -51,15 +51,34 @@ internal class Program
                 <RunSettings>
                     <RunConfiguration>
                         <InIsolation>true</InIsolation>
+                        <MaxCpuCount>4</MaxCpuCount>
                     </RunConfiguration>
                 </RunSettings>
             ";
+
         var sources = new[] {
-            Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll")
+            Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"),
+            Path.Combine(playground, "MSTest1", "bin", "Debug", "net5.0", "MSTest1.dll"),
+            @"C:\Users\jajares\source\repos\TestProject48\TestProject48\bin\Debug\net48\TestProject48.dll",
+            @"C:\Users\jajares\source\repos\TestProject48\TestProject1\bin\x64\Debug\net48\win10-x64\TestProject1.dll"
         };
 
-        var options = new TestPlatformOptions();
-        r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
+        // console mode
+        var settingsFile = Path.GetTempFileName();
+        try
+        {
+
+            File.WriteAllText(settingsFile, sourceSettings);
+            Process.Start(console, string.Join(" ", sources) + " --settings:" + settingsFile).WaitForExit();
+        }
+        finally
+        {
+            try { File.Delete(settingsFile); } catch { }
+        }
+
+        // design mode
+        // var options = new TestPlatformOptions();
+        // r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
     }
 
     public class TestRunHandler : ITestRunEventsHandler

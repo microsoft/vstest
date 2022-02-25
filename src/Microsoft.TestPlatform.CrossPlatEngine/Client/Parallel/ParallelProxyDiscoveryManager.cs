@@ -202,7 +202,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         // ERRR: GetConcurrentManagerInstances() was called before that touches proxyOperationManager, not CreateNewConcurrentManager directly
         // is this still compatible? I guess I am skipping the testhost pool? Or am I getting the manager from the pool via a creator?
         var parallel = 0;
-        while (parallel <= MaxParallelLevel)
+        while (parallel < MaxParallelLevel)
         {
             parallel++;
             if (!TryFetchNextSource(_sourceEnumerator, out string source))
