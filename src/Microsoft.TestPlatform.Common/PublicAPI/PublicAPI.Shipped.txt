@@ -238,49 +238,56 @@ static Microsoft.VisualStudio.TestPlatform.Common.Hosting.TestRuntimeProviderMan
 static Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider.SettingsProviderExtensionManager.Create() -> Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider.SettingsProviderExtensionManager
 static Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider.SettingsProviderExtensionManager.Destroy() -> void
 static Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider.SettingsProviderExtensionManager.LoadAndInitializeAllExtensions(bool shouldThrowOnError) -> void
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.AttachmentsProcessingState -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.CommandLineSwitches -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.DataCollectorsEnabled -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.DisableAppDomain -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.DiscoveryState -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.LegacySettingPrefix -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.LoggerUsed -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.MaxCPUcount -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfAdapterUsedToRunTests -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfAttachmentsAfterProcessing -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfAttachmentsSentForProcessing -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfSourcesSentForDiscovery -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfSourcesSentForRun -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.ParallelEnabledDuringDiscovery -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.ParallelEnabledDuringExecution -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.ParallelEnabledDuringStartTestSession -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.RunState -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.StartTestSessionCompleteEvent -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TargetDevice -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TargetFramework -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TargetOS -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TargetPlatform -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestDiscoveryCompleteEvent -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestExecutionCompleteEvent -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestPlatformVersion -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestSettingsUsed -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenByAllAdaptersInSec -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenInSecByAllAdapters -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenInSecForAttachmentsProcessing -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenInSecForDiscovery -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenInSecForRun -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenToLoadAdaptersInSec -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TotalTestsByAdapter -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TotalTestsDiscovered -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TotalTestsRanByAdapter -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TotalTestsRun -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TotalTestsRunByMSTestv1 -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.AttachmentsProcessingState = "VS.AttachmentsProcessing.State" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.CommandLineSwitches = "VS.TestRun.CommandLineSwitches" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.DataCollectorsEnabled = "VS.TestRun.DataCollectorsEnabled" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.DisableAppDomain = "VS.TestRun.DisableAppDomain" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.DiscoveryState = "VS.TestDiscovery.DiscoveryState" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.LegacySettingPrefix = "VS.TestRun.LegacySettings" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.LoggerUsed = "VS.TestRun.LoggersUsed" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.MaxCPUcount = "VS.TestRun.MaxCPUcount" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery = "VS.TestDiscovery.AdaptersDiscoveredCount" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution = "VS.TestRun.AdaptersDiscoveredCount" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests = "VS.TestDiscovery.AdaptersUsedCount" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfAdapterUsedToRunTests = "VS.TestRun.AdaptersUsedCount" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfAttachmentsAfterProcessing = "VS.AttachmentsProcessing.FinalAttachmentsCount" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfAttachmentsSentForProcessing = "VS.AttachmentsProcessing.InitialAttachmentsCount" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfSourcesSentForDiscovery = "VS.TestDiscovery.NumberOfSources" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.NumberOfSourcesSentForRun = "VS.TestRun.NumberOfSources" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.ParallelEnabledDuringDiscovery = "VS.TestDiscovery.ParallelEnabled" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.ParallelEnabledDuringExecution = "VS.TestRun.ParallelEnabled" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.ParallelEnabledDuringStartTestSession = "VS.TestSession.ParallelEnabled" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.RunState = "VS.TestRun.RunState" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.StartTestSessionCompleteEvent = "vs/testplatform/starttestsession" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.StopTestSessionCompleteEvent = "vs/testplatform/stoptestsession" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TargetDevice = "VS.TestRun.TargetDevice" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TargetFramework = "VS.TestRun.TargetFramework" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TargetOS = "VS.TestRun.TargetOS" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TargetPlatform = "VS.TestRun.TargetPlatform" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent = "vs/testplatform/testattachmentsprocessingsession" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestDiscoveryCompleteEvent = "vs/testplatform/testdiscoverysession" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestExecutionCompleteEvent = "vs/testplatform/testrunsession" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestPlatformVersion = "VS.TestRun.TestPlatformVersion" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestSessionId = "VS.TestSession.Id" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestSessionSpawnedTesthostCount = "VS.TestSession.SpawnedTesthostCount" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestSessionState = "VS.TestSession.State" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestSessionTesthostSpawnTimeInSec = "VS.TestSession.TesthostSpawnTimeInSec" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestSessionTotalSessionTimeInSec = "VS.TestSession.TotalSessionTimeInSec" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestSettingsUsed = "VS.TestRun.IsTestSettingsUsed" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenByAllAdaptersInSec = "VS.TestRun.TimeTakenByAllAdapters" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenInSecByAllAdapters = "VS.TestDiscovery.TimeTakenInSecByAllAdapters" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenInSecForAttachmentsProcessing = "VS.AttachmentsProcessing.TotalTimeTakenInSec" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenInSecForDiscovery = "VS.TestDiscovery.TotalTimeTakenInSec" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenInSecForRun = "VS.TestRun.TimeTakenInSec" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter = "VS.TestDiscovery.TimeTakenAdapter" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenToLoadAdaptersInSec = "VS.TestDiscovery.TimeTakenToLoadAdaptersInSec" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter = "VS.TestRun.TimeTakenToRun" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TotalTestsByAdapter = "VS.TestDiscovery.TotalTestsDiscovered" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TotalTestsDiscovered = "VS.TestDiscovery.TotalTests" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TotalTestsRanByAdapter = "VS.TestRun.TotalTestsRun" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TotalTestsRun = "VS.TestRun.TotalTests" -> string
+const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TotalTestsRunByMSTestv1 = "VS.TestRun.TotalTestsRunByMSTestv1" -> string
+
 static Microsoft.VisualStudio.TestPlatform.Common.Utilities.CancellationTokenExtensions.ThrowTestPlatformExceptionIfCancellationRequested(this System.Threading.CancellationToken token) -> void
 static Microsoft.VisualStudio.TestPlatform.Common.Utilities.ExceptionUtilities.GetExceptionMessage(System.Exception exception) -> string
 static Microsoft.VisualStudio.TestPlatform.Common.Utilities.FakesUtilities.GenerateFakesSettingsForRunConfiguration(string[] sources, string runSettingsXml) -> string
