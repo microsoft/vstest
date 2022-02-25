@@ -599,6 +599,11 @@ public class IntegrationTestBase
             throw new ArgumentException("Executable path must not be null or whitespace.", nameof(path));
         }
 
+        if (!File.Exists(path))
+        {
+            throw new ArgumentException($"Executable path '{path}' could not be found.", nameof(path));
+        }
+
         var executableName = Path.GetFileName(path);
 
         using var process = new Process();

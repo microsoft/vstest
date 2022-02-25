@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
@@ -80,21 +82,38 @@ public partial class ProcessHelper : IProcessHelper
 
             if (exitCallBack != null)
             {
-                process.Exited += (sender, args) =>
+                process.Exited += async (sender, args) =>
                 {
-                    // Call WaitForExit without again to ensure all streams are flushed,
-                    var p = sender as Process;
-                    try
+                    if (sender is Process p)
                     {
-                        // Add timeout to avoid indefinite waiting on child process exit.
-                        p.WaitForExit(500);
-                    }
-                    catch (InvalidOperationException)
-                    {
+                        try
+                        {
+                            // NOTE: When receiving an exit event, we want to give some time to the child process
+                            // to close properly (i.e. flush output, error stream...). Despite this simple need,
+                            // the actual implementation needs to be complex, especially for Unix systems.
+                            // See ticket https://github.com/microsoft/vstest/issues/3375 to get the links to all
+                            // issues, discussions and documentations.
+                            //
+                            // On .NET 5 and later, the solution is simple, we can simply use WaitForExitAsync which
+                            // correctly ensure that some time is given to the child process (or any grandchild) to
+                            // flush before exit happens.
+                            //
+                            // For older frameworks, the solution is more tricky but it seems we can get the expected
+                            // behavior using the parameterless 'WaitForExit()' combined with an awaited Task.Run call.
+                            var cts = new CancellationTokenSource(500);
+#if NET5_0_OR_GREATER
+                            await p.WaitForExitAsync(cts.Token);
+#else
+                            await Task.Run(() => p.WaitForExit(), cts.Token);
+#endif
+                        }
+                        catch (Exception ex) when (ex is InvalidOperationException or TaskCanceledException)
+                        {
+                        }
                     }
 
                     // If exit callback has code that access Process object, ensure that the exceptions handling should be done properly.
-                    exitCallBack(p);
+                    exitCallBack(sender);
                 };
             }
 
