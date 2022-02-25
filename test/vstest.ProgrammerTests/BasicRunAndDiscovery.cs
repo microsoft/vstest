@@ -56,12 +56,11 @@ public class BasicRunAndDiscovery
         var testRequestManager = fixture.BuildTestRequestManager();
 
         // -- act
-        var runConfiguration = string.Empty;
         var testRunRequestPayload = new TestRunRequestPayload
         {
             Sources = new List<string> { mstest1Dll.Path },
 
-            RunSettings = $"<RunSettings>{runConfiguration}</RunSettings>"
+            RunSettings = $"<RunSettings></RunSettings>"
         };
 
         await testRequestManager.ExecuteWithAbort(tm => tm.RunTests(testRunRequestPayload, testHostLauncher: null, fixture.TestRunEventsRegistrar, fixture.ProtocolConfig));
@@ -134,12 +133,11 @@ public class BasicRunAndDiscovery
         var testRequestManager = fixture.BuildTestRequestManager();
 
         // -- act
-        var runConfiguration = string.Empty;
         var testRunRequestPayload = new TestRunRequestPayload
         {
             Sources = new List<string> { mstest1Dll.Path, mstest2Dll.Path },
 
-            RunSettings = $"<RunSettings>{runConfiguration}</RunSettings>"
+            RunSettings = $"<RunSettings></RunSettings>"
         };
 
         await testRequestManager.ExecuteWithAbort(tm => tm.RunTests(testRunRequestPayload, testHostLauncher: null, fixture.TestRunEventsRegistrar, fixture.ProtocolConfig));
