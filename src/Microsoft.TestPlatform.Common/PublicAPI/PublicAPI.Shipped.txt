@@ -287,7 +287,6 @@ const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstant
 const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TotalTestsRanByAdapter = "VS.TestRun.TotalTestsRun" -> string
 const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TotalTestsRun = "VS.TestRun.TotalTests" -> string
 const Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TotalTestsRunByMSTestv1 = "VS.TestRun.TotalTestsRunByMSTestv1" -> string
-
 static Microsoft.VisualStudio.TestPlatform.Common.Utilities.CancellationTokenExtensions.ThrowTestPlatformExceptionIfCancellationRequested(this System.Threading.CancellationToken token) -> void
 static Microsoft.VisualStudio.TestPlatform.Common.Utilities.ExceptionUtilities.GetExceptionMessage(System.Exception exception) -> string
 static Microsoft.VisualStudio.TestPlatform.Common.Utilities.FakesUtilities.GenerateFakesSettingsForRunConfiguration(string[] sources, string runSettingsXml) -> string
