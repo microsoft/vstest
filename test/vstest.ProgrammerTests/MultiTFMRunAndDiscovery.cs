@@ -1,21 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace vstest.ProgrammerTests;
-
+using Intent;
 using FluentAssertions;
+using vstest.ProgrammerTests.Fakes;
+
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-
-# if DEBUG
-#endif
-
-using vstest.ProgrammerTests.Fakes;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-using Intent;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 
+namespace vstest.ProgrammerTests;
 public class MultiTFM
 {
     public class MultiTFMDiscovery
@@ -108,8 +104,7 @@ public class MultiTFM
             // -- assert
             fixture.AssertNoErrors();
             // We figure out the framework for each assembly so there should be no incompatibility warnings
-            // REVIEW: This should be uncommented. Commenting it now, because it is helpful to see those warnings.
-            // fixture.TestRunEventsRegistrar.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which were built for different framework*");
+            fixture.TestRunEventsRegistrar.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which were built for different framework*");
 
             fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
             var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartDiscovery);
@@ -217,8 +212,7 @@ public class MultiTFM
             // -- assert
             fixture.AssertNoErrors();
             // We figure out the framework for each assembly so there should be no incompatibility warnings
-            // REVIEW: This should be uncommented. Commenting it now, because it is helpful to see those warnings.
-            // fixture.TestRunEventsRegistrar.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which were built for different framework*");
+            fixture.TestRunEventsRegistrar.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which were built for different framework*");
 
             fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
             var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartDiscovery);
@@ -326,8 +320,7 @@ public class MultiTFM
             // -- assert
             fixture.AssertNoErrors();
             // We figure out the framework for each assembly so there should be no incompatibility warnings
-            // REVIEW: This should be uncommented. Commenting it now, because it is helpful to see those warnings.
-            // fixture.TestRunEventsRegistrar.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which were built for different framework*");
+            fixture.TestRunEventsRegistrar.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which were built for different framework*");
 
             fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
             var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
@@ -435,8 +428,7 @@ public class MultiTFM
             // -- assert
             fixture.AssertNoErrors();
             // We figure out the framework for each assembly so there should be no incompatibility warnings
-            // REVIEW: This should be uncommented. Commenting it now, because it is helpful to see those warnings.
-            // fixture.TestRunEventsRegistrar.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which were built for different framework*");
+            fixture.TestRunEventsRegistrar.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which were built for different framework*");
 
             fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
             var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
@@ -561,8 +553,7 @@ public class MultiTFM
             // -- assert
             fixture.AssertNoErrors();
             // We figure out the framework for each assembly so there should be no incompatibility warnings
-            // REVIEW: This should be uncommented. Commenting it now, because it is helpful to see those warnings.
-            // fixture.TestRunEventsRegistrar.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which were built for different framework*");
+            fixture.TestRunEventsRegistrar.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which were built for different framework*");
 
             fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
             var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
