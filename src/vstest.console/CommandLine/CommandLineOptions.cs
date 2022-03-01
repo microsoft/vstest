@@ -1,23 +1,23 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+using vstest.console.Internal;
+
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using ObjectModel;
-
-using Utilities.Helpers;
-using Utilities.Helpers.Interfaces;
-
-using CommandLineResources = Resources.Resources;
-using vstest.console.Internal;
-using System.Globalization;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// Provides access to the command-line options.
@@ -56,17 +56,7 @@ internal class CommandLineOptions
     /// Gets the instance.
     /// </summary>
     internal static CommandLineOptions Instance
-    {
-        get
-        {
-            if (s_instance == null)
-            {
-                s_instance = new CommandLineOptions();
-            }
-
-            return s_instance;
-        }
-    }
+        => s_instance ??= new CommandLineOptions();
 
     /// <summary>
     /// Default constructor.
@@ -78,7 +68,7 @@ internal class CommandLineOptions
         FileHelper = new FileHelper();
         FilePatternParser = new FilePatternParser();
 #if TODO
-            UseVsixExtensions = Utilities.GetAppSettingValue(UseVsixExtensionsKey, false);
+        UseVsixExtensions = Utilities.GetAppSettingValue(UseVsixExtensionsKey, false);
 #endif
     }
 
@@ -278,7 +268,7 @@ internal class CommandLineOptions
     /// <param name="source">Path to source file to look for tests in.</param>
     public void AddSource(string source)
     {
-        if (String.IsNullOrWhiteSpace(source))
+        if (string.IsNullOrWhiteSpace(source))
         {
             throw new TestSourceException(CommandLineResources.CannotBeNullOrEmpty);
         }

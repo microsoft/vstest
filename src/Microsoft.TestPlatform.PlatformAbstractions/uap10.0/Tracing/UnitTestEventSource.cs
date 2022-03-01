@@ -3,11 +3,11 @@
 
 #if WINDOWS_UWP
 
+using System.Diagnostics.Tracing;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-using System.Diagnostics.Tracing;
 
 internal sealed class UnitTestEventSource : EventSource
 {

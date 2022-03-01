@@ -1,16 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.AcceptanceTests;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 // monitoring the processes does not work correctly
@@ -42,7 +42,7 @@ public class RunsettingsTests : AcceptanceTestBase
         // passing different platform
         var additionalArgs = "/Platform:x64";
 
-        var runSettingsArgs = String.Join(
+        var runSettingsArgs = string.Join(
             " ",
             new string[]
             {
@@ -73,7 +73,7 @@ public class RunsettingsTests : AcceptanceTestBase
         var additionalArgs = "/Parallel";
 
         // Pass non parallel
-        var runSettingsArgs = String.Join(
+        var runSettingsArgs = string.Join(
             " ",
             new string[]
             {
@@ -149,7 +149,7 @@ public class RunsettingsTests : AcceptanceTestBase
         var testhostProcessName = new[] { "testhost.x86" };
         var expectedNumOfProcessCreated = 1;
 
-        var runSettingsArgs = String.Join(
+        var runSettingsArgs = string.Join(
             " ",
             new string[]
             {
@@ -180,7 +180,7 @@ public class RunsettingsTests : AcceptanceTestBase
             { "TestAdaptersPaths", GetTestAdapterPath() }
         };
 
-        var runSettingsArgs = String.Join(
+        var runSettingsArgs = string.Join(
             " ",
             new string[]
             {

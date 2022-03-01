@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Runtime.Serialization;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
-
-using System.Runtime.Serialization;
 
 /// <summary>
 /// Test run summary collects the relevant summary information.

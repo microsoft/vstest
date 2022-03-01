@@ -1,17 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Runtime.ExceptionServices;
+using System.Threading;
+
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
 #if NETCOREAPP
 
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
-using System;
-using System.Runtime.ExceptionServices;
-using System.Threading;
-
-using Interfaces;
 
 public class PlatformThread : IThread
 {

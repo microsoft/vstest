@@ -4,16 +4,16 @@
 // define trace and debug to trigger the Debug.Assert calls even when we build in Release
 #define DEBUG
 
-#nullable disable
-
-namespace testhost.UnitTests;
-
 #if NETCOREAPP
+using System.Collections.Generic;
+using System.Diagnostics;
+
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using System.Collections.Generic;
-using System.Diagnostics;
+#nullable disable
+
+namespace testhost.UnitTests;
 
 [TestClass]
 public class TestHostTraceListenerTests

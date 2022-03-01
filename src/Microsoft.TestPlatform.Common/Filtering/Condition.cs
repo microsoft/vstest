@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,10 +8,14 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
-using CommonResources = Resources.Resources;
+using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 
 internal enum Operation
 {

@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
-
-using ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Logging;
 
 /// <summary>
 /// Aggregates test messages and test results received to determine the test run result.
@@ -31,17 +31,7 @@ internal class TestRunResultAggregator
     /// </summary>
     /// <returns>Instance of the test run result aggregator.</returns>
     public static TestRunResultAggregator Instance
-    {
-        get
-        {
-            if (s_instance == null)
-            {
-                s_instance = new TestRunResultAggregator();
-            }
-
-            return s_instance;
-        }
-    }
+        => s_instance ??= new TestRunResultAggregator();
 
     /// <summary>
     /// The current test run outcome.

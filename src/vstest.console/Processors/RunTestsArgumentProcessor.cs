@@ -1,28 +1,28 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
-using Client.RequestHelper;
-using Internal;
-using TestPlatformHelpers;
-using Common;
-using Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-using CommandLineResources = Resources.Resources;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 internal class RunTestsArgumentProcessor : IArgumentProcessor
 {
@@ -33,38 +33,20 @@ internal class RunTestsArgumentProcessor : IArgumentProcessor
     private Lazy<IArgumentExecutor> _executor;
 
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new RunTestsArgumentProcessorCapabilities());
-            }
-            return _metadata;
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new RunTestsArgumentProcessorCapabilities());
 
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor = new Lazy<IArgumentExecutor>(() =>
-                    new RunTestsArgumentExecutor(
-                        CommandLineOptions.Instance,
-                        RunSettingsManager.Instance,
-                        TestRequestManager.Instance,
-                        new ArtifactProcessingManager(CommandLineOptions.Instance.TestSessionCorrelationId),
-                        ConsoleOutput.Instance));
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new RunTestsArgumentExecutor(
+                CommandLineOptions.Instance,
+                RunSettingsManager.Instance,
+                TestRequestManager.Instance,
+                new ArtifactProcessingManager(CommandLineOptions.Instance.TestSessionCorrelationId),
+                ConsoleOutput.Instance));
 
-            return _executor;
-        }
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 }
 

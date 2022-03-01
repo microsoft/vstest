@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.TestUtilities;
-
 using System;
 using System.Linq;
 using System.Reflection;
@@ -14,6 +10,10 @@ using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using Moq;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.TestUtilities;
 
 public static class TestPluginCacheHelper
 {

@@ -1,20 +1,20 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Diagnostics.Contracts;
 
-using Common;
-using Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// Argument Executor for the "-e|--Environment|/e|/Environment" command line argument.
@@ -36,35 +36,14 @@ internal class EnvironmentArgumentProcessor : IArgumentProcessor
 
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor = new Lazy<IArgumentExecutor>(
-                    () => new ArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, ConsoleOutput.Instance)
-                );
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new ArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, ConsoleOutput.Instance));
 
-            return _executor;
-        }
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ArgumentProcessorCapabilities());
-            }
-
-            return _metadata;
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() => new ArgumentProcessorCapabilities());
 
     internal class ArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
     {
@@ -104,7 +83,7 @@ internal class EnvironmentArgumentProcessor : IArgumentProcessor
         /// Set the environment variables in RunSettings.xml
         /// </summary>
         /// <param name="argument">
-        /// Environment variable to set. 
+        /// Environment variable to set.
         /// </param>
         public void Initialize(string argument)
         {

@@ -1,10 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Xml.XPath;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
-using System.Xml.XPath;
 
 /// <summary>
 /// Utility class for MaxCpuCount element of RunSetting

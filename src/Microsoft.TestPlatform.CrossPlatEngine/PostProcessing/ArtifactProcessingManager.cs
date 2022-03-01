@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,6 +21,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
 
 internal class ArtifactProcessingManager : IArtifactProcessingManager
 {
@@ -201,7 +201,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
             new RequestData()
             {
                 IsTelemetryOptedIn = IsTelemetryOptedIn(),
-                ProtocolConfig = Constants.DefaultProtocolConfig
+                ProtocolConfig = ObjectModel.Constants.DefaultProtocolConfig
             },
             attachments,
             invokedDataCollectors,

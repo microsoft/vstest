@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace vstest.ProgrammerTests.Fakes;
-
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
@@ -10,6 +8,8 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+namespace vstest.ProgrammerTests.Fakes;
 
 internal abstract class FakeCommunicationChannel : ICommunicationChannel
 {
@@ -84,7 +84,7 @@ internal class FakeCommunicationChannel<TContext> : FakeCommunicationChannel, IC
     public Task? ProcessIncomingMessagesTask { get; private set; }
     public Task? ProcessOutgoingMessagesTask { get; private set; }
 
-    public FakeCommunicationChannel(List<RequestResponsePair<string, FakeMessage, TContext>> responses, FakeErrorAggregator fakeErrorAggregator, int id) : base (id)
+    public FakeCommunicationChannel(List<RequestResponsePair<string, FakeMessage, TContext>> responses, FakeErrorAggregator fakeErrorAggregator, int id) : base(id)
     {
         FakeErrorAggregator = fakeErrorAggregator;
         responses.ForEach(NextResponses.Enqueue);

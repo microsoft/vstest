@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +9,11 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using TrxLoggerResources = VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
 /// <summary>
 /// Helper function to deal with file name.

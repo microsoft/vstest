@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
-using System;
-
-using CommandLineResources = Resources.Resources;
 
 /// <summary>
 /// An argument processor that allows the user to disable fakes
@@ -23,24 +23,15 @@ internal class DisableAutoFakesArgumentProcessor : IArgumentProcessor
 
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            return _executor ??= new Lazy<IArgumentExecutor>(
-                () => new DisableAutoFakesArgumentExecutor(
-                    CommandLineOptions.Instance));
-        }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new DisableAutoFakesArgumentExecutor(CommandLineOptions.Instance));
 
         set => _executor = value;
     }
 
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            return _metadata ??= new Lazy<IArgumentProcessorCapabilities>(
-                () => new DisableAutoFakesArgumentProcessorCapabilities());
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new DisableAutoFakesArgumentProcessorCapabilities());
 }
 
 internal class DisableAutoFakesArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities

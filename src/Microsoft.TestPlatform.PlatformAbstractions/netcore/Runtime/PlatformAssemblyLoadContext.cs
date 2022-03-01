@@ -3,14 +3,14 @@
 
 #if NETCOREAPP
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
 using System.Reflection;
 using System.Runtime.Loader;
 
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <inheritdoc/>
 public class PlatformAssemblyLoadContext : IAssemblyLoadContext

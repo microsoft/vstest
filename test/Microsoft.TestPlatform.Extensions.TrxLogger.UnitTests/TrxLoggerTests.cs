@@ -1,17 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
-#nullable disable
-
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests;
-
-using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-using VisualStudio.TestTools.UnitTesting;
-using Moq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,13 +9,24 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
-using VisualStudio.TestPlatform.ObjectModel;
-using VisualStudio.TestPlatform.ObjectModel.Client;
-using VisualStudio.TestPlatform.ObjectModel.Logging;
-using ObjectModel = VisualStudio.TestPlatform.ObjectModel;
-using TrxLoggerConstants = TrxLogger.Utility.Constants;
-using TrxLoggerObjectModel = ObjectModel;
-using TrxLoggerResources = VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+
+using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
+using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.Constants;
+using TrxLoggerObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests;
 
 [TestClass]
 public class TrxLoggerTests
@@ -149,7 +149,7 @@ public class TrxLoggerTests
     public void TestResultHandlerShouldCaptureStartTimeInSummaryWithTimeStampDuringIntialize()
     {
         TestCase testCase = CreateTestCase("dummy string");
-        ObjectModel.TestResult testResult = new(testCase);
+        VisualStudio.TestPlatform.ObjectModel.TestResult testResult = new(testCase);
         Mock<TestResultEventArgs> e = new(testResult);
 
         _testableTrxLogger.TestResultHandler(new object(), e.Object);
@@ -165,16 +165,16 @@ public class TrxLoggerTests
         TestCase failTestCase1 = CreateTestCase("Fail1");
         TestCase skipTestCase1 = CreateTestCase("Skip1");
 
-        ObjectModel.TestResult passResult1 = new(passTestCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult passResult1 = new(passTestCase1);
         passResult1.Outcome = TestOutcome.Passed;
 
-        ObjectModel.TestResult passResult2 = new(passTestCase2);
+        VisualStudio.TestPlatform.ObjectModel.TestResult passResult2 = new(passTestCase2);
         passResult2.Outcome = TestOutcome.Passed;
 
-        ObjectModel.TestResult failResult1 = new(failTestCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult failResult1 = new(failTestCase1);
         failResult1.Outcome = TestOutcome.Failed;
 
-        ObjectModel.TestResult skipResult1 = new(skipTestCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult skipResult1 = new(skipTestCase1);
         skipResult1.Outcome = TestOutcome.Skipped;
 
         Mock<TestResultEventArgs> pass1 = new(passResult1);
@@ -199,16 +199,16 @@ public class TrxLoggerTests
         TestCase failTestCase1 = CreateTestCase("Fail1");
         TestCase skipTestCase1 = CreateTestCase("Skip1");
 
-        ObjectModel.TestResult passResult1 = new(passTestCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult passResult1 = new(passTestCase1);
         passResult1.Outcome = TestOutcome.Passed;
 
-        ObjectModel.TestResult passResult2 = new(passTestCase2);
+        VisualStudio.TestPlatform.ObjectModel.TestResult passResult2 = new(passTestCase2);
         passResult2.Outcome = TestOutcome.Passed;
 
-        ObjectModel.TestResult failResult1 = new(failTestCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult failResult1 = new(failTestCase1);
         failResult1.Outcome = TestOutcome.Failed;
 
-        ObjectModel.TestResult skipResult1 = new(skipTestCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult skipResult1 = new(skipTestCase1);
         skipResult1.Outcome = TestOutcome.Skipped;
 
         Mock<TestResultEventArgs> pass1 = new(passResult1);
@@ -229,14 +229,14 @@ public class TrxLoggerTests
     {
         TestCase skipTestCase1 = CreateTestCase("Skip1");
 
-        ObjectModel.TestResult skipResult1 = new(skipTestCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult skipResult1 = new(skipTestCase1);
         skipResult1.Outcome = TestOutcome.Skipped;
 
         Mock<TestResultEventArgs> skip1 = new(skipResult1);
 
         _testableTrxLogger.TestResultHandler(new object(), skip1.Object);
 
-        string expectedMessage = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.MessageForSkippedTests, "Skip1");
+        string expectedMessage = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.MessageForSkippedTests, "Skip1");
 
         Assert.AreEqual(expectedMessage + Environment.NewLine, _testableTrxLogger.GetRunLevelInformationalMessage());
     }
@@ -247,10 +247,10 @@ public class TrxLoggerTests
         var testCase1 = CreateTestCase("testCase1");
         TestCase testCase2 = CreateTestCase("testCase2");
 
-        ObjectModel.TestResult result1 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result1 = new(testCase1);
         result1.Outcome = TestOutcome.Skipped;
 
-        ObjectModel.TestResult result2 = new(testCase2);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result2 = new(testCase2);
         result2.Outcome = TestOutcome.Failed;
 
         Mock<TestResultEventArgs> resultEventArg1 = new(result1);
@@ -268,10 +268,10 @@ public class TrxLoggerTests
         TestCase testCase1 = CreateTestCase("TestCase1");
         TestCase testCase2 = CreateTestCase("TestCase2");
 
-        ObjectModel.TestResult result1 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result1 = new(testCase1);
         result1.Outcome = TestOutcome.Skipped;
 
-        ObjectModel.TestResult result2 = new(testCase2);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result2 = new(testCase2);
         result2.Outcome = TestOutcome.Passed;
 
         Mock<TestResultEventArgs> resultEventArg1 = new(result1);
@@ -289,9 +289,9 @@ public class TrxLoggerTests
         TestCase testCase1 = CreateTestCase("TestCase1");
         TestCase testCase2 = CreateTestCase("TestCase2");
 
-        ObjectModel.TestResult result1 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result1 = new(testCase1);
 
-        ObjectModel.TestResult result2 = new(testCase2);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result2 = new(testCase2);
         result2.Outcome = TestOutcome.Failed;
 
         Mock<TestResultEventArgs> resultEventArg1 = new(result1);
@@ -310,11 +310,11 @@ public class TrxLoggerTests
 
         Guid parentExecutionId = Guid.NewGuid();
 
-        ObjectModel.TestResult result1 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result1 = new(testCase1);
         result1.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
         result1.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
-        ObjectModel.TestResult result2 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result2 = new(testCase1);
         result2.Outcome = TestOutcome.Failed;
         result2.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
         result2.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
@@ -347,14 +347,14 @@ public class TrxLoggerTests
 
         Guid parentExecutionId = Guid.NewGuid();
 
-        ObjectModel.TestResult result1 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result1 = new(testCase1);
         result1.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, parentExecutionId);
 
-        ObjectModel.TestResult result2 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result2 = new(testCase1);
         result2.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
         result2.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
-        ObjectModel.TestResult result3 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result3 = new(testCase1);
         result3.Outcome = TestOutcome.Failed;
         result3.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
         result3.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
@@ -378,14 +378,14 @@ public class TrxLoggerTests
 
         Guid parentExecutionId = Guid.NewGuid();
 
-        ObjectModel.TestResult result1 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result1 = new(testCase1);
         result1.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, parentExecutionId);
 
-        ObjectModel.TestResult result2 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result2 = new(testCase1);
         result2.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
         result2.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
-        ObjectModel.TestResult result3 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result3 = new(testCase1);
         result3.Outcome = TestOutcome.Failed;
         result3.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
         result3.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
@@ -408,14 +408,14 @@ public class TrxLoggerTests
 
         Guid parentExecutionId = Guid.NewGuid();
 
-        ObjectModel.TestResult result1 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result1 = new(testCase1);
         result1.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, parentExecutionId);
 
-        ObjectModel.TestResult result2 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result2 = new(testCase1);
         result2.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
         result2.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
-        ObjectModel.TestResult result3 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result3 = new(testCase1);
         result3.Outcome = TestOutcome.Failed;
         result3.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
         result3.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
@@ -440,15 +440,15 @@ public class TrxLoggerTests
 
         Guid parentExecutionId = Guid.NewGuid();
 
-        ObjectModel.TestResult result1 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result1 = new(testCase1);
         result1.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, parentExecutionId);
         result1.SetPropertyValue(TrxLoggerConstants.TestTypeProperty, TrxLoggerConstants.OrderedTestTypeGuid);
 
-        ObjectModel.TestResult result2 = new(testCase2);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result2 = new(testCase2);
         result2.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
         result2.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
-        ObjectModel.TestResult result3 = new(testCase3);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result3 = new(testCase3);
         result3.Outcome = TestOutcome.Failed;
         result3.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
         result3.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
@@ -474,15 +474,15 @@ public class TrxLoggerTests
 
         Guid parentExecutionId = Guid.NewGuid();
 
-        ObjectModel.TestResult result1 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result1 = new(testCase1);
         result1.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, parentExecutionId);
         result1.SetPropertyValue(TrxLoggerConstants.TestTypeProperty, TrxLoggerConstants.OrderedTestTypeGuid);
 
-        ObjectModel.TestResult result2 = new(testCase2);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result2 = new(testCase2);
         result2.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
         result2.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
-        ObjectModel.TestResult result3 = new(testCase3);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result3 = new(testCase3);
         result3.Outcome = TestOutcome.Failed;
         result3.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
         result3.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
@@ -507,15 +507,15 @@ public class TrxLoggerTests
 
         Guid parentExecutionId = Guid.NewGuid();
 
-        ObjectModel.TestResult result1 = new(testCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result1 = new(testCase1);
         result1.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, parentExecutionId);
         result1.SetPropertyValue(TrxLoggerConstants.TestTypeProperty, TrxLoggerConstants.OrderedTestTypeGuid);
 
-        ObjectModel.TestResult result2 = new(testCase2);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result2 = new(testCase2);
         result2.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
         result2.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
-        ObjectModel.TestResult result3 = new(testCase3);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result3 = new(testCase3);
         result3.Outcome = TestOutcome.Failed;
         result3.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
         result3.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
@@ -551,16 +551,16 @@ public class TrxLoggerTests
         TestCase failTestCase1 = CreateTestCase("Fail1");
         TestCase skipTestCase1 = CreateTestCase("Skip1");
 
-        ObjectModel.TestResult passResult1 = new(passTestCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult passResult1 = new(passTestCase1);
         passResult1.Outcome = TestOutcome.Passed;
 
-        ObjectModel.TestResult passResult2 = new(passTestCase2);
+        VisualStudio.TestPlatform.ObjectModel.TestResult passResult2 = new(passTestCase2);
         passResult2.Outcome = TestOutcome.Passed;
 
-        ObjectModel.TestResult failResult1 = new(failTestCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult failResult1 = new(failTestCase1);
         failResult1.Outcome = TestOutcome.Failed;
 
-        ObjectModel.TestResult skipResult1 = new(skipTestCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult skipResult1 = new(skipTestCase1);
         skipResult1.Outcome = TestOutcome.Skipped;
 
         Mock<TestResultEventArgs> pass1 = new(passResult1);
@@ -587,13 +587,13 @@ public class TrxLoggerTests
         TestCase passTestCase2 = CreateTestCase("Pass2");
         TestCase skipTestCase1 = CreateTestCase("Skip1");
 
-        ObjectModel.TestResult passResult1 = new(passTestCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult passResult1 = new(passTestCase1);
         passResult1.Outcome = TestOutcome.Passed;
 
-        ObjectModel.TestResult passResult2 = new(passTestCase2);
+        VisualStudio.TestPlatform.ObjectModel.TestResult passResult2 = new(passTestCase2);
         passResult2.Outcome = TestOutcome.Passed;
 
-        ObjectModel.TestResult skipResult1 = new(skipTestCase1);
+        VisualStudio.TestPlatform.ObjectModel.TestResult skipResult1 = new(skipTestCase1);
         skipResult1.Outcome = TestOutcome.Skipped;
 
         Mock<TestResultEventArgs> pass1 = new(passResult1);
@@ -745,9 +745,9 @@ public class TrxLoggerTests
         testCase1.SetPropertyValue(testProperty, new[] { "ClassLevel", "AsmLevel" });
 
         var converter = new Converter(new Mock<IFileHelper>().Object, new TrxFileHelper());
-        List<String> listCategoriesActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "MSTestDiscoverer.TestCategory");
+        List<string> listCategoriesActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "MSTestDiscoverer.TestCategory");
 
-        List<String> listCategoriesExpected = new()
+        List<string> listCategoriesExpected = new()
         {
             "ClassLevel",
             "AsmLevel"
@@ -871,7 +871,7 @@ public class TrxLoggerTests
         TestCase testCase = CreateTestCase("TestCase");
         testCase.ExecutorUri = isMstestAdapter ? new Uri("some://mstestadapteruri") : new Uri("some://uri");
 
-        ObjectModel.TestResult result = new(testCase);
+        VisualStudio.TestPlatform.ObjectModel.TestResult result = new(testCase);
         result.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
         if (isMstestAdapter)
         {
@@ -941,7 +941,7 @@ public class TrxLoggerTests
     private static Mock<TestResultEventArgs> CreatePassTestResultEventArgsMock(string testCaseName = "Pass1", List<TestResultMessage> testResultMessages = null)
     {
         TestCase passTestCase = CreateTestCase(testCaseName);
-        var passResult = new ObjectModel.TestResult(passTestCase);
+        var passResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(passTestCase);
         passResult.Outcome = TestOutcome.Passed;
 
         if (testResultMessages != null && testResultMessages.Any())
@@ -966,7 +966,7 @@ public class TrxLoggerTests
     }
 }
 
-internal class TestableTrxLogger : TrxLogger
+internal class TestableTrxLogger : VisualStudio.TestPlatform.Extensions.TrxLogger.TrxLogger
 {
     public TestableTrxLogger() : base() { }
     public TestableTrxLogger(IFileHelper fileHelper, TrxFileHelper trxFileHelper) : base(fileHelper, trxFileHelper) { }

@@ -1,15 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Intent.Console;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 using static System.Console;
 using static System.ConsoleColor;
+
+namespace Intent.Console;
 
 internal class ConsoleLogger : IRunLogger
 {

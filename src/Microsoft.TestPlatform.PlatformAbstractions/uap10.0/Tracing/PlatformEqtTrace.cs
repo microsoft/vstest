@@ -3,13 +3,13 @@
 
 #if WINDOWS_UWP
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Diagnostics.Tracing;
 using System.IO;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Wrapper class for tracing.

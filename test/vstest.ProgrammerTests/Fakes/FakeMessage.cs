@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace vstest.ProgrammerTests.Fakes;
-
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+
+namespace vstest.ProgrammerTests.Fakes;
 
 /// <summary>
 /// Marker for Fake message so we can put put all FakeMessages into one collection, without making it too wide.

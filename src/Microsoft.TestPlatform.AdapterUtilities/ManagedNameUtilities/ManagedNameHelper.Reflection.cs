@@ -1,21 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
-
-using Microsoft.TestPlatform.AdapterUtilities.Resources;
 using Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
 using System;
 using System.Globalization;
-using System.Reflection;
-using System.Text;
-
 #if !NET20
 using System.Linq;
 #endif
+using System.Reflection;
+using System.Text;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
 
 public static partial class ManagedNameHelper
 {
@@ -197,7 +195,7 @@ public static partial class ManagedNameHelper
 
         if (type == null)
         {
-            string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorTypeNotFound, parsedManagedTypeName);
+            string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorTypeNotFound, parsedManagedTypeName);
             throw new InvalidManagedNameException(message);
         }
 
@@ -215,7 +213,7 @@ public static partial class ManagedNameHelper
 
         if (method == null)
         {
-            string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorMethodNotFound, methodName, managedTypeName);
+            string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorMethodNotFound, methodName, managedTypeName);
             throw new InvalidManagedNameException(message);
         }
 

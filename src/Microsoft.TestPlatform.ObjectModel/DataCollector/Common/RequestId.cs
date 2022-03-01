@@ -1,14 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-
 using System;
 using System.Runtime.Serialization;
 
-using Resources;
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
 /// Wrapper class for a request ID that can be used for messages or events for identification
@@ -136,7 +134,7 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
 
         RequestId other = obj as RequestId;
         return other == null
-            ? throw new ArgumentException(string.Format(Resources.Common_ObjectMustBeOfType, new object[] { typeof(RequestId).Name }), nameof(obj))
+            ? throw new ArgumentException(string.Format(Resources.Resources.Common_ObjectMustBeOfType, new object[] { typeof(RequestId).Name }), nameof(obj))
             : Id.CompareTo(other.Id);
     }
 

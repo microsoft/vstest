@@ -1,18 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Versioning;
 
-using CommandLine.Processors;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
 
 internal class InferHelper
 {
