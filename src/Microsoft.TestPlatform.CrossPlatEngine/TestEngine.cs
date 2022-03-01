@@ -330,12 +330,6 @@ public class TestEngine : ITestEngine
         {
             var sources = testRuntimeProviderInfo.SourceDetails.Select(x => x.Source).ToList();
             var hostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(testRuntimeProviderInfo.RunSettings, sources);
-
-            if (hostManager.GetType() != testRuntimeProviderInfo.Type)
-            {
-                throw new Exception("hostmanager type is not the same, why?");
-            }
-
             ThrowExceptionIfTestHostManagerIsNull(hostManager, testRuntimeProviderInfo.RunSettings);
 
             hostManager.Initialize(TestSessionMessageLogger.Instance, testRuntimeProviderInfo.RunSettings);
@@ -405,7 +399,7 @@ public class TestEngine : ITestEngine
             var testRuntimeProvider = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runsettingsXml, sources);
             var testRuntimeProviderInfo = new TestRuntimeProviderInfo(testRuntimeProvider.GetType(), testRuntimeProvider.Shared, runsettingsXml, sourceDetails: runConfiguration.ToList());
 
-            // Outputting the instance, because the code for in-process run uses it, and we don't want to resolve a
+            // Outputting the instance, because the code for in-process run uses it, and we don't want to resolve it another time.
             mostRecentlyCreatedInstance = testRuntimeProvider;
             testRuntimeProviders.Add(testRuntimeProviderInfo);
         }
@@ -504,7 +498,7 @@ public class TestEngine : ITestEngine
     {
         if (testHostProviders.Count > 1)
         {
-            EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: This run has multiple different architectures or frameworks, running in isolation (in a separate testhost proces)..");
+            EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: This run has multiple different architectures or frameworks, running in isolation (in a separate testhost proces).");
             return false;
         }
 

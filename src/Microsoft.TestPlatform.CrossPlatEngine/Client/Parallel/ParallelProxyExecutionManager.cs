@@ -135,7 +135,7 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
         ICollection<string> executorUris)
     {
         var allRunsCompleted = false;
-        // REVIEW: Interlocked.Increment _runCompletedClients, and the condition on the bottom probably does not need to be under lock?
+        // TODO: Interlocked.Increment _runCompletedClients, and the condition on the bottom probably does not need to be under lock??
         lock (_executionStatusLockObject)
         {
             // Each concurrent Executor calls this method 

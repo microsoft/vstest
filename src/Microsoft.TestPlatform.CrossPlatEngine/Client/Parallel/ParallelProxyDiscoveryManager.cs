@@ -127,7 +127,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
     public bool HandlePartialDiscoveryComplete(IProxyDiscoveryManager proxyDiscoveryManager, long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
     {
         var allDiscoverersCompleted = false;
-        // REVIEW: Interlocked.Increment the count, and the condition below probably does not need to be in a lock?
+        // TODO: Interlocked.Increment the count, and the condition below probably does not need to be in a lock?
         lock (_discoveryStatusLockObject)
         {
             // Each concurrent Executor calls this method

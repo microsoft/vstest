@@ -877,7 +877,6 @@ internal class TestRequestManager : ITestRequestManager
             return false;
         }
 
-        // REVIEW: this should make the target platform empty, or "default" rather than the inferred platform, and we will then use the sources map to choose the correct testhost provider, and populate the runsettings there
         // Autodetect platform from sources, and return a single common platform.
         commonPlatform = _inferHelper.AutoDetectArchitecture(sources, defaultArchitecture, out sourceToPlatformMap);
         InferRunSettingsHelper.UpdateTargetPlatform(document, commonPlatform.ToString(), overwrite: true);
@@ -910,8 +909,6 @@ internal class TestRequestManager : ITestRequestManager
             return false;
         }
 
-
-        // REVIEW: this should make the target framework empty, or "default" rather than the inferred framework, and we will then use the sources map to choose the correct testhost provider, and populate the runsettings there
         // Autodetect framework from sources, and return a single common platform.
         commonFramework = _inferHelper.AutoDetectFramework(sources, out sourceToFrameworkMap);
         InferRunSettingsHelper.UpdateTargetFramework(document, commonFramework.ToString(), overwrite: true);

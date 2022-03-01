@@ -305,8 +305,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         _targetFramework = runConfiguration.TargetFramework;
         _testHostProcess = null;
 
-        // REVIEW: this is only here to force the use of the parallel proxy manager even when the default is netfmw and single source, so I don't have to fix all the logic right now
-        Shared = false; // !runConfiguration.DisableAppDomain;
+        Shared = !runConfiguration.DisableAppDomain;
         _hostExitedEventRaised = false;
     }
 

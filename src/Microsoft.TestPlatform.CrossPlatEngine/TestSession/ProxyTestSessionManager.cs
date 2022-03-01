@@ -43,6 +43,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     private readonly IList<ProxyOperationManagerContainer> _proxyContainerList;
     private readonly IDictionary<string, int> _proxyMap;
     private readonly Stopwatch _testSessionStopwatch;
+    private readonly Dictionary<string, TestRuntimeProviderInfo> _sourceToRuntimeProviderInfoMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyTestSessionManager"/> class.
@@ -64,6 +65,12 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         _proxyContainerList = new List<ProxyOperationManagerContainer>();
         _proxyMap = new Dictionary<string, int>();
         _testSessionStopwatch = new Stopwatch();
+
+        // Get dictionary from source -> runtimeProviderInfo, that has the type of runtime provider to create for this
+        // source, and updated runsettings.
+        _sourceToRuntimeProviderInfoMap = _runtimeProviders
+            .SelectMany(runtimeProviderInfo => runtimeProviderInfo.SourceDetails.Select(detail => new KeyValuePair<string, TestRuntimeProviderInfo>(detail.Source, runtimeProviderInfo)))
+            .ToDictionary(pair => pair.Key, pair => pair.Value);
     }
 
     // NOTE: The method is virtual for mocking purposes.
@@ -88,12 +95,6 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         // To follow the way parallel execution and discovery is (supposed to be) working, there should be as many testhosts
         // as the maxParallel level pre-started,and marked with the Shared, and configuration that they can run.
 
-        // Get dictionary from source -> runtimeProviderInfo, that has the type of runtime provider to create for this
-        // source, and updated runsettings.
-        var sourceToRuntimeProviderInfoMap = _runtimeProviders
-            .SelectMany(runtimeProviderInfo => runtimeProviderInfo.SourceDetails.Select(detail => new KeyValuePair<string, TestRuntimeProviderInfo>(detail.Source, runtimeProviderInfo)))
-            .ToDictionary(pair => pair.Key, pair => pair.Value);
-
         // Create all the proxies in parallel, one task per proxy.
         var taskList = new Task[_maxTesthostCount];
         for (int i = 0; i < taskList.Length; ++i)
@@ -102,7 +103,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             // up the payload into multiple smaller pieces. Here it is one source per proxy.
             var source = _testSessionCriteria.Sources[i];
             var sources = new List<string>() { source };
-            var runtimeProviderInfo = sourceToRuntimeProviderInfoMap[source];
+            var runtimeProviderInfo = _sourceToRuntimeProviderInfoMap[source];
 
             taskList[i] = Task.Factory.StartNew(() =>
             {
@@ -233,16 +234,14 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             //
             // TODO (copoiena): This run settings match is rudimentary. We should refine the
             // match criteria in the future.
-            // ERR: we actually have different run settings, because the framework and architecture migh be different, because we figure out the common framework and architecture, and we definitely want the architecture and framework to be the same.
-            // What should we do? Strip the info from runsettings when we infer it? Ideally we would have that info on the runsetting node.
-            //if (!_testSessionCriteria.RunSettings.Equals(runSettings))
-            //{
-            //    EqtTrace.Verbose($"ProxyTestSessionManager.DequeueProxy: A proxy exists, but the runsettings do not match. Skipping it. Incoming settings: {runSettings}, Settings on proxy: {_testSessionCriteria.RunSettings}");
-            //    throw new InvalidOperationException(
-            //        string.Format(
-            //            CultureInfo.CurrentUICulture,
-            //            CrossPlatResources.NoProxyMatchesDescription));
-            //}
+            if (!_sourceToRuntimeProviderInfoMap[source].RunSettings.Equals(runSettings))
+            {
+                EqtTrace.Verbose($"ProxyTestSessionManager.DequeueProxy: A proxy exists, but the runsettings do not match. Skipping it. Incoming settings: {runSettings}, Settings on proxy: {_testSessionCriteria.RunSettings}");
+                throw new InvalidOperationException(
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        CrossPlatResources.NoProxyMatchesDescription));
+            }
 
             // Get the actual proxy.
             proxyContainer = _proxyContainerList[_proxyMap[source]];
