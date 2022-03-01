@@ -38,6 +38,6 @@ internal class RequestResponsePair<TRequest, TResponse, TContext> where TRequest
 
     public override string ToString()
     {
-        return $"\u8595;{Request} \u8593;{Responses.FirstOrDefault()}";
+        return $"\u2193{Request} \u2191{Responses.FirstOrDefault()}";
     }
 }

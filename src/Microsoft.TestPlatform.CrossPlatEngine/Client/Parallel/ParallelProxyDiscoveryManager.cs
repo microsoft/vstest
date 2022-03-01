@@ -162,25 +162,31 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
 
     private List<ProviderSpecificWorkload<DiscoveryCriteria>> SplitToWorkloads(DiscoveryCriteria discoveryCriteria, Dictionary<string, TestRuntimeProviderInfo> sourceToTestHostProviderMap)
     {
-        List<ProviderSpecificWorkload<DiscoveryCriteria>> workloads = discoveryCriteria.Sources
-            .Select(source => new ProviderSpecificWorkload<DiscoveryCriteria>(NewDiscoveryCriteriaFromSource(source, discoveryCriteria), sourceToTestHostProviderMap[source]))
-            .ToList();
+        List<ProviderSpecificWorkload<DiscoveryCriteria>> workloads = new();
+        foreach (var source in discoveryCriteria.Sources)
+        {
+            var testHostProviderInfo = sourceToTestHostProviderMap[source];
+            var runsettingsXml = testHostProviderInfo.RunSettings;
+            var updatedDiscoveryCriteria = new ProviderSpecificWorkload<DiscoveryCriteria>(NewDiscoveryCriteriaFromSourceAndSettings(source, discoveryCriteria, runsettingsXml), testHostProviderInfo);
+            workloads.Add(updatedDiscoveryCriteria);
+        }
 
         return workloads;
-    }
 
-    private DiscoveryCriteria NewDiscoveryCriteriaFromSource(string source, DiscoveryCriteria discoveryCriteria)
-    {
-        var criteria = new DiscoveryCriteria(
-            new[] { source },
-            discoveryCriteria.FrequencyOfDiscoveredTestsEvent,
-            discoveryCriteria.DiscoveredTestEventTimeout,
-            discoveryCriteria.RunSettings
-        );
+        static DiscoveryCriteria NewDiscoveryCriteriaFromSourceAndSettings(string source, DiscoveryCriteria discoveryCriteria, string runsettingsXml)
+        {
+            var criteria = new DiscoveryCriteria(
+                new[] { source },
+                discoveryCriteria.FrequencyOfDiscoveredTestsEvent,
+                discoveryCriteria.DiscoveredTestEventTimeout,
+                runsettingsXml,
+                discoveryCriteria.TestSessionInfo
+            );
 
-        criteria.TestCaseFilter = discoveryCriteria.TestCaseFilter;
+            criteria.TestCaseFilter = discoveryCriteria.TestCaseFilter;
 
-        return criteria;
+            return criteria;
+        }
     }
 
     /// <summary>

@@ -394,7 +394,7 @@ public class TestEngine : ITestEngine
         // out which runtime providers would run them, and if the runtime provider is shared or not.
         mostRecentlyCreatedInstance = null;
         var testRuntimeProviders = new List<TestRuntimeProviderInfo>();
-        var uniqueRunConfigurations = sourceToSourceDetailMap.Values.GroupBy(k => new { k.Framework, k.Architecture });
+        var uniqueRunConfigurations = sourceToSourceDetailMap.Values.GroupBy(k => $"{k.Framework}|{k.Architecture}");
         foreach (var runConfiguration in uniqueRunConfigurations)
         {
             // It is okay to take the first (or any) source detail in the group. We are grouping to get the same source detail, so all architectures and frameworks are the same.

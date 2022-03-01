@@ -75,7 +75,7 @@ public class BasicRunAndDiscovery
 
         When we run tests.
 
-        Then all tests from all assemblies are run..
+        Then all tests from all assemblies are run.
     ")]
     public async Task B()
     {

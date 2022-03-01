@@ -14,6 +14,7 @@ internal class FakeTestRuntimeProviderManager : ITestRuntimeProviderManager
     }
 
     public List<FakeTestRuntimeProvider> TestRuntimeProviders { get; } = new();
+    public Queue<FakeTestRuntimeProvider> TestRuntimeProvidersByOrder { get; } = new();
     public List<ActionRecord<FakeTestRuntimeProvider>> UsedTestRuntimeProviders { get; } = new();
 
     public FakeErrorAggregator FakeErrorAggregator { get; }
@@ -21,6 +22,17 @@ internal class FakeTestRuntimeProviderManager : ITestRuntimeProviderManager
     public void AddTestRuntimeProviders(params FakeTestRuntimeProvider[] runtimeProviders)
     {
         TestRuntimeProviders.AddRange(runtimeProviders);
+
+        // In cases where we don't have multi tfm run, we will be asked for
+        // a provider with multiple sources. In that case we don't know exactly which one to provide
+        // so we need to go by order. We also do this resolve twice for each source in parallel run
+        // because we first need to know if the provider is shared. So we add to the queue twice.
+        // This is brittle, but there is no way around this :(
+        foreach(var provider in runtimeProviders)
+        {
+            TestRuntimeProvidersByOrder.Enqueue(provider);
+            TestRuntimeProvidersByOrder.Enqueue(provider);
+        }
     }
 
     public ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string _, List<string> sources)
@@ -30,18 +42,27 @@ internal class FakeTestRuntimeProviderManager : ITestRuntimeProviderManager
             .Any(path => sources.Contains(path)))
             .ToList();
 
+        if (allMatchingProviders.Count == 0)
+        {
+            throw new InvalidOperationException($"There are no FakeTestRuntimeProviders associated with any of the incoming sources, make sure your testhost fixture has at least one dll: {sources.JoinByComma()}");
+        }
+
         if (allMatchingProviders.Count > 1)
         {
+            // This is a single tfm run, or multiple dlls in the run have the same tfm. We need to provide
+            // providers by order.
+            if (!TestRuntimeProvidersByOrder.TryDequeue(out var provider))
+            {
+                throw new InvalidOperationException("There are no more FakeTestRuntimeProviders to be provided.");
+            }
 
-        }
-        var match = allMatchingProviders.FirstOrDefault();
-        if (match == null)
-        {
-            throw new InvalidOperationException("There is no FakeTestRuntimeProvider that would match the filter.");
+            UsedTestRuntimeProviders.Add(new ActionRecord<FakeTestRuntimeProvider>(provider));
+            return provider;
         }
 
-        UsedTestRuntimeProviders.Add(new ActionRecord<FakeTestRuntimeProvider>(match));
-        return match;
+        var single = allMatchingProviders.Single();
+        UsedTestRuntimeProviders.Add(new ActionRecord<FakeTestRuntimeProvider>(single));
+        return single;
     }
 
     public ITestRuntimeProvider GetTestHostManagerByUri(string hostUri)

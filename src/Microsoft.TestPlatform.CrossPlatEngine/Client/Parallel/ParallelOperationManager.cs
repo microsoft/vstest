@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,12 +19,6 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
 {
     private readonly Func<TestRuntimeProviderInfo, TManager> _createNewManager;
     private readonly int _maxParallelLevel;
-
-    /// <summary>
-    /// Holds all active managers, so we can do actions on all of them, like initialize, run, cancel or close.
-    /// </summary>
-    // TODO: make this ConcurrentDictionary and use it's concurrent api, if we have the need.
-    private readonly IDictionary<TManager, TEventHandler> _managerToEventHandlerMap = new ConcurrentDictionary<TManager, TEventHandler>();
 
     /// <summary>
     /// Default number of Processes
@@ -119,7 +112,9 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
             }
         }
 
-        return false;
+        // Return true when we started more work. Or false, when there was nothing more to do.
+        // This will propagate to handling of partial discovery / run.
+        return workToRun.Count > 0;
     }
 
     public bool RunNextWork(TManager completedManager)
@@ -139,54 +134,34 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         }
     }
 
-    /// <summary>
-    /// Remove and dispose a manager from concurrent list of manager.
-    /// </summary>
-    /// <param name="manager">Manager to remove</param>
-    public void RemoveManager(TManager manager)
-    {
-        _managerToEventHandlerMap.Remove(manager);
-    }
-
-    /// <summary>
-    /// Add a manager in concurrent list of manager.
-    /// </summary>
-    /// <param name="manager">Manager to add</param>
-    /// <param name="handler">eventHandler of the manager</param>
-    public void AddManager(TManager manager, TEventHandler handler)
-    {
-        _managerToEventHandlerMap.Add(manager, handler);
-    }
-
     public void DoActionOnAllManagers(Action<TManager> action, bool doActionsInParallel = false)
     {
-        lock (_lock)
+        // We don't need to lock here, we just grab the current list of
+        // managers and run action on each one of them.
+        var managers = _managerSlots.Select(slot => slot.Manager).ToList();
+        int i = 0;
+        var actionTasks = new Task[managers.Count];
+        foreach (var manager in managers)
         {
-            int i = 0;
-            var actionTasks = new Task[_managerToEventHandlerMap.Count];
-            foreach (var manager in _managerSlots.Select(s => s.Manager))
-            {
-                if (manager == null)
-                    continue;
+            if (manager == null)
+                continue;
 
-                // Read the array before firing the task - beware of closures
-                if (doActionsInParallel)
-                {
-                    actionTasks[i] = Task.Run(() => action(manager));
-                    i++;
-                }
-                else
-                {
-                    DoManagerAction(() => action(manager));
-                }
-            }
-
+            // Read the array before firing the task - beware of closures
             if (doActionsInParallel)
             {
-                DoManagerAction(() => Task.WaitAll(actionTasks));
+                actionTasks[i] = Task.Run(() => action(manager));
+                i++;
+            }
+            else
+            {
+                DoManagerAction(() => action(manager));
             }
         }
 
+        if (doActionsInParallel)
+        {
+            DoManagerAction(() => Task.WaitAll(actionTasks));
+        }
     }
 
     private void DoManagerAction(Action action)

@@ -466,7 +466,7 @@ public class MultiTFM
         and provide runsettings that define the desired target framework.
 
         Then two testhosts should be started that target the framework chosen by runsettings.
-    ")][Only]
+    ")]
         public async Task E()
         {
             // -- arrange
