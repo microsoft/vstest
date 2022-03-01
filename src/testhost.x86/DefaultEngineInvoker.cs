@@ -94,10 +94,14 @@ internal class DefaultEngineInvoker :
         // beacuse of it's public interface, we work around that by making it implement a second interface
         if (_requestHandler is IDeploymentAwareTestRequestHandler deployedHandler)
         {
-            if (argsDictionary.ContainsKey(RemotePath) && argsDictionary.ContainsKey(LocalPath))
+            if (argsDictionary.ContainsKey(RemotePath))
+            {
+                deployedHandler.RemotePath = argsDictionary[RemotePath];
+            }
+
+            if (argsDictionary.ContainsKey(LocalPath))
             {
                 deployedHandler.LocalPath = argsDictionary[LocalPath];
-                deployedHandler.RemotePath = argsDictionary[RemotePath];
             }
         }
 

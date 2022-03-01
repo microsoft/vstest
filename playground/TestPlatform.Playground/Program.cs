@@ -51,11 +51,17 @@ internal class Program
                 <RunSettings>
                     <RunConfiguration>
                         <InIsolation>true</InIsolation>
+                        <MaxCpuCount>2</MaxCpuCount>
                     </RunConfiguration>
                 </RunSettings>
             ";
         var sources = new[] {
-            Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll")
+            @"C:\Users\jajares\source\repos\TestProject48\TestProject1\bin\Debug\net48\TestProject1.dll",
+            @"C:\Users\jajares\source\repos\TestProject48\TestProject5\bin\Debug\net48\TestProject5.dll",
+            @"C:\Users\jajares\source\repos\TestProject48\TestProject48\bin\Debug\net48\TestProject48.dll",
+            @"C:\Users\jajares\source\repos\TestProject48\TestProject2\bin\Debug\net48\TestProject2.dll",
+            @"C:\Users\jajares\source\repos\TestProject48\TestProject3\bin\Debug\net48\TestProject3.dll",
+            @"C:\Users\jajares\source\repos\TestProject48\TestProject4\bin\Debug\net48\TestProject4.dll",
         };
 
         var options = new TestPlatformOptions();
