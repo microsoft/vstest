@@ -2,8 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
@@ -15,21 +17,93 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 public partial class ProcessHelper : IProcessHelper
 {
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool IsWow64Process2(IntPtr process, out ushort processMachine, out ushort nativeMachine);
+
+    private const ushort Arm64Machine = 0xAA64;
+
     /// <inheritdoc/>
     public string GetCurrentProcessLocation()
-    {
-        return Path.GetDirectoryName(GetCurrentProcessFileName());
-    }
-
-    public IntPtr GetProcessHandle(int processId)
-    {
-        return Process.GetProcessById(processId).Handle;
-    }
+        => Path.GetDirectoryName(GetCurrentProcessFileName());
 
     /// <inheritdoc/>
-    public PlatformArchitecture GetCurrentProcessArchitecture()
+    public IntPtr GetProcessHandle(int processId)
+        => Process.GetProcessById(processId).Handle;
+
+    /// <inheritdoc/>
+    public PlatformArchitecture GetCurrentProcessArchitecture() =>
+        IntPtr.Size == 8 ?
+        IsArm64() ? PlatformArchitecture.ARM64 : PlatformArchitecture.X64
+        : PlatformArchitecture.X86;
+
+    private static bool IsArm64()
     {
-        return IntPtr.Size == 8 ? PlatformArchitecture.X64 : PlatformArchitecture.X86;
+        try
+        {
+            var currentProcess = Process.GetCurrentProcess();
+            if (!IsWow64Process2(currentProcess.Handle, out ushort processMachine, out ushort nativeMachine))
+                throw new Win32Exception();
+
+            // if IMAGE_FILE_MACHINE_UNKNOWN we're not running inside WOW64 and we can verify the native architecture.
+            if (processMachine == 0 && nativeMachine == Arm64Machine)
+            {
+                // To distinguish between ARM64 and x64 emulated on ARM we check the PE header.
+                return IsArm64Module(currentProcess.MainModule.ModuleName);
+            }
+        }
+        catch (Exception)
+        {
+            // We should have Win32Exception() or IOException() but we don't want to block and we'll fallback to emulated path.
+        }
+
+        return false;
+    }
+
+    private static bool IsArm64Module(string path)
+    {
+        // This document specifies the structure of executable (image) files
+        // https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#general-concepts
+        using Stream fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+        {
+            using BinaryReader reader = new(fs);
+
+            // https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#ms-dos-stub-image-only
+            // At location 0x3c, the stub has the file offset to the PE signature. 
+            fs.Position = 0x3C;
+            var peHeader = reader.ReadUInt32();
+
+            // Check if the offset is invalid
+            if (peHeader > fs.Length - 5)
+            {
+                return false;
+            }
+
+            // https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#signature-image-only
+            // Moving to the PE Header start location.
+            fs.Position = peHeader;
+
+            // After the MS-DOS stub, at the file offset specified at offset 0x3c, is a 4-byte signature that identifies the file as a PE format image file.
+            // This signature is "PE\0\0" (the letters "P" and "E" followed by two null bytes).
+            uint signature = reader.ReadUInt32();
+            if (signature != 0x00004550)
+            {
+                return false;
+            }
+
+            // https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#coff-file-header-object-and-image
+            // At the beginning of an object file, or immediately after the signature of an image file, is a standard COFF file header.
+            var machine = reader.ReadUInt16();
+            reader.ReadUInt16(); //NumberOfSections
+            reader.ReadUInt32(); //TimeDateStamp
+            reader.ReadUInt32(); //PointerToSymbolTable
+            reader.ReadUInt32(); //NumberOfSymbols
+            reader.ReadUInt16(); //SizeOfOptionalHeader
+            reader.ReadUInt16(); //Characteristics
+
+            // https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#optional-header-image-only
+            ushort magic = reader.ReadUInt16();
+            return magic is 0x010B or 0x020B && machine == Arm64Machine;
+        }
     }
 }
 
