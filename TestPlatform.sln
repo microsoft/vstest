@@ -95,7 +95,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E344E0A2-7715-4C7F-BAF7-D64EA94CB19B}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		azure-pipelines.yml = azure-pipelines.yml
 		Nuget.config = Nuget.config
 	EndProjectSection
 EndProject
@@ -182,9 +181,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AttachmentProcessorDataColl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vstest.ProgrammerTests", "test\vstest.ProgrammerTests\vstest.ProgrammerTests.csproj", "{B1F84FD8-6150-4ECA-9AD7-C316E04E17D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Intent", "test\Intent\Intent.csproj", "{BFBB35C9-6437-480A-8DCC-AE3700110E7D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intent", "test\Intent\Intent.csproj", "{BFBB35C9-6437-480A-8DCC-AE3700110E7D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Intent.Primitives", "test\Intent.Primitives\Intent.Primitives.csproj", "{29270853-90DC-4C39-9621-F47AE40A79B6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intent.Primitives", "test\Intent.Primitives\Intent.Primitives.csproj", "{29270853-90DC-4C39-9621-F47AE40A79B6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "testhost.arm64", "src\testhost.arm64\testhost.arm64.csproj", "{186069FE-E1E8-4DE1-BEA4-0FF1484D22D1}"
 EndProject

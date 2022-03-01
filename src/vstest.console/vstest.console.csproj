@@ -5,9 +5,6 @@
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems" Label="Shared" />
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
-  <Target Name="DisplayMessages" BeforeTargets="Publish">
-    <Message Text="PlatformTarget $(PlatformTarget) RuntimeIdentifier $(RuntimeIdentifier)" Importance="high" />
-  </Target>
   <PropertyGroup>
     <AssemblyName>vstest.console</AssemblyName>
     <AssemblyName Condition=" '$(RuntimeIdentifier)' == 'win10-arm64' ">vstest.console.arm64</AssemblyName>
