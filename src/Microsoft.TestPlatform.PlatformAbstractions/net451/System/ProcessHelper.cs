@@ -48,7 +48,7 @@ public partial class ProcessHelper : IProcessHelper
             if (processMachine == 0 && nativeMachine == Arm64Machine)
             {
                 // To distinguish between ARM64 and x64 emulated on ARM we check the PE header.
-                return IsArm64Module(currentProcess.MainModule.ModuleName);
+                return IsArm64Module(currentProcess.MainModule.FileName);
             }
         }
         catch (Exception)
