@@ -12,6 +12,7 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
 {
     public FakeProcessHelper FakeProcessHelper { get; }
     public FakeCommunicationEndpoint FakeCommunicationEndpoint { get; }
+    public FakeCommunicationChannel FakeCommunicationChannel { get; }
     public FakeErrorAggregator FakeErrorAggregator { get; }
     public FakeProcess TestHostProcess { get; private set; }
     public FakeFileHelper FileHelper { get; }
@@ -30,6 +31,7 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
         FileHelper = fakeFileHelper;
         TestDlls = fakeTestDlls;
         FakeCommunicationEndpoint = fakeCommunicationEndpoint;
+        FakeCommunicationChannel = fakeCommunicationEndpoint.Channel;
         FakeErrorAggregator = fakeErrorAggregator;
 
         var architectures = fakeTestDlls.Select(dll => dll.Architecture).Distinct().ToList();
@@ -122,5 +124,10 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
     public void SetCustomLauncher(ITestHostLauncher customLauncher)
     {
         throw new NotImplementedException();
+    }
+
+    public override string ToString()
+    {
+        return $"{nameof(FakeTestRuntimeProvider)} - ({TestHostProcess.ToString() ?? "<no process>"}) - {FakeCommunicationChannel}";
     }
 }

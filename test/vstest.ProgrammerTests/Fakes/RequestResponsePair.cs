@@ -35,4 +35,9 @@ internal class RequestResponsePair<TRequest, TResponse, TContext> where TRequest
     public Action<TContext>? AfterAction { get; }
     public List<TResponse> Responses { get; }
     public bool Debug { get; }
+
+    public override string ToString()
+    {
+        return $"\u8595;{Request} \u8593;{Responses.FirstOrDefault()}";
+    }
 }

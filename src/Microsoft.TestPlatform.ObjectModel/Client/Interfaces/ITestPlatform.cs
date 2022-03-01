@@ -77,5 +77,6 @@ public interface ITestPlatform : IDisposable
     bool StartTestSession(
         IRequestData requestData,
         StartTestSessionCriteria criteria,
-        ITestSessionEventsHandler eventsHandler);
+        ITestSessionEventsHandler eventsHandler,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap);
 }

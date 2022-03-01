@@ -18,7 +18,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using ObjectModel.Engine;
 
 using CrossPlatResources = Resources.Resources;
-
+using System.Linq;
 /// <summary>
 /// Orchestrates test session operations for the engine communicating with the client.
 /// </summary>
@@ -36,9 +36,10 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     private readonly object _proxyOperationLockObject = new();
     private volatile bool _proxySetupFailed;
     private readonly StartTestSessionCriteria _testSessionCriteria;
-    private readonly int _testhostCount;
+    private readonly int _maxTesthostCount;
     private TestSessionInfo _testSessionInfo;
-    private readonly Func<ProxyOperationManager> _proxyCreator;
+    private readonly Func<TestRuntimeProviderInfo, ProxyOperationManager> _proxyCreator;
+    private readonly List<TestRuntimeProviderInfo> _runtimeProviders;
     private readonly IList<ProxyOperationManagerContainer> _proxyContainerList;
     private readonly IDictionary<string, int> _proxyMap;
     private readonly Stopwatch _testSessionStopwatch;
@@ -48,17 +49,18 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     /// </summary>
     /// 
     /// <param name="criteria">The test session criteria.</param>
-    /// <param name="testhostCount">The testhost count.</param>
+    /// <param name="maxTesthostCount">The testhost count.</param>
     /// <param name="proxyCreator">The proxy creator.</param>
     public ProxyTestSessionManager(
         StartTestSessionCriteria criteria,
-        int testhostCount,
-        Func<ProxyOperationManager> proxyCreator)
+        int maxTesthostCount,
+        Func<TestRuntimeProviderInfo, ProxyOperationManager> proxyCreator,
+        List<TestRuntimeProviderInfo> runtimeProviders)
     {
         _testSessionCriteria = criteria;
-        _testhostCount = testhostCount;
+        _maxTesthostCount = maxTesthostCount;
         _proxyCreator = proxyCreator;
-
+        _runtimeProviders = runtimeProviders;
         _proxyContainerList = new List<ProxyOperationManagerContainer>();
         _proxyMap = new Dictionary<string, int>();
         _testSessionStopwatch = new Stopwatch();
@@ -80,33 +82,34 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
+        // TODO: Right now we either pre-create 1 testhost if parallel is disabled, or we pre-create as many
+        // testhosts as we have sources. In the future we will have a maxParallelLevel set to the actual parallel level
+        // (which might be lower than the number of sources) and we should do some kind of thinking here to figure out how to split the sources.
+        // To follow the way parallel execution and discovery is (supposed to be) working, there should be as many testhosts
+        // as the maxParallel level pre-started,and marked with the Shared, and configuration that they can run.
+
+        // Get dictionary from source -> runtimeProviderInfo, that has the type of runtime provider to create for this
+        // source, and updated runsettings.
+        var sourceToRuntimeProviderInfoMap = _runtimeProviders
+            .SelectMany(runtimeProviderInfo => runtimeProviderInfo.SourceDetails.Select(detail => new KeyValuePair<string, TestRuntimeProviderInfo>(detail.Source, runtimeProviderInfo)))
+            .ToDictionary(pair => pair.Key, pair => pair.Value);
+
         // Create all the proxies in parallel, one task per proxy.
-        var taskList = new Task[_testhostCount];
+        var taskList = new Task[_maxTesthostCount];
         for (int i = 0; i < taskList.Length; ++i)
         {
-            // The testhost count is equal to 1 because one of the following conditions
-            // holds true:
-            //     1. we're dealing with a shared testhost (e.g.: .NET Framework testhost)
-            //        that must process multiple sources within the same testhost process;
-            //     2. we're dealing with a single testhost (shared or not, it doesn't matter)
-            //        that must process a single source;
-            // Either way, no further processing of the original test source list is needed
-            // in either of those cases.
-            //
-            // Consequentely, if the testhost count is greater than one it means that the
-            // testhost is not shared (e.g.: .NET Core testhost), in which case each test
-            // source must be processed by a dedicated testhost, which is the reason we
-            // create a list with a single element, i.e. the current source to be processed.
-            var sources = (_testhostCount == 1)
-                ? _testSessionCriteria.Sources
-                : new List<string>() { _testSessionCriteria.Sources[i] };
+            // This is similar to what we do in ProxyExecutionManager, and ProxyDiscoveryManager, we split
+            // up the payload into multiple smaller pieces. Here it is one source per proxy.
+            var source = _testSessionCriteria.Sources[i];
+            var sources = new List<string>() { source };
+            var runtimeProviderInfo = sourceToRuntimeProviderInfoMap[source];
 
             taskList[i] = Task.Factory.StartNew(() =>
             {
-                if (!SetupRawProxy(
-                        sources,
-                        _testSessionCriteria.RunSettings))
+                var proxySetupSucceeded = SetupRawProxy(sources, runtimeProviderInfo);
+                if (!proxySetupSucceeded)
                 {
+                    // Set this only in the failed case, so we can check if any proxy failed to setup.
                     _proxySetupFailed = true;
                 }
             });
@@ -230,13 +233,16 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             //
             // TODO (copoiena): This run settings match is rudimentary. We should refine the
             // match criteria in the future.
-            if (!_testSessionCriteria.RunSettings.Equals(runSettings))
-            {
-                throw new InvalidOperationException(
-                    string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CrossPlatResources.NoProxyMatchesDescription));
-            }
+            // ERR: we actually have different run settings, because the framework and architecture migh be different, because we figure out the common framework and architecture, and we definitely want the architecture and framework to be the same.
+            // What should we do? Strip the info from runsettings when we infer it? Ideally we would have that info on the runsetting node.
+            //if (!_testSessionCriteria.RunSettings.Equals(runSettings))
+            //{
+            //    EqtTrace.Verbose($"ProxyTestSessionManager.DequeueProxy: A proxy exists, but the runsettings do not match. Skipping it. Incoming settings: {runSettings}, Settings on proxy: {_testSessionCriteria.RunSettings}");
+            //    throw new InvalidOperationException(
+            //        string.Format(
+            //            CultureInfo.CurrentUICulture,
+            //            CrossPlatResources.NoProxyMatchesDescription));
+            //}
 
             // Get the actual proxy.
             proxyContainer = _proxyContainerList[_proxyMap[source]];
@@ -312,12 +318,12 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
 
     private bool SetupRawProxy(
         IList<string> sources,
-        string runSettings)
+        TestRuntimeProviderInfo runtimeProviderInfo)
     {
         try
         {
             // Create and cache the proxy.
-            var operationManagerProxy = _proxyCreator();
+            var operationManagerProxy = _proxyCreator(runtimeProviderInfo);
             if (operationManagerProxy == null)
             {
                 return false;
@@ -327,7 +333,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             operationManagerProxy.Initialize(skipDefaultAdapters: false);
 
             // Start the test host associated to the proxy.
-            if (!operationManagerProxy.SetupChannel(sources, runSettings))
+            if (!operationManagerProxy.SetupChannel(sources, runtimeProviderInfo.RunSettings))
             {
                 return false;
             }

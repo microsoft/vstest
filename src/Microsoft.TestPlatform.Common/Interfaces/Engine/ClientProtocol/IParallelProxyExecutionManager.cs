@@ -12,7 +12,7 @@ using Client;
 /// <summary>
 /// Interface defining the parallel execution manager
 /// </summary>
-public interface IParallelProxyExecutionManager : IParallelOperationManager, IProxyExecutionManager
+public interface IParallelProxyExecutionManager : IProxyExecutionManager
 {
     /// <summary>
     /// Handles Partial Run Complete event coming from a specific concurrent proxy execution manager

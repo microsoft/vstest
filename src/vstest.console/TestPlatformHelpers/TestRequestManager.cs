@@ -476,6 +476,13 @@ internal class TestRequestManager : ITestRequestManager
             payload.RunSettings = updatedRunsettings;
         }
 
+        var sourceToSourceDetailMap = payload.Sources.Select(source => new SourceDetail
+        {
+            Source = source,
+            Architecture = sourceToArchitectureMap[source],
+            Framework = sourceToFrameworkMap[source],
+        }).ToDictionary(k => k.Source);
+
         if (InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(payload.RunSettings))
         {
             throw new SettingsException(
@@ -505,7 +512,8 @@ internal class TestRequestManager : ITestRequestManager
                     TestHostLauncher = testHostLauncher
                 };
 
-                if (!_testPlatform.StartTestSession(requestData, criteria, eventsHandler))
+                var testSessionStarted = _testPlatform.StartTestSession(requestData, criteria, eventsHandler, sourceToSourceDetailMap);
+                if (!testSessionStarted)
                 {
                     EqtTrace.Warning("TestRequestManager.StartTestSession: Unable to start test session.");
                 }

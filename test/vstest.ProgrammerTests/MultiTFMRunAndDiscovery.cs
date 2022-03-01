@@ -209,7 +209,7 @@ public class MultiTFM
             var testDiscoveryPayload = new DiscoveryRequestPayload
             {
                 Sources = new List<string> { mstest1Dll.Path, mstest2Dll.Path },
-                RunSettings = $"<RunSettings><RunConfiguration><TargetFramework>{KnownFrameworkStrings.Net7}</TargetFramework></RunConfiguration></RunSettings>"
+                RunSettings = $"<RunSettings><RunConfiguration><TargetFrameworkVersion>{KnownFrameworkStrings.Net7}</TargetFrameworkVersion></RunConfiguration></RunSettings>"
             };
 
             await testRequestManager.ExecuteWithAbort(tm => tm.DiscoverTests(testDiscoveryPayload, fixture.TestDiscoveryEventsRegistrar, fixture.ProtocolConfig));
@@ -427,7 +427,7 @@ public class MultiTFM
             var testRunRequestPayload = new TestRunRequestPayload
             {
                 Sources = new List<string> { mstest1Dll.Path, mstest2Dll.Path },
-                RunSettings = $"<RunSettings><RunConfiguration><TargetFramework>{KnownFrameworkStrings.Net7}</TargetFramework></RunConfiguration></RunSettings>"
+                RunSettings = $"<RunSettings><RunConfiguration><TargetFrameworkVersion>{KnownFrameworkStrings.Net7}</TargetFrameworkVersion></RunConfiguration></RunSettings>"
             };
 
             await testRequestManager.ExecuteWithAbort(tm => tm.RunTests(testRunRequestPayload, testHostLauncher: null, fixture.TestRunEventsRegistrar, fixture.ProtocolConfig));
@@ -538,16 +538,22 @@ public class MultiTFM
 
             var startTestSessionPayload = new StartTestSessionPayload
             {
-                RunSettings = "<RunSettings></RunSettings>",
+                // We need to have a parallel run, otherwise we will create just a single proxy,
+                // because 1 is the maximum number of proxies to start for non-parallel run.
+                RunSettings = "<RunSettings><RunConfiguration><MaxCpuCount>0</MaxCpuCount></RunConfiguration></RunSettings>",
                 Sources = new[] { mstest1Dll.Path, mstest2Dll.Path }
             };
 
             await testRequestManager.ExecuteWithAbort(tm => tm.StartTestSession(startTestSessionPayload, testHostLauncher: null, fixture.TestSessionEventsHandler, fixture.ProtocolConfig));
 
+            // You need to pass this on, otherwise it will ignore the test session that you just started. This is a by product of being able to start multiple test sessions.
+            var testSessionInfo = fixture.TestSessionEventsHandler.StartTestSessionCompleteEvents.Single().TestSessionInfo;
+
             var testRunRequestPayload = new TestRunRequestPayload
             {
                 Sources = new List<string> { mstest1Dll.Path, mstest2Dll.Path },
-                RunSettings = $"<RunSettings><RunConfiguration><TargetFramework>{KnownFrameworkStrings.Net7}</TargetFramework></RunConfiguration></RunSettings>"
+                RunSettings = $"<RunSettings><RunConfiguration><MaxCpuCount>0</MaxCpuCount></RunConfiguration></RunSettings>",
+                TestSessionInfo = testSessionInfo,
             };
 
             await testRequestManager.ExecuteWithAbort(tm => tm.RunTests(testRunRequestPayload, testHostLauncher: null, fixture.TestRunEventsRegistrar, fixture.ProtocolConfig));
@@ -563,13 +569,13 @@ public class MultiTFM
             var startWithSources1Text = startWithSources1.Request.Payload.Select(t => t.ToString()).JoinBySpace();
             // We sent mstest1.dll.
             startWithSources1Text.Should().Contain("mstest1.dll");
-            startWithSources1Text.Should().Contain(KnownFrameworkStrings.Net7);
+            startWithSources1Text.Should().Contain(mstest1Dll.FrameworkName.ToString());
 
             var startWithSources2 = testhost2.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
             var startWithSources2Text = startWithSources2.Request.Payload.Select(t => t.ToString()).JoinBySpace();
             // We sent mstest2.dll.
             startWithSources2Text.Should().Contain("mstest2.dll");
-            startWithSources2Text.Should().Contain(KnownFrameworkStrings.Net7);
+            startWithSources2Text.Should().Contain(mstest2Dll.FrameworkName.ToString());
 
             fixture.ExecutedTests.Should().HaveCount(mstest1Dll.TestCount + mstest2Dll.TestCount);
         }

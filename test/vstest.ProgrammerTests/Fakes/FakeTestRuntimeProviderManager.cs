@@ -3,8 +3,6 @@
 
 namespace vstest.ProgrammerTests.Fakes;
 
-using System.Collections.Concurrent;
-
 using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
@@ -15,30 +13,35 @@ internal class FakeTestRuntimeProviderManager : ITestRuntimeProviderManager
         FakeErrorAggregator = fakeErrorAggregator;
     }
 
-    public ConcurrentQueue<FakeTestRuntimeProvider> TestRuntimeProviders { get; } = new();
-    public List<FakeTestRuntimeProvider> UsedTestRuntimeProviders { get; } = new();
+    public List<FakeTestRuntimeProvider> TestRuntimeProviders { get; } = new();
+    public List<ActionRecord<FakeTestRuntimeProvider>> UsedTestRuntimeProviders { get; } = new();
 
     public FakeErrorAggregator FakeErrorAggregator { get; }
 
     public void AddTestRuntimeProviders(params FakeTestRuntimeProvider[] runtimeProviders)
     {
-        foreach (var runtimeProvider in runtimeProviders)
-        {
-            TestRuntimeProviders.Enqueue(runtimeProvider);
-        }
+        TestRuntimeProviders.AddRange(runtimeProviders);
     }
 
-    public ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration)
+    public ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string _, List<string> sources)
     {
+        var allMatchingProviders = TestRuntimeProviders
+            .Where(r => r.TestDlls.Select(dll => dll.Path)
+            .Any(path => sources.Contains(path)))
+            .ToList();
 
-
-        if (!TestRuntimeProviders.TryDequeue(out var next))
+        if (allMatchingProviders.Count > 1)
         {
-            throw new InvalidOperationException("There are no more TestRuntimeProviders to be provided");
+
+        }
+        var match = allMatchingProviders.FirstOrDefault();
+        if (match == null)
+        {
+            throw new InvalidOperationException("There is no FakeTestRuntimeProvider that would match the filter.");
         }
 
-        UsedTestRuntimeProviders.Add(next);
-        return next;
+        UsedTestRuntimeProviders.Add(new ActionRecord<FakeTestRuntimeProvider>(match));
+        return match;
     }
 
     public ITestRuntimeProvider GetTestHostManagerByUri(string hostUri)

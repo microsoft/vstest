@@ -3,10 +3,12 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 
+using System.Collections.Generic;
+
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
 internal interface ITestRuntimeProviderManager
 {
-    ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration);
+    ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration, List<string> sources);
     ITestRuntimeProvider GetTestHostManagerByUri(string hostUri);
 }

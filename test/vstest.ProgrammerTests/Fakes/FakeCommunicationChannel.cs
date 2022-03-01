@@ -206,5 +206,10 @@ internal class FakeCommunicationChannel<TContext> : FakeCommunicationChannel, IC
             }
         }
     }
+
+    public override string? ToString()
+    {
+        return NextResponses.Peek()?.ToString();
+    }
 }
 

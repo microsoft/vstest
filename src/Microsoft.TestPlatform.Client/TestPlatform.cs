@@ -124,7 +124,8 @@ internal class TestPlatform : ITestPlatform
     public bool StartTestSession(
         IRequestData requestData,
         StartTestSessionCriteria testSessionCriteria!!,
-        ITestSessionEventsHandler eventsHandler)
+        ITestSessionEventsHandler eventsHandler,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
         RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testSessionCriteria.RunSettings);
         TestAdapterLoadingStrategy strategy = runConfiguration.TestAdapterLoadingStrategy;
@@ -136,8 +137,6 @@ internal class TestPlatform : ITestPlatform
             return false;
         }
 
-        // REVIEW: TODO: NOMERGE: figure out the details of each source
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap = new();
         IProxyTestSessionManager testSessionManager = TestEngine.GetTestSessionManager(requestData, testSessionCriteria, sourceToSourceDetailMap);
         if (testSessionManager == null)
         {

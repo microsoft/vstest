@@ -86,4 +86,14 @@ internal class FakeProcess
             ExitCallback(this);
         }
     }
+
+    public override string ToString()
+    {
+        var state = !Started
+            ? "not started"
+            : !Exited
+                ? "running"
+                : "exited";
+        return $"{(Id != default ? Id : "<no id>")} {Name ?? "<no name>"} {state}";
+    }
 }

@@ -6,7 +6,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -23,15 +22,15 @@ using ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using ObjectModel.Engine;
 using ObjectModel.Logging;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
 
 /// <summary>
 /// ParallelProxyExecutionManager that manages parallel execution
 /// </summary>
-internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyExecutionManager, ITestRunEventsHandler, SourceDetail>, IParallelProxyExecutionManager
+internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
 {
     private readonly IDataSerializer _dataSerializer;
-    private readonly Dictionary<string, SourceDetail> _sourceToSourceDetailMap;
+    private readonly ParallelOperationManager<IProxyExecutionManager, ITestRunEventsHandler, TestRunCriteria> _parallelOperationManager;
+    private readonly Dictionary<string, TestRuntimeProviderInfo> _sourceToTestHostProviderMap;
 
     #region TestRunSpecificData
 
@@ -40,17 +39,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
 
     private int _runCompletedClients;
     private int _runStartedClients;
-    private int _availableTestSources = -1;
-
-    private TestRunCriteria _actualTestRunCriteria;
-
-    private IEnumerator<string> _sourceEnumerator;
-
-    private IEnumerator _testCaseListEnumerator;
-
-    private bool _hasSpecificTestsRun;
-
-    private ITestRunEventsHandler _currentRunEventsHandler;
+    private int _availableWorkloads = -1;
 
     private ParallelRunDataAggregator _currentRunDataAggregator;
 
@@ -71,97 +60,73 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
 
     #endregion
 
-    public ParallelProxyExecutionManager(IRequestData requestData, Func<SourceDetail, IProxyExecutionManager> actualProxyManagerCreator, int parallelLevel, Dictionary<string, SourceDetail> sourceToSourceDetailMap)
-        : this(requestData, actualProxyManagerCreator, JsonDataSerializer.Instance, parallelLevel, sourceToSourceDetailMap)
+    public ParallelProxyExecutionManager(
+        IRequestData requestData,
+        Func<TestRuntimeProviderInfo, IProxyExecutionManager> actualProxyManagerCreator,
+        int parallelLevel,
+         List<TestRuntimeProviderInfo> testHostProviders)
+        : this(requestData, actualProxyManagerCreator, JsonDataSerializer.Instance, parallelLevel, testHostProviders)
     {
     }
 
-    internal ParallelProxyExecutionManager(IRequestData requestData, Func<SourceDetail, IProxyExecutionManager> actualProxyManagerCreator, IDataSerializer dataSerializer, int parallelLevel, Dictionary<string, SourceDetail> sourceToSourceDetailMap)
-        : base(actualProxyManagerCreator, parallelLevel)
+    internal ParallelProxyExecutionManager(
+        IRequestData requestData,
+        Func<TestRuntimeProviderInfo, IProxyExecutionManager> actualProxyManagerCreator,
+        IDataSerializer dataSerializer,
+        int parallelLevel,
+        List<TestRuntimeProviderInfo> testHostProviders)
     {
         _requestData = requestData;
         _dataSerializer = dataSerializer;
-        _sourceToSourceDetailMap = sourceToSourceDetailMap;
+        _parallelOperationManager = new(actualProxyManagerCreator, parallelLevel);
+        _sourceToTestHostProviderMap = testHostProviders
+            .SelectMany(provider => provider.SourceDetails.Select(s => new KeyValuePair<string, TestRuntimeProviderInfo>(s.Source, provider)))
+            .ToDictionary(pair => pair.Key, pair => pair.Value);
     }
-
-    #region IProxyExecutionManager
 
     public void Initialize(bool skipDefaultAdapters)
     {
         _skipDefaultAdapters = skipDefaultAdapters;
-        // base class does not create any manager just save the info
     }
 
     public int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
     {
-        _hasSpecificTestsRun = testRunCriteria.HasSpecificTests;
-        _actualTestRunCriteria = testRunCriteria;
+        var workloads = SplitToWorkloads(testRunCriteria, _sourceToTestHostProviderMap);
+        _availableWorkloads = workloads.Count;
 
-        if (_hasSpecificTestsRun)
-        {
-            var testCasesBySource = new Dictionary<string, List<TestCase>>();
-            foreach (var test in testRunCriteria.Tests)
-            {
-                if (!testCasesBySource.ContainsKey(test.Source))
-                {
-                    testCasesBySource.Add(test.Source, new List<TestCase>());
-                }
+        EqtTrace.Verbose("ParallelProxyExecutionManager: Start execution. Total sources: " + _availableWorkloads);
 
-                testCasesBySource[test.Source].Add(test);
-            }
+        // Reset the run complete data
+        _runCompletedClients = 0;
 
-            // Do not use "Dictionary.ValueCollection.Enumerator" - it becomes nondeterministic once we go out of scope of this method
-            // Use "ToArray" to copy ValueColleciton to a simple array and use it's enumerator
-            // Set the enumerator for parallel yielding of testCases
-            // Whenever a concurrent executor becomes free, it picks up the next set of testCases using this enumerator
-            var testCaseLists = testCasesBySource.Values.ToArray();
-            _testCaseListEnumerator = testCaseLists.GetEnumerator();
-            _availableTestSources = testCaseLists.Length;
-        }
-        else
-        {
-            // Set the enumerator for parallel yielding of sources
-            // Whenever a concurrent executor becomes free, it picks up the next source using this enumerator
-            _sourceEnumerator = testRunCriteria.Sources.GetEnumerator();
-            _availableTestSources = testRunCriteria.Sources.Count();
-        }
+        // One data aggregator per parallel run
+        _currentRunDataAggregator = new ParallelRunDataAggregator(testRunCriteria.TestRunSettings);
 
-        EqtTrace.Verbose("ParallelProxyExecutionManager: Start execution. Total sources: " + _availableTestSources);
+        _parallelOperationManager.StartWork(workloads, eventHandler, GetParallelEventHandler, StartTestRunOnConcurrentManager);
 
-        return StartTestRunPrivate(eventHandler);
+        // Why 1? Because this is supposed to be a processId, and that is just the default that was chosen by someone before me,
+        // and maybe is checked somewhere, but I don't see it checked in our codebase.
+        return 1;
     }
 
     public void Abort(ITestRunEventsHandler runEventsHandler)
     {
         // Test platform initiated abort.
         _abortRequested = true;
-        DoActionOnAllManagers((proxyManager) => proxyManager.Abort(runEventsHandler), doActionsInParallel: true);
+        _parallelOperationManager.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(runEventsHandler), doActionsInParallel: true);
     }
 
     public void Cancel(ITestRunEventsHandler runEventsHandler)
     {
-        DoActionOnAllManagers((proxyManager) => proxyManager.Cancel(runEventsHandler), doActionsInParallel: true);
+        _parallelOperationManager.DoActionOnAllManagers((proxyManager) => proxyManager.Cancel(runEventsHandler), doActionsInParallel: true);
     }
 
     public void Close()
     {
-        DoActionOnAllManagers(proxyManager => proxyManager.Close(), doActionsInParallel: true);
+        _parallelOperationManager.DoActionOnAllManagers(proxyManager => proxyManager.Close(), doActionsInParallel: true);
     }
 
-    #endregion
-
-    #region IParallelProxyExecutionManager methods
-
-    /// <summary>
-    /// Handles Partial Run Complete event coming from a specific concurrent proxy execution manager
-    /// Each concurrent proxy execution manager will signal the parallel execution manager when its complete
-    /// </summary>
-    /// <param name="proxyExecutionManager">Concurrent Execution manager that completed the run</param>
-    /// <param name="testRunCompleteArgs">RunCompleteArgs for the concurrent run</param>
-    /// <param name="lastChunkArgs">LastChunk testresults for the concurrent run</param>
-    /// <param name="runContextAttachments">RunAttachments for the concurrent run</param>
-    /// <param name="executorUris">ExecutorURIs of the adapters involved in executing the tests</param>
-    /// <returns>True if parallel run is complete</returns>
+    /// <inheritdoc/>
     public bool HandlePartialRunComplete(
         IProxyExecutionManager proxyExecutionManager,
         TestRunCompleteEventArgs testRunCompleteArgs,
@@ -179,169 +144,127 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
 
             allRunsCompleted = testRunCompleteArgs.IsCanceled || _abortRequested
                 ? _runCompletedClients == _runStartedClients
-                : _runCompletedClients == _availableTestSources;
+                : _runCompletedClients == _availableWorkloads;
 
             EqtTrace.Verbose("ParallelProxyExecutionManager: HandlePartialRunComplete: Total completed clients = {0}, Run complete = {1}, Run canceled: {2}.", _runCompletedClients, allRunsCompleted, testRunCompleteArgs.IsCanceled);
         }
 
-        // verify that all executors are done with the execution and there are no more sources/testcases to execute
         if (allRunsCompleted)
         {
-            // Reset enumerators
-            _sourceEnumerator = null;
-            _testCaseListEnumerator = null;
-
-            _currentRunDataAggregator = null;
-            _currentRunEventsHandler = null;
-
-            // Dispose concurrent executors
-            // Do not do the cleanup task in the current thread as we will unnecessarily add to execution time
-            UpdateParallelLevel(0);
-
+            _parallelOperationManager.StopAllManagers();
             return true;
         }
 
-        var SharedHosts = false;
-        EqtTrace.Verbose("ParallelProxyExecutionManager: HandlePartialRunComplete: Replace execution manager. Shared: {0}, Aborted: {1}.", SharedHosts, testRunCompleteArgs.IsAborted);
-        // TODO: this should not always happen, this should happen only if we are going to the next non-shared host, but is has been like this forever, so be cautions when changing it.
-        // Maybe it is not as safe to re-use host for execution.
-        RemoveManager(proxyExecutionManager);
-
-        TestRunCriteria testRunCriteria = null;
-        string source = null;
-        if (!_hasSpecificTestsRun)
-        {
-            if (TryFetchNextSource(_sourceEnumerator, out source))
-            {
-                EqtTrace.Info("ProxyParallelExecutionManager: Triggering test run for next source: {0}", source);
-                testRunCriteria = new TestRunCriteria(new[] { source }, _actualTestRunCriteria);
-            }
-        }
-        else
-        {
-            if (TryFetchNextSource(_testCaseListEnumerator, out List<TestCase> nextSetOfTests))
-            {
-                // TODO: How could this not have a value? None of the code I found should actually fail when this is null.
-                // We will just mix results from multiple sources. But I doubt we would get here if we had a testcase without path.
-                source = nextSetOfTests?.FirstOrDefault()?.Source;
-                EqtTrace.Info("ProxyParallelExecutionManager: Triggering test run for next source: {0}", source);
-                testRunCriteria = new TestRunCriteria(nextSetOfTests, _actualTestRunCriteria);
-            }
-        }
-
-        if (testRunCriteria == null)
-        {
-            // We most likely have nothing to run, but let's still return false. This way we let the logic on the top
-            // of this method to decide if we are done with the run or not.
-            return false;
-        }
-
-        // We have something more to run.
-        var sourceDetail = _sourceToSourceDetailMap[source];
-        proxyExecutionManager = CreateNewConcurrentManager(sourceDetail);
-        var parallelEventsHandler = GetEventsHandler(proxyExecutionManager);
-        AddManager(proxyExecutionManager, parallelEventsHandler);
-
         // If cancel is triggered for any one run or abort is requested by test platform, there is no reason to fetch next source
-        // and queue another test run
+        // and queue another test run.
         if (!testRunCompleteArgs.IsCanceled && !_abortRequested)
         {
-            StartTestRunOnConcurrentManager(proxyExecutionManager, testRunCriteria);
+            var hadMoreWork = _parallelOperationManager.RunNextWork(proxyExecutionManager);
+            if (!hadMoreWork)
+            {
+                return true;
+            }
         }
 
         return false;
     }
 
-    #endregion
-
-    private int StartTestRunPrivate(ITestRunEventsHandler runEventsHandler)
+    /// <summary>
+    ///  Split the incoming work into smaller workloads that we can run on different testhosts.
+    ///  Each workload is associated with a type of provider that can run it.
+    /// </summary>
+    /// <param name="testRunCriteria"></param>
+    /// <param name="sourceToTestHostProviderMap"></param>
+    /// <returns></returns>
+    private List<ProviderSpecificWorkload<TestRunCriteria>> SplitToWorkloads(TestRunCriteria testRunCriteria, Dictionary<string, TestRuntimeProviderInfo> sourceToTestHostProviderMap)
     {
-        _currentRunEventsHandler = runEventsHandler;
-
-        // Reset the run complete data
-        _runCompletedClients = 0;
-
-        // One data aggregator per parallel run
-        _currentRunDataAggregator = new ParallelRunDataAggregator(_actualTestRunCriteria.TestRunSettings);
-
-        // Create as many handlers as we can, until we reach the max parallel level (this is number of logical processors, or the number of sources, or user
-        // preference. Originally this was done in the UpdateParallelLevel in base constructor, but we did not know which source will be the next there. So we could not
-        // start the manager specifically for the source with the correct tfm and platform.
-        var parallel = 0;
-        while (parallel < MaxParallelLevel)
+        // We split the work to workloads that will run on each testhost, we and add all of them
+        // to a bag of work that needs to be processed. (The workloads are just
+        // a single source, or all test cases for a given source.)
+        //
+        // For every workload we associated a given type of testhost that can run the work.
+        // This is important when we have shared testhosts. A shared testhost can re-use the same process
+        // to run more than one workload, as long as the provider is the same. 
+        //
+        // We then start as many instances of testhost as we are allowed by parallel level,
+        // and we start sending them work. Once any testhost is done processing a given workload,
+        // we will get notified with the completed event for the work we are doing. For example for StartTestRun
+        // we will get TestExecutionCompleted, and we will call HandlePartialTestExecutionComplete.
+        // (The "partial" here refers to posibly having more work in the work bag. It does not mean that
+        // there was an error in the testhost and we only did part of execution.).
+        //
+        // At that point we know that at least one testhost is not busy doing work anymore. It either
+        // processed the workload and waits for another one, or it maybe crashed and we should move to
+        // another source.
+        // 
+        // In the "partial" step we check if we have more workloads, and if the currently running testhost
+        // is shared we try to find a workload that is appropriate for it. If we don't find any work that the
+        // running testhost can do. Or if the testhost already exited (or maybe crashed), we start another one
+        // and give it the next workload.
+        List<ProviderSpecificWorkload<TestRunCriteria>> workloads = new();
+        if (testRunCriteria.HasSpecificTests)
         {
-            parallel++;
-            TestRunCriteria testRunCriteria = null;
-            string source = null;
-            if (!_hasSpecificTestsRun)
+            // We split test cases to their respective sources, and associate them with additional info about on
+            // which type of provider they can run so we can later select the correct workload for the provider
+            // if we already have a provider running, and it is shared.
+            var testCasesPerSource = testRunCriteria.Tests.GroupBy(t => t.Source);        
+            foreach (var group in testCasesPerSource)
             {
-                if (TryFetchNextSource(_sourceEnumerator, out source))
-                {
-                    EqtTrace.Info("ProxyParallelExecutionManager: Triggering test run for next source: {0}", source);
-                    var sourceDetail2 = _sourceToSourceDetailMap[source];
-                    var runSettingsXml = SourceDetailHelper.UpdateRunSettingsFromSourceDetail(_actualTestRunCriteria.TestRunSettings, sourceDetail2);
-
-                    // Copy the test run criteria, but use a single source, and updated runsettings.
-                    testRunCriteria = new TestRunCriteria(new[] { source }, // <-
-                        _actualTestRunCriteria.FrequencyOfRunStatsChangeEvent,
-                        _actualTestRunCriteria.KeepAlive,
-                        runSettingsXml, // <- 
-                        _actualTestRunCriteria.RunStatsChangeEventTimeout,
-                        _actualTestRunCriteria.TestHostLauncher,
-                        _actualTestRunCriteria.TestCaseFilter,
-                        _actualTestRunCriteria.FilterOptions,
-                        _actualTestRunCriteria.TestSessionInfo,
-                        _actualTestRunCriteria.DebugEnabledForTestSession);
-                }
-            }
-            else
-            {
-                if (TryFetchNextSource(_testCaseListEnumerator, out List<TestCase> nextSetOfTests))
-                {
-                    source = nextSetOfTests?.FirstOrDefault()?.Source;
-
-                    var sourceDetail2 = _sourceToSourceDetailMap[source];
-                    var runSettingsXml = SourceDetailHelper.UpdateRunSettingsFromSourceDetail(_actualTestRunCriteria.TestRunSettings, sourceDetail2);
-
-                    EqtTrace.Info("ProxyParallelExecutionManager: Triggering test run for next source: {0}", source);
-                    // Copy the test run criteria, but use the next set of tests, and updated runsettings.
-                    testRunCriteria = new TestRunCriteria(nextSetOfTests, // <-
-                        _actualTestRunCriteria.FrequencyOfRunStatsChangeEvent,
-                        _actualTestRunCriteria.KeepAlive,
-                        runSettingsXml, // <- 
-                        _actualTestRunCriteria.RunStatsChangeEventTimeout,
-                        _actualTestRunCriteria.TestHostLauncher,
-                        _actualTestRunCriteria.TestSessionInfo,
-                        _actualTestRunCriteria.DebugEnabledForTestSession);
-                }
+                var testHostProviderInfo = sourceToTestHostProviderMap[group.Key];
+                var runsettings = testHostProviderInfo.RunSettings;
+                var testCases = group.ToList();
+                var updatedCriteria = CreateTestRunCriteriaFromTestCasesAndSettings(testCases, testRunCriteria, runsettings);
+                var workload = new ProviderSpecificWorkload<TestRunCriteria>(updatedCriteria, testHostProviderInfo);
+                workloads.Add(workload);
             }
 
-            if (source == null)
+        }
+        else
+        {
+            // We associate every source with additional info about on which type of provider it can run so we can later
+            // select the correct workload for the provider if we already have a provider running, and it is shared.
+            foreach (var source in testRunCriteria.Sources)
             {
-                // Why 1? Because this is supposed to be a processId, and that is just the default that was chosen,
-                // and maybe is checked somewhere, but I don't see it checked in our codebase.
-                return 1;
+                var testHostProviderInfo = sourceToTestHostProviderMap[source];
+                var runsettings = testHostProviderInfo.RunSettings;
+                var updatedCriteria = CreateTestRunCriteriaFromSourceAndSettings(new[] { source }, testRunCriteria, runsettings);
+                var workload = new ProviderSpecificWorkload<TestRunCriteria>(updatedCriteria, testHostProviderInfo);
+                workloads.Add(workload);
             }
-
-            var sourceDetail = _sourceToSourceDetailMap[source];
-            var concurrentManager = CreateNewConcurrentManager(sourceDetail);
-
-
-            var parallelEventsHandler = GetEventsHandler(concurrentManager);
-            UpdateHandlerForManager(concurrentManager, parallelEventsHandler);
-            if (!concurrentManager.IsInitialized)
-            {
-                concurrentManager.Initialize(_skipDefaultAdapters);
-            }
-            IsInitialized = true;
-
-            StartTestRunOnConcurrentManager(concurrentManager, testRunCriteria);
         }
 
-        return 1;
+        return workloads;
+
+        TestRunCriteria CreateTestRunCriteriaFromTestCasesAndSettings(IEnumerable<TestCase> testCases, TestRunCriteria criteria, string runsettingsXml)
+        {
+           return new TestRunCriteria(
+                testCases,
+                testRunCriteria.FrequencyOfRunStatsChangeEvent,
+                testRunCriteria.KeepAlive,
+                runsettingsXml,
+                testRunCriteria.RunStatsChangeEventTimeout,
+                testRunCriteria.TestHostLauncher,
+                testRunCriteria.TestSessionInfo,
+                testRunCriteria.DebugEnabledForTestSession);
+        }
+
+        TestRunCriteria CreateTestRunCriteriaFromSourceAndSettings(IEnumerable<string> sources, TestRunCriteria criteria, string runsettingsXml)
+        {
+            return new TestRunCriteria(
+                 sources,
+                 testRunCriteria.FrequencyOfRunStatsChangeEvent,
+                 testRunCriteria.KeepAlive,
+                 runsettingsXml,
+                 testRunCriteria.RunStatsChangeEventTimeout,
+                 testRunCriteria.TestHostLauncher,
+                 testRunCriteria.TestCaseFilter,
+                 testRunCriteria.FilterOptions,
+                 testRunCriteria.TestSessionInfo,
+                 testRunCriteria.DebugEnabledForTestSession);
+        }
     }
 
-    private ParallelRunEventsHandler GetEventsHandler(IProxyExecutionManager concurrentManager)
+    private ParallelRunEventsHandler GetParallelEventHandler(ITestRunEventsHandler eventHandler, IProxyExecutionManager concurrentManager)
     {
         if (concurrentManager is ProxyExecutionManagerWithDataCollection)
         {
@@ -351,7 +274,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
             return new ParallelDataCollectionEventsHandler(
                 _requestData,
                 concurrentManagerWithDataCollection,
-                _currentRunEventsHandler,
+                eventHandler,
                 this,
                 _currentRunDataAggregator,
                 attachmentsProcessingManager,
@@ -361,7 +284,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
         return new ParallelRunEventsHandler(
             _requestData,
             concurrentManager,
-            _currentRunEventsHandler,
+            eventHandler,
             this,
             _currentRunDataAggregator);
     }
@@ -372,7 +295,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
     /// </summary>
     /// <param name="proxyExecutionManager">Proxy execution manager instance.</param>
     /// <returns>True, if execution triggered</returns>
-    private void StartTestRunOnConcurrentManager(IProxyExecutionManager proxyExecutionManager, TestRunCriteria testRunCriteria)
+    private void StartTestRunOnConcurrentManager(IProxyExecutionManager proxyExecutionManager, ITestRunEventsHandler eventHandler, TestRunCriteria testRunCriteria)
     {
         if (testRunCriteria != null)
         {
@@ -386,7 +309,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
                     Interlocked.Increment(ref _runStartedClients);
                     EqtTrace.Verbose("ParallelProxyExecutionManager: Execution started. Started clients: " + _runStartedClients);
 
-                    proxyExecutionManager.StartTestRun(testRunCriteria, GetHandlerForGivenManager(proxyExecutionManager));
+                    proxyExecutionManager.StartTestRun(testRunCriteria, eventHandler);
                 })
                 .ContinueWith(t =>
                     {
@@ -395,7 +318,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
                         // execution will not terminate
                         EqtTrace.Error("ParallelProxyExecutionManager: Failed to trigger execution. Exception: " + t.Exception);
 
-                        var handler = GetHandlerForGivenManager(proxyExecutionManager);
+                        var handler = eventHandler;
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
                         handler.HandleRawMessage(_dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
                         handler.HandleLogMessage(TestMessageLevel.Error, t.Exception.ToString());
@@ -413,4 +336,29 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
 
         EqtTrace.Verbose("ProxyParallelExecutionManager: No sources available for execution.");
     }
+}
+
+/// <summary>
+/// A workload with a specification of a provider that can run that workload. The workload is a list of sources,
+/// or a list of testcases. Provider is a given testhost manager, that is capable of running this workload, so
+/// we end up running .NET sources on .NET testhost, and .NET Framework sources on .NET Framework provider.
+/// </summary>
+internal class ProviderSpecificWorkload<T> : ProviderSpecificWorkload
+{
+    public T Work { get; }
+
+    public ProviderSpecificWorkload(T work, TestRuntimeProviderInfo provider)
+    {
+        Provider = provider;
+        Work = work;
+    }
+}
+
+/// <summary>
+/// A "marker" for ProviderSpecificWorkload of T, so we can have a collection that either holds test cases,
+/// or just sources and still know which provider they require.
+/// </summary>
+internal abstract class ProviderSpecificWorkload
+{
+    public TestRuntimeProviderInfo Provider { get; protected set; }
 }

@@ -1,82 +1,151 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+
 using ObjectModel;
-using ObjectModel.Engine;
 
 /// <summary>
-/// Common parallel manager functionality.
+/// Manages work that is done on multiple testhosts in parallel.
 /// </summary>
-internal abstract class ParallelOperationManager<TParallelManager, TEventHandler, TCreationContext> : IParallelOperationManager, IDisposable
+internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkload> : IDisposable
 {
-    #region ConcurrentManagerInstanceData
-
-    protected Func<TCreationContext, TParallelManager> CreateNewConcurrentManager { get; }
+    private readonly Func<TestRuntimeProviderInfo, TManager> _createNewManager;
+    private readonly int _maxParallelLevel;
 
     /// <summary>
     /// Holds all active managers, so we can do actions on all of them, like initialize, run, cancel or close.
     /// </summary>
     // TODO: make this ConcurrentDictionary and use it's concurrent api, if we have the need.
-    private readonly IDictionary<TParallelManager, TEventHandler> _concurrentManagerHandlerMap = new ConcurrentDictionary<TParallelManager, TEventHandler>();
-
-    /// <summary>
-    /// Singleton Instance of this class
-    /// </summary>
-    protected static TParallelManager s_instance;
+    private readonly IDictionary<TManager, TEventHandler> _managerToEventHandlerMap = new ConcurrentDictionary<TManager, TEventHandler>();
 
     /// <summary>
     /// Default number of Processes
     /// </summary>
-    private int _currentParallelLevel;
+    private TEventHandler _eventHandler;
+    private Func<TEventHandler, TManager, TEventHandler> _getEventHandler;
+    private Action<TManager, TEventHandler, TWorkload> _runWorkload;
+    private readonly List<ProviderSpecificWorkload<TWorkload>> _workloads = new();
+    private readonly List<Slot> _managerSlots = new();
 
-    protected int MaxParallelLevel { get; private set; }
+    private readonly object _lock = new();
 
-    #endregion
-
-    #region Concurrency Keeper Objects
-
-    /// <summary>
-    /// LockObject to iterate our sourceEnumerator in parallel
-    /// We can use the sourceEnumerator itself as lockObject, but since its a changing object - it's risky to use it as one
-    /// </summary>
-    protected object _sourceEnumeratorLockObject = new();
-
-    #endregion
-
-    protected ParallelOperationManager(Func<TCreationContext, TParallelManager> createNewManager, int parallelLevel)
+    public ParallelOperationManager(Func<TestRuntimeProviderInfo, TManager> createNewManager, int parallelLevel)
     {
-        CreateNewConcurrentManager = createNewManager;
+        _createNewManager = createNewManager;
+        _maxParallelLevel = parallelLevel;
+        ClearSlots();
+    }
 
-        // Update Parallel Level
-        // REVIEW: this "pre-starts" testhosts so we have a pool of them, this is the reason the number or
-        // parallel hosts is capped to the amount of sources so we don't "pre-start" too many of them
-        // instead we should take each source, look if it can be run by shared host, and if so try to
-        // grab a free host, run new one if we are below parallel level, or wait if we are at parallel
-        // level and everyone is busy if we have non-shared host we do just the two last options, run new
-        // one if current count is under parallel level, or wait till we can run new one.
-        // this.UpdateParallelLevel(parallelLevel);
+    private void ClearSlots()
+    {
+        lock (_lock)
+        {
+            _managerSlots.Clear();
+            _managerSlots.AddRange(Enumerable.Range(0, _maxParallelLevel).Select(_ => new Slot()));
+        }
+    }
 
-        MaxParallelLevel = parallelLevel;
+    public void StartWork(
+        List<ProviderSpecificWorkload<TWorkload>> workloads!!,
+        TEventHandler eventHandler!!,
+        Func<TEventHandler, TManager, TEventHandler> getEventHandler!!,
+        Action<TManager, TEventHandler, TWorkload> runWorkload!!)
+    {
+        _eventHandler = eventHandler;
+        _getEventHandler = getEventHandler;
+        _runWorkload = runWorkload;
+
+        _workloads.AddRange(workloads);
+
+        lock (_lock)
+        {
+            ClearSlots();
+            RunWorkInParallel();
+        }
+    }
+
+    private bool RunWorkInParallel()
+    {
+        // TODO: Right now we don't re-use shared hosts, but if we did, this is the place
+        // where we should find a workload that fits the manager if any of them is shared.
+        // Or tear it down, and start a new one.
+
+        List<SlotWorkloadPair> workToRun = new();
+        lock (_lock)
+        {
+            if (_workloads.Count == 0)
+                return true;
+
+            var availableSlots = _managerSlots.Where(slot => slot.IsAvailable).ToList();
+            var availableWorkloads = _workloads.Where(workload => workload != null).ToList();
+            var amount = Math.Min(availableSlots.Count, availableWorkloads.Count);
+            var workloadsToRun = availableWorkloads.Take(amount).ToList();
+
+            for (int i = 0; i < amount; i++)
+            {
+                var slot = availableSlots[i];
+                slot.IsAvailable = false;
+                var workload = availableWorkloads[i];
+                workToRun.Add(new SlotWorkloadPair(slot, workload));
+                _workloads.Remove(workload);
+            }
+        }
+
+        foreach (var pair in workToRun)
+        {
+            try
+            {
+                var manager = _createNewManager(pair.Workload.Provider);
+                var eventHandler = _getEventHandler(_eventHandler, manager);
+                pair.Slot.EventHandler = eventHandler;
+                pair.Slot.Manager = manager;
+                pair.Slot.ManagerInfo = pair.Workload.Provider;
+                pair.Slot.Work = pair.Workload.Work;
+
+                _runWorkload(manager, eventHandler, pair.Workload.Work);
+            }
+            finally
+            {
+                // clean the slot or something, to make sure we don't keep it reserved.
+            }
+        }
+
+        return false;
+    }
+
+    public bool RunNextWork(TManager completedManager)
+    {
+        lock (_lock)
+        {
+            var completedSlot = _managerSlots.Where(s => ReferenceEquals(completedManager, s.Manager)).ToList();
+            if (!completedSlot.Any())
+            {
+                // yikes, we should have found it there
+            }
+
+            var slot = completedSlot.Single();
+            slot.IsAvailable = true;
+
+            return RunWorkInParallel();
+        }
     }
 
     /// <summary>
     /// Remove and dispose a manager from concurrent list of manager.
     /// </summary>
     /// <param name="manager">Manager to remove</param>
-    public void RemoveManager(TParallelManager manager)
+    public void RemoveManager(TManager manager)
     {
-        _concurrentManagerHandlerMap.Remove(manager);
+        _managerToEventHandlerMap.Remove(manager);
     }
 
     /// <summary>
@@ -84,130 +153,31 @@ internal abstract class ParallelOperationManager<TParallelManager, TEventHandler
     /// </summary>
     /// <param name="manager">Manager to add</param>
     /// <param name="handler">eventHandler of the manager</param>
-    public void AddManager(TParallelManager manager, TEventHandler handler)
+    public void AddManager(TManager manager, TEventHandler handler)
     {
-        _concurrentManagerHandlerMap.Add(manager, handler);
+        _managerToEventHandlerMap.Add(manager, handler);
     }
 
-    /// <summary>
-    /// Update event handler for the manager.
-    /// If it is a new manager, add this.
-    /// </summary>
-    /// <param name="manager">Manager to update</param>
-    /// <param name="handler">event handler to update for manager</param>
-    public void UpdateHandlerForManager(TParallelManager manager, TEventHandler handler)
+    public void DoActionOnAllManagers(Action<TManager> action, bool doActionsInParallel = false)
     {
-        if (_concurrentManagerHandlerMap.ContainsKey(manager))
-        {
-            _concurrentManagerHandlerMap[manager] = handler;
-        }
-        else
-        {
-            AddManager(manager, handler);
-        }
-    }
-
-    /// <summary>
-    /// Get the event handler associated with the manager.
-    /// </summary>
-    /// <param name="manager">Manager</param>
-    public TEventHandler GetHandlerForGivenManager(TParallelManager manager)
-    {
-        return _concurrentManagerHandlerMap[manager];
-    }
-
-    /// <summary>
-    /// Get total number of active concurrent manager
-    /// </summary>
-    public int GetConcurrentManagersCount()
-    {
-        return _concurrentManagerHandlerMap.Count;
-    }
-
-    /// <summary>
-    /// Get instances of all active concurrent manager
-    /// </summary>
-    public IEnumerable<TParallelManager> GetConcurrentManagerInstances()
-    {
-        return _concurrentManagerHandlerMap.Keys.ToList();
-    }
-
-
-    /// <summary>
-    /// Updates the Concurrent Executors according to new parallel setting
-    /// </summary>
-    /// <param name="newParallelLevel">Number of Parallel Executors allowed</param>
-    public void UpdateParallelLevel(int newParallelLevel)
-    {
-        if (_concurrentManagerHandlerMap == null)
-        {
-            throw new Exception("ParallelOperationManager.UpdateParallelLevel: This should not be used anymore, to pre-start hosts.");
-        }
-        else if (_currentParallelLevel != newParallelLevel)
-        {
-            // If number of concurrent clients is less than the new level
-            // Create more concurrent clients and update the list
-            if (_currentParallelLevel < newParallelLevel)
-            {
-                // This path does not even seem to be used anywhere.
-
-                throw new Exception("ParallelOperationManager.UpdateParallelLevel: This should not be used anymore, to ensure we add more hosts.");
-            }
-            else
-            {
-                // If number of concurrent clients is more than the new level
-                // Dispose off the extra ones
-                int managersCount = _currentParallelLevel - newParallelLevel;
-
-                foreach (var concurrentManager in GetConcurrentManagerInstances())
-                {
-                    if (managersCount == 0)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        RemoveManager(concurrentManager);
-                        managersCount--;
-                    }
-                }
-            }
-        }
-
-        // Update current parallel setting to new one
-        _currentParallelLevel = newParallelLevel;
-    }
-
-    public void Dispose()
-    {
-        if (_concurrentManagerHandlerMap != null)
-        {
-            foreach (var managerInstance in GetConcurrentManagerInstances())
-            {
-                RemoveManager(managerInstance);
-            }
-        }
-
-        s_instance = default;
-    }
-
-    protected void DoActionOnAllManagers(Action<TParallelManager> action, bool doActionsInParallel = false)
-    {
-        if (_concurrentManagerHandlerMap != null && _concurrentManagerHandlerMap.Count > 0)
+        lock (_lock)
         {
             int i = 0;
-            var actionTasks = new Task[_concurrentManagerHandlerMap.Count];
-            foreach (var client in GetConcurrentManagerInstances())
+            var actionTasks = new Task[_managerToEventHandlerMap.Count];
+            foreach (var manager in _managerSlots.Select(s => s.Manager))
             {
+                if (manager == null)
+                    continue;
+
                 // Read the array before firing the task - beware of closures
                 if (doActionsInParallel)
                 {
-                    actionTasks[i] = Task.Run(() => action(client));
+                    actionTasks[i] = Task.Run(() => action(manager));
                     i++;
                 }
                 else
                 {
-                    DoManagerAction(() => action(client));
+                    DoManagerAction(() => action(manager));
                 }
             }
 
@@ -216,6 +186,7 @@ internal abstract class ParallelOperationManager<TParallelManager, TEventHandler
                 DoManagerAction(() => Task.WaitAll(actionTasks));
             }
         }
+
     }
 
     private void DoManagerAction(Action action)
@@ -233,25 +204,37 @@ internal abstract class ParallelOperationManager<TParallelManager, TEventHandler
         }
     }
 
-    /// <summary>
-    /// Fetches the next data object for the concurrent executor to work on
-    /// </summary>
-    /// <param name="source">source data to work on - source file or testCaseList</param>
-    /// <returns>True, if data exists. False otherwise</returns>
-    protected bool TryFetchNextSource<TSource>(IEnumerator enumerator, out TSource source)
+    internal void StopAllManagers()
     {
-        // TODO: If only something like a concurrent queue existed.
-        source = default;
-        var hasNext = false;
-        lock (_sourceEnumeratorLockObject)
-        {
-            if (enumerator != null && enumerator.MoveNext())
-            {
-                source = (TSource)enumerator.Current;
-                hasNext = source != null;
-            }
-        }
+        ClearSlots();
+    }
 
-        return hasNext;
+    public void Dispose()
+    {
+        ClearSlots();
+    }
+
+    private class Slot
+    {
+        public bool IsAvailable { get; set; } = true;
+
+        public TManager? Manager { get; set; }
+
+        public TestRuntimeProviderInfo? ManagerInfo { get; set; }
+
+        public TEventHandler? EventHandler { get; set; }
+
+        public TWorkload? Work { get; set; }
+    }
+
+    private class SlotWorkloadPair
+    {
+        public SlotWorkloadPair(Slot slot, ProviderSpecificWorkload<TWorkload> workload)
+        {
+            Slot = slot;
+            Workload = workload;
+        }
+        public Slot Slot { get; }
+        public ProviderSpecificWorkload<TWorkload> Workload { get; }
     }
 }

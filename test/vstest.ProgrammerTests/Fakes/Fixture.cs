@@ -42,7 +42,7 @@ internal class Fixture : IDisposable
     public List<TestResult> ExecutedTests => TestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults).ToList();
     public List<TestCase> DiscoveredTests => TestDiscoveryEventsRegistrar.DiscoveredTestsEvents.SelectMany(er => er.Data.DiscoveredTestCases).ToList();
 
-    public ITestSessionEventsHandler TestSessionEventsHandler { get; }
+    public FakeTestSessionEventsHandler TestSessionEventsHandler { get; }
 
     public Fixture(FixtureOptions? fixtureOptions = null)
     {

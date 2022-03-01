@@ -10,6 +10,8 @@ using System;
 using Logging;
 using ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using System.Collections.Generic;
 
 /// <summary>
 /// Responsible for managing TestRuntimeProviderManager extensions
@@ -44,7 +46,7 @@ public class TestRuntimeProviderManager : ITestRuntimeProviderManager
         return host?.Value;
     }
 
-    public virtual ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration)
+    public virtual ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration, List<string> _)
     {
         foreach (var testExtension in _testHostExtensionManager.TestExtensions)
         {

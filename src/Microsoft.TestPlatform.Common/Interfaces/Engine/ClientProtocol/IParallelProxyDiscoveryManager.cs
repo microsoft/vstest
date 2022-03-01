@@ -10,7 +10,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Interface defining the parallel discovery manager
 /// </summary>
-public interface IParallelProxyDiscoveryManager : IParallelOperationManager, IProxyDiscoveryManager
+public interface IParallelProxyDiscoveryManager : IProxyDiscoveryManager
 {
     /// <summary>
     /// Indicates if user requested an abortion

@@ -5,7 +5,6 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System;
