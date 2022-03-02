@@ -5,8 +5,6 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;

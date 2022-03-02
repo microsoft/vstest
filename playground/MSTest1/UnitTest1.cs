@@ -6,9 +6,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 #nullable disable
 
 namespace MSTest1;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 [TestClass]
 public class UnitTest1
 {

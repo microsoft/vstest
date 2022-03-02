@@ -197,3 +197,5 @@ static Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resour
 static Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources.ResourceManager.get -> System.Resources.ResourceManager
 static Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources.VsTestProcessExitedAbnormally.get -> string
 virtual Microsoft.TestPlatform.VsTestConsole.TranslationLayer.TestSession.Dispose(bool disposing) -> void
+Microsoft.TestPlatform.VsTestConsole.TranslationLayer.ConsoleParameters.EnvironmentVariables.get -> System.Collections.Generic.Dictionary<string, string>
+Microsoft.TestPlatform.VsTestConsole.TranslationLayer.ConsoleParameters.EnvironmentVariables.set -> void

@@ -175,8 +175,6 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol.TestExecut
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol.TestExecutionContext.TestExecutionContext(long frequencyOfRunStatsChangeEvent, System.TimeSpan runStatsChangeEventTimeout, bool inIsolation, bool keepAlive, bool isDataCollectionEnabled, bool areTestCaseLevelEventsRequired, bool hasTestRun, bool isDebug, string testCaseFilter, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.FilterOptions filterOptions) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol.TestExecutionContext.TestRunConfiguration.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol.TestExecutionContext.TestRunConfiguration.set -> void
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IParallelOperationManager
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IParallelOperationManager.UpdateParallelLevel(int parallelLevel) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IParallelProxyDiscoveryManager
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IParallelProxyDiscoveryManager.HandlePartialDiscoveryComplete(Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IProxyDiscoveryManager proxyDiscoveryManager, long totalTests, System.Collections.Generic.IEnumerable<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase> lastChunk, bool isAborted) -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IParallelProxyExecutionManager
@@ -201,11 +199,8 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestCaseEventsHandler.Se
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestCaseEventsHandler.SendTestCaseStart(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase testCase) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestCaseEventsHandler.SendTestResult(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult result) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestEngine
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestEngine.GetDiscoveryManager(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Host.ITestRuntimeProvider testHostManager, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria discoveryCriteria) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IProxyDiscoveryManager
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestEngine.GetExecutionManager(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Host.ITestRuntimeProvider testHostManager, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCriteria testRunCriteria) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IProxyExecutionManager
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestEngine.GetExtensionManager() -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestExtensionManager
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestEngine.GetLoggerManager(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestLoggerManager
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestEngine.GetTestSessionManager(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StartTestSessionCriteria testSessionCriteria) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IProxyTestSessionManager
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestExtensionManager
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestExtensionManager.ClearExtensions() -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ITestExtensionManager.UseAdditionalExtensions(System.Collections.Generic.IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters) -> void
@@ -295,4 +290,3 @@ static Microsoft.VisualStudio.TestPlatform.Common.Utilities.RunSettingsUtilities
 virtual Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.TestPluginCache.GetFilteredExtensions(System.Collections.Generic.List<string> extensions, string endsWithPattern) -> System.Collections.Generic.IEnumerable<string>
 virtual Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities.TestPluginInformation.IdentifierData.get -> string
 virtual Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities.TestPluginInformation.Metadata.get -> System.Collections.Generic.ICollection<object>
-virtual Microsoft.VisualStudio.TestPlatform.Common.Hosting.TestRuntimeProviderManager.GetTestHostManagerByRunConfiguration(string runConfiguration) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Host.ITestRuntimeProvider

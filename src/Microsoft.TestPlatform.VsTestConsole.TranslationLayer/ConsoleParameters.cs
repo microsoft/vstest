@@ -1,9 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if NETFRAMEWORK
 using System.Collections.Generic;
-#endif
 using System.Diagnostics;
 using System.IO;
 
@@ -41,15 +39,10 @@ public class ConsoleParameters
         _fileHelper = fileHelper;
     }
 
-#if NETFRAMEWORK
-
     /// <summary>
-    /// TODO: Remove the #if when project is targeted to netstandard2.0
     /// Environment variables to be set for the process
     /// </summary>
     public Dictionary<string, string> EnvironmentVariables { get; set; }
-
-#endif
 
     /// <summary>
     /// Trace level for logs.

@@ -535,7 +535,11 @@ public class IntegrationTestBase
             throw new FileNotFoundException($"File '{dotnetPath}' was not found.");
         }
 
-        var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath });
+        var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters()
+        {
+            LogFilePath = logFilePath,
+            EnvironmentVariables = new Dictionary<string, string> { ["VSTEST_RUNNER_DEBUG_ATTACHVS"] = "1" }
+        });
         vstestConsoleWrapper.StartSession();
 
         return vstestConsoleWrapper;
