@@ -25,7 +25,6 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System.Text;
-using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 
 #nullable disable
 
@@ -404,7 +403,7 @@ public class TestEngine : ITestEngine
             testRuntimeProviders.Add(testRuntimeProviderInfo);
         }
 
-        ThrowExceptionIfAnyTestHostManagerIsNull(testRuntimeProviders);
+        ThrowExceptionIfAnyTestHostManagerIsNullOrNoneAreFound(testRuntimeProviders);
         return testRuntimeProviders;
     }
 
@@ -585,8 +584,11 @@ public class TestEngine : ITestEngine
         }
     }
 
-    private static void ThrowExceptionIfAnyTestHostManagerIsNull(List<TestRuntimeProviderInfo> testRuntimeProviders)
+    private static void ThrowExceptionIfAnyTestHostManagerIsNullOrNoneAreFound(List<TestRuntimeProviderInfo> testRuntimeProviders)
     {
+        if (!testRuntimeProviders.Any())
+            throw new ArgumentException(null, nameof(testRuntimeProviders));
+
         var missingRuntimeProviders = testRuntimeProviders.Where(p => p.Type == null);
         if (missingRuntimeProviders.Any())
         {
@@ -594,7 +596,7 @@ public class TestEngine : ITestEngine
             stringBuilder.AppendLine(string.Format(CultureInfo.CurrentCulture, Resources.Resources.NoTestHostProviderFound));
             foreach (var missingRuntimeProvider in missingRuntimeProviders)
             {
-                EqtTrace.Error($"{nameof(TestEngine)}.{nameof(ThrowExceptionIfAnyTestHostManagerIsNull)}: No suitable testHostProvider found for sources {missingRuntimeProvider.SourceDetails.Select(s => s.Source)} and runsettings: {missingRuntimeProvider.RunSettings}");
+                EqtTrace.Error($"{nameof(TestEngine)}.{nameof(ThrowExceptionIfAnyTestHostManagerIsNullOrNoneAreFound)}: No suitable testHostProvider found for sources {missingRuntimeProvider.SourceDetails.Select(s => s.Source)} and runsettings: {missingRuntimeProvider.RunSettings}");
                 missingRuntimeProvider.SourceDetails.ForEach(detail => stringBuilder.AppendLine(detail.Source));
             }
 

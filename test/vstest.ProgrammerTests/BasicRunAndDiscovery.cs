@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace vstest.ProgrammerTests;
 
 using FluentAssertions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -10,9 +9,10 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using vstest.ProgrammerTests.Fakes;
 using Intent;
 
+namespace vstest.ProgrammerTests;
+
 // Tests are run by Intent library that is executed from our Program.Main. To debug press F5 in VS, and maybe mark just a single test with [Only].
 // To just run, press Ctrl+F5 to run without debugging. It will use short timeout for abort in case something is wrong with your test.
-
 
 public class BasicRunAndDiscovery
 {

@@ -228,8 +228,8 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestMessageEventHandler.
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestMessageEventHandler.HandleRawMessage(string rawMessage) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.ClearExtensions() -> void
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.CreateDiscoveryRequest(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria discoveryCriteria, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestPlatformOptions options) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IDiscoveryRequest
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.CreateTestRunRequest(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCriteria testRunCriteria, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestPlatformOptions options) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunRequest
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.CreateDiscoveryRequest(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria discoveryCriteria, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestPlatformOptions options, System.Collections.Generic.Dictionary<string, Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail> sourceToSourceDetailMap) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IDiscoveryRequest
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.CreateTestRunRequest(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCriteria testRunCriteria, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestPlatformOptions options, System.Collections.Generic.Dictionary<string, Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail> sourceToSourceDetailMap) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunRequest
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.UpdateExtensions(System.Collections.Generic.IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatformCapabilities
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatformCapabilities.TestPlatformType.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestPlatformType
@@ -881,3 +881,8 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.Uri.get -> 
 override Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.Equals(object obj) -> bool
 override Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.GetHashCode() -> int
 override Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.ToString() -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail
+Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.Architecture.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture
+Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.Framework.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Framework
+Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.Source.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.SourceDetail() -> void

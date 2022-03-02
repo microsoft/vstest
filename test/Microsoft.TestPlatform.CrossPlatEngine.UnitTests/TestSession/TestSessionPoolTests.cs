@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -26,7 +27,8 @@ public class TestSessionPoolTests
         var proxyTestSessionManager = new ProxyTestSessionManager(
             new StartTestSessionCriteria(),
             1,
-            () => null);
+            _ => null,
+            new List<TestRuntimeProviderInfo>());
 
         Assert.IsTrue(TestSessionPool.Instance.AddSession(testSessionInfo, proxyTestSessionManager));
         Assert.IsFalse(TestSessionPool.Instance.AddSession(testSessionInfo, proxyTestSessionManager));
@@ -41,7 +43,8 @@ public class TestSessionPoolTests
         var mockProxyTestSessionManager = new Mock<ProxyTestSessionManager>(
             new StartTestSessionCriteria(),
             1,
-            (Func<ProxyOperationManager>)(() => null));
+            (Func<TestRuntimeProviderInfo, ProxyOperationManager>)(_ => null),
+            new List<TestRuntimeProviderInfo>());
         var mockRequestData = new Mock<IRequestData>();
 
         mockProxyTestSessionManager.SetupSequence(tsm => tsm.StopSession(It.IsAny<IRequestData>()))
@@ -69,7 +72,8 @@ public class TestSessionPoolTests
         var mockProxyTestSessionManager = new Mock<ProxyTestSessionManager>(
             new StartTestSessionCriteria(),
             1,
-            (Func<ProxyOperationManager>)(() => null));
+            (Func<TestRuntimeProviderInfo, ProxyOperationManager>)(_ => null),
+            new List<TestRuntimeProviderInfo>());
 
         mockProxyTestSessionManager.SetupSequence(tsm => tsm.DequeueProxy(It.IsAny<string>(), It.IsAny<string>()))
             .Throws(new InvalidOperationException("Test Exception"))
@@ -99,7 +103,8 @@ public class TestSessionPoolTests
         var mockProxyTestSessionManager = new Mock<ProxyTestSessionManager>(
             new StartTestSessionCriteria(),
             1,
-            (Func<ProxyOperationManager>)(() => null));
+            (Func<TestRuntimeProviderInfo, ProxyOperationManager>)(_ => null),
+            new List<TestRuntimeProviderInfo>());
 
         mockProxyTestSessionManager.SetupSequence(tsm => tsm.EnqueueProxy(It.IsAny<int>()))
             .Throws(new ArgumentException("Test Exception"))

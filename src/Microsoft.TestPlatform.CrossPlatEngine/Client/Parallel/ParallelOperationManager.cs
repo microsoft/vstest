@@ -22,9 +22,9 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
     /// <summary>
     /// Default number of Processes
     /// </summary>
-    private TEventHandler _eventHandler;
-    private Func<TEventHandler, TManager, TEventHandler> _getEventHandler;
-    private Action<TManager, TEventHandler, TWorkload> _runWorkload;
+    private TEventHandler? _eventHandler;
+    private Func<TEventHandler, TManager, TEventHandler>? _getEventHandler;
+    private Action<TManager, TEventHandler, TWorkload>? _runWorkload;
     private readonly List<ProviderSpecificWorkload<TWorkload>> _workloads = new();
     private readonly List<Slot> _managerSlots = new();
 
@@ -70,6 +70,15 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         // TODO: Right now we don't re-use shared hosts, but if we did, this is the place
         // where we should find a workload that fits the manager if any of them is shared.
         // Or tear it down, and start a new one.
+
+        if (_eventHandler == null)
+            throw new InvalidOperationException($"{nameof(_eventHandler)} was not provided.");
+
+        if (_getEventHandler == null)
+            throw new InvalidOperationException($"{nameof(_eventHandler)} was not provided.");
+
+        if (_runWorkload == null)
+            throw new InvalidOperationException($"{nameof(_runWorkload)} was not provided.");
 
         List<SlotWorkloadPair> workToRun = new();
         lock (_lock)

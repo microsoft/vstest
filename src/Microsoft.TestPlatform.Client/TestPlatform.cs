@@ -13,7 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.Client.Execution;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
-using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -71,7 +70,7 @@ internal class TestPlatform : ITestPlatform
         IFileHelper filehelper,
         ITestRuntimeProviderManager testHostProviderManager)
     {
-        TestEngine = testEngine;
+        _testEngine = testEngine;
         _fileHelper = filehelper;
         _testHostProviderManager = testHostProviderManager;
     }
@@ -79,7 +78,7 @@ internal class TestPlatform : ITestPlatform
     /// <summary>
     /// Gets or sets the test engine instance.
     /// </summary>
-    private ITestEngine TestEngine { get; set; }
+    private readonly ITestEngine _testEngine;
 
     /// <inheritdoc/>
     public IDiscoveryRequest CreateDiscoveryRequest(
@@ -91,10 +90,10 @@ internal class TestPlatform : ITestPlatform
         PopulateExtensions(discoveryCriteria.RunSettings, discoveryCriteria.Sources);
 
         // Initialize loggers.
-        ITestLoggerManager loggerManager = TestEngine.GetLoggerManager(requestData);
+        ITestLoggerManager loggerManager = _testEngine.GetLoggerManager(requestData);
         loggerManager.Initialize(discoveryCriteria.RunSettings);
 
-        IProxyDiscoveryManager discoveryManager = TestEngine.GetDiscoveryManager(requestData,  discoveryCriteria, sourceToSourceDetailMap);
+        IProxyDiscoveryManager discoveryManager = _testEngine.GetDiscoveryManager(requestData,  discoveryCriteria, sourceToSourceDetailMap);
         discoveryManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
         return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager, loggerManager);
@@ -111,10 +110,10 @@ internal class TestPlatform : ITestPlatform
         PopulateExtensions(testRunCriteria.TestRunSettings, sources);
 
         // Initialize loggers.
-        ITestLoggerManager loggerManager = TestEngine.GetLoggerManager(requestData);
+        ITestLoggerManager loggerManager = _testEngine.GetLoggerManager(requestData);
         loggerManager.Initialize(testRunCriteria.TestRunSettings);
 
-        IProxyExecutionManager executionManager = TestEngine.GetExecutionManager(requestData, testRunCriteria, sourceToSourceDetailMap);
+        IProxyExecutionManager executionManager = _testEngine.GetExecutionManager(requestData, testRunCriteria, sourceToSourceDetailMap);
         executionManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
         return new TestRunRequest(requestData, testRunCriteria, executionManager, loggerManager);
@@ -137,7 +136,7 @@ internal class TestPlatform : ITestPlatform
             return false;
         }
 
-        IProxyTestSessionManager testSessionManager = TestEngine.GetTestSessionManager(requestData, testSessionCriteria, sourceToSourceDetailMap);
+        IProxyTestSessionManager testSessionManager = _testEngine.GetTestSessionManager(requestData, testSessionCriteria, sourceToSourceDetailMap);
         if (testSessionManager == null)
         {
             // The test session manager is null because the combination of runsettings and
@@ -179,13 +178,13 @@ internal class TestPlatform : ITestPlatform
         IEnumerable<string> pathToAdditionalExtensions,
         bool skipExtensionFilters)
     {
-        TestEngine.GetExtensionManager().UseAdditionalExtensions(pathToAdditionalExtensions, skipExtensionFilters);
+        _testEngine.GetExtensionManager().UseAdditionalExtensions(pathToAdditionalExtensions, skipExtensionFilters);
     }
 
     /// <inheritdoc/>
     public void ClearExtensions()
     {
-        TestEngine.GetExtensionManager().ClearExtensions();
+        _testEngine.GetExtensionManager().ClearExtensions();
     }
 
     private static void ThrowExceptionIfTestHostManagerIsNull(

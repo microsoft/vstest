@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace vstest.ProgrammerTests.Fakes;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
+namespace vstest.ProgrammerTests.Fakes;
 internal class FakeTestDiscoveryEventsRegistrar : ITestDiscoveryEventsRegistrar
 {
     private readonly FakeErrorAggregator _fakeErrorAggregator;

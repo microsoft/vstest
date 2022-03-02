@@ -39,13 +39,7 @@ internal class Program
         var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
 
         var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
-        var consoleOptions = new ConsoleParameters
-        {
-            LogFilePath = Path.Combine(here, "logs", "log.txt"),
-            TraceLevel = TraceLevel.Verbose,
-        };
 
-        var r = new VsTestConsoleWrapper(console, consoleOptions);
 
         var sourceSettings = @"
                 <RunSettings>
@@ -77,8 +71,14 @@ internal class Program
         }
 
         // design mode
-        // var options = new TestPlatformOptions();
-        // r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
+        var consoleOptions = new ConsoleParameters
+        {
+            LogFilePath = Path.Combine(here, "logs", "log.txt"),
+            TraceLevel = TraceLevel.Verbose,
+        };
+        var options = new TestPlatformOptions();
+        var r = new VsTestConsoleWrapper(console, consoleOptions);
+        r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
     }
 
     public class TestRunHandler : ITestRunEventsHandler

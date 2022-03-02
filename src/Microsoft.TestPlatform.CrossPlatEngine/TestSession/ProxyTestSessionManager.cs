@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
+#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 

@@ -31,7 +31,6 @@ public class TestEngineTests
     private ITestEngine _testEngine;
     private readonly Mock<IProcessHelper> _mockProcessHelper;
     private readonly ProtocolConfig _protocolConfig = new() { Version = 1 };
-    private ITestRuntimeProvider _testableTestRuntimeProvider;
     private readonly Mock<IRequestData> _mockRequestData;
     private readonly Mock<IMetricsCollection> _mockMetricsCollection;
 
@@ -39,7 +38,6 @@ public class TestEngineTests
     {
         TestPluginCacheHelper.SetupMockExtensions(new[] { typeof(TestEngineTests).GetTypeInfo().Assembly.Location }, () => { });
         _mockProcessHelper = new Mock<IProcessHelper>();
-        _testableTestRuntimeProvider = new TestableRuntimeProvider(true);
         _mockRequestData = new Mock<IRequestData>();
         _mockMetricsCollection = new Mock<IMetricsCollection>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
@@ -56,172 +54,207 @@ public class TestEngineTests
     [TestMethod]
     public void GetDiscoveryManagerShouldReturnANonNullInstance()
     {
-        var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, null);
-        Assert.IsNotNull(_testEngine.GetDiscoveryManager(_mockRequestData.Object, _testableTestRuntimeProvider, discoveryCriteria));
+        string settingXml =
+            @"<RunSettings>
+                <RunConfiguration>
+                    <InIsolation>true</InIsolation>
+                </RunConfiguration >
+            </RunSettings>";
+        var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
+        Assert.IsNotNull(_testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap));
     }
 
+
     [TestMethod]
-    public void GetDiscoveryManagerShouldReturnsNewInstanceOfProxyDiscoveryManagerIfTestHostIsShared()
+    public void GetDiscoveryManagerShouldReturnParallelProxyDiscoveryManagerIfNotRunningInProcess()
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <InIsolation>true</InIsolation>
-                    </RunConfiguration >
-                 </RunSettings>";
+                <RunConfiguration>
+                    <InIsolation>true</InIsolation>
+                </RunConfiguration >
+            </RunSettings>";
         var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, _testableTestRuntimeProvider, discoveryCriteria);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        Assert.AreNotSame(discoveryManager, _testEngine.GetDiscoveryManager(_mockRequestData.Object, _testableTestRuntimeProvider, discoveryCriteria));
-        Assert.IsInstanceOfType(_testEngine.GetDiscoveryManager(_mockRequestData.Object, _testableTestRuntimeProvider, discoveryCriteria), typeof(ProxyDiscoveryManager));
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
+        Assert.IsNotNull(discoveryManager);
+        Assert.IsInstanceOfType(discoveryManager, typeof(ParallelProxyDiscoveryManager));
     }
 
     [TestMethod]
-    public void GetDiscoveryManagerShouldReturnsParallelDiscoveryManagerIfTestHostIsNotShared()
+    public void GetDiscoveryManagerShouldNotReturnInProcessProxyDiscoveryManagerIfCurrentProcessIsDotnet()
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <InIsolation>true</InIsolation>
-                    </RunConfiguration >
-                 </RunSettings>";
+                <RunConfiguration>
+                    <InIsolation>true</InIsolation>
+                </RunConfiguration >
+            </RunSettings>";
         var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
-        _testableTestRuntimeProvider = new TestableRuntimeProvider(false);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        Assert.IsNotNull(_testEngine.GetDiscoveryManager(_mockRequestData.Object, _testableTestRuntimeProvider, discoveryCriteria));
-        Assert.IsInstanceOfType(_testEngine.GetDiscoveryManager(_mockRequestData.Object, _testableTestRuntimeProvider, discoveryCriteria), typeof(ParallelProxyDiscoveryManager));
-    }
-
-    [TestMethod]
-    public void GetDiscoveryManagerShouldNotReturnsInProcessProxyDiscoveryManagerIfCurrentProcessIsDotnet()
-    {
-        var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, null);
         _mockProcessHelper.Setup(o => o.GetCurrentProcessFileName()).Returns("dotnet.exe");
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, _testableTestRuntimeProvider, discoveryCriteria);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
         Assert.IsNotNull(discoveryManager);
         Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
 
     [TestMethod]
-    public void GetDiscoveryManagerShouldNotReturnsInProcessProxyDiscoveryManagerIfDisableAppDomainIsSet()
+    public void GetDiscoveryManagerShouldNotReturnInProcessProxyDiscoveryManagerIfDisableAppDomainIsSet()
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <TargetPlatform>x86</TargetPlatform>
-                        <DisableAppDomain>true</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                    </RunConfiguration >
-                 </RunSettings>";
+                <RunConfiguration>
+                    <TargetPlatform>x86</TargetPlatform>
+                    <DisableAppDomain>true</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                </RunConfiguration >
+            </RunSettings>";
 
         var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, _testableTestRuntimeProvider, discoveryCriteria);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
         Assert.IsNotNull(discoveryManager);
         Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
 
     [TestMethod]
-    public void GetDiscoveryManagerShouldNotReturnsInProcessProxyDiscoveryManagerIfDesignModeIsTrue()
+    public void GetDiscoveryManagerShouldNotReturnInProcessProxyDiscoveryManagerIfDesignModeIsTrue()
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <TargetPlatform>x86</TargetPlatform>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>true</DesignMode>
-                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                    </RunConfiguration >
-                 </RunSettings>";
+                <RunConfiguration>
+                    <TargetPlatform>x86</TargetPlatform>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>true</DesignMode>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                </RunConfiguration >
+            </RunSettings>";
 
         var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, _testableTestRuntimeProvider, discoveryCriteria);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
         Assert.IsNotNull(discoveryManager);
         Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
 
     [TestMethod]
-    public void GetDiscoveryManagerShouldNotReturnsInProcessProxyDiscoveryManagereIfTargetFrameworkIsNetcoreApp()
+    public void GetDiscoveryManagerShouldNotReturnInProcessProxyDiscoveryManagereIfTargetFrameworkIsNetcoreApp()
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <TargetPlatform>x86</TargetPlatform>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETCoreApp, Version=v1.1</TargetFrameworkVersion>
-                    </RunConfiguration >
-                 </RunSettings>";
+                <RunConfiguration>
+                    <TargetPlatform>x86</TargetPlatform>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETCoreApp, Version=v1.1</TargetFrameworkVersion>
+                </RunConfiguration >
+            </RunSettings>";
 
         var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, _testableTestRuntimeProvider, discoveryCriteria);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
         Assert.IsNotNull(discoveryManager);
         Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
 
     [TestMethod]
-    public void GetDiscoveryManagerShouldNotReturnsInProcessProxyDiscoveryManagereIfTargetFrameworkIsNetStandard()
+    public void GetDiscoveryManagerShouldNotReturnInProcessProxyDiscoveryManagereIfTargetFrameworkIsNetStandard()
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <TargetPlatform>x86</TargetPlatform>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETStandard, Version=v1.4</TargetFrameworkVersion>
-                    </RunConfiguration >
-                 </RunSettings>";
+                <RunConfiguration>
+                    <TargetPlatform>x86</TargetPlatform>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETStandard, Version=v1.4</TargetFrameworkVersion>
+                </RunConfiguration >
+            </RunSettings>";
 
         var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, _testableTestRuntimeProvider, discoveryCriteria);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
         Assert.IsNotNull(discoveryManager);
         Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
 
     [TestMethod]
-    public void GetDiscoveryManagerShouldNotReturnsInProcessProxyDiscoveryManagereIfTargetPlatformIsX64()
+    public void GetDiscoveryManagerShouldNotReturnInProcessProxyDiscoveryManagereIfTargetPlatformIsX64()
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <TargetPlatform>x64</TargetPlatform>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETStandard, Version=v1.4</TargetFrameworkVersion>
-                    </RunConfiguration >
-                 </RunSettings>";
+                <RunConfiguration>
+                    <TargetPlatform>x64</TargetPlatform>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETStandard, Version=v1.4</TargetFrameworkVersion>
+                </RunConfiguration >
+            </RunSettings>";
 
         var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, _testableTestRuntimeProvider, discoveryCriteria);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
         Assert.IsNotNull(discoveryManager);
         Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
 
     [TestMethod]
-    public void GetDiscoveryManagerShouldNotReturnsInProcessProxyDiscoveryManagereIfrunsettingsHasTestSettingsInIt()
+    public void GetDiscoveryManagerShouldNotReturnInProcessProxyDiscoveryManagereIfrunsettingsHasTestSettingsInIt()
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <TargetPlatform>x86</TargetPlatform>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                    </RunConfiguration>
-                    <MSTest>
-                        <SettingsFile>C:\temp.testsettings</SettingsFile>
-                    </MSTest>
-                 </RunSettings>";
+                <RunConfiguration>
+                    <TargetPlatform>x86</TargetPlatform>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                </RunConfiguration>
+                <MSTest>
+                    <SettingsFile>C:\temp.testsettings</SettingsFile>
+                </MSTest>
+            </RunSettings>";
 
         var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, _testableTestRuntimeProvider, discoveryCriteria);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
         Assert.IsNotNull(discoveryManager);
         Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
@@ -231,17 +264,21 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <TargetPlatform>x64</TargetPlatform>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                    </RunConfiguration>
-                 </RunSettings>";
+                <RunConfiguration>
+                    <TargetPlatform>x64</TargetPlatform>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                </RunConfiguration>
+            </RunSettings>";
 
         var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, _testableTestRuntimeProvider, discoveryCriteria);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
         Assert.IsNotNull(discoveryManager);
         Assert.IsInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
@@ -249,54 +286,49 @@ public class TestEngineTests
     [TestMethod]
     public void GetExecutionManagerShouldReturnANonNullInstance()
     {
-        var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100);
+        string settingsXml = @"<RunSettings></RunSettings>";
+        var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingsXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        Assert.IsNotNull(_testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria));
+        Assert.IsNotNull(_testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap));
     }
 
     [TestMethod]
     public void GetExecutionManagerShouldReturnNewInstance()
     {
-        var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100);
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria);
+        string settingsXml = @"<RunSettings></RunSettings>";
+        var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingsXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
 
-        Assert.AreNotSame(executionManager, _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria));
-    }
-
-    [TestMethod]
-    public void GetExecutionManagerShouldReturnDefaultExecutionManagerIfParallelDisabled()
-    {
-        string settingXml = @"<RunSettings><RunConfiguration><InIsolation>true</InIsolation></RunConfiguration></RunSettings>";
-        var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingXml);
-
-        Assert.IsNotNull(_testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria));
-        Assert.IsInstanceOfType(_testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria), typeof(ProxyExecutionManager));
-    }
-
-    [TestMethod]
-    public void GetExecutionManagerWithSingleSourceShouldReturnDefaultExecutionManagerEvenIfParallelEnabled()
-    {
-        string settingXml =
-            @"<RunSettings>
-                    <RunConfiguration>
-                        <MaxCpuCount>2</MaxCpuCount>
-                        <InIsolation>true</InIsolation>
-                    </RunConfiguration >
-                </RunSettings>";
-        var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingXml);
-
-        Assert.IsNotNull(_testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria));
-        Assert.IsInstanceOfType(_testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria), typeof(ProxyExecutionManager));
+        Assert.AreNotSame(executionManager, _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap));
     }
 
     [TestMethod]
     public void GetExecutionManagerShouldReturnParallelExecutionManagerIfParallelEnabled()
     {
-        string settingXml = @"<RunSettings><RunConfiguration><MaxCpuCount>2</MaxCpuCount></RunConfiguration></RunSettings>";
-        var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+        string settingXml =
+            @"<RunSettings>
+                <RunConfiguration>
+                    <MaxCpuCount>2</MaxCpuCount>
+                </RunConfiguration>
+            </RunSettings>";
 
-        Assert.IsNotNull(_testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria));
-        Assert.IsInstanceOfType(_testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria), typeof(ParallelProxyExecutionManager));
+        var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+            ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
+        Assert.IsNotNull(_testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap));
+        Assert.IsInstanceOfType(_testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap), typeof(ParallelProxyExecutionManager));
     }
 
     [TestMethod]
@@ -304,23 +336,39 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <InIsolation>true</InIsolation>
-                    </RunConfiguration >
-                </RunSettings>";
-        _testableTestRuntimeProvider = new TestableRuntimeProvider(false);
-        var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+                <RunConfiguration>
+                    <InIsolation>true</InIsolation>
+                </RunConfiguration >
+            </RunSettings>";
 
-        Assert.IsNotNull(_testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria));
-        Assert.IsInstanceOfType(_testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria), typeof(ParallelProxyExecutionManager));
+        var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+            ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
+        Assert.IsNotNull(_testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap));
+        Assert.IsInstanceOfType(_testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap), typeof(ParallelProxyExecutionManager));
     }
 
     [TestMethod]
-    public void GetExcecutionManagerShouldReturnExectuionManagerWithDataCollectionIfDataCollectionIsEnabled()
+    public void GetExecutionManagerShouldReturnExecutionManagerWithDataCollectionIfDataCollectionIsEnabled()
     {
-        var settingXml = @"<RunSettings><DataCollectionRunSettings><DataCollectors><DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector></DataCollectors></DataCollectionRunSettings></RunSettings>";
+        var settingXml =
+            @"<RunSettings>
+                <DataCollectionRunSettings>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector>
+                    </DataCollectors>
+                </DataCollectionRunSettings>
+            </RunSettings>";
         var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingXml);
-        var result = _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+        var result = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
 
         Assert.IsNotNull(result);
         Assert.IsInstanceOfType(result, typeof(ProxyExecutionManagerWithDataCollection));
@@ -331,17 +379,22 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <InIsolation>true</InIsolation>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                    </RunConfiguration >
-                 </RunSettings>";
+                <RunConfiguration>
+                    <InIsolation>true</InIsolation>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                </RunConfiguration >
+            </RunSettings>";
 
         var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+            ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
 
         Assert.IsNotNull(executionManager);
         Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -352,17 +405,22 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                        <MaxCpuCount>2</MaxCpuCount>
-                    </RunConfiguration >
-                 </RunSettings>";
+                <RunConfiguration>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                    <MaxCpuCount>2</MaxCpuCount>
+                </RunConfiguration >
+            </RunSettings>";
 
         var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+            ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
 
         Assert.IsNotNull(executionManager);
         Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -373,23 +431,28 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                        <MaxCpuCount>1</MaxCpuCount>
-                    </RunConfiguration >
-                    <DataCollectionRunSettings>
-                        <DataCollectors>
-                            <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"">
-                            </DataCollector>
-                        </DataCollectors>
-                    </DataCollectionRunSettings>
-                 </RunSettings>";
+                <RunConfiguration>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                    <MaxCpuCount>1</MaxCpuCount>
+                </RunConfiguration >
+                <DataCollectionRunSettings>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"">
+                        </DataCollector>
+                    </DataCollectors>
+                </DataCollectionRunSettings>
+            </RunSettings>";
 
         var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+            ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
 
         Assert.IsNotNull(executionManager);
         Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -400,26 +463,31 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                        <MaxCpuCount>1</MaxCpuCount>
-                    </RunConfiguration >
-                    <InProcDataCollectionRunSettings>
-                        <InProcDataCollectors>
-                            <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='SimpleDataCollector.SimpleDataCollector, SimpleDataCollector, Version=15.6.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase='E:\Enlistments\vstest\test\TestAssets\SimpleDataCollector\bin\Debug\net451\SimpleDataCollector.dll'>
-                                <Configuration>
-                                    <Port>4312</Port>
-                                </Configuration>
-                            </InProcDataCollector>
-                        </InProcDataCollectors>
-                    </InProcDataCollectionRunSettings>
-                 </RunSettings>";
+                <RunConfiguration>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                    <MaxCpuCount>1</MaxCpuCount>
+                </RunConfiguration >
+                <InProcDataCollectionRunSettings>
+                    <InProcDataCollectors>
+                        <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='SimpleDataCollector.SimpleDataCollector, SimpleDataCollector, Version=15.6.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase='E:\Enlistments\vstest\test\TestAssets\SimpleDataCollector\bin\Debug\net451\SimpleDataCollector.dll'>
+                            <Configuration>
+                                <Port>4312</Port>
+                            </Configuration>
+                        </InProcDataCollector>
+                    </InProcDataCollectors>
+                </InProcDataCollectionRunSettings>
+            </RunSettings>";
 
         var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+            ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
 
         Assert.IsNotNull(executionManager);
         Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -430,20 +498,25 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                        <MaxCpuCount>1</MaxCpuCount>
-                    </RunConfiguration >
-                    <MSTest>
-                        <SettingsFile>C:\temp.testsettings</SettingsFile>
-                    </MSTest>
-                 </RunSettings>";
+                <RunConfiguration>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                    <MaxCpuCount>1</MaxCpuCount>
+                </RunConfiguration >
+                <MSTest>
+                    <SettingsFile>C:\temp.testsettings</SettingsFile>
+                </MSTest>
+            </RunSettings>";
 
         var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+            ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
 
         Assert.IsNotNull(executionManager);
         Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -455,17 +528,22 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                        <MaxCpuCount>1</MaxCpuCount>
-                    </RunConfiguration>
-                 </RunSettings>";
+                <RunConfiguration>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                    <MaxCpuCount>1</MaxCpuCount>
+                </RunConfiguration>
+            </RunSettings>";
 
         var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+            ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
 
         Assert.IsNotNull(executionManager);
         Assert.IsInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -482,17 +560,22 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                        <MaxCpuCount>1</MaxCpuCount>
-                    </RunConfiguration>
-                 </RunSettings>";
+                <RunConfiguration>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                    <MaxCpuCount>1</MaxCpuCount>
+                </RunConfiguration>
+            </RunSettings>";
 
         var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+            ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
 
         _mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, It.IsAny<object>()), Times.Once);
     }
@@ -500,26 +583,51 @@ public class TestEngineTests
     [TestMethod]
     public void ProxyDataCollectionManagerShouldBeInitialzedWithCorrectTestSourcesWhenTestRunCriteriaContainsSourceList()
     {
-        var settingXml = @"<RunSettings><DataCollectionRunSettings><DataCollectors><DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector></DataCollectors></DataCollectionRunSettings></RunSettings>";
+        var settingXml =
+            @"<RunSettings>
+                <DataCollectionRunSettings>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector>
+                    </DataCollectors>
+                </DataCollectionRunSettings>
+            </RunSettings>";
 
         var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+            ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
 
-        Assert.IsTrue((executionManager as ProxyExecutionManagerWithDataCollection).ProxyDataCollectionManager.Sources.Contains("1.dll"));
+        Assert.IsInstanceOfType(executionManager, typeof(ProxyExecutionManagerWithDataCollection));
+        Assert.IsTrue(((ProxyExecutionManagerWithDataCollection)executionManager).ProxyDataCollectionManager.Sources.Contains("1.dll"));
     }
 
     [TestMethod]
     public void ProxyDataCollectionManagerShouldBeInitialzedWithCorrectTestSourcesWhenTestRunCriteriaContainsTestCaseList()
     {
-        var settingXml = @"<RunSettings><DataCollectionRunSettings><DataCollectors><DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector></DataCollectors></DataCollectionRunSettings></RunSettings>";
+        var settingXml =
+            @"<RunSettings>
+                <DataCollectionRunSettings>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector>
+                    </DataCollectors>
+                </DataCollectionRunSettings>
+            </RunSettings>";
 
         var testCaseList = new List<TestCase> { new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll") };
         var testRunCriteria = new TestRunCriteria(testCaseList, 100, false, settingXml);
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["x.dll"] = new SourceDetail { Source = "x.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
 
-        Assert.IsTrue((executionManager as ProxyExecutionManagerWithDataCollection).ProxyDataCollectionManager.Sources.Contains("x.dll"));
+        Assert.IsInstanceOfType(executionManager, typeof(ProxyExecutionManagerWithDataCollection));
+        Assert.IsTrue(((ProxyExecutionManagerWithDataCollection)executionManager).ProxyDataCollectionManager.Sources.Contains("x.dll"));
     }
 
     /// <summary>
@@ -550,9 +658,15 @@ public class TestEngineTests
             RunSettings = settingXml
         };
 
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
         Assert.IsNotNull(_testEngine.GetTestSessionManager(
             _mockRequestData.Object,
-            testSessionCriteria));
+            testSessionCriteria,
+            sourceToSourceDetailMap));
     }
 
     [TestMethod]
@@ -565,30 +679,49 @@ public class TestEngineTests
             RunSettings = settingXml
         };
 
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
         var testSessionManager1 = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
-            testSessionCriteria);
+            testSessionCriteria,
+            sourceToSourceDetailMap);
 
         Assert.AreNotSame(
             _testEngine.GetTestSessionManager(
                 _mockRequestData.Object,
-                testSessionCriteria),
+                testSessionCriteria,
+                sourceToSourceDetailMap),
             testSessionManager1);
     }
 
     [TestMethod]
     public void GetTestSessionManagerShouldReturnDefaultTestSessionManagerIfParallelDisabled()
     {
-        var settingXml = @"<RunSettings><RunConfiguration><InIsolation>true</InIsolation></RunConfiguration></RunSettings>";
+        var settingXml =
+            @"<RunSettings>
+                <RunConfiguration>
+                    <InIsolation>true</InIsolation>
+                </RunConfiguration>
+            </RunSettings>";
+
         var testSessionCriteria = new StartTestSessionCriteria()
         {
             Sources = new List<string> { "1.dll" },
             RunSettings = settingXml
         };
 
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
-            testSessionCriteria);
+            testSessionCriteria,
+            sourceToSourceDetailMap);
 
         Assert.IsNotNull(testSessionManager);
         Assert.IsInstanceOfType(testSessionManager, typeof(ProxyTestSessionManager));
@@ -599,20 +732,27 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <MaxCpuCount>2</MaxCpuCount>
-                        <InIsolation>true</InIsolation>
-                    </RunConfiguration >
-                </RunSettings>";
+                <RunConfiguration>
+                    <MaxCpuCount>2</MaxCpuCount>
+                    <InIsolation>true</InIsolation>
+                </RunConfiguration >
+            </RunSettings>";
+
         var testSessionCriteria = new StartTestSessionCriteria()
         {
             Sources = new List<string> { "1.dll" },
             RunSettings = settingXml
         };
 
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
-            testSessionCriteria);
+            testSessionCriteria,
+            sourceToSourceDetailMap);
 
         Assert.IsNotNull(testSessionManager);
         Assert.IsInstanceOfType(testSessionManager, typeof(ProxyTestSessionManager));
@@ -621,16 +761,28 @@ public class TestEngineTests
     [TestMethod]
     public void GetTestSessionManagerShouldReturnDefaultTestSessionManagerIfParallelEnabled()
     {
-        string settingXml = @"<RunSettings><RunConfiguration><MaxCpuCount>2</MaxCpuCount></RunConfiguration></RunSettings>";
+        string settingXml =
+            @"<RunSettings>
+                <RunConfiguration>
+                    <MaxCpuCount>2</MaxCpuCount>
+                </RunConfiguration>
+            </RunSettings>";
         var testSessionCriteria = new StartTestSessionCriteria()
         {
             Sources = new List<string> { "1.dll", "2.dll" },
             RunSettings = settingXml
         };
 
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+            ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
-            testSessionCriteria);
+            testSessionCriteria,
+            sourceToSourceDetailMap);
 
         Assert.IsNotNull(testSessionManager);
         Assert.IsInstanceOfType(testSessionManager, typeof(ProxyTestSessionManager));
@@ -641,19 +793,26 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <InIsolation>true</InIsolation>
-                    </RunConfiguration >
-                </RunSettings>";
+                <RunConfiguration>
+                    <InIsolation>true</InIsolation>
+                </RunConfiguration >
+            </RunSettings>";
         var testSessionCriteria = new StartTestSessionCriteria()
         {
             Sources = new List<string> { "1.dll", "2.dll" },
             RunSettings = settingXml
         };
 
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+            ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
-            testSessionCriteria);
+            testSessionCriteria,
+            sourceToSourceDetailMap);
 
         Assert.IsNotNull(testSessionManager);
         Assert.IsInstanceOfType(testSessionManager, typeof(ProxyTestSessionManager));
@@ -664,22 +823,27 @@ public class TestEngineTests
     {
         var settingXml =
             @"<RunSettings>
-                    <DataCollectionRunSettings>
-                        <DataCollectors>
-                            <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"">
-                            </DataCollector>
-                        </DataCollectors>
-                    </DataCollectionRunSettings>
-                </RunSettings>";
+                <DataCollectionRunSettings>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector>
+                    </DataCollectors>
+                </DataCollectionRunSettings>
+            </RunSettings>";
         var testSessionCriteria = new StartTestSessionCriteria()
         {
             Sources = new List<string> { "1.dll" },
             RunSettings = settingXml
         };
 
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
-            testSessionCriteria);
+            testSessionCriteria,
+            sourceToSourceDetailMap);
 
         Assert.IsNotNull(testSessionManager);
         Assert.IsInstanceOfType(testSessionManager, typeof(ProxyTestSessionManager));
@@ -690,19 +854,26 @@ public class TestEngineTests
     {
         var settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                    </RunConfiguration>
-                 </RunSettings>";
+                <RunConfiguration>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                </RunConfiguration>
+            </RunSettings>";
+
         var testSessionCriteria = new StartTestSessionCriteria()
         {
             Sources = new List<string> { "1.dll" },
             RunSettings = settingXml
         };
 
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
         Assert.IsNull(_testEngine.GetTestSessionManager(
             _mockRequestData.Object,
-            testSessionCriteria));
+            testSessionCriteria,
+            sourceToSourceDetailMap));
     }
 
     [TestMethod]
@@ -711,13 +882,20 @@ public class TestEngineTests
         var testSessionCriteria = new StartTestSessionCriteria()
         {
             Sources = new List<string> { "1.dll" },
-            RunSettings = null
+            RunSettings = @"<RunSettings></RunSettings>"
         };
+
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
         _mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("dotnet.exe");
 
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
-            testSessionCriteria);
+            testSessionCriteria,
+            sourceToSourceDetailMap);
 
         Assert.IsNotNull(testSessionManager);
     }
@@ -727,23 +905,28 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <TargetPlatform>x86</TargetPlatform>
-                        <DisableAppDomain>true</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                    </RunConfiguration >
-                 </RunSettings>";
+                <RunConfiguration>
+                    <TargetPlatform>x86</TargetPlatform>
+                    <DisableAppDomain>true</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                </RunConfiguration >
+            </RunSettings>";
 
         var testSessionCriteria = new StartTestSessionCriteria()
         {
             Sources = new List<string> { "1.dll" },
             RunSettings = settingXml
         };
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
 
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
-            testSessionCriteria);
+            testSessionCriteria,
+            sourceToSourceDetailMap);
 
         Assert.IsNotNull(testSessionManager);
     }
@@ -753,13 +936,13 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <TargetPlatform>x86</TargetPlatform>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>true</DesignMode>
-                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                    </RunConfiguration >
-                 </RunSettings>";
+                <RunConfiguration>
+                    <TargetPlatform>x86</TargetPlatform>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>true</DesignMode>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                </RunConfiguration >
+            </RunSettings>";
 
         var testSessionCriteria = new StartTestSessionCriteria()
         {
@@ -767,9 +950,15 @@ public class TestEngineTests
             RunSettings = settingXml
         };
 
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
-            testSessionCriteria);
+            testSessionCriteria,
+            sourceToSourceDetailMap);
 
         Assert.IsNotNull(testSessionManager);
     }
@@ -779,13 +968,13 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <TargetPlatform>x86</TargetPlatform>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETCoreApp, Version=v1.1</TargetFrameworkVersion>
-                    </RunConfiguration >
-                 </RunSettings>";
+                <RunConfiguration>
+                    <TargetPlatform>x86</TargetPlatform>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETCoreApp, Version=v1.1</TargetFrameworkVersion>
+                </RunConfiguration >
+            </RunSettings>";
 
         var testSessionCriteria = new StartTestSessionCriteria()
         {
@@ -793,9 +982,15 @@ public class TestEngineTests
             RunSettings = settingXml
         };
 
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
-            testSessionCriteria);
+            testSessionCriteria,
+            sourceToSourceDetailMap);
 
         Assert.IsNotNull(testSessionManager);
     }
@@ -805,13 +1000,13 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <TargetPlatform>x86</TargetPlatform>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETStandard, Version=v1.4</TargetFrameworkVersion>
-                    </RunConfiguration >
-                 </RunSettings>";
+                <RunConfiguration>
+                    <TargetPlatform>x86</TargetPlatform>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETStandard, Version=v1.4</TargetFrameworkVersion>
+                </RunConfiguration >
+            </RunSettings>";
 
         var testSessionCriteria = new StartTestSessionCriteria()
         {
@@ -819,9 +1014,15 @@ public class TestEngineTests
             RunSettings = settingXml
         };
 
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
-            testSessionCriteria);
+            testSessionCriteria,
+            sourceToSourceDetailMap);
 
         Assert.IsNotNull(testSessionManager);
     }
@@ -831,13 +1032,13 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <TargetPlatform>x64</TargetPlatform>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETStandard, Version=v1.4</TargetFrameworkVersion>
-                    </RunConfiguration >
-                 </RunSettings>";
+                <RunConfiguration>
+                    <TargetPlatform>x64</TargetPlatform>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETStandard, Version=v1.4</TargetFrameworkVersion>
+                </RunConfiguration >
+            </RunSettings>";
 
         var testSessionCriteria = new StartTestSessionCriteria()
         {
@@ -845,9 +1046,15 @@ public class TestEngineTests
             RunSettings = settingXml
         };
 
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
-            testSessionCriteria);
+            testSessionCriteria,
+            sourceToSourceDetailMap);
 
         Assert.IsNotNull(testSessionManager);
     }
@@ -857,16 +1064,16 @@ public class TestEngineTests
     {
         string settingXml =
             @"<RunSettings>
-                    <RunConfiguration>
-                        <TargetPlatform>x86</TargetPlatform>
-                        <DisableAppDomain>false</DisableAppDomain>
-                        <DesignMode>false</DesignMode>
-                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                    </RunConfiguration>
-                    <MSTest>
-                        <SettingsFile>C:\temp.testsettings</SettingsFile>
-                    </MSTest>
-                 </RunSettings>";
+                <RunConfiguration>
+                    <TargetPlatform>x86</TargetPlatform>
+                    <DisableAppDomain>false</DisableAppDomain>
+                    <DesignMode>false</DesignMode>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                </RunConfiguration>
+                <MSTest>
+                    <SettingsFile>C:\temp.testsettings</SettingsFile>
+                </MSTest>
+            </RunSettings>";
 
         var testSessionCriteria = new StartTestSessionCriteria()
         {
@@ -874,9 +1081,15 @@ public class TestEngineTests
             RunSettings = settingXml
         };
 
+        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+        };
+
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
-            testSessionCriteria);
+            testSessionCriteria,
+            sourceToSourceDetailMap);
 
         Assert.IsNotNull(testSessionManager);
     }

@@ -202,6 +202,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
             {
                 EqtTrace.Verbose("ParallelProxyDiscoveryManager: Discovery started.");
 
+                proxyDiscoveryManager.Initialize(_skipDefaultAdapters);
                 proxyDiscoveryManager.DiscoverTests(discoveryCriteria, eventHandler);
             })
             .ContinueWith(t =>
