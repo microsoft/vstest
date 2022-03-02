@@ -29,7 +29,7 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
     {
         IDictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>> datacollectorsAttachmentsProcessors = new Dictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>>();
 
-        if (!RunSettingsHelper.Instance.IsDesignMode)
+        if (!RunSettingsHelper.Instance.IsDesignMode || FeatureFlag.Instance.IsEnabled(FeatureFlag.FORCE_DATACOLLECTORS_ATTACHMENTPROCESSORS))
         {
             if (invokedDataCollectors?.Length > 0)
             {
