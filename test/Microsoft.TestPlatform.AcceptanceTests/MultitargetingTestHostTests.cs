@@ -17,7 +17,7 @@ public class MultitargetingTestHostTests : AcceptanceTestBase
     // xUnit supports net452 onwards, so that is why this starts at net452, I also don't test all framework versions
     [NetCoreRunner(NETFX452_48)]
     [NetFrameworkRunner(NETFX452_48)]
-    public void RunningTestWithAFailingDebugAssertDoesNotCrashTheHostingProcess(RunnerInfo runnerInfo)
+    public void TestRunInATesthostThatTargetsTheirChosenNETFramework(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();

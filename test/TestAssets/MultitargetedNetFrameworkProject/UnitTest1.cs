@@ -2,7 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Security;
 using System.Security.Authentication;
 
@@ -54,6 +56,7 @@ namespace MultitargetedNetFrameworkProject
         [Fact]
         public void FailsUntilNet462ButPassesOnNewerNetFramework()
         {
+            var processName = Process.GetCurrentProcess().ProcessName;
             Exception exception = null;
             try
             {
@@ -68,18 +71,22 @@ namespace MultitargetedNetFrameworkProject
                 exception = ex;
             }
 
-            switch (TargetFramework)
+            var shouldThrowException = new[] { "NET451", "NET452", "NET46", "NET461", "NET462" }.Contains(TargetFramework);
+
+            if (shouldThrowException && exception == null)
             {
-                case "NET451":
-                case "NET452":
-                case "NET46":
-                case "NET461":
-                case "NET462":
-                    Assert.NotNull(exception);
-                    break;
-                default:
-                    Assert.Null(exception);
-                    break;
+                throw new Exception($"Expected the code above to throw exception, " +
+                    $"because it fails when running in <= NET462 versions of .NET Framework, " +
+                    $"and we are running in process that was compiled as {TargetFramework}, " +
+                    $"and is called {processName}, but there was no exception.");
+            }
+
+            if (!shouldThrowException && exception != null)
+            {
+                throw new Exception($"Expected the code above to not throw an exception, " +
+                    $"because it does not fail when running in > NET462 versions of .NET Framework, " +
+                    $"and we are running in process that was compiled as {TargetFramework}, " +
+                    $"and is called {processName}.");
             }
         }
 
