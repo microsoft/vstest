@@ -28,7 +28,7 @@ public class MultitargetingTestHostTests : AcceptanceTestBase
         var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
         // Tell the test project which target framework we are expecting it to run as.
-        // It has this value condionally compiled, so it can compare it.
+        // It has this value conditionally compiled, so it can compare it.
         var env = new Dictionary<string, string>
         {
             ["EXPECTED_TARGET_FRAMEWORK"] = runnerInfo.TargetFramework
