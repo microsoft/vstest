@@ -32,7 +32,8 @@ public partial class ProcessHelper : IProcessHelper
         => Process.GetProcessById(processId).Handle;
 
     /// <inheritdoc/>
-    public PlatformArchitecture GetCurrentProcessArchitecture() =>
+    public PlatformArchitecture GetCurrentProcessArchitecture()
+        =>
         IntPtr.Size == 8
         ? IsArm64()
             ? PlatformArchitecture.ARM64
