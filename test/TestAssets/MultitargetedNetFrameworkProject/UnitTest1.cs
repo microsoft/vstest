@@ -50,48 +50,12 @@ namespace MultitargetedNetFrameworkProject
 #if NET48
         public string TargetFramework { get; } = "NET48";
 #endif
-
-        // Using xUnit here because MSTest uses AppDomains by default and fixes this problem for us
-        // as long as the appdomains are enabled and modern .NET Framework is installed.
         [Fact]
         public void FailsUntilNet462ButPassesOnNewerNetFramework()
         {
-            var processName = Process.GetCurrentProcess().ProcessName;
-            Exception exception = null;
-            try
-            {
-                MemoryStream stream = new MemoryStream();
-                SslStream sslStream = new SslStream(stream);
+            var expected = Environment.GetEnvironmentVariable("EXPECTED_TARGET_FRAMEWORK");
 
-                // this throws SSLException on net451-net462, on net471 onwards it passes so we can use it to test that we target correctly
-                sslStream.BeginAuthenticateAsClient("microsoft.com", null, SslProtocols.None, false, new AsyncCallback(ProcessInformation), null);
-            }
-            catch (Exception ex)
-            {
-                exception = ex;
-            }
-
-            var shouldThrowException = new[] { "NET451", "NET452", "NET46", "NET461", "NET462" }.Contains(TargetFramework);
-
-            if (shouldThrowException && exception == null)
-            {
-                throw new Exception($"Expected the code above to throw exception, " +
-                    $"because it fails when running in <= NET462 versions of .NET Framework, " +
-                    $"and we are running in process that was compiled as {TargetFramework}, " +
-                    $"and is called {processName}, but there was no exception.");
-            }
-
-            if (!shouldThrowException && exception != null)
-            {
-                throw new Exception($"Expected the code above to not throw an exception, " +
-                    $"because it does not fail when running in > NET462 versions of .NET Framework, " +
-                    $"and we are running in process that was compiled as {TargetFramework}, " +
-                    $"and is called {processName}.");
-            }
-        }
-
-        static void ProcessInformation(IAsyncResult result)
-        {
+            Assert.Equal(expected, TargetFramework, ignoreCase: true);
         }
     }
 }

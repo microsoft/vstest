@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
+
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -24,7 +26,15 @@ public class MultitargetingTestHostTests : AcceptanceTestBase
 
         var assemblyPath = BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll").Trim('\"');
         var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
-        InvokeVsTest(arguments);
+
+        // Tell the test project which target framework we are expecting it to run as.
+        // It has this value condionally compiled, so it can compare it.
+        var env = new Dictionary<string, string>
+        {
+            ["EXPECTED_TARGET_FRAMEWORK"] = runnerInfo.TargetFramework
+        };
+
+        InvokeVsTest(arguments, env);
 
         ValidateSummaryStatus(passedTestsCount: 1, failedTestsCount: 0, 0);
     }
