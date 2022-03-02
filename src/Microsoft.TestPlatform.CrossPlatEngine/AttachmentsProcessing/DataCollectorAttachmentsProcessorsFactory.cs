@@ -29,6 +29,12 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
     {
         IDictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>> datacollectorsAttachmentsProcessors = new Dictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>>();
 
+
+        // Temporary disabled in design mode.
+        // We have an issue when the collector is found inside bin folder/subfolder of the user in case of VS.
+        // Usually collector are loaded from nuget package or visual studio special folders, but if a user for some reason run `dotnet publish`
+        // and after run the datacollector with the attachment processor we're loading 'published' version and no more nuget one.
+        // This led to file locking that prevents further `dotnet publish` and maybe build.
         if (!RunSettingsHelper.Instance.IsDesignMode || FeatureFlag.Instance.IsEnabled(FeatureFlag.FORCE_DATACOLLECTORS_ATTACHMENTPROCESSORS))
         {
             if (invokedDataCollectors?.Length > 0)
