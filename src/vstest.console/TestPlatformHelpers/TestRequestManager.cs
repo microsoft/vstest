@@ -640,9 +640,14 @@ internal class TestRequestManager : ITestRequestManager
                 // This is a special case for 1 version of Nuget.Frameworks that was shipped with using identifier NET5 instead of NETCoreApp5 for .NET 5.
                 || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                // We are running in vstest.console that is either started via dotnet.exe
-                // or via vstest.console.exe .NET Core executable. For AnyCPU dlls this
-                // should resolve 32-bit SDK when running from 32-bit dotnet process and
+                // We are running in vstest.console that is either started via dotnet
+                // or via vstest.console.exe. The architecture of the current process
+                // determines the default architecture to use for AnyCPU dlls
+                // and other sources that don't dictate architecture (e.g. js files).
+                // This way starting 32-bit dotnet will try to run as 32-bit testhost
+                // using the runtime that was installed with that 32-bit dotnet SDK. 
+                // Similarly ARM64 vstest.console will start ARM64 testhost, making sure 
+                // that we choose the architecture that we already know we can run as.
                 // 64-bit SDK when running from 64-bit dotnet process.
                 // As default architecture we specify the expected test host architecture,
                 // it can be specified by user on the command line with --arch or through runsettings.
