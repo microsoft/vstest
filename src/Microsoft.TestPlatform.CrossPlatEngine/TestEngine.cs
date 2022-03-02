@@ -210,40 +210,59 @@ public class TestEngine : ITestEngine
                 new TestHostManagerFactory(newRequestData));
         }
 
+        // This creates a single non-parallel execution manager, based requestData, isDataCollectorEnabled and the
+        // overall testRunCriteria. The overall testRunCriteria are split to smaller pieces (e.g. each source from the overall
+        // testRunCriteria) so we can run them in parallel, and those are then passed to those non-parallel execution managers.
+        //
+        // The function below grabs most of the parameter via closure from the local context,
+        // but gets the runtime provider later, because that is specific info to the source (or sources) it will be running.
+        // This creator does not get those smaller pieces of testRunCriteria, those come later when we call a method on
+        // the non-parallel execution manager we create here. E.g. StartTests(<single piece of testRunCriteria>).
+        Func<TestRuntimeProviderInfo, IProxyExecutionManager> proxyExecutionManagerCreator = runtimeProviderInfo =>
+            CreateNonParallelExecutionManager(requestData, testRunCriteria, isDataCollectorEnabled, runtimeProviderInfo);
+
+        var executionManager = new ParallelProxyExecutionManager(requestData, proxyExecutionManagerCreator, parallelLevel, testHostProviders);
+
+        EqtTrace.Verbose($"TestEngine.GetExecutionManager: Chosen execution manager '{executionManager.GetType().AssemblyQualifiedName}' ParallelLevel '{parallelLevel}'.");
+
+        return executionManager;
+    }
+
+    // This is internal so tests can use it.
+    internal IProxyExecutionManager CreateNonParallelExecutionManager(IRequestData requestData, TestRunCriteria testRunCriteria, bool isDataCollectorEnabled, TestRuntimeProviderInfo runtimeProviderInfo)
+    {
         // SetupChannel ProxyExecutionManager with data collection if data collectors are
         // specified in run settings.
-        Func<TestRuntimeProviderInfo, IProxyExecutionManager> proxyExecutionManagerCreator = runtimeProviderInfo =>
+        // Create a new host manager, to be associated with individual
+        // ProxyExecutionManager(&POM)
+        var sources = runtimeProviderInfo.SourceDetails.Select(r => r.Source).ToList();
+        var hostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runtimeProviderInfo.RunSettings, sources);
+        ThrowExceptionIfTestHostManagerIsNull(hostManager, runtimeProviderInfo.RunSettings);
+        hostManager.Initialize(TestSessionMessageLogger.Instance, runtimeProviderInfo.RunSettings);
+
+        if (testRunCriteria.TestHostLauncher != null)
         {
-            // Create a new host manager, to be associated with individual
-            // ProxyExecutionManager(&POM)
-            var sources = runtimeProviderInfo.SourceDetails.Select(r => r.Source).ToList();
-            var hostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runtimeProviderInfo.RunSettings, sources);
-            ThrowExceptionIfTestHostManagerIsNull(hostManager, runtimeProviderInfo.RunSettings);
-            hostManager.Initialize(TestSessionMessageLogger.Instance, runtimeProviderInfo.RunSettings);
+            hostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
+        }
 
-            if (testRunCriteria.TestHostLauncher != null)
-            {
-                hostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
-            }
+        var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager);
 
-            var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager);
+        if (testRunCriteria.TestSessionInfo != null)
+        {
+            // This function is used to either take a pre-existing proxy operation manager from
+            // the test pool or to create a new proxy operation manager on the spot.
+            Func<string, ProxyExecutionManager, ProxyOperationManager>
+                proxyOperationManagerCreator = (
+                    string source,
+                    ProxyExecutionManager proxyExecutionManager) =>
+                {
+                    var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
+                        testRunCriteria.TestSessionInfo,
+                        source,
+                        runtimeProviderInfo.RunSettings);
 
-            if (testRunCriteria.TestSessionInfo != null)
-            {
-                // This function is used to either take a pre-existing proxy operation manager from
-                // the test pool or to create a new proxy operation manager on the spot.
-                Func<string, ProxyExecutionManager, ProxyOperationManager>
-                    proxyOperationManagerCreator = (
-                        string source,
-                        ProxyExecutionManager proxyExecutionManager) =>
+                    if (proxyOperationManager == null)
                     {
-                        var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
-                            testRunCriteria.TestSessionInfo,
-                            source,
-                            runtimeProviderInfo.RunSettings);
-
-                        if (proxyOperationManager == null)
-                        {
                             // If the proxy creation process based on test session info failed, then
                             // we'll proceed with the normal creation process as if no test session
                             // info was passed in in the first place.
@@ -252,46 +271,39 @@ public class TestEngine : ITestEngine
                             // regarding the test session pool operation and consistency.
                             EqtTrace.Warning("ProxyExecutionManager creation with test session failed.");
 
-                            proxyOperationManager = new ProxyOperationManager(
-                                requestData,
-                                requestSender,
-                                hostManager,
-                                proxyExecutionManager);
-                        }
+                        proxyOperationManager = new ProxyOperationManager(
+                            requestData,
+                            requestSender,
+                            hostManager,
+                            proxyExecutionManager);
+                    }
 
-                        return proxyOperationManager;
-                    };
+                    return proxyOperationManager;
+                };
 
-                // In case we have an active test session, data collection needs were
-                // already taken care of when first creating the session. As a consequence
-                // we always return this proxy instead of choosing between the vanilla
-                // execution proxy and the one with data collection enabled.
-                return new ProxyExecutionManager(
-                    testRunCriteria.TestSessionInfo,
-                    proxyOperationManagerCreator,
-                    testRunCriteria.DebugEnabledForTestSession);
-            }
+            // In case we have an active test session, data collection needs were
+            // already taken care of when first creating the session. As a consequence
+            // we always return this proxy instead of choosing between the vanilla
+            // execution proxy and the one with data collection enabled.
+            return new ProxyExecutionManager(
+                testRunCriteria.TestSessionInfo,
+                proxyOperationManagerCreator,
+                testRunCriteria.DebugEnabledForTestSession);
+        }
 
-            return isDataCollectorEnabled
-                ? new ProxyExecutionManagerWithDataCollection(
+        return isDataCollectorEnabled
+            ? new ProxyExecutionManagerWithDataCollection(
+                requestData,
+                requestSender,
+                hostManager,
+                new ProxyDataCollectionManager(
                     requestData,
-                    requestSender,
-                    hostManager,
-                    new ProxyDataCollectionManager(
-                        requestData,
-                        runtimeProviderInfo.RunSettings,
-                        GetSourcesFromTestRunCriteria(testRunCriteria)))
-                : new ProxyExecutionManager(
-                    requestData,
-                    requestSender,
-                    hostManager);
-        };
-
-        var executionManager = new ParallelProxyExecutionManager(requestData, proxyExecutionManagerCreator, parallelLevel, testHostProviders);
-
-        EqtTrace.Verbose($"TestEngine.GetExecutionManager: Chosen execution manager '{executionManager.GetType().AssemblyQualifiedName}' ParallelLevel '{parallelLevel}'.");
-
-        return executionManager;
+                    runtimeProviderInfo.RunSettings,
+                    sources))
+            : new ProxyExecutionManager(
+                requestData,
+                requestSender,
+                hostManager);
     }
 
     /// <inheritdoc/>
@@ -561,18 +573,6 @@ public class TestEngine : ITestEngine
                 : new NoOpMetricsCollection(),
             IsTelemetryOptedIn = isTelemetryOptedIn
         };
-    }
-
-    /// <summary>
-    /// Gets test sources from test run criteria.
-    /// </summary>
-    ///
-    /// <returns>The test sources.</returns>
-    private IEnumerable<string> GetSourcesFromTestRunCriteria(TestRunCriteria testRunCriteria)
-    {
-        return testRunCriteria.HasSpecificTests
-            ? TestSourcesUtility.GetSources(testRunCriteria.Tests)
-            : testRunCriteria.Sources;
     }
 
     private static void ThrowExceptionIfTestHostManagerIsNull(ITestRuntimeProvider testHostManager, string settingsXml)

@@ -75,7 +75,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
             throw new InvalidOperationException($"{nameof(_eventHandler)} was not provided.");
 
         if (_getEventHandler == null)
-            throw new InvalidOperationException($"{nameof(_eventHandler)} was not provided.");
+            throw new InvalidOperationException($"{nameof(_getEventHandler)} was not provided.");
 
         if (_runWorkload == null)
             throw new InvalidOperationException($"{nameof(_runWorkload)} was not provided.");
@@ -125,14 +125,14 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         return workToRun.Count > 0;
     }
 
-    public bool RunNextWork(TManager completedManager)
+    public bool RunNextWork(TManager completedManager!!)
     {
         lock (_lock)
         {
             var completedSlot = _managerSlots.Where(s => ReferenceEquals(completedManager, s.Manager)).ToList();
             if (!completedSlot.Any())
             {
-                // yikes, we should have found it there
+                throw new InvalidOperationException("The provided manager was not found in any slot.");
             }
 
             var slot = completedSlot.Single();

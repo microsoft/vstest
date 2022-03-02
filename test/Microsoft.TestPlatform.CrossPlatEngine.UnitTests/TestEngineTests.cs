@@ -28,7 +28,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests;
 [TestClass]
 public class TestEngineTests
 {
-    private ITestEngine _testEngine;
+    private TestableTestEngine _testEngine;
     private readonly Mock<IProcessHelper> _mockProcessHelper;
     private readonly ProtocolConfig _protocolConfig = new() { Version = 1 };
     private readonly Mock<IRequestData> _mockRequestData;
@@ -353,28 +353,6 @@ public class TestEngineTests
     }
 
     [TestMethod]
-    public void GetExecutionManagerShouldReturnExecutionManagerWithDataCollectionIfDataCollectionIsEnabled()
-    {
-        var settingXml =
-            @"<RunSettings>
-                <DataCollectionRunSettings>
-                    <DataCollectors>
-                        <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector>
-                    </DataCollectors>
-                </DataCollectionRunSettings>
-            </RunSettings>";
-        var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingXml);
-        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
-        {
-            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
-        };
-        var result = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
-
-        Assert.IsNotNull(result);
-        Assert.IsInstanceOfType(result, typeof(ProxyExecutionManagerWithDataCollection));
-    }
-
-    [TestMethod]
     public void GetExecutionManagerShouldNotReturnInProcessProxyexecutionManagerIfInIsolationIsTrue()
     {
         string settingXml =
@@ -578,56 +556,6 @@ public class TestEngineTests
         var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
 
         _mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, It.IsAny<object>()), Times.Once);
-    }
-
-    [TestMethod]
-    public void ProxyDataCollectionManagerShouldBeInitialzedWithCorrectTestSourcesWhenTestRunCriteriaContainsSourceList()
-    {
-        var settingXml =
-            @"<RunSettings>
-                <DataCollectionRunSettings>
-                    <DataCollectors>
-                        <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector>
-                    </DataCollectors>
-                </DataCollectionRunSettings>
-            </RunSettings>";
-
-        var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
-        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
-        {
-            ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
-            ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
-        };
-
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
-
-        Assert.IsInstanceOfType(executionManager, typeof(ProxyExecutionManagerWithDataCollection));
-        Assert.IsTrue(((ProxyExecutionManagerWithDataCollection)executionManager).ProxyDataCollectionManager.Sources.Contains("1.dll"));
-    }
-
-    [TestMethod]
-    public void ProxyDataCollectionManagerShouldBeInitialzedWithCorrectTestSourcesWhenTestRunCriteriaContainsTestCaseList()
-    {
-        var settingXml =
-            @"<RunSettings>
-                <DataCollectionRunSettings>
-                    <DataCollectors>
-                        <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector>
-                    </DataCollectors>
-                </DataCollectionRunSettings>
-            </RunSettings>";
-
-        var testCaseList = new List<TestCase> { new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll") };
-        var testRunCriteria = new TestRunCriteria(testCaseList, 100, false, settingXml);
-        var sourceToSourceDetailMap = new Dictionary<string, SourceDetail>
-        {
-            ["x.dll"] = new SourceDetail { Source = "x.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
-        };
-
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
-
-        Assert.IsInstanceOfType(executionManager, typeof(ProxyExecutionManagerWithDataCollection));
-        Assert.IsTrue(((ProxyExecutionManagerWithDataCollection)executionManager).ProxyDataCollectionManager.Sources.Contains("x.dll"));
     }
 
     /// <summary>
@@ -1092,5 +1020,56 @@ public class TestEngineTests
             sourceToSourceDetailMap);
 
         Assert.IsNotNull(testSessionManager);
+    }
+
+    [TestMethod]
+    public void CreatingNonParallelExecutionManagerShouldReturnExecutionManagerWithDataCollectionIfDataCollectionIsEnabled()
+    {
+        var settingXml =
+            @"<RunSettings>
+                <DataCollectionRunSettings>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector>
+                    </DataCollectors>
+                </DataCollectionRunSettings>
+            </RunSettings>";
+        var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingXml);
+
+        var runtimeProviderInfo = new TestRuntimeProviderInfo(typeof(ITestRuntimeProvider), false, settingXml,
+            new List<SourceDetail> { new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework } });
+        var nonParallelExecutionManager = _testEngine.CreateNonParallelExecutionManager(_mockRequestData.Object, testRunCriteria, true, runtimeProviderInfo);
+
+        Assert.IsNotNull(nonParallelExecutionManager);
+        Assert.IsInstanceOfType(nonParallelExecutionManager, typeof(ProxyExecutionManagerWithDataCollection));
+    }
+
+
+    [TestMethod]
+    public void CreatedNonParallelExecutionManagerShouldBeInitialzedWithCorrectTestSourcesWhenTestRunCriteriaContainsSourceList()
+    {
+        // Test run criteria are NOT used to get sources or settings
+        // those are taken from the runtimeProviderInfo, because we've split the
+        // test run criteria into smaller pieces to run them on each non-parallel execution manager.
+        var testRunCriteria = new TestRunCriteria(new List<string> { "none.dll" }, 100, false, testSettings: null);
+
+        var settingXml =
+            @"<RunSettings>
+                <DataCollectionRunSettings>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector>
+                    </DataCollectors>
+                </DataCollectionRunSettings>
+            </RunSettings>";
+
+        var runtimeProviderInfo = new TestRuntimeProviderInfo(typeof(ITestRuntimeProvider), false, settingXml,
+            new List<SourceDetail> {
+                new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
+                new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework }
+            });
+        var nonParallelExecutionManager = _testEngine.CreateNonParallelExecutionManager(_mockRequestData.Object, testRunCriteria, true, runtimeProviderInfo);
+
+        Assert.IsInstanceOfType(nonParallelExecutionManager, typeof(ProxyExecutionManagerWithDataCollection));
+        Assert.IsTrue(((ProxyExecutionManagerWithDataCollection)nonParallelExecutionManager).ProxyDataCollectionManager.Sources.Contains("1.dll"));
+        Assert.IsTrue(((ProxyExecutionManagerWithDataCollection)nonParallelExecutionManager).ProxyDataCollectionManager.Sources.Contains("2.dll"));
     }
 }
