@@ -20,7 +20,8 @@ public partial class ProcessHelper : IProcessHelper
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool IsWow64Process2(IntPtr process, out ushort processMachine, out ushort nativeMachine);
 
-    private const ushort Arm64Machine = 0xAA64;
+    private const ushort IMAGE_FILE_MACHINE_ARM64 = 0xAA64;
+    private const ushort IMAGE_FILE_MACHINE_UNKNOWN = 0;
 
     /// <inheritdoc/>
     public string GetCurrentProcessLocation()
@@ -32,8 +33,10 @@ public partial class ProcessHelper : IProcessHelper
 
     /// <inheritdoc/>
     public PlatformArchitecture GetCurrentProcessArchitecture() =>
-        IntPtr.Size == 8 ?
-        IsArm64() ? PlatformArchitecture.ARM64 : PlatformArchitecture.X64
+        IntPtr.Size == 8
+        ? IsArm64()
+            ? PlatformArchitecture.ARM64
+            : PlatformArchitecture.X64
         : PlatformArchitecture.X86;
 
     private static bool IsArm64()
@@ -44,11 +47,12 @@ public partial class ProcessHelper : IProcessHelper
             if (!IsWow64Process2(currentProcess.Handle, out ushort processMachine, out ushort nativeMachine))
                 throw new Win32Exception();
 
-            // if IMAGE_FILE_MACHINE_UNKNOWN we're not running inside WOW64 and we can verify the native architecture.
-            if (processMachine == 0 && nativeMachine == Arm64Machine)
+            // If processMachine is IMAGE_FILE_MACHINE_UNKNOWN mean that we're not running using WOW64 x86 emulation.
+            // If nativeMachine is IMAGE_FILE_MACHINE_ARM64 mean that we're running on ARM64 architecture device.
+            if (processMachine == IMAGE_FILE_MACHINE_UNKNOWN && nativeMachine == IMAGE_FILE_MACHINE_ARM64)
             {
-                // To distinguish between ARM64 and x64 emulated on ARM we check the PE header.
-                return IsArm64Module(currentProcess.MainModule.FileName);
+                // To distinguish between ARM64 and x64 emulated on ARM64 we check the PE header of the current running executable.
+                return IsArm64Executable(currentProcess.MainModule.FileName);
             }
         }
         catch (Exception)
@@ -59,7 +63,7 @@ public partial class ProcessHelper : IProcessHelper
         return false;
     }
 
-    private static bool IsArm64Module(string path)
+    private static bool IsArm64Executable(string path)
     {
         // This document specifies the structure of executable (image) files
         // https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#general-concepts
@@ -102,7 +106,7 @@ public partial class ProcessHelper : IProcessHelper
 
             // https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#optional-header-image-only
             ushort magic = reader.ReadUInt16();
-            return magic is 0x010B or 0x020B && machine == Arm64Machine;
+            return magic is 0x010B or 0x020B && machine == IMAGE_FILE_MACHINE_ARM64;
         }
     }
 }
