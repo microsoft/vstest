@@ -158,6 +158,8 @@ internal class TestRequestManager : ITestRequestManager
 
         // TODO: Normalize rest of the data on the request as well
         discoveryPayload.Sources = discoveryPayload.Sources?.Distinct().ToList() ?? new List<string>();
+        discoveryPayload.RunSettings ??= "<RunSettings></RunSettings>";
+
         var runsettings = discoveryPayload.RunSettings;
 
         if (discoveryPayload.TestPlatformOptions != null)
@@ -453,6 +455,9 @@ internal class TestRequestManager : ITestRequestManager
         {
             _telemetryOptedIn = payload.TestPlatformOptions.CollectMetrics;
         }
+
+        payload.Sources ??= new List<string>();
+        payload.RunSettings ??= "<RunSettings></RunSettings>";
 
         if (UpdateRunSettingsIfRequired(
                 payload.RunSettings,

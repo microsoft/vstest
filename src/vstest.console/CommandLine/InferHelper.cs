@@ -35,7 +35,13 @@ internal class InferHelper
         // Set the default for all sources.
         foreach (var source in sources)
         {
-            sourceToPlatformMap.Add(source, defaultArchitecture);
+            // TODO: Add default architecture to runtime providers info, or something and that will allow us to have test
+            // cases without any sources. Otherwise change test AutoDetectArchitectureShouldReturnDefaultArchitectureOnNullItemInSources
+            // because this condition is making that test happy.
+            if (source != null)
+            {
+                sourceToPlatformMap.Add(source, defaultArchitecture);
+            }
         }
 
         try
@@ -70,6 +76,7 @@ internal class InferHelper
 
                         // This source has no associated architecture so it does not help use determine a common architecture for
                         // all the sources, so we continue to next one.
+                        sourceToPlatformMap[source] = defaultArchitecture;
                         continue;
                     }
 

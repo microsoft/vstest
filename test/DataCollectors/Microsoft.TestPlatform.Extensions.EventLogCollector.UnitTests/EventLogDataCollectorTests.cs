@@ -217,7 +217,6 @@ public class EventLogDataCollectorTests
     {
         var testableDataCollectionEvents = new TestableDataCollectionEvents();
         _eventLogDataCollector.Initialize(null, testableDataCollectionEvents, _mockDataCollectionSink, _mockDataCollectionLogger.Object, _dataCollectionEnvironmentContext);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestHostLaunchedInvocationList().Length);
         Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseStartInvocationList().Length);
         Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseEndInvocationList().Length);
         Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionEndInvocationList().Length);

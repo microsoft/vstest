@@ -22,7 +22,7 @@ public class MetadataReaderHelperTests
     public void MetadataReaderHelper_GetCollectorExtensionTypes()
     {
         string testAssetsPath = GetTestAssetsFolder();
-        var dataCollectorFilePath = Directory.GetFiles(testAssetsPath, "AttachmentProcessorDataCollector.dll", SearchOption.AllDirectories).Where(x => x.Contains("bin")).Single();
+        var dataCollectorFilePath = Directory.GetFiles(testAssetsPath, "AttachmentProcessorDataCollector.dll", SearchOption.AllDirectories).Where(x => x.Contains("bin")).First();
         var types = _metadataReaderHelper.DiscoverTestExtensionTypesV2Attribute(Assembly.LoadFile(dataCollectorFilePath), dataCollectorFilePath);
         Assert.IsTrue(types.Any(), $"File {dataCollectorFilePath}");
         Assert.IsTrue(types[0].AssemblyQualifiedName.StartsWith("AttachmentProcessorDataCollector.SampleDataCollectorV2"), $"File {dataCollectorFilePath}");

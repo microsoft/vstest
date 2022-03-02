@@ -27,7 +27,6 @@ public class InferHelperTests
     private readonly Framework _frameworkNet47 = Framework.FromString(".NETFramework,Version=4.7");
     private readonly Framework _frameworkCore10 = Framework.FromString(".NETCoreApp,Version=1.0");
     private readonly Framework _frameworkCore11 = Framework.FromString(".NETCoreApp,Version=1.1");
-    private readonly IDictionary<string, Framework> _sourceFrameworks;
 
     public InferHelperTests()
     {
@@ -75,10 +74,10 @@ public class InferHelperTests
     }
 
     [TestMethod]
-    public void AutoDetectArchitectureShouldSetAnyCpuArchForNotDotNetAssembly()
+    public void AutoDetectArchitectureShouldSetDefaultArchForNotDotNetAssembly()
     {
         _inferHelper.AutoDetectArchitecture(new List<string>() { "NotDotNetAssebly.appx" }, _defaultArchitecture, out var sourceArchitectures);
-        Assert.AreEqual(Architecture.AnyCPU, sourceArchitectures["NotDotNetAssebly.appx"]);
+        Assert.AreEqual(_defaultArchitecture, sourceArchitectures["NotDotNetAssebly.appx"]);
     }
 
     [TestMethod]
@@ -113,7 +112,7 @@ public class InferHelperTests
     {
         _mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.AnyCPU).Returns(Architecture.AnyCPU).Returns(Architecture.X64);
-        Assert.AreEqual(Architecture.X64, _inferHelper.AutoDetectArchitecture(new List<string>() { "x64.dll", "AnyCPU2.exe", "x64.dll" }, _defaultArchitecture, out _));
+        Assert.AreEqual(Architecture.X64, _inferHelper.AutoDetectArchitecture(new List<string>() { "x64.dll", "AnyCPU2.exe", "x64-2.dll" }, _defaultArchitecture, out _));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
     }
 
@@ -134,7 +133,7 @@ public class InferHelperTests
 
         Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "x64.exe", "x86.dll" }, _defaultArchitecture, out var sourceArchitectures));
         Assert.AreEqual(3, sourceArchitectures.Count);
-        Assert.AreEqual(Architecture.AnyCPU, sourceArchitectures["AnyCPU1.dll"]);
+        Assert.AreEqual(_defaultArchitecture, sourceArchitectures["AnyCPU1.dll"]);
         Assert.AreEqual(Architecture.X64, sourceArchitectures["x64.exe"]);
         Assert.AreEqual(Architecture.X86, sourceArchitectures["x86.dll"]);
 
@@ -241,12 +240,12 @@ public class InferHelperTests
             .Returns(new FrameworkName(_frameworkNet47.Name))
             .Returns(new FrameworkName(_frameworkNet45.Name));
 
-        Assert.AreEqual(_frameworkNet47.Name, _inferHelper.AutoDetectFramework(new List<string>() { "net46.dll", "net47.exe", "net45.dll" }, out _).Name);
+        Assert.AreEqual(_frameworkNet47.Name, _inferHelper.AutoDetectFramework(new List<string>() { "net46.dll", "net47.exe", "net45.dll" }, out var sourceFrameworks).Name);
 
-        Assert.AreEqual(3, _sourceFrameworks.Count);
-        Assert.AreEqual(_frameworkNet46.Name, _sourceFrameworks["net46.dll"].Name);
-        Assert.AreEqual(_frameworkNet47.Name, _sourceFrameworks["net47.exe"].Name);
-        Assert.AreEqual(_frameworkNet45.Name, _sourceFrameworks["net45.dll"].Name);
+        Assert.AreEqual(3, sourceFrameworks.Count);
+        Assert.AreEqual(_frameworkNet46.Name, sourceFrameworks["net46.dll"].Name);
+        Assert.AreEqual(_frameworkNet47.Name, sourceFrameworks["net47.exe"].Name);
+        Assert.AreEqual(_frameworkNet45.Name, sourceFrameworks["net45.dll"].Name);
         _mockAssemblyHelper.Verify(ah => ah.GetFrameWork(It.IsAny<string>()), Times.Exactly(3));
     }
 
