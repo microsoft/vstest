@@ -225,6 +225,6 @@
   </xsl:template>
   
   <xsl:template match = "tp:DisplayName">
-    <span>&#160;<xsl:value-of select = "." /></span>
+    <span>&#160;<xsl:value-of select = "." />&#8203;</span>
   </xsl:template>
 </xsl:stylesheet>
