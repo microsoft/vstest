@@ -1,22 +1,25 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Diagnostics;
-using System.Globalization;
-using System.Collections.Generic;
 
-using Utilities;
-using Logging;
-using ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using CommonResources = Resources.Resources;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 /// <summary>
 /// Discovers test extensions in a directory.
@@ -33,8 +36,6 @@ internal class TestPluginDiscoverer
     {
     }
 
-    #region Fields
-
 #if WINDOWS_UAP
         private static HashSet<string> platformAssemblies = new HashSet<string>(new string[] {
             "MICROSOFT.VISUALSTUDIO.TESTPLATFORM.UNITTESTFRAMEWORK.DLL",
@@ -50,10 +51,6 @@ internal class TestPluginDiscoverer
 
         private const string SYSTEM_ASSEMBLY_PREFIX = "system.";
 #endif
-
-    #endregion
-
-    #region Public Methods
 
     /// <summary>
     /// Gets information about each of the test extensions available.
@@ -80,10 +77,6 @@ internal class TestPluginDiscoverer
 
         return pluginInfos;
     }
-
-    #endregion
-
-    #region Private Methods
 
     private void AddKnownExtensions(ref IEnumerable<string> extensionPaths)
     {
@@ -248,11 +241,8 @@ internal class TestPluginDiscoverer
 
             if (pluginInfo == null || pluginInfo.IdentifierData == null)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error(
-                        "GetTestExtensionFromType: Either PluginInformation is null or PluginInformation doesn't contain IdentifierData for type {0}.", type.FullName);
-                }
+                EqtTrace.Error(
+                    "GetTestExtensionFromType: Either PluginInformation is null or PluginInformation doesn't contain IdentifierData for type {0}.", type.FullName);
                 return;
             }
 
@@ -271,5 +261,4 @@ internal class TestPluginDiscoverer
         }
     }
 
-    #endregion
 }

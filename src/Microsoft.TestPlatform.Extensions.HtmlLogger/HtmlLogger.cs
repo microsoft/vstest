@@ -1,12 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger;
-
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,14 +9,22 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 
-using ObjectModel;
-using Utilities;
-using Utilities.Helpers;
-using Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-using HtmlResource = Resources.Resources;
-using HtmlLoggerConstants = Constants;
 using NuGet.Frameworks;
+
+using HtmlLoggerConstants = Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.Constants;
+using HtmlResource = Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger;
 
 /// <summary>
 /// Logger for generating Html.
@@ -101,13 +103,8 @@ public class HtmlLogger : ITestLoggerWithParameters
     public string HtmlFilePath { get; private set; }
 
     /// <inheritdoc/>
-    public void Initialize(TestLoggerEvents events, string testResultsDirPath)
+    public void Initialize(TestLoggerEvents events!!, string testResultsDirPath)
     {
-        if (events == null)
-        {
-            throw new ArgumentNullException(nameof(events));
-        }
-
         if (string.IsNullOrEmpty(testResultsDirPath))
         {
             throw new ArgumentNullException(nameof(testResultsDirPath));
@@ -128,13 +125,8 @@ public class HtmlLogger : ITestLoggerWithParameters
     }
 
     /// <inheritdoc/>
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters!!)
     {
-        if (parameters == null)
-        {
-            throw new ArgumentNullException(nameof(parameters));
-        }
-
         if (parameters.Count == 0)
         {
             throw new ArgumentException("No default parameters added", nameof(parameters));

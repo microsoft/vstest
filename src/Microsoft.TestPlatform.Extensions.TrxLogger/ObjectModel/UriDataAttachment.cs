@@ -1,16 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Xml;
 
-using Utility;
+using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
-using XML;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
 /// Class that provides a basic implementation of IUriAttachment, which can be used by plugin
@@ -19,13 +21,9 @@ using XML;
 internal class UriDataAttachment : IDataAttachment, IXmlTestStore
 {
     private readonly TrxFileHelper _trxFileHelper;
-    #region Private fields
-
     /// <summary>
     /// The name for the attachment
     /// </summary>
-
-    #endregion
 
     /// <summary>
     /// Initializes the URI data attachment
@@ -112,9 +110,6 @@ internal class UriDataAttachment : IDataAttachment, IXmlTestStore
     }
 
     #endregion
-
-    #region Private Methods
-
     private void Initialize(string desc, Uri uri)
     {
         EqtAssert.ParameterNotNull(desc, nameof(desc));
@@ -124,5 +119,4 @@ internal class UriDataAttachment : IDataAttachment, IXmlTestStore
         Uri = uri;
     }
 
-    #endregion
 }

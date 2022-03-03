@@ -1,18 +1,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
-using ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using Interfaces;
-using Resources;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 /// <summary>
 /// Manager for VisualStudio based extensions
@@ -61,7 +63,7 @@ public class VSExtensionManager : IVSExtensionManager
         }
         catch (Exception ex)
         {
-            string message = string.Format(CultureInfo.CurrentCulture, Resources.FailedToFindInstalledUnitTestExtensions, ex);
+            string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.FailedToFindInstalledUnitTestExtensions, ex);
             throw new TestPlatformException(message, ex);
         }
     }
@@ -78,7 +80,7 @@ public class VSExtensionManager : IVSExtensionManager
         var installContext = new InstallationContext(_fileHelper);
         if (!installContext.TryGetVisualStudioDirectory(out string vsInstallPath))
         {
-            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.VSInstallationNotFound));
+            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.VSInstallationNotFound));
         }
 
         // Adding resolution paths for resolving dependencies.
@@ -88,7 +90,7 @@ public class VSExtensionManager : IVSExtensionManager
             object extensionManager;
             object settingsManager;
 
-            settingsManager = SettingsManagerType.GetMethod("CreateForApplication", new Type[] { typeof(String) }).Invoke(null, new object[] { installContext.GetVisualStudioPath(vsInstallPath) });
+            settingsManager = SettingsManagerType.GetMethod("CreateForApplication", new Type[] { typeof(string) }).Invoke(null, new object[] { installContext.GetVisualStudioPath(vsInstallPath) });
             if (settingsManager != null)
             {
                 try
@@ -98,15 +100,12 @@ public class VSExtensionManager : IVSExtensionManager
 
                     if (extensionManager != null)
                     {
-                        installedExtensions = ExtensionManagerServiceType.GetMethod("GetEnabledExtensionContentLocations", new Type[] { typeof(String) }).Invoke(
+                        installedExtensions = ExtensionManagerServiceType.GetMethod("GetEnabledExtensionContentLocations", new Type[] { typeof(string) }).Invoke(
                             extensionManager, new object[] { extensionType }) as IEnumerable<string>;
                     }
                     else
                     {
-                        if (EqtTrace.IsWarningEnabled)
-                        {
-                            EqtTrace.Warning("VSExtensionManager : Unable to create extension manager");
-                        }
+                        EqtTrace.Warning("VSExtensionManager : Unable to create extension manager");
                     }
                 }
                 finally
@@ -121,10 +120,7 @@ public class VSExtensionManager : IVSExtensionManager
             }
             else
             {
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("VSExtensionManager : Unable to create settings manager");
-                }
+                EqtTrace.Warning("VSExtensionManager : Unable to create settings manager");
             }
         }
 

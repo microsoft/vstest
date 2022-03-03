@@ -3,6 +3,8 @@
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
 
 /// <summary>

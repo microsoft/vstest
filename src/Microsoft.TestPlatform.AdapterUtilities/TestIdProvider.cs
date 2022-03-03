@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AdapterUtilities;
-
 using System;
 using System.Text;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AdapterUtilities;
 
 public class TestIdProvider
 {
@@ -14,9 +16,9 @@ public class TestIdProvider
     internal const int DigestBytes = DigestBits / 8;
 
     private Guid _id = Guid.Empty;
-    private byte[] _hash = null;
+    private byte[] _hash;
     private byte[] _lastBlock = new byte[BlockBytes];
-    private int _position = 0;
+    private int _position;
 
     private readonly Sha1Implementation _hasher;
 
@@ -121,8 +123,8 @@ public class TestIdProvider
          * For more information please refer to https://tools.ietf.org/html/rfc3174.
          */
 
-        private int _streamSize = 0;
-        private bool _messagePadded = false;
+        private int _streamSize;
+        private bool _messagePadded;
 
         public Sha1Implementation()
         {
@@ -145,20 +147,14 @@ public class TestIdProvider
         /// </returns>
         private static uint F(int t, uint b, uint c, uint d)
         {
-            if (t >= 0 && t <= 19)
+            return t switch
             {
-                return (b & c) | (~b & d);
-            }
-            else if ((t >= 20 && t <= 39) || (t >= 60 && t <= 79))
-            {
-                return b ^ c ^ d;
-            }
-            else
-            {
-                return t >= 40 && t <= 59
-                    ? (b & c) | (b & d) | (c & d)
-                    : throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t));
-            }
+                >= 0 and <= 19 => b & c | ~b & d,
+                >= 20 and <= 39 or >= 60 and <= 79 => b ^ c ^ d,
+                _ => t is >= 40 and <= 59
+                    ? b & c | b & d | c & d
+                    : throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t))
+            };
         }
 
         /// <summary>
@@ -173,22 +169,15 @@ public class TestIdProvider
         /// </returns>
         private static uint K(int t)
         {
-            if (t >= 0 && t <= 19)
+            return t switch
             {
-                return 0x5A827999u;
-            }
-            else if (t >= 20 && t <= 39)
-            {
-                return 0x6ED9EBA1u;
-            }
-            else if (t >= 40 && t <= 59)
-            {
-                return 0x8F1BBCDCu;
-            }
-            else
-            {
-                return t >= 60 && t <= 79 ? 0xCA62C1D6u : throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t));
-            }
+                >= 0 and <= 19 => 0x5A827999u,
+                >= 20 and <= 39 => 0x6ED9EBA1u,
+                >= 40 and <= 59 => 0x8F1BBCDCu,
+                _ => t is >= 60 and <= 79
+                    ? 0xCA62C1D6u
+                    : throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t))
+            };
         }
 
         /// <summary>

@@ -1,21 +1,23 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
-
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-using CommonResources = Common.Resources.Resources;
+using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 
 /// <summary>
 /// Utility class that facilitates the IPC communication. Acts as server.
@@ -54,10 +56,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     /// <returns>Port number</returns>
     public int InitializeCommunication()
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DataCollectionRequestSender.InitializeCommunication : Initialize communication. ");
-        }
+        EqtTrace.Verbose("DataCollectionRequestSender.InitializeCommunication : Initialize communication. ");
 
         var endpoint = _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0));
         _communicationManager.AcceptClientAsync();
@@ -71,10 +70,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     /// <returns>True, if Handler is connected</returns>
     public bool WaitForRequestHandlerConnection(int clientConnectionTimeout)
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DataCollectionRequestSender.WaitForRequestHandlerConnection : Waiting for connection with timeout: {0}", clientConnectionTimeout);
-        }
+        EqtTrace.Verbose("DataCollectionRequestSender.WaitForRequestHandlerConnection : Waiting for connection with timeout: {0}", clientConnectionTimeout);
 
         return _communicationManager.WaitForClientConnection(clientConnectionTimeout);
     }
@@ -92,10 +88,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     /// </summary>
     public void Close()
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Closing the connection");
-        }
+        EqtTrace.Info("Closing the connection");
 
         _communicationManager?.StopServer();
     }
@@ -112,10 +105,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
         var isDataCollectionStarted = false;
         BeforeTestRunStartResult result = null;
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DataCollectionRequestSender.SendBeforeTestRunStartAndGetResult : Send BeforeTestRunStart message with settingsXml {0} and sources {1}: ", settingsXml, sources.ToString());
-        }
+        EqtTrace.Verbose("DataCollectionRequestSender.SendBeforeTestRunStartAndGetResult: Send BeforeTestRunStart message with settingsXml {0} and sources {1}: ", settingsXml, sources.ToString());
 
         var payload = new BeforeTestRunStartPayload
         {
@@ -130,10 +120,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
         {
             var message = _communicationManager.ReceiveMessage();
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("DataCollectionRequestSender.SendBeforeTestRunStartAndGetResult : Received message: {0}", message);
-            }
+            EqtTrace.Verbose("DataCollectionRequestSender.SendBeforeTestRunStartAndGetResult: Received message: {0}", message);
 
             if (message.MessageType == MessageType.DataCollectionMessage)
             {
@@ -156,10 +143,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
         var isDataCollectionComplete = false;
         AfterTestRunEndResult result = null;
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DataCollectionRequestSender.SendAfterTestRunStartAndGetResult : Send AfterTestRunEnd message with isCancelled: {0}", isCancelled);
-        }
+        EqtTrace.Verbose("DataCollectionRequestSender.SendAfterTestRunStartAndGetResult: Send AfterTestRunEnd message with isCancelled: {0}", isCancelled);
 
         _communicationManager.SendMessage(MessageType.AfterTestRunEnd, isCancelled);
 
@@ -169,10 +153,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
         {
             var message = _communicationManager.ReceiveMessage();
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("DataCollectionRequestSender.SendAfterTestRunStartAndGetResult : Received message: {0}", message);
-            }
+            EqtTrace.Verbose("DataCollectionRequestSender.SendAfterTestRunStartAndGetResult: Received message: {0}", message);
 
             if (message.MessageType == MessageType.DataCollectionMessage)
             {

@@ -1,20 +1,22 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
-
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using Interfaces;
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
 
 [TestClass]
 [Obsolete("This API is not final yet and is subject to changes.", false)]
@@ -298,19 +300,20 @@ public class TestSessionTests
     }
 
     [TestMethod]
-    public void StopTestSessionShouldCallConsoleWrapperStopTestSessionWithCorrectArguments1()
+    public void StopTestSessionWithNoArgsShouldCallConsoleWrapperStopTestSessionWithCorrectArguments()
     {
         _testSession.StopTestSession();
 
         _mockVsTestConsoleWrapper.Verify(
             vtcw => vtcw.StopTestSession(
                 _testSessionInfo,
+                null,
                 _mockTestSessionEventsHandler.Object),
             Times.Once);
     }
 
     [TestMethod]
-    public void StopTestSessionShouldCallConsoleWrapperStopTestSessionWithCorrectArguments2()
+    public void StopTestSessionWithOneArgShouldCallConsoleWrapperStopTestSessionWithCorrectArguments()
     {
         var mockTestSessionEventsHandler2 = new Mock<ITestSessionEventsHandler>();
 
@@ -319,6 +322,23 @@ public class TestSessionTests
         _mockVsTestConsoleWrapper.Verify(
             vtcw => vtcw.StopTestSession(
                 _testSessionInfo,
+                null,
+                mockTestSessionEventsHandler2.Object),
+            Times.Once);
+    }
+
+    [TestMethod]
+    public void StopTestSessionWithTwoArgsShouldCallConsoleWrapperStopTestSessionWithCorrectArguments()
+    {
+        var testPlatformOptions = new TestPlatformOptions();
+        var mockTestSessionEventsHandler2 = new Mock<ITestSessionEventsHandler>();
+
+        _testSession.StopTestSession(testPlatformOptions, mockTestSessionEventsHandler2.Object);
+
+        _mockVsTestConsoleWrapper.Verify(
+            vtcw => vtcw.StopTestSession(
+                _testSessionInfo,
+                testPlatformOptions,
                 mockTestSessionEventsHandler2.Object),
             Times.Once);
     }
@@ -556,19 +576,20 @@ public class TestSessionTests
     }
 
     [TestMethod]
-    public async Task StopTestSessionAsyncShouldCallConsoleWrapperStopTestSessionWithCorrectArguments1()
+    public async Task StopTestSessionAsyncWithNoArgsShouldCallConsoleWrapperStopTestSessionWithCorrectArguments()
     {
         await _testSession.StopTestSessionAsync().ConfigureAwait(false);
 
         _mockVsTestConsoleWrapper.Verify(
             vtcw => vtcw.StopTestSessionAsync(
                 _testSessionInfo,
+                null,
                 _mockTestSessionEventsHandler.Object),
             Times.Once);
     }
 
     [TestMethod]
-    public async Task StopTestSessionAsyncShouldCallConsoleWrapperStopTestSessionWithCorrectArguments2()
+    public async Task StopTestSessionAsyncWithOneArgShouldCallConsoleWrapperStopTestSessionWithCorrectArguments()
     {
         var mockTestSessionEventsHandler2 = new Mock<ITestSessionEventsHandler>();
 
@@ -579,6 +600,26 @@ public class TestSessionTests
         _mockVsTestConsoleWrapper.Verify(
             vtcw => vtcw.StopTestSessionAsync(
                 _testSessionInfo,
+                null,
+                mockTestSessionEventsHandler2.Object),
+            Times.Once);
+    }
+
+    [TestMethod]
+    public async Task StopTestSessionAsyncWithTwoArgsShouldCallConsoleWrapperStopTestSessionWithCorrectArguments()
+    {
+        var testPlatformOptions = new TestPlatformOptions();
+        var mockTestSessionEventsHandler2 = new Mock<ITestSessionEventsHandler>();
+
+        await _testSession.StopTestSessionAsync(
+                testPlatformOptions,
+                mockTestSessionEventsHandler2.Object)
+            .ConfigureAwait(false);
+
+        _mockVsTestConsoleWrapper.Verify(
+            vtcw => vtcw.StopTestSessionAsync(
+                _testSessionInfo,
+                testPlatformOptions,
                 mockTestSessionEventsHandler2.Object),
             Times.Once);
     }

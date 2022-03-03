@@ -1,26 +1,26 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
-
-using Common.Telemetry;
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 /// <summary>
 /// ParallelDiscoveryDataAggregator aggregates discovery data from parallel discovery managers
 /// </summary>
 internal class ParallelDiscoveryDataAggregator
 {
-    #region PrivateFields
-
     private readonly object _dataUpdateSyncObject = new();
     private readonly ConcurrentDictionary<string, object> _metricsAggregator;
-
-    #endregion
 
     public ParallelDiscoveryDataAggregator()
     {
@@ -28,8 +28,6 @@ internal class ParallelDiscoveryDataAggregator
         TotalTests = 0;
         _metricsAggregator = new ConcurrentDictionary<string, object>();
     }
-
-    #region Public Properties
 
     /// <summary>
     /// Set to true if any of the request is aborted
@@ -41,9 +39,16 @@ internal class ParallelDiscoveryDataAggregator
     /// </summary>
     public long TotalTests { get; private set; }
 
-    #endregion
 
-    #region Public Methods
+    /// <summary>
+    /// Dictionary which stores source with corresponding discoveryStatus
+    /// </summary>
+    private readonly ConcurrentDictionary<string, DiscoveryStatus> _sourcesWithDiscoveryStatus = new();
+
+    /// <summary>
+    /// Indicates if discovery complete payload already sent back to IDE
+    /// </summary>
+    internal bool IsMessageSent { get; private set; }
 
     /// <summary>
     /// Returns the Aggregated Metrics.
@@ -51,7 +56,7 @@ internal class ParallelDiscoveryDataAggregator
     /// <returns></returns>
     public IDictionary<string, object> GetAggregatedDiscoveryDataMetrics()
     {
-        if (_metricsAggregator == null || _metricsAggregator.Count == 0)
+        if (_metricsAggregator == null || _metricsAggregator.IsEmpty)
         {
             return new ConcurrentDictionary<string, object>();
         }
@@ -128,5 +133,27 @@ internal class ParallelDiscoveryDataAggregator
         }
     }
 
-    #endregion
+    /// <summary>
+    /// Aggregate the source as fully discovered
+    /// </summary>
+    /// <param name="sorce">Fully discovered source</param>
+    public void MarkSourcesWithStatus(ICollection<string> sources, DiscoveryStatus status)
+        => DiscoveryManager.MarkSourcesWithStatus(sources, status, _sourcesWithDiscoveryStatus);
+
+    /// <summary>
+    /// Aggregates the value indicating if we already sent message to IDE.
+    /// </summary>
+    /// <param name="isMessageSent">Boolean value if we already sent message to IDE</param>
+    public void AggregateIsMessageSent(bool isMessageSent)
+    {
+        IsMessageSent = IsMessageSent || isMessageSent;
+    }
+
+    /// <summary>
+    /// Returns sources with particular discovery status.
+    /// </summary>
+    /// <param name="status">Status to filter</param>
+    /// <returns></returns>
+    public List<string> GetSourcesWithStatus(DiscoveryStatus status)
+        => DiscoveryManager.GetSourcesWithStatus(status, _sourcesWithDiscoveryStatus);
 }

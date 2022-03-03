@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,17 +8,19 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-using ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 /// <summary>
 /// Maintains a cache of last 'n' test results and maintains stats for the complete run.
 /// </summary>
 internal class TestRunCache : ITestRunCache
 {
-    #region Private Members
-
     /// <summary>
     /// Specifies whether the object is disposed or not.
     /// </summary>
@@ -76,10 +76,6 @@ internal class TestRunCache : ITestRunCache
     /// </summary>
     private readonly object _syncObject;
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRunCache"/> class.
     /// </summary>
@@ -109,18 +105,10 @@ internal class TestRunCache : ITestRunCache
         _timer = new Timer(OnCacheTimeHit, this, cacheTimeout, cacheTimeout);
     }
 
-    #endregion
-
-    #region Delegates
-
     /// <summary>
     /// Called when the cache is ready to report on the current status.
     /// </summary>
     internal delegate void OnCacheHit(TestRunStatistics testRunStats, ICollection<TestResult> results, ICollection<TestCase> inProgressTests);
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets the test results present in the cache currently.
@@ -182,10 +170,6 @@ internal class TestRunCache : ITestRunCache
     }
 
     public IDictionary<string, int> AdapterTelemetry { get; set; } = new Dictionary<string, int>();
-    #endregion
-
-    #region Public/internal methods
-
     /// <summary>
     /// Disposes the cache
     /// </summary>
@@ -323,10 +307,6 @@ internal class TestRunCache : ITestRunCache
         }
     }
 
-    #endregion
-
-    #region Private methods.
-
     /// <summary>
     /// Checks if the cache timeout/size has been met.
     /// </summary>
@@ -382,10 +362,7 @@ internal class TestRunCache : ITestRunCache
             }
             catch (Exception ex)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestRunCache: OnCacheTimeHit: Exception occurred while checking for cache hit. {0}", ex);
-                }
+                EqtTrace.Error("TestRunCache: OnCacheTimeHit: Exception occurred while checking for cache hit. {0}", ex);
             }
         }
     }
@@ -399,5 +376,4 @@ internal class TestRunCache : ITestRunCache
         }
     }
 
-    #endregion
 }

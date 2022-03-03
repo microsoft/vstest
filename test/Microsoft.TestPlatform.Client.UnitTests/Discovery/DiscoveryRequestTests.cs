@@ -1,25 +1,27 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Client.Discovery;
+using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
 
-using Common.Telemetry;
-using CommunicationUtilities;
-using CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
-using TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery;
 
 [TestClass]
 public class DiscoveryRequestTests
@@ -41,6 +43,10 @@ public class DiscoveryRequestTests
         _mockDataSerializer = new Mock<IDataSerializer>();
         _discoveryRequest = new DiscoveryRequest(_mockRequestData.Object, _discoveryCriteria, _discoveryManager.Object, _loggerManager.Object, _mockDataSerializer.Object);
     }
+
+    public static IEnumerable<object[]> ProtocolConfigVersionProvider
+        => Enumerable.Range(0, Constants.DefaultProtocolConfig.Version + 1)
+            .Select(x => new object[] { x });
 
     [TestMethod]
     public void ConstructorSetsDiscoveryCriteriaAndDiscoveryManager()
@@ -89,14 +95,27 @@ public class DiscoveryRequestTests
         Assert.ThrowsException<ObjectDisposedException>(() => _discoveryRequest.Abort());
     }
 
-    [TestMethod]
-    public void AbortIfDiscoveryIsinProgressShouldCallDiscoveryManagerAbort()
+    [DataTestMethod]
+    [DynamicData(nameof(ProtocolConfigVersionProvider))]
+    public void AbortIfDiscoveryIsinProgressShouldCallDiscoveryManagerAbort(int version)
     {
         // Just to set the IsDiscoveryInProgress flag
         _discoveryRequest.DiscoverAsync();
+        // Set the protocol version to a version not supporting new abort overload.
+        Constants.DefaultProtocolConfig.Version = version;
 
         _discoveryRequest.Abort();
-        _discoveryManager.Verify(dm => dm.Abort(), Times.Once);
+
+        if (version < Constants.MinimumProtocolVersionWithCancelDiscoveryEventHandlerSupport)
+        {
+            _discoveryManager.Verify(dm => dm.Abort(), Times.Once);
+            _discoveryManager.Verify(dm => dm.Abort(_discoveryRequest), Times.Never);
+        }
+        else
+        {
+            _discoveryManager.Verify(dm => dm.Abort(), Times.Never);
+            _discoveryManager.Verify(dm => dm.Abort(_discoveryRequest), Times.Once);
+        }
     }
 
     [TestMethod]

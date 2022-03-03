@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Common.UnitTests.Logging;
-
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -12,9 +10,13 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using TestResult = VisualStudio.TestPlatform.ObjectModel.TestResult;
+using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Common.UnitTests.Logging;
 
 [TestClass]
 public class InternalTestLoggerEventsBehaviors

@@ -1,22 +1,22 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-using Utilities;
-using PlatformAbstractions;
-
 using System;
 using System.Globalization;
 using System.Xml;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Stores information about a test settings.
 /// </summary>
 public class RunConfiguration : TestRunSettings
 {
-    #region Private Fields
-
     /// <summary>
     /// Platform architecture which rocksteady should use for discovery/execution
     /// </summary>
@@ -67,10 +67,6 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     private bool _shouldCollectSourceInformation;
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="RunConfiguration"/> class.
     /// </summary>
@@ -95,10 +91,6 @@ public class RunConfiguration : TestRunSettings
         TargetDevice = null;
         ExecutionThreadApartmentState = Constants.DefaultExecutionThreadApartmentState;
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets or sets the solution directory.
@@ -220,6 +212,11 @@ public class RunConfiguration : TestRunSettings
     }
 
     /// <summary>
+    /// Gets or sets the test adapter loading strategy.
+    /// </summary>
+    internal TestAdapterLoadingStrategy TestAdapterLoadingStrategy { get; set; }
+
+    /// <summary>
     /// Gets a value indicating whether parallelism needs to be disabled by the adapters.
     /// </summary>
     public bool DisableParallelization
@@ -331,11 +328,7 @@ public class RunConfiguration : TestRunSettings
     /// Gets or sets the execution thread apartment state.
     /// </summary>
     [CLSCompliant(false)]
-    public PlatformApartmentState ExecutionThreadApartmentState
-    {
-        get;
-        set;
-    }
+    public PlatformApartmentState ExecutionThreadApartmentState { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to treat the errors from test adapters as warnings.
@@ -435,7 +428,7 @@ public class RunConfiguration : TestRunSettings
     /// <summary>
     /// Collect source information
     /// </summary>
-    public bool CollectSourceInformationSet { get; private set; } = false;
+    public bool CollectSourceInformationSet { get; private set; }
 
     /// <summary>
     /// Default filter to use to filter tests
@@ -445,8 +438,6 @@ public class RunConfiguration : TestRunSettings
     /// Path to dotnet executable to be used to invoke testhost.dll. Specifying this will skip looking up testhost.exe and will force usage of the testhost.dll.
     /// </summary>
     public string DotnetHostPath { get; private set; }
-
-    #endregion
 
 #if !NETSTANDARD1_0
     /// <inheritdoc/>
@@ -509,6 +500,13 @@ public class RunConfiguration : TestRunSettings
             XmlElement testAdaptersPaths = doc.CreateElement("TestAdaptersPaths");
             testAdaptersPaths.InnerXml = TestAdaptersPaths;
             root.AppendChild(testAdaptersPaths);
+        }
+
+        if (TestAdapterLoadingStrategy != TestAdapterLoadingStrategy.Default)
+        {
+            XmlElement adapterLoadingStrategy = doc.CreateElement("TestAdapterLoadingStrategy");
+            adapterLoadingStrategy.InnerXml = TestAdapterLoadingStrategy.ToString();
+            root.AppendChild(adapterLoadingStrategy);
         }
 
         XmlElement treatTestAdapterErrorsAsWarnings = doc.CreateElement("TreatTestAdapterErrorsAsWarnings");
@@ -601,7 +599,7 @@ public class RunConfiguration : TestRunSettings
                         bool bCollectSourceInformation = true;
                         if (!bool.TryParse(collectSourceInformationStr, out bCollectSourceInformation))
                         {
-                            throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                 Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, bCollectSourceInformation, elementName));
                         }
 
@@ -668,7 +666,7 @@ public class RunConfiguration : TestRunSettings
                         string designModeValueString = reader.ReadElementContentAsString();
                         if (!bool.TryParse(designModeValueString, out bool designMode))
                         {
-                            throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                 Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, designModeValueString, elementName));
                         }
                         runConfiguration.DesignMode = designMode;
@@ -680,7 +678,7 @@ public class RunConfiguration : TestRunSettings
                         string inIsolationValueString = reader.ReadElementContentAsString();
                         if (!bool.TryParse(inIsolationValueString, out bool inIsolation))
                         {
-                            throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                 Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, inIsolationValueString, elementName));
                         }
                         runConfiguration.InIsolation = inIsolation;
@@ -692,7 +690,7 @@ public class RunConfiguration : TestRunSettings
                         string disableAppDomainValueString = reader.ReadElementContentAsString();
                         if (!bool.TryParse(disableAppDomainValueString, out bool disableAppDomainCheck))
                         {
-                            throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                 Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, disableAppDomainValueString, elementName));
                         }
                         runConfiguration.DisableAppDomain = disableAppDomainCheck;
@@ -771,6 +769,21 @@ public class RunConfiguration : TestRunSettings
                         runConfiguration.TestAdaptersPaths = reader.ReadElementContentAsString();
                         break;
 
+                    case "TestAdapterLoadingStrategy":
+                        XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                        value = reader.ReadElementContentAsString();
+                        if (Enum.TryParse<TestAdapterLoadingStrategy>(value, out var loadingStrategy))
+                        {
+                            runConfiguration.TestAdapterLoadingStrategy = loadingStrategy;
+                        }
+                        else
+                        {
+                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
+                        }
+
+                        break;
+
                     case "TreatTestAdapterErrorsAsWarnings":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                         bool treatTestAdapterErrorsAsWarnings = false;
@@ -809,11 +822,7 @@ public class RunConfiguration : TestRunSettings
 #endif
                            )
                         {
-                            if (EqtTrace.IsErrorEnabled)
-                            {
-                                EqtTrace.Error(string.Format(CultureInfo.CurrentCulture, Resources.Resources.SolutionDirectoryNotExists, solutionDirectory));
-                            }
-
+                            EqtTrace.Error(string.Format(CultureInfo.CurrentCulture, Resources.Resources.SolutionDirectoryNotExists, solutionDirectory));
                             solutionDirectory = null;
                         }
 
@@ -871,15 +880,12 @@ public class RunConfiguration : TestRunSettings
                     default:
                         // Ignore a runsettings element that we don't understand. It could occur in the case
                         // the test runner is of a newer version, but the test host is of an earlier version.
-                        if (EqtTrace.IsErrorEnabled)
-                        {
-                            EqtTrace.Warning(
-                                string.Format(
-                                    CultureInfo.CurrentCulture,
-                                    Resources.Resources.InvalidSettingsXmlElement,
-                                    Constants.RunConfigurationSettingsName,
-                                    reader.Name));
-                        }
+                        EqtTrace.Warning(
+                            string.Format(
+                                CultureInfo.CurrentCulture,
+                                Resources.Resources.InvalidSettingsXmlElement,
+                                Constants.RunConfigurationSettingsName,
+                                reader.Name));
                         reader.Skip();
                         break;
                 }

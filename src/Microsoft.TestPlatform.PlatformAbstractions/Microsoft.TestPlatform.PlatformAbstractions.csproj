@@ -12,7 +12,7 @@
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
     <!-- This causes a build error on netcoreapp1.0 -->
-    <NoWarn Condition="'$(TargetFramework)' != 'netcoreapp1.0'">NU1605</NoWarn>
+    <NoWarn Condition="'$(TargetFramework)' != 'netcoreapp1.0'">$(NoWarn);NU1605</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">

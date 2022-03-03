@@ -159,12 +159,22 @@
       </trans-unit>
       <trans-unit id="NoTestHostProviderFound">
         <source>No suitable test runtime provider found for this run.</source>
-        <target state="new">No suitable test runtime provider found for this run.</target>
+        <target state="translated">Für diese Ausführung wurde kein geeigneter Testlaufzeitanbieter gefunden.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="NoProxyMatchesDescription">
         <source>The runsettings changed between the time when the test session was established and the time of the current run/discovery request.</source>
-        <target state="new">The runsettings changed between the time when the test session was established and the time of the current run/discovery request.</target>
+        <target state="translated">Die Ausführungseinstellungen wurden zwischen dem Zeitpunkt, zu dem die Testsitzung eingerichtet wurde, und dem Zeitpunkt der aktuellen Ausführungs-/Ermittlungsanforderung geändert.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="translated">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="translated">Anlagen:</target>
         <note></note>
       </trans-unit>
     </body>

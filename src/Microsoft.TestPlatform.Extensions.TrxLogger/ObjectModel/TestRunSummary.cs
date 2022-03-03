@@ -1,21 +1,21 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
 using System;
 using System.Collections.Generic;
 using System.Xml;
 
-using XML;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
 /// XML object for saving test summary - Outcome and counts (passed, failed etc)
 /// </summary>
 internal class TestRunSummary : IXmlTestStore
 {
-    #region Fields
-
     [StoreXmlSimpleField("Counters/@total")]
     private readonly int _totalTests;
     [StoreXmlSimpleField("Counters/@executed")]
@@ -57,11 +57,7 @@ internal class TestRunSummary : IXmlTestStore
 
     private readonly List<CollectorDataEntry> _collectorDataEntries;
 
-    private readonly IList<String> _resultFiles;
-
-    #endregion
-
-    #region constructor
+    private readonly IList<string> _resultFiles;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRunSummary"/> class.
@@ -101,7 +97,7 @@ internal class TestRunSummary : IXmlTestStore
         TestOutcome outcome,
         List<RunInfo> runMessages,
         string stdOut,
-        IList<String> resultFiles,
+        IList<string> resultFiles,
         List<CollectorDataEntry> dataCollectors)
     {
         _totalTests = total;
@@ -130,7 +126,6 @@ internal class TestRunSummary : IXmlTestStore
         _collectorDataEntries = dataCollectors;
     }
 
-    #endregion
 
     #region IXmlTestStore Members
 

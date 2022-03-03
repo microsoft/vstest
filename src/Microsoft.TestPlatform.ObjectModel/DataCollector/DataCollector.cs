@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-
 using System;
 using System.Xml;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
 /// Interface for data collector add-ins
 /// </summary>
 public abstract class DataCollector : IDisposable
 {
-    #region Methods
-
     /// <summary>
     /// Initializes the data collector
     /// </summary>
@@ -55,5 +55,4 @@ public abstract class DataCollector : IDisposable
     {
     }
 
-    #endregion
 }

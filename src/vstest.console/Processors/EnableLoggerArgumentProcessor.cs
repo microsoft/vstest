@@ -1,18 +1,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
-using Utilities;
-using Common;
-using Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// An argument processor that allows the user to enable a specific logger
@@ -20,16 +22,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class EnableLoggerArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The command name.
     /// </summary>
     public const string CommandName = "/Logger";
-
-    #endregion
-
-    #region Fields
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -40,39 +36,18 @@ internal class EnableLoggerArgumentProcessor : IArgumentProcessor
     /// </summary>
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor(RunSettingsManager.Instance));
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new EnableLoggerArgumentExecutor(RunSettingsManager.Instance));
 
-            return _executor;
-        }
-
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 
     /// <summary>
     /// Gets the metadata.
     /// </summary>
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new EnableLoggerArgumentProcessorCapabilities());
-            }
-
-            return _metadata;
-        }
-    }
-
-    #endregion
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new EnableLoggerArgumentProcessorCapabilities());
 }
 
 internal class EnableLoggerArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
@@ -119,8 +94,6 @@ internal class EnableLoggerArgumentExecutor : IArgumentExecutor
 {
     private readonly IRunSettingsProvider _runSettingsManager;
 
-    #region Constructors
-
     /// <summary>
     /// Initializes a new instance of the <see cref="EnableLoggerArgumentExecutor"/> class.
     /// </summary>
@@ -130,7 +103,6 @@ internal class EnableLoggerArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsManager;
     }
 
-    #endregion
 
     #region IArgumentProcessor
 

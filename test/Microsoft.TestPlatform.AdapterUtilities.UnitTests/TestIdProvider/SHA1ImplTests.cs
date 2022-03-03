@@ -1,13 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AdapterUtilities.UnitTests.TestIdProvider;
-
-using VisualStudio.TestTools.UnitTesting;
-
 using System;
 using System.Linq;
 using System.Text;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AdapterUtilities.UnitTests.TestIdProvider;
 
 [TestClass]
 public class Sha1ImplTests

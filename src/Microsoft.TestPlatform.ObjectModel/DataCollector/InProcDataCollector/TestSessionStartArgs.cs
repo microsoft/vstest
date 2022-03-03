@@ -1,10 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
-
 using System;
 using System.Collections.Generic;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
 
 /// <summary>
 /// The test session start args.
@@ -18,7 +20,7 @@ public class TestSessionStartArgs : InProcDataCollectionArgs
     /// </summary>
     public TestSessionStartArgs()
     {
-        Configuration = String.Empty;
+        Configuration = string.Empty;
     }
 
     /// <summary>
@@ -29,7 +31,7 @@ public class TestSessionStartArgs : InProcDataCollectionArgs
     /// </param>
     public TestSessionStartArgs(IDictionary<string, object> properties)
     {
-        Configuration = String.Empty;
+        Configuration = string.Empty;
         _properties = properties;
     }
 

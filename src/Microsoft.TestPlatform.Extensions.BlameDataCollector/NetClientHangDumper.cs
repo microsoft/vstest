@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,10 +9,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Diagnostics.NETCore.Client;
+using Microsoft.Diagnostics.NETCore.Client;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 internal class NetClientHangDumper : IHangDumper
 {

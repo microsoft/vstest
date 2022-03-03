@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,8 +11,11 @@ using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Text;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 /* Expected attribute shape
 
     namespace Microsoft.VisualStudio.TestPlatform
@@ -54,7 +55,16 @@ internal class MetadataReaderExtensionsHelper
 
 #if !NETSTANDARD1_3
         // We don't cache the load because this method is used by DiscoverTestExtensionTypesV2Attribute that caches the outcome Type[]
-        Assembly assemblyToAnalyze = Assembly.LoadFile(assemblyFilePath);
+        Assembly assemblyToAnalyze;
+        try
+        {
+            assemblyToAnalyze = Assembly.LoadFile(assemblyFilePath);
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Failure during assembly file load '{assemblyFilePath}', fallback to the loaded assembly.\n{FormatException(ex)}");
+            assemblyToAnalyze = loadedAssembly;
+        }
 #else
         Assembly assemblyToAnalyze = loadedAssembly;
 #endif

@@ -1,18 +1,20 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NET451
-
-namespace Microsoft.TestPlatform.AcceptanceTests;
-
-using TestUtilities;
-using VisualStudio.TestTools.UnitTesting;
-
-using Newtonsoft.Json.Linq;
-
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Newtonsoft.Json.Linq;
+
+#if !NET451
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
@@ -50,6 +52,8 @@ public class DotnetArchitectureSwitchTestsWindowsOnly : AcceptanceTestBase
 @"
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+
+#nullable disable
 
 namespace cfebbc5339cf4c22854e79824e938c74;
 

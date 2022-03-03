@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.TestExecutor;
-
 using System.Threading.Tasks;
 
-using TestHost;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.TestExecutor;
 
 /// <summary>
 /// Initialization point for Old UWP application

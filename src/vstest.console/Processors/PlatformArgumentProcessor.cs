@@ -1,20 +1,22 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
-using Common;
-using Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 ///  An argument processor that allows the user to specify the target platform architecture
@@ -22,14 +24,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class PlatformArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the OutputArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/Platform";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -39,37 +37,18 @@ internal class PlatformArgumentProcessor : IArgumentProcessor
     /// Gets the metadata.
     /// </summary>
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new PlatformArgumentProcessorCapabilities());
-            }
-
-            return _metadata;
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new PlatformArgumentProcessorCapabilities());
 
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor = new Lazy<IArgumentExecutor>(() => new PlatformArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new PlatformArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
 
-            return _executor;
-        }
-
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 }
 
@@ -92,8 +71,6 @@ internal class PlatformArgumentProcessorCapabilities : BaseArgumentProcessorCapa
 /// </summary>
 internal class PlatformArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -102,10 +79,6 @@ internal class PlatformArgumentExecutor : IArgumentExecutor
     private readonly IRunSettingsProvider _runSettingsManager;
 
     public const string RunSettingsPath = "RunConfiguration.TargetPlatform";
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -120,7 +93,6 @@ internal class PlatformArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsManager;
     }
 
-    #endregion
 
     #region IArgumentExecutor
 
@@ -136,7 +108,7 @@ internal class PlatformArgumentExecutor : IArgumentExecutor
         }
 
         var validPlatforms = Enum.GetValues(typeof(Architecture)).Cast<Architecture>()
-            .Where(e => e != Architecture.AnyCPU && e != Architecture.Default)
+            .Where(e => e is not Architecture.AnyCPU and not Architecture.Default)
             .ToList();
 
         var validPlatform = Enum.TryParse(argument, true, out Architecture platform);
@@ -161,10 +133,7 @@ internal class PlatformArgumentExecutor : IArgumentExecutor
                 string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidPlatformType, argument, string.Join(", ", validPlatforms)));
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Using platform:{0}", _commandLineOptions.TargetArchitecture);
-        }
+        EqtTrace.Info("Using platform:{0}", _commandLineOptions.TargetArchitecture);
     }
 
     /// <summary>

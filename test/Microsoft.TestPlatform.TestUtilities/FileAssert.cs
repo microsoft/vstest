@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.TestUtilities;
+using System.IO;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using System.IO;
+#nullable disable
+
+namespace TestPlatform.TestUtilities;
 
 public static class FileAssert
 {

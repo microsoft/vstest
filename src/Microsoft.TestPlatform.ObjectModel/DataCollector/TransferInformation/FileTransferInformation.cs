@@ -1,12 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-
 using System;
 using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
 /// Represents required and optional information needed for requesting a file transfer.
@@ -15,7 +17,6 @@ public class FileTransferInformation : BasicTransferInformation
 {
     private readonly IFileHelper _fileHelper;
 
-    #region Constructor
     /// <summary>
     /// Initializes a new instance of the <see cref="FileTransferInformation"/> class.
     /// </summary>
@@ -69,10 +70,6 @@ public class FileTransferInformation : BasicTransferInformation
         PerformCleanup = deleteFile;
     }
 
-    #endregion
-
-    #region  Required Parameters.
-
     /// <summary>
     /// Gets the path to the file on the local file system.
     /// </summary>
@@ -88,5 +85,4 @@ public class FileTransferInformation : BasicTransferInformation
     /// </summary>
     protected internal override string FileName => Path;
 
-    #endregion
 }

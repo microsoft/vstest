@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator;
-
 using System;
 using System.IO;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator;
 
 /// <summary>
 /// Used to resolve the inputs provided by the user to paths needed by migrator.

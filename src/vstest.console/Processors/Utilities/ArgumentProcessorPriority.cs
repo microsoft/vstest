@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
@@ -43,10 +45,18 @@ internal enum ArgumentProcessorPriority
 
     /// <summary>
     /// Priority of TestAdapterPathArgumentProcessor.
+    /// 
     /// The priority of TestAdapterPath processor is more than the logger because logger initialization
     /// loads the extensions which are incomplete if custom test adapter is enabled
     /// </summary>
-    TestAdapterPath = 10,
+    TestAdapterPath = 9,
+
+    /// <summary>
+    /// Priority of TestAdapterLoadingStrategyArgumentProcessor.
+    /// 
+    /// This needs to be higher than most of other arguments, because it affects where we look for test adapters.
+    /// </summary>
+    TestAdapterLoadingStrategy = 10,
 
     /// <summary>
     /// Priority of processors that needs to update runsettings.

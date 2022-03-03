@@ -27,11 +27,6 @@
         <note></note>
         <target state="translated">Ayarlar yüklenirken bir hata oluştu. Hata: {0}.</target>
       </trans-unit>
-      <trans-unit id="SystemArchitectureIncompatibleWithTargetPlatform">
-        <source>Incompatible Target platform settings '{0}' with system architecture '{1}'.</source>
-        <note></note>
-        <target state="translated">'{0}' hedef platform ayarları, '{1}' sistem mimarisiyle uyumlu değil.</target>
-      </trans-unit>
       <trans-unit id="UnExpectedSettingsFile">
         <source>Unexpected settings file specified.</source>
         <note></note>

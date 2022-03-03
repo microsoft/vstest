@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-
 #if NETFRAMEWORK
 using System;
 #endif
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
 /// Encapsulates the context of the environment a data collector is being hosted in.
@@ -15,14 +17,9 @@ using System;
 #endif
 public sealed class DataCollectionEnvironmentContext
 {
-    #region Fields
     /// <summary>
     /// DataCollectionContext for the session.
     /// </summary>
-
-    #endregion
-
-    #region Constructors and initialization
 
     /// <summary>
     /// Default Constructor
@@ -63,14 +60,9 @@ public sealed class DataCollectionEnvironmentContext
         return dataCollectionEnvironmentContext;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// DataCollectionContext for the session.
     /// </summary>
     public DataCollectionContext SessionDataCollectionContext { get; internal set; }
 
-    #endregion
 }

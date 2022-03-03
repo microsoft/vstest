@@ -1,23 +1,23 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
 using System.Diagnostics;
 
-using Utility;
+using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
-using XML;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
-using TrxLoggerResources = VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
 /// The test list category.
 /// </summary>
 internal class TestListCategory : IXmlTestStore
 {
-    #region Fields
-
     private static TestListCategory s_uncategorizedResults;
 
     private static TestListCategory s_allResults;
@@ -27,8 +27,6 @@ internal class TestListCategory : IXmlTestStore
     private readonly string _name = string.Empty;
 
     private TestListCategoryId _parentCategoryId;
-
-    #endregion
 
     /// <summary>
     /// Constructor for TestListCategory .
@@ -61,8 +59,6 @@ internal class TestListCategory : IXmlTestStore
         EqtAssert.ParameterNotNull(id, nameof(id));
         Id = id;
     }
-
-    #region Properties
 
     /// <summary>
     /// Gets the uncategorized results.
@@ -113,7 +109,7 @@ internal class TestListCategory : IXmlTestStore
     /// <summary>
     /// Gets the id.
     /// </summary>
-    public TestListCategoryId Id { get; private set; } = new TestListCategoryId();
+    public TestListCategoryId Id { get; } = new TestListCategoryId();
 
     /// <summary>
     /// Gets or sets id of parent category. Use TestCategoryId.Root for top level categories.
@@ -133,7 +129,6 @@ internal class TestListCategory : IXmlTestStore
         }
     }
 
-    #endregion
 
     #region Overrides
 

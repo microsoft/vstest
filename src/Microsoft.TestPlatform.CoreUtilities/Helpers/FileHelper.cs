@@ -1,17 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD1_0
-
-namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-
-using Interfaces;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#if !NETSTANDARD1_0
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 /// <summary>
 /// The file helper.
@@ -22,40 +24,27 @@ public class FileHelper : IFileHelper
 
     /// <inheritdoc/>
     public DirectoryInfo CreateDirectory(string path)
-    {
-        return Directory.CreateDirectory(path);
-    }
+        => Directory.CreateDirectory(path);
 
     /// <inheritdoc/>
     public string GetCurrentDirectory()
-    {
-        return Directory.GetCurrentDirectory();
-    }
+        => Directory.GetCurrentDirectory();
 
     /// <inheritdoc/>
     public bool Exists(string path)
-    {
-        return File.Exists(path);
-    }
+        => File.Exists(path);
 
     /// <inheritdoc/>
     public bool DirectoryExists(string path)
-    {
-        return Directory.Exists(path);
-    }
+        => Directory.Exists(path);
 
     /// <inheritdoc/>
     public Stream GetStream(string filePath, FileMode mode, FileAccess access = FileAccess.ReadWrite)
-    {
-        return new FileStream(filePath, mode, access);
-    }
+        => new FileStream(filePath, mode, access);
 
     /// <inheritdoc/>
     public Stream GetStream(string filePath, FileMode mode, FileAccess access, FileShare share)
-    {
-        return new FileStream(filePath, mode, access, share);
-    }
-
+        => new FileStream(filePath, mode, access, share);
 
     /// <inheritdoc/>
     public IEnumerable<string> EnumerateFiles(
@@ -77,40 +66,29 @@ public class FileHelper : IFileHelper
 
     /// <inheritdoc/>
     public FileAttributes GetFileAttributes(string path)
-    {
-        return new FileInfo(path).Attributes;
-    }
+        => new FileInfo(path).Attributes;
 
     /// <inheritdoc/>
     public Version GetFileVersion(string path)
-    {
-        var currentFileVersion = FileVersionInfo.GetVersionInfo(path)?.FileVersion;
-        return Version.TryParse(currentFileVersion, out var currentVersion) ? currentVersion : DefaultFileVersion;
-    }
+        => Version.TryParse(FileVersionInfo.GetVersionInfo(path)?.FileVersion, out var currentVersion) ?
+            currentVersion :
+            DefaultFileVersion;
 
     /// <inheritdoc/>
     public void CopyFile(string sourcePath, string destinationPath)
-    {
-        File.Copy(sourcePath, destinationPath);
-    }
+        => File.Copy(sourcePath, destinationPath);
 
     /// <inheritdoc/>
     public void MoveFile(string sourcePath, string destinationPath)
-    {
-        File.Move(sourcePath, destinationPath);
-    }
+        => File.Move(sourcePath, destinationPath);
 
     /// <inheritdoc/>
     public void WriteAllTextToFile(string filePath, string content)
-    {
-        File.WriteAllText(filePath, content);
-    }
+        => File.WriteAllText(filePath, content);
 
     /// <inheritdoc/>
     public string GetFullPath(string path)
-    {
-        return Path.GetFullPath(path);
-    }
+        => Path.GetFullPath(path);
 
     /// <inheritdoc/>
     public void DeleteEmptyDirectroy(string dirPath)
@@ -131,15 +109,20 @@ public class FileHelper : IFileHelper
 
     /// <inheritdoc/>
     public string[] GetFiles(string path, string searchPattern, SearchOption searchOption)
-    {
-        return Directory.GetFiles(path, searchPattern, searchOption);
-    }
+        => Directory.GetFiles(path, searchPattern, searchOption);
 
     /// <inheritdoc/>
     public void Delete(string path)
-    {
-        File.Delete(path);
-    }
+        => File.Delete(path);
+
+    public void DeleteDirectory(string directoryPath, bool recursive)
+        => Directory.Delete(directoryPath, recursive);
+
+    public string GetTempPath()
+        => Path.GetTempPath();
+
+    public long GetFileLength(string path)
+        => new FileInfo(path).Length;
 }
 
 #endif

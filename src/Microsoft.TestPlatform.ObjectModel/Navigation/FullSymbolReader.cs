@@ -1,13 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
 /// <summary>
 /// To get method's file name, startline and endline from desktop assembly file.
@@ -276,13 +278,10 @@ internal class FullSymbolReader : ISymbolReader
                 }
                 catch (Exception ex)
                 {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error(
-                            "Ignoring the exception while iterating method symbols:{0} for type:{1}",
-                            ex,
-                            name);
-                    }
+                    EqtTrace.Error(
+                        "Ignoring the exception while iterating method symbols:{0} for type:{1}",
+                        ex,
+                        name);
                 }
                 finally
                 {
@@ -294,10 +293,7 @@ internal class FullSymbolReader : ISymbolReader
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("Ignoring the exception while iterating type symbols:{0}", ex);
-            }
+            EqtTrace.Error("Ignoring the exception while iterating type symbols:{0}", ex);
         }
         finally
         {

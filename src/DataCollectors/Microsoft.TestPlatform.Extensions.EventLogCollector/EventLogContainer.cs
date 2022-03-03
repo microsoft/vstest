@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +9,11 @@ using System.Globalization;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
-using Resource = Resources.Resources;
+using Resource = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
 
 /// <summary>
 /// The event log container.
@@ -55,7 +57,11 @@ internal class EventLogContainer : IEventLogContainer
     /// </param>
     public EventLogContainer(string eventLogName, ISet<string> eventSources, ISet<EventLogEntryType> entryTypes, int maxLogEntries, DataCollectionLogger dataCollectionLogger, DataCollectionContext dataCollectionContext)
     {
-        CreateEventLog(eventLogName);
+        EventLog = new EventLog(eventLogName);
+        EventLog.EnableRaisingEvents = true;
+        EventLog.EntryWritten += OnEventLogEntryWritten;
+        int currentCount = EventLog.Entries.Count;
+        NextEntryIndexToCollect = currentCount == 0 ? 0 : EventLog.Entries[currentCount - 1].Index + 1;
         _eventSources = eventSources;
         _entryTypes = entryTypes;
         _maxLogEntries = maxLogEntries;
@@ -69,7 +75,7 @@ internal class EventLogContainer : IEventLogContainer
     public List<EventLogEntry> EventLogEntries { get; }
 
     /// <inheritdoc />
-    public EventLog EventLog { get; private set; }
+    public EventLog EventLog { get; }
 
     internal int NextEntryIndexToCollect { get; set; }
 
@@ -138,16 +144,11 @@ internal class EventLogContainer : IEventLogContainer
 
                     if (mostRecentIndexInLog < NextEntryIndexToCollect - 1)
                     {
-                        if (EqtTrace.IsWarningEnabled)
-                        {
-                            EqtTrace.Warning(
-                                string.Format(
-                                    CultureInfo.InvariantCulture,
-                                    "EventLogDataContainer: OnEventLogEntryWritten: Handling clearing of log (mostRecentIndexInLog < eventLogContainer.NextEntryIndex): firstIndexInLog: {0}:, mostRecentIndexInLog: {1}, NextEntryIndex: {2}",
-                                    firstIndexInLog,
-                                    mostRecentIndexInLog,
-                                    NextEntryIndexToCollect));
-                        }
+                        EqtTrace.Warning(
+                            "EventLogDataContainer: OnEventLogEntryWritten: Handling clearing of log (mostRecentIndexInLog < eventLogContainer.NextEntryIndex): firstIndexInLog: {0}:, mostRecentIndexInLog: {1}, NextEntryIndex: {2}",
+                            firstIndexInLog,
+                            mostRecentIndexInLog,
+                            NextEntryIndexToCollect);
 
                         // Send warning; event log must have been cleared.
                         _dataCollectionLogger.LogWarning(
@@ -186,16 +187,11 @@ internal class EventLogContainer : IEventLogContainer
                         {
                             EventLogEntries.Add(nextEntry);
 
-                            if (EqtTrace.IsVerboseEnabled)
-                            {
-                                EqtTrace.Verbose(
-                                    string.Format(
-                                        CultureInfo.InvariantCulture,
-                                        "EventLogDataContainer.OnEventLogEntryWritten() add event with Id {0} from position {1} in the current {2} log",
-                                        nextEntry.Index,
-                                        nextEntryIndexInCurrentLog,
-                                        EventLog.Log));
-                            }
+                            EqtTrace.Verbose(
+                                "EventLogDataContainer.OnEventLogEntryWritten() add event with Id {0} from position {1} in the current {2} log",
+                                nextEntry.Index,
+                                nextEntryIndexInCurrentLog,
+                                EventLog.Log);
                         }
                         else
                         {
@@ -237,15 +233,5 @@ internal class EventLogContainer : IEventLogContainer
 
             _isDisposed = true;
         }
-    }
-
-    private void CreateEventLog(string eventLogName)
-    {
-        EventLog = new EventLog(eventLogName);
-        EventLog.EnableRaisingEvents = true;
-        EventLog.EntryWritten += OnEventLogEntryWritten;
-        int currentCount = EventLog.Entries.Count;
-        NextEntryIndexToCollect =
-            (currentCount == 0) ? 0 : EventLog.Entries[currentCount - 1].Index + 1;
     }
 }

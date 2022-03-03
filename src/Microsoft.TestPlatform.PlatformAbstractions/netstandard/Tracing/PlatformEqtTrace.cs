@@ -1,12 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if NETSTANDARD && !NETSTANDARD2_0
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Diagnostics;
+
+#if NETSTANDARD && !NETSTANDARD2_0
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Wrapper class for tracing.
@@ -21,7 +23,7 @@ using System.Diagnostics;
 ///       We pass through exceptions thrown due to incorrect arguments to <c>EqtTrace</c> methods.
 /// Usage: <c>EqtTrace.Info("Here's how to trace info");</c>
 /// </summary>
-public class PlatformEqtTrace : IPlatformEqtTrace
+public partial class PlatformEqtTrace : IPlatformEqtTrace
 {
     private PlatformTraceLevel _traceLevel = PlatformTraceLevel.Off;
 

@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,24 +9,27 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 
-using Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-using Common.Filtering;
-using Common.Interfaces;
-using Common.Logging;
-using Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using CoreUtilities.Tracing;
-using CoreUtilities.Tracing.Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Logging;
-using PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-using Utilities;
+using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
-using CrossPlatEngineResources = Resources.Resources;
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 
 /// <summary>
 /// Enumerates through all the discoverers.
@@ -381,8 +382,7 @@ internal class DiscovererEnumerator
         {
             var sourcesToCheck = sources;
 
-            if (discoverer.Metadata.AssemblyType == AssemblyType.Native ||
-                discoverer.Metadata.AssemblyType == AssemblyType.Managed)
+            if (discoverer.Metadata.AssemblyType is AssemblyType.Native or AssemblyType.Managed)
             {
                 assemblyTypeToSoucesMap ??= GetAssemblyTypeToSoucesMap(sources, assemblyProperties);
                 sourcesToCheck = assemblyTypeToSoucesMap[AssemblyType.None].Concat(assemblyTypeToSoucesMap[discoverer.Metadata.AssemblyType]);
@@ -471,7 +471,7 @@ internal class DiscovererEnumerator
     {
         try
         {
-            if (string.IsNullOrEmpty(extensionAssembly) || string.Equals(extensionAssembly, Constants.UnspecifiedAdapterPath))
+            if (string.IsNullOrEmpty(extensionAssembly) || string.Equals(extensionAssembly, ObjectModel.Constants.UnspecifiedAdapterPath))
             {
                 // full discovery.
                 return TestDiscoveryExtensionManager.Create().Discoverers;

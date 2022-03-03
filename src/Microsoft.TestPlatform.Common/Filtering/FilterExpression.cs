@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,10 +9,14 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
-using CommonResources = Resources.Resources;
+using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 
 /// <summary>
 /// Represents an expression tree.
@@ -45,8 +47,6 @@ internal class FilterExpression
     /// </summary>
     private readonly bool _areJoinedByAnd;
 
-    #region Constructors
-
     private FilterExpression(FilterExpression left, FilterExpression right, bool areJoinedByAnd)
     {
         ValidateArg.NotNull(left, nameof(left));
@@ -62,8 +62,6 @@ internal class FilterExpression
         ValidateArg.NotNull(condition, nameof(condition));
         _condition = condition;
     }
-    #endregion
-
     /// <summary>
     /// Create a new filter expression 'And'ing 'this' with 'filter'.
     /// </summary>

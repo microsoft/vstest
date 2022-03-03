@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,6 +13,10 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 public class ProcDumpDumper : ICrashDumper, IHangDumper
 {
@@ -50,18 +52,13 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
     }
 
     protected Action<object, string> OutputReceivedCallback => (process, data) =>
-    {
         // useful for visibility when debugging this tool
         // Console.ForegroundColor = ConsoleColor.Cyan;
         // Console.WriteLine(data);
         // Console.ForegroundColor = ConsoleColor.White;
         // Log all standard output message of procdump in diag files.
         // Otherwise they end up coming on console in pipleine.
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("ProcDumpDumper.OutputReceivedCallback: Output received from procdump process: " + data);
-        }
-    };
+        EqtTrace.Info("ProcDumpDumper.OutputReceivedCallback: Output received from procdump process: " + data);
 
     /// <inheritdoc/>
     public void WaitForDumpToFinish()
@@ -279,7 +276,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
         }
         else
         {
-            filename = _environment.OperatingSystem == PlatformOperatingSystem.Unix || _environment.OperatingSystem == PlatformOperatingSystem.OSX
+            filename = _environment.OperatingSystem is PlatformOperatingSystem.Unix or PlatformOperatingSystem.OSX
                 ? Constants.ProcdumpUnixProcess
                 : throw new NotSupportedException($"Not supported platform {_environment.OperatingSystem}");
         }

@@ -1,17 +1,21 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if NETFRAMEWORK || NETCOREAPP ||  NETSTANDARD2_0
-
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+#if NETFRAMEWORK || NETCOREAPP ||  NETSTANDARD2_0
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <summary>
 /// Helper class to deal with process related functionality.
@@ -78,21 +82,38 @@ public partial class ProcessHelper : IProcessHelper
 
             if (exitCallBack != null)
             {
-                process.Exited += (sender, args) =>
+                process.Exited += async (sender, args) =>
                 {
-                    // Call WaitForExit without again to ensure all streams are flushed,
-                    var p = sender as Process;
-                    try
+                    if (sender is Process p)
                     {
-                        // Add timeout to avoid indefinite waiting on child process exit.
-                        p.WaitForExit(500);
-                    }
-                    catch (InvalidOperationException)
-                    {
+                        try
+                        {
+                            // NOTE: When receiving an exit event, we want to give some time to the child process
+                            // to close properly (i.e. flush output, error stream...). Despite this simple need,
+                            // the actual implementation needs to be complex, especially for Unix systems.
+                            // See ticket https://github.com/microsoft/vstest/issues/3375 to get the links to all
+                            // issues, discussions and documentations.
+                            //
+                            // On .NET 5 and later, the solution is simple, we can simply use WaitForExitAsync which
+                            // correctly ensure that some time is given to the child process (or any grandchild) to
+                            // flush before exit happens.
+                            //
+                            // For older frameworks, the solution is more tricky but it seems we can get the expected
+                            // behavior using the parameterless 'WaitForExit()' combined with an awaited Task.Run call.
+                            var cts = new CancellationTokenSource(500);
+#if NET5_0_OR_GREATER
+                            await p.WaitForExitAsync(cts.Token);
+#else
+                            await Task.Run(() => p.WaitForExit(), cts.Token);
+#endif
+                        }
+                        catch (Exception ex) when (ex is InvalidOperationException or TaskCanceledException)
+                        {
+                        }
                     }
 
                     // If exit callback has code that access Process object, ensure that the exceptions handling should be done properly.
-                    exitCallBack(p);
+                    exitCallBack(sender);
                 };
             }
 
@@ -198,7 +219,7 @@ public partial class ProcessHelper : IProcessHelper
     public string GetNativeDllDirectory()
     {
         var osArchitecture = new PlatformEnvironment().Architecture;
-        return osArchitecture == PlatformArchitecture.ARM || osArchitecture == PlatformArchitecture.ARM64
+        return osArchitecture is PlatformArchitecture.ARM or PlatformArchitecture.ARM64
             ? Path.Combine(GetCurrentProcessLocation(), GetCurrentProcessArchitecture().ToString().ToLower(), Arm)
             : Path.Combine(GetCurrentProcessLocation(), GetCurrentProcessArchitecture().ToString().ToLower());
     }

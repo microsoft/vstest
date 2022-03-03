@@ -1,12 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
-
 using System.Threading;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 
 /// <summary>
 /// DesignMode TestHost Launcher for hosting of test process

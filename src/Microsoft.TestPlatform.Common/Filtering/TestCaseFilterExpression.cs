@@ -1,13 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
-
 using System;
 using System.Collections.Generic;
 
-using ObjectModel;
-using ObjectModel.Adapter;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 
 /// <summary>
 /// Implements ITestCaseFilterExpression, providing test case filtering functionality.
@@ -47,7 +49,7 @@ public class TestCaseFilterExpression : ITestCaseFilterExpression
     /// <summary>
     /// Validate if underlying filter expression is valid for given set of supported properties.
     /// </summary>
-    public string[] ValidForProperties(IEnumerable<String> supportedProperties, Func<string, TestProperty> propertyProvider)
+    public string[] ValidForProperties(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider)
     {
         string[] invalidProperties = null;
         if (null != _filterWrapper && _validForMatch)

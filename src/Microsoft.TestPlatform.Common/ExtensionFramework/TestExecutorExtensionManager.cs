@@ -1,32 +1,28 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Utilities;
-using Interfaces;
-using Logging;
-using ObjectModel;
-using ObjectModel.Adapter;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 /// <summary>
 /// Manages the Test Executor extensions.
 /// </summary>
 internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor, ITestExecutorCapabilities>
 {
-    #region Fields
-
     private static TestExecutorExtensionManager s_testExecutorExtensionManager;
     private static readonly object Synclock = new();
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -46,9 +42,6 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
     {
     }
 
-    #endregion
-
-    #region Private Methods
     /// <summary>
     /// Merges two test extension lists.
     /// </summary>
@@ -100,10 +93,6 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
         return mergedTestExtensions;
     }
 
-    #endregion
-
-    #region Factory Methods
-
     /// <summary>
     /// Creates the TestExecutorExtensionManager.
     /// </summary>
@@ -118,15 +107,13 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
                 {
 
                     // Get all extensions for ITestExecutor.
-                    TestPluginManager.Instance
-                        .GetSpecificTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
+                    TestPluginManager.GetSpecificTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
                             TestPlatformConstants.TestAdapterEndsWithPattern,
                             out var unfilteredTestExtensions1,
                             out var testExtensions1);
 
                     // Get all extensions for ITestExecutor2.
-                    TestPluginManager.Instance
-                        .GetSpecificTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
+                    TestPluginManager.GetSpecificTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
                             TestPlatformConstants.TestAdapterEndsWithPattern,
                             out var unfilteredTestExtensions2,
                             out var testExtensions2);
@@ -163,15 +150,13 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
     {
 
         // Get all extensions for ITestExecutor.
-        TestPluginManager.Instance
-            .GetTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
+        TestPluginManager.GetTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
                 extensionAssembly,
                 out var unfilteredTestExtensions1,
                 out var testExtensions1);
 
         // Get all extensions for ITestExecutor2.
-        TestPluginManager.Instance
-            .GetTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
+        TestPluginManager.GetTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
                 extensionAssembly,
                 out var unfilteredTestExtensions2,
                 out var testExtensions2);
@@ -223,12 +208,9 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error(
-                    "TestExecutorExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}",
-                    ex);
-            }
+            EqtTrace.Error(
+                "TestExecutorExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}",
+                ex);
 
             if (shouldThrowOnError)
             {
@@ -237,7 +219,6 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
         }
     }
 
-    #endregion
 }
 
 /// <summary>

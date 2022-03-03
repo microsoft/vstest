@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
-
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -10,6 +8,10 @@ using System.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
@@ -60,7 +62,7 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
     [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
     public void RunMultipleTestAssembliesWithCodeCoverage(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
 
@@ -69,7 +71,7 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
 
         ExitCodeEquals(1); // failing tests
 
-        var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, _resultsDirectory.Path);
+        var actualCoverageFile = GetCoverageFileNameFromTrx(trxFilePath, _resultsDirectory.Path);
         Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {_resultsDirectory} trxfile: {trxFilePath}");
         Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
     }

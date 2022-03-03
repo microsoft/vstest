@@ -1,13 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
-
 using System;
 using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
@@ -17,7 +19,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void ChutzpahRunAllTestExecution(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
         var testJSFileAbsolutePath = Path.Combine(_testEnvironment.TestAssetsPath, "test.js");
         var arguments = PrepareArguments(testJSFileAbsolutePath, GetTestAdapterPath(UnitTestFramework.Chutzpah), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
@@ -32,7 +34,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useCoreRunner: false)]
     public void CPPRunAllTestExecutionNetFramework(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         CppRunAllTests(runnerInfo.RunnerFramework, "x86");
     }
 
@@ -44,7 +46,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useCoreRunner: false)]
     public void CPPRunAllTestExecutionPlatformx64NetFramework(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         CppRunAllTests(runnerInfo.RunnerFramework, "x64");
     }
 
@@ -55,7 +57,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false, useCoreRunner: true, useNetCore21Target: false, useNetCore31Target: true)]
     public void CPPRunAllTestExecutionPlatformx64Net(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         CppRunAllTests(runnerInfo.RunnerFramework, "x64");
     }
 
@@ -65,7 +67,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     public void WebTestRunAllTestsWithRunSettings(RunnerInfo runnerInfo)
     {
         using var tempDir = new TempDirectory();
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         var runSettingsFilePath = Path.Combine(tempDir.Path, Guid.NewGuid() + ".runsettings");
 
         //test the iterationCount setting for WebTestRunConfiguration in run settings
@@ -77,7 +79,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
                                     </RunConfiguration>
                                 </RunSettings>";
 
-        IntegrationTestBase.CreateRunSettingsFile(runSettingsFilePath, runSettingsXml);
+        CreateRunSettingsFile(runSettingsFilePath, runSettingsXml);
 
         //minWebTestResultFileSizeInKB is set to 150 here as the web test has a iteration count set to 5
         //therefore, the test will run for 5 iterations resulting in web test result file size of at least 150 KB
@@ -89,7 +91,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void CodedWebTestRunAllTests(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         CodedWebTestRunAllTests(runnerInfo.RunnerFramework);
     }
 
@@ -98,7 +100,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void NUnitRunAllTestExecution(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
         var arguments = PrepareArguments(
@@ -115,7 +117,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void XUnitRunAllTestExecution(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
         string testAssemblyPath;

@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,10 +8,14 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
-using CommonResources = Resources.Resources;
+using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 
 internal enum Operation
 {
@@ -42,8 +44,6 @@ internal enum Operator
 /// </summary>
 internal class Condition
 {
-    #region Fields
-
     /// <summary>
     ///  Default property name which will be used when filter has only property value.
     /// </summary>
@@ -80,17 +80,12 @@ internal class Condition
         get;
         private set;
     }
-    #endregion
-
-    #region Constructors
     internal Condition(string name, Operation operation, string value)
     {
         Name = name;
         Operation = operation;
         Value = value;
     }
-    #endregion
-
 
     /// <summary>
     /// Evaluate this condition for testObject.

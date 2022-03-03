@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,21 +9,23 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
 /// <summary>
 /// Represents the result of a test case.
 /// </summary>
 [DataContract]
 public sealed class TestResult : TestObject
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TestResult"/> class.
     /// </summary>
     /// <param name="testCase">The test case the result is for.</param>
-    public TestResult(TestCase testCase)
+    public TestResult(TestCase testCase!!)
     {
-        TestCase = testCase ?? throw new ArgumentNullException(nameof(testCase));
+        TestCase = testCase;
         Messages = new Collection<TestResultMessage>();
         Attachments = new Collection<AttachmentSet>();
 
@@ -34,10 +34,6 @@ public sealed class TestResult : TestObject
         StartTime = DateTimeOffset.UtcNow;
         EndTime = DateTimeOffset.UtcNow;
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets the test case that this result is for.
@@ -116,10 +112,6 @@ public sealed class TestResult : TestObject
         }
     }
 
-    #endregion
-
-    #region Methods
-
     /// <inheritdoc/>
     public override string ToString()
     {
@@ -175,10 +167,6 @@ public sealed class TestResult : TestObject
 
         return result.ToString();
     }
-
-    #endregion
-
-    #region Protected Methods
 
     /// <summary>
     /// Return TestProperty's value
@@ -240,7 +228,6 @@ public sealed class TestResult : TestObject
         base.ProtectedSetPropertyValue(property, value);
     }
 
-    #endregion
 }
 
 /// <summary>
@@ -357,6 +344,6 @@ public static class TestResultProperties
 
     private static bool ValidateOutcome(object value)
     {
-        return (TestOutcome)value <= TestOutcome.NotFound && (TestOutcome)value >= TestOutcome.None;
+        return (TestOutcome)value is <= TestOutcome.NotFound and >= TestOutcome.None;
     }
 }

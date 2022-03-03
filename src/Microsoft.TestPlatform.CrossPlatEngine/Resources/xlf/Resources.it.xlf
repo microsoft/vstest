@@ -167,6 +167,16 @@
         <target state="translated">Le impostazioni di esecuzione sono cambiate tra l'ora in cui è stata stabilita la sessione di test e l'ora della richiesta di esecuzione/individuazione corrente.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="translated">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="translated">Allegati:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

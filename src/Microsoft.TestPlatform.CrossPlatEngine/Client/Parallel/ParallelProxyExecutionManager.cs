@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,16 +9,20 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using CommunicationUtilities;
-using CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using CoreUtilities.Tracing;
-using DataCollection;
-using TestRunAttachmentsProcessing;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 /// <summary>
 /// ParallelProxyExecutionManager that manages parallel execution
@@ -32,10 +34,10 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
     #region TestRunSpecificData
 
     // This variable id to differentiate between implicit (abort requested by testPlatform) and explicit (test host aborted) abort.
-    private bool _abortRequested = false;
+    private bool _abortRequested;
 
-    private int _runCompletedClients = 0;
-    private int _runStartedClients = 0;
+    private int _runCompletedClients;
+    private int _runStartedClients;
     private int _availableTestSources = -1;
 
     private TestRunCriteria _actualTestRunCriteria;
@@ -44,7 +46,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
 
     private IEnumerator _testCaseListEnumerator;
 
-    private bool _hasSpecificTestsRun = false;
+    private bool _hasSpecificTestsRun;
 
     private ITestRunEventsHandler _currentRunEventsHandler;
 
@@ -54,7 +56,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
     private bool _skipDefaultAdapters;
 
     /// <inheritdoc/>
-    public bool IsInitialized { get; private set; } = false;
+    public bool IsInitialized { get; private set; }
 
     #endregion
 
@@ -127,10 +129,8 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
             _availableTestSources = testRunCriteria.Sources.Count();
         }
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("ParallelProxyExecutionManager: Start execution. Total sources: " + _availableTestSources);
-        }
+        EqtTrace.Verbose("ParallelProxyExecutionManager: Start execution. Total sources: " + _availableTestSources);
+
         return StartTestRunPrivate(eventHandler);
     }
 
@@ -183,10 +183,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
                 ? _runCompletedClients == _runStartedClients
                 : _runCompletedClients == _availableTestSources;
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("ParallelProxyExecutionManager: HandlePartialRunComplete: Total completed clients = {0}, Run complete = {1}, Run canceled: {2}.", _runCompletedClients, allRunsCompleted, testRunCompleteArgs.IsCanceled);
-            }
+            EqtTrace.Verbose("ParallelProxyExecutionManager: HandlePartialRunComplete: Total completed clients = {0}, Run complete = {1}, Run canceled: {2}.", _runCompletedClients, allRunsCompleted, testRunCompleteArgs.IsCanceled);
         }
 
         // verify that all executors are done with the execution and there are no more sources/testcases to execute
@@ -207,10 +204,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
         }
 
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("ParallelProxyExecutionManager: HandlePartialRunComplete: Replace execution manager. Shared: {0}, Aborted: {1}.", SharedHosts, testRunCompleteArgs.IsAborted);
-        }
+        EqtTrace.Verbose("ParallelProxyExecutionManager: HandlePartialRunComplete: Replace execution manager. Shared: {0}, Aborted: {1}.", SharedHosts, testRunCompleteArgs.IsAborted);
 
         RemoveManager(proxyExecutionManager);
         proxyExecutionManager = CreateNewConcurrentManager();
@@ -310,10 +304,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
             Task.Run(() =>
                 {
                     Interlocked.Increment(ref _runStartedClients);
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("ParallelProxyExecutionManager: Execution started. Started clients: " + _runStartedClients);
-                    }
+                    EqtTrace.Verbose("ParallelProxyExecutionManager: Execution started. Started clients: " + _runStartedClients);
 
                     proxyExecutionManager.StartTestRun(testRunCriteria, GetHandlerForGivenManager(proxyExecutionManager));
                 })
@@ -322,10 +313,7 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
                         // Just in case, the actual execution couldn't start for an instance. Ensure that
                         // we call execution complete since we have already fetched a source. Otherwise
                         // execution will not terminate
-                        if (EqtTrace.IsErrorEnabled)
-                        {
-                            EqtTrace.Error("ParallelProxyExecutionManager: Failed to trigger execution. Exception: " + t.Exception);
-                        }
+                        EqtTrace.Error("ParallelProxyExecutionManager: Failed to trigger execution. Exception: " + t.Exception);
 
                         var handler = GetHandlerForGivenManager(proxyExecutionManager);
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
@@ -343,9 +331,6 @@ internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyEx
                     TaskContinuationOptions.OnlyOnFaulted);
         }
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("ProxyParallelExecutionManager: No sources available for execution.");
-        }
+        EqtTrace.Verbose("ProxyParallelExecutionManager: No sources available for execution.");
     }
 }

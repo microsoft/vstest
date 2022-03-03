@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
-
 using System;
 using System.Collections.Generic;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 
 /// <summary>
 /// Helper class for processing arguments passed to a process.

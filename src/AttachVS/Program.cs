@@ -5,6 +5,8 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.AttachVS;
 
 internal class Program

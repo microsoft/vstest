@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace vstest.console.UnitTests.Processors;
-
 using System;
 using System.IO;
 
@@ -17,6 +15,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
 using static Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.CollectArgumentExecutor;
+
+#nullable disable
+
+namespace vstest.console.UnitTests.Processors;
 
 [TestClass]
 public class CollectArgumentProcessorTests
@@ -91,7 +93,7 @@ public class CollectArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldNotThrowIfArgumentIsEmpty()
     {
-        Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(String.Empty));
+        Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(string.Empty));
     }
 
     [TestMethod]

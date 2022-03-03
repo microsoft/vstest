@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
-
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
 
 /// <summary>
 /// Stores the list of failed results and list of all results corresponding to the source.

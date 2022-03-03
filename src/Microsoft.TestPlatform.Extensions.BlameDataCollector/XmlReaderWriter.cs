@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +9,10 @@ using System.Xml;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 /// <summary>
 /// XmlReaderWriter class for reading and writing test sequences to file
@@ -21,8 +23,6 @@ public class XmlReaderWriter : IBlameReaderWriter
     /// The file helper.
     /// </summary>
     private readonly IFileHelper _fileHelper;
-
-    #region  Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlReaderWriter"/> class.
@@ -43,8 +43,6 @@ public class XmlReaderWriter : IBlameReaderWriter
     {
         _fileHelper = fileHelper;
     }
-
-    #endregion
 
     /// <summary>
     /// Writes test Sequence to file.

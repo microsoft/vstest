@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.Common.UnitTests.Logging;
-
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -16,6 +14,10 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace TestPlatform.Common.UnitTests.Logging;
 
 /// <summary>
 /// Tests the behaviors of the TestLoggerManager class.
@@ -196,12 +198,12 @@ public class TestHostProviderManagerTests
             throw new NotImplementedException();
         }
 
-        public void OnHostExited(HostProviderEventArgs e)
+        public void OnHostExited(HostProviderEventArgs _)
         {
             HostExited.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
-        public void OnHostLaunched(HostProviderEventArgs e)
+        public void OnHostLaunched(HostProviderEventArgs _)
         {
             HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
         }
@@ -264,12 +266,12 @@ public class TestHostProviderManagerTests
             throw new NotImplementedException();
         }
 
-        public void OnHostExited(HostProviderEventArgs e)
+        public void OnHostExited(HostProviderEventArgs _)
         {
             HostExited.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
-        public void OnHostLaunched(HostProviderEventArgs e)
+        public void OnHostLaunched(HostProviderEventArgs _)
         {
             HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
         }

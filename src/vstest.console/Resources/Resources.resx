@@ -560,6 +560,43 @@
   <data name="TestAdapterPathValueRequired" xml:space="preserve">
     <value>The /TestAdapterPath parameter requires a value, which is path of a location containing custom test adapters. Example:  /TestAdapterPath:c:\MyCustomAdapters</value>
   </data>
+  <data name="TestAdapterLoadingStrategyHelp" xml:space="preserve">
+    <value>--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+      This affects adapter loading behavior.
+
+      Currently supported behaviors:
+        - Explicit: Test Platform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). 
+                    If a specific adapter path is provided, adapter will be loaded; if a directory path is provided adapters directly in that folder will be loaded, unless Recursive option is also specified.
+                    If no adapter path is specified, test run will fail.
+                    This will imply /InIsolation switch and force the tests to be run in an isolated process.
+        
+        - Default: Test Platform will load adapters is if this argument has not been specified. 
+                   It will pick up extensions from next to source, provided additional adapter paths and from the default directory.
+
+        - DefaultRuntimeProviders: Load default runtime providers shipped with Test Platform. 
+                                   If this is not specified when "Explicit" option is set, a test host provider need to be specified explicitly.
+
+        - ExtensionsDirectory: Load adapters inside Extensions folder.
+
+        - NextToSource: Load adapters next to source. 
+
+        - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</value>
+    <comment>Do not translate "Default", "DefaultRuntimeProviders", "ExtensionsDirectory", "NextToSource" or "Recursive".</comment>
+  </data>
+  <data name="TestAdapterLoadingStrategyValueInvalid" xml:space="preserve">
+    <value>Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!</value>
+  </data>
+  <data name="TestAdapterLoadingStrategyValueInvalidRecursive" xml:space="preserve">
+    <value>Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}</value>
+    <comment>
+        - Do not translate "Recursive",
+        - {0} is the strategy names, seperated by comma: for example "Explicit, NextToSource"
+    </comment>
+  </data>
+  <data name="TestAdapterPathValueRequiredWhenStrategyXIsUsed" xml:space="preserve">
+    <value>The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!</value>
+    <comment>{0} is the strategy name, "Explicit" for example.</comment>
+  </data>
   <data name="TestCaseFilterArgumentHelp" xml:space="preserve">
     <value>--TestCaseFilter|/TestCaseFilter:&lt;Expression&gt;
       Run tests that match the given expression.
@@ -766,5 +803,8 @@
   </data>
   <data name="TestRunAbortedWithError" xml:space="preserve">
     <value>Test Run Aborted with error {0}.</value>
+  </data>
+  <data name="InvalidTestSessionCorrelationId" xml:space="preserve">
+    <value>Invalid testSessionCorrelationId</value>
   </data>
 </root>

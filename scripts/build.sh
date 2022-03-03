@@ -202,7 +202,7 @@ function install_cli()
         # Skip download of dotnet toolset if REPO API is enabled
         local failed=false
         local install_script="$TP_TOOLS_DIR/dotnet-install.sh"
-        local remote_path="https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.sh"
+        local remote_path="https://dot.net/v1/dotnet-install.sh"
 
         log "Installing dotnet cli..."
         local start=$SECONDS
@@ -215,12 +215,12 @@ function install_cli()
         fi
         chmod u+x $install_script
         # Get netcoreapp1.1 shared components
-        $install_script  --runtime dotnet --version "2.1.0" --channel "release/2.1.0" --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64
-        $install_script  --runtime dotnet --version "3.1.0" --channel "release/3.1.0" --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64
-        $install_script  --runtime dotnet --version "5.0.1" --channel "release/5.0.1" --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64
+        $install_script  --runtime dotnet --version "2.1.0" --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64
+        $install_script  --runtime dotnet --version "3.1.0" --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64
+        $install_script  --runtime dotnet --version "5.0.1" --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64
 
         log "install_cli: Get the latest dotnet cli toolset..."
-        $install_script --install-dir "$TP_DOTNET_DIR" --no-path --channel "main" --version $DOTNET_CLI_VERSION
+        $install_script --install-dir "$TP_DOTNET_DIR" --no-path --version $DOTNET_CLI_VERSION
 
 
         log " ---- dotnet x64"

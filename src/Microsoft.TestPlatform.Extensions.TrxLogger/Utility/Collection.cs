@@ -1,15 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-
-using XML;
-using ObjectModel;
 using System.Xml;
+
+using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
 /// <summary>
 /// Base class for Eqt Collections.
@@ -58,13 +60,9 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
     }
     #endregion
 
-    #region Fields
     protected Hashtable _container;
 
     private string _childElementName;
-    #endregion
-
-    #region Constructors
     protected EqtBaseCollection()
     {
         _container = new Hashtable();
@@ -88,7 +86,6 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
         EqtAssert.ParameterNotNull(other, nameof(other));
         _container = new Hashtable(other._container);
     }
-    #endregion
 
     #region Methods: ICollection<T>
     // TODO: Consider putting check for null to derived classes.
@@ -184,7 +181,6 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
 
     #endregion
 
-    #region Private
     private string ChildElementName
     {
         get
@@ -197,5 +193,4 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
             return _childElementName;
         }
     }
-    #endregion
 }

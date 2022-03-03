@@ -1,13 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-
 using System;
 #if !NETSTANDARD1_0
 using System.Collections.Generic;
 using System.IO;
 #endif
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 /// <summary>
 /// The FileHelper interface.
@@ -131,6 +133,14 @@ public interface IFileHelper
     /// </param>
     void DeleteEmptyDirectroy(string directoryPath);
 
+    /// <summary>
+    /// Helper for deleting a directory.
+    /// </summary>
+    /// <param name="directoryPath">
+    /// The directory path.
+    /// </param>
+    void DeleteDirectory(string directoryPath, bool recursive);
+
 #if !NETSTANDARD1_0
     /// <summary>
     /// Gets all files in directory based on search pattern
@@ -147,4 +157,16 @@ public interface IFileHelper
     /// </summary>
     /// <param name="path"></param>
     void Delete(string path);
+
+    /// <summary>
+    /// Get temporary file path
+    /// </summary>
+    /// <param name="path"></param>
+    public string GetTempPath();
+
+    /// <summary>
+    /// Get file length
+    /// </summary>
+    /// <param name="path"></param>
+    public long GetFileLength(string path);
 }

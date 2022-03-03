@@ -18,6 +18,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 
 /// <summary>
@@ -35,10 +37,10 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRunAttachmentsProcessingManager"/> class.
     /// </summary>
-    public TestRunAttachmentsProcessingManager(ITestPlatformEventSource testPlatformEventSource, IDataCollectorAttachmentsProcessorsFactory dataCollectorAttachmentsProcessorsFactory)
+    public TestRunAttachmentsProcessingManager(ITestPlatformEventSource testPlatformEventSource!!, IDataCollectorAttachmentsProcessorsFactory dataCollectorAttachmentsProcessorsFactory!!)
     {
-        _testPlatformEventSource = testPlatformEventSource ?? throw new ArgumentNullException(nameof(testPlatformEventSource));
-        _dataCollectorAttachmentsProcessorsFactory = dataCollectorAttachmentsProcessorsFactory ?? throw new ArgumentNullException(nameof(dataCollectorAttachmentsProcessorsFactory));
+        _testPlatformEventSource = testPlatformEventSource;
+        _dataCollectorAttachmentsProcessorsFactory = dataCollectorAttachmentsProcessorsFactory;
     }
 
     /// <inheritdoc/>
@@ -54,7 +56,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
 
     private async Task<Collection<AttachmentSet>> InternalProcessTestRunAttachmentsAsync(string runSettingsXml, IRequestData requestData, Collection<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)
     {
-        Stopwatch stopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
 
         try
         {
@@ -83,10 +85,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
         }
         catch (OperationCanceledException)
         {
-            if (EqtTrace.IsWarningEnabled)
-            {
-                EqtTrace.Warning("TestRunAttachmentsProcessingManager: Operation was cancelled.");
-            }
+            EqtTrace.Warning("TestRunAttachmentsProcessingManager: Operation was cancelled.");
             return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(true, null), attachments, stopwatch, eventHandler);
         }
         catch (Exception e)
@@ -169,6 +168,13 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
             catch (Exception e)
             {
                 EqtTrace.Error("TestRunAttachmentsProcessingManager: Exception in ProcessAttachmentsAsync: " + e);
+
+                // If it's OperationCanceledException of our cancellationToken we let the exception bubble up.
+                if (e is OperationCanceledException operationCanceled && operationCanceled.CancellationToken == cancellationToken)
+                {
+                    throw;
+                }
+
                 logger.SendMessage(TestMessageLevel.Error, e.ToString());
 
                 // Restore the attachment sets for the others attachment processors.
@@ -203,9 +209,9 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
     {
         private readonly ITestRunAttachmentsProcessingEventsHandler _eventsHandler;
 
-        public AttachmentsProcessingMessageLogger(ITestRunAttachmentsProcessingEventsHandler eventsHandler)
+        public AttachmentsProcessingMessageLogger(ITestRunAttachmentsProcessingEventsHandler eventsHandler!!)
         {
-            _eventsHandler = eventsHandler ?? throw new ArgumentNullException(nameof(eventsHandler));
+            _eventsHandler = eventsHandler;
         }
 
         public void SendMessage(TestMessageLevel testMessageLevel, string message)

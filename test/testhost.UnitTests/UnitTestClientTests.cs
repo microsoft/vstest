@@ -1,9 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.TestExecutor.Tests;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using TestTools.UnitTesting;
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.TestExecutor.Tests;
 
 [TestClass]
 public class UnitTestClientTests

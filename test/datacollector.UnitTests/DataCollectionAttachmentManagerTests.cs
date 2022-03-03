@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,15 +8,17 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Interfaces;
-
+using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using TestTools.UnitTesting;
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
 
 [TestClass]
 public class DataCollectionAttachmentManagerTests

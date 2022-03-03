@@ -1,14 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if WINDOWS_UWP
-
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
 using System.IO;
 using System.Reflection;
 
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+#if WINDOWS_UWP
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <inheritdoc/>
 public class PlatformAssemblyLoadContext : IAssemblyLoadContext

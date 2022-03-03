@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +16,10 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
 
 [TestClass]
 public class DataCollectionManagerTests
@@ -49,7 +51,7 @@ public class DataCollectionManagerTests
         _dataCollectorSettings = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, _friendlyName, _uri, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
         _mockMessageSink = new Mock<IMessageSink>();
         _mockDataCollectionAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
-        _mockDataCollectionAttachmentManager.SetReturnsDefault<List<AttachmentSet>>(new List<AttachmentSet>());
+        _mockDataCollectionAttachmentManager.SetReturnsDefault(new List<AttachmentSet>());
         _mockDataCollectionTelemetryManager = new Mock<IDataCollectionTelemetryManager>();
 
         _dataCollectionManager = new TestableDataCollectionManager(_mockDataCollectionAttachmentManager.Object, _mockMessageSink.Object, _mockDataCollector.Object, _mockCodeCoverageDataCollector.Object, _mockDataCollectionTelemetryManager.Object);
@@ -490,10 +492,10 @@ public class DataCollectionManagerTests
 
 internal class TestableDataCollectionManager : DataCollectionManager
 {
-    private readonly DataCollector _dataCollector;
-    private readonly DataCollector _ccDataCollector;
+    private readonly ObjectModel.DataCollection.DataCollector _dataCollector;
+    private readonly ObjectModel.DataCollection.DataCollector _ccDataCollector;
 
-    public TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, DataCollector dataCollector, DataCollector ccDataCollector, IDataCollectionTelemetryManager dataCollectionTelemetryManager) : this(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager)
+    public TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, ObjectModel.DataCollection.DataCollector dataCollector, ObjectModel.DataCollection.DataCollector ccDataCollector, IDataCollectionTelemetryManager dataCollectionTelemetryManager) : this(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager)
     {
         _dataCollector = dataCollector;
         _ccDataCollector = ccDataCollector;
@@ -527,7 +529,7 @@ internal class TestableDataCollectionManager : DataCollectionManager
         return uri.Equals("my://custom/datacollector") || uri.Equals("my://custom/ccdatacollector");
     }
 
-    protected override DataCollector TryGetTestExtension(string extensionUri)
+    protected override ObjectModel.DataCollection.DataCollector TryGetTestExtension(string extensionUri)
     {
         if (extensionUri.Equals("my://custom/datacollector"))
         {
@@ -565,13 +567,13 @@ internal class TestableDataCollectionManager : DataCollectionManager
 [DataCollectorFriendlyName("CustomDataCollector")]
 [DataCollectorTypeUri("my://custom/datacollector")]
 [DataCollectorAttachmentProcessor(typeof(AttachmentProcessorDataCollector2))]
-public abstract class DataCollector2 : DataCollector
+public abstract class DataCollector2 : ObjectModel.DataCollection.DataCollector
 {
 }
 
 [DataCollectorFriendlyName("Code Coverage")]
 [DataCollectorTypeUri("my://custom/ccdatacollector")]
-public abstract class CodeCoverageDataCollector : DataCollector
+public abstract class CodeCoverageDataCollector : ObjectModel.DataCollection.DataCollector
 {
 }
 

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests;
-
 using System;
 using System.Collections.ObjectModel;
 using System.Net;
@@ -14,11 +12,15 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
 using Newtonsoft.Json.Linq;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests;
 
 [TestClass]
 public class DataCollectionTestCaseEventHandlerTests

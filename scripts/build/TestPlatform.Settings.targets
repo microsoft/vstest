@@ -10,6 +10,7 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>preview</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
     <!-- Versioning is defined from the build script. Use a default dev build if it's not defined.
@@ -20,7 +21,9 @@
          serialization. This is also defined in build script. -->
     <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">15.0.0</AssemblyVersion>
 
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- Treat warnings as errors only on CI to prevent painful development process because of unused usings... -->
+    <TreatWarningsAsErrors Condition="'$(CIBuild)' == 'true'">true</TreatWarningsAsErrors>
+
     <PublicSign Condition="'$(CIBuild)' == '' or '$(CIBuild)' == 'false'">true</PublicSign>
     <DelaySign Condition="'$(CIBuild)' == 'true'">true</DelaySign>
     <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
@@ -68,6 +71,8 @@
     <When Condition="$(TestProject) == 'true'">
       <PropertyGroup>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <!-- Suppress warnings about testhost being x64 (AMD64)/x86 when imported into AnyCPU (MSIL) test projects. -->
+        <NoWarn>$(NoWarn);MSB3270</NoWarn>
       </PropertyGroup>
 
       <!-- Test projects are not discovered in test window without test container capability -->

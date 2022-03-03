@@ -11,7 +11,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
     using System;
     using System.Reflection;
- 
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -75,6 +75,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         internal static string AttachDebuggerToDefaultTestHostFailure {
             get {
                 return ResourceManager.GetString("AttachDebuggerToDefaultTestHostFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to   {0}.
+        /// </summary>
+        internal static string AttachmentOutputFormat {
+            get {
+                return ResourceManager.GetString("AttachmentOutputFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attachments:.
+        /// </summary>
+        internal static string AttachmentsBanner {
+            get {
+                return ResourceManager.GetString("AttachmentsBanner", resourceCulture);
             }
         }
         

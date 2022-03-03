@@ -1,37 +1,36 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
-
 using System;
 using System.Collections.Generic;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 
-using CommandLineUtilities;
-
-using CoreUtilities.Tracing.Interfaces;
-
-using Extensions.FileSystemGlobbing;
-using Client;
-using Client.RequestHelper;
+using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.VisualStudio.TestPlatform.Client;
+using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-using Publisher;
-using TestPlatformHelpers;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
-using PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-using TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
 using vstest.console.Internal;
 using vstest.console.UnitTests.Processors;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 [TestClass]
 public class RunSpecificTestsArgumentProcessorTests
@@ -48,12 +47,13 @@ public class RunSpecificTestsArgumentProcessorTests
     private readonly Mock<IMetricsPublisher> _mockMetricsPublisher;
     private readonly Mock<IProcessHelper> _mockProcessHelper;
     private readonly Mock<ITestRunAttachmentsProcessingManager> _mockAttachmentsProcessingManager;
+    private readonly Mock<IArtifactProcessingManager> _mockArtifactProcessingManager;
 
     private RunSpecificTestsArgumentExecutor GetExecutor(ITestRequestManager testRequestManager)
     {
         var runSettingsProvider = new TestableRunSettingsProvider();
         runSettingsProvider.AddDefaultRunSettings();
-        return new RunSpecificTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, _mockOutput.Object);
+        return new RunSpecificTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, _mockArtifactProcessingManager.Object, _mockOutput.Object);
     }
 
     public RunSpecificTestsArgumentProcessorTests()
@@ -73,6 +73,7 @@ public class RunSpecificTestsArgumentProcessorTests
         _mockProcessHelper.Setup(x => x.GetCurrentProcessId()).Returns(1234);
         _mockProcessHelper.Setup(x => x.GetProcessName(It.IsAny<int>())).Returns("dotnet.exe");
         _mockAttachmentsProcessingManager = new Mock<ITestRunAttachmentsProcessingManager>();
+        _mockArtifactProcessingManager = new Mock<IArtifactProcessingManager>();
     }
 
     [TestMethod]
@@ -132,7 +133,7 @@ public class RunSpecificTestsArgumentProcessorTests
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object);
         var executor = GetExecutor(testRequestManager);
 
-        Assert.ThrowsException<CommandLineException>(() => executor.Initialize(String.Empty));
+        Assert.ThrowsException<CommandLineException>(() => executor.Initialize(string.Empty));
     }
 
     [TestMethod]
@@ -356,7 +357,7 @@ public class RunSpecificTestsArgumentProcessorTests
         ResetAndAddSourceToCommandLineOptions();
 
         // Setting some test adapter path
-        CommandLineOptions.Instance.TestAdapterPath = @"C:\Foo";
+        CommandLineOptions.Instance.TestAdapterPath = new[] { @"C:\Foo" };
 
         mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(new List<TestCase>()));
         mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);

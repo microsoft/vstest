@@ -3,6 +3,8 @@
 
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 /// <summary>
@@ -19,4 +21,10 @@ internal class RunSettingsHelper : IRunSettingsHelper
     /// --arch or runsettings file or -- RunConfiguration.TargetPlatform=arch
     /// </summary>
     public bool IsDefaultTargetArchitecture { get; set; } = true;
+
+    /// <summary>
+    /// True indicates the test run is started from an Editor or IDE.
+    /// Defaults to false.
+    /// </summary>
+    public bool IsDesignMode { get; set; }
 }

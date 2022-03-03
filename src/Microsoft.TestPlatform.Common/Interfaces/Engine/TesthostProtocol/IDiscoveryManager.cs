@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
-
 using System.Collections.Generic;
 
-using Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
 
 /// <summary>
 /// Orchestrates discovery operations for the engine communicating with the test host process.
@@ -29,4 +31,10 @@ public interface IDiscoveryManager
     /// Aborts the test discovery.
     /// </summary>
     void Abort();
+
+    /// <summary>
+    /// Aborts the test discovery with eventHandler.
+    /// </summary>
+    /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
+    void Abort(ITestDiscoveryEventsHandler2 eventHandler);
 }

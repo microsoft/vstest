@@ -1,17 +1,20 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
-
 using System;
 using System.ComponentModel;
 using System.IO;
 
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.DataCollectorUnitTests;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-using TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
 
 [TestClass]
 public class TestPlatformDataCollectionSinkTests
@@ -22,7 +25,7 @@ public class TestPlatformDataCollectionSinkTests
 
     private TestPlatformDataCollectionSink _dataCollectionSink;
 
-    private bool _isEventHandlerInvoked = false;
+    private bool _isEventHandlerInvoked;
     private static readonly string TempDirectoryPath = Path.GetTempPath();
 
     public TestPlatformDataCollectionSinkTests()

@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -15,6 +13,10 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
 /// Facilitates communication using sockets
@@ -124,11 +126,8 @@ public class SocketCommunicationManager : ICommunicationManager
             _binaryWriter = new BinaryWriter(bufferedStream);
 
             _clientConnectedEvent.Set();
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
-                EqtTrace.Info("Accepted Client request and set the flag");
-            }
+            EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
+            EqtTrace.Info("Accepted Client request and set the flag");
         }
     }
 
@@ -139,7 +138,11 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <returns>True if Client is connected, false otherwise</returns>
     public bool WaitForClientConnection(int clientConnectionTimeout)
     {
-        return _clientConnectedEvent.WaitOne(clientConnectionTimeout);
+        var stopWatch = Stopwatch.StartNew();
+        var result = _clientConnectedEvent.WaitOne(clientConnectionTimeout);
+        EqtTrace.Verbose("SocketCommunicationManager.WaitForClientConnection took: {0} ms, with {1} ms timeout, and finished with {2}.", stopWatch.ElapsedMilliseconds, clientConnectionTimeout, result);
+
+        return result;
     }
 
     /// <summary>
@@ -189,11 +192,8 @@ public class SocketCommunicationManager : ICommunicationManager
                     _binaryReader = new BinaryReader(networkStream);
                     _binaryWriter = new BinaryWriter(bufferedStream);
 
-                    if (EqtTrace.IsInfoEnabled)
-                    {
-                        EqtTrace.Info("Connected to the server successfully ");
-                        EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
-                    }
+                    EqtTrace.Info("Connected to the server successfully ");
+                    EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
 
                     _clientConnectionAcceptedEvent.Set();
                 }
@@ -215,7 +215,11 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <returns>True, if Server got a connection from client</returns>
     public bool WaitForServerConnection(int connectionTimeout)
     {
-        return _clientConnectionAcceptedEvent.WaitOne(connectionTimeout);
+        var stopWatch = Stopwatch.StartNew();
+        var result = _clientConnectionAcceptedEvent.WaitOne(connectionTimeout);
+        EqtTrace.Verbose("SocketCommunicationManager.WaitForServerConnection took: {0} ms, with {1} ms timeout, and finished with {2}.", stopWatch.ElapsedMilliseconds, connectionTimeout, result);
+
+        return result;
     }
 
     /// <summary>

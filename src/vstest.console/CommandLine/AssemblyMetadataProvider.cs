@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-
 using System;
 using System.IO;
 using System.Reflection;
@@ -11,10 +9,14 @@ using System.Reflection.PortableExecutable;
 using System.Runtime.Versioning;
 using System.Text;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-using TestPlatform.Utilities.Helpers;
-using TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
 internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
 {
@@ -45,10 +47,7 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
             EqtTrace.Warning("AssemblyMetadataProvider.GetFrameWork: failed to determine TargetFrameworkVersion exception: {0} for assembly: {1}", ex, filePath);
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("AssemblyMetadataProvider.GetFrameWork: Determined framework:'{0}' for source: '{1}'", frameworkName, filePath);
-        }
+        EqtTrace.Info("AssemblyMetadataProvider.GetFrameWork: Determined framework:'{0}' for source: '{1}'", frameworkName, filePath);
 
         return frameworkName;
     }
@@ -67,10 +66,7 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
         {
             // AssemblyName will throw Exception if assembly contains native code or no manifest.
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("AssemblyMetadataProvider.GetArchitecture: Failed get ProcessorArchitecture using AssemblyName API with exception: {0}", ex);
-            }
+            EqtTrace.Verbose("AssemblyMetadataProvider.GetArchitecture: Failed get ProcessorArchitecture using AssemblyName API with exception: {0}", ex);
 
             try
             {
@@ -78,18 +74,12 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
             }
             catch (Exception e)
             {
-                if (EqtTrace.IsInfoEnabled)
-                {
-                    EqtTrace.Info("AssemblyMetadataProvider.GetArchitecture: Failed to determine Assembly Architecture with exception: {0}", e);
-                }
+                EqtTrace.Info("AssemblyMetadataProvider.GetArchitecture: Failed to determine Assembly Architecture with exception: {0}", e);
             }
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("AssemblyMetadataProvider.GetArchitecture: Determined architecture:{0} info for assembly: {1}", archType,
-                assemblyPath);
-        }
+        EqtTrace.Info("AssemblyMetadataProvider.GetArchitecture: Determined architecture:{0} info for assembly: {1}", archType,
+            assemblyPath);
 
         return archType;
     }
@@ -261,7 +251,7 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
 
                     // magic number.32bit or 64bit assembly.
                     var magic = reader.ReadUInt16();
-                    if (magic != 0x010B && magic != 0x020B)
+                    if (magic is not 0x010B and not 0x020B)
                     {
                         validImage = false;
                     }

@@ -1108,6 +1108,72 @@
         <target state="translated">테스트 실행이 {0} 오류로 인해 중단되었습니다.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidTestSessionCorrelationId">
+        <source>Invalid testSessionCorrelationId</source>
+        <target state="translated">잘못된 testSessionCorrelationId</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestAdapterLoadingStrategyHelp">
+        <source>--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+      This affects adapter loading behavior.
+
+      Currently supported behaviors:
+        - Explicit: Test Platform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). 
+                    If a specific adapter path is provided, adapter will be loaded; if a directory path is provided adapters directly in that folder will be loaded, unless Recursive option is also specified.
+                    If no adapter path is specified, test run will fail.
+                    This will imply /InIsolation switch and force the tests to be run in an isolated process.
+        
+        - Default: Test Platform will load adapters is if this argument has not been specified. 
+                   It will pick up extensions from next to source, provided additional adapter paths and from the default directory.
+
+        - DefaultRuntimeProviders: Load default runtime providers shipped with Test Platform. 
+                                   If this is not specified when "Explicit" option is set, a test host provider need to be specified explicitly.
+
+        - ExtensionsDirectory: Load adapters inside Extensions folder.
+
+        - NextToSource: Load adapters next to source. 
+
+        - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</source>
+        <target state="translated">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+      이는 어댑터 로딩 동작에 영향을 미칩니다.
+
+      현재 지원되는 동작:
+      - 명시적: 테스트 플랫폼은 /TestAdapterPath(또는 RunConfiguration.TestAdaptersPaths 노드)에 지정된 어댑터만 로드합니다. 
+      특정 어댑터 경로가 제공되면 어댑터가 로드됩니다. 디렉터리 경로가 제공되면 재귀 옵션도 지정되지 않는 한 해당 폴더에 직접 어댑터가 로드됩니다.
+     어댑터 경로를 지정하지 않으면 테스트 실행이 실패합니다.
+   이는 /InIsolation을 전환을 의미하고 테스트가 격리된 프로세스에서 실행되도록 합니다.
+ 
+ - 기본값: 테스트 플랫폼은 이 인수가 지정되지 않은 경우 어댑터를 로드합니다. 
+        추가 어댑터 경로를 제공하고 기본 디렉터리에서 소스 옆에 있는 확장 프로그램을 선택합니다.
+
+ -      DefaultRuntimeProviders: 테스트 플랫폼과 함께 제공되는 기본 런타임 공급자를 로드합니다. 
+ '명시적' 옵션이 설정되어 있을 때 지정하지 않으면 테스트 호스트 공급자를 명시적으로 지정해야 합니다.
+
+       - ExtensionsDirectory: Extensions 폴더 내부에 어댑터를 로드합니다. 
+
+       - NextToSource: 소스 옆에 어댑터를 로드합니다. 
+
+        - 재귀: 어댑터를 로드할 때 폴더를 재귀적으로 검색합니다. 이렇게 하려면 "명시적" 또는 "NextToSource"도 지정해야 합니다.</target>
+        <note>Do not translate "Default", "DefaultRuntimeProviders", "ExtensionsDirectory", "NextToSource" or "Recursive".</note>
+      </trans-unit>
+      <trans-unit id="TestAdapterLoadingStrategyValueInvalid">
+        <source>Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!</source>
+        <target state="translated">/TestAdapterLoadingStrategy에 대해 지정된 값({0})이 잘못되었습니다!</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestAdapterLoadingStrategyValueInvalidRecursive">
+        <source>Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}</source>
+        <target state="translated">재귀 어댑터 로드 전략은 단독으로 사용할 수 없습니다. 다음 중 하나 이상과 결합하세요. {0}</target>
+        <note>
+        - Do not translate "Recursive",
+        - {0} is the strategy names, seperated by comma: for example "Explicit, NextToSource"
+    </note>
+      </trans-unit>
+      <trans-unit id="TestAdapterPathValueRequiredWhenStrategyXIsUsed">
+        <source>The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!</source>
+        <target state="translated">"{0}" 테스트 어댑터 로드 전략이 지정된 경우 /TestAdapterPath 매개 변수를 제공해야 합니다!</target>
+        <note>{0} is the strategy name, "Explicit" for example.</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

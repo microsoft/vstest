@@ -1,14 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsProcessing;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
@@ -17,8 +16,13 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using Moq;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsProcessing;
 
 [TestClass]
 public class TestRunAttachmentsProcessingManagerTests
@@ -417,6 +421,9 @@ public class TestRunAttachmentsProcessingManagerTests
 
         var innerTaskCompletionSource = new TaskCompletionSource<object>();
 
+        CountdownEvent expectedProgress = new(4);
+        _mockEventsHandler.Setup(h => h.HandleTestRunAttachmentsProcessingProgress(It.IsAny<TestRunAttachmentsProcessingProgressEventArgs>())).Callback((TestRunAttachmentsProcessingProgressEventArgs _) => expectedProgress.Signal());
+
         _mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()))
             .Returns((string configElement, ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
             {
@@ -424,7 +431,6 @@ public class TestRunAttachmentsProcessingManagerTests
                 {
                     for (int i = 0; i < 100; ++i)
                     {
-                        Task.Delay(200, cancellation).Wait(cancellation);
                         Console.WriteLine($"Iteration: {i}");
                         logger.SendMessage(TestMessageLevel.Informational, $"Iteration: {i}");
 
@@ -434,11 +440,10 @@ public class TestRunAttachmentsProcessingManagerTests
                         if (i == 3)
                         {
                             _cancellationTokenSource.Cancel();
-                            Task.Delay(1000, cancellation).Wait(cancellation);
                         }
                     }
                 }
-                catch (OperationCanceledException)
+                finally
                 {
                     innerTaskCompletionSource.TrySetResult(null);
                 }
@@ -446,21 +451,28 @@ public class TestRunAttachmentsProcessingManagerTests
                 return Task.FromResult(outputAttachments);
             });
 
+        ManualResetEventSlim attachmentProcessingComplete = new(false);
+        _mockEventsHandler.Setup(h => h.HandleTestRunAttachmentsProcessingComplete(It.IsAny<TestRunAttachmentsProcessingCompleteEventArgs>(), It.IsAny<IEnumerable<AttachmentSet>>()))
+            .Callback((TestRunAttachmentsProcessingCompleteEventArgs _, IEnumerable<AttachmentSet> _) => attachmentProcessingComplete.Set());
+
         // act
         await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, _cancellationTokenSource.Token);
         Console.WriteLine("Attachments processing done");
         await innerTaskCompletionSource.Task;
 
+        // Wait to drain all progress events
+        Assert.IsTrue(expectedProgress.Wait(TimeSpan.FromMinutes(1)));
+
+        // Wait for the HandleTestRunAttachmentsProcessingComplete
+        Assert.IsTrue(attachmentProcessingComplete.Wait(TimeSpan.FromMinutes(1)));
+
         // assert
         VerifyCompleteEvent(true, false, inputAttachments[0]);
-
-        // TODO: Make more stable
-        // _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.IsAny<TestRunAttachmentsProcessingProgressEventArgs>()), Times.Exactly(4));
-        // _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgs(a, 1))));
-        // _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgs(a, 2))));
-        // _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgs(a, 3))));
-        // _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgs(a, 4))));
-
+        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.IsAny<TestRunAttachmentsProcessingProgressEventArgs>()), Times.Exactly(4));
+        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgs(a, 1))));
+        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgs(a, 2))));
+        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgs(a, 3))));
+        _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => VerifyProgressArgs(a, 4))));
         _mockEventsHandler.Verify(h => h.HandleLogMessage(TestMessageLevel.Informational, "Attachments processing was cancelled."));
         _mockAttachmentHandler1.Verify(h => h.GetExtensionUris());
         _mockAttachmentHandler2.Verify(h => h.GetExtensionUris(), Times.Never);
@@ -506,7 +518,7 @@ public class TestRunAttachmentsProcessingManagerTests
                         }
                     }
                 }
-                catch (OperationCanceledException)
+                finally
                 {
                     innerTaskCompletionSource.TrySetResult(null);
                 }

@@ -14,6 +14,9 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+
+#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 
@@ -26,50 +29,59 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
     {
         IDictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>> datacollectorsAttachmentsProcessors = new Dictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>>();
 
-        if (invokedDataCollectors?.Length > 0)
+
+        // Temporary disabled in design mode.
+        // We have an issue when the collector is found inside bin folder/subfolder of the user in case of VS.
+        // Usually collector are loaded from nuget package or visual studio special folders, but if a user for some reason run `dotnet publish`
+        // and after run the datacollector with the attachment processor we're loading 'published' version and no more nuget one.
+        // This led to file locking that prevents further `dotnet publish` and maybe build.
+        if (!RunSettingsHelper.Instance.IsDesignMode || FeatureFlag.Instance.IsEnabled(FeatureFlag.FORCE_DATACOLLECTORS_ATTACHMENTPROCESSORS))
         {
-            // We order files by filename descending so in case of the same collector from the same nuget but with different versions, we'll run the newer version.
-            // i.e. C:\Users\xxx\.nuget\packages\coverlet.collector
-            // /3.0.2
-            // /3.0.3
-            // /3.1.0
-            foreach (var invokedDataCollector in invokedDataCollectors.OrderByDescending(d => d.FilePath))
+            if (invokedDataCollectors?.Length > 0)
             {
-                // We'll merge using only one AQN in case of more "same processors" in different assembly.
-                if (!invokedDataCollector.HasAttachmentProcessor)
+                // We order files by filename descending so in case of the same collector from the same nuget but with different versions, we'll run the newer version.
+                // i.e. C:\Users\xxx\.nuget\packages\coverlet.collector
+                // /3.0.2
+                // /3.0.3
+                // /3.1.0
+                foreach (var invokedDataCollector in invokedDataCollectors.OrderByDescending(d => d.FilePath))
                 {
-                    continue;
-                }
-
-                EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Analyzing data collector attachment processor Uri: {invokedDataCollector.Uri} AssemblyQualifiedName: {invokedDataCollector.AssemblyQualifiedName} FilePath: {invokedDataCollector.FilePath} HasAttachmentProcessor: {invokedDataCollector.HasAttachmentProcessor}");
-
-                // We cache extension locally by file path
-                var dataCollectorExtensionManager = DataCollectorExtensionManagerCache.GetOrAdd(invokedDataCollector.FilePath, DataCollectorExtensionManager.Create(invokedDataCollector.FilePath, true, TestSessionMessageLogger.Instance));
-                var dataCollectorExtension = dataCollectorExtensionManager.TryGetTestExtension(invokedDataCollector.Uri);
-                if (dataCollectorExtension?.Metadata.HasAttachmentProcessor == true)
-                {
-                    Type attachmentProcessorType = ((DataCollectorConfig)dataCollectorExtension.TestPluginInfo).AttachmentsProcessorType;
-                    IDataCollectorAttachmentProcessor dataCollectorAttachmentProcessorInstance = null;
-                    try
+                    // We'll merge using only one AQN in case of more "same processors" in different assembly.
+                    if (!invokedDataCollector.HasAttachmentProcessor)
                     {
-                        dataCollectorAttachmentProcessorInstance = TestPluginManager.CreateTestExtension<IDataCollectorAttachmentProcessor>(attachmentProcessorType);
-                        EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Creation of collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}' from file '{invokedDataCollector.FilePath}' succeded");
-                    }
-                    catch (Exception ex)
-                    {
-                        EqtTrace.Error($"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}'\n{ex}");
-                        logger?.SendMessage(TestMessageLevel.Error, $"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}'\n{ex}");
+                        continue;
                     }
 
-                    if (dataCollectorAttachmentProcessorInstance != null && !datacollectorsAttachmentsProcessors.ContainsKey(attachmentProcessorType.AssemblyQualifiedName))
+                    EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Analyzing data collector attachment processor Uri: {invokedDataCollector.Uri} AssemblyQualifiedName: {invokedDataCollector.AssemblyQualifiedName} FilePath: {invokedDataCollector.FilePath} HasAttachmentProcessor: {invokedDataCollector.HasAttachmentProcessor}");
+
+                    // We cache extension locally by file path
+                    var dataCollectorExtensionManager = DataCollectorExtensionManagerCache.GetOrAdd(invokedDataCollector.FilePath, DataCollectorExtensionManager.Create(invokedDataCollector.FilePath, true, TestSessionMessageLogger.Instance));
+                    var dataCollectorExtension = dataCollectorExtensionManager.TryGetTestExtension(invokedDataCollector.Uri);
+                    if (dataCollectorExtension?.Metadata.HasAttachmentProcessor == true)
                     {
-                        datacollectorsAttachmentsProcessors.Add(attachmentProcessorType.AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(dataCollectorExtension.Metadata.FriendlyName, dataCollectorAttachmentProcessorInstance));
-                        EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}' from file '{invokedDataCollector.FilePath}' added to the 'run list'");
+                        Type attachmentProcessorType = ((DataCollectorConfig)dataCollectorExtension.TestPluginInfo).AttachmentsProcessorType;
+                        IDataCollectorAttachmentProcessor dataCollectorAttachmentProcessorInstance = null;
+                        try
+                        {
+                            dataCollectorAttachmentProcessorInstance = TestPluginManager.CreateTestExtension<IDataCollectorAttachmentProcessor>(attachmentProcessorType);
+                            EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Creation of collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}' from file '{invokedDataCollector.FilePath}' succeded");
+                        }
+                        catch (Exception ex)
+                        {
+                            EqtTrace.Error($"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}'\n{ex}");
+                            logger?.SendMessage(TestMessageLevel.Error, $"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}'\n{ex}");
+                        }
+
+                        if (dataCollectorAttachmentProcessorInstance != null && !datacollectorsAttachmentsProcessors.ContainsKey(attachmentProcessorType.AssemblyQualifiedName))
+                        {
+                            datacollectorsAttachmentsProcessors.Add(attachmentProcessorType.AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(dataCollectorExtension.Metadata.FriendlyName, dataCollectorAttachmentProcessorInstance));
+                            EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}' from file '{invokedDataCollector.FilePath}' added to the 'run list'");
+                        }
                     }
-                }
-                else
-                {
-                    EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: DataCollectorExtension not found for uri '{invokedDataCollector.Uri}'");
+                    else
+                    {
+                        EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: DataCollectorExtension not found for uri '{invokedDataCollector.Uri}'");
+                    }
                 }
             }
         }

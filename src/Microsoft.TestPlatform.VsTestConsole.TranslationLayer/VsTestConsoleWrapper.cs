@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Interfaces;
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -23,8 +21,12 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
-using CommunicationUtilitiesResources = VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
-using CoreUtilitiesConstants = VisualStudio.TestPlatform.CoreUtilities.Constants;
+using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
 /// <summary>
 /// An implementation of <see cref="IVsTestConsoleWrapper"/> to invoke test operations
@@ -32,8 +34,6 @@ using CoreUtilitiesConstants = VisualStudio.TestPlatform.CoreUtilities.Constants
 /// </summary>
 public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 {
-    #region Private Members
-
     private readonly IProcessManager _vstestConsoleProcessManager;
 
     private readonly ITranslationLayerRequestSender _requestSender;
@@ -53,10 +53,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     private readonly ConsoleParameters _consoleParameters;
 
     private readonly ITestPlatformEventSource _testPlatformEventSource;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="VsTestConsoleWrapper"/> class.
@@ -140,17 +136,13 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         _sessionStarted = false;
     }
 
-    #endregion
 
     #region IVsTestConsoleWrapper
 
     /// <inheritdoc/>
     public void StartSession()
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("VsTestConsoleWrapper.StartSession: Starting VsTestConsoleWrapper session.");
-        }
+        EqtTrace.Info("VsTestConsoleWrapper.StartSession: Starting VsTestConsoleWrapper session.");
 
         _testPlatformEventSource.TranslationLayerInitializeStart();
 
@@ -238,11 +230,25 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         TestSessionInfo testSessionInfo,
         ITestSessionEventsHandler eventsHandler)
     {
+        return StopTestSession(
+            testSessionInfo,
+            options: null,
+            eventsHandler);
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    public bool StopTestSession(
+        TestSessionInfo testSessionInfo,
+        TestPlatformOptions options,
+        ITestSessionEventsHandler eventsHandler)
+    {
         _testPlatformEventSource.TranslationLayerStopTestSessionStart();
 
         EnsureInitialized();
         return _requestSender.StopTestSession(
             testSessionInfo,
+            options,
             eventsHandler);
     }
 
@@ -650,11 +656,25 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         TestSessionInfo testSessionInfo,
         ITestSessionEventsHandler eventsHandler)
     {
+        return await StopTestSessionAsync(
+            testSessionInfo,
+            options: null,
+            eventsHandler).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    public async Task<bool> StopTestSessionAsync(
+        TestSessionInfo testSessionInfo,
+        TestPlatformOptions options,
+        ITestSessionEventsHandler eventsHandler)
+    {
         _testPlatformEventSource.TranslationLayerStopTestSessionStart();
 
         await EnsureInitializedAsync().ConfigureAwait(false);
         return await _requestSender.StopTestSessionAsync(
             testSessionInfo,
+            options,
             eventsHandler).ConfigureAwait(false);
     }
 

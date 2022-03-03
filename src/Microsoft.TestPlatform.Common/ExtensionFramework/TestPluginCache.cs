@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 #if NETFRAMEWORK
 using System.Threading;
@@ -12,12 +11,16 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using ObjectModel;
-using PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 /// <summary>
 /// The test plugin cache.
@@ -25,8 +28,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 /// <remarks>Making this a singleton to offer better unit testing.</remarks>
 public class TestPluginCache
 {
-    #region Private Members
-
     private readonly Dictionary<string, Assembly> _resolvedAssemblies;
 
     private List<string> _filterableExtensionPaths;
@@ -46,10 +47,6 @@ public class TestPluginCache
 
     private readonly List<string> _defaultExtensionPaths = new();
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TestPluginCache"/> class.
     /// </summary>
@@ -61,10 +58,6 @@ public class TestPluginCache
         _lockForExtensionsUpdate = new object();
         TestExtensions = null;
     }
-
-    #endregion
-
-    #region Public Properties
 
     public static TestPluginCache Instance
     {
@@ -85,10 +78,6 @@ public class TestPluginCache
     /// <remarks>Returns null if discovery of extensions is not done.</remarks>
     internal TestExtensions TestExtensions { get; private set; }
 
-    #endregion
-
-    #region Public Methods
-
     /// <summary>
     /// Gets a list of all extension paths filtered by input string.
     /// </summary>
@@ -97,27 +86,18 @@ public class TestPluginCache
     {
         var extensions = GetFilteredExtensions(_filterableExtensionPaths, endsWithPattern);
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose(
-                "TestPluginCache.GetExtensionPaths: Filtered extension paths: {0}", string.Join(Environment.NewLine, extensions));
-        }
+        EqtTrace.Verbose(
+            "TestPluginCache.GetExtensionPaths: Filtered extension paths: {0}", string.Join(Environment.NewLine, extensions));
 
         if (!skipDefaultExtensions)
         {
             extensions = extensions.Concat(_defaultExtensionPaths);
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose(
-                    "TestPluginCache.GetExtensionPaths: Added default extension paths: {0}", string.Join(Environment.NewLine, _defaultExtensionPaths));
-            }
+            EqtTrace.Verbose(
+                "TestPluginCache.GetExtensionPaths: Added default extension paths: {0}", string.Join(Environment.NewLine, _defaultExtensionPaths));
         }
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose(
-                "TestPluginCache.GetExtensionPaths: Added unfilterableExtensionPaths: {0}", string.Join(Environment.NewLine, _unfilterableExtensionPaths));
-        }
+        EqtTrace.Verbose(
+            "TestPluginCache.GetExtensionPaths: Added unfilterableExtensionPaths: {0}", string.Join(Environment.NewLine, _unfilterableExtensionPaths));
 
         return extensions.Concat(_unfilterableExtensionPaths).ToList();
     }
@@ -165,11 +145,8 @@ public class TestPluginCache
             // Combine all the possible extensions - both default and additional.
             var allExtensionPaths = GetExtensionPaths(endsWithPattern);
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose(
-                    "TestPluginCache.DiscoverTestExtensions: Discovering the extensions using allExtensionPaths: {0}", string.Join(Environment.NewLine, allExtensionPaths));
-            }
+            EqtTrace.Verbose(
+                "TestPluginCache.DiscoverTestExtensions: Discovering the extensions using allExtensionPaths: {0}", string.Join(Environment.NewLine, allExtensionPaths));
 
             // Discover the test extensions from candidate assemblies.
             pluginInfos = GetTestExtensions<TPluginInfo, TExtension>(allExtensionPaths);
@@ -201,10 +178,7 @@ public class TestPluginCache
         {
             // Nothing to do here, we just do not want to do an EqtTrace.Fail for this thread
             // being aborted as it is a legitimate exception to receive.
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: Data extension discovery is being aborted due to a thread abort.");
-            }
+            EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: Data extension discovery is being aborted due to a thread abort.");
         }
 #endif
         catch (Exception e)
@@ -239,10 +213,7 @@ public class TestPluginCache
     {
         lock (_lockForExtensionsUpdate)
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestPluginCache: Update extensions started. Skip filter = " + skipExtensionFilters);
-            }
+            EqtTrace.Verbose("TestPluginCache: Update extensions started. Skip filter = " + skipExtensionFilters);
 
             var extensions = additionalExtensionsPath?.ToList();
             if (extensions == null || extensions.Count == 0)
@@ -303,10 +274,6 @@ public class TestPluginCache
     {
         _assemblyResolver.AddSearchDirectories(directories);
     }
-
-    #endregion
-
-    #region Utility methods
 
     internal IEnumerable<string> DefaultExtensionPaths
     {
@@ -449,13 +416,9 @@ public class TestPluginCache
     {
         if (additionalExtensions.Count == extensionsList.Count && additionalExtensions.All(extensionsList.Contains))
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                var extensionString = string.Join(",", extensionsList);
-                EqtTrace.Verbose(
-                    "TestPluginCache: Ignoring extensions merge as there is no change. Current additionalExtensions are '{0}'.",
-                    extensionString);
-            }
+            EqtTrace.Verbose(
+                "TestPluginCache: Ignoring extensions merge as there is no change. Current additionalExtensions are '{0}'.",
+                string.Join(",", extensionsList));
 
             mergedExtensionsList = extensionsList;
             return false;
@@ -583,5 +546,4 @@ public class TestPluginCache
         }
     }
 
-    #endregion
 }

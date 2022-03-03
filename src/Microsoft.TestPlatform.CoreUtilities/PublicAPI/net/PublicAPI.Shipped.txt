@@ -56,6 +56,9 @@ Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper.CopyFile(string
 Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper.CreateDirectory(string path) -> System.IO.DirectoryInfo
 Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper.Delete(string path) -> void
 Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper.DeleteEmptyDirectroy(string dirPath) -> void
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper.DeleteDirectory(string directoryPath, bool recursive) -> void
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper.GetTempPath() -> string
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper.GetFileLength(string path) -> long
 Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper.DirectoryExists(string path) -> bool
 Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper.EnumerateFiles(string directory, System.IO.SearchOption searchOption, params string[] endsWithSearchPatterns) -> System.Collections.Generic.IEnumerable<string>
 Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper.Exists(string path) -> bool

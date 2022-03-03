@@ -1,14 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.IO;
 
-using Utilities;
-using Client;
-using PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Defines the defaults/constants used across different components.
@@ -173,12 +175,17 @@ public static class Constants
     /// <summary>
     /// The default protocol version
     /// </summary>
-    public static readonly ProtocolConfig DefaultProtocolConfig = new() { Version = 5 };
+    public static readonly ProtocolConfig DefaultProtocolConfig = new() { Version = 6 };
 
     /// <summary>
     /// The minimum protocol version that has debug support
     /// </summary>
     public const int MinimumProtocolVersionWithDebugSupport = 3;
+
+    /// <summary>
+    /// The minimum protocol version that has debug support
+    /// </summary>
+    public const int MinimumProtocolVersionWithCancelDiscoveryEventHandlerSupport = 6;
 
     /// <summary>
     /// Name of the results directory

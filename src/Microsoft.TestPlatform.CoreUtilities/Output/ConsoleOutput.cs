@@ -1,12 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD1_0 && !WINDOWS_UWP
-
-namespace Microsoft.VisualStudio.TestPlatform.Utilities;
-
 using System;
 using System.IO;
+
+#if !NETSTANDARD1_0 && !WINDOWS_UWP
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
 /// Sends output to the console.
@@ -14,10 +16,10 @@ using System.IO;
 public class ConsoleOutput : IOutput
 {
     private static readonly object LockObject = new();
-    private static ConsoleOutput s_consoleOutput = null;
+    private static ConsoleOutput s_consoleOutput;
 
-    private readonly TextWriter _standardOutput = null;
-    private readonly TextWriter _standardError = null;
+    private readonly TextWriter _standardOutput;
+    private readonly TextWriter _standardError;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConsoleOutput"/> class.

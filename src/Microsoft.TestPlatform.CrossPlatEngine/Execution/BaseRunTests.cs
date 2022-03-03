@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,36 +11,37 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-using CommunicationUtilities.Interfaces;
-
-using Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-using Common.Interfaces;
-using Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using CommunicationUtilities;
-using CoreUtilities.Tracing.Interfaces;
-using Adapter;
-using DataCollection.Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
-using ObjectModel.Engine.ClientProtocol;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using PlatformAbstractions;
-using PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-using CrossPlatEngineResources = Resources.Resources;
+using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 /// <summary>
 /// The base run tests.
 /// </summary>
 internal abstract class BaseRunTests
 {
-    #region private fields
-
     private readonly ITestEventsPublisher _testEventsPublisher;
     private protected string _package;
     private readonly IRequestData _requestData;
@@ -67,16 +66,12 @@ internal abstract class BaseRunTests
     /// <summary>
     /// The Run configuration. To determine framework and execution thread apartment state.
     /// </summary>
-    private RunConfiguration _runConfiguration;
+    private readonly RunConfiguration _runConfiguration;
 
     /// <summary>
     /// The Serializer to clone testcase object in case of user input test source is package. E.g UWP scenario(appx/build.appxrecipe).
     /// </summary>
     private readonly IDataSerializer _dataSerializer;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BaseRunTests"/> class.
@@ -147,44 +142,58 @@ internal abstract class BaseRunTests
         _testEventsPublisher = testEventsPublisher;
         _platformThread = platformThread;
         _dataSerializer = dataSerializer;
-        SetContext();
+
+        TestRunCache = new TestRunCache(TestExecutionContext.FrequencyOfRunStatsChangeEvent, TestExecutionContext.RunStatsChangeEventTimeout, OnCacheHit);
+
+        RunContext = new RunContext();
+        RunContext.RunSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(RunSettings);
+        RunContext.KeepAlive = TestExecutionContext.KeepAlive;
+        RunContext.InIsolation = TestExecutionContext.InIsolation;
+        RunContext.IsDataCollectionEnabled = TestExecutionContext.IsDataCollectionEnabled;
+        RunContext.IsBeingDebugged = TestExecutionContext.IsDebug;
+
+        var runConfig = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettings);
+        RunContext.TestRunDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfig);
+        RunContext.SolutionDirectory = RunSettingsUtilities.GetSolutionDirectory(runConfig);
+        _runConfiguration = runConfig;
+
+        FrameworkHandle = new FrameworkHandle(
+            _testCaseEventsHandler,
+            TestRunCache,
+            TestExecutionContext,
+            TestRunEventsHandler);
+        FrameworkHandle.TestRunMessage += OnTestRunMessage;
+
+        ExecutorUrisThatRanTests = new List<string>();
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets the run settings.
     /// </summary>
-    protected string RunSettings { get; private set; }
+    protected string RunSettings { get; }
 
     /// <summary>
     /// Gets the test execution context.
     /// </summary>
-    protected TestExecutionContext TestExecutionContext { get; private set; }
+    protected TestExecutionContext TestExecutionContext { get; }
 
     /// <summary>
     /// Gets the test run events handler.
     /// </summary>
-    protected ITestRunEventsHandler TestRunEventsHandler { get; private set; }
+    protected ITestRunEventsHandler TestRunEventsHandler { get; }
 
     /// <summary>
     /// Gets the test run cache.
     /// </summary>
-    protected ITestRunCache TestRunCache { get; private set; }
+    protected ITestRunCache TestRunCache { get; }
 
     protected bool IsCancellationRequested => _isCancellationRequested;
 
-    protected RunContext RunContext { get; private set; }
+    protected RunContext RunContext { get; }
 
-    protected FrameworkHandle FrameworkHandle { get; private set; }
+    protected FrameworkHandle FrameworkHandle { get; }
 
-    protected ICollection<string> ExecutorUrisThatRanTests { get; private set; }
-
-    #endregion
-
-    #region Public methods
+    protected ICollection<string> ExecutorUrisThatRanTests { get; }
 
     public void RunTests()
     {
@@ -208,13 +217,9 @@ internal abstract class BaseRunTests
             }
             catch (Exception ex)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("BaseRunTests.RunTests: Failed to run the tests. Reason: {0}.", ex);
-                }
+                EqtTrace.Error("BaseRunTests.RunTests: Failed to run the tests. Reason: {0}.", ex);
 
                 exception = new Exception(ex.Message, ex.InnerException);
-
                 isAborted = true;
             }
             finally
@@ -229,10 +234,7 @@ internal abstract class BaseRunTests
                 }
                 catch (Exception ex2)
                 {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error("BaseRunTests.RunTests: Failed to raise runCompletion error. Reason: {0}.", ex2);
-                    }
+                    EqtTrace.Error("BaseRunTests.RunTests: Failed to raise runCompletion error. Reason: {0}.", ex2);
 
                     // TODO : this does not crash the process currently because of the job queue.
                     // Let the process crash
@@ -270,8 +272,6 @@ internal abstract class BaseRunTests
         }
     }
 
-    #region Abstract methods
-
     protected abstract void BeforeRaisingTestRunComplete(bool exceptionsHitDuringRunTests);
 
     protected abstract IEnumerable<Tuple<Uri, string>> GetExecutorUriExtensionMap(
@@ -303,8 +303,6 @@ internal abstract class BaseRunTests
 
     protected abstract void SendSessionEnd();
 
-    #endregion
-
     private void CancelTestRunInternal(ITestExecutor executor)
     {
         try
@@ -316,36 +314,6 @@ internal abstract class BaseRunTests
             EqtTrace.Info("{0}.Cancel threw an exception: {1} ", executor.GetType().FullName, e);
         }
     }
-    #endregion
-
-    #region Private methods
-
-    private void SetContext()
-    {
-        TestRunCache = new TestRunCache(TestExecutionContext.FrequencyOfRunStatsChangeEvent, TestExecutionContext.RunStatsChangeEventTimeout, OnCacheHit);
-
-        RunContext = new RunContext();
-        RunContext.RunSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(RunSettings);
-        RunContext.KeepAlive = TestExecutionContext.KeepAlive;
-        RunContext.InIsolation = TestExecutionContext.InIsolation;
-        RunContext.IsDataCollectionEnabled = TestExecutionContext.IsDataCollectionEnabled;
-        RunContext.IsBeingDebugged = TestExecutionContext.IsDebug;
-
-        var runConfig = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettings);
-        RunContext.TestRunDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfig);
-        RunContext.SolutionDirectory = RunSettingsUtilities.GetSolutionDirectory(runConfig);
-        _runConfiguration = runConfig;
-
-        FrameworkHandle = new FrameworkHandle(
-            _testCaseEventsHandler,
-            TestRunCache,
-            TestExecutionContext,
-            TestRunEventsHandler);
-        FrameworkHandle.TestRunMessage += OnTestRunMessage;
-
-        ExecutorUrisThatRanTests = new List<string>();
-    }
-
     private void OnTestRunMessage(object sender, TestRunMessageEventArgs e)
     {
         TestRunEventsHandler.HandleLogMessage(e.Level, e.Message);
@@ -397,7 +365,7 @@ internal abstract class BaseRunTests
             {
                 // Commenting this out because of a compatibility issue with Microsoft.Dotnet.ProjectModel released on nuGet.org.
                 // this.activeExecutor = null;
-                // var runtimeVersion = string.Concat(PlatformServices.Default.Runtime.RuntimeType, " ",	
+                // var runtimeVersion = string.Concat(PlatformServices.Default.Runtime.RuntimeType, " ",
                 // PlatformServices.Default.Runtime.RuntimeVersion);
                 var runtimeVersion = " ";
                 TestRunEventsHandler?.HandleLogMessage(
@@ -426,7 +394,7 @@ internal abstract class BaseRunTests
             // host by default.
             // Same goes if all adapters implement the new test executor interface but at
             // least one of them needs the test platform to attach to the default test host.
-            if (!(executor.Value is ITestExecutor2)
+            if (executor.Value is not ITestExecutor2
                 || ShouldAttachDebuggerToTestHost(executor, executorUriExtensionTuple, RunContext))
             {
                 EqtTrace.Verbose("Attaching to default test host.");
@@ -461,12 +429,9 @@ internal abstract class BaseRunTests
 
             try
             {
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose(
-                        "BaseRunTests.RunTestInternalWithExecutors: Running tests for {0}",
-                        executor.Metadata.ExtensionUri);
-                }
+                EqtTrace.Verbose(
+                    "BaseRunTests.RunTestInternalWithExecutors: Running tests for {0}",
+                    executor.Metadata.ExtensionUri);
 
                 // set the active executor
                 _activeExecutor = executor.Value;
@@ -522,12 +487,9 @@ internal abstract class BaseRunTests
                     totalTests = TestRunCache.TotalExecutedTests;
                 }
 
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose(
-                        "BaseRunTests.RunTestInternalWithExecutors: Completed running tests for {0}",
-                        executor.Metadata.ExtensionUri);
-                }
+                EqtTrace.Verbose(
+                    "BaseRunTests.RunTestInternalWithExecutors: Completed running tests for {0}",
+                    executor.Metadata.ExtensionUri);
 
                 // Collecting Time Taken by each executor Uri
                 _requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, executorUri), totalTimeTaken.TotalSeconds);
@@ -541,13 +503,10 @@ internal abstract class BaseRunTests
 
                 exceptionsHitDuringRunTests = true;
 
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error(
-                        "BaseRunTests.RunTestInternalWithExecutors: An exception occurred while invoking executor {0}. {1}.",
-                        executorUriExtensionTuple.Item1,
-                        e);
-                }
+                EqtTrace.Error(
+                    "BaseRunTests.RunTestInternalWithExecutors: An exception occurred while invoking executor {0}. {1}.",
+                    executorUriExtensionTuple.Item1,
+                    e);
 
                 TestRunEventsHandler?.HandleLogMessage(
                     TestMessageLevel.Error,
@@ -584,7 +543,7 @@ internal abstract class BaseRunTests
         try
         {
             if (string.IsNullOrEmpty(extensionAssembly)
-                || string.Equals(extensionAssembly, Constants.UnspecifiedAdapterPath))
+                || string.Equals(extensionAssembly, ObjectModel.Constants.UnspecifiedAdapterPath))
             {
                 // full execution. Since the extension manager is cached this can be created multiple times without harming performance.
                 return TestExecutorExtensionManager.Create();
@@ -689,10 +648,7 @@ internal abstract class BaseRunTests
         }
         else
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("BaseRunTests.OnCacheHit: Unable to send TestRunStatsChange Event as TestRunEventsHandler is NULL");
-            }
+            EqtTrace.Error("BaseRunTests.OnCacheHit: Unable to send TestRunStatsChange Event as TestRunEventsHandler is NULL");
         }
     }
 
@@ -760,5 +716,4 @@ internal abstract class BaseRunTests
         return updatedTestCases;
     }
 
-    #endregion
 }

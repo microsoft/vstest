@@ -1,30 +1,29 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution;
-
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 
-using Client.Execution;
-
-using Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.Client.Execution;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-using ObjectModel.Logging;
-using TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using ObjectModel;
-using ObjectModel.Client;
-using ObjectModel.Engine;
-using System.Collections.ObjectModel;
+#nullable disable
 
-using CommunicationUtilities;
-using CommunicationUtilities.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution;
 
 [TestClass]
 public class TestRunRequestTests
@@ -169,6 +168,10 @@ public class TestRunRequestTests
     {
         bool handleLogMessageCalled = false;
         bool handleRawMessageCalled = false;
+
+        _mockDataSerializer
+            .Setup(s => s.SerializePayload(It.IsAny<string>(), It.IsAny<Object>()))
+            .Returns("non-empty rawMessage");
 
         _testRunRequest.TestRunMessage += (object sender, TestRunMessageEventArgs e) => handleLogMessageCalled = true;
 

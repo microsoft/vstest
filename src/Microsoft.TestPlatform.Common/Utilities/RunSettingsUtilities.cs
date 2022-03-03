@@ -1,14 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
 /// <summary>
 /// Utility methods for RunSettings.
@@ -106,10 +108,7 @@ public static class RunSettingsUtilities
         }
         catch (SettingsException ex)
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("RunSettingsUtilities.GetMaxCpuCount: Unable to get maximum CPU count from Setting Xml. {0}", ex);
-            }
+            EqtTrace.Verbose("RunSettingsUtilities.GetMaxCpuCount: Unable to get maximum CPU count from Setting Xml. {0}", ex);
         }
 
         return cpuCount;
@@ -149,10 +148,7 @@ public static class RunSettingsUtilities
             }
             catch (SettingsException se)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("RunSettingsUtilities.GetTreatNoTestsAsError: Unable to get the value of TreatNoTestsAsError from runsettings: Error {0}", se);
-                }
+                EqtTrace.Error("RunSettingsUtilities.GetTreatNoTestsAsError: Unable to get the value of TreatNoTestsAsError from runsettings: Error {0}", se);
             }
         }
 
@@ -194,4 +190,15 @@ public static class RunSettingsUtilities
         return testAdaptersPaths;
     }
 
+    /// <summary>
+    /// Gets the test adapter loading strategy
+    /// </summary>
+    /// <param name="runSettings">Test run settings</param>
+    /// <returns>Test adapter loading strategy</returns>
+    internal static TestAdapterLoadingStrategy GetLoadingStrategy(string runSettings)
+    {
+        var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
+
+        return runConfiguration.TestAdapterLoadingStrategy;
+    }
 }

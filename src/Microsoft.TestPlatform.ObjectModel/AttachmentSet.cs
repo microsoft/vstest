@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Represents a set of attachments.
@@ -59,13 +61,13 @@ public class UriDataAttachment
     /// Description of the attachment.
     /// </summary>
     [DataMember]
-    public string Description { get; private set; }
+    public string Description { get; }
 
     /// <summary>
     /// Uri of the attachment.
     /// </summary>
     [DataMember]
-    public Uri Uri { get; private set; }
+    public Uri Uri { get; }
 
     public UriDataAttachment(Uri uri, string description)
     {

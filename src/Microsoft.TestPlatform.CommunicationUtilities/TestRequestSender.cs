@@ -1,24 +1,26 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
 
-using CoreUtilities.Helpers;
-
-using Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-using CommonResources = Resources.Resources;
-using ObjectModelConstants = TestPlatform.ObjectModel.Constants;
+using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
 /// Test request sender implementation.
@@ -36,7 +38,7 @@ public class TestRequestSender : ITestRequestSender
 
     private readonly int _clientExitedWaitTime;
 
-    private ICommunicationEndPoint _communicationEndpoint;
+    private readonly ICommunicationEndPoint _communicationEndpoint;
 
     private ICommunicationChannel _channel;
 
@@ -57,7 +59,7 @@ public class TestRequestSender : ITestRequestSender
 
     // Must be in sync with the highest supported version in
     // src/Microsoft.TestPlatform.CrossPlatEngine/EventHandlers/TestRequestHandler.cs file.
-    private readonly int _highestSupportedVersion = 5;
+    private readonly int _highestSupportedVersion = 6;
 
     private readonly TestHostConnectionInfo _connectionInfo;
 
@@ -77,7 +79,6 @@ public class TestRequestSender : ITestRequestSender
             protocolConfig,
             ClientProcessExitWaitTimeout)
     {
-        SetCommunicationEndPoint();
     }
 
     internal TestRequestSender(
@@ -98,7 +99,14 @@ public class TestRequestSender : ITestRequestSender
 
         // The connectionInfo here is that of RuntimeProvider, so reverse the role of runner.
         _runtimeProvider = runtimeProvider;
-        _communicationEndpoint = communicationEndPoint;
+
+        // TODO: In various places TestRequest sender is instantiated, and we can't easily inject the factory, so this is last
+        // resort of getting the dependency into the execution flow.
+        _communicationEndpoint = communicationEndPoint
+#if DEBUG
+            ?? TestServiceLocator.Get<ICommunicationEndPoint>(connectionInfo.Endpoint)
+#endif
+            ?? SetCommunicationEndPoint();
         _connectionInfo.Endpoint = connectionInfo.Endpoint;
         _connectionInfo.Role = connectionInfo.Role == ConnectionRole.Host
             ? ConnectionRole.Client
@@ -135,16 +143,19 @@ public class TestRequestSender : ITestRequestSender
     /// <inheritdoc />
     public int InitializeCommunication()
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.InitializeCommunication: initialize communication. ");
-        }
+        EqtTrace.Verbose("TestRequestSender.InitializeCommunication: initialize communication. ");
 
         // this.clientExitCancellationSource = new CancellationTokenSource();
         _clientExitErrorMessage = string.Empty;
         _communicationEndpoint.Connected += (sender, args) =>
         {
             _channel = args.Channel;
+            // TODO: I suspect that Channel can be null only because of some unit tests,
+            // and being connected and actually not setting any channel should be error
+            // rather than silently waiting for timeout
+            // TODO: also this event is called back on connected, why are the event args holding
+            // the Connected boolean and why do we check it here. If we did not connect we should
+            // have not fired this event.
             if (args.Connected && _channel != null)
             {
                 _connected.Set();
@@ -158,21 +169,22 @@ public class TestRequestSender : ITestRequestSender
         // Server start returns the listener port
         // return int.Parse(this.communicationServer.Start());
         var endpoint = _communicationEndpoint.Start(_connectionInfo.Endpoint);
+        // TODO: This is forcing us to use IP address and port for communication
         return endpoint.GetIpEndPoint().Port;
     }
 
     /// <inheritdoc />
     public bool WaitForRequestHandlerConnection(int connectionTimeout, CancellationToken cancellationToken)
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting for connection with timeout: {0}", connectionTimeout);
-        }
+        var sw = Stopwatch.StartNew();
+        EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting for connection with timeout: {0}.", connectionTimeout);
 
         // Wait until either connection is successful, handled by connected.WaitHandle
         // or operation is canceled, handled by cancellationToken.WaitHandle
         // or testhost exits unexpectedly, handled by clientExited.WaitHandle
         var waitIndex = WaitHandle.WaitAny(new WaitHandle[] { _connected.WaitHandle, cancellationToken.WaitHandle, _clientExited.WaitHandle }, connectionTimeout);
+
+        EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting took {0} ms, with timeout {1} ms, and result {2}, which is {3}.", sw.ElapsedMilliseconds, connectionTimeout, waitIndex, waitIndex == 0 ? "success" : "failure");
 
         // Return true if connection was successful.
         return waitIndex == 0;
@@ -183,17 +195,15 @@ public class TestRequestSender : ITestRequestSender
     {
         // Negotiation follows these steps:
         // Runner sends highest supported version to Test host
-        // Test host sends the version it can support (must be less than highest) to runner
+        // Test host compares the version with the highest version it can support.
+        // Test host sends back the lower number of the two. So the highest protocol version, that both sides support is used.
         // Error case: test host can send a protocol error if it cannot find a supported version
         var protocolNegotiated = new ManualResetEvent(false);
         _onMessageReceived = (sender, args) =>
         {
             var message = _dataSerializer.DeserializeMessage(args.Data);
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestRequestSender.CheckVersionWithTestHost: onMessageReceived received message: {0}", message);
-            }
+            EqtTrace.Verbose("TestRequestSender.CheckVersionWithTestHost: onMessageReceived received message: {0}", message);
 
             if (message.MessageType == MessageType.VersionCheck)
             {
@@ -229,10 +239,7 @@ public class TestRequestSender : ITestRequestSender
             // without any versioning in the message itself.
             var data = _dataSerializer.SerializePayload(MessageType.VersionCheck, _highestSupportedVersion);
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestRequestSender.CheckVersionWithTestHost: Sending check version message: {0}", data);
-            }
+            EqtTrace.Verbose("TestRequestSender.CheckVersionWithTestHost: Sending check version message: {0}", data);
 
             _channel.Send(data);
 
@@ -260,10 +267,7 @@ public class TestRequestSender : ITestRequestSender
             pathToAdditionalExtensions,
             _protocolVersion);
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.InitializeDiscovery: Sending initialize discovery with message: {0}", message);
-        }
+        EqtTrace.Verbose("TestRequestSender.InitializeDiscovery: Sending initialize discovery with message: {0}", message);
 
         _channel.Send(message);
     }
@@ -281,12 +285,22 @@ public class TestRequestSender : ITestRequestSender
             discoveryCriteria,
             _protocolVersion);
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.DiscoverTests: Sending discover tests with message: {0}", message);
-        }
+        EqtTrace.Verbose("TestRequestSender.DiscoverTests: Sending discover tests with message: {0}", message);
 
         _channel.Send(message);
+    }
+
+    /// <inheritdoc/>
+    public void SendDiscoveryAbort()
+    {
+        if (IsOperationComplete())
+        {
+            EqtTrace.Verbose("TestRequestSender.SendDiscoveryAbort: Operation is already complete. Skip error message.");
+            return;
+        }
+
+        EqtTrace.Verbose("TestRequestSender.SendDiscoveryAbort: Sending discovery abort.");
+        _channel?.Send(_dataSerializer.SerializeMessage(MessageType.CancelDiscovery));
     }
     #endregion
 
@@ -299,10 +313,8 @@ public class TestRequestSender : ITestRequestSender
             MessageType.ExecutionInitialize,
             pathToAdditionalExtensions,
             _protocolVersion);
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.InitializeExecution: Sending initialize execution with message: {0}", message);
-        }
+
+        EqtTrace.Verbose("TestRequestSender.InitializeExecution: Sending initialize execution with message: {0}", message);
 
         _channel.Send(message);
     }
@@ -345,10 +357,7 @@ public class TestRequestSender : ITestRequestSender
             runCriteria,
             _protocolVersion);
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.StartTestRun: Sending test run with message: {0}", message);
-        }
+        EqtTrace.Verbose("TestRequestSender.StartTestRun: Sending test run with message: {0}", message);
 
         _channel.Send(message);
     }
@@ -391,10 +400,7 @@ public class TestRequestSender : ITestRequestSender
             runCriteria,
             _protocolVersion);
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.StartTestRun: Sending test run with message: {0}", message);
-        }
+        EqtTrace.Verbose("TestRequestSender.StartTestRun: Sending test run with message: {0}", message);
 
         _channel.Send(message);
     }
@@ -408,10 +414,7 @@ public class TestRequestSender : ITestRequestSender
             return;
         }
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.SendTestRunCancel: Sending test run cancel.");
-        }
+        EqtTrace.Verbose("TestRequestSender.SendTestRunCancel: Sending test run cancel.");
 
         _channel?.Send(_dataSerializer.SerializeMessage(MessageType.CancelTestRun));
     }
@@ -425,10 +428,7 @@ public class TestRequestSender : ITestRequestSender
             return;
         }
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.SendTestRunAbort: Sending test run abort.");
-        }
+        EqtTrace.Verbose("TestRequestSender.SendTestRunAbort: Sending test run abort.");
 
         _channel?.Send(_dataSerializer.SerializeMessage(MessageType.AbortTestRun));
     }
@@ -440,10 +440,7 @@ public class TestRequestSender : ITestRequestSender
     {
         if (!IsOperationComplete())
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestRequestSender.EndSession: Sending end session.");
-            }
+            EqtTrace.Verbose("TestRequestSender.EndSession: Sending end session.");
 
             _channel?.Send(_dataSerializer.SerializeMessage(MessageType.SessionEnd));
         }
@@ -454,10 +451,7 @@ public class TestRequestSender : ITestRequestSender
     {
         // This method is called on test host exit. If test host has any errors, stdError
         // provides the crash call stack.
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info($"TestRequestSender.OnClientProcessExit: Test host process exited. Standard error: {stdError}");
-        }
+        EqtTrace.Info($"TestRequestSender.OnClientProcessExit: Test host process exited. Standard error: {stdError}");
 
         _clientExitErrorMessage = stdError;
         _clientExited.Set();
@@ -490,10 +484,7 @@ public class TestRequestSender : ITestRequestSender
         try
         {
             var rawMessage = messageReceived.Data;
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Received message: {0}", rawMessage);
-            }
+            EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Received message: {0}", rawMessage);
 
             // Send raw message first to unblock handlers waiting to send message to IDEs
             testRunEventsHandler.HandleRawMessage(rawMessage);
@@ -529,10 +520,7 @@ public class TestRequestSender : ITestRequestSender
                             MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback,
                             processId,
                             _protocolVersion);
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Sending LaunchAdapterProcessWithDebuggerAttachedCallback message: {0}", data);
-                    }
+                    EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Sending LaunchAdapterProcessWithDebuggerAttachedCallback message: {0}", data);
 
                     _channel.Send(data);
                     break;
@@ -546,10 +534,7 @@ public class TestRequestSender : ITestRequestSender
                         result,
                         _protocolVersion);
 
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Sending AttachDebugger with message: {0}", message);
-                    }
+                    EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Sending AttachDebugger with message: {0}", message);
 
                     _channel.Send(resultMessage);
 
@@ -558,7 +543,9 @@ public class TestRequestSender : ITestRequestSender
         }
         catch (Exception exception)
         {
-            OnTestRunAbort(testRunEventsHandler, exception, false);
+            // If we failed to process the incoming message, initiate client (testhost) abort, because we can't recover, and don't wait
+            // for it to exit and write into error stream, because it did not do anything wrong, so no error is coming there
+            OnTestRunAbort(testRunEventsHandler, exception, getClientError: false);
         }
     }
 
@@ -569,10 +556,7 @@ public class TestRequestSender : ITestRequestSender
             var rawMessage = args.Data;
 
             // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestRequestSender.OnDiscoveryMessageReceived: Received message: {0}", rawMessage);
-            }
+            EqtTrace.Verbose("TestRequestSender.OnDiscoveryMessageReceived: Received message: {0}", rawMessage);
 
             // Send raw message first to unblock handlers waiting to send message to IDEs
             discoveryEventsHandler.HandleRawMessage(rawMessage);
@@ -587,7 +571,12 @@ public class TestRequestSender : ITestRequestSender
                 case MessageType.DiscoveryComplete:
                     var discoveryCompletePayload =
                         _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(data);
-                    var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
+                    var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
+                        discoveryCompletePayload.TotalTests,
+                        discoveryCompletePayload.IsAborted,
+                        discoveryCompletePayload.FullyDiscoveredSources,
+                        discoveryCompletePayload.PartiallyDiscoveredSources,
+                        discoveryCompletePayload.NotDiscoveredSources);
                     discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
                     discoveryEventsHandler.HandleDiscoveryComplete(
                         discoveryCompleteEventArgs,
@@ -666,20 +655,25 @@ public class TestRequestSender : ITestRequestSender
 
     private string GetAbortErrorMessage(Exception exception, bool getClientError)
     {
+
         EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Exception: " + exception);
 
         // It is also possible for an operation to abort even if client has not
-        // disconnected, e.g. if there's an error parsing the response from test host. We
-        // want the exception to be available in those scenarios.
+        // disconnected, because we initiate client abort when there is error in processing incoming messages.
+        // in this case, we will use the exception as the failure result, if it is present. Otherwise we will
+        // try to wait for the client process to exit, and capture it's error output (we are listening to it's standard and
+        // error output in the ClientExited callback).
         var reason = exception?.Message;
         if (getClientError)
         {
             EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Client has disconnected. Wait for standard error.");
 
             // Wait for test host to exit for a moment
+            // TODO: this timeout is 10 seconds, make it also configurable like the other famous timeout that is 100ms
             if (_clientExited.Wait(_clientExitedWaitTime))
             {
-                // Set a default message of test host process exited and additionally specify the error if present
+                // Set a default message of test host process exited and additionally specify the error if we were able to get it
+                // from error output of the process
                 EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Received test host error message.");
                 reason = CommonResources.TestHostProcessCrashed;
                 if (!string.IsNullOrWhiteSpace(_clientExitErrorMessage))
@@ -732,33 +726,24 @@ public class TestRequestSender : ITestRequestSender
         }
 
         // Complete the currently ongoing operation (Discovery/Execution)
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRequestSender.SetOperationComplete: Setting operation complete.");
-        }
+        EqtTrace.Verbose("TestRequestSender.SetOperationComplete: Setting operation complete.");
 
         _communicationEndpoint.Stop();
         Interlocked.CompareExchange(ref _operationCompleted, 1, 0);
     }
 
-    private void SetCommunicationEndPoint()
+    private ICommunicationEndPoint SetCommunicationEndPoint()
     {
         // TODO: Use factory to get the communication endpoint. It will abstract out the type of communication endpoint like socket, shared memory or named pipe etc.,
         if (_connectionInfo.Role == ConnectionRole.Client)
         {
-            _communicationEndpoint = new SocketClient();
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestRequestSender is acting as client");
-            }
+            EqtTrace.Verbose("TestRequestSender is acting as client.");
+            return new SocketClient();
         }
         else
         {
-            _communicationEndpoint = new SocketServer();
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestRequestSender is acting as server");
-            }
+            EqtTrace.Verbose("TestRequestSender is acting as server.");
+            return new SocketServer();
         }
     }
 }

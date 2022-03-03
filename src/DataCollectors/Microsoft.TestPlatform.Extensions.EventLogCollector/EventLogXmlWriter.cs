@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
-
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,13 +11,15 @@ using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
+
 /// <summary>
 /// This class writes event log entries to an XML file in a format that can be retrieved into a DataSet
 /// </summary>
 internal static class EventLogXmlWriter
 {
-    #region Public methods
-
     /// <summary>
     /// The write event log entries to xml file.
     /// </summary>
@@ -81,4 +81,3 @@ internal static class EventLogXmlWriter
         fileHelper.WriteAllTextToFile(xmlFilePath, stringBuilder.ToString());
     }
 }
-#endregion

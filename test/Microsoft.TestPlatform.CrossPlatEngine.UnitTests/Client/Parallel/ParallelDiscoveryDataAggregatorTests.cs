@@ -1,14 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel;
-
 using System;
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel;
 
 [TestClass]
 public class ParallelDiscoveryDataAggregatorTests
@@ -233,5 +236,42 @@ public class ParallelDiscoveryDataAggregatorTests
 
         var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
         Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, out _));
+    }
+
+    [TestMethod]
+    public void AggregateShouldAggregateMessageSentCorrectly()
+    {
+        var aggregator = new ParallelDiscoveryDataAggregator();
+
+        aggregator.AggregateIsMessageSent(isMessageSent: false);
+        Assert.IsFalse(aggregator.IsMessageSent, "Aborted must be false");
+
+        aggregator.AggregateIsMessageSent(isMessageSent: true);
+        Assert.IsTrue(aggregator.IsMessageSent, "Aborted must be true");
+
+        aggregator.AggregateIsMessageSent(isMessageSent: false);
+        Assert.IsTrue(aggregator.IsMessageSent, "Aborted must be true");
+    }
+
+    [TestMethod]
+    public void AggregateShouldAggregateSourcesCorrectly()
+    {
+        // Arrange
+        var aggregator = new ParallelDiscoveryDataAggregator();
+        var sources = new List<string>() { "sample.dll" };
+
+        // Act
+        aggregator.MarkSourcesWithStatus(sources, DiscoveryStatus.NotDiscovered);
+        var sourcesWithNotDiscoveredStatus = aggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered);
+
+        // Assert
+        Assert.AreEqual(1, sourcesWithNotDiscoveredStatus.Count);
+
+        // Act
+        aggregator.MarkSourcesWithStatus(sources, DiscoveryStatus.FullyDiscovered);
+        var sourcesWithFullyDiscoveryStatus = aggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered);
+
+        // Assert
+        Assert.AreEqual(1, sourcesWithFullyDiscoveryStatus.Count);
     }
 }

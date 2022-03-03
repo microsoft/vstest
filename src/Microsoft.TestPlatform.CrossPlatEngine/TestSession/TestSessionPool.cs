@@ -1,15 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
-
 using System;
 using System.Collections.Generic;
 
-using Client;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
 /// <summary>
 /// Represents the test session pool.
@@ -90,9 +92,10 @@ public class TestSessionPool
     /// </summary>
     /// 
     /// <param name="testSessionInfo">The test session info object.</param>
+    /// <param name="requestData">The request data.</param>
     /// 
     /// <returns>True if the operation succeeded, false otherwise.</returns>
-    public virtual bool KillSession(TestSessionInfo testSessionInfo)
+    public virtual bool KillSession(TestSessionInfo testSessionInfo, IRequestData requestData)
     {
         // TODO (copoiena): What happens if some request is running for the current session ?
         // Should we stop the request as well ? Probably yes.
@@ -112,7 +115,7 @@ public class TestSessionPool
         }
 
         // Kill the session.
-        return proxyManager.StopSession();
+        return proxyManager.StopSession(requestData);
     }
 
     /// <summary>

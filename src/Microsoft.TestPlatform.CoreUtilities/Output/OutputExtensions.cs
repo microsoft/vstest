@@ -1,14 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD1_0 && !WINDOWS_UWP
-
-namespace Microsoft.VisualStudio.TestPlatform.Utilities;
-
-using CoreUtilities.Resources;
-
 using System;
 using System.Globalization;
+
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
+
+#if !NETSTANDARD1_0 && !WINDOWS_UWP
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
 /// Utility Methods for sending output to IOutput.
@@ -86,13 +88,8 @@ public static class OutputExtensions
     /// <param name="messageTypeFormat">Format string for the message type.</param>
     /// <param name="format">Format string for the error message.</param>
     /// <param name="args">Arguments to format into the format string.</param>
-    private static void Output(IOutput output, OutputLevel level, string messageTypeFormat, string format, params object[] args)
+    private static void Output(IOutput output!!, OutputLevel level, string messageTypeFormat, string format, params object[] args)
     {
-        if (output == null)
-        {
-            throw new ArgumentNullException(nameof(output));
-        }
-
         output.WriteLine(Format(messageTypeFormat, format, args), level);
     }
 

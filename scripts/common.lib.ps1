@@ -11,8 +11,8 @@ $TPB_BRANCH = "LOCALBRANCH"
 $TPB_COMMIT = "LOCALBUILD"
 
 try {
-    $TPB_BRANCH = $env:BUILD_SOURCEBRANCH -replace "^refs/heads/"  
-    if ([string]::IsNullOrWhiteSpace($TPB_BRANCH)) { 
+    $TPB_BRANCH = $env:BUILD_SOURCEBRANCH -replace "^refs/heads/"
+    if ([string]::IsNullOrWhiteSpace($TPB_BRANCH)) {
         $TPB_BRANCH = git -C "." rev-parse --abbrev-ref HEAD
     }
 }
@@ -20,7 +20,7 @@ catch { }
 
 try {
     $TPB_COMMIT = $env:BUILD_SOURCEVERSION
-    if ([string]::IsNullOrWhiteSpace($TPB_COMMIT)) { 
+    if ([string]::IsNullOrWhiteSpace($TPB_COMMIT)) {
         $TPB_COMMIT = git -C "." rev-parse HEAD
     }
 }
@@ -42,9 +42,9 @@ $GlobalJson = Get-Content -Raw -Path (Join-Path $env:TP_ROOT_DIR 'global.json') 
 #
 # Dotnet configuration
 #
-# Disable first run since we want to control all package sources 
+# Disable first run since we want to control all package sources
 Write-Verbose "Setup dotnet configuration."
-$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1 
+$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "5.8.1"
@@ -61,16 +61,10 @@ function Write-Log {
         $Level = "Success"
     )
     
-    $currentColor = $Host.UI.RawUI.ForegroundColor
-    try {
-        $Host.UI.RawUI.ForegroundColor = if ("Success" -eq $Level) { "Green" } else { "Red" }
-        if ($message)
-        {
-            Write-Output "... $message"
-        }
-    }
-    finally {
-        $Host.UI.RawUI.ForegroundColor = $currentColor
+    if ($message)
+    {
+        $color = if ("Success" -eq $Level) { "Green" } else { "Red" }
+        Write-Host "... $message" -ForegroundColor $color
     }
 }
 
@@ -87,7 +81,7 @@ function Install-DotNetCli
 {
     $timer = Start-Timer
     Write-Log "Install-DotNetCli: Get dotnet-install.ps1 script..."
-    $dotnetInstallRemoteScript = "https://raw.githubusercontent.com/dotnet/install-scripts/main/src/dotnet-install.ps1"
+    $dotnetInstallRemoteScript = "https://dot.net/v1/dotnet-install.ps1"
     $dotnetInstallScript = Join-Path $env:TP_TOOLS_DIR "dotnet-install.ps1"
     if (-not (Test-Path $env:TP_TOOLS_DIR)) {
         New-Item $env:TP_TOOLS_DIR -Type Directory | Out-Null
@@ -119,7 +113,7 @@ function Install-DotNetCli
 
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '2.1.30' -Channel '2.1' -Architecture x86 -NoPath
     ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
-    
+
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '3.1.22' -Channel '3.1' -Architecture x64 -NoPath
     $env:DOTNET_ROOT= $dotnetInstallPath
 
@@ -136,7 +130,7 @@ function Install-DotNetCli
 
     "---- dotnet environment variables"
     Get-ChildItem "Env:\dotnet_*"
-    
+
     "`n`n---- x64 dotnet"
     Invoke-Exe "$env:DOTNET_ROOT\dotnet.exe" -Arguments "--info"
 
@@ -150,10 +144,10 @@ function Install-DotNetCli
 
 function Clear-Package {
     # find all microsoft packages that have the same version as we specified
-    # this is cache-busting the nuget packages, so we don't reuse them from cache 
+    # this is cache-busting the nuget packages, so we don't reuse them from cache
     # after we built new ones
     if (Test-Path $env:TP_PACKAGES_DIR) {
-        $devPackages = Get-ChildItem $env:TP_PACKAGES_DIR/microsoft.*/$TPB_Version | Select-Object -ExpandProperty FullName 
+        $devPackages = Get-ChildItem $env:TP_PACKAGES_DIR/microsoft.*/$TPB_Version | Select-Object -ExpandProperty FullName
         $devPackages | Remove-Item -Force -Recurse -Confirm:$false
     }
 }
@@ -173,11 +167,11 @@ function Copy-Bulk {
         [string]$root,
         [hashtable]$files
     )
-    
+
     $files.GetEnumerator() | ForEach-Object {
         $from = Join-Path $root $_.Name
         $to = $_.Value
-          
+
         New-Item -ItemType directory -Path "$to\" -Force | Out-Null
         Copy-Item "$from\*" $to -Force -Recurse
     }
@@ -195,13 +189,13 @@ function Get-ElapsedTime([System.Diagnostics.Stopwatch] $timer)
 
 function Set-ScriptFailedOnError
 {
-    param ($Command, $Arguments)
-    if ($lastExitCode -eq 0) {
+    param ($Command, $Arguments, $ExitCode)
+    if (0 -eq $ExitCode) {
         return
     }
 
-    if ($FailFast -eq $true) {
-        Write-Error "Build failed. Stopping as fail fast is set.`nFailed command: $Command $Arguments`nExit code: $LASTEXITCODE"
+    if ($FailFast) {
+        Write-Error "Build failed. Stopping as fail fast is set.`nFailed command: $Command $Arguments`nExit code: $ExitCode"
     }
 
     $script:ScriptFailedCommands += "$Command $Arguments"
@@ -237,14 +231,14 @@ function Invoke-Exe {
         if($CaptureOutput)
         {
             $process.StdErr
-        }  
-        Set-ScriptFailedOnError -Command $Command -Arguments $Arguments
+        }
+        Set-ScriptFailedOnError -Command $Command -Arguments $Arguments -ExitCode $exitCode
     }
-    
+
     if($CaptureOutput)
     {
         $process.StdOut
-    }  
+    }
 }
 
 Add-Type -TypeDefinition @'
@@ -252,34 +246,66 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 
-public class ProcessOutputter { 
+public class ProcessOutputter
+{
     private readonly ConsoleColor _color;
+    private readonly ConsoleColor _warningColor;
+    private readonly ConsoleColor _errorColor;
     private readonly List<string> _output;
     private int nullCount = 0;
 
-    public ProcessOutputter (ConsoleColor color, bool suppressOutput = false) { 
+    public ProcessOutputter(ConsoleColor color, ConsoleColor warningColor, ConsoleColor errorColor, bool suppressOutput = false)
+    {
         _color = color;
+        _warningColor = warningColor;
+        _errorColor = errorColor;
         _output = new List<string>();
 
-        OutputHandler = (s, e) => {
+        OutputHandler = (s, e) =>
+        {
             AppendLine(e.Data);
 
-            if (!suppressOutput) {
+            if (suppressOutput || e.Data == null)
+            { 
+                return;
+            }
+    
+            // These handlers can run at the same time,
+            // without lock they sometimes grab the color the other
+            // one set.
+            lock (Console.Out)
+            {
                 var fg = Console.ForegroundColor;
                 try
                 {
-                    Console.ForegroundColor = _color;
-                    Console.WriteLine(e.Data);
+                    var lines = e.Data.Split('\n');
+                    foreach (var line in lines)
+                    {
+                        // one extra space before the word, to avoid highlighting
+                        // warnaserror and similar parameters that are not actual errors
+                        //
+                        // The comparison is not done using the insensitive overload because that 
+                        // is too new for PowerShell 5 compiler
+                        var lineToLower = line.ToLowerInvariant();
+                        Console.ForegroundColor = lineToLower.Contains(" warning")
+                            ? _warningColor
+                            : lineToLower.Contains(" error")
+                                ? _errorColor
+                                : _color;
+
+                        Console.WriteLine(line);
+                    }
                 }
                 finally
-                { 
+                {
                     Console.ForegroundColor = fg;
                 }
             }
         };
     }
-    
-    public ProcessOutputter () { 
+
+    public ProcessOutputter()
+    {
         _output = new List<string>();
         OutputHandler = (s, e) => AppendLine(e.Data);
     }
@@ -287,17 +313,20 @@ public class ProcessOutputter {
     public System.Diagnostics.DataReceivedEventHandler OutputHandler { get; private set; }
     public IEnumerable<string> Output { get { return _output; } }
 
-    private void AppendLine(string line) {
-        if (string.IsNullOrEmpty(line)) {
+    private void AppendLine(string line)
+    {
+        if (string.IsNullOrEmpty(line))
+        {
             nullCount++;
             return;
         }
 
-        while (nullCount > 0) {
+        while (nullCount > 0)
+        {
             --nullCount;
             _output.Add(string.Empty);
         }
-        
+
         _output.Add(line);
     }
 }
@@ -317,15 +346,15 @@ function Start-InlineProcess {
         [switch]
         $Elevate,
 
-        [switch] 
+        [switch]
         $SuppressOutput
     )
-    
+
     $processInfo = [System.Diagnostics.ProcessStartInfo]::new()
     $processInfo.FileName = $Path
     $processInfo.Arguments = $Arguments
     $processInfo.WorkingDirectory = $WorkingDirectory
-    
+
     $processInfo.RedirectStandardError = $true
     $processInfo.RedirectStandardOutput = $true
     $processInfo.UseShellExecute = $false
@@ -334,8 +363,8 @@ function Start-InlineProcess {
         $processInfo.Verb = "runas"
     }
 
-    $outputHandler = [ProcessOutputter]::new("White", $SuppressOutput.IsPresent)
-    $errorHandler = [ProcessOutputter]::new("Red", $SuppressOutput.IsPresent)
+    $outputHandler = [ProcessOutputter]::new("White", "Yellow", "Red", $SuppressOutput.IsPresent)
+    $errorHandler = [ProcessOutputter]::new("White", "Yellow", "Red", $SuppressOutput.IsPresent)
     $outputDataReceived = $outputHandler.OutputHandler
     $errorDataReceivedEvent = $errorHandler.OutputHandler
 

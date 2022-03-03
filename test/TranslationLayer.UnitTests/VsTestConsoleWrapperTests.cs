@@ -1,22 +1,26 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
-
-using Interfaces;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-using VisualStudio.TestTools.UnitTesting;
-using Moq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
 
 [TestClass]
 public class VsTestConsoleWrapperTests
@@ -204,22 +208,26 @@ public class VsTestConsoleWrapperTests
     public void StopTestSessionShouldCallRequestSenderWithCorrectArguments()
     {
         var testSessionInfo = new TestSessionInfo();
+        var testPlatformOptions = new TestPlatformOptions();
         var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
 
         _mockRequestSender.Setup(
                 rs => rs.StopTestSession(
                     It.IsAny<TestSessionInfo>(),
+                    It.IsAny<TestPlatformOptions>(),
                     It.IsAny<ITestSessionEventsHandler>()))
             .Returns(true);
 
         Assert.IsTrue(
             _consoleWrapper.StopTestSession(
                 testSessionInfo,
+                testPlatformOptions,
                 mockEventsHandler.Object));
 
         _mockRequestSender.Verify(
             rs => rs.StopTestSession(
                 testSessionInfo,
+                testPlatformOptions,
                 mockEventsHandler.Object),
             Times.Once);
     }

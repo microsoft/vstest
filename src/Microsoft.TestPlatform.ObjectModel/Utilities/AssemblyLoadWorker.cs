@@ -1,13 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 #if NETFRAMEWORK
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 /// <summary>
 /// Does the real work of finding references using Assembly.ReflectionOnlyLoadFrom.
@@ -34,17 +37,11 @@ internal class AssemblyLoadWorker : MarshalByRefObject
         }
         catch (BadImageFormatException)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("AssemblyLoadWorker:GetTargetFrameworkVersionString() caught BadImageFormatException. Falling to native binary.");
-            }
+            EqtTrace.Error("AssemblyLoadWorker:GetTargetFrameworkVersionString() caught BadImageFormatException. Falling to native binary.");
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("AssemblyLoadWorker:GetTargetFrameworkVersionString() Returning default. Unhandled exception: {0}.", ex);
-            }
+            EqtTrace.Error("AssemblyLoadWorker:GetTargetFrameworkVersionString() Returning default. Unhandled exception: {0}.", ex);
         }
 
         return string.Empty;
@@ -169,7 +166,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
     public void GetPlatformAndFrameworkSettings(string path, out string procArchType, out string frameworkVersion)
     {
         procArchType = nameof(Architecture.Default);
-        frameworkVersion = String.Empty;
+        frameworkVersion = string.Empty;
 
         try
         {
@@ -215,10 +212,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
 
             if (string.IsNullOrEmpty(procArchType))
             {
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("Unable to find the platform type for image:{0} with PEKind:{1}, Machine:{2}. Returning Default:{3}", path, peKindString, machineTypeString, "AnyCPU");
-                }
+                EqtTrace.Verbose("Unable to find the platform type for image:{0} with PEKind:{1}, Machine:{2}. Returning Default:{3}", path, peKindString, machineTypeString, "AnyCPU");
                 procArchType = "AnyCPU";
             }
 
@@ -249,18 +243,12 @@ internal class AssemblyLoadWorker : MarshalByRefObject
         }
         catch (BadImageFormatException)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("AssemblyLoadWorker:GetPlatformAndFrameworkSettings() caught BadImageFormatException. Falling to native binary.");
-            }
+            EqtTrace.Error("AssemblyLoadWorker:GetPlatformAndFrameworkSettings() caught BadImageFormatException. Falling to native binary.");
             procArchType = GetArchitectureForSource(path);
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("AssemblyLoadWorker:GetPlatformAndFrameworkSettings() Returning default. Unhandled exception: {0}.", ex);
-            }
+            EqtTrace.Error("AssemblyLoadWorker:GetPlatformAndFrameworkSettings() Returning default. Unhandled exception: {0}.", ex);
             return;
         }
     }
@@ -322,7 +310,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
 
                     // magic number.32bit or 64bit assembly.
                     UInt16 magic = reader.ReadUInt16();
-                    if (magic != 0x010B && magic != 0x020B)
+                    if (magic is not 0x010B and not 0x020B)
                     {
                         validImage = false;
                     }
@@ -350,20 +338,14 @@ internal class AssemblyLoadWorker : MarshalByRefObject
                 }
                 else
                 {
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("Source path {0} is not a valid image path. Returning default proc arch type {1}.", imagePath, "AnyCPU");
-                    }
+                    EqtTrace.Verbose("Source path {0} is not a valid image path. Returning default proc arch type {1}.", imagePath, "AnyCPU");
                 }
             }
         }
         catch (Exception ex)
         {
             //Ignore all exception
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("AssemblyLoadWorker:GetArchitectureForSource() Returning default:{0}. Unhandled exception: {1}.", "AnyCPU", ex.ToString());
-            }
+            EqtTrace.Error("AssemblyLoadWorker:GetArchitectureForSource() Returning default:{0}. Unhandled exception: {1}.", "AnyCPU", ex.ToString());
         }
 
         return archType;

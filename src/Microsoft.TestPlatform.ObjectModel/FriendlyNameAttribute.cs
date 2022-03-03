@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 
-using Resources;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// This attribute is applied to Loggers so they can be uniquely identified.
@@ -15,8 +17,6 @@ using Resources;
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public sealed class FriendlyNameAttribute : Attribute
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes with the Friendly Name of the logger.
     /// </summary>
@@ -31,15 +31,9 @@ public sealed class FriendlyNameAttribute : Attribute
         FriendlyName = friendlyName;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// The friendly Name of the Test Logger.
     /// </summary>
     public string FriendlyName { get; private set; }
-
-    #endregion
 
 }

@@ -1,13 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
-using System.IO;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// The class that enables us to get debug information from both managed and native binaries.

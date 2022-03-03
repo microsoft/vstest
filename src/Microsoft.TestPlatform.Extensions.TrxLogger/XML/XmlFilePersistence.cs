@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
 internal class XmlFilePersistence : XmlPersistence
 {
-    #region Constants
-
     /// <summary>
     /// Type of the object that is persisted to the file, the object that represents the root element
     /// </summary>
@@ -17,5 +17,4 @@ internal class XmlFilePersistence : XmlPersistence
     /// </summary>
     public const string DirectoryPath = "DirectoryPath";
 
-    #endregion
 }

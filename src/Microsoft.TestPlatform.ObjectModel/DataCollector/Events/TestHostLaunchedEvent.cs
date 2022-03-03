@@ -1,9 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-
 using System.Runtime.Serialization;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
 /// Session End event arguments
@@ -11,20 +13,10 @@ using System.Runtime.Serialization;
 [DataContract]
 public sealed class TestHostLaunchedEventArgs : DataCollectionEventArgs
 {
-    #region Private members
-
     /// <summary>
     /// Process id of the test host
     /// </summary>
-    #endregion
-
-    #region Public properties
-
-    public int TestHostProcessId { get; private set; }
-
-    #endregion
-
-    #region Constructor
+    public int TestHostProcessId { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestHostLaunchedEventArgs"/> class.
@@ -41,5 +33,4 @@ public sealed class TestHostLaunchedEventArgs : DataCollectionEventArgs
         TestHostProcessId = processId;
     }
 
-    #endregion
 }

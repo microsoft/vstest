@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
-
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -14,7 +12,11 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-using Win32.SafeHandles;
+using Microsoft.Win32.SafeHandles;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 internal class WindowsHangDumper : IHangDumper
 {
@@ -26,23 +28,18 @@ internal class WindowsHangDumper : IHangDumper
     }
 
     private static Action<object, string> OutputReceivedCallback => (process, data) =>
-    {
         // useful for visibility when debugging this tool
         // Console.ForegroundColor = ConsoleColor.Cyan;
         // Console.WriteLine(data);
         // Console.ForegroundColor = ConsoleColor.White;
         // Log all standard output message of procdump in diag files.
         // Otherwise they end up coming on console in pipleine.
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("ProcDumpDumper.OutputReceivedCallback: Output received from procdump process: " + data);
-        }
-    };
+        EqtTrace.Info("ProcDumpDumper.OutputReceivedCallback: Output received from procdump process: " + data);
 
     public void Dump(int processId, string outputDirectory, DumpTypeOption type)
     {
         var process = Process.GetProcessById(processId);
-        var processTree = process.GetProcessTree().Where(p => p.Process.ProcessName != "conhost" && p.Process.ProcessName != "WerFault").ToList();
+        var processTree = process.GetProcessTree().Where(p => p.Process.ProcessName is not "conhost" and not "WerFault").ToList();
 
         if (processTree.Count > 1)
         {

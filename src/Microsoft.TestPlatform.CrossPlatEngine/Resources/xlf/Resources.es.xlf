@@ -167,6 +167,16 @@
         <target state="translated">Los ajustes de ejecución cambiaron entre el momento en que se estableció la sesión de prueba y el momento de la solicitud de ejecución/detección actual.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="translated">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="translated">Datos adjuntos:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

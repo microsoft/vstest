@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Utilities;
-
 using System;
 using System.IO;
 using System.Xml;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
 /// Utilities used by the client to understand the environment of the current run.
@@ -21,13 +23,8 @@ public static class ClientUtilities
     /// </summary>
     /// <param name="xmlDocument">Xml Document containing Runsettings xml</param>
     /// <param name="path">Path of the .runsettings xml file</param>
-    public static void FixRelativePathsInRunSettings(XmlDocument xmlDocument, string path)
+    public static void FixRelativePathsInRunSettings(XmlDocument xmlDocument!!, string path)
     {
-        if (xmlDocument == null)
-        {
-            throw new ArgumentNullException(nameof(xmlDocument));
-        }
-
         if (string.IsNullOrEmpty(path))
         {
             throw new ArgumentNullException(nameof(path));

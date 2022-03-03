@@ -10,6 +10,8 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.AttachVS;
 
 internal class DebuggerUtility

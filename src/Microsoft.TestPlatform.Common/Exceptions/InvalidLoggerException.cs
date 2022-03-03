@@ -1,16 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
-
-using ObjectModel;
-
 using System;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
 
 public class InvalidLoggerException : TestPlatformException
 {
-    #region Constructors
-
     /// <summary>
     /// Initializes with the message.
     /// </summary>
@@ -30,5 +30,4 @@ public class InvalidLoggerException : TestPlatformException
     {
     }
 
-    #endregion
 }

@@ -1,22 +1,24 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-using ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-using Interfaces;
-using Logging;
-using ObjectModel;
-using ObjectModel.Adapter;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-using CommonResources = Resources.Resources;
-using ObjectModelCommonResources = ObjectModel.Resources.CommonResources;
+using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+using ObjectModelCommonResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
 
 /// <summary>
 /// Manages the settings provider extensions.
@@ -27,7 +29,6 @@ using ObjectModelCommonResources = ObjectModel.Resources.CommonResources;
 /// </remarks>
 public class SettingsProviderExtensionManager
 {
-    #region Fields
     private static SettingsProviderExtensionManager s_settingsProviderExtensionManager;
     private static readonly object Synclock = new();
 
@@ -40,10 +41,6 @@ public class SettingsProviderExtensionManager
     /// Used for logging errors.
     /// </summary>
     private readonly IMessageLogger _logger;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes with the settings providers.
@@ -66,26 +63,35 @@ public class SettingsProviderExtensionManager
         _logger = logger;
 
         // Populate the map to avoid threading issues
-        PopulateMap();
+        SettingsProvidersMap = new Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>();
+
+        foreach (var settingsProvider in _settingsProviders)
+        {
+            if (SettingsProvidersMap.ContainsKey(settingsProvider.Metadata.SettingsName))
+            {
+                _logger.SendMessage(
+                    TestMessageLevel.Error,
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        CommonResources.DuplicateSettingsName,
+                        settingsProvider.Metadata.SettingsName));
+            }
+            else
+            {
+                SettingsProvidersMap.Add(settingsProvider.Metadata.SettingsName, settingsProvider);
+            }
+        }
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets the Unfiltered list of settings providers.  Used for the /ListSettingsProviders command line argument.
     /// </summary>
-    public IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> UnfilteredSettingsProviders { get; private set; }
+    public IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> UnfilteredSettingsProviders { get; }
 
     /// <summary>
     /// Gets the map of settings name to settings provider.
     /// </summary>
-    public Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> SettingsProvidersMap { get; private set; }
-
-    #endregion
-
-    #region Static Methods
+    public Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> SettingsProvidersMap { get; }
 
     /// <summary>
     /// Creates an instance of the settings provider.
@@ -100,8 +106,7 @@ public class SettingsProviderExtensionManager
                 if (s_settingsProviderExtensionManager == null)
                 {
 
-                    TestPluginManager.Instance
-                        .GetSpecificTestExtensions<TestSettingsProviderPluginInformation, ISettingsProvider, ISettingsProviderCapabilities, TestSettingsProviderMetadata>(
+                    TestPluginManager.GetSpecificTestExtensions<TestSettingsProviderPluginInformation, ISettingsProvider, ISettingsProviderCapabilities, TestSettingsProviderMetadata>(
                             TestPlatformConstants.TestAdapterEndsWithPattern,
                             out var unfilteredTestExtensions,
                             out var testExtensions);
@@ -145,10 +150,7 @@ public class SettingsProviderExtensionManager
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("SettingsProviderExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}", ex);
-            }
+            EqtTrace.Error("SettingsProviderExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}", ex);
 
             if (shouldThrowOnError)
             {
@@ -156,10 +158,6 @@ public class SettingsProviderExtensionManager
             }
         }
     }
-
-    #endregion
-
-    #region Public Methods
 
     /// <summary>
     /// Gets the settings with the provided name.
@@ -178,33 +176,6 @@ public class SettingsProviderExtensionManager
         return settingsProvider;
     }
 
-    #endregion
-
-
-    /// <summary>
-    /// Populate the settings provider map
-    /// </summary>
-    private void PopulateMap()
-    {
-        SettingsProvidersMap = new Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>();
-
-        foreach (var settingsProvider in _settingsProviders)
-        {
-            if (SettingsProvidersMap.ContainsKey(settingsProvider.Metadata.SettingsName))
-            {
-                _logger.SendMessage(
-                    TestMessageLevel.Error,
-                    string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CommonResources.DuplicateSettingsName,
-                        settingsProvider.Metadata.SettingsName));
-            }
-            else
-            {
-                SettingsProvidersMap.Add(settingsProvider.Metadata.SettingsName, settingsProvider);
-            }
-        }
-    }
 }
 
 /// <summary>

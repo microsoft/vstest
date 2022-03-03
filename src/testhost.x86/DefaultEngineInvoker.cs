@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.TestHost;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,27 +9,31 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Common;
-using Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
-using CommunicationUtilities;
-using CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
-using CoreUtilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 
-using CrossPlatEngine;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
-using ObjectModel;
-using ObjectModel.Client;
-using ObjectModel.Engine.TesthostProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
 
-using PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-using PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 using CommunicationUtilitiesResources =
-    CommunicationUtilities.Resources.Resources;
-using CoreUtilitiesConstants = CoreUtilities.Constants;
+    Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.TestHost;
 
 internal class DefaultEngineInvoker :
 #if NETFRAMEWORK
@@ -59,6 +61,13 @@ internal class DefaultEngineInvoker :
 
     private const string TelemetryOptedIn = "--telemetryoptedin";
 
+    // this path is where the sources were originally located on the source system
+    // we are in a testhost that runs on the remote system, so this local path is
+    // actually remote for us and the remote path is local for us. 
+    private const string LocalPath = "--local-path";
+
+    private const string RemotePath = "--remote-path";
+
     private readonly ITestRequestHandler _requestHandler;
 
     private readonly IDataCollectionTestCaseEventSender _dataCollectionTestCaseEventSender;
@@ -80,6 +89,17 @@ internal class DefaultEngineInvoker :
     public void Invoke(IDictionary<string, string> argsDictionary)
     {
         InitializeEqtTrace(argsDictionary);
+
+        // We don't have a way to pass these values to TestRequestHandler directly
+        // beacuse of it's public interface, we work around that by making it implement a second interface
+        if (_requestHandler is IDeploymentAwareTestRequestHandler deployedHandler)
+        {
+            if (argsDictionary.ContainsKey(RemotePath) && argsDictionary.ContainsKey(LocalPath))
+            {
+                deployedHandler.LocalPath = argsDictionary[LocalPath];
+                deployedHandler.RemotePath = argsDictionary[RemotePath];
+            }
+        }
 
         if (EqtTrace.IsVerboseEnabled)
         {

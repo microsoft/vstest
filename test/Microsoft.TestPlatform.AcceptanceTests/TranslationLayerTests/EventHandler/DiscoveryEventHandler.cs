@@ -1,14 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
-
 using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 /// <inheritdoc />
 public class DiscoveryEventHandler : ITestDiscoveryEventsHandler
@@ -70,6 +72,10 @@ public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
     /// </summary>
     public List<TestCase> DiscoveredTestCases { get; }
 
+    public IList<string> FullyDiscoveredSources { get; private set; }
+    public IList<string> PartiallyDiscoveredSources { get; private set; }
+    public IList<string> NotDiscoveredSources { get; private set; }
+
     public List<TestMessage> TestMessages;
 
     /// <summary>
@@ -101,6 +107,9 @@ public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
         }
 
         Metrics = discoveryCompleteEventArgs.Metrics;
+        FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources;
+        PartiallyDiscoveredSources = discoveryCompleteEventArgs.PartiallyDiscoveredSources;
+        NotDiscoveredSources = discoveryCompleteEventArgs.NotDiscoveredSources;
     }
 
     public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)

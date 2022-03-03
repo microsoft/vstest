@@ -29,6 +29,13 @@
 
     <ItemGroup>
         <ManifestBuildData Include="Location=$(FeedUrl)" />
+        <!-- <ManifestBuildData Include="InitialAssetsLocation=https://dev.azure.com/url/to/my/feed/index.json" /> -->
+        <ManifestBuildData Include="AzureDevOpsBuildId=$(BUILD_BUILDID)" />
+        <ManifestBuildData Include="AzureDevOpsBuildDefinitionId=$(SYSTEM_DEFINITIONID)" />
+        <ManifestBuildData Include="AzureDevOpsProject=$(SYSTEM_TEAMPROJECT)" />
+        <ManifestBuildData Include="AzureDevOpsBuildNumber=$(BUILD_BUILDNUMBER)" />
+        <ManifestBuildData Include="AzureDevOpsRepository=$(BUILD_REPOSITORY_URI)" />
+        <ManifestBuildData Include="AzureDevOpsBranch=$(BUILD_SOURCEBRANCH)" />
     </ItemGroup>
 
     <UsingTask TaskName="GenerateBuildManifest" AssemblyFile="$(MicrosoftDotNetBuildTasksFeedTaskDir)Microsoft.DotNet.Build.Tasks.Feed.dll" />

@@ -1,19 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
-
-using Microsoft.TestPlatform.AdapterUtilities.Resources;
 using Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
 using System;
 using System.Globalization;
-using System.Reflection;
-using System.Text;
-
 #if !NET20
 using System.Linq;
 #endif
+using System.Reflection;
+using System.Text;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
 
 public static partial class ManagedNameHelper
 {
@@ -82,13 +82,8 @@ public static partial class ManagedNameHelper
     /// More information about <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/> can be found in
     /// <see href="https://github.com/microsoft/vstest-docs/blob/main/RFCs/0017-Managed-TestCase-Properties.md">the RFC</see>.
     /// </remarks>
-    public static void GetManagedName(MethodBase method, out string managedTypeName, out string managedMethodName, out string[] hierarchyValues)
+    public static void GetManagedName(MethodBase method!!, out string managedTypeName, out string managedMethodName, out string[] hierarchyValues)
     {
-        if (method == null)
-        {
-            throw new ArgumentNullException(nameof(method));
-        }
-
         if (!ReflectionHelpers.IsMethod(method))
         {
             throw new NotSupportedException(nameof(method));
@@ -200,7 +195,7 @@ public static partial class ManagedNameHelper
 
         if (type == null)
         {
-            string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorTypeNotFound, parsedManagedTypeName);
+            string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorTypeNotFound, parsedManagedTypeName);
             throw new InvalidManagedNameException(message);
         }
 
@@ -218,7 +213,7 @@ public static partial class ManagedNameHelper
 
         if (method == null)
         {
-            string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorMethodNotFound, methodName, managedTypeName);
+            string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorMethodNotFound, methodName, managedTypeName);
             throw new InvalidManagedNameException(message);
         }
 
@@ -389,7 +384,7 @@ public static partial class ManagedNameHelper
             char c = name[i];
             if (NeedsEscaping(c, i))
             {
-                if (c == '\\' || c == '\'')
+                if (c is '\\' or '\'')
                 {
                     // var encoded = Convert.ToString(((uint)c), 16);
                     // b.Append("\\u");
@@ -494,15 +489,11 @@ public static partial class ManagedNameHelper
         }
 
         var category = CharUnicodeInfo.GetUnicodeCategory(c);
-        if (category == UnicodeCategory.NonSpacingMark        // Mn
-            || category == UnicodeCategory.SpacingCombiningMark  // Mc
-            || category == UnicodeCategory.ConnectorPunctuation  // Pc
-            || category == UnicodeCategory.Format)               // Cf
-        {
-            return false;
-        }
-
-        return true;
+        return category
+            is not UnicodeCategory.NonSpacingMark         // Mn
+            and not UnicodeCategory.SpacingCombiningMark  // Mc
+            and not UnicodeCategory.ConnectorPunctuation  // Pc
+            and not UnicodeCategory.Format;               // Cf
     }
 
     private static string GetTypeString(Type type, bool closedType)

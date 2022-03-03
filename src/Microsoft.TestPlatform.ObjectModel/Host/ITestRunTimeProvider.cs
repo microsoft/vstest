@@ -1,23 +1,24 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Client.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
-using Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
 /// <summary>
 /// Interface for TestRuntimeProvider which manages test host processes for test engine.
 /// </summary>
 public interface ITestRuntimeProvider
 {
-    #region events
     /// <summary>
     /// Raised when host is launched successfully
     /// Consumed by TestPlatform to initialize connection b/w test host and test platform
@@ -28,8 +29,6 @@ public interface ITestRuntimeProvider
     /// Raised when host is cleaned up and removes all it's dependencies
     /// </summary>
     event EventHandler<HostProviderEventArgs> HostExited;
-
-    #endregion
 
     /// <summary>
     /// Gets a value indicating whether the test host is specific to a test source. If yes, each test source

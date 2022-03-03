@@ -1,13 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
-
-using ObjectModel;
-
 #if !NETSTANDARD1_0
 using System;
 #endif
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 
 public class EnvironmentHelper
 {

@@ -1108,6 +1108,72 @@
         <target state="translated">Testovací běh se přerušil s chybou {0}.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidTestSessionCorrelationId">
+        <source>Invalid testSessionCorrelationId</source>
+        <target state="translated">Neplatné testSessionCorrelationId</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestAdapterLoadingStrategyHelp">
+        <source>--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+      This affects adapter loading behavior.
+
+      Currently supported behaviors:
+        - Explicit: Test Platform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). 
+                    If a specific adapter path is provided, adapter will be loaded; if a directory path is provided adapters directly in that folder will be loaded, unless Recursive option is also specified.
+                    If no adapter path is specified, test run will fail.
+                    This will imply /InIsolation switch and force the tests to be run in an isolated process.
+        
+        - Default: Test Platform will load adapters is if this argument has not been specified. 
+                   It will pick up extensions from next to source, provided additional adapter paths and from the default directory.
+
+        - DefaultRuntimeProviders: Load default runtime providers shipped with Test Platform. 
+                                   If this is not specified when "Explicit" option is set, a test host provider need to be specified explicitly.
+
+        - ExtensionsDirectory: Load adapters inside Extensions folder.
+
+        - NextToSource: Load adapters next to source. 
+
+        - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</source>
+        <target state="translated">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+      Toto má dopad na chování při načítání adaptéru.
+
+      Aktuálně podporovaná chování:
+        – Explicit: Testovací platforma načte pouze adaptéry určené přes /TestAdapterPath (nebo uzel RunConfiguration.TestAdaptersPaths). 
+                    Pokud je poskytnuta určená cesta k adaptéru, adaptér se načte; pokud je poskytnuta cesta adresáře, načtou se adaptér přímo v dané složce, pokud není zároveň určená rekurzivní možnost.
+                    Pokud není určena žádná cesta k adaptéru, testovací běh se nezdaří.
+                    To bude znamenat přepnutí na /InIsolation a vynutí spuštění testů v izolovaném procesu.
+        
+        – Výchozí: Testovací platforma načte adaptéry pokud nedošlo k určení tohoto argumentu.
+                   Vyzvedne rozšíření z okolí zdroje, z poskytnutých dodatečných cest k adaptéru a z výchozího adresáře. 
+
+        – DefaultRuntimeProviders: Načte výchozí poskytovatele modulů runtime doručené spolu s Testovací platformou.
+                                   Pokud toto není výslovně určeno, když je nastavena možnost „Explicit“, poskytovatel hostitele testu musí být explicitně určen.
+
+        – ExtensionsDirectory: Načte adaptéry ve složce Rozšíření.
+
+        – NextToSource: Načte adaptéry v okolí zdroje. 
+
+        – Recursive: Rekurzivně prohledá složky při načítání adaptérů. Toto vyžaduje, aby bylo zároveň určeno „Explicit“ a „NextToSource“.</target>
+        <note>Do not translate "Default", "DefaultRuntimeProviders", "ExtensionsDirectory", "NextToSource" or "Recursive".</note>
+      </trans-unit>
+      <trans-unit id="TestAdapterLoadingStrategyValueInvalid">
+        <source>Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!</source>
+        <target state="translated">Určená hodnota ({0}) pro /TestAdapterLoadingStrategy je neplatná!</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestAdapterLoadingStrategyValueInvalidRecursive">
+        <source>Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}</source>
+        <target state="translated">Strategie načítání rekurzivního adaptéru nemůže být použita samostatně. Zkombinujte ji prosím s jednou nebo několika z: {0}</target>
+        <note>
+        - Do not translate "Recursive",
+        - {0} is the strategy names, seperated by comma: for example "Explicit, NextToSource"
+    </note>
+      </trans-unit>
+      <trans-unit id="TestAdapterPathValueRequiredWhenStrategyXIsUsed">
+        <source>The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!</source>
+        <target state="translated">Při načítání určené strategie načítání adaptéru testu {0}musí být zadaný parametr /TestAdapterPath!</target>
+        <note>{0} is the strategy name, "Explicit" for example.</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

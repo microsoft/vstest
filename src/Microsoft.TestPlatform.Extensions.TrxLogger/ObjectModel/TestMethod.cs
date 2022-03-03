@@ -1,12 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
 using System.Diagnostics;
 using System.Xml;
 
-using XML;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+
 /// <summary>
 /// TestMethod contains information about a unit test method that needs to be executed
 /// </summary>
@@ -23,12 +26,12 @@ internal sealed class TestMethod : IXmlTestStore
     /// <summary>
     /// Gets the name.
     /// </summary>
-    public string Name { get; private set; }
+    public string Name { get; }
 
     /// <summary>
     /// Gets the class name.
     /// </summary>
-    public string ClassName { get; private set; }
+    public string ClassName { get; }
 
     /// <summary>
     /// Gets or sets a value indicating whether is valid.

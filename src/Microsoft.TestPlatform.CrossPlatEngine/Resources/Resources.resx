@@ -219,4 +219,10 @@
   <data name="NoProxyMatchesDescription" xml:space="preserve">
     <value>The runsettings changed between the time when the test session was established and the time of the current run/discovery request.</value>
   </data>
+  <data name="AttachmentOutputFormat" xml:space="preserve">
+    <value>  {0}</value>
+  </data>
+  <data name="AttachmentsBanner" xml:space="preserve">
+    <value>Attachments:</value>
+  </data>
 </root>

@@ -1,21 +1,21 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
 using System;
 using System.Diagnostics;
 using System.Xml;
 
-using XML;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
 /// This is a record about one run-level event that happened at run execution or around it.
 /// </summary>
 internal sealed class RunInfo : IXmlTestStore
 {
-    #region Fields
-
     [StoreXmlSimpleField("Text", "")]
     private readonly string _text;
 
@@ -29,10 +29,6 @@ internal sealed class RunInfo : IXmlTestStore
 
     [StoreXmlSimpleField("@timestamp")]
     private readonly DateTime _timestamp;
-
-    #endregion
-
-    #region Constructors
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RunInfo"/> class.
@@ -60,7 +56,6 @@ internal sealed class RunInfo : IXmlTestStore
         _timestamp = DateTime.UtcNow;
     }
 
-    #endregion
 
     #region IXmlTestStore Members
 

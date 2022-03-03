@@ -1,34 +1,47 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
-
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 
-using Client;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
-using CrossPlatResources = Resources.Resources;
+using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
 /// <summary>
 /// Orchestrates test session operations for the engine communicating with the client.
 /// </summary>
 public class ProxyTestSessionManager : IProxyTestSessionManager
 {
+    private enum TestSessionState
+    {
+        Unknown,
+        Error,
+        Active,
+        Terminated
+    }
+
     private readonly object _lockObject = new();
     private readonly object _proxyOperationLockObject = new();
-    private volatile bool _proxySetupFailed = false;
+    private volatile bool _proxySetupFailed;
     private readonly StartTestSessionCriteria _testSessionCriteria;
     private readonly int _testhostCount;
     private TestSessionInfo _testSessionInfo;
     private readonly Func<ProxyOperationManager> _proxyCreator;
     private readonly IList<ProxyOperationManagerContainer> _proxyContainerList;
     private readonly IDictionary<string, int> _proxyMap;
+    private readonly Stopwatch _testSessionStopwatch;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyTestSessionManager"/> class.
@@ -48,10 +61,12 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
 
         _proxyContainerList = new List<ProxyOperationManagerContainer>();
         _proxyMap = new Dictionary<string, int>();
+        _testSessionStopwatch = new Stopwatch();
     }
 
+    // NOTE: The method is virtual for mocking purposes.
     /// <inheritdoc/>
-    public virtual bool StartSession(ITestSessionEventsHandler eventsHandler)
+    public virtual bool StartSession(ITestSessionEventsHandler eventsHandler, IRequestData requestData)
     {
         lock (_lockObject)
         {
@@ -61,6 +76,9 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             }
             _testSessionInfo = new TestSessionInfo();
         }
+
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
 
         // Create all the proxies in parallel, one task per proxy.
         var taskList = new Task[_testhostCount];
@@ -96,10 +114,25 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
 
         // Wait for proxy creation to be over.
         Task.WaitAll(taskList);
+        stopwatch.Stop();
+
+        // Collecting session metrics.
+        requestData?.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionId,
+            _testSessionInfo.Id);
+        requestData?.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionSpawnedTesthostCount,
+            _proxyContainerList.Count);
+        requestData?.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionTesthostSpawnTimeInSec,
+            stopwatch.Elapsed.TotalSeconds);
 
         // Dispose of all proxies if even one of them failed during setup.
         if (_proxySetupFailed)
         {
+            requestData?.MetricsCollection.Add(
+                TelemetryDataConstants.TestSessionState,
+                TestSessionState.Error.ToString());
             DisposeProxies();
             return false;
         }
@@ -107,28 +140,63 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         // Make the session available.
         if (!TestSessionPool.Instance.AddSession(_testSessionInfo, this))
         {
+            requestData?.MetricsCollection.Add(
+                TelemetryDataConstants.TestSessionState,
+                TestSessionState.Error.ToString());
             DisposeProxies();
             return false;
         }
 
+        requestData?.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionState,
+            TestSessionState.Active.ToString());
+
+        // This counts as the session start time.
+        _testSessionStopwatch.Start();
+
         // Let the caller know the session has been created.
-        eventsHandler.HandleStartTestSessionComplete(_testSessionInfo);
+        eventsHandler.HandleStartTestSessionComplete(
+            new()
+            {
+                TestSessionInfo = _testSessionInfo,
+                Metrics = requestData?.MetricsCollection.Metrics
+            });
         return true;
     }
 
+    // NOTE: The method is virtual for mocking purposes.
     /// <inheritdoc/>
-    public virtual bool StopSession()
+    public virtual bool StopSession(IRequestData requestData)
     {
+        var testSessionId = string.Empty;
         lock (_lockObject)
         {
             if (_testSessionInfo == null)
             {
                 return false;
             }
+
+            testSessionId = _testSessionInfo.Id.ToString();
             _testSessionInfo = null;
         }
 
+        // Dispose of the pooled testhosts.
         DisposeProxies();
+
+        // Compute session time.
+        _testSessionStopwatch.Stop();
+
+        // Collecting session metrics.
+        requestData?.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionId,
+            testSessionId);
+        requestData?.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionTotalSessionTimeInSec,
+            _testSessionStopwatch.Elapsed.TotalSeconds);
+        requestData?.MetricsCollection.Add(
+            TelemetryDataConstants.TestSessionState,
+            TestSessionState.Terminated.ToString());
+
         return true;
     }
 

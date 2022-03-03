@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if NETFRAMEWORK
+using System;
+using System.IO;
+#endif
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 namespace SampleUnitTestProject
 {
-#if NETFRAMEWORK
-    using System;
-    using System.IO;
-#endif
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     /// <summary>
     /// The unit test 1.
     /// </summary>

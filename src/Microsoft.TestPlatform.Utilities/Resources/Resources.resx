@@ -132,9 +132,6 @@
   <data name="RunSettingsParseError" xml:space="preserve">
     <value>An error occurred while loading the settings.  Error: {0}.</value>
   </data>
-  <data name="SystemArchitectureIncompatibleWithTargetPlatform" xml:space="preserve">
-    <value>Incompatible Target platform settings '{0}' with system architecture '{1}'.</value>
-  </data>
   <data name="UnExpectedSettingsFile" xml:space="preserve">
     <value>Unexpected settings file specified.</value>
   </data>

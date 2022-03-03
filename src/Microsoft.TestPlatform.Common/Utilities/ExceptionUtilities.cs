@@ -1,10 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-
 using System;
 using System.Text;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
 /// <summary>
 /// Exception utilities.
@@ -31,7 +33,7 @@ public class ExceptionUtilities
         {
             exceptionString
                 .AppendLine()
-                .Append(Resources.Resources.InnerException).Append(" ").AppendLine(inner.Message);
+                .Append(Resources.Resources.InnerException).Append(' ').AppendLine(inner.Message);
             AppendStackTrace(exceptionString, inner);
             inner = inner.InnerException;
         }

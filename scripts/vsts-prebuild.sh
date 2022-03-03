@@ -5,7 +5,7 @@ set -o nounset  # Fail on uninitialized variables.
 set -e          # Fail on non-zero exit code.
 
 # Parameter
-TP_BUILD_SUFFIX="dev" 
+TP_BUILD_SUFFIX="dev"
 BRANCH=
 IS_RTM=false
 
@@ -40,9 +40,9 @@ if [ $IS_RTM == true ]; then
     PACKAGE_VERSION="$TP_BUILD_PREFIX"
     TP_BUILD_SUFFIX=
 else
-    if [ ! -z "$BRANCH" ] && [[ $BRANCH =~ ^refs\/heads\/rel\/.*$ ]]; then 
+    if [ ! -z "$BRANCH" ] && [[ $BRANCH =~ ^refs\/heads\/rel\/.*$ ]]; then
         TP_BUILD_SUFFIX="${TP_BUILD_SUFFIX/preview/release}"
-    fi    
+    fi
 
     PACKAGE_VERSION="$TP_BUILD_PREFIX-$TP_BUILD_SUFFIX"
 fi

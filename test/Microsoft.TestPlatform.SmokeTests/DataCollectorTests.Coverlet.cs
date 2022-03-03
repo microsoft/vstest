@@ -1,14 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.SmokeTests;
-
-using TestUtilities;
-using VisualStudio.TestTools.UnitTesting;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 using System;
 using System.IO;
 using System.Linq;
+
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.SmokeTests;
 
 [TestClass]
 public class DataCollectorTestsCoverlets : IntegrationTestBase

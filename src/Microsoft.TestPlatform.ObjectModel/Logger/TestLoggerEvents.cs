@@ -1,29 +1,25 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-
 using System;
 
-using Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
 /// Exposes events that Test Loggers can register for.
 /// </summary>
 public abstract class TestLoggerEvents
 {
-    #region Constructor
-
     /// <summary>
     /// Default constructor.
     /// </summary>
     protected TestLoggerEvents()
     {
     }
-
-    #endregion
-
-    #region Events
 
     /// <summary>
     /// Raised when a test message is received.
@@ -65,5 +61,4 @@ public abstract class TestLoggerEvents
     /// </summary>
     public abstract event EventHandler<DiscoveryCompleteEventArgs> DiscoveryComplete;
 
-    #endregion
 }

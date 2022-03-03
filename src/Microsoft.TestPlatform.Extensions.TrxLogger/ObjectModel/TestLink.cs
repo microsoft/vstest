@@ -1,14 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
 using System;
 using System.Globalization;
 
-using Utility;
+using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
-using XML;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
 /// Test link.
@@ -38,12 +40,12 @@ internal sealed class TestLink : IXmlTestStore
     /// <summary>
     /// Gets the name.
     /// </summary>
-    public string Name { get; private set; } = string.Empty;
+    public string Name { get; } = string.Empty;
 
     /// <summary>
     /// Gets the storage.
     /// </summary>
-    public string Storage { get; private set; } = string.Empty;
+    public string Storage { get; } = string.Empty;
 
     /// <summary>
     /// Whether this Link is equal to other Link. Compares by Id.

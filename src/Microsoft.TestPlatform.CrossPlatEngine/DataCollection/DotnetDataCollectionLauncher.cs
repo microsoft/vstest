@@ -1,20 +1,22 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
-
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-using Common.Logging;
-using CoreUtilities.Extensions;
-using ObjectModel;
-using ObjectModel.Logging;
-using PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 /// <summary>
 /// The datacollection launcher.
@@ -64,10 +66,7 @@ internal class DotnetDataCollectionLauncher : DataCollectionLauncher
         var dataCollectorDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation());
         var currentProcessFileName = _processHelper.GetCurrentProcessFileName();
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("DotnetDataCollectionLauncher: Full path of dotnet.exe is {0}", currentProcessFileName);
-        }
+        EqtTrace.Verbose("DotnetDataCollectionLauncher: Full path of dotnet.exe is {0}", currentProcessFileName);
 
         var dataCollectorAssemblyPath = Path.Combine(dataCollectorDirectory, DataCollectorProcessName);
 
@@ -82,17 +81,11 @@ internal class DotnetDataCollectionLauncher : DataCollectionLauncher
         {
             var argsToAdd = " --runtimeconfig " + runtimeConfigPath.AddDoubleQuote();
             args += argsToAdd;
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("DotnetDataCollectionLauncher: Adding {0} in args", argsToAdd);
-            }
+            EqtTrace.Verbose("DotnetDataCollectionLauncher: Adding {0} in args", argsToAdd);
         }
         else
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("DotnetDataCollectionLauncher: File {0}, does not exist", runtimeConfigPath);
-            }
+            EqtTrace.Verbose("DotnetDataCollectionLauncher: File {0}, does not exist", runtimeConfigPath);
         }
 
         // Use the deps.json for test source
@@ -101,17 +94,11 @@ internal class DotnetDataCollectionLauncher : DataCollectionLauncher
         {
             var argsToAdd = " --depsfile " + depsFilePath.AddDoubleQuote();
             args += argsToAdd;
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("DotnetDataCollectionLauncher: Adding {0} in args", argsToAdd);
-            }
+            EqtTrace.Verbose("DotnetDataCollectionLauncher: Adding {0} in args", argsToAdd);
         }
         else
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("DotnetDataCollectionLauncher: File {0}, does not exist", depsFilePath);
-            }
+            EqtTrace.Verbose("DotnetDataCollectionLauncher: File {0}, does not exist", depsFilePath);
         }
 
         var cliArgs = string.Join(" ", commandLineArguments);

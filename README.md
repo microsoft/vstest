@@ -55,4 +55,3 @@ Please see [issue tracking](https://github.com/Microsoft/vstest-docs/blob/main/i
 
 ### Roadmap
 For more information on shipped and upcoming features/enhancements please refer to our [Releases](https://github.com/Microsoft/vstest-docs/blob/main/docs/releases.md) and [Quarterly Checkin reports](https://github.com/Microsoft/vstest-docs/tree/main/Quarterly%20Checkins)
-

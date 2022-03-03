@@ -1,9 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-
 using System.Runtime.Serialization;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
 /// Class representing the context in which data collection occurs.
@@ -11,8 +13,6 @@ using System.Runtime.Serialization;
 [DataContract]
 public class DataCollectionContext
 {
-    #region Constructors
-
     // NOTE: These constructors are protected internal to allow 3rd parties to
     //       do unit testing of their data collectors.
     //
@@ -71,10 +71,6 @@ public class DataCollectionContext
         TestCase = testCase;
 
     }
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets test case.
     /// </summary>
@@ -85,14 +81,14 @@ public class DataCollectionContext
     /// Identifies the session under which the data collection occurs.  Will not be null.
     /// </summary>
     [DataMember]
-    public SessionId SessionId { get; private set; }
+    public SessionId SessionId { get; }
 
     /// <summary>
     /// Identifies the test execution under which the data collection occurs,
     /// or null if no such test exists.
     /// </summary>
     [DataMember]
-    public TestExecId TestExecId { get; private set; }
+    public TestExecId TestExecId { get; }
 
     /// <summary>
     /// Returns true if there is an executing test case associated with this context.
@@ -102,10 +98,6 @@ public class DataCollectionContext
     {
         get { return TestExecId != null; }
     }
-
-    #endregion
-
-    #region Equals and Hashcode
 
     public static bool operator ==(DataCollectionContext context1, DataCollectionContext context2)
     {
@@ -131,10 +123,6 @@ public class DataCollectionContext
         return _hashCode;
     }
 
-    #endregion
-
-    #region Private Methods
-
     private int ComputeHashCode()
     {
         int hashCode = 17;
@@ -149,11 +137,6 @@ public class DataCollectionContext
         return hashCode;
     }
 
-    #endregion
-
-    #region Private Fields
-
     private readonly int _hashCode;
 
-    #endregion
 }
