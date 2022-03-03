@@ -42,7 +42,7 @@
     </ProjectReference>
 
     <!-- CVE-2019-0657, CVE-2019-0980 and CVE-2019-0981 mitigation -->
-    <PackageReference Include="System.Private.Uri" Version="$(SystemUriVersion)" />
+    <PackageReference Include="System.Private.Uri" Version="$(SystemUriVersion)" Condition="'$(DotNetBuildFromSource)' != 'true'"/>
     <!-- CVE-2019-0657, CVE-2019-0980 and CVE-2019-0981 mitigation -->
   </ItemGroup>
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) AND '$(OS)' != 'Windows_NT' ">
