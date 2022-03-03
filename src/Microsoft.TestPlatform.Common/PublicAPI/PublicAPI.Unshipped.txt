@@ -1,9 +1,3 @@
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestSessionId -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestSessionSpawnedTesthostCount -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestSessionTesthostSpawnTimeInSec -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestSessionState -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.TestSessionTotalSessionTimeInSec -> string
-static Microsoft.VisualStudio.TestPlatform.Common.Telemetry.TelemetryDataConstants.StopTestSessionCompleteEvent -> string
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IProxyTestSessionManager.StartSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler eventsHandler, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData) -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IProxyTestSessionManager.StopSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData) -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IParallelProxyDiscoveryManager.IsAbortRequested.get -> bool
