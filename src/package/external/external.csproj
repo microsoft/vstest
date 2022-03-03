@@ -31,10 +31,6 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Coverage.IO" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" />
-  </ItemGroup>
-
   <ItemGroup Condition=" '$(DotNetBuildFromSource)' != 'true' ">
     <!-- This csproj restore external tools required for build process -->
     <PackageReference Include="NuGet.CommandLine" Version="5.8.1" PrivateAssets="All" />
@@ -45,6 +41,7 @@
 	  <PackageReference Include="Microsoft.DiaSymReader.Pdb2Pdb" Version="1.1.0-beta2-21075-01" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Internal.TestPlatform.Remote" Version="$(TestPlatformRemoteExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Internal.TestPlatform.Extensions" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Coverage.IO" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.TraceDataCollector" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.QualityTools" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
