@@ -239,7 +239,10 @@ function Publish-Package
     ################################################################################
     # Publish vstest.console and datacollector exclusively because *.config/*.deps.json file is not getting publish when we are publishing aforementioned project through dependency.
     Write-Log "Package: Publish src\vstest.console\vstest.console.csproj"
-    Publish-PackageInternal $vstestConsoleProject $TPB_TargetFramework451 $fullCLRPackage451Dir
+
+    # We build vstest.console.arm64.exe before and we ship in the same folder as win7-x64 to have the same VSIX packaging to deploy on VS.
+    Publish-PackageWithRuntimeInternal $vstestConsoleProject $TPB_TargetFramework451 $TPB_ARM64_Runtime false $fullCLRPackage451Dir
+    Publish-PackageWithRuntimeInternal $vstestConsoleProject $TPB_TargetFramework451 $TPB_X64_Runtime false $fullCLRPackage451Dir
     Publish-PackageInternal $vstestConsoleProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
 
     Write-Log "Package: Publish src\SettingsMigrator\SettingsMigrator.csproj"
