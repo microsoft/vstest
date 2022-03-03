@@ -1,9 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if NETFRAMEWORK
 using System.Collections.Generic;
-#endif
 using System.Diagnostics;
 using System.IO;
 
@@ -41,15 +39,24 @@ public class ConsoleParameters
         _fileHelper = fileHelper;
     }
 
-#if NETFRAMEWORK
+    /// <summary>
+    /// Environment variables to be set for the process. This will add the specified entries to the environment variables
+    /// inherited from the current process. If you wish to provide a full set of environment variables yourself set <see cref="ClearEnvironmentVariables"/> to true.
+    /// </summary>
+    public Dictionary<string, string> EnvironmentVariables { get; set; } = new Dictionary<string, string>();
 
     /// <summary>
-    /// TODO: Remove the #if when project is targeted to netstandard2.0
-    /// Environment variables to be set for the process
+    /// Clears all environment variables that would be inherited from machine, user and process
+    /// and only sets the entries you provided in <see cref="EnvironmentVariables"/>.
+    /// This allows you to provide an arbitrary set of environment variables, for example when you
+    /// want to skip environment variables that are set in the IDE that starts vstest.console.
+    /// When setting this to true you are responsible for providing a full set of envirionment variables
+    /// that allow the process to start.
+    /// You most likely want to use <see cref="System.Environment.GetEnvironmentVariables(System.EnvironmentVariableTarget)"/> and combine
+    /// <see cref="System.EnvironmentVariableTarget.Machine"/> and <see cref="System.EnvironmentVariableTarget.User"/> responses.
     /// </summary>
-    public Dictionary<string, string> EnvironmentVariables { get; set; }
+    public bool ClearEnvironmentVariables { get; set; }
 
-#endif
 
     /// <summary>
     /// Trace level for logs.

@@ -43,6 +43,7 @@ internal class Program
         {
             LogFilePath = Path.Combine(here, "logs", "log.txt"),
             TraceLevel = TraceLevel.Verbose,
+            EnvironmentVariables = new Dictionary<string, string> { ["my"]="my" }
         };
 
         var r = new VsTestConsoleWrapper(console, consoleOptions);
@@ -57,7 +58,7 @@ internal class Program
         var sources = new[] {
             Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll")
         };
-
+        r.StartSession();
         var options = new TestPlatformOptions();
         r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
     }
