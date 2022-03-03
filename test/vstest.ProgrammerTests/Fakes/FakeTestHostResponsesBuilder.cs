@@ -151,8 +151,9 @@ internal class FakeTestHostResponsesBuilder
             // the last batch will be sent as test run complete event
 
             // see TestRequestSender.OnDiscoveryMessageReceived to see how the vstest.console receives the data
-            List<FakeMessage> changeMessages = testResultBatches.Take(testResultBatches.Count - 1).Select(batch =>
-                new FakeMessage<IEnumerable<TestCase>>(MessageType.TestCasesFound, batch.Select(testResult => testResult.TestCase).ToList())).ToList<FakeMessage>();
+            List<FakeMessage> changeMessages = testResultBatches.Take(testResultBatches.Count - 1)
+                .Select(batch => new FakeMessage<IEnumerable<TestCase>>(MessageType.TestCasesFound, batch.Select(testResult => testResult.TestCase).ToList()))
+                .ToList<FakeMessage>();
 
             // TODO: if we send this incorrectly the handler just continues, check logs if we can understand it from there. We should at least write a warning.
             // because otherwise it hangs.
@@ -171,7 +172,6 @@ internal class FakeTestHostResponsesBuilder
 
             messages = completedMessage.AsList();
         }
-
 
         AddPairWithMultipleFakeMessages(MessageType.StartDiscovery, messages);
 

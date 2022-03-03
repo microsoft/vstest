@@ -61,7 +61,6 @@ internal class Program
         var settingsFile = Path.GetTempFileName();
         try
         {
-
             File.WriteAllText(settingsFile, sourceSettings);
             Process.Start(console, string.Join(" ", sources) + " --settings:" + settingsFile).WaitForExit();
         }

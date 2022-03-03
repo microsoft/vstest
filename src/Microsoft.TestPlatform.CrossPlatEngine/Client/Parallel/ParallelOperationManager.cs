@@ -130,7 +130,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         lock (_lock)
         {
             var completedSlot = _managerSlots.Where(s => ReferenceEquals(completedManager, s.Manager)).ToList();
-            if (!completedSlot.Any())
+            if (completedSlot.Count == 0)
             {
                 throw new InvalidOperationException("The provided manager was not found in any slot.");
             }

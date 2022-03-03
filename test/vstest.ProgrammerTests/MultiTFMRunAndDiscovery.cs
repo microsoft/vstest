@@ -12,19 +12,19 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 
 namespace vstest.ProgrammerTests;
+
 public class MultiTFM
 {
     public class MultiTFMDiscovery
     {
-
         [Test(@"
-        Given two test assemblies that have the same architecture
-        but have different target frameworks.
+            Given two test assemblies that have the same architecture
+            but have different target frameworks.
 
-        When we run test discovery.
+            When we run test discovery.
 
-        Then two testhosts should be started that target the same framework as each assembly.
-    ")]
+            Then two testhosts should be started that target the same framework as each assembly.
+        ")]
         public async Task A()
         {
             // -- arrange
@@ -125,14 +125,14 @@ public class MultiTFM
         }
 
         [Test(@"
-        Given two test assemblies that have the same architecture
-        but have different target frameworks.
+            Given two test assemblies that have the same architecture
+            but have different target frameworks.
 
-        When we run test discovery
-        and provide runsettings that define the desired target framework.
+            When we run test discovery
+            and provide runsettings that define the desired target framework.
 
-        Then two testhosts should be started that target the framework chosen by runsettings.
-    ")]
+            Then two testhosts should be started that target the framework chosen by runsettings.
+        ")]
         public async Task B()
         {
             // -- arrange
@@ -451,14 +451,14 @@ public class MultiTFM
     {
 
         [Test(@"
-        Given two test assemblies that have the same architecture
-        but have different target frameworks.
+            Given two test assemblies that have the same architecture
+            but have different target frameworks.
 
-        When we execute tests
-        and provide runsettings that define the desired target framework.
+            When we execute tests
+            and provide runsettings that define the desired target framework.
 
-        Then two testhosts should be started that target the framework chosen by runsettings.
-    ")]
+            Then two testhosts should be started that target the framework chosen by runsettings.
+        ")]
         public async Task E()
         {
             // -- arrange
@@ -575,6 +575,7 @@ public class MultiTFM
 
 public class MultiTFMRunAndDiscoveryCompatibilityMode
 {
+    // TODO: NOMERGE: Add backward compats flag functionality and test it.
     [Exclude]
     public async Task GivenMultipleMsTestAssembliesThatHaveTheSameArchitecture_AndHaveDifferentTargetFrameworks_AndMULTI_TFM_RUNFeatureFlagIsDisabled_WhenTestsAreRun_ThenTwoTesthostsAreStartedBothForTheSameTFM()
     {

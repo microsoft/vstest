@@ -90,14 +90,12 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
     }
 
     private ITestDiscoveryEventsHandler2 GetParallelEventHandler(ITestDiscoveryEventsHandler2 eventHandler, IProxyDiscoveryManager concurrentManager)
-    {
-        return new ParallelDiscoveryEventsHandler(
-                                           _requestData,
-                                           concurrentManager,
-                                           eventHandler,
-                                           this,
-                                           _currentDiscoveryDataAggregator);
-    }
+        => new ParallelDiscoveryEventsHandler(
+            _requestData,
+            concurrentManager,
+            eventHandler,
+            this,
+            _currentDiscoveryDataAggregator);
 
     /// <inheritdoc/>
     public void Abort()
@@ -222,6 +220,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
                     // Total tests must be zero here since parallel discovery events handler adds the count
                     // Keep `lastChunk` as null since we don't want a message back to the IDE (discovery didn't even begin)
                     // Set `isAborted` as true since we want this instance of discovery manager to be replaced
+                    // TODO: the comment above mentions 0 tests but sends -1. Make sense of this.
                     var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
                     handler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
                 },

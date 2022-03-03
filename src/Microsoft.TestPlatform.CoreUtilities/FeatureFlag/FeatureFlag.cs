@@ -36,7 +36,7 @@ internal sealed class FeatureFlag : IFeatureFlag
     internal static void SetFlag(string name, bool value)
     {
         if (!FeatureFlags.ContainsKey(name))
-            throw new ArgumentException($"Feature flag {name} is a known feature flag.");
+            throw new ArgumentException($"Feature flag {name} is not a known feature flag.");
         
         FeatureFlags[name] = value;
     }

@@ -59,7 +59,7 @@ internal class Fixture : IDisposable
         }
 #endif
 
-#pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete (to prevent use outside of test context)
         FeatureFlag.Reset();
         fixtureOptions?.FeatureFlags?.ToList().ForEach(flag => FeatureFlag.SetFlag(flag.Key, flag.Value));
 #pragma warning restore CS0618 // Type or member is obsolete
