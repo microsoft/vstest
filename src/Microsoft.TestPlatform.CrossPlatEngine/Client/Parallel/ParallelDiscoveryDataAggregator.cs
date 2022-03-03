@@ -8,6 +8,8 @@ using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 #nullable disable
@@ -20,14 +22,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 internal class ParallelDiscoveryDataAggregator
 {
     private readonly object _dataUpdateSyncObject = new();
-    private readonly ConcurrentDictionary<string, object> _metricsAggregator;
-
-    public ParallelDiscoveryDataAggregator()
-    {
-        IsAborted = false;
-        TotalTests = 0;
-        _metricsAggregator = new ConcurrentDictionary<string, object>();
-    }
+    private readonly ConcurrentDictionary<string, object> _metricsAggregator = new();
+    private readonly ConcurrentDictionary<string, DiscoveryStatus> _sourcesWithDiscoveryStatus = new();
 
     /// <summary>
     /// Set to true if any of the request is aborted
@@ -38,12 +34,6 @@ internal class ParallelDiscoveryDataAggregator
     /// Aggregate total test count
     /// </summary>
     public long TotalTests { get; private set; }
-
-
-    /// <summary>
-    /// Dictionary which stores source with corresponding discoveryStatus
-    /// </summary>
-    private readonly ConcurrentDictionary<string, DiscoveryStatus> _sourcesWithDiscoveryStatus = new();
 
     /// <summary>
     /// Indicates if discovery complete payload already sent back to IDE
@@ -84,22 +74,70 @@ internal class ParallelDiscoveryDataAggregator
     /// Aggregate discovery data
     /// Must be thread-safe as this is expected to be called by parallel managers
     /// </summary>
-    public void Aggregate(long totalTests, bool isAborted)
+    public void Aggregate(DiscoveryCompleteEventArgs discoveryCompleteEventArgs)
     {
         lock (_dataUpdateSyncObject)
         {
-            IsAborted = IsAborted || isAborted;
+            IsAborted = IsAborted || discoveryCompleteEventArgs.IsAborted;
 
-            if (IsAborted)
-            {
-                // Do not aggregate tests count if test discovery is aborted. It is mandated by
-                // platform that tests count is negative for discovery abort event.
-                // See `DiscoveryCompleteEventArgs`.
-                TotalTests = -1;
-                return;
-            }
+            // Do not aggregate tests count if test discovery is aborted. It is mandated by
+            // platform that tests count is negative for discovery abort event.
+            // See `DiscoveryCompleteEventArgs`.
+            TotalTests = IsAborted
+                ? -1
+                : TotalTests + discoveryCompleteEventArgs.TotalCount;
+        }
 
-            TotalTests += totalTests;
+        AggregateDiscoveryStatus(
+            discoveryCompleteEventArgs.NotDiscoveredSources,
+            discoveryCompleteEventArgs.PartiallyDiscoveredSources,
+            discoveryCompleteEventArgs.FullyDiscoveredSources);
+        AggregateDiscoveryDataMetrics(discoveryCompleteEventArgs.Metrics);
+    }
+
+    internal /* for testing purposes */ void AggregateDiscoveryStatus(
+        IEnumerable<string> notDiscoveredSources,
+        IEnumerable<string> partiallyDiscoveredSources,
+        IEnumerable<string> fullyDiscoveredSources)
+    {
+        // Only add to our aggregated dictionary sources we were not aware of.
+        foreach (var source in notDiscoveredSources)
+        {
+            _sourcesWithDiscoveryStatus.TryAdd(source, DiscoveryStatus.NotDiscovered);
+        }
+
+        // Update sources from not discovered to partially discovered.
+        foreach (var source in partiallyDiscoveredSources)
+        {
+            _sourcesWithDiscoveryStatus.AddOrUpdate(
+                source,
+                _ =>
+                {
+                    EqtTrace.Warning($"ParallelDiscoveryDataAggregator.AggregateDiscoveryStatus: Source '{source}' was not tracked and is now marked as partially discovered.");
+                    return DiscoveryStatus.PartiallyDiscovered;
+                },
+                (_, previousState) =>
+                {
+                    if (previousState == DiscoveryStatus.FullyDiscovered)
+                    {
+                        EqtTrace.Warning($"ParallelDiscoveryDataAggregator.AggregateDiscoveryStatus: Source '{source}' was known as fully discovered but received request to mark it as partially discovered.");
+                        return DiscoveryStatus.FullyDiscovered;
+                    }
+                    return DiscoveryStatus.PartiallyDiscovered;
+                });
+        }
+
+        // Update sources from not discovered or partially discovered to fully discovered.
+        foreach (var source in fullyDiscoveredSources)
+        {
+            _sourcesWithDiscoveryStatus.AddOrUpdate(
+                source,
+                _ =>
+                {
+                    EqtTrace.Warning($"ParallelDiscoveryDataAggregator.AggregateDiscoveryStatus: Source '{source}' was not tracked and is now marked as fully discovered.");
+                    return DiscoveryStatus.FullyDiscovered;
+                },
+                (_, _) => DiscoveryStatus.FullyDiscovered);
         }
     }
 
@@ -107,7 +145,7 @@ internal class ParallelDiscoveryDataAggregator
     /// Aggregates the metrics from Test Host Process.
     /// </summary>
     /// <param name="metrics"></param>
-    public void AggregateDiscoveryDataMetrics(IDictionary<string, object> metrics)
+    internal /* for testing purposes */ void AggregateDiscoveryDataMetrics(IDictionary<string, object> metrics)
     {
         if (metrics == null || metrics.Count == 0 || _metricsAggregator == null)
         {
@@ -134,13 +172,6 @@ internal class ParallelDiscoveryDataAggregator
     }
 
     /// <summary>
-    /// Aggregate the source as fully discovered
-    /// </summary>
-    /// <param name="sorce">Fully discovered source</param>
-    public void MarkSourcesWithStatus(ICollection<string> sources, DiscoveryStatus status)
-        => DiscoveryManager.MarkSourcesWithStatus(sources, status, _sourcesWithDiscoveryStatus);
-
-    /// <summary>
     /// Aggregates the value indicating if we already sent message to IDE.
     /// </summary>
     /// <param name="isMessageSent">Boolean value if we already sent message to IDE</param>
@@ -148,6 +179,13 @@ internal class ParallelDiscoveryDataAggregator
     {
         IsMessageSent = IsMessageSent || isMessageSent;
     }
+
+    /// <summary>
+    /// Aggregate the source as fully discovered
+    /// </summary>
+    /// <param name="sorce">Fully discovered source</param>
+    public void MarkSourcesWithStatus(IEnumerable<string> sources, DiscoveryStatus status)
+        => DiscoveryManager.MarkSourcesWithStatus(sources, status, _sourcesWithDiscoveryStatus);
 
     /// <summary>
     /// Returns sources with particular discovery status.

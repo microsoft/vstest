@@ -3,13 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-#nullable disable
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel;
 
@@ -21,13 +20,13 @@ public class ParallelDiscoveryDataAggregatorTests
     {
         var aggregator = new ParallelDiscoveryDataAggregator();
 
-        aggregator.Aggregate(totalTests: 5, isAborted: false);
+        aggregator.Aggregate(new(totalTests: 5, isAborted: false));
         Assert.IsFalse(aggregator.IsAborted, "Aborted must be false");
 
-        aggregator.Aggregate(totalTests: 5, isAborted: true);
+        aggregator.Aggregate(new(totalTests: 5, isAborted: true));
         Assert.IsTrue(aggregator.IsAborted, "Aborted must be true");
 
-        aggregator.Aggregate(totalTests: 5, isAborted: false);
+        aggregator.Aggregate(new(totalTests: 5, isAborted: false));
         Assert.IsTrue(aggregator.IsAborted, "Aborted must be true");
 
         Assert.AreEqual(-1, aggregator.TotalTests, "Aggregator shouldn't count tests if one host aborts");
@@ -37,13 +36,13 @@ public class ParallelDiscoveryDataAggregatorTests
     public void AggregateShouldAggregateTotalTestsCorrectly()
     {
         var aggregator = new ParallelDiscoveryDataAggregator();
-        aggregator.Aggregate(totalTests: 2, isAborted: false);
+        aggregator.Aggregate(new(totalTests: 2, isAborted: false));
         Assert.AreEqual(2, aggregator.TotalTests, "Aggregated totalTests count does not match");
 
-        aggregator.Aggregate(totalTests: 5, isAborted: false);
+        aggregator.Aggregate(new(totalTests: 5, isAborted: false));
         Assert.AreEqual(7, aggregator.TotalTests, "Aggregated totalTests count does not match");
 
-        aggregator.Aggregate(totalTests: 3, isAborted: false);
+        aggregator.Aggregate(new(totalTests: 3, isAborted: false));
         Assert.AreEqual(10, aggregator.TotalTests, "Aggregated totalTests count does not match");
     }
 
@@ -273,5 +272,73 @@ public class ParallelDiscoveryDataAggregatorTests
 
         // Assert
         Assert.AreEqual(1, sourcesWithFullyDiscoveryStatus.Count);
+    }
+
+    [TestMethod]
+    public void AggregateDiscoveryStatusHandlesNotDiscoveredSources()
+    {
+        // Arrange
+        var aggregator = new ParallelDiscoveryDataAggregator();
+        aggregator.MarkSourcesWithStatus(new List<string> { "a", "b", "d" }, DiscoveryStatus.NotDiscovered);
+
+        // Act
+        aggregator.AggregateDiscoveryStatus(
+            new List<string> { "a", "c", "d" },
+            Enumerable.Empty<string>(),
+            Enumerable.Empty<string>());
+
+        // Assert
+        CollectionAssert.AreEquivalent(
+            new List<string> { "a", "b", "c", "d" },
+            aggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+        Assert.AreEqual(0, aggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        Assert.AreEqual(0, aggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+    }
+
+    [TestMethod]
+    public void AggregateDiscoveryStatusHandlesPartiallyDiscoveredSources()
+    {
+        // Arrange
+        var aggregator = new ParallelDiscoveryDataAggregator();
+        aggregator.MarkSourcesWithStatus(new List<string> { "a", "d" }, DiscoveryStatus.NotDiscovered);
+        aggregator.MarkSourcesWithStatus(new List<string> { "b" }, DiscoveryStatus.FullyDiscovered);
+
+        // Act
+        aggregator.AggregateDiscoveryStatus(
+            Enumerable.Empty<string>(),
+            new List<string> { "a", "b", "c", "d" },
+            Enumerable.Empty<string>());
+
+        // Assert
+        Assert.AreEqual(0, aggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+        CollectionAssert.AreEquivalent(
+            new List<string> { "a", "c", "d" },
+            aggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        CollectionAssert.AreEquivalent(
+            new List<string> { "b" },
+            aggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+    }
+
+    [TestMethod]
+    public void AggregateDiscoveryStatusHandlesFullyDiscoveredSources()
+    {
+        // Arrange
+        var aggregator = new ParallelDiscoveryDataAggregator();
+        aggregator.MarkSourcesWithStatus(new List<string> { "a", "d" }, DiscoveryStatus.NotDiscovered);
+        aggregator.MarkSourcesWithStatus(new List<string> { "b" }, DiscoveryStatus.PartiallyDiscovered);
+        aggregator.MarkSourcesWithStatus(new List<string> { "e" }, DiscoveryStatus.FullyDiscovered);
+
+        // Act
+        aggregator.AggregateDiscoveryStatus(
+            Enumerable.Empty<string>(),
+            Enumerable.Empty<string>(),
+            new List<string> { "a", "b", "c", "d", "e" });
+
+        // Assert
+        Assert.AreEqual(0, aggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+        Assert.AreEqual(0, aggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        CollectionAssert.AreEquivalent(
+            new List<string> { "a", "b", "c", "d", "e" },
+            aggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
     }
 }
