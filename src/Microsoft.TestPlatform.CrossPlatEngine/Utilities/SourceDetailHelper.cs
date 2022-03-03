@@ -15,7 +15,7 @@ internal static class SourceDetailHelper
     internal static string UpdateRunSettingsFromSourceDetail(string runSettings, SourceDetail sourceDetail)
     {
         using var stream = new StringReader(runSettings);
-        var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings);
+        using var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings);
         var document = new XmlDocument();
         document.Load(reader);
         var navigator = document.CreateNavigator();
