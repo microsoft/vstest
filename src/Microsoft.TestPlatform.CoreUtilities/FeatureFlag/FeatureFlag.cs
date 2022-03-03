@@ -29,6 +29,7 @@ internal sealed class FeatureFlag : IFeatureFlag
         FeatureFlags.Clear();
         FeatureFlags.Add(ARTIFACTS_POSTPROCESSING, true);
         FeatureFlags.Add(ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX, false);
+        FeatureFlags.Add(FORCE_DATACOLLECTORS_ATTACHMENTPROCESSORS, false);
         FeatureFlags.Add(MULTI_TFM_RUN, true);
     }
 
@@ -43,15 +44,18 @@ internal sealed class FeatureFlag : IFeatureFlag
 
     // Added for artifact post-processing, it enable/disable the post processing.
     // Added in 17.2-preview 7.0-preview
-    public static string ARTIFACTS_POSTPROCESSING = VSTEST_FEATURE + "_" + nameof(ARTIFACTS_POSTPROCESSING);
+    public const string ARTIFACTS_POSTPROCESSING = VSTEST_FEATURE + "_" + nameof(ARTIFACTS_POSTPROCESSING);
 
     // Added for artifact post-processing, it will show old output for dotnet sdk scenario.
     // It can be useful if we need to restore old UX in case users are parsing the console output.
     // Added in 17.2-preview 7.0-preview
-    public static string ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX = VSTEST_FEATURE + "_" + nameof(ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX);
+    public const string ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX = VSTEST_FEATURE + "_" + nameof(ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX);
 
     // Allow vstest.console to sources from multiple TFMs
-    public static string MULTI_TFM_RUN = VSTEST_FEATURE + "_" + nameof(MULTI_TFM_RUN);
+    public const string MULTI_TFM_RUN = VSTEST_FEATURE + "_" + nameof(MULTI_TFM_RUN);
+
+    // Temporary used to allow tests to work
+    public const string FORCE_DATACOLLECTORS_ATTACHMENTPROCESSORS = VSTEST_FEATURE + "_" + "FORCE_DATACOLLECTORS_ATTACHMENTPROCESSORS";
 
     // For now we're checking env var.
     // We could add it also to some section inside the runsettings.
