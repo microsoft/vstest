@@ -339,18 +339,17 @@ public class DiscoveryManager : IDiscoveryManager
         {
             string currentSource = testCase.Source;
 
-            // If it is the first list of testCases which was discovered or if current source
-            // is the same as previous we mark them as partially discovered.
+            // We rely on the fact that sources are processed in a sequential way, which means that
+            // when we receive a different source than the previous, we can assume that the previous
+            // source was fully discovered.
             if (_previousSource is null || _previousSource == currentSource)
             {
-                MarkSourceWithStatus(currentSource, DiscoveryStatus.PartiallyDiscovered);
+                MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
             }
-            // If source is changed, we need to mark previous source as already fully discovered
-            // and currentSource as partially discovered.
             else if (currentSource != _previousSource)
             {
-                MarkSourceWithStatus(_previousSource, DiscoveryStatus.FullyDiscovered);
-                MarkSourceWithStatus(currentSource, DiscoveryStatus.PartiallyDiscovered);
+                MarkSourcesWithStatus(new[] { _previousSource }, DiscoveryStatus.FullyDiscovered);
+                MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
             }
 
             _previousSource = currentSource;
@@ -363,29 +362,25 @@ public class DiscoveryManager : IDiscoveryManager
     /// <param name="lastChunk">Last chunk of testCases which were discovered</param>
     private void MarkTheLastChunkSourcesAsFullyDiscovered(IList<TestCase> lastChunk)
     {
-        // When all testcases in project is dividable by 10 then lastChunk is coming as empty
-        // So we need to take the lastSource and mark it as FullyDiscovered.
-        var lastChunkSources = lastChunk.Count > 0
-            ? lastChunk.Select(testcase => testcase.Source).ToList()
-            : new List<string>() { _previousSource };
+        // When all testcases count in project is dividable by chunk size (e.g. 100 tests and
+        // chunk size of 10) then lastChunk is coming as empty. In this case, we need to take
+        // the lastSource and mark it as FullyDiscovered.
+        IEnumerable<string> lastChunkSources = lastChunk.Count > 0
+            ? lastChunk.Select(testcase => testcase.Source)
+            : new[] { _previousSource };
 
-        MarkSourcesWithStatus(lastChunkSources, DiscoveryStatus.FullyDiscovered, _sourcesWithDiscoveryStatus);
+        MarkSourcesWithStatus(lastChunkSources, DiscoveryStatus.FullyDiscovered);
     }
 
-    /// <summary>
-    /// Mark the source with particular DiscoveryStatus
-    /// </summary>
-    /// <param name="source">Sources to mark</param>
-    /// <param name="status">DiscoveryStatus to mark for source</param>
-    private void MarkSourceWithStatus(string source, DiscoveryStatus status)
-        => MarkSourcesWithStatus(new[] { source }, status, _sourcesWithDiscoveryStatus);
+    private void MarkSourcesWithStatus(IEnumerable<string> sources, DiscoveryStatus status)
+        => MarkSourcesWithStatus(sources, status, _sourcesWithDiscoveryStatus);
 
     /// <summary>
     /// Mark sources with particular DiscoveryStatus
     /// </summary>
     /// <param name="sources">List of sources to mark</param>
     /// <param name="status">DiscoveryStatus to mark for list of sources</param>
-    internal static void MarkSourcesWithStatus(ICollection<string> sources, DiscoveryStatus status,
+    internal static void MarkSourcesWithStatus(IEnumerable<string> sources, DiscoveryStatus status,
         ConcurrentDictionary<string, DiscoveryStatus> sourcesWithDiscoveryStatus)
     {
         if (sources is null)
