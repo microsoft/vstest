@@ -123,6 +123,23 @@ if ($env:PATH -notlike "*$attachVsPath") {
     $env:PATH = "$attachVsPath;$env:PATH"
 }
 
+# VsixUtil gets regularly eaten by antivirus or something. Remove the package dir if it gets broken
+# so nuget restores it correctly.
+$vsSdkBuildToolsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.VSSdkBuildToolsVersion
+$vsixUtilDir = "$env:TP_ROOT_DIR\packages\microsoft.vssdk.buildtools"
+if ((Test-Path $vsixUtilDir) -and -not (Test-Path "$vsixUtilDir\$vsSdkBuildToolsVersion\tools\vssdk\bin\VsixUtil.exe"))
+{
+    Remove-Item -Recurse -Force $vsixUtilDir
+}
+
+# Procdump gets regularly eaten by antivirus or something. Remove the package dir if it gets broken
+# so nuget restores it correctly.
+$procdumpDir = "$env:TP_ROOT_DIR\packages\procdump"
+if ((Test-Path $procdumpDir) -and 2 -ne @(Get-Item "$procdumpDir\0.0.1\bin").Length)
+{
+    Remove-Item -Recurse -Force $procdumpDir
+}
+
 function Invoke-Build
 {
     $timer = Start-Timer

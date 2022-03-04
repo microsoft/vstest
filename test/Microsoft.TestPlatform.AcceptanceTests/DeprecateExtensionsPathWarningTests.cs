@@ -20,18 +20,6 @@ public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
     private IList<string> _adapterDependencies;
     private IList<string> _copiedFiles;
 
-    private string BuildConfiguration
-    {
-        get
-        {
-#if DEBUG
-            return "Debug";
-#else
-            return "Release";
-#endif
-        }
-    }
-
     [TestCleanup]
     public void Cleanup()
     {
@@ -73,8 +61,7 @@ public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
     [TestMethod]
     public void VerifyDeprecatedWarningIsThrownWhenAdaptersPickedFromExtensionDirectory()
     {
-        using var tempDir = new TempDirectory();
-        var arguments = PrepareArguments(GetSampleTestAssembly(), null, null, FrameworkArgValue, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), null, null, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         StdOutputContains("Adapter lookup is being changed, please follow");
