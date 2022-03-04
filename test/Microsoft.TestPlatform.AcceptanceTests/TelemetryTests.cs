@@ -83,15 +83,15 @@ public class TelemetryTests : AcceptanceTestBase
         ValidateOutput("Discovery", TempDirectory);
     }
 
-    private void ValidateOutput(string command, TempDirectory TempDirectory)
+    private void ValidateOutput(string command, TempDirectory tempDirectory)
     {
-        if (!Directory.Exists(TempDirectory.Path))
+        if (!Directory.Exists(tempDirectory.Path))
         {
-            Assert.Fail("Could not find the telemetry logs folder at {0}", TempDirectory.Path);
+            Assert.Fail("Could not find the telemetry logs folder at {0}", tempDirectory.Path);
         }
 
         bool isValid = false;
-        var directory = new DirectoryInfo(TempDirectory.Path);
+        var directory = new DirectoryInfo(tempDirectory.Path);
         var file = directory.GetFiles().OrderByDescending(f => f.CreationTime).First();
 
         string[] lines = File.ReadAllLines(file.FullName);

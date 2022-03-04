@@ -246,7 +246,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     private string CreateArguments(
-        TempDirectory TempDirectory,
+        TempDirectory tempDirectory,
         RunnerInfo runnerInfo,
         TestParameters testParameters,
         out string trxFilePath)
@@ -256,14 +256,14 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
             "artifacts", IntegrationTestEnvironment.BuildConfiguration, "Microsoft.CodeCoverage");
 
-        string diagFileName = Path.Combine(TempDirectory.Path, "diaglog.txt");
+        string diagFileName = Path.Combine(tempDirectory.Path, "diaglog.txt");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty,
-            FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+            FrameworkArgValue, runnerInfo.InIsolationValue, tempDirectory.Path);
         arguments = string.Concat(arguments, $" /Diag:{diagFileName}",
             $" /TestAdapterPath:{traceDataCollectorDir}");
         arguments = string.Concat(arguments, $" /Platform:{testParameters.TargetPlatform}");
 
-        trxFilePath = Path.Combine(TempDirectory.Path, Guid.NewGuid() + ".trx");
+        trxFilePath = Path.Combine(tempDirectory.Path, Guid.NewGuid() + ".trx");
         arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
 
         var defaultRunSettingsPath = Path.Combine(

@@ -64,9 +64,9 @@ public class DisableAppdomainTests : AcceptanceTestBase
         ValidateSummaryStatus(passedTestCount, 0, 0);
     }
 
-    private string GetRunsettingsFilePath(TempDirectory TempDirectory, Dictionary<string, string> runConfigurationDictionary)
+    private string GetRunsettingsFilePath(TempDirectory tempDirectory, Dictionary<string, string> runConfigurationDictionary)
     {
-        var runsettingsPath = Path.Combine(TempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
+        var runsettingsPath = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
         CreateRunSettingsFile(runsettingsPath, runConfigurationDictionary);
         return runsettingsPath;
     }

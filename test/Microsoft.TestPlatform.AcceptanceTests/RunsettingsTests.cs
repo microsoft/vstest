@@ -522,9 +522,9 @@ public class RunsettingsTests : AcceptanceTestBase
 
     #endregion
 
-    private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary, TempDirectory TempDirectory)
+    private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary, TempDirectory tempDirectory)
     {
-        var runsettingsPath = Path.Combine(TempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
+        var runsettingsPath = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
         if (runConfigurationDictionary != null)
         {
             CreateRunSettingsFile(runsettingsPath, runConfigurationDictionary);

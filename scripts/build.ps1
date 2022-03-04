@@ -140,7 +140,6 @@ if ((Test-Path $procdumpDir) -and 2 -ne @(Get-Item "$procdumpDir\0.0.1\bin").Len
     Remove-Item -Recurse -Force $procdumpDir
 }
 
-
 function Invoke-Build
 {
     $timer = Start-Timer

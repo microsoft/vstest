@@ -61,9 +61,9 @@ public class EventLogCollectorTests : AcceptanceTestBase
         StdErrorDoesNotContains("Unable to read event log");
     }
 
-    private string GetRunsettingsFilePath(TempDirectory TempDirectory)
+    private string GetRunsettingsFilePath(TempDirectory tempDirectory)
     {
-        var runsettingsPath = Path.Combine(TempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
+        var runsettingsPath = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
 
         string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
     <RunSettings>
@@ -85,10 +85,10 @@ public class EventLogCollectorTests : AcceptanceTestBase
         return runsettingsPath;
     }
 
-    private void VaildateDataCollectorOutput(TempDirectory TempDirectory)
+    private void VaildateDataCollectorOutput(TempDirectory tempDirectory)
     {
         // Verify attachments
-        var di = new DirectoryInfo(TempDirectory.Path);
+        var di = new DirectoryInfo(tempDirectory.Path);
         var resultFiles = di.EnumerateFiles("Event Log.xml", SearchOption.AllDirectories)
             .OrderBy(d => d.CreationTime)
             .Select(d => d.FullName)

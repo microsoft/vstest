@@ -59,7 +59,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
         return node.SelectSingleNode($"//{type}[@name='{name}']") ?? node.SelectSingleNode($"//{type}[@name='{name.ToLower()}']");
     }
 
-    protected XmlDocument GetXmlCoverage(string coverageResult, TempDirectory TempDirectory)
+    protected XmlDocument GetXmlCoverage(string coverageResult, TempDirectory tempDirectory)
     {
         var coverage = new XmlDocument();
 
@@ -70,7 +70,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
         }
 
         var codeCoverageExe = GetCodeCoverageExePath();
-        var output = Path.Combine(TempDirectory.Path, Guid.NewGuid().ToString() + ".xml");
+        var output = Path.Combine(tempDirectory.Path, Guid.NewGuid().ToString() + ".xml");
 
         var watch = new Stopwatch();
 

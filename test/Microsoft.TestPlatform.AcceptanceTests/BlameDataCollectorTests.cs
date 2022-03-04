@@ -323,14 +323,14 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         }
     }
 
-    private void VaildateOutput(TempDirectory TempDirectory, string testName, bool validateDumpFile = false)
+    private void VaildateOutput(TempDirectory tempDirectory, string testName, bool validateDumpFile = false)
     {
         bool isSequenceAttachmentReceived = false;
         bool isDumpAttachmentReceived = false;
         bool isValid = false;
         StdErrorContains(testName);
         StdOutputContains("Sequence_");
-        var resultFiles = Directory.GetFiles(TempDirectory.Path, "*", SearchOption.AllDirectories);
+        var resultFiles = Directory.GetFiles(tempDirectory.Path, "*", SearchOption.AllDirectories);
 
         foreach (var file in resultFiles)
         {

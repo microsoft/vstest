@@ -73,9 +73,9 @@ public class AppDomainTests : AcceptanceTestBase
         return string.Equals(content1, content2, StringComparison.Ordinal);
     }
 
-    private string GetInProcDataCollectionRunsettingsFile(bool disableAppDomain, TempDirectory TempDirectory)
+    private string GetInProcDataCollectionRunsettingsFile(bool disableAppDomain, TempDirectory tempDirectory)
     {
-        var runSettings = Path.Combine(TempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
+        var runSettings = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
         var inprocasm = _testEnvironment.GetTestAsset("SimpleDataCollector.dll");
 #if !NET451
         var assemblyName = AssemblyLoadContext.GetAssemblyName(inprocasm);
