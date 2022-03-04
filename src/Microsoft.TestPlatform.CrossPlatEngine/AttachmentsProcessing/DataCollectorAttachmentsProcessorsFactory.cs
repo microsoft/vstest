@@ -4,7 +4,13 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
@@ -29,31 +35,52 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
     {
         IDictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>> datacollectorsAttachmentsProcessors = new Dictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>>();
 
-
-        // Temporary disabled in design mode.
-        // We have an issue when the collector is found inside bin folder/subfolder of the user in case of VS.
-        // Usually collector are loaded from nuget package or visual studio special folders, but if a user for some reason run `dotnet publish`
-        // and after run the datacollector with the attachment processor we're loading 'published' version and no more nuget one.
-        // This led to file locking that prevents further `dotnet publish` and maybe build.
-        if (!RunSettingsHelper.Instance.IsDesignMode || FeatureFlag.Instance.IsEnabled(FeatureFlag.FORCE_DATACOLLECTORS_ATTACHMENTPROCESSORS))
+        if (invokedDataCollectors?.Length > 0)
         {
-            if (invokedDataCollectors?.Length > 0)
+            // We order files by filename descending so in case of the same collector from the same nuget but with different versions, we'll run the newer version.
+            // i.e. C:\Users\xxx\.nuget\packages\coverlet.collector
+            // /3.0.2
+            // /3.0.3
+            // /3.1.0
+            foreach (var invokedDataCollector in invokedDataCollectors.OrderByDescending(d => d.FilePath))
             {
-                // We order files by filename descending so in case of the same collector from the same nuget but with different versions, we'll run the newer version.
-                // i.e. C:\Users\xxx\.nuget\packages\coverlet.collector
-                // /3.0.2
-                // /3.0.3
-                // /3.1.0
-                foreach (var invokedDataCollector in invokedDataCollectors.OrderByDescending(d => d.FilePath))
+                // We'll merge using only one AQN in case of more "same processors" in different assembly.
+                if (!invokedDataCollector.HasAttachmentProcessor)
                 {
-                    // We'll merge using only one AQN in case of more "same processors" in different assembly.
-                    if (!invokedDataCollector.HasAttachmentProcessor)
+                    continue;
+                }
+
+                EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Analyzing data collector attachment processor Uri: {invokedDataCollector.Uri} AssemblyQualifiedName: {invokedDataCollector.AssemblyQualifiedName} FilePath: {invokedDataCollector.FilePath} HasAttachmentProcessor: {invokedDataCollector.HasAttachmentProcessor}");
+
+#if NETFRAMEWORK
+                // If we're in design mode we need to load the extension inside a different AppDomain to avoid to lock extension file containers.
+                if (RunSettingsHelper.Instance.IsDesignMode)
+                {
+                    try
                     {
-                        continue;
+                        var wrapper = new DataCollectorAttachmentProcessorAppDomain(invokedDataCollector, logger);
+                        if (wrapper.LoadSucceded && wrapper.HasAttachmentProcessor)
+                        {
+                            if (!datacollectorsAttachmentsProcessors.ContainsKey(wrapper.AssemblyQualifiedName))
+                            {
+                                datacollectorsAttachmentsProcessors.Add(wrapper.AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(wrapper.FriendlyName, wrapper));
+                                EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Collector attachment processor '{wrapper.AssemblyQualifiedName}' from file '{invokedDataCollector.FilePath}' added to the 'run list'");
+                            }
+                        }
+                        else
+                        {
+                            EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: DataCollectorExtension not found for uri '{invokedDataCollector.Uri}'");
+                        }
                     }
-
-                    EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Analyzing data collector attachment processor Uri: {invokedDataCollector.Uri} AssemblyQualifiedName: {invokedDataCollector.AssemblyQualifiedName} FilePath: {invokedDataCollector.FilePath} HasAttachmentProcessor: {invokedDataCollector.HasAttachmentProcessor}");
-
+                    catch (Exception ex)
+                    {
+                        EqtTrace.Error($"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{invokedDataCollector.AssemblyQualifiedName}'\n{ex}");
+                        logger?.SendMessage(TestMessageLevel.Error, $"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{invokedDataCollector.AssemblyQualifiedName}'\n{ex}");
+                    }
+                }
+                else
+                {
+#endif
                     // We cache extension locally by file path
                     var dataCollectorExtensionManager = DataCollectorExtensionManagerCache.GetOrAdd(invokedDataCollector.FilePath, DataCollectorExtensionManager.Create(invokedDataCollector.FilePath, true, TestSessionMessageLogger.Instance));
                     var dataCollectorExtension = dataCollectorExtensionManager.TryGetTestExtension(invokedDataCollector.Uri);
@@ -72,7 +99,7 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
                             logger?.SendMessage(TestMessageLevel.Error, $"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}'\n{ex}");
                         }
 
-                        if (dataCollectorAttachmentProcessorInstance != null && !datacollectorsAttachmentsProcessors.ContainsKey(attachmentProcessorType.AssemblyQualifiedName))
+                        if (dataCollectorAttachmentProcessorInstance is not null && !datacollectorsAttachmentsProcessors.ContainsKey(attachmentProcessorType.AssemblyQualifiedName))
                         {
                             datacollectorsAttachmentsProcessors.Add(attachmentProcessorType.AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(dataCollectorExtension.Metadata.FriendlyName, dataCollectorAttachmentProcessorInstance));
                             EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}' from file '{invokedDataCollector.FilePath}' added to the 'run list'");
@@ -82,7 +109,9 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
                     {
                         EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: DataCollectorExtension not found for uri '{invokedDataCollector.Uri}'");
                     }
+#if NETFRAMEWORK
                 }
+#endif
             }
         }
 
@@ -97,7 +126,7 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
         var finalDatacollectorsAttachmentsProcessors = new List<DataCollectorAttachmentProcessor>();
         foreach (var attachementProcessor in datacollectorsAttachmentsProcessors)
         {
-            EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Valid data collector attachment processor found: '{attachementProcessor.Value.Item2.GetType().AssemblyQualifiedName}'");
+            EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Valid data collector attachment processor found: '{attachementProcessor.Key}'");
             finalDatacollectorsAttachmentsProcessors.Add(new DataCollectorAttachmentProcessor(attachementProcessor.Value.Item1, attachementProcessor.Value.Item2));
         }
 

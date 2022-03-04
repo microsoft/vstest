@@ -106,7 +106,9 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
         var dataCollectorAttachmentsProcessors = _dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollector?.ToArray(), logger);
         for (int i = 0; i < dataCollectorAttachmentsProcessors.Length; i++)
         {
-            var dataCollectorAttachmentsProcessor = dataCollectorAttachmentsProcessors[i];
+            // We need to dispose the DataCollectorAttachmentProcessor to unload the AppDomain for net451
+            using DataCollectorAttachmentProcessor dataCollectorAttachmentsProcessor = dataCollectorAttachmentsProcessors[i];
+
             int attachmentsHandlerIndex = i + 1;
 
             if (!dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.SupportsIncrementalProcessing)

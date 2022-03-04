@@ -27,7 +27,7 @@ internal interface IDataCollectorAttachmentsProcessorsFactory
 /// <summary>
 /// Registered data collector attachment processor
 /// </summary>
-internal class DataCollectorAttachmentProcessor
+internal class DataCollectorAttachmentProcessor : IDisposable
 {
     /// <summary>
     /// Data collector FriendlyName
@@ -43,5 +43,10 @@ internal class DataCollectorAttachmentProcessor
     {
         FriendlyName = string.IsNullOrEmpty(friendlyName) ? throw new ArgumentException("Invalid FriendlyName", nameof(friendlyName)) : friendlyName;
         DataCollectorAttachmentProcessorInstance = dataCollectorAttachmentProcessor;
+    }
+
+    public void Dispose()
+    {
+        (DataCollectorAttachmentProcessorInstance as IDisposable)?.Dispose();
     }
 }
