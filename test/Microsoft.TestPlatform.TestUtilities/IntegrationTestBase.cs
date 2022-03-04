@@ -76,7 +76,7 @@ public class IntegrationTestBase
     [TestCleanup]
     public void TempDirectoryCleanup()
     {
-        // Delete the directory only when we passed, so we can look at results and logs of failed tests.
+        // Delete the directory only when the test succeeded, so we can look at results and logs of failed tests.
         if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
         {
             TempDirectory.Dispose();
