@@ -12,12 +12,6 @@
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.AcceptanceTests</AssemblyName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp2.1|AnyCPU'">
-    <Optimize>False</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net451|AnyCPU'">
-    <Optimize>False</Optimize>
-  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="TestAssets\**" />
     <None Remove="TestAssets\**" />
