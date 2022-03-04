@@ -228,7 +228,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
                 CultureInfo.InvariantCulture,
                 "{0}, {1}, {2:yyyy}/{2:MM}/{2:dd}, {2:HH}:{2:mm}:{2:ss}.{2:fff}, {5}, {3}, {4}",
                 ProcessId,
-                Thread.CurrentThread.ManagedThreadId,
+                Environment.CurrentManagedThreadId,
                 DateTime.Now,
                 ProcessName,
                 message,
