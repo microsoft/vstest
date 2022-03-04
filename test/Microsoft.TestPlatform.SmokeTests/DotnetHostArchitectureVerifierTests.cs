@@ -26,7 +26,7 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
     {
         string dotnetPath = GetDownloadedDotnetMuxerFromTools(architecture);
         var vstestConsolePath = GetDotnetRunnerPath();
-        var dotnetRunnerPath = workSpace.CreateDirectory("dotnetrunner");
+        var dotnetRunnerPath = TempDirectory.CreateDirectory("dotnetrunner");
         TempDirectory.CopyDirectory(new DirectoryInfo(Path.GetDirectoryName(vstestConsolePath)), dotnetRunnerPath);
 
         // Patch the runner
@@ -42,10 +42,10 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
             ["ExpectedArchitecture"] = architecture
         };
 
-        ExecuteApplication(dotnetPath, "new mstest", out string stdOut, out string stdError, out int exitCode, environmentVariables, workSpace.Path);
+        ExecuteApplication(dotnetPath, "new mstest", out _, out  _, out _, environmentVariables, TempDirectory.Path);
 
         // Patch test file
-        File.WriteAllText(Path.Combine(workSpace.Path, "UnitTest1.cs"),
+        File.WriteAllText(Path.Combine(TempDirectory.Path, "UnitTest1.cs"),
 @"
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -62,7 +62,7 @@ public class UnitTest1
     }
 }");
 
-        ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\"", out stdOut, out stdError, out exitCode, environmentVariables, workSpace.Path);
+        ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\"", out string stdOut, out _, out int exitCode, environmentVariables, TempDirectory.Path);
         Assert.AreEqual(0, exitCode, stdOut);
     }
 

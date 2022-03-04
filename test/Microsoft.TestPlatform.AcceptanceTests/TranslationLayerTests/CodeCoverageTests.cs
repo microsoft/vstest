@@ -29,7 +29,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 {
     private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private TempDirectory _TempDirectory;
+    private TempDirectory _tempDirectory;
     private RunEventHandler _runEventHandler;
     private TestRunAttachmentsProcessingEventHandler _testRunAttachmentsProcessingEventHandler;
 
@@ -42,7 +42,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
     private void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _TempDirectory);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _tempDirectory);
         _runEventHandler = new RunEventHandler();
         _testRunAttachmentsProcessingEventHandler = new TestRunAttachmentsProcessingEventHandler();
     }

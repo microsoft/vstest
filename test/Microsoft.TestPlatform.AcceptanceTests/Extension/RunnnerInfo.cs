@@ -24,8 +24,8 @@ public class RunnerInfo
         IsNetFrameworkRunner = !IsNetRunner;
         IsNetTarget = TargetFramework.StartsWith("netcoreapp", StringComparison.InvariantCultureIgnoreCase);
         IsNetFrameworkTarget = !IsNetTarget;
-
     }
+
     /// <summary>
     /// Gets the target framework.
     /// </summary>
