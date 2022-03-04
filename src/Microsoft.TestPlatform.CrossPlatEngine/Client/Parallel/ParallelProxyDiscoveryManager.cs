@@ -80,9 +80,6 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         // One data aggregator per parallel discovery
         _currentDiscoveryDataAggregator = new ParallelDiscoveryDataAggregator();
 
-        // Marking all sources as not discovered before starting actual discovery
-        _currentDiscoveryDataAggregator.MarkSourcesWithStatus(discoveryCriteria.Sources.ToList(), DiscoveryStatus.NotDiscovered);
-
         DiscoverTestsPrivate(eventHandler);
     }
 

@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -28,15 +29,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDiscoveryEventsHandler2
 {
     private readonly TestSessionInfo _testSessionInfo;
-    readonly Func<string, ProxyDiscoveryManager, ProxyOperationManager> _proxyOperationManagerCreator;
-
-    private ITestRuntimeProvider _testHostManager;
-    private IRequestData _requestData;
-
+    private readonly Func<string, ProxyDiscoveryManager, ProxyOperationManager> _proxyOperationManagerCreator;
     private readonly IFileHelper _fileHelper;
     private readonly IDataSerializer _dataSerializer;
-    private bool _isCommunicationEstablished;
+    private readonly DiscoverySourceStatusCache _discoverySourceStatusCache = new();
 
+    private ITestRuntimeProvider _testHostManager;
+    private bool _isCommunicationEstablished;
     private ProxyOperationManager _proxyOperationManager;
     private ITestDiscoveryEventsHandler2 _baseTestDiscoveryEventsHandler;
     private bool _skipDefaultAdapters;
@@ -54,12 +53,8 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         // Filling in test session info and proxy information.
         _testSessionInfo = testSessionInfo;
         _proxyOperationManagerCreator = proxyOperationManagerCreator;
-
-        _requestData = null;
-        _testHostManager = null;
         _dataSerializer = JsonDataSerializer.Instance;
         _fileHelper = new FileHelper();
-        _isCommunicationEstablished = false;
     }
 
     /// <summary>
@@ -105,17 +100,13 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         IDataSerializer dataSerializer,
         IFileHelper fileHelper)
     {
-        _requestData = requestData;
         _testHostManager = testHostManager;
-
         _dataSerializer = dataSerializer;
         _fileHelper = fileHelper;
-        _isCommunicationEstablished = false;
 
         // Create a new proxy operation manager.
         _proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
     }
-
 
     #region IProxyDiscoveryManager implementation.
 
@@ -135,13 +126,16 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
                 this);
 
             _testHostManager = _proxyOperationManager.TestHostManager;
-            _requestData = _proxyOperationManager.RequestData;
         }
 
         _baseTestDiscoveryEventsHandler = eventHandler;
+
         try
         {
             _isCommunicationEstablished = _proxyOperationManager.SetupChannel(discoveryCriteria.Sources, discoveryCriteria.RunSettings);
+
+            // Mark all sources as NotDiscovered before actual discovery starts
+            _discoverySourceStatusCache.MarkSourcesWithStatus(discoveryCriteria.Sources, DiscoveryStatus.NotDiscovered);
 
             if (_isCommunicationEstablished)
             {
@@ -241,12 +235,28 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     /// <inheritdoc/>
     public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
     {
-        _baseTestDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, lastChunk);
+        if (lastChunk != null)
+        {
+            // When discovery is complete then the last discovered source is still marked
+            // as partially discovered, so we need to mark it as fully discovered.
+            _discoverySourceStatusCache.MarkTheLastChunkSourcesAsFullyDiscovered(lastChunk);
+        }
+
+        _baseTestDiscoveryEventsHandler.HandleDiscoveryComplete(
+            new(discoveryCompleteEventArgs.TotalCount, discoveryCompleteEventArgs.IsAborted)
+            {
+                Metrics = discoveryCompleteEventArgs.Metrics,
+                NotDiscoveredSources = _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered),
+                PartiallyDiscoveredSources = _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
+                FullyDiscoveredSources = _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
+            }
+            , lastChunk);
     }
 
     /// <inheritdoc/>
     public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
     {
+        _discoverySourceStatusCache.MarkSourcesBasedOnDiscoveredTestCases(discoveredTestCases);
         _baseTestDiscoveryEventsHandler.HandleDiscoveredTests(discoveredTestCases);
     }
 

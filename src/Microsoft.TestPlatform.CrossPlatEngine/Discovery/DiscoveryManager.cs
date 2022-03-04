@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -39,9 +38,8 @@ public class DiscoveryManager : IDiscoveryManager
     private ITestDiscoveryEventsHandler2 _testDiscoveryEventsHandler;
     private DiscoveryCriteria _discoveryCriteria;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private string _previousSource;
-    private readonly ConcurrentDictionary<string, DiscoveryStatus> _sourcesWithDiscoveryStatus = new();
-
+    private readonly DiscoverySourceStatusCache _discoverySourceStatusCache = new();
+    
     /// <summary>
     /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
     /// </summary>
@@ -113,7 +111,7 @@ public class DiscoveryManager : IDiscoveryManager
                 {
                     verifiedExtensionSourceMap.Add(kvp.Key, kvp.Value);
                     // Mark all sources as NotDiscovered before actual discovery starts
-                    MarkSourcesWithStatus(verifiedSources, DiscoveryStatus.NotDiscovered, _sourcesWithDiscoveryStatus);
+                    _discoverySourceStatusCache.MarkSourcesWithStatus(verifiedSources, DiscoveryStatus.NotDiscovered);
                 }
             }
 
@@ -144,7 +142,7 @@ public class DiscoveryManager : IDiscoveryManager
                     UpdateTestCases(lastChunk, _discoveryCriteria.Package);
                     // When discovery is complete then the last discovered source is still marked
                     // as partially discovered, so we need to mark it as fully discovered.
-                    MarkTheLastChunkSourcesAsFullyDiscovered(lastChunk);
+                    _discoverySourceStatusCache.MarkTheLastChunkSourcesAsFullyDiscovered(lastChunk);
                 }
 
                 // Collecting Discovery State
@@ -161,9 +159,9 @@ public class DiscoveryManager : IDiscoveryManager
                 var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(
                     totalDiscoveredTestCount,
                     _cancellationTokenSource.IsCancellationRequested,
-                    GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered, _sourcesWithDiscoveryStatus),
-                    GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered, _sourcesWithDiscoveryStatus),
-                    GetSourcesWithStatus(DiscoveryStatus.NotDiscovered, _sourcesWithDiscoveryStatus));
+                    _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
+                    _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
+                    _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
 
                 discoveryCompleteEventsArgs.DiscoveredExtensions = TestPluginCache.Instance.TestExtensions?.GetCachedExtensions();
                 discoveryCompleteEventsArgs.Metrics = _requestData.MetricsCollection.Metrics;
@@ -200,9 +198,9 @@ public class DiscoveryManager : IDiscoveryManager
 
         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
             -1, true,
-            GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered, _sourcesWithDiscoveryStatus),
-            GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered, _sourcesWithDiscoveryStatus),
-            GetSourcesWithStatus(DiscoveryStatus.NotDiscovered, _sourcesWithDiscoveryStatus));
+            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
+            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
+            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
 
         eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
     }
@@ -214,8 +212,7 @@ public class DiscoveryManager : IDiscoveryManager
         if (_testDiscoveryEventsHandler != null)
         {
             _testDiscoveryEventsHandler.HandleDiscoveredTests(testCases);
-            // We need to mark sources based on already discovered testcases
-            MarkSourcesBasedOnDiscoveredTestCases(testCases);
+            _discoverySourceStatusCache.MarkSourcesBasedOnDiscoveredTestCases(testCases);
         }
         else
         {
@@ -310,7 +307,6 @@ public class DiscoveryManager : IDiscoveryManager
         }
     }
 
-
     private static void UpdateTestCases(IEnumerable<TestCase> testCases, string package)
     {
         // Update TestCase objects Source data to contain the actual source(package) provided by IDE(users),
@@ -322,111 +318,5 @@ public class DiscoveryManager : IDiscoveryManager
                 tc.Source = package;
             }
         }
-    }
-
-    /// <summary>
-    /// Mark sources based on already discovered testCases
-    /// </summary>
-    /// <param name="testCases">List of testCases which were already discovered</param>
-    private void MarkSourcesBasedOnDiscoveredTestCases(ICollection<TestCase> testCases)
-    {
-        if (testCases is null)
-        {
-            return;
-        }
-
-        foreach (var testCase in testCases)
-        {
-            string currentSource = testCase.Source;
-
-            // We rely on the fact that sources are processed in a sequential way, which means that
-            // when we receive a different source than the previous, we can assume that the previous
-            // source was fully discovered.
-            if (_previousSource is null || _previousSource == currentSource)
-            {
-                MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
-            }
-            else if (currentSource != _previousSource)
-            {
-                MarkSourcesWithStatus(new[] { _previousSource }, DiscoveryStatus.FullyDiscovered);
-                MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
-            }
-
-            _previousSource = currentSource;
-        }
-    }
-
-    /// <summary>
-    /// Mark the last sources as fullyDiscovered
-    /// </summary>
-    /// <param name="lastChunk">Last chunk of testCases which were discovered</param>
-    private void MarkTheLastChunkSourcesAsFullyDiscovered(IList<TestCase> lastChunk)
-    {
-        // When all testcases count in project is dividable by chunk size (e.g. 100 tests and
-        // chunk size of 10) then lastChunk is coming as empty. In this case, we need to take
-        // the lastSource and mark it as FullyDiscovered.
-        IEnumerable<string> lastChunkSources = lastChunk.Count > 0
-            ? lastChunk.Select(testcase => testcase.Source)
-            : new[] { _previousSource };
-
-        MarkSourcesWithStatus(lastChunkSources, DiscoveryStatus.FullyDiscovered);
-    }
-
-    private void MarkSourcesWithStatus(IEnumerable<string> sources, DiscoveryStatus status)
-        => MarkSourcesWithStatus(sources, status, _sourcesWithDiscoveryStatus);
-
-    /// <summary>
-    /// Mark sources with particular DiscoveryStatus
-    /// </summary>
-    /// <param name="sources">List of sources to mark</param>
-    /// <param name="status">DiscoveryStatus to mark for list of sources</param>
-    internal static void MarkSourcesWithStatus(IEnumerable<string> sources, DiscoveryStatus status,
-        ConcurrentDictionary<string, DiscoveryStatus> sourcesWithDiscoveryStatus)
-    {
-        if (sources is null)
-        {
-            return;
-        }
-
-        foreach (var source in sources)
-        {
-            if (source is null)
-            {
-                continue;
-            }
-
-            sourcesWithDiscoveryStatus.AddOrUpdate(source,
-                _ =>
-                {
-                    if (status != DiscoveryStatus.NotDiscovered)
-                    {
-                        EqtTrace.Warning($"Undiscovered {source}.");
-                    }
-
-                    return status;
-                },
-                (_, _) =>
-                {
-                    EqtTrace.Info($"Marking {source} with {status} status.");
-                    return status;
-                });
-        }
-    }
-
-    /// <summary>
-    /// Returns sources with particular discovery status.
-    /// </summary>
-    /// <param name="status">Status to filter</param>
-    /// <returns></returns>
-    internal static List<string> GetSourcesWithStatus(DiscoveryStatus discoveryStatus,
-        ConcurrentDictionary<string, DiscoveryStatus> sourcesWithDiscoveryStatus)
-    {
-        // If by some accident SourcesWithDiscoveryStatus map is empty we will return empty list
-        return sourcesWithDiscoveryStatus is null || sourcesWithDiscoveryStatus.IsEmpty
-            ? new List<string>()
-            : sourcesWithDiscoveryStatus
-                .Where(source => source.Value == discoveryStatus)
-                .Select(source => source.Key)
-                .ToList();
     }
 }

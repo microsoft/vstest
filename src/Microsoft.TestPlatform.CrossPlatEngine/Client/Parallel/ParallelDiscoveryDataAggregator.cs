@@ -13,8 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 /// <summary>
@@ -154,7 +152,7 @@ internal class ParallelDiscoveryDataAggregator
     /// Aggregates the metrics from Test Host Process.
     /// </summary>
     /// <param name="metrics"></param>
-    internal /* for testing purposes */ void AggregateDiscoveryDataMetrics(IDictionary<string, object> metrics)
+    internal /* for testing purposes */ void AggregateDiscoveryDataMetrics(IDictionary<string, object>? metrics)
     {
         if (metrics == null || metrics.Count == 0 || _metricsAggregator == null)
         {
@@ -189,18 +187,6 @@ internal class ParallelDiscoveryDataAggregator
         IsMessageSent = IsMessageSent || isMessageSent;
     }
 
-    /// <summary>
-    /// Aggregate the source as fully discovered
-    /// </summary>
-    /// <param name="sorce">Fully discovered source</param>
-    public void MarkSourcesWithStatus(IEnumerable<string> sources, DiscoveryStatus status)
-        => DiscoveryManager.MarkSourcesWithStatus(sources, status, _sourcesWithDiscoveryStatus);
-
-    /// <summary>
-    /// Returns sources with particular discovery status.
-    /// </summary>
-    /// <param name="status">Status to filter</param>
-    /// <returns></returns>
-    public List<string> GetSourcesWithStatus(DiscoveryStatus status)
-        => DiscoveryManager.GetSourcesWithStatus(status, _sourcesWithDiscoveryStatus);
+    public List<string> GetSourcesWithStatus(DiscoveryStatus discoveryStatus)
+        => DiscoverySourceStatusCache.GetSourcesWithStatus(discoveryStatus, _sourcesWithDiscoveryStatus);
 }
