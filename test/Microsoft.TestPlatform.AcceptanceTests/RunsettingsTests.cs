@@ -242,7 +242,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
         var runConfigurationDictionary = new Dictionary<string, string>
         {
-                { "TargetPlatform", "123" }
+            { "TargetPlatform", "123" }
         };
         var runsettingsFilePath = GetRunsettingsFilePath(runConfigurationDictionary, TempDirectory);
         var arguments = PrepareArguments(
@@ -263,7 +263,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
         var runConfigurationDictionary = new Dictionary<string, string>
         {
-                { "TestAdaptersPaths", GetTestAdapterPath() }
+            { "TestAdaptersPaths", GetTestAdapterPath() }
         };
         var runsettingsFilePath = GetRunsettingsFilePath(runConfigurationDictionary, TempDirectory);
         var arguments = PrepareArguments(

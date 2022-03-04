@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using System;
+
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 public class RunnerInfo
@@ -17,10 +19,10 @@ public class RunnerInfo
         TargetFramework = targetFramework;
         InIsolationValue = inIsolation;
         // The value is netcoreapp2.1.
-        IsNetRunner = RunnerFramework.StartsWith("netcoreapp");
+        IsNetRunner = RunnerFramework.StartsWith("netcoreapp", StringComparison.InvariantCultureIgnoreCase);
         // The value is net451.
         IsNetFrameworkRunner = !IsNetRunner;
-        IsNetTarget = TargetFramework.StartsWith("netcoreapp");
+        IsNetTarget = TargetFramework.StartsWith("netcoreapp", StringComparison.InvariantCultureIgnoreCase);
         IsNetFrameworkTarget = !IsNetTarget;
 
     }

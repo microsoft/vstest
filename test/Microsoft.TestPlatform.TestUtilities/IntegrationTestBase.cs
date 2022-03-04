@@ -42,8 +42,6 @@ public class IntegrationTestBase
 
     protected readonly IntegrationTestEnvironment _testEnvironment;
 
-    public string BuildConfiguration { get; }
-
     private readonly string _testAdapterRelativePath = @"mstest.testadapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
     private readonly string _nUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build".Replace('\\', Path.DirectorySeparatorChar);
     private readonly string _xUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
@@ -72,6 +70,8 @@ public class IntegrationTestBase
     public TempDirectory TempDirectory { get; }
 
     public TestContext TestContext { get; set; }
+
+    public string BuildConfiguration { get; }
 
     [TestCleanup]
     public void TempDirectoryCleanup()
@@ -765,12 +765,12 @@ public class IntegrationTestBase
     /// <summary>
     /// Counts the number of logs following the '*.host.*' pattern in the given folder.
     /// </summary>
-    protected static int CountTestHostLogs(string diagLogsDir, IEnumerable<string> testHostProcessNames)
-        => Directory.GetFiles(diagLogsDir, "*.host.*").Count();
+    protected static int CountTestHostLogs(string diagLogsDir)
+        => Directory.GetFiles(diagLogsDir, "*.host.*").Length;
 
     protected static void AssertExpectedNumberOfHostProcesses(int expectedNumOfProcessCreated, string diagLogsDir, IEnumerable<string> testHostProcessNames, string arguments = null, string runnerPath = null)
     {
-        var processCreatedCount = CountTestHostLogs(diagLogsDir, testHostProcessNames);
+        var processCreatedCount = CountTestHostLogs(diagLogsDir);
         Assert.AreEqual(
             expectedNumOfProcessCreated,
             processCreatedCount,

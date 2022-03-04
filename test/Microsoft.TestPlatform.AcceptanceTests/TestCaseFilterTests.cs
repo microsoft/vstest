@@ -165,7 +165,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     {
         if (runnerInfo.IsNetRunner)
         {
-            Assert.Inconclusive("Mstest v1 tests not supported with .Netcore runner.");
+            Assert.Inconclusive("Mstest v1 tests not supported with .NET Core runner.");
             return;
         }
 
@@ -197,7 +197,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     {
         if (runnerInfo.IsNetRunner)
         {
-            Assert.Inconclusive("Tmi tests not supported with .Netcore runner.");
+            Assert.Inconclusive("Tmi tests not supported with .NET Core runner.");
             return;
         }
 

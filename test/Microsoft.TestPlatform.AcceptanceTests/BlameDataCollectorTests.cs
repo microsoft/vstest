@@ -33,8 +33,8 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         if (!File.Exists(procDumpExePath))
         {
             throw new InvalidOperationException($"Procdump path {procDumpExePath} does not exist. "
-                + $"It is possible that antivirus deleted it from your nuget cache. "
-                + $"Delete the whole procdump folder in your nuget cache, and run build, or restore");
+                + "It is possible that antivirus deleted it from your nuget cache. "
+                + "Delete the whole procdump folder in your nuget cache, and run build, or restore");
         }
     }
 

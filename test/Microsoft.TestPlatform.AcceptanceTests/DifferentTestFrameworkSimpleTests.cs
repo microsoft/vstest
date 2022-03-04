@@ -83,7 +83,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         var minWebTestResultFileSizeInKB = 150;
         if (runnerInfo.IsNetRunner)
         {
-            Assert.Inconclusive("WebTests tests not supported with .Netcore runner.");
+            Assert.Inconclusive("WebTests tests not supported with .NET Core runner.");
             return;
         }
 
@@ -120,7 +120,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         if (runnerInfo.IsNetRunner)
         {
-            Assert.Inconclusive("WebTests tests not supported with .Netcore runner.");
+            Assert.Inconclusive("WebTests tests not supported with .NET Core runner.");
             return;
         }
 
@@ -143,10 +143,10 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
-GetAssetFullPath("NUTestProject.dll"),
-GetTestAdapterPath(UnitTestFramework.NUnit),
-string.Empty, FrameworkArgValue,
-runnerInfo.InIsolationValue, TempDirectory.Path);
+            GetAssetFullPath("NUTestProject.dll"),
+            GetTestAdapterPath(UnitTestFramework.NUnit),
+            string.Empty, FrameworkArgValue,
+            runnerInfo.InIsolationValue, TempDirectory.Path);
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 1, 0);
     }
