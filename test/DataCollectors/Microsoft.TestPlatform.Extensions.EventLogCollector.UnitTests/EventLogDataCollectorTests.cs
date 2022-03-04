@@ -220,7 +220,7 @@ public class EventLogDataCollectorTests
         Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseStartInvocationList()?.Length, "GetTestCaseStartInvocationList");
         Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseEndInvocationList()?.Length, "GetTestCaseEndInvocationList");
         Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionEndInvocationList()?.Length, "GetTestSessionEndInvocationList");
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionStartInvocationList().Length, "GetTestSessionStartInvocationList");
+        Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionStartInvocationList()?.Length, "GetTestSessionStartInvocationList");
     }
 
     [TestMethod]
