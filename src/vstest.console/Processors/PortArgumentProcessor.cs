@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
@@ -143,6 +144,7 @@ internal class PortArgumentExecutor : IArgumentExecutor
 
         _commandLineOptions.Port = portNumber;
         _commandLineOptions.IsDesignMode = true;
+        RunSettingsHelper.Instance.IsDesignMode = true;
         _designModeClient = _designModeInitializer?.Invoke(_commandLineOptions.ParentProcessId, _processHelper);
     }
 

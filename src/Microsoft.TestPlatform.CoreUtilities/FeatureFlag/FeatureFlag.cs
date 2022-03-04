@@ -1,12 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if !NETSTANDARD1_0
+
 using System;
 using System.Collections.Generic;
 
-#if !NETSTANDARD1_0
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
+
 // !!! FEATURES MUST BE KEPT IN SYNC WITH https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestFeatureFlag.cs !!!
 internal partial class FeatureFlag : IFeatureFlag
 {
@@ -20,6 +21,7 @@ internal partial class FeatureFlag : IFeatureFlag
     {
         FeatureFlags.Add(ARTIFACTS_POSTPROCESSING, true);
         FeatureFlags.Add(ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX, false);
+        FeatureFlags.Add(FORCE_DATACOLLECTORS_ATTACHMENTPROCESSORS, false);
     }
 
     // Added for artifact porst-processing, it enable/disable the post processing.
@@ -30,6 +32,9 @@ internal partial class FeatureFlag : IFeatureFlag
     // It can be useful if we need to restore old UX in case users are parsing the console output.
     // Added in 17.2-preview 7.0-preview
     public static string ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX = VSTEST_FEATURE + "_" + "ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX";
+
+    // Temporary used to allow tests to work
+    public static string FORCE_DATACOLLECTORS_ATTACHMENTPROCESSORS = VSTEST_FEATURE + "_" + "FORCE_DATACOLLECTORS_ATTACHMENTPROCESSORS";
 
     // For now we're checking env var.
     // We could add it also to some section inside the runsettings.

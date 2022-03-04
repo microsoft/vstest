@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if NETFRAMEWORK || NETCOREAPP || NETSTANDARD2_0
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Threading;
-
-#if NETFRAMEWORK || NETCOREAPP || NETSTANDARD2_0
 
 #nullable disable
 
@@ -228,7 +228,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
                 CultureInfo.InvariantCulture,
                 "{0}, {1}, {2:yyyy}/{2:MM}/{2:dd}, {2:HH}:{2:mm}:{2:ss}.{2:fff}, {5}, {3}, {4}",
                 ProcessId,
-                Thread.CurrentThread.ManagedThreadId,
+                Environment.CurrentManagedThreadId,
                 DateTime.Now,
                 ProcessName,
                 message,
@@ -445,6 +445,19 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
         LogFile = null;
         TraceLevel = TraceLevel.Off;
         Source.Switch.Level = SourceLevels.Off;
+    }
+
+    /// <summary>
+    /// Trace a verbose message.
+    /// </summary>
+    /// <param name="message">Trace message.</param>
+    [Conditional("TRACE")]
+    internal static void Verbose(string message)
+    {
+        if (Instance.ShouldTrace(PlatformTraceLevel.Verbose))
+        {
+            Instance.WriteLine(PlatformTraceLevel.Verbose, message);
+        }
     }
 }
 

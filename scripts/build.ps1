@@ -148,11 +148,11 @@ function Invoke-Build
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
-    Invoke-Exe $dotnetExe -Arguments "build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:TestPlatform.binlog"
+    Invoke-Exe $dotnetExe -Arguments "build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$env:TP_OUT_DIR\log\$Configuration\TestPlatform.binlog"""
     Write-Log ".. .. Build: Complete."
 
     Write-Log ".. .. Build: Source: $TPB_TestAssets_CILAssets"
-    Invoke-Exe $dotnetExe -Arguments "build $TPB_TestAssets_CILAssets --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$($env:TP_ROOT_DIR)\CILAssets.binlog"""
+    Invoke-Exe $dotnetExe -Arguments "build $TPB_TestAssets_CILAssets --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$env:TP_OUT_DIR\log\$Configuration\CILAssets.binlog"""
     Write-Log ".. .. Build: Complete."
     Write-Log "Invoke-Build: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -169,7 +169,7 @@ function Invoke-TestAssetsBuild
     try {
         Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution -- add NuGet source"
         Invoke-Exe -IgnoreExitCode 1 $nugetExe -Arguments "sources add -Name ""locally-built-testplatform-packages"" -Source $env:TP_TESTARTIFACTS\packages\ -ConfigFile ""$nugetConfig"""
-        Invoke-Exe $dotnetExe -Arguments "build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$($env:TP_ROOT_DIR)\TestAssets.binlog"""
+        Invoke-Exe $dotnetExe -Arguments "build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$env:TP_OUT_DIR\log\$Configuration\TestAssets.binlog"""
     }
     finally {
         Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution -- remove NuGet source"
@@ -257,7 +257,10 @@ function Publish-Package
     ################################################################################
     # Publish vstest.console and datacollector exclusively because *.config/*.deps.json file is not getting publish when we are publishing aforementioned project through dependency.
     Write-Log "Package: Publish src\vstest.console\vstest.console.csproj"
-    Publish-PackageInternal $vstestConsoleProject $TPB_TargetFramework451 $fullCLRPackage451Dir
+
+    # We build vstest.console.arm64.exe before and we ship in the same folder as win7-x64 to have the same VSIX packaging to deploy on VS.
+    Publish-PackageWithRuntimeInternal $vstestConsoleProject $TPB_TargetFramework451 $TPB_ARM64_Runtime false $fullCLRPackage451Dir
+    Publish-PackageWithRuntimeInternal $vstestConsoleProject $TPB_TargetFramework451 $TPB_X64_Runtime false $fullCLRPackage451Dir
     Publish-PackageInternal $vstestConsoleProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
 
     Write-Log "Package: Publish src\SettingsMigrator\SettingsMigrator.csproj"

@@ -104,7 +104,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
                     It.IsAny<Dictionary<string, string>>(),
                     It.Is<TestRunnerConnectionInfo>(
                         t => t.LogFile.Contains("log.host." + DateTime.Now.ToString("yy-MM-dd"))
-                             && t.LogFile.Contains("_" + Thread.CurrentThread.ManagedThreadId + ".txt"))));
+                             && t.LogFile.Contains("_" + Environment.CurrentManagedThreadId + ".txt"))));
 #if NETFRAMEWORK
         EqtTrace.TraceLevel = TraceLevel.Off;
 #else

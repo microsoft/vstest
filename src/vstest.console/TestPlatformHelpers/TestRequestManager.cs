@@ -640,10 +640,14 @@ internal class TestRequestManager : ITestRequestManager
                 // This is a special case for 1 version of Nuget.Frameworks that was shipped with using identifier NET5 instead of NETCoreApp5 for .NET 5.
                 || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-#if NETCOREAPP
-                // We are running in vstest.console that is either started via dotnet.exe
-                // or via vstest.console.exe .NET Core executable. For AnyCPU dlls this
-                // should resolve 32-bit SDK when running from 32-bit dotnet process and
+                // We are running in vstest.console that is either started via dotnet
+                // or via vstest.console.exe. The architecture of the current process
+                // determines the default architecture to use for AnyCPU dlls
+                // and other sources that don't dictate architecture (e.g. js files).
+                // This way starting 32-bit dotnet will try to run as 32-bit testhost
+                // using the runtime that was installed with that 32-bit dotnet SDK. 
+                // Similarly ARM64 vstest.console will start ARM64 testhost, making sure 
+                // that we choose the architecture that we already know we can run as.
                 // 64-bit SDK when running from 64-bit dotnet process.
                 // As default architecture we specify the expected test host architecture,
                 // it can be specified by user on the command line with --arch or through runsettings.
@@ -652,16 +656,7 @@ internal class TestRequestManager : ITestRequestManager
                 defaultArchitecture = RunSettingsHelper.Instance.IsDefaultTargetArchitecture ?
                     TranslateToArchitecture(_processHelper.GetCurrentProcessArchitecture()) :
                     runConfiguration.TargetPlatform;
-#else
-                // We are running in vstest.console.exe that was built against .NET
-                // Framework. This console prefers 32-bit because it needs to run as 32-bit
-                // to be compatible with QTAgent. It runs as 32-bit both under VS and in
-                // Developer console. Set the default architecture based on the OS
-                // architecture, to find 64-bit dotnet SDK when running AnyCPU dll on 64-bit
-                // system, and 32-bit SDK when running AnyCPU dll on 32-bit OS.
-                // We want to find 64-bit SDK because it is more likely to be installed.
-                defaultArchitecture = Environment.Is64BitOperatingSystem ? Architecture.X64 : Architecture.X86;
-#endif
+
                 EqtTrace.Verbose($"TestRequestManager.UpdateRunSettingsIfRequired: Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}, Current process architecture: {_processHelper.GetCurrentProcessArchitecture()}.");
             }
 
@@ -689,7 +684,6 @@ internal class TestRequestManager : ITestRequestManager
 
         return settingsUpdated;
 
-#if NETCOREAPP
         static Architecture TranslateToArchitecture(PlatformArchitecture targetArchitecture)
         {
             switch (targetArchitecture)
@@ -713,7 +707,6 @@ internal class TestRequestManager : ITestRequestManager
             // it should be handled in a correct way by the callers.
             return Architecture.Default;
         }
-#endif
     }
 
     private bool AddOrUpdateConsoleLogger(
