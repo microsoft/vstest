@@ -195,6 +195,9 @@ public class IntegrationTestEnvironment
         set;
     }
 
+    // A known AzureDevOps env variable meaning we are running in CI.
+    public static bool IsCI { get; } = Environment.GetEnvironmentVariable("TF_BUILD") == "True";
+
     /// <summary>
     /// Gets the full path to a test asset.
     /// </summary>

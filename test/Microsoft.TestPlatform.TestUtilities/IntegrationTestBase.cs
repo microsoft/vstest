@@ -59,6 +59,7 @@ public class IntegrationTestBase
         _testEnvironment = new IntegrationTestEnvironment();
         BuildConfiguration = IntegrationTestEnvironment.BuildConfiguration;
         TempDirectory = new TempDirectory();
+        IsCI = IntegrationTestEnvironment.IsCI;
     }
 
     public string StdOut => _standardTestOutput;
@@ -72,6 +73,8 @@ public class IntegrationTestBase
     public TestContext TestContext { get; set; }
 
     public string BuildConfiguration { get; }
+
+    public bool IsCI { get; }
 
     [TestCleanup]
     public void TempDirectoryCleanup()
