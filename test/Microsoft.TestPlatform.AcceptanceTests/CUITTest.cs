@@ -18,20 +18,19 @@ public class CuitTest : AcceptanceTestBase
     public void CuitRunAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        CuitRunAll(runnerInfo.RunnerFramework);
+        CuitRunAll(runnerInfo);
     }
 
-    private void CuitRunAll(string runnerFramework)
+    private void CuitRunAll(RunnerInfo runnerInfo)
     {
-        if (runnerFramework.StartsWith("netcoreapp"))
+        if (runnerInfo.IsNetRunner)
         {
-            Assert.Inconclusive("CUIT tests are not supported with .Netcore runner.");
+            Assert.Inconclusive("CUIT tests are not supported with .NET Core runner.");
             return;
         }
 
         var assemblyAbsolutePath = _testEnvironment.GetTestAsset("CUITTestProject.dll", "net451");
-        using var tempDir = new TempDirectory();
-        var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 0, 0);

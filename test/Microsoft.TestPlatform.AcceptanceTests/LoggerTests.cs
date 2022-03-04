@@ -22,19 +22,18 @@ public class LoggerTests : AcceptanceTestBase
     public void TrxLoggerWithFriendlyNameShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
-        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         var trxFileName = "TestResults.trx";
         arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
         InvokeVsTest(arguments);
 
-        arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
+        arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
         arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
         InvokeVsTest(arguments);
 
-        var trxFilePath = Path.Combine(tempDir.Path, trxFileName);
+        var trxFilePath = Path.Combine(TempDirectory.Path, trxFileName);
         Assert.IsTrue(IsValidXml(trxFilePath), "Invalid content in Trx log file");
     }
 
@@ -44,19 +43,18 @@ public class LoggerTests : AcceptanceTestBase
     public void HtmlLoggerWithFriendlyNameShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
-        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         var htmlFileName = "TestResults.html";
         arguments = string.Concat(arguments, $" /logger:\"html;LogFileName={htmlFileName}\"");
         InvokeVsTest(arguments);
 
-        arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
+        arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:\"html;LogFileName={htmlFileName}\"");
         arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
         InvokeVsTest(arguments);
 
-        var htmlLogFilePath = Path.Combine(tempDir.Path, htmlFileName);
+        var htmlLogFilePath = Path.Combine(TempDirectory.Path, htmlFileName);
         IsFileAndContentEqual(htmlLogFilePath);
     }
 
@@ -65,19 +63,18 @@ public class LoggerTests : AcceptanceTestBase
     public void TrxLoggerWithExecutorUriShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
-        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         var trxFileName = "TestResults.trx";
         arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/TrxLogger/v1;LogFileName={trxFileName}\"");
         InvokeVsTest(arguments);
 
-        arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
+        arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/TrxLogger/v1;LogFileName={trxFileName}\"");
         arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
         InvokeVsTest(arguments);
 
-        var trxLogFilePath = Path.Combine(tempDir.Path, trxFileName);
+        var trxLogFilePath = Path.Combine(TempDirectory.Path, trxFileName);
         Assert.IsTrue(IsValidXml(trxLogFilePath), "Invalid content in Trx log file");
     }
 
@@ -87,19 +84,18 @@ public class LoggerTests : AcceptanceTestBase
     public void TrxLoggerWithLogFilePrefixShouldGenerateMultipleTrx(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
         var trxFileNamePattern = "TestResults";
 
-        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/TrxLogger/v1;LogFilePrefix={trxFileNamePattern}\"");
         InvokeVsTest(arguments);
 
-        arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
+        arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/TrxLogger/v1;LogFilePrefix={trxFileNamePattern}\"");
         arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
         InvokeVsTest(arguments);
 
-        var trxFilePaths = Directory.EnumerateFiles(tempDir.Path, trxFileNamePattern + "_net*.trx");
+        var trxFilePaths = Directory.EnumerateFiles(TempDirectory.Path, trxFileNamePattern + "_net*.trx");
         Assert.IsTrue(trxFilePaths.Count() > 1);
     }
 
@@ -108,19 +104,18 @@ public class LoggerTests : AcceptanceTestBase
     public void HtmlLoggerWithExecutorUriShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
-        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         var htmlFileName = "TestResults.html";
         arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/htmlLogger/v1;LogFileName{htmlFileName}\"");
         InvokeVsTest(arguments);
 
-        arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
+        arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/htmlLogger/v1;LogFileName={htmlFileName}\"");
         arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
         InvokeVsTest(arguments);
 
-        var htmlLogFilePath = Path.Combine(tempDir.Path, htmlFileName);
+        var htmlLogFilePath = Path.Combine(TempDirectory.Path, htmlFileName);
         IsFileAndContentEqual(htmlLogFilePath);
     }
 
@@ -130,10 +125,9 @@ public class LoggerTests : AcceptanceTestBase
     public void TrxLoggerResultSummaryOutcomeValueShouldBeFailedIfNoTestsExecutedAndTreatNoTestsAsErrorIsTrue(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
-        var trxFilePath = Path.Combine(tempDir.Path, "TrxLogger.trx");
+        var trxFilePath = Path.Combine(TempDirectory.Path, "TrxLogger.trx");
 
         arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFilePath}\"");
 
@@ -154,10 +148,9 @@ public class LoggerTests : AcceptanceTestBase
     public void TrxLoggerResultSummaryOutcomeValueShouldNotChangeIfNoTestsExecutedAndTreatNoTestsAsErrorIsFalse(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
-        var trxFilePath = Path.Combine(tempDir.Path, "TrxLogger.trx");
+        var trxFilePath = Path.Combine(TempDirectory.Path, "TrxLogger.trx");
 
         arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFilePath}\"");
 

@@ -22,13 +22,12 @@ public class ResultsDirectoryTests : AcceptanceTestBase
 
         var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
         var trxFileName = "TestResults.trx";
-        using var tempDir = new TempDirectory();
-        var trxFilePath = Path.Combine(tempDir.Path, trxFileName);
+        var trxFilePath = Path.Combine(TempDirectory.Path, trxFileName);
         arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
-        arguments = string.Concat(arguments, $" /ResultsDirectory:{tempDir.Path}");
+        arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
 
         // Delete if already exists
-        TempDirectory.TryRemoveDirectory(tempDir.Path);
+        TempDirectory.TryRemoveDirectory(TempDirectory.Path);
 
         InvokeVsTest(arguments);
 

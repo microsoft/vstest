@@ -57,6 +57,8 @@ public class IntegrationTestBase
     public IntegrationTestBase()
     {
         _testEnvironment = new IntegrationTestEnvironment();
+        BuildConfiguration = IntegrationTestEnvironment.BuildConfiguration;
+        TempDirectory = new TempDirectory();
     }
 
     public string StdOut => _standardTestOutput;
@@ -64,6 +66,22 @@ public class IntegrationTestBase
 
     public string StdErr => _standardTestError;
     public string StdErrWithWhiteSpace { get; private set; } = string.Empty;
+
+    public TempDirectory TempDirectory { get; }
+
+    public TestContext TestContext { get; set; }
+
+    public string BuildConfiguration { get; }
+
+    [TestCleanup]
+    public void TempDirectoryCleanup()
+    {
+        // Delete the directory only when the test succeeded, so we can look at results and logs of failed tests.
+        if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+        {
+            TempDirectory.Dispose();
+        }
+    }
 
     /// <summary>
     /// Prepare arguments for <c>vstest.console.exe</c>.
@@ -183,9 +201,7 @@ public class IntegrationTestBase
         string runSettings = "",
         Dictionary<string, string> environmentVariables = null)
     {
-        using var workspace = new TempDirectory();
-
-        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: workspace.Path);
+        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
         InvokeVsTest(arguments, environmentVariables);
     }
 
@@ -197,9 +213,7 @@ public class IntegrationTestBase
     /// <param name="runSettings">Run settings for execution.</param>
     public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "", Dictionary<string, string> environmentVariables = null)
     {
-        using var workspace = new TempDirectory();
-
-        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, _testEnvironment.InIsolationValue, resultsDirectory: workspace.Path);
+        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /listtests");
         InvokeVsTest(arguments, environmentVariables);
     }
@@ -751,30 +765,12 @@ public class IntegrationTestBase
     /// <summary>
     /// Counts the number of logs following the '*.host.*' pattern in the given folder.
     /// </summary>
-    protected static int CountTestHostLogs(string diagLogsDir, IEnumerable<string> testHostProcessNames)
-        => Directory.GetFiles(diagLogsDir, "*.host.*")
-            .Count(filePath =>
-            {
-                var firstLine = File.ReadLines(filePath).FirstOrDefault();
-                return testHostProcessNames.Any(processName =>
-                {
-                    var parts = processName.Split('.');
-                    if (parts.Length > 2)
-                    {
-                        throw new InvalidOperationException("");
-                    }
-
-                    var hostName = parts[0];
-                    var platformName = parts.Length > 1 ? @$"\.{parts[1]}" : string.Empty;
-
-                    var isMatch = Regex.IsMatch(firstLine, @$",\s{hostName}(?:\.net\d+)?{platformName}\.(?:exe|dll),");
-                    return isMatch;
-                });
-            });
+    protected static int CountTestHostLogs(string diagLogsDir)
+        => Directory.GetFiles(diagLogsDir, "*.host.*").Length;
 
     protected static void AssertExpectedNumberOfHostProcesses(int expectedNumOfProcessCreated, string diagLogsDir, IEnumerable<string> testHostProcessNames, string arguments = null, string runnerPath = null)
     {
-        var processCreatedCount = CountTestHostLogs(diagLogsDir, testHostProcessNames);
+        var processCreatedCount = CountTestHostLogs(diagLogsDir);
         Assert.AreEqual(
             expectedNumOfProcessCreated,
             processCreatedCount,
