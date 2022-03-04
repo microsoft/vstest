@@ -696,7 +696,12 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private string GetTestHostPath(string runtimeConfigDevPath, string depsFilePath, string sourceDirectory)
     {
         string testHostPackageName = "microsoft.testplatform.testhost";
-        string testHostPath = null;
+        // This must be empty string, otherwise the Path.Combine below
+        // will fail if a very specific setup is used where you add our dlls
+        // as assemblies directly, but you have no RuntimeAssemblyGroups in deps.json
+        // because you don't add our nuget package. In such case we just want to move on
+        // to the next fallback.
+        string testHostPath = string.Empty;
 
         if (_fileHelper.Exists(depsFilePath))
         {
