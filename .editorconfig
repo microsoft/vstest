@@ -199,6 +199,9 @@ dotnet_diagnostic.IDE0190.severity = warning # not default, increased severity t
 # CA1840: Use 'Environment.CurrentManagedThreadId'
 dotnet_diagnostic.CA1840.severity = warning # not default, increased severity to ensure it is applied
 
+# CA1041: Provide ObsoleteAttribute message
+dotnet_diagnostic.CA1041.severity = warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences
