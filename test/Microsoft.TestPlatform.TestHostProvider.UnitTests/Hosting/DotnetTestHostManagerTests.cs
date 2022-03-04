@@ -616,7 +616,8 @@ public class DotnetTestHostManagerTests
         StringAssert.Contains(startInfo.Arguments, expectedTestHostPath);
     }
 
-    // TODO: Not sure why but this worked before on .NET451, but now I can't get it to work anywhere. Assembly.GetEntryAssembly().Location is null because of running in app domain.
+    // TODO: This assembly was previously compiled as net472 and so it was skipped and only ran as netcoreapp2.1. This fails in test, but works in code that is not isolated in appdomain. Might be worth fixing because we get one null here, and another in DotnetTestHostManager.
+    // Assembly.GetEntryAssembly().Location is null because of running in app domain.
 #if NET
     [TestMethod]
     public void GetTestHostProcessStartInfoShouldIncludeTestHostPathNextToTestRunnerIfTesthostDllIsNoFoundAndDepsFileNotFound()
@@ -643,7 +644,8 @@ public class DotnetTestHostManagerTests
 
 #endif
 
-    // TODO: Not sure why but this worked before on .NET451, but now I can't get it to work anywhere. Assembly.GetEntryAssembly().Location is null because of running in app domain.
+    // TODO: This assembly was previously compiled as net472 and so it was skipped and only ran as netcoreapp2.1. This fails in test, but works in code that is not isolated in appdomain. Might be worth fixing because we get one null here, and another in DotnetTestHostManager.
+    // Assembly.GetEntryAssembly().Location is null because of running in app domain.
 #if NET
 
     [TestMethod]
