@@ -201,9 +201,7 @@ public class IntegrationTestBase
         string runSettings = "",
         Dictionary<string, string> environmentVariables = null)
     {
-        using var workspace = new TempDirectory();
-
-        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: workspace.Path);
+        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
         InvokeVsTest(arguments, environmentVariables);
     }
 
@@ -215,9 +213,7 @@ public class IntegrationTestBase
     /// <param name="runSettings">Run settings for execution.</param>
     public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "", Dictionary<string, string> environmentVariables = null)
     {
-        using var workspace = new TempDirectory();
-
-        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, _testEnvironment.InIsolationValue, resultsDirectory: workspace.Path);
+        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /listtests");
         InvokeVsTest(arguments, environmentVariables);
     }

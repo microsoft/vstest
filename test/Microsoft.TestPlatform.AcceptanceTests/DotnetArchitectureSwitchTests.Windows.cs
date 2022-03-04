@@ -23,12 +23,11 @@ public class DotnetArchitectureSwitchTestsWindowsOnly : AcceptanceTestBase
     [DataRow("X86", "X64")]
     public void Use_EnvironmentVariables(string architectureFrom, string architectureTo)
     {
-        using var workSpace = TempDirectory;
         string dotnetPath = GetDownloadedDotnetMuxerFromTools(architectureFrom);
         string dotnetPathTo = GetDownloadedDotnetMuxerFromTools(architectureTo);
         var vstestConsolePath = GetDotnetRunnerPath();
         var dotnetRunnerPath = workSpace.CreateDirectory("dotnetrunner");
-        workSpace.CopyDirectory(new DirectoryInfo(Path.GetDirectoryName(vstestConsolePath)), dotnetRunnerPath);
+        TempDirectory.CopyDirectory(new DirectoryInfo(Path.GetDirectoryName(vstestConsolePath)), dotnetRunnerPath);
 
         // Patch the runner
         string sdkVersion = GetLatestSdkVersion(dotnetPath);

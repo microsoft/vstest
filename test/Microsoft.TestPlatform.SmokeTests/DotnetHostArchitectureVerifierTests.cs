@@ -24,11 +24,10 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
     [DataRow("X86")]
     public void VerifyHostArchitecture(string architecture)
     {
-        using var workSpace = new TempDirectory();
         string dotnetPath = GetDownloadedDotnetMuxerFromTools(architecture);
         var vstestConsolePath = GetDotnetRunnerPath();
         var dotnetRunnerPath = workSpace.CreateDirectory("dotnetrunner");
-        workSpace.CopyDirectory(new DirectoryInfo(Path.GetDirectoryName(vstestConsolePath)), dotnetRunnerPath);
+        TempDirectory.CopyDirectory(new DirectoryInfo(Path.GetDirectoryName(vstestConsolePath)), dotnetRunnerPath);
 
         // Patch the runner
         string sdkVersion = GetLatestSdkVersion(dotnetPath);
