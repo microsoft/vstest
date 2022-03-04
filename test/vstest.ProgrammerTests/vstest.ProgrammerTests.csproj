@@ -12,7 +12,7 @@
     <LangVersion>preview</LangVersion>
     <TargetFrameworks>net6.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
-    <OutputType Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">Exe</OutputType>
+    <OutputType Condition=" $(TargetFramework.StartsWith('net6')) ">Exe</OutputType>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>

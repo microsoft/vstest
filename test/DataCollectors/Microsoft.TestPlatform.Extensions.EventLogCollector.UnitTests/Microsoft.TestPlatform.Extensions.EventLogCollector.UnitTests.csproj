@@ -20,7 +20,6 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
-    <Reference Include="System.Diagnostics.EventLog" />
     <Reference Include="Microsoft.CSharp" />    
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
