@@ -71,7 +71,7 @@ public class JobQueueTests
     {
         // Setup the job process handler to keep track of the jobs.
         var jobsProcessed = new List<int>();
-        Action<string> processHandler = (job) => jobsProcessed.Add(Thread.CurrentThread.ManagedThreadId);
+        Action<string> processHandler = (job) => jobsProcessed.Add(Environment.CurrentManagedThreadId);
 
         // Queue the jobs and verify they are processed on a background thread.
         using (var queue = new JobQueue<string>(processHandler, "dp", int.MaxValue, int.MaxValue, false, (message) => { }))
@@ -79,7 +79,7 @@ public class JobQueueTests
             queue.QueueJob("dp", 0);
         }
 
-        Assert.AreNotEqual(Thread.CurrentThread.ManagedThreadId, jobsProcessed[0]);
+        Assert.AreNotEqual(Environment.CurrentManagedThreadId, jobsProcessed[0]);
     }
 
     [TestMethod]
