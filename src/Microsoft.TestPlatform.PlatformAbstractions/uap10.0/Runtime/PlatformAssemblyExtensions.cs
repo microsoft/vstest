@@ -20,7 +20,7 @@ public static class PlatformAssemblyExtensions
     /// </summary>
     /// <param name="assembly">Assembly</param>
     /// <returns>Returns Assembly location as per platform</returns>
-    public static string GetAssemblyLocation(this Assembly assembly)
+    public static string GetAssemblyLocation(this Assembly _)
     {
         // In UWP all assemblies are packages inside Appx folder, so we return location of current directory
         return Directory.GetCurrentDirectory();

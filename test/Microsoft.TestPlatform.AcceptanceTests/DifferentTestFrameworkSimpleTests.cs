@@ -35,7 +35,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     public void CPPRunAllTestExecutionNetFramework(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        CppRunAllTests(runnerInfo.RunnerFramework, "x86");
+        CppRunAllTests("x86");
     }
 
 
@@ -47,7 +47,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     public void CPPRunAllTestExecutionPlatformx64NetFramework(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        CppRunAllTests(runnerInfo.RunnerFramework, "x64");
+        CppRunAllTests("x64");
     }
 
     [TestMethod]
@@ -58,7 +58,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     public void CPPRunAllTestExecutionPlatformx64Net(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        CppRunAllTests(runnerInfo.RunnerFramework, "x64");
+        CppRunAllTests("x64");
     }
 
     [TestMethod]
@@ -140,7 +140,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         ValidateSummaryStatus(1, 1, 0);
     }
 
-    private void CppRunAllTests(string runnerFramework, string platform)
+    private void CppRunAllTests(string platform)
     {
         using var tempDir = new TempDirectory();
         string assemblyRelativePathFormat =

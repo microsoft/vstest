@@ -32,7 +32,7 @@ public class EqtTraceTests
     private static string s_logFile;
 
     [ClassInitialize]
-    public static void Init(TestContext testContext)
+    public static void Init(TestContext _)
     {
         // Set DoNotInitailize to false.
         EqtTrace.DoNotInitailize = false;
