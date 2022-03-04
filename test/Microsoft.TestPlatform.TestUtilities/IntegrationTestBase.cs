@@ -796,24 +796,4 @@ public class IntegrationTestBase
     }
 
     protected static string GetDotnetRunnerPath() => Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
-
-    public static void CopyDirectory(string sourceDirectory, string destinationDirectory)
-    {
-        if (!Directory.Exists(destinationDirectory))
-            Directory.CreateDirectory(destinationDirectory);
-        string[] files = Directory.GetFiles(sourceDirectory);
-        foreach (string file in files)
-        {
-            string name = Path.GetFileName(file);
-            string dest = Path.Combine(destinationDirectory, name);
-            File.Copy(file, dest);
-        }
-        string[] folders = Directory.GetDirectories(sourceDirectory);
-        foreach (string folder in folders)
-        {
-            string name = Path.GetFileName(folder);
-            string dest = Path.Combine(destinationDirectory, name);
-            CopyDirectory(folder, dest);
-        }
-    }
 }
