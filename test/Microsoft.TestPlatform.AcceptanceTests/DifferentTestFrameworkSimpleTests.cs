@@ -66,7 +66,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void WebTestRunAllTestsWithRunSettings(RunnerInfo runnerInfo)
     {
-        if (IsCI)
+        if (!IsCI)
         {
             Assert.Inconclusive("This works on server but not locally, because locall it grabs dll from my GAC and that is old, but has 10.0.0 version as the one in our package.");
         }
@@ -123,7 +123,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void CodedWebTestRunAllTests(RunnerInfo runnerInfo)
     {
-        if (IsCI)
+        if (!IsCI)
         {
             Assert.Inconclusive("This works on server but not locally, because locall it grabs dll from my GAC and that is old, but has 10.0.0 version as the one in our package.");
         }
