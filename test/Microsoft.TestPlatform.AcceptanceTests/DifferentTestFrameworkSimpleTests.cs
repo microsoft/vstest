@@ -65,16 +65,6 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void WebTestRunAllTestsWithRunSettings(RunnerInfo runnerInfo)
     {
-    // This test works on server but not locally, and it fails with
-    // Exception: Method not found: 'Int64 Microsoft.VisualStudio.TestTools.WebTesting.WebTestRequestStatistics.get_MillisecondsSincePageComplete()'.
-    // The dll is 
-
-        //if (!IsCI)
-        //{
-        //    Assert.Inconclusive("Web load tests need special workloads and setup locally");
-        //}
-
-
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var runSettingsFilePath = Path.Combine(TempDirectory.Path, Guid.NewGuid() + ".runsettings");
 

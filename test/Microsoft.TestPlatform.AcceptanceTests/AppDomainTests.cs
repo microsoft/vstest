@@ -29,7 +29,7 @@ public class AppDomainTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-                                var testAppDomainDetailFileName = Path.Combine(TempDirectory.Path, "appdomain_test.txt");
+        var testAppDomainDetailFileName = Path.Combine(TempDirectory.Path, "appdomain_test.txt");
         var dataCollectorAppDomainDetailFileName = Path.Combine(TempDirectory.Path, "appdomain_datacollector.txt");
 
         // Delete test output files if already exist
