@@ -14,6 +14,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+# nullable disable
+
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]

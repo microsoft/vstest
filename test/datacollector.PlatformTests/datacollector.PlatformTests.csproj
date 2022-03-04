@@ -9,7 +9,7 @@
     <RootNamespace>Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;net472</TargetFrameworks>
+    <TargetFrameworks>net6.0;net48</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <OutputType Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">Exe</OutputType>
     <AssemblyName>datacollector.PlatformTests</AssemblyName>

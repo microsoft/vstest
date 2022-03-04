@@ -8,7 +8,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <OutputType Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <TargetFrameworks>net6.0;net48</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.AcceptanceTests</AssemblyName>
   </PropertyGroup>
@@ -36,11 +36,11 @@
     <PackageReference Include="Microsoft.TestPlatform.QTools.Assets" Version="2.0.0" />
     <PackageReference Include="Procdump" Version="0.0.1" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
     <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(MicrosoftInternalCodeCoverageVersion)" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0-preview2-26406-04" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Xml" />
