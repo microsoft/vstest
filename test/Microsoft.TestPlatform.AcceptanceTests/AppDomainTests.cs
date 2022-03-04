@@ -29,22 +29,21 @@ public class AppDomainTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        using var tempDir = new TempDirectory();
-        var testAppDomainDetailFileName = Path.Combine(tempDir.Path, "appdomain_test.txt");
-        var dataCollectorAppDomainDetailFileName = Path.Combine(tempDir.Path, "appdomain_datacollector.txt");
+                                var testAppDomainDetailFileName = Path.Combine(TempDirectory.Path, "appdomain_test.txt");
+        var dataCollectorAppDomainDetailFileName = Path.Combine(TempDirectory.Path, "appdomain_datacollector.txt");
 
         // Delete test output files if already exist
         File.Delete(testAppDomainDetailFileName);
         File.Delete(dataCollectorAppDomainDetailFileName);
 
-        var runsettingsFilePath = GetInProcDataCollectionRunsettingsFile(true, tempDir);
+        var runsettingsFilePath = GetInProcDataCollectionRunsettingsFile(true, TempDirectory);
         var arguments = PrepareArguments(
             GetSampleTestAssembly(),
             GetTestAdapterPath(),
             runsettingsFilePath,
             FrameworkArgValue,
             runnerInfo.InIsolationValue,
-            tempDir.Path);
+            TempDirectory.Path);
 
         // Sets the environment variables used by the test project and test data collector.
         var env = new Dictionary<string, string>
@@ -74,9 +73,9 @@ public class AppDomainTests : AcceptanceTestBase
         return string.Equals(content1, content2, StringComparison.Ordinal);
     }
 
-    private string GetInProcDataCollectionRunsettingsFile(bool disableAppDomain, TempDirectory tempDirectory)
+    private string GetInProcDataCollectionRunsettingsFile(bool disableAppDomain, TempDirectory TempDirectory)
     {
-        var runSettings = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
+        var runSettings = Path.Combine(TempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
         var inprocasm = _testEnvironment.GetTestAsset("SimpleDataCollector.dll");
 #if !NET451
         var assemblyName = AssemblyLoadContext.GetAssemblyName(inprocasm);

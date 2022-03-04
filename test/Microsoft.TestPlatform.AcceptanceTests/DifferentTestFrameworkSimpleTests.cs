@@ -20,9 +20,8 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     public void ChutzpahRunAllTestExecution(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
         var testJSFileAbsolutePath = Path.Combine(_testEnvironment.TestAssetsPath, "test.js");
-        var arguments = PrepareArguments(testJSFileAbsolutePath, GetTestAdapterPath(UnitTestFramework.Chutzpah), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(testJSFileAbsolutePath, GetTestAdapterPath(UnitTestFramework.Chutzpah), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 1, 0);
@@ -35,7 +34,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     public void CPPRunAllTestExecutionNetFramework(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        CppRunAllTests(runnerInfo.RunnerFramework, "x86");
+        CppRunAllTests("x86");
     }
 
 
@@ -47,7 +46,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     public void CPPRunAllTestExecutionPlatformx64NetFramework(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        CppRunAllTests(runnerInfo.RunnerFramework, "x64");
+        CppRunAllTests("x64");
     }
 
     [TestMethod]
@@ -58,7 +57,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     public void CPPRunAllTestExecutionPlatformx64Net(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        CppRunAllTests(runnerInfo.RunnerFramework, "x64");
+        CppRunAllTests("x64");
     }
 
     [TestMethod]
@@ -66,9 +65,18 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void WebTestRunAllTestsWithRunSettings(RunnerInfo runnerInfo)
     {
-        using var tempDir = new TempDirectory();
+    // This test works on server but not locally, and it fails with
+    // Exception: Method not found: 'Int64 Microsoft.VisualStudio.TestTools.WebTesting.WebTestRequestStatistics.get_MillisecondsSincePageComplete()'.
+    // The dll is 
+
+        //if (!IsCI)
+        //{
+        //    Assert.Inconclusive("Web load tests need special workloads and setup locally");
+        //}
+
+
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        var runSettingsFilePath = Path.Combine(tempDir.Path, Guid.NewGuid() + ".runsettings");
+        var runSettingsFilePath = Path.Combine(TempDirectory.Path, Guid.NewGuid() + ".runsettings");
 
         //test the iterationCount setting for WebTestRunConfiguration in run settings
         var runSettingsXml = $@"<?xml version='1.0' encoding='utf-8'?>
@@ -81,83 +89,9 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 
         CreateRunSettingsFile(runSettingsFilePath, runSettingsXml);
 
-        //minWebTestResultFileSizeInKB is set to 150 here as the web test has a iteration count set to 5
         //therefore, the test will run for 5 iterations resulting in web test result file size of at least 150 KB
-        WebTestRunAllTests(runnerInfo.RunnerFramework, runSettingsFilePath, 150);
-    }
-
-    [TestMethod]
-    [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
-    public void CodedWebTestRunAllTests(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        CodedWebTestRunAllTests(runnerInfo.RunnerFramework);
-    }
-
-    [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSource]
-    public void NUnitRunAllTestExecution(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        using var tempDir = new TempDirectory();
-        var arguments = PrepareArguments(
-            GetAssetFullPath("NUTestProject.dll"),
-            GetTestAdapterPath(UnitTestFramework.NUnit),
-            string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, tempDir.Path);
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(1, 1, 0);
-    }
-
-    [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSource]
-    public void XUnitRunAllTestExecution(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
-
-        string testAssemblyPath;
-        // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
-        if (_testEnvironment.TargetFramework.Equals("net451"))
-        {
-            testAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll", "net46");
-        }
-        else
-        {
-            testAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll");
-        }
-
-        var arguments = PrepareArguments(
-            testAssemblyPath,
-            GetTestAdapterPath(UnitTestFramework.XUnit),
-            string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, tempDir.Path);
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(1, 1, 0);
-    }
-
-    private void CppRunAllTests(string runnerFramework, string platform)
-    {
-        using var tempDir = new TempDirectory();
-        string assemblyRelativePathFormat =
-            @"microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\{0}\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-        var assemblyRelativePath = platform.Equals("x64", StringComparison.OrdinalIgnoreCase)
-            ? string.Format(assemblyRelativePathFormat, platform)
-            : string.Format(assemblyRelativePathFormat, "");
-        var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
-        var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, FrameworkArgValue, _testEnvironment.InIsolationValue, resultsDirectory: tempDir.Path);
-
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(1, 1, 0);
-    }
-
-    private void WebTestRunAllTests(string runnerFramework, string runSettingsFilePath = null, int minWebTestResultFileSizeInKB = 0)
-    {
-        if (runnerFramework.StartsWith("netcoreapp"))
+        var minWebTestResultFileSizeInKB = 150;
+        if (runnerInfo.IsNetRunner)
         {
             Assert.Inconclusive("WebTests tests not supported with .Netcore runner.");
             return;
@@ -167,7 +101,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
             @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\WebTest1.webtest";
 
         var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
-        using var resultsDirectory = new TempDirectory();
+        using var resultsDirectory = TempDirectory;
         var arguments = PrepareArguments(
             assemblyAbsolutePath,
             string.Empty,
@@ -188,24 +122,82 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         }
     }
 
-    private void CodedWebTestRunAllTests(string runnerFramework)
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [NetFullTargetFrameworkDataSource]
+    public void CodedWebTestRunAllTests(RunnerInfo runnerInfo)
     {
-        if (runnerFramework.StartsWith("netcoreapp"))
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        if (runnerInfo.IsNetRunner)
         {
             Assert.Inconclusive("WebTests tests not supported with .Netcore runner.");
             return;
         }
 
-        using var tempDir = new TempDirectory();
-        string assemblyRelativePath =
-            @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\BingWebTest.dll";
+        string assemblyRelativePath = @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\BingWebTest.dll";
         var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
         var arguments = PrepareArguments(
             assemblyAbsolutePath,
             string.Empty,
-            string.Empty, FrameworkArgValue, resultsDirectory: tempDir.Path);
+            string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 0, 0);
+    }
+
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [NetCoreTargetFrameworkDataSource]
+    public void NUnitRunAllTestExecution(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var arguments = PrepareArguments(
+GetAssetFullPath("NUTestProject.dll"),
+GetTestAdapterPath(UnitTestFramework.NUnit),
+string.Empty, FrameworkArgValue,
+runnerInfo.InIsolationValue, TempDirectory.Path);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 0);
+    }
+
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [NetCoreTargetFrameworkDataSource]
+    public void XUnitRunAllTestExecution(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        string testAssemblyPath;
+        // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
+        if (_testEnvironment.TargetFramework.Equals("net451"))
+        {
+            testAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll", "net46");
+        }
+        else
+        {
+            testAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll");
+        }
+
+        var arguments = PrepareArguments(
+            testAssemblyPath,
+            GetTestAdapterPath(UnitTestFramework.XUnit),
+            string.Empty, FrameworkArgValue,
+            runnerInfo.InIsolationValue, TempDirectory.Path);
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 0);
+    }
+
+    private void CppRunAllTests(string platform)
+    {
+        string assemblyRelativePathFormat = @"microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\{0}\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
+        var assemblyRelativePath = platform.Equals("x64", StringComparison.OrdinalIgnoreCase)
+            ? string.Format(assemblyRelativePathFormat, platform)
+            : string.Format(assemblyRelativePathFormat, "");
+        var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
+        var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, FrameworkArgValue, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
+
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 0);
     }
 }

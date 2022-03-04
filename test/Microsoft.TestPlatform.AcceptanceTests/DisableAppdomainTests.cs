@@ -26,7 +26,7 @@ public class DisableAppdomainTests : AcceptanceTestBase
         var diableAppdomainTest1 = _testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", "net451");
         var diableAppdomainTest2 = _testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", "net451");
 
-        RunTests(runnerInfo.RunnerFramework, string.Format("{0}\" \"{1}", diableAppdomainTest1, diableAppdomainTest2), 2);
+        RunTests(runnerInfo, string.Format("{0}\" \"{1}", diableAppdomainTest1, diableAppdomainTest2), 2);
     }
 
     [TestMethod]
@@ -38,12 +38,12 @@ public class DisableAppdomainTests : AcceptanceTestBase
 
         var newtonSoftDependnecyTest = _testEnvironment.GetTestAsset("NewtonSoftDependency.dll", "net451");
 
-        RunTests(runnerInfo.RunnerFramework, newtonSoftDependnecyTest, 1);
+        RunTests(runnerInfo, newtonSoftDependnecyTest, 1);
     }
 
-    private void RunTests(string runnerFramework, string testAssembly, int passedTestCount)
+    private void RunTests(RunnerInfo runnerInfo, string testAssembly, int passedTestCount)
     {
-        if (runnerFramework.StartsWith("netcoreapp"))
+        if (runnerInfo.IsNetRunner)
         {
             Assert.Inconclusive("This test is not meant for .netcore.");
             return;
@@ -54,20 +54,19 @@ public class DisableAppdomainTests : AcceptanceTestBase
             { "DisableAppDomain", "true" }
         };
 
-        using var tempDir = new TempDirectory();
         var arguments = PrepareArguments(
             testAssembly,
             string.Empty,
-            GetRunsettingsFilePath(tempDir, runConfigurationDictionary),
-            FrameworkArgValue, resultsDirectory: tempDir.Path);
+            GetRunsettingsFilePath(TempDirectory, runConfigurationDictionary),
+            FrameworkArgValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         ValidateSummaryStatus(passedTestCount, 0, 0);
     }
 
-    private string GetRunsettingsFilePath(TempDirectory tempDir, Dictionary<string, string> runConfigurationDictionary)
+    private string GetRunsettingsFilePath(TempDirectory TempDirectory, Dictionary<string, string> runConfigurationDictionary)
     {
-        var runsettingsPath = Path.Combine(tempDir.Path, "test_" + Guid.NewGuid() + ".runsettings");
+        var runsettingsPath = Path.Combine(TempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
         CreateRunSettingsFile(runsettingsPath, runConfigurationDictionary);
         return runsettingsPath;
     }

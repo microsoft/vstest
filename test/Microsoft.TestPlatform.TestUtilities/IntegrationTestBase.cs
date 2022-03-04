@@ -42,6 +42,8 @@ public class IntegrationTestBase
 
     protected readonly IntegrationTestEnvironment _testEnvironment;
 
+    public string BuildConfiguration { get; }
+
     private readonly string _testAdapterRelativePath = @"mstest.testadapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
     private readonly string _nUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build".Replace('\\', Path.DirectorySeparatorChar);
     private readonly string _xUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
@@ -57,6 +59,8 @@ public class IntegrationTestBase
     public IntegrationTestBase()
     {
         _testEnvironment = new IntegrationTestEnvironment();
+        BuildConfiguration = IntegrationTestEnvironment.BuildConfiguration;
+        TempDirectory = new TempDirectory();
     }
 
     public string StdOut => _standardTestOutput;
@@ -64,6 +68,20 @@ public class IntegrationTestBase
 
     public string StdErr => _standardTestError;
     public string StdErrWithWhiteSpace { get; private set; } = string.Empty;
+
+    public TempDirectory TempDirectory { get; }
+
+    public TestContext TestContext { get; set; }
+
+    [TestCleanup]
+    public void TempDirectoryCleanup()
+    {
+        // Delete the directory only when we passed, so we can look at results and logs of failed tests.
+        if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+        {
+            TempDirectory.Dispose();
+        }
+    }
 
     /// <summary>
     /// Prepare arguments for <c>vstest.console.exe</c>.
@@ -752,25 +770,7 @@ public class IntegrationTestBase
     /// Counts the number of logs following the '*.host.*' pattern in the given folder.
     /// </summary>
     protected static int CountTestHostLogs(string diagLogsDir, IEnumerable<string> testHostProcessNames)
-        => Directory.GetFiles(diagLogsDir, "*.host.*")
-            .Count(filePath =>
-            {
-                var firstLine = File.ReadLines(filePath).FirstOrDefault();
-                return testHostProcessNames.Any(processName =>
-                {
-                    var parts = processName.Split('.');
-                    if (parts.Length > 2)
-                    {
-                        throw new InvalidOperationException("");
-                    }
-
-                    var hostName = parts[0];
-                    var platformName = parts.Length > 1 ? @$"\.{parts[1]}" : string.Empty;
-
-                    var isMatch = Regex.IsMatch(firstLine, @$",\s{hostName}(?:\.net\d+)?{platformName}\.(?:exe|dll),");
-                    return isMatch;
-                });
-            });
+        => Directory.GetFiles(diagLogsDir, "*.host.*").Count();
 
     protected static void AssertExpectedNumberOfHostProcesses(int expectedNumOfProcessCreated, string diagLogsDir, IEnumerable<string> testHostProcessNames, string arguments = null, string runnerPath = null)
     {
@@ -800,4 +800,24 @@ public class IntegrationTestBase
     }
 
     protected static string GetDotnetRunnerPath() => Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
+
+    public static void CopyDirectory(string sourceDirectory, string destinationDirectory)
+    {
+        if (!Directory.Exists(destinationDirectory))
+            Directory.CreateDirectory(destinationDirectory);
+        string[] files = Directory.GetFiles(sourceDirectory);
+        foreach (string file in files)
+        {
+            string name = Path.GetFileName(file);
+            string dest = Path.Combine(destinationDirectory, name);
+            File.Copy(file, dest);
+        }
+        string[] folders = Directory.GetDirectories(sourceDirectory);
+        foreach (string folder in folders)
+        {
+            string name = Path.GetFileName(folder);
+            string dest = Path.Combine(destinationDirectory, name);
+            CopyDirectory(folder, dest);
+        }
+    }
 }

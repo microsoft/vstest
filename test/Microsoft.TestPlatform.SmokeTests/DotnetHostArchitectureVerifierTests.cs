@@ -28,7 +28,7 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
         string dotnetPath = GetDownloadedDotnetMuxerFromTools(architecture);
         var vstestConsolePath = GetDotnetRunnerPath();
         var dotnetRunnerPath = workSpace.CreateDirectory("dotnetrunner");
-        workSpace.CopyAll(new DirectoryInfo(Path.GetDirectoryName(vstestConsolePath)), dotnetRunnerPath);
+        workSpace.CopyDirectory(new DirectoryInfo(Path.GetDirectoryName(vstestConsolePath)), dotnetRunnerPath);
 
         // Patch the runner
         string sdkVersion = GetLatestSdkVersion(dotnetPath);

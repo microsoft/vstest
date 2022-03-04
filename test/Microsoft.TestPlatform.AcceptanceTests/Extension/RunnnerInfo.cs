@@ -16,6 +16,13 @@ public class RunnerInfo
         RunnerFramework = runnerType;
         TargetFramework = targetFramework;
         InIsolationValue = inIsolation;
+        // The value is netcoreapp2.1.
+        IsNetRunner = RunnerFramework.StartsWith("netcoreapp");
+        // The value is net451.
+        IsNetFrameworkRunner = !IsNetRunner;
+        IsNetTarget = TargetFramework.StartsWith("netcoreapp");
+        IsNetFrameworkTarget = !IsNetTarget;
+
     }
     /// <summary>
     /// Gets the target framework.
@@ -48,4 +55,28 @@ public class RunnerInfo
     {
         return string.Join(",", new[] { "RunnerFramework = " + RunnerFramework, " TargetFramework = " + TargetFramework, string.IsNullOrEmpty(InIsolationValue) ? " InProcess" : " InIsolation" });
     }
+
+    /// <summary>
+    /// Is running via .NET "Core" vstest.console?
+    /// </summary>
+    /// <returns></returns>
+    public bool IsNetRunner { get; }
+
+    /// <summary>
+    /// Is running via .NET Framework vstest.console?
+    /// </summary>
+    /// <returns></returns>
+    public bool IsNetFrameworkRunner { get; }
+
+    /// <summary>
+    /// Is running via .NET "Core" testhost?
+    /// </summary>
+    /// <returns></returns>
+    public bool IsNetTarget { get; }
+
+    /// <summary>
+    /// Is running via .NET Framework testhost?
+    /// </summary>
+    /// <returns></returns>
+    public bool IsNetFrameworkTarget { get; }
 }

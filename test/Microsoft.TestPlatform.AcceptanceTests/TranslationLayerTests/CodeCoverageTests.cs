@@ -28,13 +28,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 {
     private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private TempDirectory _tempDirectory;
+    private TempDirectory _TempDirectory;
     private RunEventHandler _runEventHandler;
     private TestRunAttachmentsProcessingEventHandler _testRunAttachmentsProcessingEventHandler;
 
     private void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _tempDirectory);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _TempDirectory);
         _runEventHandler = new RunEventHandler();
         _testRunAttachmentsProcessingEventHandler = new TestRunAttachmentsProcessingEventHandler();
     }
@@ -492,7 +492,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     {
         if (attachments.Count == 1)
         {
-            var xmlCoverage = GetXmlCoverage(attachments.First().Attachments.First().Uri.LocalPath, _tempDirectory);
+            var xmlCoverage = GetXmlCoverage(attachments.First().Attachments.First().Uri.LocalPath, _TempDirectory);
 
             foreach (var project in GetProjects())
             {
