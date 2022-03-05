@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if NETFRAMEWORK || NETSTANDARD2_0
+
 using System;
 using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-
-#if NETFRAMEWORK || NETSTANDARD2_0
 
 #nullable disable
 
@@ -60,9 +60,7 @@ public class PlatformEnvironment : IEnvironment
 
     /// <inheritdoc />
     public int GetCurrentManagedThreadId()
-    {
-        return Thread.CurrentThread.ManagedThreadId;
-    }
+        => Environment.CurrentManagedThreadId;
 }
 
 #endif
