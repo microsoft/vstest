@@ -217,11 +217,10 @@ public class EventLogDataCollectorTests
     {
         var testableDataCollectionEvents = new TestableDataCollectionEvents();
         _eventLogDataCollector.Initialize(null, testableDataCollectionEvents, _mockDataCollectionSink, _mockDataCollectionLogger.Object, _dataCollectionEnvironmentContext);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestHostLaunchedInvocationList().Length);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseStartInvocationList().Length);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseEndInvocationList().Length);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionEndInvocationList().Length);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionStartInvocationList().Length);
+        Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseStartInvocationList()?.Length, "GetTestCaseStartInvocationList");
+        Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseEndInvocationList()?.Length, "GetTestCaseEndInvocationList");
+        Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionEndInvocationList()?.Length, "GetTestSessionEndInvocationList");
+        Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionStartInvocationList()?.Length, "GetTestSessionStartInvocationList");
     }
 
     [TestMethod]

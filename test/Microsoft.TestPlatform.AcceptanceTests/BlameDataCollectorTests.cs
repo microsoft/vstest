@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -23,6 +24,19 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 {
     public const string NETCOREANDFX = "net452;net472;netcoreapp3.1";
     public const string NET50 = "net5.0";
+    private readonly string _procDumpPath;
+
+    public BlameDataCollectorTests()
+    {
+        _procDumpPath = Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin");
+        var procDumpExePath = Path.Combine(_procDumpPath, "procdump.exe");
+        if (!File.Exists(procDumpExePath))
+        {
+            throw new InvalidOperationException($"Procdump path {procDumpExePath} does not exist. "
+                + "It is possible that antivirus deleted it from your nuget cache. "
+                + "Delete the whole procdump folder in your nuget cache, and run build, or restore");
+        }
+    }
 
     [TestMethod]
     // netcoreapp2.1 dump is not supported on Linux
@@ -31,15 +45,14 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void BlameDataCollectorShouldGiveCorrectTestCaseName(RunnerInfo runnerInfo)
     {
-        using var tempDir = new TempDirectory();
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var assemblyPaths = GetAssetFullPath("BlameUnitTestProject.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /Blame");
-        arguments = string.Concat(arguments, $" /ResultsDirectory:{tempDir.Path}");
+        arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         InvokeVsTest(arguments);
 
-        VaildateOutput(tempDir, "BlameUnitTestProject.UnitTest1.TestMethod2");
+        VaildateOutput(TempDirectory, "BlameUnitTestProject.UnitTest1.TestMethod2");
     }
 
     [TestMethod]
@@ -49,23 +62,22 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void BlameDataCollectorShouldOutputDumpFile(RunnerInfo runnerInfo)
     {
-        using var tempDir = new TempDirectory();
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /Blame:CollectDump");
-        arguments = string.Concat(arguments, $" /ResultsDirectory:{tempDir.Path}");
+        arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
 
         var env = new Dictionary<string, string>
         {
-            ["PROCDUMP_PATH"] = Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"),
+            ["PROCDUMP_PATH"] = _procDumpPath,
         };
 
         InvokeVsTest(arguments, env);
 
-        VaildateOutput(tempDir, "SampleUnitTestProject3.UnitTest1.ExitWithStackoverFlow", validateDumpFile: true);
+        VaildateOutput(TempDirectory, "SampleUnitTestProject3.UnitTest1.ExitWithStackoverFlow", validateDumpFile: true);
     }
 
     [TestMethod]
@@ -75,18 +87,17 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void BlameDataCollectorShouldNotOutputDumpFileWhenNoCrashOccurs(RunnerInfo runnerInfo)
     {
-        using var tempDir = new TempDirectory();
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /Blame:CollectDump");
-        arguments = string.Concat(arguments, $" /ResultsDirectory:{tempDir.Path}");
+        arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
 
         var env = new Dictionary<string, string>
         {
-            ["PROCDUMP_PATH"] = Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"),
+            ["PROCDUMP_PATH"] = _procDumpPath
         };
 
         InvokeVsTest(arguments, env);
@@ -101,23 +112,22 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void BlameDataCollectorShouldOutputDumpFileWhenNoCrashOccursButCollectAlwaysIsEnabled(RunnerInfo runnerInfo)
     {
-        using var tempDir = new TempDirectory();
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /Blame:CollectDump;CollectAlways=True");
-        arguments = string.Concat(arguments, $" /ResultsDirectory:{tempDir.Path}");
+        arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
 
         var env = new Dictionary<string, string>
         {
-            ["PROCDUMP_PATH"] = Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"),
+            ["PROCDUMP_PATH"] = _procDumpPath
         };
 
         InvokeVsTest(arguments, env);
 
-        Assert.IsTrue(StdOut.Contains(".dmp"), "it should collect dump, even if nothing crashed");
+        StringAssert.Matches(StdOut, new Regex("\\.dmp"), "it should collect dump, even if nothing crashed");
     }
 
     [TestMethod]
@@ -133,7 +143,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
         var env = new Dictionary<string, string>
         {
-            ["PROCDUMP_PATH"] = Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"),
+            ["PROCDUMP_PATH"] = _procDumpPath
         };
 
         InvokeVsTest(arguments, env);
@@ -156,7 +166,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
         var env = new Dictionary<string, string>
         {
-            ["PROCDUMP_PATH"] = Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"),
+            ["PROCDUMP_PATH"] = _procDumpPath
         };
 
         InvokeVsTest(arguments, env);
@@ -179,7 +189,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
         var env = new Dictionary<string, string>
         {
-            ["PROCDUMP_PATH"] = Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"),
+            ["PROCDUMP_PATH"] = _procDumpPath
         };
 
         InvokeVsTest(arguments, env);
@@ -200,7 +210,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
         var env = new Dictionary<string, string>
         {
-            ["PROCDUMP_PATH"] = Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"),
+            ["PROCDUMP_PATH"] = _procDumpPath
         };
 
         InvokeVsTest(arguments, env);
@@ -313,14 +323,14 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         }
     }
 
-    private void VaildateOutput(TempDirectory tempDir, string testName, bool validateDumpFile = false)
+    private void VaildateOutput(TempDirectory tempDirectory, string testName, bool validateDumpFile = false)
     {
         bool isSequenceAttachmentReceived = false;
         bool isDumpAttachmentReceived = false;
         bool isValid = false;
         StdErrorContains(testName);
         StdOutputContains("Sequence_");
-        var resultFiles = Directory.GetFiles(tempDir.Path, "*", SearchOption.AllDirectories);
+        var resultFiles = Directory.GetFiles(tempDirectory.Path, "*", SearchOption.AllDirectories);
 
         foreach (var file in resultFiles)
         {
@@ -335,9 +345,9 @@ public class BlameDataCollectorTests : AcceptanceTestBase
             }
         }
 
-        Assert.IsTrue(isSequenceAttachmentReceived);
-        Assert.IsTrue(!validateDumpFile || isDumpAttachmentReceived);
-        Assert.IsTrue(isValid);
+        Assert.IsTrue(isSequenceAttachmentReceived, "Sequence attachment was not received.");
+        Assert.IsTrue(!validateDumpFile || isDumpAttachmentReceived, "Dump attachment was not received.");
+        Assert.IsTrue(isValid, "Sequence attachment is not valid.");
     }
 
     private bool IsValidXml(string xmlFilePath)

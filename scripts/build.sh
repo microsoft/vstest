@@ -267,8 +267,6 @@ function invoke_build()
     local start=$SECONDS
     log ".. .. Build: Source: $TPB_Solution"
 
-    # Workaround for https://github.com/dotnet/sdk/issues/335
-    export FrameworkPathOverride=$TP_PACKAGES_DIR/microsoft.targetingpack.netframework.v4.7.2/1.0.0/lib/net472/
     if [ -z "$PROJECT_NAME_PATTERNS" ]
     then
         if [[ $TP_USE_REPO_API = 0 ]]; then

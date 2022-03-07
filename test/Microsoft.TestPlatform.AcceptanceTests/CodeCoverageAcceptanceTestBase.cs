@@ -56,7 +56,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
 
     protected XmlNode GetNode(XmlNode node, string type, string name)
     {
-        return node.SelectSingleNode($"//{type}[@name='{name}']");
+        return node.SelectSingleNode($"//{type}[@name='{name}']") ?? node.SelectSingleNode($"//{type}[@name='{name.ToLower()}']");
     }
 
     protected XmlDocument GetXmlCoverage(string coverageResult, TempDirectory tempDirectory)

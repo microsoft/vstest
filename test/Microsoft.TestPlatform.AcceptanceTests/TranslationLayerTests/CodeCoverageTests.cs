@@ -73,8 +73,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         AssertCoverageResults(_runEventHandler.Attachments);
 
-        Assert.AreEqual("e5f256dc-7959-4dd6-8e4f-c11150ab28e0", _runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
-        Assert.AreEqual("e5f256dc-7959-4dd6-8e4f-c11150ab28e0", _runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+        Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", _runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+        Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", _runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
     }
 
     [TestMethod]
@@ -119,8 +119,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         AssertCoverageResults(_runEventHandler.Attachments);
 
-        Assert.AreEqual("e5f256dc-7959-4dd6-8e4f-c11150ab28e0", _runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
-        Assert.AreEqual("e5f256dc-7959-4dd6-8e4f-c11150ab28e0", _runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+        Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", _runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+        Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", _runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
     }
 
     [TestMethod]
@@ -472,7 +472,6 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
                                             <DataCollectors>
                                                 <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"">
                                                     <Configuration>
-                                                      <CLRIEInstrumentationNetCore>{useClrIeInstrumentationEngine}</CLRIEInstrumentationNetCore>
                                                       <CLRIEInstrumentationNetFramework>{useClrIeInstrumentationEngine}</CLRIEInstrumentationNetFramework>
                                                       <Format>{outputFormat}</Format>
                                                       <CodeCoverage>
@@ -498,14 +497,17 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
     private void AssertCoverageResults(IList<AttachmentSet> attachments)
     {
-        if (attachments.Count == 1)
+        foreach (var attachmentSet in attachments)
         {
-            var xmlCoverage = GetXmlCoverage(attachments.First().Attachments.First().Uri.LocalPath, _tempDirectory);
-
-            foreach (var project in GetProjects())
+            foreach (var attachment in attachmentSet.Attachments)
             {
-                var moduleNode = GetModuleNode(xmlCoverage.DocumentElement, project.ToLower());
-                AssertCoverage(moduleNode, ExpectedMinimalModuleCoverage);
+                var xmlCoverage = GetXmlCoverage(attachments.First().Attachments.First().Uri.LocalPath, _tempDirectory);
+
+                foreach (var project in GetProjects())
+                {
+                    var moduleNode = GetModuleNode(xmlCoverage.DocumentElement, project);
+                    AssertCoverage(moduleNode, ExpectedMinimalModuleCoverage);
+                }
             }
         }
     }

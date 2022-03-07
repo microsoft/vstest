@@ -143,6 +143,14 @@ internal class DebuggerUtility
                             Trace($"ComException: Retrying in 250ms.\n{ex}");
                             Thread.Sleep(250);
                         }
+                        catch (TargetInvocationException ex)
+                        {
+                            if (ex.InnerException is not COMException)
+                                throw;
+
+                            Trace($"ComException: Retrying in 250ms.\n{ex}");
+                            Thread.Sleep(250);
+                        }
                     }
                     Marshal.ReleaseComObject(moniker[0]);
 

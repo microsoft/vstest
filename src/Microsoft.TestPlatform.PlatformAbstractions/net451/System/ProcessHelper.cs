@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if NETFRAMEWORK || NETSTANDARD2_0
+
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -9,8 +11,6 @@ using System.Runtime.InteropServices;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-
-#if NETFRAMEWORK || NETSTANDARD2_0
 
 #nullable disable
 
@@ -75,7 +75,7 @@ public partial class ProcessHelper : IProcessHelper
         using BinaryReader reader = new(fs);
 
         // https://docs.microsoft.com/windows/win32/debug/pe-format#ms-dos-stub-image-only
-        // At location 0x3c, the stub has the file offset to the PE signature. 
+        // At location 0x3c, the stub has the file offset to the PE signature.
         fs.Position = 0x3C;
         var peHeader = reader.ReadUInt32();
 

@@ -3,7 +3,6 @@
 
 using System.IO;
 
-using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
@@ -25,10 +24,8 @@ public class ProcessesInteractionTests : AcceptanceTestBase
         const string testAssetProjectName = "SimpleTestProjectMessedUpTargetFramework";
         var assemblyPath = GetAssetFullPath(testAssetProjectName + ".dll", Core21TargetFramework);
         UpdateRuntimeConfigJsonWithInvalidFramework(assemblyPath, testAssetProjectName);
-        using var tempDir = new TempDirectory();
 
         // Act
-        var arguments = PrepareArguments(assemblyPath, GetTestAdapterPath(), "", FrameworkArgValue, tempDir.Path);
         InvokeVsTest(assemblyPath);
 
         // Assert

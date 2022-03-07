@@ -49,6 +49,11 @@
   <!-- Package dependency versions -->
   <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Dependencies.props" Condition=" '$(DependencyVersionsImported)' != 'true' "/>
 
+  <!-- Allows build of .NET Framework assemblies on MacOS and Linux https://github.com/dotnet/designs/pull/33#issuecomment-489264196 -->
+  <ItemGroup>
+    <PackageReference Condition=" '$(OS)' != 'Windows_NT' " Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="All" />
+  </ItemGroup>
+  
   <!-- Include PublicApi analyzers into all projects that are in our src directory, this can't use TestProject == true
   because some projects in test and playground are not tests, but we don't want to analyze those for public apis, because
   we don't ship them.
