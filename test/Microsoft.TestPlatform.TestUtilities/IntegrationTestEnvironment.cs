@@ -29,10 +29,6 @@ public class IntegrationTestEnvironment
 
     public IntegrationTestEnvironment()
     {
-        // These environment variables are set in scripts/test.ps1 or scripts/test.sh.
-        TargetFramework = Environment.GetEnvironmentVariable("TPT_TargetFramework");
-        TargetRuntime = Environment.GetEnvironmentVariable("TPT_TargetRuntime");
-
         // If the variables are not set, valid defaults are assumed.
         if (string.IsNullOrEmpty(TargetFramework))
         {
