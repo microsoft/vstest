@@ -616,6 +616,9 @@ public class DotnetTestHostManagerTests
         StringAssert.Contains(startInfo.Arguments, expectedTestHostPath);
     }
 
+    // TODO: This assembly was previously compiled as net472 and so it was skipped and only ran as netcoreapp2.1. This fails in test, but works in code that is not isolated in appdomain. Might be worth fixing because we get one null here, and another in DotnetTestHostManager.
+    // Assembly.GetEntryAssembly().Location is null because of running in app domain.
+#if NET
     [TestMethod]
     public void GetTestHostProcessStartInfoShouldIncludeTestHostPathNextToTestRunnerIfTesthostDllIsNoFoundAndDepsFileNotFound()
     {
@@ -638,6 +641,12 @@ public class DotnetTestHostManagerTests
         var expectedRuntimeConfigPath = Path.Combine(here, "testhost-latest.runtimeconfig.json");
         StringAssert.Contains(startInfo.Arguments, $"--runtimeconfig \"{expectedRuntimeConfigPath}\"");
     }
+
+#endif
+
+    // TODO: This assembly was previously compiled as net472 and so it was skipped and only ran as netcoreapp2.1. This fails in test, but works in code that is not isolated in appdomain. Might be worth fixing because we get one null here, and another in DotnetTestHostManager.
+    // Assembly.GetEntryAssembly().Location is null because of running in app domain.
+#if NET
 
     [TestMethod]
 
@@ -670,6 +679,8 @@ public class DotnetTestHostManagerTests
         var expectedRuntimeConfigPath = Path.Combine(here, $"testhost-{suffix}.runtimeconfig.json");
         StringAssert.Contains(startInfo.Arguments, $"--runtimeconfig \"{expectedRuntimeConfigPath}\"");
     }
+
+#endif
 
     [TestMethod]
     public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromSourceDirectoryIfRunConfigDevFileNotFound()

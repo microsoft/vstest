@@ -65,6 +65,11 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void WebTestRunAllTestsWithRunSettings(RunnerInfo runnerInfo)
     {
+        if (!IsCI)
+        {
+            Assert.Inconclusive("This works on server but not locally, because locally it grabs old dll from GAC, but has version 10.0.0 as the one in our package.");
+        }
+
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var runSettingsFilePath = Path.Combine(TempDirectory.Path, Guid.NewGuid() + ".runsettings");
 
@@ -117,6 +122,11 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void CodedWebTestRunAllTests(RunnerInfo runnerInfo)
     {
+        if (!IsCI)
+        {
+            Assert.Inconclusive("This works on server but not locally, because locally it grabs old dll from GAC, but has version 10.0.0 as the one in our package.");
+        }
+
         SetTestEnvironment(_testEnvironment, runnerInfo);
         if (runnerInfo.IsNetRunner)
         {
