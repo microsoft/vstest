@@ -162,7 +162,7 @@ public class DataCollectorAttachmentProcessorAppDomainTests
         Assert.AreEqual(TestMessageLevel.Warning, messages[1].Item1);
         Assert.AreEqual("Warning", messages[1].Item2);
         Assert.AreEqual(TestMessageLevel.Error, messages[2].Item1);
-        Assert.AreEqual("line1\nline2\nline3", messages[2].Item2);
+        Assert.AreEqual($"line1{Environment.NewLine}line2{Environment.NewLine}line3", messages[2].Item2);
     }
 
     [TestMethod]
@@ -245,7 +245,7 @@ public class DataCollectorAttachmentProcessorAppDomainTests
 
             logger.SendMessage(TestMessageLevel.Informational, "Info");
             logger.SendMessage(TestMessageLevel.Warning, "Warning");
-            logger.SendMessage(TestMessageLevel.Error, $"line1\nline2{Environment.NewLine}\nline3");
+            logger.SendMessage(TestMessageLevel.Error, $"line1{Environment.NewLine}line2\nline3");
 
             return attachments;
         }

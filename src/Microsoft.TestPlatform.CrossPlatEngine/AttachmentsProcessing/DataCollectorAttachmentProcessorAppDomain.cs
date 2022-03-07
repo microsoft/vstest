@@ -37,7 +37,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
 /// </summary>
 internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachmentProcessor, IDisposable
 {
-    private static readonly char[] MessageTerminator = new char[] { '\0' };
     private readonly string _pipeShutdownMessagePrefix = Guid.NewGuid().ToString();
     private readonly DataCollectorAttachmentProcessorRemoteWrapper _wrapper;
     private readonly InvokedDataCollector _invokedDataCollector;
@@ -97,10 +96,7 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
             {
                 try
                 {
-                    var messagePayloads = sr.ReadLine().Split(MessageTerminator, StringSplitOptions.RemoveEmptyEntries);
-
-                    // Reassemble the message if needed.
-                    string messagePayload = messagePayloads.Aggregate((a, b) => $"{a}\n{b}");
+                    string messagePayload = sr.ReadLine().Replace("\0", Environment.NewLine);
 
                     if (messagePayload.StartsWith(_pipeShutdownMessagePrefix))
                     {
