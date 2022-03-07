@@ -15,7 +15,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestCategory("Windows-Review")]
 public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 {
-
     [TestMethod]
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void ChutzpahRunAllTestExecution(RunnerInfo runnerInfo)
@@ -68,7 +67,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     {
         if (!IsCI)
         {
-            Assert.Inconclusive("This works on server but not locally, because locall it grabs dll from my GAC and that is old, but has 10.0.0 version as the one in our package.");
+            Assert.Inconclusive("This works on server but not locally, because locally it grabs old dll from GAC, but has version 10.0.0 as the one in our package.");
         }
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -125,7 +124,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     {
         if (!IsCI)
         {
-            Assert.Inconclusive("This works on server but not locally, because locall it grabs dll from my GAC and that is old, but has 10.0.0 version as the one in our package.");
+            Assert.Inconclusive("This works on server but not locally, because locally it grabs old dll from GAC, but has version 10.0.0 as the one in our package.");
         }
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
