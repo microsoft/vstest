@@ -235,12 +235,9 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     /// <inheritdoc/>
     public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
     {
-        if (lastChunk != null)
-        {
-            // When discovery is complete then the last discovered source is still marked
-            // as partially discovered, so we need to mark it as fully discovered.
-            _discoverySourceStatusCache.MarkTheLastChunkSourcesAsFullyDiscovered(lastChunk);
-        }
+        // When discovery is complete then the last discovered source is still marked
+        // as partially discovered, so we need to mark it as fully discovered.
+        _discoverySourceStatusCache.MarkTheLastChunkSourcesAsFullyDiscovered(lastChunk);
 
         _baseTestDiscoveryEventsHandler.HandleDiscoveryComplete(
             new(discoveryCompleteEventArgs.TotalCount, discoveryCompleteEventArgs.IsAborted)
@@ -249,8 +246,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
                 NotDiscoveredSources = _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered),
                 PartiallyDiscoveredSources = _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
                 FullyDiscoveredSources = _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
-            }
-            , lastChunk);
+            }, lastChunk);
     }
 
     /// <inheritdoc/>

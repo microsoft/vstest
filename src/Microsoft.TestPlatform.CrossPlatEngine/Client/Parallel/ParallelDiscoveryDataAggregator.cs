@@ -78,7 +78,7 @@ internal class ParallelDiscoveryDataAggregator
     /// Aggregate discovery data
     /// Must be thread-safe as this is expected to be called by parallel managers
     /// </summary>
-    public void Aggregate(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, Dictionary<string, HashSet<string>> discoveredExtensions)
+    public void Aggregate(DiscoveryCompleteEventArgs discoveryCompleteEventArgs!!, Dictionary<string, HashSet<string>> discoveredExtensions)
     {
         lock (_dataUpdateSyncObject)
         {
@@ -102,7 +102,7 @@ internal class ParallelDiscoveryDataAggregator
         AggregateDiscoveryDataMetrics(discoveryCompleteEventArgs.Metrics);
     }
 
-    internal /* for testing purposes */ void AggregateDiscoveryStatus(
+    private void AggregateDiscoveryStatus(
         IEnumerable<string> notDiscoveredSources,
         IEnumerable<string> partiallyDiscoveredSources,
         IEnumerable<string> fullyDiscoveredSources)
@@ -152,7 +152,7 @@ internal class ParallelDiscoveryDataAggregator
     /// Aggregates the metrics from Test Host Process.
     /// </summary>
     /// <param name="metrics"></param>
-    internal /* for testing purposes */ void AggregateDiscoveryDataMetrics(IDictionary<string, object>? metrics)
+    private void AggregateDiscoveryDataMetrics(IDictionary<string, object>? metrics)
     {
         if (metrics == null || metrics.Count == 0 || _metricsAggregator == null)
         {

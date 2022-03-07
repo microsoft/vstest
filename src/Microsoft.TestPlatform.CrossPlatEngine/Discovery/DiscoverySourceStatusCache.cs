@@ -16,7 +16,7 @@ internal class DiscoverySourceStatusCache
 
     private string? _previousSource;
 
-    public void MarkSourcesWithStatus(IEnumerable<string?> sources, DiscoveryStatus status)
+    public void MarkSourcesWithStatus(IEnumerable<string?>? sources, DiscoveryStatus status)
     {
         if (sources is null)
         {
@@ -40,27 +40,33 @@ internal class DiscoverySourceStatusCache
 
                     return status;
                 },
-                (_, _) =>
+                (_, previousStatus) =>
                 {
+                    if (previousStatus == DiscoveryStatus.FullyDiscovered && status != DiscoveryStatus.FullyDiscovered
+                        || previousStatus == DiscoveryStatus.PartiallyDiscovered && status == DiscoveryStatus.NotDiscovered)
+                    {
+                        EqtTrace.Warning($"DiscoverySourceStatusCache.MarkSourcesWithStatus: Downgrading source status from {previousStatus} to {status}.");
+                    }
+
                     EqtTrace.Info($"DiscoverySourceStatusCache.MarkSourcesWithStatus: Marking {source} with {status} status.");
                     return status;
                 });
         }
     }
 
-    public void MarkTheLastChunkSourcesAsFullyDiscovered(IEnumerable<TestCase> lastChunk)
+    public void MarkTheLastChunkSourcesAsFullyDiscovered(IEnumerable<TestCase>? lastChunk)
     {
         // When all testcases count in project is dividable by chunk size (e.g. 100 tests and
         // chunk size of 10) then lastChunk is coming as empty. In this case, we need to take
         // the lastSource and mark it as FullyDiscovered.
-        IEnumerable<string?> lastChunkSources = lastChunk.Any()
+        IEnumerable<string?> lastChunkSources = lastChunk?.Any() == true
             ? lastChunk.Select<TestCase, string?>(testcase => testcase.Source)
             : new[] { _previousSource };
 
         MarkSourcesWithStatus(lastChunkSources, DiscoveryStatus.FullyDiscovered);
     }
 
-    public void MarkSourcesBasedOnDiscoveredTestCases(IEnumerable<TestCase> testCases)
+    public void MarkSourcesBasedOnDiscoveredTestCases(IEnumerable<TestCase>? testCases)
     {
         if (testCases is null)
         {
@@ -92,7 +98,7 @@ internal class DiscoverySourceStatusCache
         => GetSourcesWithStatus(discoveryStatus, _sourcesWithDiscoveryStatus);
 
     public static List<string> GetSourcesWithStatus(DiscoveryStatus discoveryStatus,
-        ConcurrentDictionary<string, DiscoveryStatus> sourcesWithDiscoveryStatus)
+        ConcurrentDictionary<string, DiscoveryStatus>? sourcesWithDiscoveryStatus)
     {
         // If by some accident SourcesWithDiscoveryStatus map is empty we will return empty list
         return sourcesWithDiscoveryStatus is null || sourcesWithDiscoveryStatus.IsEmpty

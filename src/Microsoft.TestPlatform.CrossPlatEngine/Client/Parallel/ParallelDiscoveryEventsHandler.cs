@@ -66,10 +66,13 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         // Aggregate Discovery Data Metrics
         _discoveryDataAggregator.AggregateDiscoveryDataMetrics(discoveryCompleteEventArgs.Metrics);
 
-        // we get discovery complete events from each host process
-        // so we cannot "complete" the actual operation until all sources are consumed
-        // We should not block last chunk results while we aggregate overall discovery data
-        if (lastChunk?.Any() == true)
+        // We get DiscoveryComplete events from each ProxyDiscoveryManager (each testhost) and
+        // they contain the last chunk of tests that were discovered in that particular testhost.
+        // We want to send them to the IDE, but we don't want to tell it that discovery finished,
+        // because other sources are still being discovered. So we translate the last chunk to a
+        // normal TestsDiscovered event and send that to the IDE. Once all sources are completed,
+        // we will send a single DiscoveryComplete.
+        if (lastChunk != null)
         {
             ConvertToRawMessageAndSend(MessageType.TestCasesFound, lastChunk);
             HandleDiscoveredTests(lastChunk);
@@ -80,15 +83,16 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         var parallelDiscoveryComplete = _parallelProxyDiscoveryManager.HandlePartialDiscoveryComplete(
             _proxyDiscoveryManager,
             discoveryCompleteEventArgs.TotalCount,
-            null, // lastChunk should be null as we already sent this data above
+            null, // Set lastChunk to null, because we already sent the data using HandleDiscoveredTests above.
             discoveryCompleteEventArgs.IsAborted);
+
         if (!parallelDiscoveryComplete)
         {
             return;
         }
 
-        // As we immediately return results to IDE in case of aborting
-        // we need to set isAborted = true and totalTests = -1
+        // As we immediately return results to IDE in case of aborting we need to set
+        // isAborted = true and totalTests = -1
         if (_parallelProxyDiscoveryManager.IsAbortRequested)
         {
             _discoveryDataAggregator.Aggregate(new(-1, true), null);

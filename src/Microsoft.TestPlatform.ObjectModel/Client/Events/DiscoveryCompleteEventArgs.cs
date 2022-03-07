@@ -56,11 +56,6 @@ public class DiscoveryCompleteEventArgs : EventArgs
         IList<string> notDiscoveredSources,
         Dictionary<string, HashSet<string>> discoveredExtensions)
     {
-        // This event is always raised from the client side, while the total count of tests is maintained
-        // only at the testhost end. In case of a discovery abort (various reasons including crash), it is
-        // not possible to get a list of total tests from testhost. Hence we enforce a -1 count.
-        Debug.Assert((!isAborted || -1 == totalTests), "If discovery request is aborted totalTest should be -1.");
-
         TotalCount = totalTests;
         IsAborted = isAborted;
 

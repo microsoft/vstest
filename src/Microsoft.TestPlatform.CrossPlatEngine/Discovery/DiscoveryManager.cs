@@ -39,7 +39,7 @@ public class DiscoveryManager : IDiscoveryManager
     private DiscoveryCriteria _discoveryCriteria;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly DiscoverySourceStatusCache _discoverySourceStatusCache = new();
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
     /// </summary>
