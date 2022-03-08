@@ -109,21 +109,21 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
 
                     switch (prefix)
                     {
-                        case AppDomainPipeMessageType.EqtTraceError: EqtTrace.Error(message); break;
-                        case AppDomainPipeMessageType.EqtTraceInfo: EqtTrace.Info(message); break;
-                        case AppDomainPipeMessageType.LoadExtensionTestMessageLevelInformational:
-                        case AppDomainPipeMessageType.LoadExtensionTestMessageLevelWarning:
-                        case AppDomainPipeMessageType.LoadExtensionTestMessageLevelError:
+                        case AppDomainPipeMessagePrefix.EqtTraceError: EqtTrace.Error(message); break;
+                        case AppDomainPipeMessagePrefix.EqtTraceInfo: EqtTrace.Info(message); break;
+                        case AppDomainPipeMessagePrefix.LoadExtensionTestMessageLevelInformational:
+                        case AppDomainPipeMessagePrefix.LoadExtensionTestMessageLevelWarning:
+                        case AppDomainPipeMessagePrefix.LoadExtensionTestMessageLevelError:
                             _dataCollectorAttachmentsProcessorsLogger?
                                 .SendMessage((TestMessageLevel)Enum.Parse(typeof(TestMessageLevel), prefix.Substring(prefix.LastIndexOf('.') + 1), false), message);
                             break;
-                        case AppDomainPipeMessageType.ProcessAttachmentTestMessageLevelInformational:
-                        case AppDomainPipeMessageType.ProcessAttachmentTestMessageLevelWarning:
-                        case AppDomainPipeMessageType.ProcessAttachmentTestMessageLevelError:
+                        case AppDomainPipeMessagePrefix.ProcessAttachmentTestMessageLevelInformational:
+                        case AppDomainPipeMessagePrefix.ProcessAttachmentTestMessageLevelWarning:
+                        case AppDomainPipeMessagePrefix.ProcessAttachmentTestMessageLevelError:
                             _processAttachmentSetsLogger?
                                 .SendMessage((TestMessageLevel)Enum.Parse(typeof(TestMessageLevel), prefix.Substring(prefix.LastIndexOf('.') + 1), false), message);
                             break;
-                        case AppDomainPipeMessageType.Report:
+                        case AppDomainPipeMessagePrefix.Report:
                             _progressReporter?.Report(int.Parse(message));
                             break;
                         default:
@@ -191,7 +191,7 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
     }
 }
 
-internal static class AppDomainPipeMessageType
+internal static class AppDomainPipeMessagePrefix
 {
     public const string EqtTraceError = "EqtTrace.Error";
     public const string EqtTraceInfo = "EqtTrace.Info";

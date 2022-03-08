@@ -111,9 +111,9 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
         return false;
     }
 
-    private void TraceError(string message) => Trace(AppDomainPipeMessageType.EqtTraceError, message);
+    private void TraceError(string message) => Trace(AppDomainPipeMessagePrefix.EqtTraceError, message);
 
-    private void TraceInfo(string message) => Trace(AppDomainPipeMessageType.EqtTraceInfo, message);
+    private void TraceInfo(string message) => Trace(AppDomainPipeMessagePrefix.EqtTraceInfo, message);
 
     private void Trace(string traceType, string message)
     {
@@ -127,7 +127,7 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
     {
         lock (_pipeClientLock)
         {
-            WriteToPipe($"{AppDomainPipeMessageType.Report}|{value}");
+            WriteToPipe($"{AppDomainPipeMessagePrefix.Report}|{value}");
         }
     }
 
