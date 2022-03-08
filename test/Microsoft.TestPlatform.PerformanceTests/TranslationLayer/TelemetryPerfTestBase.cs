@@ -19,9 +19,9 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 [TestClass]
 public class TelemetryPerfTestbase
 {
-    private const string TelemetryInstrumentationKey = "76b373ba-8a55-45dd-b6db-7f1a83288691";
+    private const string TelemetryInstrumentationKey = "08de1ac5-2db8-4c30-97c6-2e12695fa610";
     private readonly TelemetryClient _client;
-    private readonly DirectoryInfo _currentDirectory = new DirectoryInfo(typeof(DiscoveryPerfTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent;
+    private readonly string _rootDirectory = new DirectoryInfo(typeof(DiscoveryPerfTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent.Parent.Parent.Parent.Parent.Parent.FullName;
 
     public TelemetryPerfTestbase()
     {
@@ -63,7 +63,13 @@ public class TelemetryPerfTestbase
     /// <returns></returns>
     public string GetPerfAssetFullPath(string dllDirectory, string dllName)
     {
-        return Path.Combine(_currentDirectory.FullName, "TestAssets\\PerfAssets", dllDirectory, dllName);
+        var dllPath = Path.Combine(_rootDirectory, "test", "TestAssets", "PerfAssets", dllDirectory, "bin", BuildConfiguration, "net451", dllName);
+        if (!File.Exists(dllPath))
+        {
+            throw new FileNotFoundException(null, dllPath);
+        }
+
+        return dllPath;
     }
 
     /// <summary>
@@ -92,10 +98,8 @@ public class TelemetryPerfTestbase
 
     private string GetConsoleRunnerPath()
     {
-        // Find the root
-        var root = _currentDirectory.Parent.Parent.Parent;
         // Path to artifacts vstest.console
-        return Path.Combine(root.FullName, BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
+        return Path.Combine(_rootDirectory, "artifacts", BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
     }
 
     /// <summary>

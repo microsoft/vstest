@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -35,6 +36,9 @@ public class ExecutionPerfTests : TelemetryPerfTestbase
         _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _runEventHandler);
 
         PostTelemetry("RunMsTest10K", _runEventHandler.Metrics);
+
+        // TODO: Assert on the basics for every test. And also add some check for the actual timing to see if we are fast or slow?
+        Assert.AreEqual(10_000L, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
     }
 
     [TestMethod]

@@ -70,7 +70,7 @@ public class SocketTests
         thread.Join();
         dataTransferred.Wait();
 
-        Assert.IsTrue(watch.Elapsed < TimeSpan.FromSeconds(4), "Elapsed: " + watch.Elapsed);
+        Assert.IsTrue(watch.Elapsed < TimeSpan.FromSeconds(10), "Elapsed: " + watch.Elapsed);
     }
 
     [TestMethod]
@@ -101,7 +101,7 @@ public class SocketTests
         watch.Stop();
         clientThread.Join();
 
-        Assert.IsTrue(watch.Elapsed < TimeSpan.FromSeconds(4), "Elapsed: " + watch.Elapsed);
+        Assert.IsTrue(watch.Elapsed < TimeSpan.FromSeconds(10), "Elapsed: " + watch.Elapsed);
     }
 
     private static void SendData(ICommunicationChannel channel, Stopwatch watch)

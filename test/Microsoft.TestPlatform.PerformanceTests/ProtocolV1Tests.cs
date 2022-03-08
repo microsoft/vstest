@@ -3,7 +3,9 @@
 
 using System;
 using System.Diagnostics;
-using System.IO;
+
+using FluentAssertions;
+using FluentAssertions.Extensions;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -30,12 +32,13 @@ public class ProtocolV1Tests
         Traits = { new Trait("Priority", "0"), new Trait("Category", "unit") }
     };
 
-    private static DateTimeOffset s_startTime = new(new DateTime(2007, 3, 10, 0, 0, 0, DateTimeKind.Utc));
+    private static readonly DateTimeOffset s_startTime = new(new DateTime(2007, 3, 10, 0, 0, 0, DateTimeKind.Utc));
 
     private static readonly TestResult TestResult = new(TestCase)
     {
         // Attachments = ?
         // Messages = ?
+        // Different text values because they might be cached?
         Outcome = TestOutcome.Passed,
         ErrorMessage = "sampleError",
         ErrorStackTrace = "sampleStackTrace",
@@ -49,78 +52,76 @@ public class ProtocolV1Tests
     [TestMethod]
     public void TestCaseSerialize()
     {
-        Serialize(TestCase);
+        SerializeV1(TestCase);
         Stopwatch sw = Stopwatch.StartNew();
 
         for (int i = 0; i < 10000; i++)
         {
-            Serialize(TestCase);
+            SerializeV1(TestCase);
         }
         sw.Stop();
 
-        VerifyPerformanceResult("TestCaseSerialize1", 2000, sw.ElapsedMilliseconds);
+        var actualDuration = sw.Elapsed;
+        actualDuration.Should().BeLessOrEqualTo(2.Seconds(), $"when serializing 10k test cases");
     }
 
     [TestMethod]
     public void TestCaseDeserialize()
     {
-        var json = Serialize(TestCase);
-        Deserialize<TestCase>(json);
+        var json = SerializeV1(TestCase);
+        DeserializeV1<TestCase>(json);
 
         Stopwatch sw = Stopwatch.StartNew();
         for (int i = 0; i < 10000; i++)
         {
-            Deserialize<TestCase>(json);
+            DeserializeV1<TestCase>(json);
         }
         sw.Stop();
 
-        VerifyPerformanceResult("TestCaseDeserialize1", 2000, sw.ElapsedMilliseconds);
+        var actualDuration = sw.Elapsed;
+        actualDuration.Should().BeLessOrEqualTo(2.Seconds(), $"when de-serializing 10k test cases");
     }
 
     [TestMethod]
     public void TestResultSerialize()
     {
-        Serialize(TestResult);
+        SerializeV1(TestResult);
         Stopwatch sw = Stopwatch.StartNew();
 
         for (int i = 0; i < 10000; i++)
         {
-            Serialize(TestResult);
+            SerializeV1(TestResult);
         }
         sw.Stop();
 
-        VerifyPerformanceResult("TestResultSerialize1", 2000, sw.ElapsedMilliseconds);
+        var actualDuration = sw.Elapsed;
+        actualDuration.Should().BeLessOrEqualTo(2.Seconds(), $"when serializing 10k test results");
     }
 
     [TestMethod]
     public void TestResultDeserialize()
     {
-        var json = Serialize(TestResult);
-        Deserialize<TestResult>(json);
+        var json = SerializeV1(TestResult);
+        DeserializeV1<TestResult>(json);
 
         Stopwatch sw = Stopwatch.StartNew();
         for (int i = 0; i < 10000; i++)
         {
-            Deserialize<TestResult>(json);
+            DeserializeV1<TestResult>(json);
         }
         sw.Stop();
 
-        VerifyPerformanceResult("TestResultDeserialize1", 3500, sw.ElapsedMilliseconds);
+        var actualDuration = sw.Elapsed;
+        actualDuration.Should().BeLessOrEqualTo(3.5.Seconds(), $"when de-serializing 10k test results");
     }
 
-    private static string Serialize<T>(T data, int version = 1)
+    private static string SerializeV1<T>(T data)
     {
-        return JsonDataSerializer.Instance.Serialize(data, version);
+        return JsonDataSerializer.Instance.Serialize(data, version: 1);
     }
 
-    private static T Deserialize<T>(string json, int version = 1)
+    private static T DeserializeV1<T>(string json)
     {
-        return JsonDataSerializer.Instance.Deserialize<T>(json, version);
-    }
-
-    private static void VerifyPerformanceResult(string scenario, long expectedElapsedTime, long elapsedTime)
-    {
-        Assert.IsTrue(elapsedTime < expectedElapsedTime, $"Scenario '{scenario}' doesn't match with expected elapsed time.");
-        File.AppendAllText(@"E:\ProtocolPerf.txt", $" {scenario} : " + elapsedTime);
+        return JsonDataSerializer.Instance.Deserialize<T>(json, version: 1);
     }
 }

@@ -1,6 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using FluentAssertions;
+using FluentAssertions.Extensions;
+
 using Microsoft.TestPlatform.TestUtilities.PerfInstrumentation;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -28,8 +31,7 @@ public class PerformanceTests : PerformanceTestBase
         AnalyzePerfData();
         var actualExecutionTime = GetExecutionTime();
 
-        // Sample Assert statement to verify the performance. 500 will be replaced by the actual threshold value.
-        Assert.IsTrue(actualExecutionTime < 500);
+        actualExecutionTime.Should().BeLessOrEqualTo(500.Milliseconds());
     }
 
     [TestMethod]
@@ -45,8 +47,7 @@ public class PerformanceTests : PerformanceTestBase
         AnalyzePerfData();
         var actualDiscoveryTime = GetDiscoveryTime();
 
-        // Sample Assert statement to verify the performance. 500 will be replaced by the actual threshold value.
-        Assert.IsTrue(actualDiscoveryTime < 500);
+        actualDiscoveryTime.Should().BeLessOrEqualTo(500.Milliseconds());
     }
 
     [TestMethod]
@@ -62,8 +63,7 @@ public class PerformanceTests : PerformanceTestBase
         AnalyzePerfData();
         var actualVsTestTime = GetVsTestTime();
 
-        // Sample Assert statement to verify the performance. 1500 will be replaced by the actual threshold value.
-        Assert.IsTrue(actualVsTestTime < 1500);
+        actualVsTestTime.Should().BeLessOrEqualTo(1500.Milliseconds());
     }
 
     [TestMethod]
@@ -79,8 +79,7 @@ public class PerformanceTests : PerformanceTestBase
         AnalyzePerfData();
         var actualTestHostTime = GetTestHostTime();
 
-        // Sample Assert statement to verify the performance. 1000 will be replaced by the actual threshold value.
-        Assert.IsTrue(actualTestHostTime < 1000);
+        actualTestHostTime.Should().BeLessOrEqualTo(1000.Milliseconds());
     }
 
     [TestMethod]
@@ -97,7 +96,6 @@ public class PerformanceTests : PerformanceTestBase
 
         var actualAdapterTimeTaken = GetAdapterExecutionTime("executor://mstestadapter/v2");
 
-        // Sample Assert statement to verify the performance. 300 will be replaced by the actual threshold value.
-        Assert.IsTrue(actualAdapterTimeTaken < 300);
+        actualAdapterTimeTaken.Should().BeLessOrEqualTo(300.Milliseconds());
     }
 }
