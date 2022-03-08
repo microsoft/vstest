@@ -91,7 +91,7 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
     {
         try
         {
-            using StreamReader sr = new(_pipeClientStream, Encoding.UTF8, false, 1024, true);
+            using StreamReader sr = new(_pipeClientStream, Encoding.Default, false, 1024, true);
             while (_pipeClientStream?.IsConnected == true)
             {
                 try
@@ -127,7 +127,7 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
                             _progressReporter?.Report(int.Parse(message));
                             break;
                         default:
-                            EqtTrace.Verbose($"DataCollectorAttachmentProcessorAppDomain:PipeReaderTask: Unknown message: {message}");
+                            EqtTrace.Error($"DataCollectorAttachmentProcessorAppDomain:PipeReaderTask: Unknown message: {message}");
                             break;
                     }
                 }
@@ -168,8 +168,10 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
         AppDomain.Unload(_appDomain);
         EqtTrace.Verbose($"DataCollectorAttachmentProcessorAppDomain.Dispose: Unloaded AppDomain '{appDomainName}'");
 
-        // TODO: Log if we timeout
-        _pipeServerReadTask?.Wait(new CancellationTokenSource(TimeSpan.FromSeconds(30)).Token);
+        if (!_pipeServerReadTask?.Wait(TimeSpan.FromSeconds(30)) == true)
+        {
+            EqtTrace.Error($"DataCollectorAttachmentProcessorAppDomain.Dispose: PipeReaderTask timeout expired");
+        }
 
         // We don't need to close the pipe handle because we're communicating with an in-process pipe and the same handle is closed by AppDomain.Unload(_appDomain);
         // Disposing here will fail for invalid handle during the release but we call it to avoid the GC cleanup inside the finalizer thread
@@ -198,10 +200,10 @@ internal static class AppDomainPipeMessagePrefix
     public const string Report = "Report";
     public const string LoadExtensionTestMessageLevelInformational = "LoadExtension.TestMessageLevel.Informational";
     public const string LoadExtensionTestMessageLevelWarning = "﻿LoadExtension.TestMessageLevel.Warning";
-    public const string LoadExtensionTestMessageLevelError = "﻿LoadExtension.TestMessageLevel.Error";
+    public const string LoadExtensionTestMessageLevelError = "LoadExtension.TestMessageLevel.Error";
     public const string ProcessAttachmentTestMessageLevelInformational = "ProcessAttachment.TestMessageLevel.Informational";
     public const string ProcessAttachmentTestMessageLevelWarning = "ProcessAttachment.TestMessageLevel.Warning";
-    public const string ProcessAttachmentTestMessageLevelError = "﻿ProcessAttachment.TestMessageLevel.Error";
+    public const string ProcessAttachmentTestMessageLevelError = "ProcessAttachment.TestMessageLevel.Error";
 }
 
 #endif

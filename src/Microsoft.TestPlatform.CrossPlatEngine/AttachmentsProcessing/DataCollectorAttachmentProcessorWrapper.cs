@@ -141,7 +141,7 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
 
     private void WriteToPipe(string message)
     {
-        using StreamWriter sw = new(_pipeServerStream, Encoding.UTF8, 1024, true);
+        using StreamWriter sw = new(_pipeServerStream, Encoding.Default, 1024, true);
         sw.AutoFlush = true;
         // We want to keep the protocol very simple and text message oriented.
         // On the read side we do ReadLine() to simplify the parsing and
