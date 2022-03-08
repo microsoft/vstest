@@ -68,7 +68,7 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
                             }
                             else
                             {
-                                // If we already registered same DataCollectorAttachmentProcessor we need to unload the unused AppDomain.
+                                // If we already registered same IDataCollectorAttachmentProcessor we need to unload the unused AppDomain.
                                 EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Unloading unused AppDomain for '{wrapper.FriendlyName}'");
                                 wrapper.Dispose();
                             }
