@@ -975,7 +975,7 @@ public class VsTestConsoleRequestSenderTests
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -998,7 +998,7 @@ public class VsTestConsoleRequestSenderTests
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -1240,7 +1240,7 @@ public class VsTestConsoleRequestSenderTests
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -1263,7 +1263,7 @@ public class VsTestConsoleRequestSenderTests
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -2735,7 +2735,7 @@ public class VsTestConsoleRequestSenderTests
         Assert.IsTrue(connectionSuccess, "Connection must succeed.");
     }
 
-    private void SetupMockCommunicationForRunRequest(Mock<ITestRunEventsHandler> mockHandler)
+    private void SetupMockCommunicationForRunRequest()
     {
         InitializeCommunication();
 

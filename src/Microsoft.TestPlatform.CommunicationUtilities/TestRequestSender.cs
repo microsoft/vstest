@@ -325,7 +325,7 @@ public class TestRequestSender : ITestRequestSender
         _messageEventHandler = eventHandler;
         _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
 
-        _onMessageReceived = (sender, args) => OnExecutionMessageReceived(sender, args, eventHandler);
+        _onMessageReceived = (sender, args) => OnExecutionMessageReceived(args, eventHandler);
         _channel.MessageReceived += _onMessageReceived;
 
         // This code section is needed because we altered the old testhost launch process for
@@ -368,7 +368,7 @@ public class TestRequestSender : ITestRequestSender
         _messageEventHandler = eventHandler;
         _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
 
-        _onMessageReceived = (sender, args) => OnExecutionMessageReceived(sender, args, eventHandler);
+        _onMessageReceived = (sender, args) => OnExecutionMessageReceived(args, eventHandler);
         _channel.MessageReceived += _onMessageReceived;
 
         // This code section is needed because we altered the old testhost launch process for
@@ -479,7 +479,7 @@ public class TestRequestSender : ITestRequestSender
         GC.SuppressFinalize(this);
     }
 
-    private void OnExecutionMessageReceived(object sender, MessageReceivedEventArgs messageReceived, ITestRunEventsHandler testRunEventsHandler)
+    private void OnExecutionMessageReceived(MessageReceivedEventArgs messageReceived, ITestRunEventsHandler testRunEventsHandler)
     {
         try
         {
