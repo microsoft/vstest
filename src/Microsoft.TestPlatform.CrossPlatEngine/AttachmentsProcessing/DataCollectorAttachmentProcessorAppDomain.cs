@@ -109,21 +109,21 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
 
                     switch (prefix)
                     {
-                        case "EqtTrace.Error": EqtTrace.Error(message); break;
-                        case "EqtTrace.Info": EqtTrace.Info(message); break;
-                        case "﻿LoadExtension.TestMessageLevel.Informational":
-                        case "﻿LoadExtension.TestMessageLevel.Warning":
-                        case "﻿LoadExtension.TestMessageLevel.Error":
+                        case AppDomainPipeMessageType.EqtTraceError: EqtTrace.Error(message); break;
+                        case AppDomainPipeMessageType.EqtTraceInfo: EqtTrace.Info(message); break;
+                        case AppDomainPipeMessageType.LoadExtensionTestMessageLevelInformational:
+                        case AppDomainPipeMessageType.LoadExtensionTestMessageLevelWarning:
+                        case AppDomainPipeMessageType.LoadExtensionTestMessageLevelError:
                             _dataCollectorAttachmentsProcessorsLogger?
                                 .SendMessage((TestMessageLevel)Enum.Parse(typeof(TestMessageLevel), prefix.Substring(prefix.LastIndexOf('.') + 1), false), message);
                             break;
-                        case "﻿ProcessAttachment.TestMessageLevel.Informational":
-                        case "﻿ProcessAttachment.TestMessageLevel.Warning":
-                        case "﻿ProcessAttachment.TestMessageLevel.Error":
+                        case AppDomainPipeMessageType.ProcessAttachmentTestMessageLevelInformational:
+                        case AppDomainPipeMessageType.ProcessAttachmentTestMessageLevelWarning:
+                        case AppDomainPipeMessageType.ProcessAttachmentTestMessageLevelError:
                             _processAttachmentSetsLogger?
                                 .SendMessage((TestMessageLevel)Enum.Parse(typeof(TestMessageLevel), prefix.Substring(prefix.LastIndexOf('.') + 1), false), message);
                             break;
-                        case "﻿Report":
+                        case AppDomainPipeMessageType.Report:
                             _progressReporter?.Report(int.Parse(message));
                             break;
                         default:
@@ -168,7 +168,8 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
         AppDomain.Unload(_appDomain);
         EqtTrace.Verbose($"DataCollectorAttachmentProcessorAppDomain.Dispose: Unloaded AppDomain '{appDomainName}'");
 
-        _pipeServerReadTask?.Wait();
+        // TODO: Log if we timeout
+        _pipeServerReadTask?.Wait(new CancellationTokenSource(TimeSpan.FromSeconds(30)).Token);
 
         // We don't need to close the pipe handle because we're communicating with an in-process pipe and the same handle is closed by AppDomain.Unload(_appDomain);
         // Disposing here will fail for invalid handle during the release but we call it to avoid the GC cleanup inside the finalizer thread
@@ -188,6 +189,19 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
         catch
         { }
     }
+}
+
+internal static class AppDomainPipeMessageType
+{
+    public const string EqtTraceError = "EqtTrace.Error";
+    public const string EqtTraceInfo = "EqtTrace.Info";
+    public const string Report = "Report";
+    public const string LoadExtensionTestMessageLevelInformational = "LoadExtension.TestMessageLevel.Informational";
+    public const string LoadExtensionTestMessageLevelWarning = "﻿LoadExtension.TestMessageLevel.Warning";
+    public const string LoadExtensionTestMessageLevelError = "﻿LoadExtension.TestMessageLevel.Error";
+    public const string ProcessAttachmentTestMessageLevelInformational = "ProcessAttachment.TestMessageLevel.Informational";
+    public const string ProcessAttachmentTestMessageLevelWarning = "ProcessAttachment.TestMessageLevel.Warning";
+    public const string ProcessAttachmentTestMessageLevelError = "﻿ProcessAttachment.TestMessageLevel.Error";
 }
 
 #endif
