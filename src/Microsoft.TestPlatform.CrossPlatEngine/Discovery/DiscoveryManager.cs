@@ -140,9 +140,6 @@ public class DiscoveryManager : IDiscoveryManager
                 if (lastChunk != null)
                 {
                     UpdateTestCases(lastChunk, _discoveryCriteria.Package);
-                    // When discovery is complete then the last discovered source is still marked
-                    // as partially discovered, so we need to mark it as fully discovered.
-                    _discoverySourceStatusCache.MarkTheLastChunkSourcesAsFullyDiscovered(lastChunk);
                 }
 
                 // Collecting Discovery State
@@ -151,13 +148,12 @@ public class DiscoveryManager : IDiscoveryManager
                 // Collecting Total Tests Discovered
                 _requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsDiscovered, totalDiscoveredTestCount);
 
-                if (_cancellationTokenSource.IsCancellationRequested)
-                {
-                    totalDiscoveredTestCount = -1;
-                }
+                _discoverySourceStatusCache.MarkSourcesBasedOnDiscoveredTestCases(
+                    lastChunk,
+                    isComplete: !_cancellationTokenSource.IsCancellationRequested);
 
                 var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(
-                    totalDiscoveredTestCount,
+                    _cancellationTokenSource.IsCancellationRequested ? -1 : totalDiscoveredTestCount,
                     _cancellationTokenSource.IsCancellationRequested,
                     _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
                     _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
@@ -212,7 +208,7 @@ public class DiscoveryManager : IDiscoveryManager
         if (_testDiscoveryEventsHandler != null)
         {
             _testDiscoveryEventsHandler.HandleDiscoveredTests(testCases);
-            _discoverySourceStatusCache.MarkSourcesBasedOnDiscoveredTestCases(testCases);
+            _discoverySourceStatusCache.MarkSourcesBasedOnDiscoveredTestCases(testCases, isComplete: false);
         }
         else
         {

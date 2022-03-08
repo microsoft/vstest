@@ -16,16 +16,16 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
-
-#nullable disable
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
@@ -35,18 +35,14 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
     //private const int CLIENTPROCESSEXITWAIT = 10 * 1000;
 
     private readonly DiscoveryCriteria _discoveryCriteria;
-
-    private ProxyDiscoveryManager _testDiscoveryManager;
-
+    private readonly DiscoverySourceStatusCache _discoverySourceStatusCache;
     private readonly Mock<ITestRequestSender> _mockRequestSender;
-
-    //private Mock<IDataSerializer> mockDataSerializer;
-
     private readonly Mock<IRequestData> _mockRequestData;
-
     private readonly Mock<IMetricsCollection> _mockMetricsCollection;
     private readonly Mock<IFileHelper> _mockFileHelper;
+    private readonly ProxyDiscoveryManager _discoveryManager;
 
+    //private Mock<IDataSerializer> mockDataSerializer;
 
     public ProxyDiscoveryManagerTests()
     {
@@ -55,12 +51,14 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _mockMetricsCollection = new Mock<IMetricsCollection>();
         _mockFileHelper = new Mock<IFileHelper>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
-        _testDiscoveryManager = new ProxyDiscoveryManager(
+        _discoverySourceStatusCache = new DiscoverySourceStatusCache();
+        _discoveryManager = new ProxyDiscoveryManager(
             _mockRequestData.Object,
             _mockRequestSender.Object,
             _mockTestHostManager.Object,
             _mockDataSerializer.Object,
-            _mockFileHelper.Object);
+            _mockFileHelper.Object,
+            _discoverySourceStatusCache);
         _discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
     }
 
@@ -72,7 +70,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
 
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, null);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, null);
 
         _mockRequestSender.Verify(s => s.InitializeDiscovery(It.IsAny<IEnumerable<string>>()), Times.Never);
     }
@@ -87,7 +85,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
 
         Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventHandler = new();
 
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventHandler.Object);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventHandler.Object);
 
         _mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>()), Times.Never);
     }
@@ -103,7 +101,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
 
         Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventHandler = new();
 
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventHandler.Object);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventHandler.Object);
 
         _mockTestHostManager.Verify(hm => hm.GetTestSources(_discoveryCriteria.Sources), Times.Once);
     }
@@ -123,7 +121,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
 
         Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventHandler = new();
 
-        _testDiscoveryManager.DiscoverTests(localDiscoveryCriteria, mockTestDiscoveryEventHandler.Object);
+        _discoveryManager.DiscoverTests(localDiscoveryCriteria, mockTestDiscoveryEventHandler.Object);
 
         Assert.IsNotNull(localDiscoveryCriteria.Package);
         // AdapterSourceMap should contain updated testSources.
@@ -146,7 +144,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
 
         Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventHandler = new();
 
-        _testDiscoveryManager.DiscoverTests(localDiscoveryCriteria, mockTestDiscoveryEventHandler.Object);
+        _discoveryManager.DiscoverTests(localDiscoveryCriteria, mockTestDiscoveryEventHandler.Object);
 
         Assert.IsNull(localDiscoveryCriteria.Package);
         // AdapterSourceMap should contain updated testSources.
@@ -168,7 +166,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
 
         Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventHandler = new();
 
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventHandler.Object);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventHandler.Object);
 
         _mockRequestSender.Verify(s => s.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Never);
     }
@@ -189,7 +187,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
             _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
             _mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "c:\\e1.dll", "c:\\e2.dll" });
 
-            _testDiscoveryManager.DiscoverTests(_discoveryCriteria, null);
+            _discoveryManager.DiscoverTests(_discoveryCriteria, null);
 
             // Also verify that we have waited for client connection.
             _mockRequestSender.Verify(s => s.InitializeDiscovery(extensions), Times.Once);
@@ -216,7 +214,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _mockFileHelper.Setup(fh => fh.Exists("xyz.TestAdapter.dll")).Returns(true);
 
         var mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler2>();
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventHandler.Object);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventHandler.Object);
 
         _mockRequestSender.Verify(s => s.InitializeDiscovery(expectedOutputPaths), Times.Once);
     }
@@ -232,7 +230,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
             _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
             _mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll", "c:\\e1.dll" });
 
-            _testDiscoveryManager.DiscoverTests(_discoveryCriteria, null);
+            _discoveryManager.DiscoverTests(_discoveryCriteria, null);
 
             _mockRequestSender.Verify(s => s.InitializeDiscovery(new[] { "he1.dll", "c:\\e1.dll" }), Times.Once);
         }
@@ -254,7 +252,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
             _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
             var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
 
-            _testDiscoveryManager.DiscoverTests(_discoveryCriteria, null);
+            _discoveryManager.DiscoverTests(_discoveryCriteria, null);
 
             _mockTestHostManager.Verify(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), expectedResult), Times.Once);
         }
@@ -283,7 +281,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
         // Act.
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, null);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, null);
 
         _mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
         _mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -297,7 +295,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
         // Act.
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
         // Verify
         mockTestDiscoveryEventsHandler.Verify(s => s.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()));
@@ -327,7 +325,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         });
 
         // Act.
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
         // Verify
         mockTestDiscoveryEventsHandler.Verify(s => s.HandleRawMessage(It.Is<string>(str => str.Contains(MessageType.DiscoveryComplete))), Times.Once);
@@ -355,7 +353,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         });
 
         // Act.
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
         // Verify
         mockTestDiscoveryEventsHandler.Verify(s => s.HandleRawMessage(It.Is<string>(str => str.Contains(MessageType.TestMessage))), Times.Once);
@@ -369,7 +367,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
         // Act.
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
         // Verify
         mockTestDiscoveryEventsHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
@@ -383,10 +381,10 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
 
         // Act.
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, null);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, null);
 
         // Assert.
-        _mockRequestSender.Verify(s => s.DiscoverTests(It.IsAny<DiscoveryCriteria>(), _testDiscoveryManager), Times.Once);
+        _mockRequestSender.Verify(s => s.DiscoverTests(It.IsAny<DiscoveryCriteria>(), _discoveryManager), Times.Once);
     }
 
     [TestMethod]
@@ -409,7 +407,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         });
 
         // Act.
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
         // Verify
         _mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Once);
@@ -431,19 +429,37 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         });
 
         // Act.
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
         // Verify
         _mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [TestMethod]
+    public void DiscoveryTestsMarksAllSourcesAsNotDiscovered()
+    {
+        // Arrange
+        Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new();
+        var inputSource = new List<string> { "source1.dll", "source2.dll", "source3.dll" };
+
+        var localDiscoveryCriteria = new DiscoveryCriteria(inputSource, 1, string.Empty);
+
+        // Act
+        _discoveryManager.DiscoverTests(localDiscoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+        // Assert
+        CollectionAssert.AreEquivalent(inputSource, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+        Assert.AreEqual(0, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
+        Assert.AreEqual(0, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count);
+    }
+
+    [TestMethod]
     public void DiscoveryManagerShouldPassOnHandleDiscoveredTests()
     {
         Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new();
-        var testCases = new List<TestCase>() { new TestCase("x.y.z", new Uri("x://y"), "x.dll") };
+        var testCases = new List<TestCase>() { new TestCase("eventHandler.y.z", new Uri("eventHandler://y"), "eventHandler.dll") };
 
-        _testDiscoveryManager = GetProxyDiscoveryManager();
+        var discoveryManager = GetProxyDiscoveryManager();
         SetupChannelMessage(MessageType.StartDiscovery, MessageType.TestCasesFound, testCases);
 
         var completePayload = new DiscoveryCompletePayload()
@@ -461,7 +477,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
             });
 
         // Act.
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+        discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
         // Verify
         mockTestDiscoveryEventsHandler.Verify(mtdeh => mtdeh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()), Times.AtLeastOnce);
@@ -483,7 +499,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         });
 
         // Act.
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
         // Verify
         mockTestDiscoveryEventsHandler.Verify(mtdeh => mtdeh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Once);
@@ -497,9 +513,9 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
 
         Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
 
-        _testDiscoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
-        _testDiscoveryManager.Abort();
+        _discoveryManager.Abort();
 
         _mockRequestSender.Verify(s => s.EndSession(), Times.Once);
     }
@@ -560,10 +576,160 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         }
     }
 
+    [TestMethod]
+    public void HandleDiscoveredTestsMarksDiscoveryStatus()
+    {
+        // Arrange
+        var localDiscoveryCriteria = new DiscoveryCriteria(new[] { "a" }, 1, string.Empty);
+        _discoveryManager.DiscoverTests(localDiscoveryCriteria, new Mock<ITestDiscoveryEventsHandler2>().Object);
+
+        // Marks 'a' as partially discovered
+        _discoveryManager.HandleDiscoveredTests(new TestCase[]
+        {
+            new() { Source = "a" },
+        });
+
+        // Act
+        _discoveryManager.HandleDiscoveredTests(new TestCase[]
+        {
+            new() { Source = "b" },
+            new() { Source = "c" },
+            new() { Source = "c" },
+            new() { Source = "d" },
+        });
+
+        // Assert
+        Assert.AreEqual(0, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
+        CollectionAssert.AreEquivalent(
+            new List<string> { "d" },
+            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        CollectionAssert.AreEquivalent(
+            new List<string> { "a", "b", "c" },
+            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+    }
+
+    [DataTestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public void HandleDiscoveryCompleteWhenAbortedNoPastDiscoveryAndNoLastCunkNotifiesWithCorrectDiscovery(bool trueIsEmptyFalseIsNull)
+    {
+        // Arrange
+        var localDiscoveryCriteria = new DiscoveryCriteria(new[] { "a", "b" }, 1, string.Empty);
+        var eventHandler = new Mock<ITestDiscoveryEventsHandler2>();
+        _discoveryManager.DiscoverTests(localDiscoveryCriteria, eventHandler.Object);
+
+        var lastChunk = trueIsEmptyFalseIsNull
+            ? Enumerable.Empty<TestCase>()
+            : null;
+
+        // Act
+        _discoveryManager.HandleDiscoveryComplete(new(-1, true), lastChunk);
+
+        // Assert
+        CollectionAssert.AreEquivalent(
+            new[] { "a", "b" },
+            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+        Assert.AreEqual(0, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
+        Assert.AreEqual(0, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count);
+    }
+
+    [DataTestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public void HandleDiscoveryCompleteWhenAbortedPastDiscoveryAndNoLastCunkNotifiesWithCorrectDiscovery(bool trueIsEmptyFalseIsNull)
+    {
+        // Arrange
+        var localDiscoveryCriteria = new DiscoveryCriteria(new[] { "a" }, 1, string.Empty);
+        _discoveryManager.DiscoverTests(localDiscoveryCriteria, new Mock<ITestDiscoveryEventsHandler2>().Object);
+
+        _discoveryManager.HandleDiscoveredTests(new TestCase[]
+        {
+            new() { Source = "a" },
+            new() { Source = "b" },
+        });
+
+        var lastChunk = trueIsEmptyFalseIsNull
+            ? Enumerable.Empty<TestCase>()
+            : null;
+
+        // Act
+        _discoveryManager.HandleDiscoveryComplete(new(-1, true), lastChunk);
+
+        // Assert
+        CollectionAssert.AreEquivalent(
+            new[] { "a" },
+            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        CollectionAssert.AreEquivalent(
+            new[] { "b" },
+            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        Assert.AreEqual(0, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
+    }
+
+    [TestMethod]
+    public void HandleDiscoveryCompleteWhenAbortedNoPastDiscoveryAndLastCunkNotifiesWithCorrectDiscovery()
+    {
+        // Arrange
+        var localDiscoveryCriteria = new DiscoveryCriteria(new[] { "a", "b" }, 1, string.Empty);
+        _discoveryManager.DiscoverTests(localDiscoveryCriteria, new Mock<ITestDiscoveryEventsHandler2>().Object);
+
+        var lastChunk = new TestCase[]
+        {
+            new() { Source = "c" },
+            new() { Source = "d" },
+        };
+
+        // Act
+        _discoveryManager.HandleDiscoveryComplete(new(-1, true), lastChunk);
+
+        // Assert
+        CollectionAssert.AreEquivalent(
+            new[] { "c" },
+            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        CollectionAssert.AreEquivalent(
+            new[] { "d" },
+            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        CollectionAssert.AreEquivalent(
+            new[] { "a", "b" },
+            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+    }
+
+    [TestMethod]
+    public void HandleDiscoveryCompleteWhenAbortedPastDiscoveryAndLastCunkNotifiesWithCorrectDiscovery()
+    {
+        // Arrange
+        var localDiscoveryCriteria = new DiscoveryCriteria(new[] { "a" }, 1, string.Empty);
+        _discoveryManager.DiscoverTests(localDiscoveryCriteria, new Mock<ITestDiscoveryEventsHandler2>().Object);
+
+        _discoveryManager.HandleDiscoveredTests(new TestCase[]
+        {
+            new() { Source = "a" },
+            new() { Source = "b" },
+        });
+
+        var lastChunk = new TestCase[]
+        {
+            new() { Source = "c" },
+            new() { Source = "d" },
+        };
+
+        // Act
+        _discoveryManager.HandleDiscoveryComplete(new(-1, true), lastChunk);
+
+        // Assert
+        CollectionAssert.AreEquivalent(
+            new[] { "a", "b", "c" },
+            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        CollectionAssert.AreEquivalent(
+            new[] { "d" },
+            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        Assert.AreEqual(0, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
+    }
+
     private void InvokeAndVerifyDiscoverTests(bool skipDefaultAdapters)
     {
         TestPluginCache.Instance = null;
-        TestPluginCache.Instance.DefaultExtensionPaths = new List<string> { "default1.dll", "default2.dll" };
+        // It's ok to use Instance. because on nulls, instance is re-instantiated.
+        TestPluginCache.Instance!.DefaultExtensionPaths = new List<string> { "default1.dll", "default2.dll" };
         TestPluginCache.Instance.UpdateExtensions(new List<string> { "filterTestAdapter.dll" }, false);
         TestPluginCache.Instance.UpdateExtensions(new List<string> { "unfilter.dll" }, true);
 
@@ -574,8 +740,8 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
             _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
             var expectedResult = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, skipDefaultAdapters);
 
-            _testDiscoveryManager.Initialize(skipDefaultAdapters);
-            _testDiscoveryManager.DiscoverTests(_discoveryCriteria, null);
+            _discoveryManager.Initialize(skipDefaultAdapters);
+            _discoveryManager.DiscoverTests(_discoveryCriteria, null);
 
             _mockRequestSender.Verify(s => s.InitializeDiscovery(expectedResult), Times.Once);
         }

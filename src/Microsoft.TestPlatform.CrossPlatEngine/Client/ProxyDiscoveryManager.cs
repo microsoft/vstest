@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
@@ -32,7 +33,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     private readonly Func<string, ProxyDiscoveryManager, ProxyOperationManager> _proxyOperationManagerCreator;
     private readonly IFileHelper _fileHelper;
     private readonly IDataSerializer _dataSerializer;
-    private readonly DiscoverySourceStatusCache _discoverySourceStatusCache = new();
+    private readonly DiscoverySourceStatusCache _discoverySourceStatusCache;
 
     private ITestRuntimeProvider _testHostManager;
     private bool _isCommunicationEstablished;
@@ -55,6 +56,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         _proxyOperationManagerCreator = proxyOperationManagerCreator;
         _dataSerializer = JsonDataSerializer.Instance;
         _fileHelper = new FileHelper();
+        _discoverySourceStatusCache = new();
     }
 
     /// <summary>
@@ -75,7 +77,8 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
             testRequestSender,
             testHostManager,
             JsonDataSerializer.Instance,
-            new FileHelper())
+            new FileHelper(),
+            new())
     { }
 
     /// <summary>
@@ -98,7 +101,8 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         ITestRequestSender requestSender,
         ITestRuntimeProvider testHostManager,
         IDataSerializer dataSerializer,
-        IFileHelper fileHelper)
+        IFileHelper fileHelper,
+        DiscoverySourceStatusCache sourceStatusCache)
     {
         _testHostManager = testHostManager;
         _dataSerializer = dataSerializer;
@@ -106,6 +110,8 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
 
         // Create a new proxy operation manager.
         _proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
+
+        _discoverySourceStatusCache = sourceStatusCache;
     }
 
     #region IProxyDiscoveryManager implementation.
@@ -119,27 +125,29 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     /// <inheritdoc/>
     public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
     {
+        // Multiple method calls will iterate over this sources collection so we want to ensure
+        // it's built once.
+        var discoverySources = discoveryCriteria.Sources.ToArray();
+
         if (_proxyOperationManager == null)
         {
-            _proxyOperationManager = _proxyOperationManagerCreator(
-                discoveryCriteria.Sources.First(),
-                this);
+            _proxyOperationManager = _proxyOperationManagerCreator(discoverySources[0], this);
 
             _testHostManager = _proxyOperationManager.TestHostManager;
         }
 
         _baseTestDiscoveryEventsHandler = eventHandler;
 
+        // Mark all sources as NotDiscovered before actual discovery starts
+        _discoverySourceStatusCache.MarkSourcesWithStatus(discoverySources, DiscoveryStatus.NotDiscovered);
+
         try
         {
-            _isCommunicationEstablished = _proxyOperationManager.SetupChannel(discoveryCriteria.Sources, discoveryCriteria.RunSettings);
-
-            // Mark all sources as NotDiscovered before actual discovery starts
-            _discoverySourceStatusCache.MarkSourcesWithStatus(discoveryCriteria.Sources, DiscoveryStatus.NotDiscovered);
+            _isCommunicationEstablished = _proxyOperationManager.SetupChannel(discoverySources, discoveryCriteria.RunSettings);
 
             if (_isCommunicationEstablished)
             {
-                InitializeExtensions(discoveryCriteria.Sources);
+                InitializeExtensions(discoverySources);
                 discoveryCriteria.UpdateDiscoveryCriteria(_testHostManager);
 
                 _proxyOperationManager.RequestSender.DiscoverTests(discoveryCriteria, this);
@@ -235,10 +243,14 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     /// <inheritdoc/>
     public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
     {
-        // When discovery is complete then the last discovered source is still marked
-        // as partially discovered, so we need to mark it as fully discovered.
-        _discoverySourceStatusCache.MarkTheLastChunkSourcesAsFullyDiscovered(lastChunk);
+        // Currently, TestRequestSender always passes null for lastChunk in case of an aborted
+        // discovery but we are not making this assumption here to ease potential future
+        // evolution.
+        _discoverySourceStatusCache.MarkSourcesBasedOnDiscoveredTestCases(lastChunk, isComplete: !discoveryCompleteEventArgs.IsAborted);
 
+        // Notify the event handler of the discovery complete using data from our cache and not
+        // directly from the event args because upon abort (or when last chunk is not null), the
+        // event args is incorrect/partial (e.g., when aborted, the 3 collections are empty).
         _baseTestDiscoveryEventsHandler.HandleDiscoveryComplete(
             new(discoveryCompleteEventArgs.TotalCount, discoveryCompleteEventArgs.IsAborted)
             {
@@ -252,7 +264,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     /// <inheritdoc/>
     public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
     {
-        _discoverySourceStatusCache.MarkSourcesBasedOnDiscoveredTestCases(discoveredTestCases);
+        _discoverySourceStatusCache.MarkSourcesBasedOnDiscoveredTestCases(discoveredTestCases, isComplete: false);
         _baseTestDiscoveryEventsHandler.HandleDiscoveredTests(discoveredTestCases);
     }
 

@@ -54,43 +54,40 @@ internal class DiscoverySourceStatusCache
         }
     }
 
-    public void MarkTheLastChunkSourcesAsFullyDiscovered(IEnumerable<TestCase>? lastChunk)
+    public void MarkSourcesBasedOnDiscoveredTestCases(IEnumerable<TestCase>? testCases, bool isComplete)
     {
-        // When all testcases count in project is dividable by chunk size (e.g. 100 tests and
-        // chunk size of 10) then lastChunk is coming as empty. In this case, we need to take
-        // the lastSource and mark it as FullyDiscovered.
-        IEnumerable<string?> lastChunkSources = lastChunk?.Any() == true
-            ? lastChunk.Select<TestCase, string?>(testcase => testcase.Source)
-            : new[] { _previousSource };
-
-        MarkSourcesWithStatus(lastChunkSources, DiscoveryStatus.FullyDiscovered);
-    }
-
-    public void MarkSourcesBasedOnDiscoveredTestCases(IEnumerable<TestCase>? testCases)
-    {
-        if (testCases is null)
+        // When all testcases count in source is dividable by chunk size (e.g. 100 tests and chunk
+        // size of 10) then lastChunk is coming as empty. Otherwise, we receive the remaining test
+        // cases to process.
+        if (testCases is not null)
         {
-            return;
+            foreach (var testCase in testCases)
+            {
+                var currentSource = testCase.Source;
+
+                // We rely on the fact that sources are processed in a sequential way, which means that
+                // when we receive a different source than the previous, we can assume that the previous
+                // source was fully discovered.
+                if (_previousSource is null || _previousSource == currentSource)
+                {
+                    MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
+                }
+                else if (currentSource != _previousSource)
+                {
+                    MarkSourcesWithStatus(new[] { _previousSource }, DiscoveryStatus.FullyDiscovered);
+                    MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
+                }
+
+                _previousSource = currentSource;
+            }
         }
 
-        foreach (var testCase in testCases)
+        // When discovery is complete (i.e. not aborted0, then the last discovered source might
+        // still be marked as partially discovered in our cache, so we need to mark it as fully
+        // discovered.
+        if (isComplete)
         {
-            string currentSource = testCase.Source;
-
-            // We rely on the fact that sources are processed in a sequential way, which means that
-            // when we receive a different source than the previous, we can assume that the previous
-            // source was fully discovered.
-            if (_previousSource is null || _previousSource == currentSource)
-            {
-                MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
-            }
-            else if (currentSource != _previousSource)
-            {
-                MarkSourcesWithStatus(new[] { _previousSource }, DiscoveryStatus.FullyDiscovered);
-                MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
-            }
-
-            _previousSource = currentSource;
+            MarkSourcesWithStatus(new[] { _previousSource }, DiscoveryStatus.FullyDiscovered);
         }
     }
 
@@ -98,10 +95,10 @@ internal class DiscoverySourceStatusCache
         => GetSourcesWithStatus(discoveryStatus, _sourcesWithDiscoveryStatus);
 
     public static List<string> GetSourcesWithStatus(DiscoveryStatus discoveryStatus,
-        ConcurrentDictionary<string, DiscoveryStatus>? sourcesWithDiscoveryStatus)
+        ConcurrentDictionary<string, DiscoveryStatus> sourcesWithDiscoveryStatus)
     {
         // If by some accident SourcesWithDiscoveryStatus map is empty we will return empty list
-        return sourcesWithDiscoveryStatus is null || sourcesWithDiscoveryStatus.IsEmpty
+        return sourcesWithDiscoveryStatus.IsEmpty
             ? new List<string>()
             : sourcesWithDiscoveryStatus
                 .Where(source => source.Value == discoveryStatus)

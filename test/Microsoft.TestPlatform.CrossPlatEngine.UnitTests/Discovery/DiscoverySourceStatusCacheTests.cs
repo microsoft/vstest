@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
@@ -50,7 +49,7 @@ public class DiscoverySourceStatusCacheTests
         cache.MarkSourcesWithStatus(sources, discoveryStatus);
 
         // Assert
-        CollectionAssert.AreEquivalent(new List<string> { "a", "b" }, cache.GetSourcesWithStatus(discoveryStatus));
+        CollectionAssert.AreEquivalent(new[] { "a", "b" }, cache.GetSourcesWithStatus(discoveryStatus));
     }
 
     [DataTestMethod]
@@ -65,7 +64,7 @@ public class DiscoverySourceStatusCacheTests
         cache.MarkSourcesWithStatus(new[] { "a" }, discoveryStatus);
 
         // Assert
-        CollectionAssert.AreEquivalent(new List<string> { "a" }, cache.GetSourcesWithStatus(discoveryStatus));
+        CollectionAssert.AreEquivalent(new[] { "a" }, cache.GetSourcesWithStatus(discoveryStatus));
     }
 
     [DataTestMethod]
@@ -81,7 +80,7 @@ public class DiscoverySourceStatusCacheTests
         cache.MarkSourcesWithStatus(new[] { "a" }, discoveryStatus);
 
         // Assert
-        CollectionAssert.AreEquivalent(new List<string> { "a" }, cache.GetSourcesWithStatus(discoveryStatus));
+        CollectionAssert.AreEquivalent(new[] { "a" }, cache.GetSourcesWithStatus(discoveryStatus));
     }
 
     [TestMethod]
@@ -95,55 +94,7 @@ public class DiscoverySourceStatusCacheTests
         cache.MarkSourcesWithStatus(new[] { "a" }, DiscoveryStatus.NotDiscovered);
 
         // Assert
-        CollectionAssert.AreEquivalent(new List<string> { "a" }, cache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
-    }
-
-    [DataTestMethod]
-    [DataRow(true)]
-    [DataRow(false)]
-    public void MarkTheLastChunkSourcesAsFullyDiscoveredWhenLastChunkIsNullOrEmptyUsesPreviousSource(bool isEmpty)
-    {
-        // Arrange
-        var cache = new DiscoverySourceStatusCache();
-        cache.MarkSourcesBasedOnDiscoveredTestCases(new TestCase[] { new() { Source = "a" } });
-
-        // Sanity check
-        CollectionAssert.AreEquivalent(new List<string> { "a" }, cache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
-        Assert.AreEqual(0, cache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count);
-
-        // Act
-        cache.MarkTheLastChunkSourcesAsFullyDiscovered(isEmpty ? Enumerable.Empty<TestCase>() : null);
-
-        // Assert
-        CollectionAssert.AreEquivalent(new List<string> { "a" }, cache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
-        Assert.AreEqual(0, cache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
-    }
-
-    [TestMethod]
-    public void MarkTheLastChunkSourcesAsFullyDiscoveredMarkAllSourcesAsFullyDiscoveredRegardlessOfPreviousState()
-    {
-        // Arrange
-        var cache = new DiscoverySourceStatusCache();
-        cache.MarkSourcesWithStatus(new[] { "old" }, DiscoveryStatus.NotDiscovered);
-        var testCases = new TestCase[]
-        {
-            new() { Source = "a" },
-            new() { Source = "b" },
-            new() { Source = "c" },
-        };
-
-        // Sanity check
-        CollectionAssert.AreEquivalent(new List<string> { "old" }, cache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
-        Assert.AreEqual(0, cache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
-        Assert.AreEqual(0, cache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count);
-
-        // Act
-        cache.MarkTheLastChunkSourcesAsFullyDiscovered(testCases);
-
-        // Assert
-        CollectionAssert.AreEquivalent(new List<string> { "old" }, cache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
-        Assert.AreEqual(0, cache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
-        CollectionAssert.AreEquivalent(new List<string> { "a", "b", "c", }, cache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        CollectionAssert.AreEquivalent(new[] { "a" }, cache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
     }
 
     [TestMethod]
@@ -161,25 +112,70 @@ public class DiscoverySourceStatusCacheTests
         };
 
         // Act
-        cache.MarkSourcesBasedOnDiscoveredTestCases(testCases);
+        cache.MarkSourcesBasedOnDiscoveredTestCases(testCases, false);
 
         // Assert
-        CollectionAssert.AreEquivalent(new List<string> { "a", "b" }, cache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
-        CollectionAssert.AreEquivalent(new List<string> { "c" }, cache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        CollectionAssert.AreEquivalent(new[] { "a", "b" }, cache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        CollectionAssert.AreEquivalent(new[] { "c" }, cache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
     }
+
     [TestMethod]
     public void MarkSourcesBasedOnDiscoveredTestCasesReuseLastDiscoveredSource()
     {
         // Arrange
         var cache = new DiscoverySourceStatusCache();
-        cache.MarkSourcesBasedOnDiscoveredTestCases(new TestCase[] { new() { Source = "a" } });
+        cache.MarkSourcesBasedOnDiscoveredTestCases(new TestCase[] { new() { Source = "a" } }, false);
 
         // Act
-        cache.MarkSourcesBasedOnDiscoveredTestCases(new TestCase[] { new() { Source = "b" }, });
+        cache.MarkSourcesBasedOnDiscoveredTestCases(new TestCase[] { new() { Source = "b" }, }, false);
 
         // Assert
-        CollectionAssert.AreEquivalent(new List<string> { "a" }, cache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
-        CollectionAssert.AreEquivalent(new List<string> { "b" }, cache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        CollectionAssert.AreEquivalent(new[] { "a" }, cache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        CollectionAssert.AreEquivalent(new[] { "b" }, cache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+    }
+
+    [DataTestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public void MarkSourcesBasedOnDiscoveredTestCasesWhenCompleteMarksLastSourceAsFullyDiscovered(bool trueIsEmptyFalseIsNull)
+    {
+        // Arrange
+        var cache = new DiscoverySourceStatusCache();
+        cache.MarkSourcesBasedOnDiscoveredTestCases(new TestCase[] { new() { Source = "a" } }, false);
+
+        // Sanity check
+        CollectionAssert.AreEquivalent(new[] { "a" }, cache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        Assert.AreEqual(0, cache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count);
+
+        // Act
+        cache.MarkSourcesBasedOnDiscoveredTestCases(trueIsEmptyFalseIsNull ? Enumerable.Empty<TestCase>() : null, true);
+
+        // Assert
+        CollectionAssert.AreEquivalent(new[] { "a" }, cache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        Assert.AreEqual(0, cache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
+    }
+
+    [TestMethod]
+    public void MarkSourcesBasedOnDiscoveredTestCasesWhenCompleteMarksAllSourcesAsFullyDiscovered()
+    {
+        // Arrange
+        var cache = new DiscoverySourceStatusCache();
+        cache.MarkSourcesBasedOnDiscoveredTestCases(new TestCase[] { new() { Source = "a" } }, false);
+
+        // Sanity check
+        CollectionAssert.AreEquivalent(new[] { "a" }, cache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        Assert.AreEqual(0, cache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count);
+
+        // Act
+        cache.MarkSourcesBasedOnDiscoveredTestCases(new TestCase[]
+            {
+                new() { Source = "b" },
+                new() { Source = "c" },
+            }, true);
+
+        // Assert
+        CollectionAssert.AreEquivalent(new[] { "a", "b", "c" }, cache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        Assert.AreEqual(0, cache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
     }
 
     [DataTestMethod]
@@ -192,16 +188,6 @@ public class DiscoverySourceStatusCacheTests
         Assert.AreEqual(0, instanceSources.Count);
 
         var givenDicSources = DiscoverySourceStatusCache.GetSourcesWithStatus(discoveryStatus, new());
-        Assert.AreEqual(0, givenDicSources.Count);
-    }
-
-    [DataTestMethod]
-    [DataRow(DiscoveryStatus.FullyDiscovered)]
-    [DataRow(DiscoveryStatus.PartiallyDiscovered)]
-    [DataRow(DiscoveryStatus.NotDiscovered)]
-    public void GetSourcesWithStatusWhenNullDictionaryReturnsEmptyList(DiscoveryStatus discoveryStatus)
-    {
-        var givenDicSources = DiscoverySourceStatusCache.GetSourcesWithStatus(discoveryStatus, null);
         Assert.AreEqual(0, givenDicSources.Count);
     }
 
@@ -234,7 +220,7 @@ public class DiscoverySourceStatusCacheTests
 
         // Assert
         CollectionAssert.AreEquivalent(
-            new List<string>
+            new[]
             {
                 "fully1",
                 "fully2",
@@ -244,7 +230,7 @@ public class DiscoverySourceStatusCacheTests
             }, fullyDiscovered);
 
         CollectionAssert.AreEquivalent(
-            new List<string>
+            new[]
             {
                 "partially1",
                 "partially2",
@@ -253,7 +239,7 @@ public class DiscoverySourceStatusCacheTests
             }, partiallyDiscovered);
 
         CollectionAssert.AreEquivalent(
-            new List<string>
+            new[]
             {
                 "not1",
                 "not2",

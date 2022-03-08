@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -34,6 +35,7 @@ public class ProxyBaseManagerTests
     protected Mock<IDataSerializer> _mockDataSerializer;
     protected Mock<ICommunicationChannel> _mockChannel;
     private readonly Mock<IFileHelper> _mockFileHelper;
+    private readonly DiscoverySourceStatusCache _discoverySourceStatusCache;
 
     public ProxyBaseManagerTests()
     {
@@ -42,6 +44,7 @@ public class ProxyBaseManagerTests
         _mockRequestData = new Mock<IRequestData>();
         _mockChannel = new Mock<ICommunicationChannel>();
         _mockFileHelper = new Mock<IFileHelper>();
+        _discoverySourceStatusCache = new();
 
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new Mock<IMetricsCollection>().Object);
         _mockDataSerializer.Setup(mds => mds.DeserializeMessage(null)).Returns(new Message());
@@ -104,7 +107,8 @@ public class ProxyBaseManagerTests
             _testRequestSender,
             _mockTestHostManager.Object,
             _mockDataSerializer.Object,
-            _mockFileHelper.Object);
+            _mockFileHelper.Object,
+            _discoverySourceStatusCache);
 
         return testDiscoveryManager;
     }
