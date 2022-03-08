@@ -66,6 +66,12 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
                                 datacollectorsAttachmentsProcessors.Add(wrapper.AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(wrapper.FriendlyName, wrapper));
                                 EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Collector attachment processor '{wrapper.AssemblyQualifiedName}' from file '{invokedDataCollector.FilePath}' added to the 'run list'");
                             }
+                            else
+                            {
+                                // If we already registered same DataCollectorAttachmentProcessor we need to unload the unused AppDomain.
+                                EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Unloading unused AppDomain for '{wrapper.FriendlyName}'");
+                                wrapper.Dispose();
+                            }
                         }
                         else
                         {

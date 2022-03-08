@@ -522,11 +522,26 @@ public class IntegrationTestBase
     /// <summary>
     /// Returns the VsTestConsole Wrapper.
     /// </summary>
-    /// <returns></returns>
+    public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
+    {
+        return GetVsTestConsoleWrapper(TempDirectory);
+    }
+
+    /// <summary>
+    /// Returns the VsTestConsole Wrapper.
+    /// </summary>
     public IVsTestConsoleWrapper GetVsTestConsoleWrapper(out TempDirectory logFileDir)
     {
         logFileDir = new TempDirectory();
+        return GetVsTestConsoleWrapper(logFileDir);
+    }
 
+    /// <summary>
+    /// Returns the VsTestConsole Wrapper.
+    /// </summary>
+    /// <returns></returns>
+    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(TempDirectory logFileDir)
+    {
         if (!Directory.Exists(logFileDir.Path))
         {
             Directory.CreateDirectory(logFileDir.Path);

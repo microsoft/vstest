@@ -149,7 +149,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
                             configuration = collectorConfiguration.Configuration;
                         }
 
-                        EqtTrace.Info($"TestRunAttachmentsProcessingManager: Invocation of data collector attachment processor '{dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName}' with configuration '{(configuration == null ? "null" : configuration.OuterXml)}'");
+                        EqtTrace.Info($"TestRunAttachmentsProcessingManager: Invocation of data collector attachment processor AssemblyQualifiedName: '{dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName}' FriendlyName: '{dataCollectorAttachmentsProcessor.FriendlyName}' with configuration '{(configuration == null ? "null" : configuration.OuterXml)}'");
                         ICollection<AttachmentSet> processedAttachments = await dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.ProcessAttachmentSetsAsync(
                             configuration,
                             new Collection<AttachmentSet>(attachmentsToBeProcessed),
