@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-#if !NET451
+#if !NETFRAMEWORK
 using System.Runtime.Loader;
 
 #else
@@ -77,7 +77,7 @@ public class AppDomainTests : AcceptanceTestBase
     {
         var runSettings = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
         var inprocasm = _testEnvironment.GetTestAsset("SimpleDataCollector.dll");
-#if !NET451
+#if !NETFRAMEWORK
         var assemblyName = AssemblyLoadContext.GetAssemblyName(inprocasm);
 #else
         var assemblyName = AssemblyName.GetAssemblyName(inprocasm);

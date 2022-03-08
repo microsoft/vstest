@@ -10,19 +10,17 @@
     <RootNamespace>Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TargetFrameworks>net451</TargetFrameworks>
+    <!-- TODO: Also for .NET6 ? -->
+    <TargetFrameworks>net48</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\Microsoft.TestPlatform.Extensions.EventLogCollector.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Runtime" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
     <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Runtime" />
+    <Reference Include="Microsoft.CSharp" />    
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
