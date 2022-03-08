@@ -168,7 +168,7 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
         AppDomain.Unload(_appDomain);
         EqtTrace.Verbose($"DataCollectorAttachmentProcessorAppDomain.Dispose: Unloaded AppDomain '{appDomainName}'");
 
-        if (!_pipeServerReadTask?.Wait(TimeSpan.FromSeconds(30)) == true)
+        if (_pipeServerReadTask?.Wait(TimeSpan.FromSeconds(30)) == false)
         {
             EqtTrace.Error($"DataCollectorAttachmentProcessorAppDomain.Dispose: PipeReaderTask timeout expired");
         }
