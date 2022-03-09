@@ -3,10 +3,8 @@
 
 using System;
 using System.IO;
+
 using IO = System.IO;
-
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.TestUtilities;
 

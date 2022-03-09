@@ -327,7 +327,7 @@ public class EventLogDataCollector : DataCollector
 
         EqtTrace.Verbose("EventLogDataCollector: SessionStart received");
 
-        StartCollectionForContext(e.Context, true);
+        StartCollectionForContext(e.Context);
     }
 
     private void OnSessionEnd(object sender, SessionEndEventArgs e)
@@ -353,7 +353,7 @@ public class EventLogDataCollector : DataCollector
 
         EqtTrace.Verbose("EventLogDataCollector: TestCaseStart received for test '{0}'.", e.TestCaseName);
 
-        StartCollectionForContext(e.Context, false);
+        StartCollectionForContext(e.Context);
     }
 
     private void OnTestCaseEnd(object sender, TestCaseEndEventArgs e)
@@ -383,7 +383,7 @@ public class EventLogDataCollector : DataCollector
         }
     }
 
-    private void StartCollectionForContext(DataCollectionContext dataCollectionContext, bool isSessionContext)
+    private void StartCollectionForContext(DataCollectionContext dataCollectionContext)
     {
         lock (ContextMap)
         {

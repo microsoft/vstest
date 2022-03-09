@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -32,13 +31,6 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     private TempDirectory _tempDirectory;
     private RunEventHandler _runEventHandler;
     private TestRunAttachmentsProcessingEventHandler _testRunAttachmentsProcessingEventHandler;
-
-    static CodeCoverageTests()
-    {
-#pragma warning disable RS0030 // Do not used banned APIs - We need it temporary
-        Environment.SetEnvironmentVariable("VSTEST_FEATURE_FORCE_DATACOLLECTORS_ATTACHMENTPROCESSORS", "1");
-#pragma warning restore RS0030 // Do not used banned APIs - We need it temporary
-    }
 
     private void Setup()
     {
