@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -91,7 +93,10 @@ internal class PortableSymbolReader : ISymbolReader
         try
         {
             var pdbFilePath = Path.ChangeExtension(binaryPath, ".pdb");
-            using var pdbReader = new PortablePdbReader(new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read));
+            using PortablePdbReader pdbReader = File.Exists(pdbFilePath)
+                ? CreatePortablePdbReaderFromExistingPdbFile(pdbFilePath)
+                : CreatePortablePdbReaderFromPEData(binaryPath);
+
             // At this point, the assembly should be already loaded into the load context. We query for a reference to
             // find the types and cache the symbol information. Let the loader follow default lookup order instead of
             // forcing load from a specific path.
@@ -147,5 +152,38 @@ internal class PortableSymbolReader : ISymbolReader
             Dispose();
             throw;
         }
+    }
+
+    /// <summary>
+    /// Reads the pdb data from the dlls itself, either by loading the referenced pdb file, or by reading
+    /// embedded pdb from the dll itself.
+    /// </summary>
+    /// <param name="binaryPath"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    private static PortablePdbReader CreatePortablePdbReaderFromPEData(string binaryPath)
+    {
+        var peReader = new PEReader(new FileStream(binaryPath, FileMode.Open, FileAccess.Read));
+
+        // (_) => null is stream reader factory for the pdb. We don't need that stream.
+        // out _ is the path to the found pdb, we also don't need that.
+        var hasPdb = peReader.TryOpenAssociatedPortablePdb(binaryPath, (_) => null, out MetadataReaderProvider mp, out _);
+
+        // The out parameters don't give additional info about the pdbFile in case it is not found. So we have few reasons to fail:
+        if (!hasPdb)
+        {
+            throw new InvalidOperationException($"Cannot find portable .PDB file for {binaryPath}. This can have multiple reasons:"
+                + "\n- The dll was built with <DebugType>portable</DebugType> and the pdb file is missing (it was deleted, or not moved together with the dll)."
+                + "\n- The dll was built with <DebugType>embedded</DebugType> and there is some unknown error reading the metadata from the dll."
+                + "\n- The sll was built with <DebugType>none</DebugType> and the pdb file was never even emitted during build."
+                + "\n- Additionally if your dll is built with <DebugType>full</DebugType>, see FullPdbReader instead.");
+        }
+
+        return new PortablePdbReader(mp);
+    }
+
+    private static PortablePdbReader CreatePortablePdbReaderFromExistingPdbFile(string pdbFilePath)
+    {
+        return new PortablePdbReader(new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read));
     }
 }
