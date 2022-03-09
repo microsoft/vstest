@@ -9,7 +9,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 public class RunnerInfo
 {
-    public RunnerInfo(string runnerType, string targetFramework) : this(runnerType, targetFramework, "")
+    // Serialization ctor that enables correct tree view for data source tests
+    private RunnerInfo()
+    {
+    }
+
+    public RunnerInfo(string runnerType, string targetFramework)
+        : this(runnerType, targetFramework, "")
     {
     }
 
