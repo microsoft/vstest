@@ -4,13 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
@@ -20,7 +14,9 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+#if NETFRAMEWORK
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+#endif
 
 #nullable disable
 
