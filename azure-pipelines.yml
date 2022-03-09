@@ -12,7 +12,7 @@ jobs:
     displayName: 'Run script build.cmd'
     inputs:
       filename: build.cmd
-      arguments: '-verbose -configuration $(buildConfiguration) -steps "InstallDotnet, Restore, UpdateLocalization, Build, Publish"'
+      arguments: '-verbose -CIBuild -configuration $(buildConfiguration) -steps "InstallDotnet, Restore, UpdateLocalization, Build, Publish"'
       modifyEnvironment: false
       failOnStandardError: true
 
@@ -63,7 +63,7 @@ jobs:
       # build should not be needed in the end, we are copying the build task from the build folder, but we should get
       # it either from artifacts, if present, or from extracted package file
       # Adding it at the moment to avoid this error: #[error]Copy-Item : Cannot find path 'D:\a\1\s\src\Microsoft.TestPlatform.Build\bin\Release\netstandard2.0' because it does  not exist.
-      arguments: '-verbose -configuration $(buildConfiguration) -steps "InstallDotnet, Restore, Build, PrepareAcceptanceTests"'
+      arguments: '-verbose -CIBuild -configuration $(buildConfiguration) -steps "InstallDotnet, Restore, Build, PrepareAcceptanceTests"'
       modifyEnvironment: false
       failOnStandardError: true
 
