@@ -1,18 +1,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-
-using Utilities;
-using Interfaces;
-using ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-using CommonResources = Resources.Resources;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 /// <summary>
 /// Generic base class for managing extensions and looking them up by their URI.
@@ -22,16 +24,10 @@ using CommonResources = Resources.Resources;
 internal abstract class TestExtensionManager<TExtension, TMetadata>
     where TMetadata : ITestExtensionCapabilities
 {
-    #region Fields
-
     /// <summary>
     /// Used for logging errors.
     /// </summary>
     private readonly IMessageLogger _logger;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -61,10 +57,6 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
         // Populate the map to avoid threading issues
         PopulateMap();
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Gets unfiltered list of test extensions which are available.
@@ -104,10 +96,6 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
         private set;
     }
 
-    #endregion
-
-    #region Public Methods
-
     /// <summary>
     /// Looks up the test extension by its URI.
     /// </summary>
@@ -140,10 +128,9 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
                 break;
             }
         }
+
         return testExtension;
     }
-
-    #endregion
 
     /// <summary>
     /// Populate the extension map.

@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.ComponentTests;
 /// </summary>
 public static class Program
 {
-    public static void Main(string[] args)
+    public static void Main()
     {
     }
 }

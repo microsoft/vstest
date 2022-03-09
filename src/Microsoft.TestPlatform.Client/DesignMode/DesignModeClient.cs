@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,24 +8,26 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Client;
-using TestRunAttachmentsProcessing;
-using RequestHelper;
-using Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+using Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using CommunicationUtilities;
-using CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using CoreUtilities.Helpers;
-using CrossPlatEngine;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
-using ObjectModel.Logging;
-using PlatformAbstractions;
-using PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-using CommunicationUtilitiesResources = CommunicationUtilities.Resources.Resources;
+using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 
 /// <summary>
 /// The design mode client.
@@ -37,7 +37,7 @@ public class DesignModeClient : IDesignModeClient
     private readonly ICommunicationManager _communicationManager;
     private readonly IDataSerializer _dataSerializer;
 
-    private readonly ProtocolConfig _protocolConfig = ObjectModel.Constants.DefaultProtocolConfig;
+    private readonly ProtocolConfig _protocolConfig = Constants.DefaultProtocolConfig;
     private readonly IEnvironment _platformEnvironment;
     private readonly TestSessionMessageLogger _testSessionMessageLogger;
     private readonly object _lockObject = new();
@@ -153,10 +153,7 @@ public class DesignModeClient : IDesignModeClient
             {
                 var message = _communicationManager.ReceiveMessage();
 
-                if (EqtTrace.IsInfoEnabled)
-                {
-                    EqtTrace.Info("DesignModeClient.ProcessRequests: Processing Message: {0}", message);
-                }
+                EqtTrace.Info("DesignModeClient.ProcessRequests: Processing Message: {0}", message);
 
                 switch (message.MessageType)
                 {
@@ -185,8 +182,8 @@ public class DesignModeClient : IDesignModeClient
 
                     case MessageType.StopTestSession:
                         {
-                            var testSessionInfo = _communicationManager.DeserializePayload<TestSessionInfo>(message);
-                            StopTestSession(testSessionInfo);
+                            var testSessionPayload = _communicationManager.DeserializePayload<StopTestSessionPayload>(message);
+                            StopTestSession(testSessionPayload, testRequestManager);
                             break;
                         }
 
@@ -537,12 +534,12 @@ public class DesignModeClient : IDesignModeClient
                 EqtTrace.Error("DesignModeClient: Exception in StartTestSession: " + ex);
 
                 eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
-                eventsHandler.HandleStartTestSessionComplete(null);
+                eventsHandler.HandleStartTestSessionComplete(new());
             }
         });
     }
 
-    private void StopTestSession(TestSessionInfo testSessionInfo)
+    private void StopTestSession(StopTestSessionPayload payload, ITestRequestManager requestManager)
     {
         Task.Run(() =>
         {
@@ -550,23 +547,22 @@ public class DesignModeClient : IDesignModeClient
 
             try
             {
-                var stopped = TestSessionPool.Instance.KillSession(testSessionInfo);
-
-                eventsHandler.HandleStopTestSessionComplete(testSessionInfo, stopped);
+                requestManager.ResetOptions();
+                requestManager.StopTestSession(payload, eventsHandler, _protocolConfig);
             }
             catch (Exception ex)
             {
                 EqtTrace.Error("DesignModeClient: Exception in StopTestSession: " + ex);
 
                 eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
-                eventsHandler.HandleStopTestSessionComplete(testSessionInfo, false);
+                eventsHandler.HandleStopTestSessionComplete(new(payload.TestSessionInfo));
             }
         });
     }
 
     #region IDisposable Support
 
-    private bool _disposedValue = false; // To detect redundant calls
+    private bool _disposedValue; // To detect redundant calls
 
     protected virtual void Dispose(bool disposing)
     {

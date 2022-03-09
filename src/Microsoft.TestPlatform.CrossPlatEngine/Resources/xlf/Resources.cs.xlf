@@ -167,6 +167,16 @@
         <target state="translated">Soubor runsettings se změnil mezi časem, kdy byla relace testu vytvořena, a časem aktuálního požadavku spuštění nebo zjišťování.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="translated">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="translated">Přílohy:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

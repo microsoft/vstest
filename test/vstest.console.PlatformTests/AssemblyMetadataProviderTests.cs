@@ -1,19 +1,23 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests;
-
 using System;
 using System.Diagnostics;
 using System.IO;
+
 using Microsoft.TestPlatform.TestUtilities;
-using Processors;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-using ObjectModel;
-using TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using Moq;
-using Utilities.Helpers;
-using Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests;
 
 [TestClass]
 public class AssemblyMetadataProviderTests : IntegrationTestBase

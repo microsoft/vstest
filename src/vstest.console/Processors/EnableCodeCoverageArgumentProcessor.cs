@@ -1,35 +1,33 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Globalization;
 using System.IO;
 using System.Xml;
 using System.Xml.XPath;
 
-using Common;
-using Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// The argument processor for enabling data collectors.
 /// </summary>
 internal class EnableCodeCoverageArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of command for enabling code coverage.
     /// </summary>
     public const string CommandName = "/EnableCodeCoverage";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -39,37 +37,18 @@ internal class EnableCodeCoverageArgumentProcessor : IArgumentProcessor
     /// Gets the metadata.
     /// </summary>
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new EnableCodeCoverageArgumentProcessorCapabilities());
-            }
-
-            return _metadata;
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new EnableCodeCoverageArgumentProcessorCapabilities());
 
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor = new Lazy<IArgumentExecutor>(() => new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, new FileHelper()));
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, new FileHelper()));
 
-            return _executor;
-        }
-
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 }
 
@@ -94,8 +73,6 @@ internal class EnableCodeCoverageArgumentProcessorCapabilities : BaseArgumentPro
 /// </summary>
 internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
 {
-    #region private variables
-
     private readonly IRunSettingsProvider _runSettingsManager;
     private readonly CommandLineOptions _commandLineOptions;
     private readonly IFileHelper _fileHelper;
@@ -184,8 +161,6 @@ internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
         @"          </CodeCoverage>" + Environment.NewLine +
         @"        </Configuration>" + Environment.NewLine +
         @"      </DataCollector>";
-
-    #endregion
 
     #endregion
 
@@ -309,18 +284,8 @@ internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
     /// <param name="runSettingDocument"> XPathNavigable representation of a runsettings file </param>
     /// <param name="dataCollectorFriendlyName"> The data Collector friendly name. </param>
     /// <returns> True if there is a datacollector configured. </returns>
-    private static bool ContainsDataCollectorWithFriendlyName(IXPathNavigable runSettingDocument, string dataCollectorFriendlyName)
+    private static bool ContainsDataCollectorWithFriendlyName(IXPathNavigable runSettingDocument!!, string dataCollectorFriendlyName!!)
     {
-        if (runSettingDocument == null)
-        {
-            throw new ArgumentNullException(nameof(runSettingDocument));
-        }
-
-        if (dataCollectorFriendlyName == null)
-        {
-            throw new ArgumentNullException(nameof(dataCollectorFriendlyName));
-        }
-
         var navigator = runSettingDocument.CreateNavigator();
         var nodes = navigator.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
 

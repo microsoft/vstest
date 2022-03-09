@@ -1,15 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.TestUtilities;
-
-using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
-using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,6 +9,17 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.TestUtilities;
 
 /// <summary>
 /// Base class for integration tests.
@@ -45,7 +47,7 @@ public class IntegrationTestBase
     private readonly string _xUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
     private readonly string _chutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools".Replace('\\', Path.DirectorySeparatorChar);
 
-    protected static readonly bool IsWindows = System.Environment.OSVersion.Platform.ToString().StartsWith("Win");
+    protected static readonly bool IsWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
 
     public enum UnitTestFramework
     {
@@ -55,6 +57,9 @@ public class IntegrationTestBase
     public IntegrationTestBase()
     {
         _testEnvironment = new IntegrationTestEnvironment();
+        BuildConfiguration = IntegrationTestEnvironment.BuildConfiguration;
+        TempDirectory = new TempDirectory();
+        IsCI = IntegrationTestEnvironment.IsCI;
     }
 
     public string StdOut => _standardTestOutput;
@@ -62,6 +67,24 @@ public class IntegrationTestBase
 
     public string StdErr => _standardTestError;
     public string StdErrWithWhiteSpace { get; private set; } = string.Empty;
+
+    public TempDirectory TempDirectory { get; }
+
+    public TestContext TestContext { get; set; }
+
+    public string BuildConfiguration { get; }
+
+    public bool IsCI { get; }
+
+    [TestCleanup]
+    public void TempDirectoryCleanup()
+    {
+        // Delete the directory only when the test succeeded, so we can look at results and logs of failed tests.
+        if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+        {
+            TempDirectory.Dispose();
+        }
+    }
 
     /// <summary>
     /// Prepare arguments for <c>vstest.console.exe</c>.
@@ -181,9 +204,7 @@ public class IntegrationTestBase
         string runSettings = "",
         Dictionary<string, string> environmentVariables = null)
     {
-        using var workspace = new TempDirectory();
-
-        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: workspace.Path);
+        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
         InvokeVsTest(arguments, environmentVariables);
     }
 
@@ -195,9 +216,7 @@ public class IntegrationTestBase
     /// <param name="runSettings">Run settings for execution.</param>
     public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "", Dictionary<string, string> environmentVariables = null)
     {
-        using var workspace = new TempDirectory();
-
-        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, _testEnvironment.InIsolationValue, resultsDirectory: workspace.Path);
+        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /listtests");
         InvokeVsTest(arguments, environmentVariables);
     }
@@ -365,8 +384,8 @@ public class IntegrationTestBase
             var flag = _standardTestOutput.Contains(test)
                        || _standardTestOutput.Contains(GetTestMethodName(test));
             Assert.IsTrue(flag, $"Test {test} does not appear in discovered tests list." +
-                                $"{System.Environment.NewLine}Std Output: {_standardTestOutput}" +
-                                $"{System.Environment.NewLine}Std Error: { _standardTestError}");
+                                $"{Environment.NewLine}Std Output: {_standardTestOutput}" +
+                                $"{Environment.NewLine}Std Error: { _standardTestError}");
         }
     }
 
@@ -381,8 +400,8 @@ public class IntegrationTestBase
             var flag = _standardTestOutput.Contains(test)
                        || _standardTestOutput.Contains(GetTestMethodName(test));
             Assert.IsFalse(flag, $"Test {test} should not appear in discovered tests list." +
-                                $"{System.Environment.NewLine}Std Output: {_standardTestOutput}" +
-                                $"{System.Environment.NewLine}Std Error: { _standardTestError}");
+                                $"{Environment.NewLine}Std Output: {_standardTestOutput}" +
+                                $"{Environment.NewLine}Std Error: { _standardTestError}");
         }
     }
 
@@ -396,8 +415,8 @@ public class IntegrationTestBase
             var flag = fileOutput.Contains(test)
                        || fileOutput.Contains(GetTestMethodName(test));
             Assert.IsTrue(flag, $"Test {test} does not appear in discovered tests list." +
-                                $"{System.Environment.NewLine}Std Output: {_standardTestOutput}" +
-                                $"{System.Environment.NewLine}Std Error: { _standardTestError}");
+                                $"{Environment.NewLine}Std Output: {_standardTestOutput}" +
+                                $"{Environment.NewLine}Std Error: { _standardTestError}");
         }
     }
 
@@ -453,12 +472,12 @@ public class IntegrationTestBase
 
     protected bool IsDesktopRunner()
     {
-        return _testEnvironment.RunnerFramework == IntegrationTestBase.DesktopRunnerFramework;
+        return _testEnvironment.RunnerFramework == DesktopRunnerFramework;
     }
 
     protected bool IsNetCoreRunner()
     {
-        return _testEnvironment.RunnerFramework == IntegrationTestBase.CoreRunnerFramework;
+        return _testEnvironment.RunnerFramework == CoreRunnerFramework;
     }
 
     /// <summary>
@@ -503,11 +522,26 @@ public class IntegrationTestBase
     /// <summary>
     /// Returns the VsTestConsole Wrapper.
     /// </summary>
-    /// <returns></returns>
+    public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
+    {
+        return GetVsTestConsoleWrapper(TempDirectory);
+    }
+
+    /// <summary>
+    /// Returns the VsTestConsole Wrapper.
+    /// </summary>
     public IVsTestConsoleWrapper GetVsTestConsoleWrapper(out TempDirectory logFileDir)
     {
         logFileDir = new TempDirectory();
+        return GetVsTestConsoleWrapper(logFileDir);
+    }
 
+    /// <summary>
+    /// Returns the VsTestConsole Wrapper.
+    /// </summary>
+    /// <returns></returns>
+    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(TempDirectory logFileDir)
+    {
         if (!Directory.Exists(logFileDir.Path))
         {
             Directory.CreateDirectory(logFileDir.Path);
@@ -557,7 +591,7 @@ public class IntegrationTestBase
         return testMethodName;
     }
 
-    private void ExecuteVsTestConsole(string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null)
+    protected void ExecuteVsTestConsole(string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null)
     {
         if (IsNetCoreRunner())
         {
@@ -590,11 +624,16 @@ public class IntegrationTestBase
         ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
     }
 
-    protected void ExecuteApplication(string path, string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null, string workingDirectory = null)
+    protected static void ExecuteApplication(string path, string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null, string workingDirectory = null)
     {
         if (string.IsNullOrWhiteSpace(path))
         {
             throw new ArgumentException("Executable path must not be null or whitespace.", nameof(path));
+        }
+
+        if (!File.Exists(path))
+        {
+            throw new ArgumentException($"Executable path '{path}' could not be found.", nameof(path));
         }
 
         var executableName = Path.GetFileName(path);
@@ -744,30 +783,12 @@ public class IntegrationTestBase
     /// <summary>
     /// Counts the number of logs following the '*.host.*' pattern in the given folder.
     /// </summary>
-    protected static int CountTestHostLogs(string diagLogsDir, IEnumerable<string> testHostProcessNames)
-        => Directory.GetFiles(diagLogsDir, "*.host.*")
-            .Count(filePath =>
-            {
-                var firstLine = File.ReadLines(filePath).FirstOrDefault();
-                return testHostProcessNames.Any(processName =>
-                {
-                    var parts = processName.Split('.');
-                    if (parts.Length > 2)
-                    {
-                        throw new InvalidOperationException("");
-                    }
-
-                    var hostName = parts[0];
-                    var platformName = parts.Length > 1 ? @$"\.{parts[1]}" : string.Empty;
-
-                    var isMatch = Regex.IsMatch(firstLine, @$",\s{hostName}(?:\.net\d+)?{platformName}\.(?:exe|dll),");
-                    return isMatch;
-                });
-            });
+    protected static int CountTestHostLogs(string diagLogsDir)
+        => Directory.GetFiles(diagLogsDir, "*.host.*").Length;
 
     protected static void AssertExpectedNumberOfHostProcesses(int expectedNumOfProcessCreated, string diagLogsDir, IEnumerable<string> testHostProcessNames, string arguments = null, string runnerPath = null)
     {
-        var processCreatedCount = CountTestHostLogs(diagLogsDir, testHostProcessNames);
+        var processCreatedCount = CountTestHostLogs(diagLogsDir);
         Assert.AreEqual(
             expectedNumOfProcessCreated,
             processCreatedCount,
@@ -776,7 +797,7 @@ public class IntegrationTestBase
 
     protected static string GetDownloadedDotnetMuxerFromTools(string architecture)
     {
-        if (architecture != "X86" && architecture != "X64")
+        if (architecture is not "X86" and not "X64")
         {
             throw new NotSupportedException(nameof(architecture));
         }

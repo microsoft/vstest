@@ -1,19 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 #if !NETSTANDARD1_0
 using System.Xml;
 #endif
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Stores information about a test settings.
 /// </summary>
 public abstract class TestRunSettings
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes with the name of the test case.
     /// </summary>
@@ -25,10 +25,6 @@ public abstract class TestRunSettings
         Name = name;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets the name of the test settings.
     /// Do not put a private setter on this
@@ -37,8 +33,6 @@ public abstract class TestRunSettings
     /// TODO: Communicate to Chutzpah and fix it
     /// </summary>
     public string Name { get; }
-
-    #endregion
 
 #if !NETSTANDARD1_0
     /// <summary>

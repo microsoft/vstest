@@ -1,16 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Utilities;
-
 using System;
 using System.Globalization;
 using System.IO;
 using System.Xml;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-using UtilitiesResources = Resources.Resources;
+using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
 /// The legacy mstest.exe settings utilities.

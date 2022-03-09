@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 
-using Resources;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// This attribute is applied to extensions so they can be uniquely identified.
@@ -16,8 +18,6 @@ using Resources;
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public sealed class ExtensionUriAttribute : Attribute
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes with the Uri of the extension.
     /// </summary>
@@ -32,15 +32,9 @@ public sealed class ExtensionUriAttribute : Attribute
         ExtensionUri = extensionUri;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// The Uri of the Test Executor.
     /// </summary>
     public string ExtensionUri { get; private set; }
-
-    #endregion
 
 }

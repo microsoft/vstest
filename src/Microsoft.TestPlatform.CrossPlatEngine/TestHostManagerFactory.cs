@@ -1,15 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 
-using Discovery;
-
-using Execution;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-using ObjectModel.Engine.TesthostProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
 /// <summary>
 /// The factory that provides discovery and execution managers to the test host.
@@ -26,9 +28,9 @@ public class TestHostManagerFactory : ITestHostManagerFactory
     /// <param name="requestData">
     /// Provide common services and data for a discovery/run request.
     /// </param>
-    public TestHostManagerFactory(IRequestData requestData)
+    public TestHostManagerFactory(IRequestData requestData!!)
     {
-        _requestData = requestData ?? throw new System.ArgumentNullException(nameof(requestData));
+        _requestData = requestData;
     }
 
     /// <summary>

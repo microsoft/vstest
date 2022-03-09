@@ -1,16 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
-
 using System;
 using System.Diagnostics;
 using System.Globalization;
 
-using Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 /// <summary>
 /// Class used by data collectors to send messages to the client
@@ -50,13 +52,10 @@ internal class TestPlatformDataCollectionLogger : DataCollectionLogger
         ValidateArg.NotNull(context, nameof(context));
         ValidateArg.NotNull(text, nameof(text));
 
-        if (EqtTrace.IsErrorEnabled)
-        {
-            EqtTrace.Error(
-                "Data collector '{0}' logged the following error: {1}",
-                _dataCollectorConfig.TypeUri,
-                text);
-        }
+        EqtTrace.Error(
+            "Data collector '{0}' logged the following error: {1}",
+            _dataCollectorConfig.TypeUri,
+            text);
 
         SendTextMessage(context, text, TestMessageLevel.Error);
     }
@@ -75,19 +74,16 @@ internal class TestPlatformDataCollectionLogger : DataCollectionLogger
             throw new InvalidOperationException(Resources.Resources.WrongDataCollectionContextType);
         }
 
-        if (EqtTrace.IsErrorEnabled)
-        {
-            EqtTrace.Error(
-                "Data collector '{0}' logged the following error:" + Environment.NewLine +
-                "Description:            {1}" + Environment.NewLine +
-                "Exception type:         {2}" + Environment.NewLine + "Exception message:      {3}"
-                + Environment.NewLine + "Exception stack trace:  {4}",
-                _dataCollectorConfig.TypeUri,
-                text,
-                exception.GetType(),
-                exception.Message,
-                exception.StackTrace);
-        }
+        EqtTrace.Error(
+            "Data collector '{0}' logged the following error:" + Environment.NewLine +
+            "Description:            {1}" + Environment.NewLine +
+            "Exception type:         {2}" + Environment.NewLine + "Exception message:      {3}"
+            + Environment.NewLine + "Exception stack trace:  {4}",
+            _dataCollectorConfig.TypeUri,
+            text,
+            exception.GetType(),
+            exception.Message,
+            exception.StackTrace);
 
         // Currently there is one type of DataCollectionMessage sent across client for all message kind.
         // If required new type can be created for different message type.
@@ -133,7 +129,7 @@ internal class TestPlatformDataCollectionLogger : DataCollectionLogger
         ValidateArg.NotNull(text, nameof(text));
 
         Debug.Assert(
-            level >= TestMessageLevel.Informational && level <= TestMessageLevel.Error,
+            level is >= TestMessageLevel.Informational and <= TestMessageLevel.Error,
             "Invalid level: " + level);
 
         // Make sure the data collection context is not a derived data collection context.  This

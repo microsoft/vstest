@@ -1,23 +1,25 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Interfaces;
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
 
 [TestClass]
 public class VsTestConsoleWrapperAsyncTests
@@ -203,23 +205,27 @@ public class VsTestConsoleWrapperAsyncTests
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task StopTestSessionAsyncShouldCallRequestSenderWithCorrectArguments()
     {
+        var testPlatformOptions = new TestPlatformOptions();
         var testSessionInfo = new TestSessionInfo();
         var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
 
         _mockRequestSender.Setup(
                 rs => rs.StopTestSessionAsync(
                     It.IsAny<TestSessionInfo>(),
+                    It.IsAny<TestPlatformOptions>(),
                     It.IsAny<ITestSessionEventsHandler>()))
             .Returns(Task.FromResult(true));
 
         Assert.IsTrue(
             await _consoleWrapper.StopTestSessionAsync(
                 testSessionInfo,
+                testPlatformOptions,
                 mockEventsHandler.Object).ConfigureAwait(false));
 
         _mockRequestSender.Verify(
             rs => rs.StopTestSessionAsync(
                 testSessionInfo,
+                testPlatformOptions,
                 mockEventsHandler.Object),
             Times.Once);
     }

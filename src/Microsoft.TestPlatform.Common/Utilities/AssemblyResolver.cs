@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,9 +8,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using ObjectModel;
-using PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
 internal class AssemblyResolver : IDisposable
 {
@@ -48,10 +50,7 @@ internal class AssemblyResolver : IDisposable
     [System.Security.SecurityCritical]
     public AssemblyResolver(IEnumerable<string> directories)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info($"AssemblyResolver.ctor: Creating AssemblyResolver with searchDirectories {string.Join(",", directories)}");
-        }
+        EqtTrace.Info($"AssemblyResolver.ctor: Creating AssemblyResolver with searchDirectories {string.Join(",", directories)}");
 
         _resolvedAssemblies = new Dictionary<string, Assembly>();
 
@@ -70,10 +69,7 @@ internal class AssemblyResolver : IDisposable
     [System.Security.SecurityCritical]
     internal void AddSearchDirectories(IEnumerable<string> directories)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info($"AssemblyResolver.AddSearchDirectories: Adding more searchDirectories {string.Join(",", directories)}");
-        }
+        EqtTrace.Info($"AssemblyResolver.AddSearchDirectories: Adding more searchDirectories {string.Join(",", directories)}");
 
         foreach (var directory in directories)
         {
@@ -120,10 +116,7 @@ internal class AssemblyResolver : IDisposable
             }
             catch (Exception ex)
             {
-                if (EqtTrace.IsInfoEnabled)
-                {
-                    EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to create assemblyName. Reason:{1} ", args.Name, ex);
-                }
+                EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to create assemblyName. Reason:{1} ", args.Name, ex);
 
                 _resolvedAssemblies[args.Name] = null;
                 return null;
@@ -186,10 +179,7 @@ internal class AssemblyResolver : IDisposable
                 }
             }
 
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to load assembly.", args.Name);
-            }
+            EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to load assembly.", args.Name);
 
             _resolvedAssemblies[args.Name] = null;
             return null;

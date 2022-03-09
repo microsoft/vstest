@@ -1,16 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Xml;
 
-using Utility;
+using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
-using XML;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
 /// Data entry from a collector along with information what this collector is and what agent it was collected on.
@@ -19,8 +21,6 @@ using XML;
 /// </summary>
 internal class CollectorDataEntry : IXmlTestStore
 {
-    #region Private Fields
-
     /// <summary>
     /// List of data attachments. These attachments can be things such as files that the
     /// collector wants to make available to the publishers.
@@ -51,10 +51,6 @@ internal class CollectorDataEntry : IXmlTestStore
     /// Name of the collector that should be displayed to the user.
     /// </summary>
     private string _collectorDisplayName;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Used by the aggregator to put collector Uri, agentName, string agentDisplayName, whether it's remote data, and
@@ -127,10 +123,6 @@ internal class CollectorDataEntry : IXmlTestStore
         }
     }
 
-    #endregion
-
-    #region Public Properties
-
     /// <summary>
     /// Gets the read-only list of data attachments
     /// </summary>
@@ -142,7 +134,6 @@ internal class CollectorDataEntry : IXmlTestStore
         }
     }
 
-    #endregion
 
     #region IXmlTestStore Members
 
@@ -175,20 +166,12 @@ internal class CollectorDataEntry : IXmlTestStore
     }
 
     #endregion
-
-    #region Internal Methods
-
     /// <summary>
     /// Adds a data attachment to the list of data attachments
     /// </summary>
     /// <param name="attachment">The attachment to add</param>
-    internal void AddAttachment(IDataAttachment attachment)
+    internal void AddAttachment(IDataAttachment attachment!!)
     {
-        if (attachment == null)
-        {
-            throw new ArgumentNullException(nameof(attachment));
-        }
-
         _attachments.Add(attachment);
     }
 
@@ -205,10 +188,6 @@ internal class CollectorDataEntry : IXmlTestStore
 
         return new CollectorDataEntry(this, resultsDirectory, useAbsolutePaths);
     }
-
-    #endregion
-
-    #region Private Methods
 
     private void Initialize(Uri uri, string collectorDisplayName, string agentName, string agentDisplayName, bool isFromRemoteAgent, IEnumerable<IDataAttachment> attachments)
     {
@@ -234,5 +213,4 @@ internal class CollectorDataEntry : IXmlTestStore
         _isFromRemoteAgent = isFromRemoteAgent;
     }
 
-    #endregion
 }

@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
-
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 // monitoring the processes does not work correctly
@@ -41,18 +43,17 @@ public class PlatformTests : AcceptanceTestBase
 
     private void RunTestExecutionWithPlatform(string platformArg, string testhostProcessName, int expectedNumOfProcessCreated)
     {
-        using var tempDir = new TempDirectory();
 
         var arguments = PrepareArguments(
             GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
-            _testEnvironment.InIsolationValue, resultsDirectory: tempDir.Path);
+            _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
 
-        arguments = string.Concat(arguments, platformArg, GetDiagArg(tempDir.Path));
+        arguments = string.Concat(arguments, platformArg, GetDiagArg(TempDirectory.Path));
         InvokeVsTest(arguments);
 
-        AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, tempDir.Path, new[] { testhostProcessName }, arguments, GetConsoleRunnerPath());
+        AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, TempDirectory.Path, new[] { testhostProcessName }, arguments, GetConsoleRunnerPath());
         ValidateSummaryStatus(1, 1, 1);
     }
 }

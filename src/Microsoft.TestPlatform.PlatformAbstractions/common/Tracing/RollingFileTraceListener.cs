@@ -3,12 +3,14 @@
 
 #if NETFRAMEWORK || NETCOREAPP || NETSTANDARD2_0
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Performs logging to a file and rolls the output file when either time or size thresholds are
@@ -118,7 +120,7 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// <summary>
         /// Whether the object is disposed or not.
         /// </summary>
-        private bool _disposed = false;
+        private bool _disposed;
 
         /// <summary>
         /// A tally keeping writer used when file size rolling is configured.<para/>
@@ -314,14 +316,9 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// <param name="stream">
         /// The <see cref="FileStream"/> to write to.
         /// </param>
-        public TallyKeepingFileStreamWriter(FileStream stream)
+        public TallyKeepingFileStreamWriter(FileStream stream!!)
             : base(stream)
         {
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
-
             Tally = stream.Length;
         }
 
@@ -334,19 +331,9 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// <param name="encoding">
         /// The <see cref="Encoding"/> to use.
         /// </param>
-        public TallyKeepingFileStreamWriter(FileStream stream, Encoding encoding)
+        public TallyKeepingFileStreamWriter(FileStream stream!!, Encoding encoding!!)
             : base(stream, encoding)
         {
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
-
-            if (encoding == null)
-            {
-                throw new ArgumentNullException(nameof(encoding));
-            }
-
             Tally = stream.Length;
         }
 

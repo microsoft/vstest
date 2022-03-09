@@ -8,7 +8,6 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net472</TargetFrameworks>
-    <LangVersion>preview</LangVersion>
     <AssemblyName>AttachVS</AssemblyName>
   </PropertyGroup>
   <ItemGroup>

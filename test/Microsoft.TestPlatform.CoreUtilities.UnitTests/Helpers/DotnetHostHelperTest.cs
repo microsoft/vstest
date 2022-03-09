@@ -1,19 +1,23 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-using VisualStudio.TestTools.UnitTesting;
-using Win32;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Win32;
+
 using Moq;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers;
 
 [TestClass]
 public class DotnetHostHelperTest : IDisposable

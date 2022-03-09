@@ -1,22 +1,24 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 
-using Internal;
-using Utilities;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 internal class EnableDiagArgumentProcessor : IArgumentProcessor
 {
@@ -48,37 +50,17 @@ internal class EnableDiagArgumentProcessor : IArgumentProcessor
     }
 
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new EnableDiagArgumentProcessorCapabilities());
-            }
-
-            return _metadata;
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new EnableDiagArgumentProcessorCapabilities());
 
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor = new Lazy<IArgumentExecutor>(() => new EnableDiagArgumentExecutor(_fileHelper));
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() => new EnableDiagArgumentExecutor(_fileHelper));
 
-            return _executor;
-        }
-
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 }
 
@@ -112,8 +94,6 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
     /// </summary>
     public const string TraceLevelParam = "tracelevel";
 
-    #region Constructor
-
     /// <summary>
     /// Default constructor.
     /// </summary>
@@ -123,7 +103,6 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         _fileHelper = fileHelper;
     }
 
-    #endregion
 
     #region IArgumentExecutor
 
@@ -156,7 +135,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         // Initialize diag logging.
         InitializeDiagLogging(diagFilePath, diagParameters);
 
-        // Write version to the log here, because that is the 
+        // Write version to the log here, because that is the
         // first place where we know if we log or not.
         EqtTrace.Verbose($"Version: {Product.Version}");
     }
@@ -226,8 +205,12 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         // Remove double quotes if present.
         diagFilePathArgument = diagFilePathArgument.Replace("\"", "");
 
-        // Create base directory for diag file path (if doesn't exist)
-        CreateDirectoryIfNotExists(diagFilePathArgument);
+        // If we provide a directory we don't need to create the base directory.
+        if (!diagFilePathArgument.EndsWith(@"\") && !diagFilePathArgument.EndsWith("/"))
+        {
+            // Create base directory for diag file path (if doesn't exist)
+            CreateDirectoryIfNotExists(diagFilePathArgument);
+        }
 
         // return full diag file path. (This is done so that vstest and testhost create logs at same location.)
         return Path.GetFullPath(diagFilePathArgument);

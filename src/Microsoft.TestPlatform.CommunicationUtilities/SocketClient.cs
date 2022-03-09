@@ -1,19 +1,21 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-
 using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-using Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
 /// Communication client implementation over sockets.
@@ -82,35 +84,29 @@ public class SocketClient : ICommunicationEndPoint
             if (connectAsyncTask.IsFaulted)
             {
                 Connected.SafeInvoke(this, new ConnectedEventArgs(connectAsyncTask.Exception), "SocketClient: Server Failed to Connect");
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("Unable to connect to server, Exception occurred : {0}", connectAsyncTask.Exception);
-                }
+                EqtTrace.Verbose("Unable to connect to server, Exception occurred: {0}", connectAsyncTask.Exception);
             }
             else
             {
                 _channel = _channelFactory(_tcpClient.GetStream());
                 Connected.SafeInvoke(this, new ConnectedEventArgs(_channel), "SocketClient: ServerConnected");
 
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("Connected to server, and starting MessageLoopAsync");
-                }
+                EqtTrace.Verbose("Connected to server, and starting MessageLoopAsync");
 
                 // Start the message loop
                 Task.Run(() => _tcpClient.MessageLoopAsync(
                         _channel,
-                        Stop,
+                        StopOnError,
                         _cancellation.Token))
                     .ConfigureAwait(false);
             }
         }
     }
 
-    private void Stop(Exception error)
+    private void StopOnError(Exception error)
     {
         EqtTrace.Info("SocketClient.PrivateStop: Stop communication from server endpoint: {0}, error:{1}", _endPoint, error);
-
+        // This is here to prevent stack overflow.
         if (!_stopped)
         {
             // Do not allow stop to be called multiple times.

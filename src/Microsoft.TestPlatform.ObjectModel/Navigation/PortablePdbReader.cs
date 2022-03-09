@@ -1,13 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
-
 using System;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
 /// <summary>
 /// The portable pdb reader.
@@ -95,8 +97,10 @@ internal class PortablePdbReader : IDisposable
     internal static bool IsPortable(Stream stream)
     {
         // First four bytes should be 'BSJB'
+#pragma warning disable IDE0078 // Use pattern matching (may change code meaning)
         var result = (stream.ReadByte() == 'B') && (stream.ReadByte() == 'S') && (stream.ReadByte() == 'J')
                      && (stream.ReadByte() == 'B');
+#pragma warning restore IDE0078 // Use pattern matching (may change code meaning)
         stream.Position = 0;
         return result;
     }

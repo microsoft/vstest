@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
 using System;
-
 #if !NETSTANDARD1_0
 using System.Security.Cryptography;
 #endif
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 /// <summary>
 /// Used to calculate SHA1 hash.
@@ -67,20 +68,14 @@ internal static class Sha1Helper
         /// </returns>
         private static uint F(int t, uint b, uint c, uint d)
         {
-            if (t >= 0 && t <= 19)
+            return t switch
             {
-                return (b & c) | (~b & d);
-            }
-            else if ((t >= 20 && t <= 39) || (t >= 60 && t <= 79))
-            {
-                return b ^ c ^ d;
-            }
-            else
-            {
-                return t >= 40 && t <= 59
-                    ? (b & c) | (b & d) | (c & d)
-                    : throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t));
-            }
+                >= 0 and <= 19 => b & c | ~b & d,
+                >= 20 and <= 39 or >= 60 and <= 79 => b ^ c ^ d,
+                _ => t is >= 40 and <= 59
+                    ? b & c | b & d | c & d
+                    : throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t))
+            };
         }
 
         /// <summary>
@@ -95,23 +90,15 @@ internal static class Sha1Helper
         /// </returns>
         private static uint K(int t)
         {
-
-            if (t >= 0 && t <= 19)
+            return t switch
             {
-                return 0x5A827999u;
-            }
-            else if (t >= 20 && t <= 39)
-            {
-                return 0x6ED9EBA1u;
-            }
-            else if (t >= 40 && t <= 59)
-            {
-                return 0x8F1BBCDCu;
-            }
-            else
-            {
-                return t >= 60 && t <= 79 ? 0xCA62C1D6u : throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t));
-            }
+                >= 0 and <= 19 => 0x5A827999u,
+                >= 20 and <= 39 => 0x6ED9EBA1u,
+                >= 40 and <= 59 => 0x8F1BBCDCu,
+                _ => t is >= 60 and <= 79
+                    ? 0xCA62C1D6u
+                    : throw new ArgumentException("Argument out of bounds! 0 <= t < 80", nameof(t))
+            };
         }
 
         /// <summary>

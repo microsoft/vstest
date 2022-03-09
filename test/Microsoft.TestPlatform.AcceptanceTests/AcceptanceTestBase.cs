@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
-
 using System;
 
 using Microsoft.TestPlatform.TestUtilities;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 public class AcceptanceTestBase : IntegrationTestBase
 {
@@ -84,7 +86,7 @@ public class AcceptanceTestBase : IntegrationTestBase
         };
 
     protected bool IsDesktopTargetFramework()
-        => _testEnvironment.TargetFramework == AcceptanceTestBase.DesktopTargetFramework;
+        => _testEnvironment.TargetFramework == DesktopTargetFramework;
 
     protected string GetTargetFramworkForRunsettings()
     {

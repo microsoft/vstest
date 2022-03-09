@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
-
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
@@ -16,20 +18,19 @@ public class CuitTest : AcceptanceTestBase
     public void CuitRunAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        CuitRunAll(runnerInfo.RunnerFramework);
+        CuitRunAll(runnerInfo);
     }
 
-    private void CuitRunAll(string runnerFramework)
+    private void CuitRunAll(RunnerInfo runnerInfo)
     {
-        if (runnerFramework.StartsWith("netcoreapp"))
+        if (runnerInfo.IsNetRunner)
         {
-            Assert.Inconclusive("CUIT tests are not supported with .Netcore runner.");
+            Assert.Inconclusive("CUIT tests are not supported with .NET Core runner.");
             return;
         }
 
         var assemblyAbsolutePath = _testEnvironment.GetTestAsset("CUITTestProject.dll", "net451");
-        using var tempDir = new TempDirectory();
-        var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 0, 0);

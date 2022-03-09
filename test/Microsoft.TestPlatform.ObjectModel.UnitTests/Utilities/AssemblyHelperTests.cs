@@ -3,13 +3,17 @@
 
 #if NETFRAMEWORK
 
-namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities;
+using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using Moq;
-using System;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities;
 
 [TestClass]
 public class AssemblyHelperTests

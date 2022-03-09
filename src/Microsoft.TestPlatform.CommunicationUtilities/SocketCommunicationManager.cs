@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -15,6 +13,10 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
 /// Facilitates communication using sockets
@@ -124,11 +126,8 @@ public class SocketCommunicationManager : ICommunicationManager
             _binaryWriter = new BinaryWriter(bufferedStream);
 
             _clientConnectedEvent.Set();
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
-                EqtTrace.Info("Accepted Client request and set the flag");
-            }
+            EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
+            EqtTrace.Info("Accepted Client request and set the flag");
         }
     }
 
@@ -193,11 +192,8 @@ public class SocketCommunicationManager : ICommunicationManager
                     _binaryReader = new BinaryReader(networkStream);
                     _binaryWriter = new BinaryWriter(bufferedStream);
 
-                    if (EqtTrace.IsInfoEnabled)
-                    {
-                        EqtTrace.Info("Connected to the server successfully ");
-                        EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
-                    }
+                    EqtTrace.Info("Connected to the server successfully ");
+                    EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
 
                     _clientConnectionAcceptedEvent.Set();
                 }

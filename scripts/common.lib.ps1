@@ -81,7 +81,7 @@ function Install-DotNetCli
 {
     $timer = Start-Timer
     Write-Log "Install-DotNetCli: Get dotnet-install.ps1 script..."
-    $dotnetInstallRemoteScript = "https://raw.githubusercontent.com/dotnet/install-scripts/main/src/dotnet-install.ps1"
+    $dotnetInstallRemoteScript = "https://dot.net/v1/dotnet-install.ps1"
     $dotnetInstallScript = Join-Path $env:TP_TOOLS_DIR "dotnet-install.ps1"
     if (-not (Test-Path $env:TP_TOOLS_DIR)) {
         New-Item $env:TP_TOOLS_DIR -Type Directory | Out-Null
@@ -120,10 +120,10 @@ function Install-DotNetCli
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '3.1.22' -Channel '3.1' -Architecture x86 -NoPath
     ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
 
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '5.0.10' -Channel '5.0' -Architecture x64 -NoPath
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '5.0.14' -Channel '5.0' -Architecture x64 -NoPath
     $env:DOTNET_ROOT= $dotnetInstallPath
 
-    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '5.0.10' -Channel '5.0' -Architecture x86 -NoPath
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '5.0.14' -Channel '5.0' -Architecture x86 -NoPath
     ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
 
     $env:DOTNET_MULTILEVEL_LOOKUP=0

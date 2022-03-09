@@ -4,6 +4,8 @@
 using System;
 using System.Globalization;
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Execution;
 
 internal static class UiLanguageOverride

@@ -869,6 +869,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid testSessionCorrelationId.
+        /// </summary>
+        internal static string InvalidTestSessionCorrelationId {
+            get {
+                return ResourceManager.GetString("InvalidTestSessionCorrelationId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Argument {0} is not expected in the &apos;UseVsixExtensions&apos; command. Specify the command indicating whether the vsix extensions should be used or skipped (Example: vstest.console.exe myTests.dll /UseVsixExtensions:true) and try again..
         /// </summary>
         internal static string InvalidUseVsixExtensionsCommand {
@@ -1508,6 +1517,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to --TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+        ///      This affects adapter loading behavior.
+        ///
+        ///      Currently supported behaviours:
+        ///        - Explicit: Test Plarform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). 
+        ///                    If a specific adapter path is provided, adapter will be loaded; if a directory path is provided adapters directly in that folder will be loaded, unless Recursive option is also specified.
+        ///            [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string TestAdapterLoadingStrategyHelp {
+            get {
+                return ResourceManager.GetString("TestAdapterLoadingStrategyHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!.
+        /// </summary>
+        internal static string TestAdapterLoadingStrategyValueInvalid {
+            get {
+                return ResourceManager.GetString("TestAdapterLoadingStrategyValueInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;Recursive&quot; adapter loading strategy is cannot be used by itself. Please specify at least one of: {0}.
+        /// </summary>
+        internal static string TestAdapterLoadingStrategyValueInvalidRecursive {
+            get {
+                return ResourceManager.GetString("TestAdapterLoadingStrategyValueInvalidRecursive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The custom test adapter search path provided was not found, provide a valid path and try again..
         /// </summary>
         internal static string TestAdapterPathDoesNotExist {
@@ -1534,6 +1576,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         internal static string TestAdapterPathValueRequired {
             get {
                 return ResourceManager.GetString("TestAdapterPathValueRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The /TestAdapterPath parameter needs to be provided when &quot;{0}&quot; test adapter loading strategy is specified!.
+        /// </summary>
+        internal static string TestAdapterPathValueRequiredWhenStrategyXIsUsed {
+            get {
+                return ResourceManager.GetString("TestAdapterPathValueRequiredWhenStrategyXIsUsed", resourceCulture);
             }
         }
         

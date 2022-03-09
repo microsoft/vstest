@@ -167,6 +167,16 @@
         <target state="translated">Runsettings 在測試工作階段建立時間與目前執行/探索要求的時間之間有所變更。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="translated">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="translated">附件:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -22,10 +22,6 @@
         <source>An error occurred while loading the settings.  Error: {0}.</source>
         <note></note>
       </trans-unit>
-      <trans-unit id="SystemArchitectureIncompatibleWithTargetPlatform">
-        <source>Incompatible Target platform settings '{0}' with system architecture '{1}'.</source>
-        <note></note>
-      </trans-unit>
       <trans-unit id="UnExpectedSettingsFile">
         <source>Unexpected settings file specified.</source>
         <note></note>

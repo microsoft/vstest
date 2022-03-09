@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
-
 using System;
 using System.Threading.Tasks;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
 
 /// <summary>
 /// Returns the Instance of <see cref="IMetricsPublisher"/> on basis of given parameters.

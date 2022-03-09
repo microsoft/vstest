@@ -167,6 +167,16 @@
         <target state="translated">Les paramètres d'exécution ont changé entre le moment où la session de test a été établie et le moment de la demande d'exécution/découverte actuelle.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="translated">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="translated">Pièces jointes :</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

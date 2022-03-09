@@ -1,32 +1,28 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 
-using Utility;
-using XML;
+using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-using TrxLoggerResources = VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
 /// Class to uniquely identify test results
 /// </summary>
 internal sealed class TestResultId : IXmlTestStore
 {
-    #region Fields
-
     private Guid _runId;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestResultId"/> class.
@@ -51,10 +47,6 @@ internal sealed class TestResultId : IXmlTestStore
         TestId = testId;
     }
 
-    #endregion
-
-    #region properties
-
     /// <summary>
     /// Gets the execution id.
     /// </summary>
@@ -70,7 +62,6 @@ internal sealed class TestResultId : IXmlTestStore
     /// </summary>
     public Guid TestId { get; }
 
-    #endregion
 
     #region Overrides
 
@@ -191,8 +182,6 @@ internal sealed class TestResultErrorInfo : IXmlTestStore
 /// </summary>
 internal class TestResult : ITestResult, IXmlTestStore
 {
-    #region Fields
-
     private readonly string _resultName;
     private string _stdOut;
     private string _stdErr;
@@ -214,10 +203,6 @@ internal class TestResult : ITestResult, IXmlTestStore
     /// Information provided by data collectors for the test case
     /// </summary>
     private readonly List<CollectorDataEntry> _collectorDataEntries = new();
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestResult"/> class.
@@ -261,10 +246,6 @@ internal class TestResult : ITestResult, IXmlTestStore
         RelativeTestResultsDirectory = TestRunDirectories.GetRelativeTestResultsDirectory(executionId);
         _trxFileHelper = trxFileHelper;
     }
-
-    #endregion
-
-    #region properties
 
     /// <summary>
     /// Gets or sets the end time.
@@ -420,7 +401,6 @@ internal class TestResult : ITestResult, IXmlTestStore
     /// </summary>
     public string ResultType { get; set; }
 
-    #endregion
 
     #region Overrides
     public override bool Equals(object obj)

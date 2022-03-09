@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -10,31 +8,31 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
-using Client.RequestHelper;
-using Internal;
-using TestPlatformHelpers;
-using Common;
-using Common.Filtering;
-using Common.Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// Argument Executor for the "--ListFullyQualifiedTests|/ListFullyQualifiedTests" command line argument.
 /// </summary>
 internal class ListFullyQualifiedTestsArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the ListFullyQualifiedTestsArgumentProcessor handles.
     /// </summary>
     public const string CommandName = "/ListFullyQualifiedTests";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -44,43 +42,21 @@ internal class ListFullyQualifiedTestsArgumentProcessor : IArgumentProcessor
     /// Gets the metadata.
     /// </summary>
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ListFullyQualifiedTestsArgumentProcessorCapabilities());
-            }
-
-            return _metadata;
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new ListFullyQualifiedTestsArgumentProcessorCapabilities());
 
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor =
-                    new Lazy<IArgumentExecutor>(
-                        () =>
-                            new ListFullyQualifiedTestsArgumentExecutor(
-                                CommandLineOptions.Instance,
-                                RunSettingsManager.Instance,
-                                TestRequestManager.Instance));
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new ListFullyQualifiedTestsArgumentExecutor(
+                CommandLineOptions.Instance,
+                RunSettingsManager.Instance,
+                TestRequestManager.Instance));
 
-            return _executor;
-        }
-
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 }
 
@@ -100,8 +76,6 @@ internal class ListFullyQualifiedTestsArgumentProcessorCapabilities : BaseArgume
 /// </summary>
 internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -136,10 +110,6 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
     /// List to store the discovered tests
     /// </summary>
     private readonly List<string> _discoveredTests = new();
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -178,7 +148,6 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
         _discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output, _testCasefilter, _discoveredTests, _commandLineOptions);
     }
 
-    #endregion
 
     #region IArgumentExecutor
 
@@ -332,7 +301,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
 
             if (filterWrapper.ParseError != null)
             {
-                var fe = new FormatException(String.Format("Invalid Test Case Filter: {0}", filterString));
+                var fe = new FormatException(string.Format("Invalid Test Case Filter: {0}", filterString));
                 EqtTrace.Error("TestCaseFilter.ValidateFilter : Filtering failed with exception : " + fe.Message);
                 throw fe;
             }

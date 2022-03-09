@@ -1,9 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
-
 using System.Collections.Generic;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
 
 /// <summary>
 /// Stores the start and end index for EventLogEntries corresponding to a data collection session.

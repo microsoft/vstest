@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,27 +11,31 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Extensions.DependencyModel;
+using Microsoft.Extensions.DependencyModel;
 using Microsoft.TestPlatform.TestHostProvider.Hosting;
 using Microsoft.TestPlatform.TestHostProvider.Resources;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
-using Helpers;
-using Helpers.Interfaces;
-using ObjectModel;
-using ObjectModel.Client.Interfaces;
-using ObjectModel.Host;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using PlatformAbstractions;
-using PlatformAbstractions.Interfaces;
-using Utilities;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-using Win32;
+using Microsoft.Win32;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
 
 /// <summary>
 /// A host manager for <c>dotnet</c> core runtime.
@@ -262,7 +264,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             && !IsWinOnArm())
         {
             // testhost.exe is 64-bit and has no suffix other versions have architecture suffix.
-            var exeName = _architecture == Architecture.X64 || _architecture == Architecture.Default || _architecture == Architecture.AnyCPU
+            var exeName = _architecture is Architecture.X64 or Architecture.Default or Architecture.AnyCPU
                 ? "testhost.exe"
                 : $"testhost.{_architecture.ToString().ToLowerInvariant()}.exe";
 
@@ -283,7 +285,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 {
                     // testhost.dll is present in path {testHostNugetRoot}\lib\netcoreapp2.1\testhost.dll
                     // testhost.(x86).exe is present in location {testHostNugetRoot}\build\netcoreapp2.1\{x86/x64}\{testhost.x86.exe/testhost.exe}
-                    var folderName = _architecture == Architecture.X64 || _architecture == Architecture.Default || _architecture == Architecture.AnyCPU
+                    var folderName = _architecture is Architecture.X64 or Architecture.Default or Architecture.AnyCPU
                         ? Architecture.X64.ToString().ToLowerInvariant()
                         : _architecture.ToString().ToLowerInvariant();
 
@@ -694,7 +696,12 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private string GetTestHostPath(string runtimeConfigDevPath, string depsFilePath, string sourceDirectory)
     {
         string testHostPackageName = "microsoft.testplatform.testhost";
-        string testHostPath = null;
+        // This must be empty string, otherwise the Path.Combine below
+        // will fail if a very specific setup is used where you add our dlls
+        // as assemblies directly, but you have no RuntimeAssemblyGroups in deps.json
+        // because you don't add our nuget package. In such case we just want to move on
+        // to the next fallback.
+        string testHostPath = string.Empty;
 
         if (_fileHelper.Exists(depsFilePath))
         {

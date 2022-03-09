@@ -167,6 +167,16 @@
         <target state="translated">Die Ausführungseinstellungen wurden zwischen dem Zeitpunkt, zu dem die Testsitzung eingerichtet wurde, und dem Zeitpunkt der aktuellen Ausführungs-/Ermittlungsanforderung geändert.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="translated">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="translated">Anlagen:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

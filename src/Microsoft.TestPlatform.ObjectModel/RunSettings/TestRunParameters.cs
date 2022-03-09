@@ -1,14 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
 
-using Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// This class deals with the run settings, Test Run Parameters node and the extracting of Key Value Pair's from the parameters listed.

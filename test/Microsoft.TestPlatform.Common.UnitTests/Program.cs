@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.UnitTests;
 
 public static class Program
 {
-    public static void Main(string[] args)
+    public static void Main()
     {
     }
 }

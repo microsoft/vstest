@@ -1,9 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#pragma warning disable IDE1006 // Naming Styles
-namespace vstest.console.Internal;
-#pragma warning restore IDE1006 // Naming Styles
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
@@ -12,12 +13,13 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+#pragma warning disable IDE1006 // Naming Styles
+namespace vstest.console.Internal;
+#pragma warning restore IDE1006 // Naming Styles
 
 /// <summary>
 /// Class for getting matching files from wild card pattern file name

@@ -1,11 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Utilities;
-
-using ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,8 +9,17 @@ using System.Text;
 using System.Xml;
 using System.Xml.XPath;
 
-using OMResources = ObjectModel.Resources.CommonResources;
-using UtilitiesResources = Resources.Resources;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+
+using OMResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
+using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resources;
+
+#nullable disable
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
 /// Utility class for Inferring the runsettings from the current environment and the user specified command line switches.
@@ -119,11 +123,8 @@ public class InferRunSettingsHelper
                 // Delete all invalid RunConfiguration Settings
                 if (listOfInValidRunConfigurationSettings.Count > 0)
                 {
-                    if (EqtTrace.IsWarningEnabled)
-                    {
-                        string settingsName = string.Join(", ", listOfInValidRunConfigurationSettings);
-                        EqtTrace.Warning(string.Format("InferRunSettingsHelper.MakeRunsettingsCompatible: Removing the following settings: {0} from RunSettings file. To use those settings please move to latest version of Microsoft.NET.Test.Sdk", settingsName));
-                    }
+                    string settingsName = string.Join(", ", listOfInValidRunConfigurationSettings);
+                    EqtTrace.Warning("InferRunSettingsHelper.MakeRunsettingsCompatible: Removing the following settings: {0} from RunSettings file. To use those settings please move to latest version of Microsoft.NET.Test.Sdk", settingsName);
 
                     // move navigator to RunConfiguration node
                     runSettingsNavigator.MoveToParent();
@@ -180,9 +181,6 @@ public class InferRunSettingsHelper
         }
 
         EqtTrace.Verbose("Using effective platform:{0} effective framework:{1}", architecture, framework);
-
-        // check if platform is compatible with current system architecture.
-        VerifyCompatibilityWithOsArchitecture(architecture);
 
         // Check if inputRunSettings has results directory configured.
         var hasResultsDirectory = runSettingsDocument.SelectSingleNode(ResultsDirectoryNodePath) != null;
@@ -439,7 +437,7 @@ public class InferRunSettingsHelper
         AddNodeIfNotPresent(runSettingsDocument, TargetPlatformNodePath, TargetPlatformNodeName, platform, overwrite);
     }
 
-    public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, out String deviceXml)
+    public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, out string deviceXml)
     {
         ValidateArg.NotNull(runSettingsNavigator, nameof(runSettingsNavigator));
 
@@ -501,6 +499,7 @@ public class InferRunSettingsHelper
 
         if (root.SelectSingleNode(RunConfigurationNodePath) == null)
         {
+            // TODO: When runsettings are incomplete this will silently return, when we run just TestRequestManager we don't get full settings.
             EqtTrace.Error("InferRunSettingsHelper.UpdateNodeIfNotPresent: Unable to navigate to RunConfiguration. Current node: " + xmlDocument.LocalName);
             return;
         }
@@ -556,27 +555,6 @@ public class InferRunSettingsHelper
                             TargetFrameworkNodeName)));
             }
         }
-    }
-
-    /// <summary>
-    /// Throws SettingsException if platform is incompatible with system architecture.
-    /// </summary>
-    /// <param name="architecture"></param>
-    private static void VerifyCompatibilityWithOsArchitecture(Architecture architecture)
-    {
-        var osArchitecture = XmlRunSettingsUtilities.OSArchitecture;
-
-        if (architecture == Architecture.X86 && osArchitecture == Architecture.X64)
-        {
-            return;
-        }
-
-        if (architecture == osArchitecture)
-        {
-            return;
-        }
-
-        throw new SettingsException(string.Format(CultureInfo.CurrentCulture, UtilitiesResources.SystemArchitectureIncompatibleWithTargetPlatform, architecture, osArchitecture));
     }
 
     /// <summary>
@@ -652,10 +630,10 @@ public class InferRunSettingsHelper
     /// Returns the sources matching the specified platform and framework settings.
     /// For incompatible sources, warning is added to incompatibleSettingWarning.
     /// </summary>
-    public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform, Architecture defaultArchitecture, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks, out String incompatibleSettingWarning)
+    public static IEnumerable<string> FilterCompatibleSources(Architecture chosenPlatform, Architecture defaultArchitecture, Framework chosenFramework, IDictionary<string, Architecture> sourcePlatforms, IDictionary<string, Framework> sourceFrameworks, out string incompatibleSettingWarning)
     {
         incompatibleSettingWarning = string.Empty;
-        List<String> compatibleSources = new();
+        List<string> compatibleSources = new();
         StringBuilder warnings = new();
         warnings.AppendLine();
         bool incompatiblityFound = false;
@@ -704,12 +682,13 @@ public class InferRunSettingsHelper
     /// </summary>
     private static bool IsPlatformIncompatible(Architecture sourcePlatform, Architecture targetPlatform)
     {
-        if (sourcePlatform == Architecture.Default ||
-            sourcePlatform == Architecture.AnyCPU)
+        if (sourcePlatform is Architecture.Default or Architecture.AnyCPU)
         {
             return false;
         }
+
         return targetPlatform == Architecture.X64 && !Is64BitOperatingSystem() || sourcePlatform != targetPlatform;
+
         static bool Is64BitOperatingSystem()
         {
 #if !NETSTANDARD1_3

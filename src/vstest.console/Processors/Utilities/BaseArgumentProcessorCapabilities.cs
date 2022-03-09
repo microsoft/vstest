@@ -26,12 +26,12 @@ internal abstract class BaseArgumentProcessorCapabilities : IArgumentProcessorCa
     /// <summary>
     /// Gets the short command name.
     /// </summary>
-    public virtual string ShortCommandName => null;
+    public virtual string? ShortCommandName => null;
 
     /// <summary>
     /// Gets the help content resource name.
     /// </summary>
-    public virtual string HelpContentResourceName => null;
+    public virtual string? HelpContentResourceName => null;
 
     /// <summary>
     /// Gets the help priority.

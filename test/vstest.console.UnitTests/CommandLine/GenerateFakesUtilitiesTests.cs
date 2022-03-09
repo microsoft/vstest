@@ -1,12 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine;
+using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using CommandLineUtilities;
-using Utilities.Helpers.Interfaces;
-using TestTools.UnitTesting;
 using Moq;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine;
 
 [TestClass]
 public class GenerateFakesUtilitiesTests

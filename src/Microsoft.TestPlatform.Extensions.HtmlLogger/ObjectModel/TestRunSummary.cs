@@ -3,6 +3,8 @@
 
 using System.Runtime.Serialization;
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
 
 /// <summary>

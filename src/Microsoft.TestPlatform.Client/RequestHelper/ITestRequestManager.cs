@@ -1,16 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-
 using System;
 using System.Collections.Generic;
 
-using Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 
 /// <summary>
 /// Defines the contract for running various requests.
@@ -20,7 +22,7 @@ public interface ITestRequestManager : IDisposable
     /// <summary>
     /// Initializes the extensions while probing additional paths.
     /// </summary>
-    /// 
+    ///
     /// <param name="pathToAdditionalExtensions">Paths to additional extensions.</param>
     /// <param name="skipExtensionFilters">Skip extension filtering by name if true.</param>
     void InitializeExtensions(
@@ -35,7 +37,7 @@ public interface ITestRequestManager : IDisposable
     /// <summary>
     /// Discovers tests given a list of sources and some run settings.
     /// </summary>
-    /// 
+    ///
     /// <param name="discoveryPayload">Discovery payload.</param>
     /// <param name="disoveryEventsRegistrar">Discovery events registrar.</param>
     /// <param name="protocolConfig">Protocol related information.</param>
@@ -47,7 +49,7 @@ public interface ITestRequestManager : IDisposable
     /// <summary>
     /// Runs tests given a list of sources and some run settings.
     /// </summary>
-    /// 
+    ///
     /// <param name="testRunRequestPayLoad">Test run request payload.</param>
     /// <param name="customTestHostLauncher">Custom test host launcher for the run.</param>
     /// <param name="testRunEventsRegistrar">Run events registrar.</param>
@@ -61,7 +63,7 @@ public interface ITestRequestManager : IDisposable
     /// <summary>
     /// Processes test run attachments.
     /// </summary>
-    /// 
+    ///
     /// <param name="testRunAttachmentsProcessingPayload">
     /// Test run attachments processing payload.
     /// </param>
@@ -77,7 +79,7 @@ public interface ITestRequestManager : IDisposable
     /// <summary>
     /// Starts a test session.
     /// </summary>
-    /// 
+    ///
     /// <param name="payload">The start test session payload.</param>
     /// <param name="testHostLauncher">The custom test host launcher.</param>
     /// <param name="eventsHandler">The events handler.</param>
@@ -85,6 +87,18 @@ public interface ITestRequestManager : IDisposable
     void StartTestSession(
         StartTestSessionPayload payload,
         ITestHostLauncher testHostLauncher,
+        ITestSessionEventsHandler eventsHandler,
+        ProtocolConfig protocolConfig);
+
+    /// <summary>
+    /// Stops a test session.
+    /// </summary>
+    /// 
+    /// <param name="testSessionInfo">The stop test session payload.</param>
+    /// <param name="eventsHandler">The events handler.</param>
+    /// <param name="protocolConfig">Protocol related information.</param>
+    void StopTestSession(
+        StopTestSessionPayload payload,
         ITestSessionEventsHandler eventsHandler,
         ProtocolConfig protocolConfig);
 

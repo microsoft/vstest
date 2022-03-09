@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// An argument processor that allows the user to disable fakes
@@ -13,36 +15,23 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class DisableAutoFakesArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     public const string CommandName = "/DisableAutoFakes";
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
     private Lazy<IArgumentExecutor> _executor;
 
-    #endregion
-
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            return _executor ??= new Lazy<IArgumentExecutor>(
-                () => new DisableAutoFakesArgumentExecutor(
-                    CommandLineOptions.Instance));
-        }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new DisableAutoFakesArgumentExecutor(CommandLineOptions.Instance));
 
         set => _executor = value;
     }
 
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            return _metadata ??= new Lazy<IArgumentProcessorCapabilities>(
-                () => new DisableAutoFakesArgumentProcessorCapabilities());
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new DisableAutoFakesArgumentProcessorCapabilities());
 }
 
 internal class DisableAutoFakesArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
@@ -60,12 +49,10 @@ internal class DisableAutoFakesArgumentExecutor : IArgumentExecutor
 {
     private readonly CommandLineOptions _commandLineOptions;
 
-    #region Constructors
     public DisableAutoFakesArgumentExecutor(CommandLineOptions commandLineOptions)
     {
         _commandLineOptions = commandLineOptions;
     }
-    #endregion
 
     #region IArgumentProcessor
 

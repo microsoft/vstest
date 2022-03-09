@@ -1,9 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-
-using ObjectModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,13 +10,18 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 
+using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-using TrxObjectModel = ObjectModel;
-using System.Text;
+using TrxObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
 /// <summary>
 /// The xml persistence class.
@@ -34,8 +36,6 @@ internal class XmlPersistence
     /// </summary>
     public class DuplicateKeyLoadException : Exception
     {
-        #region Constructors
-
         /// <summary>
         /// Initializes the instance
         /// </summary>
@@ -58,10 +58,6 @@ internal class XmlPersistence
             Key = key;
         }
 
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets the key that was a duplicate
         /// </summary>
@@ -71,12 +67,9 @@ internal class XmlPersistence
             private set;
         }
 
-        #endregion
     }
 
     #endregion
-
-    #region Fields
 
     /// <summary>This is how we persist date time except DateTime.MinValue.</summary>
     private const string DateTimePersistenceFormat = "yyyy'-'MM'-'ddTHH':'mm':'ss'.'fffffffzzz";
@@ -107,10 +100,6 @@ internal class XmlPersistence
     private readonly string _namespaceUri;
     private readonly XmlNamespaceManager _xmlNamespaceManager = new(new NameTable());
 
-    #endregion Fields
-
-    #region Constructors
-
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlPersistence"/> class.
     /// </summary>
@@ -138,8 +127,6 @@ internal class XmlPersistence
             _xmlNamespaceManager.AddNamespace(DefaultNamespacePrefixEquivalent, _namespaceUri);
         }
     }
-
-    #endregion Constructors
 
     /// <summary>
     /// Create root element.

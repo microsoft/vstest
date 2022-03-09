@@ -1,13 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
-
 using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using Newtonsoft.Json.Serialization;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 
 /// <summary>
 /// JSON contract resolver for mapping test platform types for v1 serialization.

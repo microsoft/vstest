@@ -1,13 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.Common.UnitTests.Utilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Xml;
+
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-using System.Xml;
-using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace TestPlatform.Common.UnitTests.Utilities;
 
 [TestClass]
 public class RunSettingsUtilitiesTests
@@ -111,5 +115,5 @@ public class DummyMsTestSetingsProvider : ISettingsProvider
         StringToVerify = reader.ReadOuterXml();
     }
 
-    public static string StringToVerify = string.Empty;
+    public static string StringToVerify { get; private set; } = string.Empty;
 }

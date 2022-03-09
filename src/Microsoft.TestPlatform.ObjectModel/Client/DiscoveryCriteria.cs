@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-using Resources;
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
 /// Defines the discovery criterion.
@@ -104,12 +104,12 @@ public class DiscoveryCriteria
         {
             throw new ArgumentOutOfRangeException(
                 nameof(frequencyOfDiscoveredTestsEvent),
-                Resources.NotificationFrequencyIsNotPositive);
+                Resources.Resources.NotificationFrequencyIsNotPositive);
         }
 
         if (discoveredTestEventTimeout <= TimeSpan.MinValue)
         {
-            throw new ArgumentOutOfRangeException(nameof(discoveredTestEventTimeout), Resources.NotificationTimeoutIsZero);
+            throw new ArgumentOutOfRangeException(nameof(discoveredTestEventTimeout), Resources.Resources.NotificationTimeoutIsZero);
         }
 
         AdapterSourceMap = new Dictionary<string, IEnumerable<string>>
@@ -152,14 +152,14 @@ public class DiscoveryCriteria
     public Dictionary<string, IEnumerable<string>> AdapterSourceMap { get; private set; }
 
     /// <summary>
-    /// Gets the frequency of discovered test event. 
+    /// Gets the frequency of discovered test event.
     /// </summary>
     /// <remarks>
-    /// Discovered test event will be raised after discovering these number of tests. 
-    /// Note that this event is raised asynchronously and the underlying discovery process is not 
-    /// paused during the listener invocation. So if the event handler, you try to query the 
+    /// Discovered test event will be raised after discovering these number of tests.
+    /// Note that this event is raised asynchronously and the underlying discovery process is not
+    /// paused during the listener invocation. So if the event handler, you try to query the
     /// next set of tests, you may get more than 'FrequencyOfDiscoveredTestsEvent'.
-    /// </remarks>        
+    /// </remarks>
     [DataMember]
     public long FrequencyOfDiscoveredTestsEvent { get; private set; }
 
@@ -170,7 +170,7 @@ public class DiscoveryCriteria
     public TimeSpan DiscoveredTestEventTimeout { get; private set; }
 
     /// <summary>
-    /// Gets the test settings used for the discovery request. 
+    /// Gets the test settings used for the discovery request.
     /// </summary>
     [DataMember]
     public string RunSettings { get; private set; }

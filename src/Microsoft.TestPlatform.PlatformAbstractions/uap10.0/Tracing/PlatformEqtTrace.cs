@@ -3,11 +3,13 @@
 
 #if WINDOWS_UWP
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Diagnostics.Tracing;
 using System.IO;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Wrapper class for tracing.
@@ -22,11 +24,11 @@ using System.IO;
 ///       We pass through exceptions thrown due to incorrect arguments to <c>EqtTrace</c> methods.
 /// Usage: <c>EqtTrace.Info("Here's how to trace info");</c>
 /// </summary>
-public class PlatformEqtTrace : IPlatformEqtTrace
+public partial class PlatformEqtTrace : IPlatformEqtTrace
 {
     private static readonly object InitLock = new();
 
-    private static bool s_isInitialized = false;
+    private static bool s_isInitialized;
 
     public static string ErrorOnInitialization { get; set; }
 

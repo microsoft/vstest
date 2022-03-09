@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,8 +9,12 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.XPath;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
 /// <summary>
 /// Provides helper to configure run settings for Fakes. Works even when Fakes are not installed on the machine.
@@ -35,18 +37,8 @@ public static class FakesUtilities
     /// <param name="sources">test sources</param>
     /// <param name="runSettingsXml">runsettings</param>
     /// <returns>updated runsettings for fakes</returns>
-    public static string GenerateFakesSettingsForRunConfiguration(string[] sources, string runSettingsXml)
+    public static string GenerateFakesSettingsForRunConfiguration(string[] sources!!, string runSettingsXml!!)
     {
-        if (sources == null)
-        {
-            throw new ArgumentNullException(nameof(sources));
-        }
-
-        if (runSettingsXml == null)
-        {
-            throw new ArgumentNullException(nameof(runSettingsXml));
-        }
-
         var doc = new XmlDocument();
         using (var xmlReader = XmlReader.Create(
                    new StringReader(runSettingsXml),
@@ -172,9 +164,10 @@ public static class FakesUtilities
 
         // The fallback settings is for the old implementation of fakes 
         // that only supports .Net Framework versions
-        if (framework != FrameworkVersion.Framework35 &&
-            framework != FrameworkVersion.Framework40 &&
-            framework != FrameworkVersion.Framework45)
+        if (framework
+            is not FrameworkVersion.Framework35
+            and not FrameworkVersion.Framework40
+            and not FrameworkVersion.Framework45)
         {
             return false;
         }
@@ -246,10 +239,7 @@ public static class FakesUtilities
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("Failed to create Fakes Configurator. Reason:{0} ", ex);
-            }
+            EqtTrace.Info("Failed to create Fakes Configurator. Reason:{0} ", ex);
         }
 #endif
         return null;
@@ -269,10 +259,7 @@ public static class FakesUtilities
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("Failed to create newly implemented Fakes Configurator. Reason:{0} ", ex);
-            }
+            EqtTrace.Info("Failed to create newly implemented Fakes Configurator. Reason: {0} ", ex);
         }
 
         return null;

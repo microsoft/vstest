@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,20 +8,24 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 
-using Common.Exceptions;
-using Common.ExtensionFramework;
-using Common.Logging;
-using Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using PlatformAbstractions;
-using PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-using CommonResources = Common.Resources.Resources;
+using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 /// <summary>
 /// Responsible for managing logger extensions and broadcasting results
@@ -31,12 +33,10 @@ using CommonResources = Common.Resources.Resources;
 /// </summary>
 internal class TestLoggerManager : ITestLoggerManager
 {
-    #region FieldsLog
-
     /// <summary>
     /// Keeps track if we are disposed.
     /// </summary>
-    private bool _isDisposed = false;
+    private bool _isDisposed;
 
     /// <summary>
     /// Used to keep track of which loggers have been initialized.
@@ -83,10 +83,6 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     private readonly IAssemblyLoadContext _assemblyLoadContext;
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Test logger manager.
     /// </summary>
@@ -114,10 +110,6 @@ internal class TestLoggerManager : ITestLoggerManager
         _assemblyLoadContext = assemblyLoadContext;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Loggers initialized flag.
     /// </summary>
@@ -135,10 +127,6 @@ internal class TestLoggerManager : ITestLoggerManager
             return _testLoggerExtensionManager;
         }
     }
-
-    #endregion
-
-    #region Public Methods
 
     /// <summary>
     /// Initializes all the loggers passed by user
@@ -361,8 +349,6 @@ internal class TestLoggerManager : ITestLoggerManager
         GC.SuppressFinalize(this);
     }
 
-    #endregion
-
     /// <summary>
     /// Initializes logger with the specified URI and parameters.
     /// For ex. TfsPublisher takes parameters such as  Platform, Flavor etc.
@@ -456,10 +442,7 @@ internal class TestLoggerManager : ITestLoggerManager
             }
             catch (SettingsException se)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the test results directory: Error {0}", se);
-                }
+                EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the test results directory: Error {0}", se);
             }
         }
 
@@ -483,10 +466,7 @@ internal class TestLoggerManager : ITestLoggerManager
             }
             catch (SettingsException se)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the target framework: Error {0}", se);
-                }
+                EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the target framework: Error {0}", se);
             }
         }
 
@@ -668,7 +648,7 @@ internal class TestLoggerManager : ITestLoggerManager
         // Add custom logger parameters
         if (_treatNoTestsAsError)
         {
-            loggerParams[Constants.TreatNoTestsAsError] = _treatNoTestsAsError.ToString();
+            loggerParams[ObjectModel.Constants.TreatNoTestsAsError] = _treatNoTestsAsError.ToString();
         }
 
         return loggerParams;

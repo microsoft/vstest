@@ -3,12 +3,14 @@
 
 #if NETFRAMEWORK || NETSTANDARD2_0
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
 using System;
 using System.Threading;
 
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <inheritdoc />
 public class PlatformEnvironment : IEnvironment
@@ -35,7 +37,9 @@ public class PlatformEnvironment : IEnvironment
             // CLR 2.x. See below link for more information:
             // http://www.mono-project.com/docs/faq/technical/#how-to-detect-the-execution-platform
             int p = (int)Environment.OSVersion.Platform;
-            return (p == 4) || (p == 6) || (p == 128) ? PlatformOperatingSystem.Unix : PlatformOperatingSystem.Windows;
+            return p is 4 or 6 or 128
+                ? PlatformOperatingSystem.Unix
+                : PlatformOperatingSystem.Windows;
         }
     }
 
@@ -56,9 +60,7 @@ public class PlatformEnvironment : IEnvironment
 
     /// <inheritdoc />
     public int GetCurrentManagedThreadId()
-    {
-        return Thread.CurrentThread.ManagedThreadId;
-    }
+        => Environment.CurrentManagedThreadId;
 }
 
 #endif

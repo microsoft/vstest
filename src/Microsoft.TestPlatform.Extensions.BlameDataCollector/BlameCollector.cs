@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,6 +14,10 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 /// <summary>
 /// The blame collector.
@@ -301,11 +303,9 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
             {
                 case XmlAttribute attribute when string.Equals(attribute.Name, Constants.CollectDumpAlwaysKey, StringComparison.OrdinalIgnoreCase):
 
-                    if (string.Equals(attribute.Value, Constants.TrueConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.FalseConfigurationValue, StringComparison.OrdinalIgnoreCase))
-                    {
-                        bool.TryParse(attribute.Value, out _collectDumpAlways);
-                    }
-                    else
+                    if ((!string.Equals(attribute.Value, Constants.TrueConfigurationValue, StringComparison.OrdinalIgnoreCase)
+                        && !string.Equals(attribute.Value, Constants.FalseConfigurationValue, StringComparison.OrdinalIgnoreCase))
+                        || !bool.TryParse(attribute.Value, out _collectDumpAlways))
                     {
                         _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.TrueConfigurationValue, Constants.FalseConfigurationValue));
                     }
@@ -397,10 +397,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     {
         ResetInactivityTimer();
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Blame Collector : Test Case Start");
-        }
+        EqtTrace.Info("Blame Collector : Test Case Start");
 
         var blameTestObject = new BlameTestObject(e.TestElement);
 
@@ -423,10 +420,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     {
         ResetInactivityTimer();
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Blame Collector : Test Case End");
-        }
+        EqtTrace.Info("Blame Collector: Test Case End");
 
         _testEndCount++;
 
@@ -446,10 +440,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     {
         ResetInactivityTimer();
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Blame Collector : Session End");
-        }
+        EqtTrace.Info("Blame Collector: Session End");
 
         try
         {
@@ -540,20 +531,12 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         }
         catch (TestPlatformException e)
         {
-            if (EqtTrace.IsWarningEnabled)
-            {
-                EqtTrace.Warning("BlameCollector.TestHostLaunchedHandler: Could not start process dump. {0}", e);
-            }
-
+            EqtTrace.Warning("BlameCollector.TestHostLaunchedHandler: Could not start process dump. {0}", e);
             _logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, e.Message));
         }
         catch (Exception e)
         {
-            if (EqtTrace.IsWarningEnabled)
-            {
-                EqtTrace.Warning("BlameCollector.TestHostLaunchedHandler: Could not start process dump. {0}", e);
-            }
-
+            EqtTrace.Warning("BlameCollector.TestHostLaunchedHandler: Could not start process dump. {0}", e);
             _logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, e.ToString()));
         }
     }

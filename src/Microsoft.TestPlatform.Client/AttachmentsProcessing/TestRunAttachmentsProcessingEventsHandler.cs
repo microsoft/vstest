@@ -1,15 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
-
-using CommunicationUtilities.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Logging;
-
 using System.Collections.Generic;
+
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
 
 /// <summary>
 /// The test run attachments processing events handler.
@@ -31,10 +33,7 @@ public class TestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProc
     /// <inheritdoc/>
     public void HandleTestRunAttachmentsProcessingComplete(TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk)
     {
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Test run attachments processing completed.");
-        }
+        EqtTrace.Info("Test run attachments processing completed.");
 
         var payload = new TestRunAttachmentsProcessingCompletePayload()
         {

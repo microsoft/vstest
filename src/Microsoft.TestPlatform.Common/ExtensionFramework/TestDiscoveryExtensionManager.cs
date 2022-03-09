@@ -1,29 +1,25 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-
 using System;
 using System.Collections.Generic;
 
-using Utilities;
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using ObjectModel;
-using ObjectModel.Adapter;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 /// <summary>
 /// Responsible for managing the Test Discoverer extensions which are available.
 /// </summary>
 internal class TestDiscoveryExtensionManager
 {
-    #region Fields
-
     private static TestDiscoveryExtensionManager s_testDiscoveryExtensionManager;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -40,10 +36,6 @@ internal class TestDiscoveryExtensionManager
         UnfilteredDiscoverers = unfilteredDiscoverers;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets the unfiltered list of test discoverers which are available.
     /// </summary>
@@ -56,10 +48,6 @@ internal class TestDiscoveryExtensionManager
     /// Gets the discoverers which are available for discovering tests.
     /// </summary>
     public IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> Discoverers { get; private set; }
-
-    #endregion
-
-    #region Factory
 
     /// <summary>
     /// Gets an instance of the Test Discovery Extension Manager.
@@ -75,9 +63,7 @@ internal class TestDiscoveryExtensionManager
     {
         if (s_testDiscoveryExtensionManager == null)
         {
-
-            TestPluginManager.Instance
-                .GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+            TestPluginManager.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                     TestPlatformConstants.TestAdapterEndsWithPattern,
                     out var unfilteredTestExtensions,
                     out var testExtensions);
@@ -102,8 +88,7 @@ internal class TestDiscoveryExtensionManager
     public static TestDiscoveryExtensionManager GetDiscoveryExtensionManager(string extensionAssembly)
     {
 
-        TestPluginManager.Instance
-            .GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+        TestPluginManager.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                 extensionAssembly,
                 out var unfilteredTestExtensions,
                 out var testExtensions);
@@ -132,10 +117,7 @@ internal class TestDiscoveryExtensionManager
         }
         catch (Exception ex)
         {
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("TestDiscoveryManager: LoadExtensions: Exception occurred while loading extensions {0}", ex);
-            }
+            EqtTrace.Error("TestDiscoveryManager: LoadExtensions: Exception occurred while loading extensions {0}", ex);
 
             if (throwOnError)
             {
@@ -152,7 +134,6 @@ internal class TestDiscoveryExtensionManager
         s_testDiscoveryExtensionManager = null;
     }
 
-    #endregion
 }
 
 /// <summary>

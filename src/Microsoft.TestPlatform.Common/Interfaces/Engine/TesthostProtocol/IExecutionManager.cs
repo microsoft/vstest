@@ -1,13 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
-
 using System.Collections.Generic;
 
-using Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-using ClientProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
 
 /// <summary>
 /// Orchestrates test execution related functionality for the engine communicating with the test host process.

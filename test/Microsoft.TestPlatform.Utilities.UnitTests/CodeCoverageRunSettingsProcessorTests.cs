@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Utilities.UnitTests;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +9,11 @@ using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Utilities.UnitTests;
 
 [TestClass]
 public class CodeCoverageRunSettingsProcessorTests

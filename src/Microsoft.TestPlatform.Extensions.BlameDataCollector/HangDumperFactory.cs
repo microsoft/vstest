@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
-
 using System;
 using System.Runtime.InteropServices;
 
@@ -10,17 +8,16 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using NuGet.Frameworks;
 
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
+
 internal class HangDumperFactory : IHangDumperFactory
 {
     public Action<string> LogWarning { get; set; }
 
-    public IHangDumper Create(string targetFramework)
+    public IHangDumper Create(string targetFramework!!)
     {
-        if (targetFramework is null)
-        {
-            throw new ArgumentNullException(nameof(targetFramework));
-        }
-
         EqtTrace.Info($"HangDumperFactory: Creating dumper for {RuntimeInformation.OSDescription} with target framework {targetFramework}.");
         var procdumpOverride = Environment.GetEnvironmentVariable("VSTEST_DUMP_FORCEPROCDUMP")?.Trim();
         var netdumpOverride = Environment.GetEnvironmentVariable("VSTEST_DUMP_FORCENETDUMP")?.Trim();

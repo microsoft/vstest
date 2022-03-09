@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,29 +8,34 @@ using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 
-using Extensions.FileSystemGlobbing;
-using Client;
-using Client.RequestHelper;
+using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.VisualStudio.TestPlatform.Client;
+using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-using Publisher;
-using TestPlatformHelpers;
-using Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using CoreUtilities.Tracing.Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
-using ObjectModel.Logging;
-using PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-using TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
 using vstest.console.Internal;
 using vstest.console.UnitTests.Processors;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 /// <summary>
 /// Tests for RunTestsArgumentProcessor
@@ -52,6 +53,7 @@ public class RunTestsArgumentProcessorTests
     private readonly Mock<IMetricsPublisher> _mockMetricsPublisher;
     private readonly Mock<IProcessHelper> _mockProcessHelper;
     private readonly Mock<ITestRunAttachmentsProcessingManager> _mockAttachmentsProcessingManager;
+    private readonly Mock<IArtifactProcessingManager> _artifactProcessingManager;
 
     public RunTestsArgumentProcessorTests()
     {
@@ -63,6 +65,7 @@ public class RunTestsArgumentProcessorTests
         _mockMetricsPublisherTask = Task.FromResult(_mockMetricsPublisher.Object);
         _mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
         _mockAssemblyMetadataProvider = new Mock<IAssemblyMetadataProvider>();
+        _artifactProcessingManager = new Mock<IArtifactProcessingManager>();
         _inferHelper = new InferHelper(_mockAssemblyMetadataProvider.Object);
         SetupMockExtensions();
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
@@ -117,7 +120,7 @@ public class RunTestsArgumentProcessorTests
         CommandLineOptions.Instance.Reset();
         CommandLineOptions.Instance.IsDesignMode = true;
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object);
-        var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, _mockOutput.Object);
+        var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, _artifactProcessingManager.Object, _mockOutput.Object);
 
         Assert.AreEqual(ArgumentProcessorResult.Success, executor.Execute());
     }
@@ -140,6 +143,7 @@ public class RunTestsArgumentProcessorTests
             CommandLineOptions.Instance,
             runSettingsProvider,
             testRequestManager,
+            _artifactProcessingManager.Object,
             _mockOutput.Object
         );
         return executor;

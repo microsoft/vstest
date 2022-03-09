@@ -1,16 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Versioning;
 
-using CommandLine.Processors;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
 
 internal class InferHelper
 {
@@ -78,10 +80,7 @@ internal class InferHelper
             EqtTrace.Error("Failed to determine platform: {0}, using default: {1}", ex, architecture);
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Determined platform for all sources: {0}", architecture);
-        }
+        EqtTrace.Info("Determined platform for all sources: {0}", architecture);
 
         return architecture;
     }
@@ -98,7 +97,7 @@ internal class InferHelper
             {
                 var finalFx = DetermineFrameworkName(sources, sourceFrameworkVersions, out var conflictInFxIdentifier);
                 framework = Framework.FromString(finalFx.FullName);
-                if (conflictInFxIdentifier && EqtTrace.IsInfoEnabled)
+                if (conflictInFxIdentifier)
                 {
                     // TODO Log to console and client.
                     EqtTrace.Info(
@@ -112,10 +111,7 @@ internal class InferHelper
             EqtTrace.Error("Failed to determine framework:{0}, using default: {1}", ex, framework);
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Determined framework for all sources: {0}", framework);
-        }
+        EqtTrace.Info("Determined framework for all sources: {0}", framework);
 
         return framework;
     }

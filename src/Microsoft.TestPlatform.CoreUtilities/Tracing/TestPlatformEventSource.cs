@@ -3,11 +3,13 @@
 
 #if !NETSTANDARD1_0
 
-namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
-
-using Interfaces;
-
 using System.Diagnostics.Tracing;
+
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 
 /// <inheritdoc/>
 [EventSource(Name = "TestPlatform")]

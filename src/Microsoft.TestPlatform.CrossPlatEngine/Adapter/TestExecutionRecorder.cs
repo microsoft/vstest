@@ -1,17 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-using Common.Logging;
-using Execution;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-using ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
 
 /// <summary>
 /// The test execution recorder used for recording test results and test messages.

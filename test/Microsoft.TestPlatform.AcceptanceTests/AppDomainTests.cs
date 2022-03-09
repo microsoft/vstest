@@ -1,18 +1,22 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
-#if !NET451
+#if !NETFRAMEWORK
 using System.Runtime.Loader;
+
 #else
 using System.Reflection;
+
 #endif
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
@@ -23,24 +27,23 @@ public class AppDomainTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void RunTestExecutionWithDisableAppDomain(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        using var tempDir = new TempDirectory();
-        var testAppDomainDetailFileName = Path.Combine(tempDir.Path, "appdomain_test.txt");
-        var dataCollectorAppDomainDetailFileName = Path.Combine(tempDir.Path, "appdomain_datacollector.txt");
+        var testAppDomainDetailFileName = Path.Combine(TempDirectory.Path, "appdomain_test.txt");
+        var dataCollectorAppDomainDetailFileName = Path.Combine(TempDirectory.Path, "appdomain_datacollector.txt");
 
         // Delete test output files if already exist
         File.Delete(testAppDomainDetailFileName);
         File.Delete(dataCollectorAppDomainDetailFileName);
 
-        var runsettingsFilePath = GetInProcDataCollectionRunsettingsFile(true, tempDir);
+        var runsettingsFilePath = GetInProcDataCollectionRunsettingsFile(true, TempDirectory);
         var arguments = PrepareArguments(
             GetSampleTestAssembly(),
             GetTestAdapterPath(),
             runsettingsFilePath,
             FrameworkArgValue,
             runnerInfo.InIsolationValue,
-            tempDir.Path);
+            TempDirectory.Path);
 
         // Sets the environment variables used by the test project and test data collector.
         var env = new Dictionary<string, string>
@@ -74,7 +77,7 @@ public class AppDomainTests : AcceptanceTestBase
     {
         var runSettings = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
         var inprocasm = _testEnvironment.GetTestAsset("SimpleDataCollector.dll");
-#if !NET451
+#if !NETFRAMEWORK
         var assemblyName = AssemblyLoadContext.GetAssemblyName(inprocasm);
 #else
         var assemblyName = AssemblyName.GetAssemblyName(inprocasm);

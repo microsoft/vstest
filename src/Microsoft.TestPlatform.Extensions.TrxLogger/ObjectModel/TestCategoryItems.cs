@@ -1,29 +1,26 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
 using System;
 using System.Diagnostics;
 using System.Text;
 
-using Utility;
+using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
-using XML;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 #region TestCategoryItem
 /// <summary>
 /// Stores a string which categorizes the Test
 /// </summary>
 internal sealed class TestCategoryItem : IXmlTestStore
 {
-    #region Fields
     [StoreXmlSimpleField(Location = "@TestCategory", DefaultValue = "")]
     private readonly string _category = string.Empty;
 
-    #endregion
-
-    #region Constructors
     /// <summary>
     /// Create a new item with the category set
     /// </summary>
@@ -33,16 +30,13 @@ internal sealed class TestCategoryItem : IXmlTestStore
         // Treat null as empty.
         if (category == null)
         {
-            category = String.Empty;
+            category = string.Empty;
         }
 
 
         _category = StripIllegalChars(category);
     }
 
-    #endregion
-
-    #region Properties/Methods
     /// <summary>
     /// Gets the category for this TestCategory
     /// </summary>
@@ -57,16 +51,13 @@ internal sealed class TestCategoryItem : IXmlTestStore
     private string StripIllegalChars(string category)
     {
         string ret = category.Trim();
-        ret = ret.Replace("&", String.Empty);
-        ret = ret.Replace("|", String.Empty);
-        ret = ret.Replace("!", String.Empty);
-        ret = ret.Replace(",", String.Empty);
+        ret = ret.Replace("&", string.Empty);
+        ret = ret.Replace("|", string.Empty);
+        ret = ret.Replace("!", string.Empty);
+        ret = ret.Replace(",", string.Empty);
         return ret;
     }
 
-    #endregion
-
-    #region Methods - overrides
     /// <summary>
     /// Compare the values of the items
     /// </summary>
@@ -79,7 +70,7 @@ internal sealed class TestCategoryItem : IXmlTestStore
             return false;
         }
         Debug.Assert(_category != null, "category is null");
-        return String.Equals(_category, otherItem._category, StringComparison.OrdinalIgnoreCase);
+        return string.Equals(_category, otherItem._category, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -101,7 +92,6 @@ internal sealed class TestCategoryItem : IXmlTestStore
         Debug.Assert(_category != null, "category is null");
         return _category;
     }
-    #endregion
 
     #region IXmlTestStore Members
 
@@ -125,7 +115,6 @@ internal sealed class TestCategoryItem : IXmlTestStore
 /// </summary>
 internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategoryItem>
 {
-    #region Constructors
     /// <summary>
     /// Creates an empty TestCategoryItemCollection.
     /// </summary>
@@ -146,10 +135,6 @@ internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategor
         }
     }
 
-    #endregion
-
-    #region Methods
-
     /// <summary>
     /// Adds the category.
     /// </summary>
@@ -168,7 +153,7 @@ internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategor
         EqtAssert.ParameterNotNull(item, nameof(item));
 
         // Don't add empty items.
-        if (!String.IsNullOrEmpty(item.TestCategory))
+        if (!string.IsNullOrEmpty(item.TestCategory))
         {
             base.Add(item);
         }
@@ -184,11 +169,11 @@ internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategor
         StringBuilder returnString = new();
         if (Count > 0)
         {
-            returnString.Append(",");
+            returnString.Append(',');
             foreach (TestCategoryItem item in this)
             {
                 returnString.Append(item.TestCategory);
-                returnString.Append(",");
+                returnString.Append(',');
             }
         }
 
@@ -261,6 +246,5 @@ internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategor
     {
         return base.GetHashCode();
     }
-    #endregion
 }
 #endregion

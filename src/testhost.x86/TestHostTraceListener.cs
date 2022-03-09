@@ -2,14 +2,17 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 
-namespace Microsoft.VisualStudio.TestPlatform.TestHost;
 #if NETCOREAPP
-using ObjectModel;
-
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.TestHost;
 
 internal class TestHostTraceListener : DefaultTraceListener
 {

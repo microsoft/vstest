@@ -1,13 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Utilities;
-
 using System;
 using System.Diagnostics;
 using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
 /// Utility methods for MulticastDelegates.
@@ -37,13 +39,8 @@ public static class MulticastDelegateUtilities
     /// <param name="sender">Sender to use when raising the event.</param>
     /// <param name="args">Arguments to provide.</param>
     /// <param name="traceDisplayName">Name to use when tracing out errors.</param>
-    public static void SafeInvoke(this Delegate delegates, object sender, object args, string traceDisplayName)
+    public static void SafeInvoke(this Delegate delegates, object sender, object args!!, string traceDisplayName)
     {
-        if (args == null)
-        {
-            throw new ArgumentNullException(nameof(args));
-        }
-
         if (string.IsNullOrWhiteSpace(traceDisplayName))
         {
             throw new ArgumentNullException(nameof(traceDisplayName));
@@ -60,31 +57,25 @@ public static class MulticastDelegateUtilities
                 try
                 {
                     handler.DynamicInvoke(sender, args);
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, took {5} ms.",
-                                traceDisplayName,
-                                ++i,
-                                invocationList.Length,
-                                handler.GetTargetName(),
-                                handler.GetMethodName(),
-                                stopwatch.ElapsedMilliseconds);
-                    }
-                }
-                catch (TargetInvocationException exception)
-                {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error(
-                            "MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, failed after {5} ms with: {6}.",
+                    EqtTrace.Verbose("MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, took {5} ms.",
+                            traceDisplayName,
                             ++i,
                             invocationList.Length,
                             handler.GetTargetName(),
                             handler.GetMethodName(),
-                            traceDisplayName,
-                            stopwatch.ElapsedMilliseconds,
-                            exception);
-                    }
+                            stopwatch.ElapsedMilliseconds);
+                }
+                catch (TargetInvocationException exception)
+                {
+                    EqtTrace.Error(
+                        "MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, failed after {5} ms with: {6}.",
+                        ++i,
+                        invocationList.Length,
+                        handler.GetTargetName(),
+                        handler.GetMethodName(),
+                        traceDisplayName,
+                        stopwatch.ElapsedMilliseconds,
+                        exception);
                 }
             }
         }

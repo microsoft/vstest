@@ -1,17 +1,20 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation;
-
 using System.Collections.Generic;
 
 #if NETFRAMEWORK
-using Diagnostics.Tracing;
-using Diagnostics.Tracing.Parsers;
-using Diagnostics.Tracing.Session;
 using System;
 using System.Linq;
+
+using Microsoft.Diagnostics.Tracing;
+using Microsoft.Diagnostics.Tracing.Parsers;
+using Microsoft.Diagnostics.Tracing.Session;
 #endif
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation;
 
 /// <summary>
 /// The performance analyzer.
@@ -178,7 +181,7 @@ public class PerfAnalyzer
         if (key != null)
         {
             var task = _testPlatformTaskMap[key].Find(t => t.PayLoadProperties["executorUri"].Equals(executorUri));
-            long.TryParse(task.PayLoadProperties["numberOfTests"], out totalTestsExecuted);
+            _ = long.TryParse(task.PayLoadProperties["numberOfTests"], out totalTestsExecuted);
         }
 #endif
         return totalTestsExecuted;

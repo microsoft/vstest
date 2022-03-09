@@ -6,6 +6,8 @@ using System;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 /// <summary>
@@ -25,7 +27,7 @@ internal interface IDataCollectorAttachmentsProcessorsFactory
 /// <summary>
 /// Registered data collector attachment processor
 /// </summary>
-internal class DataCollectorAttachmentProcessor
+internal class DataCollectorAttachmentProcessor : IDisposable
 {
     /// <summary>
     /// Data collector FriendlyName
@@ -37,9 +39,14 @@ internal class DataCollectorAttachmentProcessor
     /// </summary>
     public IDataCollectorAttachmentProcessor DataCollectorAttachmentProcessorInstance { get; private set; }
 
-    public DataCollectorAttachmentProcessor(string friendlyName, IDataCollectorAttachmentProcessor dataCollectorAttachmentProcessor)
+    public DataCollectorAttachmentProcessor(string friendlyName, IDataCollectorAttachmentProcessor dataCollectorAttachmentProcessor!!)
     {
         FriendlyName = string.IsNullOrEmpty(friendlyName) ? throw new ArgumentException("Invalid FriendlyName", nameof(friendlyName)) : friendlyName;
-        DataCollectorAttachmentProcessorInstance = dataCollectorAttachmentProcessor ?? throw new ArgumentNullException(nameof(dataCollectorAttachmentProcessor));
+        DataCollectorAttachmentProcessorInstance = dataCollectorAttachmentProcessor;
+    }
+
+    public void Dispose()
+    {
+        (DataCollectorAttachmentProcessorInstance as IDisposable)?.Dispose();
     }
 }

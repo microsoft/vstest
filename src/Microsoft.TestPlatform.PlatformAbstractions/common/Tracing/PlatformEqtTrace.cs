@@ -3,14 +3,16 @@
 
 #if NETFRAMEWORK || NETCOREAPP || NETSTANDARD2_0
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Threading;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Wrapper class for tracing.
@@ -87,14 +89,14 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     /// <summary>
     /// Specifies whether the trace is initialized or not
     /// </summary>
-    private static bool s_isInitialized = false;
+    private static bool s_isInitialized;
 
     /// <summary>
     /// Lock over initialization
     /// </summary>
     private static readonly object IsInitializationLock = new();
 
-    private static int s_traceFileSize = 0;
+    private static int s_traceFileSize;
     private static readonly int DefaultTraceFileSize = 10240; // 10Mb.
 
     public static string LogFile
@@ -226,7 +228,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
                 CultureInfo.InvariantCulture,
                 "{0}, {1}, {2:yyyy}/{2:MM}/{2:dd}, {2:HH}:{2:mm}:{2:ss}.{2:fff}, {5}, {3}, {4}",
                 ProcessId,
-                Thread.CurrentThread.ManagedThreadId,
+                Environment.CurrentManagedThreadId,
                 DateTime.Now,
                 ProcessName,
                 message,
@@ -336,25 +338,39 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
                 return true;
             }
 
+            using var process = Process.GetCurrentProcess();
+            string runnerLogFileName = $"{Path.GetFileNameWithoutExtension(process.MainModule.FileName)}_{process.Id}.{DateTime.Now:yy-MM-dd_HH-mm-ss_fffff}.diag";
             string logsDirectory = Path.GetTempPath();
 
             // Set the trace level and add the trace listener
             if (LogFile == null)
             {
-                using var process = Process.GetCurrentProcess();
-
                 // In case of parallel execution, there may be several processes with same name.
                 // Add a process id to make the traces unique.
-                LogFile = Path.Combine(
-                    logsDirectory,
-                    Path.GetFileNameWithoutExtension(process.MainModule.FileName) + "." + process.Id + ".TpTrace.log");
+                LogFile = Path.Combine(logsDirectory, runnerLogFileName);
             }
 
             // Add a default listener
             s_traceFileSize = DefaultTraceFileSize;
             try
             {
-                Source.Listeners.Add(new RollingFileTraceListener(LogFile, ListenerName, s_traceFileSize));
+                // If we point to a folder we create default filename
+                if (LogFile.EndsWith(@"\") || LogFile.EndsWith("/"))
+                {
+                    if (!Directory.Exists(LogFile))
+                    {
+                        Directory.CreateDirectory(LogFile);
+                    }
+
+                    runnerLogFileName = Path.Combine(LogFile, runnerLogFileName);
+                    LogFile = Path.Combine(LogFile, $"{Path.GetFileNameWithoutExtension(process.MainModule.FileName)}_{process.Id}.diag");
+                }
+                else
+                {
+                    runnerLogFileName = LogFile;
+                }
+
+                Source.Listeners.Add(new RollingFileTraceListener(runnerLogFileName, ListenerName, s_traceFileSize));
             }
             catch (Exception e)
             {
@@ -429,6 +445,19 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
         LogFile = null;
         TraceLevel = TraceLevel.Off;
         Source.Switch.Level = SourceLevels.Off;
+    }
+
+    /// <summary>
+    /// Trace a verbose message.
+    /// </summary>
+    /// <param name="message">Trace message.</param>
+    [Conditional("TRACE")]
+    internal static void Verbose(string message)
+    {
+        if (Instance.ShouldTrace(PlatformTraceLevel.Verbose))
+        {
+            Instance.WriteLine(PlatformTraceLevel.Verbose, message);
+        }
     }
 }
 

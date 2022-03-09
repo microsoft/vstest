@@ -3,9 +3,11 @@
 
 #if NETCOREAPP
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
 using System.Diagnostics;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 public static class ProcessStartInfoExtensions
 {

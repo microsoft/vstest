@@ -6,4 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 internal interface IRunSettingsHelper
 {
     bool IsDefaultTargetArchitecture { get; set; }
+
+    bool IsDesignMode { get; set; }
 }

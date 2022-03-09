@@ -8,7 +8,7 @@ namespace TestPlatform.CoreUtilities.UnitTests;
 /// </summary>
 public static class Program
 {
-    public static void Main(string[] args)
+    public static void Main()
     {
     }
 }

@@ -3,6 +3,10 @@
 
 using System;
 using System.IO;
+using IO = System.IO;
+
+
+#nullable disable
 
 namespace Microsoft.TestPlatform.TestUtilities;
 
@@ -24,26 +28,31 @@ public class TempDirectory : IDisposable
     }
 
     public DirectoryInfo CreateDirectory(string dir)
-        => Directory.CreateDirectory(System.IO.Path.Combine(Path, dir));
+        => Directory.CreateDirectory(IO.Path.Combine(Path, dir));
 
-    public void CopyAll(DirectoryInfo source, DirectoryInfo target)
+    public void CopyDirectory(string sourceDirectory, string targetDirectory)
+    {
+        CopyDirectory(new DirectoryInfo(sourceDirectory), new DirectoryInfo(targetDirectory));
+    }
+
+    public void CopyDirectory(DirectoryInfo source, DirectoryInfo target)
     {
         Directory.CreateDirectory(target.FullName);
 
         // Copy each file into the new directory.
         foreach (FileInfo fi in source.GetFiles())
         {
-            fi.CopyTo(System.IO.Path.Combine(target.FullName, fi.Name), true);
+            fi.CopyTo(IO.Path.Combine(target.FullName, fi.Name), true);
         }
 
         // Copy each subdirectory using recursion.
         foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
         {
-            DirectoryInfo nextTargetSubDir =
-                target.CreateSubdirectory(diSourceSubDir.Name);
-            CopyAll(diSourceSubDir, nextTargetSubDir);
+            DirectoryInfo nextTargetSubDir = target.CreateSubdirectory(diSourceSubDir.Name);
+            CopyDirectory(diSourceSubDir, nextTargetSubDir);
         }
     }
+
     /// <summary>
     /// Creates an unique temporary directory.
     /// </summary>
@@ -52,19 +61,20 @@ public class TempDirectory : IDisposable
     /// </returns>
     internal static string CreateUniqueDirectory()
     {
-        // AGENT_TEMPDIRECTORY is AzureDevops variable, which is set to path
-        // that is cleaned up after every job. This is preferable to use over
-        // just the normal temp.
         var temp = GetTempPath();
-        var directoryPath = System.IO.Path.Combine(temp, Guid.NewGuid().ToString("n"));
+        var directoryPath = IO.Path.Combine(temp, "vstest", RandomId.Next());
         Directory.CreateDirectory(directoryPath);
 
         return directoryPath;
     }
 
     private static string GetTempPath()
-        => Environment.GetEnvironmentVariable("AGENT_TEMPDIRECTORY")
-            ?? System.IO.Path.GetTempPath();
+    {
+        // AGENT_TEMPDIRECTORY is AzureDevops variable, which is set to path
+        // that is cleaned up after every job. This is preferable to use over
+        // just the normal TEMP, because that is not cleaned up for every run.
+        return Environment.GetEnvironmentVariable("AGENT_TEMPDIRECTORY") ?? IO.Path.GetTempPath();
+    }
 
     public static void TryRemoveDirectory(string directory)
     {
@@ -72,7 +82,7 @@ public class TempDirectory : IDisposable
         {
             try
             {
-                Directory.Delete(directory, true);
+                Directory.Delete(directory, recursive: true);
             }
             catch { }
         }

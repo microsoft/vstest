@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
-
-using Discovery;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
 
 /// <summary>
 /// Provides user specified runSettings and framework provided context of the run. 

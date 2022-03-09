@@ -1,31 +1,33 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Common;
-using Common.ExtensionFramework;
-using CommunicationUtilities;
-using CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
-using ObjectModel.Host;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 /// <summary>
 /// Orchestrates discovery operations for the engine communicating with the client.
 /// </summary>
 public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDiscoveryEventsHandler2
 {
-    private readonly TestSessionInfo _testSessionInfo = null;
+    private readonly TestSessionInfo _testSessionInfo;
     readonly Func<string, ProxyDiscoveryManager, ProxyOperationManager> _proxyOperationManagerCreator;
 
     private ITestRuntimeProvider _testHostManager;
@@ -35,16 +37,14 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     private readonly IDataSerializer _dataSerializer;
     private bool _isCommunicationEstablished;
 
-    private ProxyOperationManager _proxyOperationManager = null;
+    private ProxyOperationManager _proxyOperationManager;
     private ITestDiscoveryEventsHandler2 _baseTestDiscoveryEventsHandler;
     private bool _skipDefaultAdapters;
-
-    #region Constructors
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
     /// </summary>
-    /// 
+    ///
     /// <param name="testSessionInfo">The test session info.</param>
     /// <param name="proxyOperationManagerCreator">The proxy operation manager creator.</param>
     public ProxyDiscoveryManager(
@@ -65,7 +65,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
     /// </summary>
-    /// 
+    ///
     /// <param name="requestData">
     /// The request data for providing discovery services and data.
     /// </param>
@@ -86,11 +86,11 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
     /// </summary>
-    /// 
+    ///
     /// <remarks>
     /// Constructor with dependency injection. Used for unit testing.
     /// </remarks>
-    /// 
+    ///
     /// <param name="requestData">
     /// The request data for providing discovery services and data.
     /// </param>
@@ -116,7 +116,6 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         _proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
     }
 
-    #endregion
 
     #region IProxyDiscoveryManager implementation.
 
@@ -193,6 +192,26 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         // Cancel fast, try to stop testhost deployment/launch
         _proxyOperationManager.CancellationTokenSource.Cancel();
         Close();
+    }
+
+    // <inheritdoc/>
+    public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
+    {
+        // Do nothing if the proxy is not initialized yet.
+        if (_proxyOperationManager is null)
+        {
+            return;
+        }
+
+        if (_baseTestDiscoveryEventsHandler is null)
+        {
+            _baseTestDiscoveryEventsHandler = eventHandler;
+        }
+
+        if (_isCommunicationEstablished)
+        {
+            _proxyOperationManager.RequestSender.SendDiscoveryAbort();
+        }
     }
 
     /// <inheritdoc/>

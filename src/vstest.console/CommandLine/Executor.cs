@@ -1,6 +1,26 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
 // General Flow:
 // Create a command processor for each argument.
 //   If there is no matching command processor for an argument, output error, display help and exit.
@@ -21,27 +41,9 @@
 //   Required
 //   Single or multiple
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-
-using Internal;
-using Processors;
-using TestPlatformHelpers;
-using Common;
-using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using CoreUtilities.Tracing;
-using CoreUtilities.Tracing.Interfaces;
-using ObjectModel;
-using Utilities;
-
-using CommandLineResources = Resources.Resources;
 
 /// <summary>
 /// Performs the execution based on the arguments provided.
@@ -50,8 +52,6 @@ internal class Executor
 {
     private readonly ITestPlatformEventSource _testPlatformEventSource;
     private bool _showHelp;
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -67,18 +67,10 @@ internal class Executor
         _showHelp = true;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Instance to use for sending output.
     /// </summary>
     private IOutput Output { get; set; }
-
-    #endregion
-
-    #region Methods
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
@@ -103,7 +95,11 @@ internal class Executor
         }
         else
         {
-            PrintSplashScreen(isDiag);
+            // If we're postprocessing we don't need to show the splash
+            if (!ArtifactProcessingPostProcessModeProcessor.ContainsPostProcessCommand(args))
+            {
+                PrintSplashScreen(isDiag);
+            }
         }
 
         int exitCode = 0;
@@ -180,10 +176,6 @@ internal class Executor
         return exitCode;
     }
 
-    #endregion
-
-    #region Private Methods
-
     /// <summary>
     /// Get the list of argument processors for the arguments.
     /// </summary>
@@ -230,7 +222,16 @@ internal class Executor
         // Examples: processors to enable loggers that are statically configured, and to start logging,
         // should always be executed.
         var processorsToAlwaysExecute = processorFactory.GetArgumentProcessorsToAlwaysExecute();
-        processors.AddRange(processorsToAlwaysExecute);
+        foreach (var processor in processorsToAlwaysExecute)
+        {
+            if (processors.Any(i => i.Metadata.Value.CommandName == processor.Metadata.Value.CommandName))
+            {
+                continue;
+            }
+
+            // We need to initialize the argument executor if it's set to always execute. This ensures it will be initialized with other executors.
+            processors.Add(ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation(processor));
+        }
 
         // Initialize Runsettings with defaults
         RunSettingsManager.Instance.AddDefaultRunSettings();
@@ -251,7 +252,7 @@ internal class Executor
             }
             catch (Exception ex)
             {
-                if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException)
+                if (ex is CommandLineException or TestPlatformException or SettingsException)
                 {
                     Output.Error(false, ex.Message);
                     result = 1;
@@ -355,7 +356,7 @@ internal class Executor
         }
         catch (Exception ex)
         {
-            if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException || ex is InvalidOperationException)
+            if (ex is CommandLineException or TestPlatformException or SettingsException or InvalidOperationException)
             {
                 EqtTrace.Error("ExecuteArgumentProcessor: failed to execute argument process: {0}", ex);
                 Output.Error(false, ex.Message);
@@ -378,7 +379,7 @@ internal class Executor
         }
 
         Debug.Assert(
-            result >= ArgumentProcessorResult.Success && result <= ArgumentProcessorResult.Abort,
+            result is >= ArgumentProcessorResult.Success and <= ArgumentProcessorResult.Abort,
             "Invalid argument processor result.");
 
         if (result == ArgumentProcessorResult.Fail)
@@ -469,7 +470,7 @@ internal class Executor
             return true;
         }
 
-        return !string.IsNullOrEmpty(args) && CommandLineUtilities.SplitCommandLineIntoArguments(args, out arguments);
+        return !string.IsNullOrEmpty(args) && Utilities.CommandLineUtilities.SplitCommandLineIntoArguments(args, out arguments);
     }
 
     private bool GetContentUsingFile(string fileName, out string contents)
@@ -490,5 +491,4 @@ internal class Executor
         return false;
     }
 
-    #endregion
 }

@@ -10,6 +10,8 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.AttachVS;
 
 internal class DebuggerUtility
@@ -138,6 +140,14 @@ internal class DebuggerUtility
                         }
                         catch (COMException ex)
                         {
+                            Trace($"ComException: Retrying in 250ms.\n{ex}");
+                            Thread.Sleep(250);
+                        }
+                        catch (TargetInvocationException ex)
+                        {
+                            if (ex.InnerException is not COMException)
+                                throw;
+
                             Trace($"ComException: Retrying in 250ms.\n{ex}");
                             Thread.Sleep(250);
                         }

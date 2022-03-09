@@ -1,19 +1,21 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 
-using Common;
-using Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 ///  An argument processor that allows the user to specify the target platform architecture
@@ -21,14 +23,10 @@ using CommandLineResources = Resources.Resources;
 /// </summary>
 internal class FrameworkArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the OutputArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "/Framework";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -38,37 +36,18 @@ internal class FrameworkArgumentProcessor : IArgumentProcessor
     /// Gets the metadata.
     /// </summary>
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new FrameworkArgumentProcessorCapabilities());
-            }
-
-            return _metadata;
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new FrameworkArgumentProcessorCapabilities());
 
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor = new Lazy<IArgumentExecutor>(() => new FrameworkArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new FrameworkArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
 
-            return _executor;
-        }
-
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 }
 
@@ -92,8 +71,6 @@ internal class FrameworkArgumentProcessorCapabilities : BaseArgumentProcessorCap
 /// </summary>
 internal class FrameworkArgumentExecutor : IArgumentExecutor
 {
-    #region Fields
-
     /// <summary>
     /// Used for getting sources.
     /// </summary>
@@ -102,10 +79,6 @@ internal class FrameworkArgumentExecutor : IArgumentExecutor
     private readonly IRunSettingsProvider _runSettingsManager;
 
     public const string RunSettingsPath = "RunConfiguration.TargetFrameworkVersion";
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -120,7 +93,6 @@ internal class FrameworkArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsManager;
     }
 
-    #endregion
 
     #region IArgumentExecutor
 
@@ -157,10 +129,7 @@ internal class FrameworkArgumentExecutor : IArgumentExecutor
                 validFramework.ToString());
         }
 
-        if (EqtTrace.IsInfoEnabled)
-        {
-            EqtTrace.Info("Using .Net Framework version:{0}", _commandLineOptions.TargetFrameworkVersion);
-        }
+        EqtTrace.Info("Using .Net Framework version:{0}", _commandLineOptions.TargetFrameworkVersion);
     }
 
     /// <summary>

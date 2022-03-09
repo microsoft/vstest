@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Client.Execution;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,19 +8,23 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-using Common.Telemetry;
-using CommunicationUtilities;
-using CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-using ObjectModel.Engine;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-using ClientResources = Resources.Resources;
+using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Client.Execution;
 
 public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
 {
@@ -82,10 +84,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
         Debug.Assert(requestData != null, "request Data is null");
         Debug.Assert(loggerManager != null, "LoggerManager cannot be null");
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Creating test run request.");
-        }
+        EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Creating test run request.");
 
         TestRunCriteria = testRunCriteria;
         ExecutionManager = executionManager;
@@ -123,16 +122,9 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
             var numberOfSources = (uint)(TestRunCriteria.Sources != null ? TestRunCriteria.Sources.Count() : 0);
             _requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForRun, numberOfSources);
 
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("TestRunRequest.ExecuteAsync: Starting run with settings:{0}", TestRunCriteria);
-            }
-
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                // Waiting for warm up to be over.
-                EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Wait for the first run request is over.");
-            }
+            EqtTrace.Info("TestRunRequest.ExecuteAsync: Starting run with settings:{0}", TestRunCriteria);
+            // Waiting for warm up to be over.
+            EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Wait for the first run request is over.");
 
             State = TestRunState.InProgress;
 
@@ -148,10 +140,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
 
                 if (_testSessionTimeout > 0)
                 {
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose(String.Format("TestRunRequest.ExecuteAsync: TestSessionTimeout is {0} milliseconds.", _testSessionTimeout));
-                    }
+                    EqtTrace.Verbose("TestRunRequest.ExecuteAsync: TestSessionTimeout is {0} milliseconds.", _testSessionTimeout);
 
                     _timer = new Timer(OnTestSessionTimeout, null, TimeSpan.FromMilliseconds(_testSessionTimeout), TimeSpan.FromMilliseconds(0));
                 }
@@ -165,10 +154,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                 OnRunStart.SafeInvoke(this, testRunStartEvent, "TestRun.TestRunStart");
                 int processId = ExecutionManager.StartTestRun(TestRunCriteria, this);
 
-                if (EqtTrace.IsInfoEnabled)
-                {
-                    EqtTrace.Info("TestRunRequest.ExecuteAsync: Started.");
-                }
+                EqtTrace.Info("TestRunRequest.ExecuteAsync: Started.");
 
                 return processId;
             }
@@ -182,10 +168,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
 
     internal void OnTestSessionTimeout(object obj)
     {
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose(string.Format("TestRunRequest.OnTestSessionTimeout: calling cancellation as test run exceeded testSessionTimeout {0} milliseconds", _testSessionTimeout));
-        }
+        EqtTrace.Verbose("TestRunRequest.OnTestSessionTimeout: calling cancellation as test run exceeded testSessionTimeout {0} milliseconds", _testSessionTimeout);
 
         string message = string.Format(ClientResources.TestSessionTimeoutMessage, _testSessionTimeout);
         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = message };
@@ -208,10 +191,9 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
             throw new ObjectDisposedException("testRunRequest");
         }
 
-        if (State != TestRunState.InProgress
-            && !(State == TestRunState.Completed
-                 || State == TestRunState.Canceled
-                 || State == TestRunState.Aborted))
+        if (State
+            is not TestRunState.InProgress
+            and not (TestRunState.Completed or TestRunState.Canceled or TestRunState.Aborted))
         {
             // If run is already terminated, then we should not throw an exception.
             throw new InvalidOperationException(ClientResources.WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive);
@@ -371,13 +353,8 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     /// <summary>
     /// Invoked when test run is complete
     /// </summary>
-    public void HandleTestRunComplete(TestRunCompleteEventArgs runCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
+    public void HandleTestRunComplete(TestRunCompleteEventArgs runCompleteArgs!!, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
     {
-        if (runCompleteArgs == null)
-        {
-            throw new ArgumentNullException(nameof(runCompleteArgs));
-        }
-
         bool isAborted = runCompleteArgs.IsAborted;
         bool isCanceled = runCompleteArgs.IsCanceled;
 

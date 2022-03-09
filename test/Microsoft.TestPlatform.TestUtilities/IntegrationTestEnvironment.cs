@@ -1,14 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.TestUtilities;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.TestUtilities;
 
 /// <summary>
 /// Provider for test environment configuration.
@@ -17,7 +19,7 @@ using VisualStudio.TestTools.UnitTesting;
 /// </summary>
 public class IntegrationTestEnvironment
 {
-    public static string TestPlatformRootDirectory =
+    public static string TestPlatformRootDirectory { get; private set; } =
         Environment.GetEnvironmentVariable("TP_ROOT_DIR")
         ?? Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
 
@@ -27,10 +29,6 @@ public class IntegrationTestEnvironment
 
     public IntegrationTestEnvironment()
     {
-        // These environment variables are set in scripts/test.ps1 or scripts/test.sh.
-        TargetFramework = Environment.GetEnvironmentVariable("TPT_TargetFramework");
-        TargetRuntime = Environment.GetEnvironmentVariable("TPT_TargetRuntime");
-
         // If the variables are not set, valid defaults are assumed.
         if (string.IsNullOrEmpty(TargetFramework))
         {
@@ -71,17 +69,7 @@ public class IntegrationTestEnvironment
     }
 
     public Dictionary<string, string> DependencyVersions
-    {
-        get
-        {
-            if (s_dependencyVersions == null)
-            {
-                s_dependencyVersions = GetDependencies(TestPlatformRootDirectory);
-            }
-
-            return s_dependencyVersions;
-        }
-    }
+        => s_dependencyVersions ??= GetDependencies(TestPlatformRootDirectory);
 
     /// <summary>
     /// Gets the nuget packages directory for enlistment.
@@ -202,6 +190,9 @@ public class IntegrationTestEnvironment
         get;
         set;
     }
+
+    // A known AzureDevOps env variable meaning we are running in CI.
+    public static bool IsCI { get; } = Environment.GetEnvironmentVariable("TF_BUILD") == "True";
 
     /// <summary>
     /// Gets the full path to a test asset.

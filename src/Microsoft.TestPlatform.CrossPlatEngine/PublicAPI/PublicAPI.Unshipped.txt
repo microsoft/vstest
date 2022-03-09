@@ -1,0 +1,5 @@
+virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestSessionPool.KillSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo testSessionInfo, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData) -> bool
+virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ProxyTestSessionManager.StartSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler eventsHandler, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData) -> bool
+virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ProxyTestSessionManager.StopSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData) -> bool
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.ProxyDiscoveryManager.Abort(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestDiscoveryEventsHandler2 eventHandler) -> void
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery.DiscoveryManager.Abort(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestDiscoveryEventsHandler2 eventHandler) -> void

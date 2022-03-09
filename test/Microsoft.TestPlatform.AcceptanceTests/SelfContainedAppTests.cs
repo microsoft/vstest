@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
+using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using System.IO;
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 public class SelfContainedAppTests : AcceptanceTestBase
@@ -22,12 +24,11 @@ public class SelfContainedAppTests : AcceptanceTestBase
         // properties, the testhost.exe executable is given a runtimeconfig that instructs it to find a hostpolicy.dll and hostfxr.dll next to it
         // that will fail if we run the testhost.exe from the .nuget location, but will work when we run it from the output folder
         // see https://github.com/dotnet/runtime/issues/3569#issuecomment-595820524 and below for description of how it works
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         // the app is published to win10-x64 because of the runtime identifier in the project
         var assemblyPath = BuildMultipleAssemblyPath($@"win10-x64{Path.DirectorySeparatorChar}SelfContainedAppTestProject.dll").Trim('\"');
-        var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         InvokeVsTest(arguments);
 
         ValidateSummaryStatus(passedTestsCount: 1, 0, 0);

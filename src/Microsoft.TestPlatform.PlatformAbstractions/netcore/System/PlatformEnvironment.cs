@@ -3,13 +3,15 @@
 
 #if NETCOREAPP
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <inheritdoc />
 public class PlatformEnvironment : IEnvironment
@@ -72,9 +74,7 @@ public class PlatformEnvironment : IEnvironment
 
     /// <inheritdoc />
     public int GetCurrentManagedThreadId()
-    {
-        return Thread.CurrentThread.ManagedThreadId;
-    }
+        => Environment.CurrentManagedThreadId;
 }
 
 #endif

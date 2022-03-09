@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.Common.UnitTests.ExtensionFramework;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +16,10 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace TestPlatform.Common.UnitTests.ExtensionFramework;
 
 [TestClass]
 public class TestPluginManagerTests
@@ -72,7 +74,7 @@ public class TestPluginManagerTests
     {
         TestPluginCacheHelper.SetupMockExtensions(typeof(TestPluginManagerTests));
 
-        TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+        TestPluginManager.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
             TestPlatformConstants.TestAdapterEndsWithPattern,
             out var unfilteredTestExtensions,
             out var testExtensions);
@@ -88,13 +90,13 @@ public class TestPluginManagerTests
         var discoveryCount = 0;
         TestPluginCacheHelper.SetupMockExtensions(typeof(TestPluginManagerTests), () => discoveryCount++);
 
-        TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+        TestPluginManager.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
             TestPlatformConstants.TestAdapterEndsWithPattern,
             out var unfilteredTestExtensions,
             out var testExtensions);
 
         // Call this again to verify that discovery is not called again.
-        TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+        TestPluginManager.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
             TestPlatformConstants.TestAdapterEndsWithPattern,
             out unfilteredTestExtensions,
             out testExtensions);
@@ -108,8 +110,7 @@ public class TestPluginManagerTests
     [TestMethod]
     public void GetTestExtensionsForAnExtensionAssemblyShouldReturnExtensionsInThatAssembly()
     {
-        TestPluginManager.Instance
-            .GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+        TestPluginManager.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                 typeof(TestPluginManagerTests).GetTypeInfo().Assembly.Location,
                 out _,
                 out var testExtensions);

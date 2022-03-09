@@ -1,10 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-
 using System;
 using System.Diagnostics;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
 /// Base class for all execution event arguments
@@ -14,8 +16,6 @@ using System.Diagnostics;
 #endif
 public abstract class DataCollectionEventArgs : EventArgs
 {
-    #region Constructor
-
     /// <summary>
     /// Default constructor added for serialization/deserialization.
     /// </summary>
@@ -32,10 +32,6 @@ public abstract class DataCollectionEventArgs : EventArgs
         Context = context;
     }
 
-    #endregion
-
-    #region Public properties
-
     /// <summary>
     /// Gets the context information for the event
     /// </summary>
@@ -44,10 +40,6 @@ public abstract class DataCollectionEventArgs : EventArgs
         get;
         internal set;
     }
-
-    #endregion
-
-    #region Private Methods
 
     /// <summary>
     /// Updates the data collection context stored by this instance.
@@ -65,5 +57,4 @@ public abstract class DataCollectionEventArgs : EventArgs
         Context = context;
     }
 
-    #endregion
 }

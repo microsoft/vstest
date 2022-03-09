@@ -4,6 +4,8 @@
 using System;
 using System.Text;
 
+#nullable disable
+
 namespace Microsoft.TestPlatform.Build.Utils;
 
 public static class ArgumentEscaper

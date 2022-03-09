@@ -1,17 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.TestHost;
-
 using System;
 using System.Collections.Generic;
 
-using CoreUtilities.Helpers;
-using CoreUtilities.Tracing;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 
-using Execution;
+using Microsoft.VisualStudio.TestPlatform.Execution;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.TestHost;
 
 /// <summary>
 /// The program.

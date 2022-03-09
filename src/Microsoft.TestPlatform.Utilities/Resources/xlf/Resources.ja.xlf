@@ -27,11 +27,6 @@
         <note></note>
         <target state="translated">設定の読み込み中にエラーが発生しました。エラー: {0}。</target>
       </trans-unit>
-      <trans-unit id="SystemArchitectureIncompatibleWithTargetPlatform">
-        <source>Incompatible Target platform settings '{0}' with system architecture '{1}'.</source>
-        <note></note>
-        <target state="translated">ターゲット プラットフォームの設定 '{0}' はシステム アーキテクチャ '{1}' と互換性がありません。</target>
-      </trans-unit>
       <trans-unit id="UnExpectedSettingsFile">
         <source>Unexpected settings file specified.</source>
         <note></note>

@@ -3,9 +3,11 @@
 
 #if NETFRAMEWORK || NETSTANDARD2_0
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
 using System.Reflection;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <summary>
 /// Assembly Extensions

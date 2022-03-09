@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,22 +9,24 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 
-using Interfaces;
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-using Resources = VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
+using Resources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
 /// <summary>
 /// Vstest.console process manager
 /// </summary>
 internal class VsTestConsoleProcessManager : IProcessManager
 {
-    #region Private Members
-
     /// <summary>
     /// Port number for communicating with Vstest CLI
     /// </summary>
@@ -51,8 +51,8 @@ internal class VsTestConsoleProcessManager : IProcessManager
 
     private readonly string _vstestConsolePath;
     private readonly object _syncObject = new();
-    private bool _vstestConsoleStarted = false;
-    private bool _vstestConsoleExited = false;
+    private bool _vstestConsoleStarted;
+    private bool _vstestConsoleExited;
     private readonly bool _isNetCoreRunner;
     private readonly string _dotnetExePath;
     private Process _process;
@@ -60,12 +60,8 @@ internal class VsTestConsoleProcessManager : IProcessManager
 
     internal IFileHelper FileHelper { get; set; }
 
-    #endregion
-
     /// <inheritdoc/>
     public event EventHandler ProcessExited;
-
-    #region Constructor
 
     /// <summary>
     /// Creates an instance of VsTestConsoleProcessManager class.
@@ -87,8 +83,6 @@ internal class VsTestConsoleProcessManager : IProcessManager
     {
         _dotnetExePath = dotnetExePath;
     }
-
-    #endregion Constructor
 
     /// <summary>
     /// Checks if the process has been initialized.

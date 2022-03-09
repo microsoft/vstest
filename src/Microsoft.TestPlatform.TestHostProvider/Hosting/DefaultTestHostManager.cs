@@ -1,10 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
-
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -18,19 +17,23 @@ using System.Xml.Linq;
 using Microsoft.TestPlatform.TestHostProvider.Hosting;
 using Microsoft.TestPlatform.TestHostProvider.Resources;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
-using Helpers;
-using Helpers.Interfaces;
-using DesktopTestHostRuntimeProvider;
-using ObjectModel;
-using ObjectModel.Client.Interfaces;
-using ObjectModel.Host;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.DesktopTestHostRuntimeProvider;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using PlatformAbstractions;
-using PlatformAbstractions.Interfaces;
-using Utilities;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
 
 /// <summary>
 /// The default test host launcher for the engine.
@@ -40,12 +43,13 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 [FriendlyName(DefaultTestHostFriendlyName)]
 public class DefaultTestHostManager : ITestRuntimeProvider2
 {
-    private const string X64TestHostProcessName = "testhost{0}.exe";
-    private const string X86TestHostProcessName = "testhost{0}.x86.exe";
-
     private const string DefaultTestHostUri = "HostProvider://DefaultTestHost";
     private const string DefaultTestHostFriendlyName = "DefaultTestHost";
     private const string TestAdapterEndsWithPattern = @"TestAdapter.dll";
+
+    // Any version (older or newer) that is not in this list will use the default testhost.exe that is built using net451.
+    // TODO: Add net481 when it is published, if it uses a new moniker.
+    private static readonly ImmutableArray<string> SupportedTargetFrameworks = ImmutableArray.Create("net452", "net46", "net461", "net462", "net47", "net471", "net472", "net48");
 
     private Architecture _architecture;
     private Framework _targetFramework;
@@ -131,24 +135,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         IDictionary<string, string> environmentVariables,
         TestRunnerConnectionInfo connectionInfo)
     {
-        string testHostProcessName;
-        if (_targetFramework.Name.StartsWith(".NETFramework,Version=v"))
-        {
-            var targetFrameworkMoniker = "net" + _targetFramework.Name.Replace(".NETFramework,Version=v", string.Empty).Replace(".", string.Empty);
-
-            // Net451 or older will use the default testhost.exe that is compiled against net451.
-            var isSupportedNetTarget = new[] { "net452", "net46", "net461", "net462", "net47", "net471", "net472", "net48" }.Contains(targetFrameworkMoniker);
-            var targetFrameworkSuffix = isSupportedNetTarget ? $".{targetFrameworkMoniker}" : string.Empty;
-
-            // Default test host manager supports shared test sources
-            testHostProcessName = string.Format(_architecture == Architecture.X86 ? X86TestHostProcessName : X64TestHostProcessName, targetFrameworkSuffix);
-        }
-        else
-        {
-            // This path is probably happening only in our tests, because otherwise we are first running CanExecuteCurrentRunConfiguration
-            // which would disqualify anything that is not netframework.
-            testHostProcessName = string.Format(_architecture == Architecture.X86 ? X86TestHostProcessName : X64TestHostProcessName, string.Empty);
-        }
+        string testHostProcessName = GetTestHostName(_architecture, _targetFramework, _processHelper.GetCurrentProcessArchitecture());
 
         var currentWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location), "..//");
         var argumentsString = " " + connectionInfo.ToCommandLineOptions();
@@ -158,7 +145,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
         if (!File.Exists(testhostProcessPath))
         {
-            // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies.
+            // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies, in dotnet SDK.
             testHostProcessName = Path.Combine("TestHost", testHostProcessName);
             testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
         }
@@ -193,6 +180,75 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>(),
             WorkingDirectory = processWorkingDirectory
         };
+    }
+
+    private string GetTestHostName(Architecture architecture, Framework targetFramework, PlatformArchitecture processArchitecture)
+    {
+        // We ship multiple executables for testhost that follow this naming schema:
+        // testhost<.tfm><.architecture>.exe
+        // e.g.: testhost.net472.x86.exe -> 32-bit testhost for .NET Framework 4.7.2
+        //
+        // The tfm is omitted for .NET Framework 4.5.1 testhost.
+        // testhost.x86.exe -> 32-bit testhost for .NET Framework 4.5.1
+        //
+        // The architecture is omitted for 64-bit (x64) testhost.
+        // testhost.net472.exe -> 64-bit testhost for .NET Framework 4.7.2
+        // testhost.exe -> 64-bit testhost for .NET Framework 4.5.1
+        //
+        // These omissions are done for backwards compatibility because originally there were
+        // only testhost.exe and testhost.x86.exe, both built against .NET Framework 4.5.1.
+
+        StringBuilder testHostProcessName = new("testhost");
+
+        if (targetFramework.Name.StartsWith(".NETFramework,Version=v"))
+        {
+            // Transform target framework name into moniker.
+            // e.g. ".NETFramework,Version=v4.7.2" -> "net472".
+            var targetFrameworkMoniker = "net" + targetFramework.Name.Replace(".NETFramework,Version=v", string.Empty).Replace(".", string.Empty);
+
+            var isSupportedTargetFramework = SupportedTargetFrameworks.Contains(targetFrameworkMoniker);
+            if (isSupportedTargetFramework)
+            {
+                testHostProcessName.Append('.').Append(targetFrameworkMoniker);
+            }
+            else
+            {
+                // The .NET Framework 4.5.1 testhost that does not have moniker in the name is used as fallback.
+            }
+        }
+
+        var processArchitectureAsArchitecture = processArchitecture switch
+        {
+            PlatformArchitecture.X86 => Architecture.X86,
+            PlatformArchitecture.X64 => Architecture.X64,
+            PlatformArchitecture.ARM => Architecture.ARM,
+            PlatformArchitecture.ARM64 => Architecture.ARM64,
+            PlatformArchitecture.S390x => Architecture.S390x,
+            _ => throw new NotSupportedException(),
+        };
+
+        // Default architecture, or AnyCPU architecture will use the architecture of the current process,
+        // so when you run from 32-bit vstest.console, or from 32-bit dotnet test, you will get 32-bit testhost
+        // as the preferred testhost.
+        var actualArchitecture = architecture is Architecture.Default or Architecture.AnyCPU
+            ? processArchitectureAsArchitecture
+            : architecture;
+
+        if (actualArchitecture != Architecture.X64)
+        {
+            // Append .<architecture> to the name, such as .x86. It is possible that we are not shipping the
+            // executable for the architecture with VS, and that will fail later with file not found exception,
+            // which is okay.
+            testHostProcessName.Append('.').Append(architecture.ToString().ToLowerInvariant());
+        }
+        else
+        {
+            // 64-bit (x64) executable, uses no architecture suffix in the name.
+            // E.g.: testhost.exe or testhost.net472.exe
+        }
+
+        testHostProcessName.Append(".exe");
+        return testHostProcessName.ToString();
     }
 
     /// <inheritdoc/>
@@ -345,10 +401,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     private Version GetAndLogFileVersion(string path)
     {
         var fileVersion = _fileHelper.GetFileVersion(path);
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("FileVersion for {0} : {1}", path, fileVersion);
-        }
+        EqtTrace.Verbose("FileVersion for {0} : {1}", path, fileVersion);
 
         return fileVersion;
     }

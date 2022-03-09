@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
-
 using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 public class TestCaseFilterTests : AcceptanceTestBase
@@ -16,14 +18,13 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithAndOperatorTrait(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
             GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+            runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /TestCaseFilter:\"(TestCategory=CategoryA&Priority=3)\"");
         InvokeVsTest(arguments);
         ValidateSummaryStatus(0, 1, 0);
@@ -34,14 +35,13 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithCategoryTraitInMixCase(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
             GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+            runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory=Categorya\"");
         InvokeVsTest(arguments);
         ValidateSummaryStatus(0, 1, 0);
@@ -52,14 +52,13 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithClassNameTrait(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
             GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+            runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /TestCaseFilter:\"ClassName=SampleUnitTestProject.UnitTest1\"");
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 1, 1);
@@ -70,14 +69,13 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithFullyQualifiedNameTrait(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
             GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+            runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(
             arguments,
             " /TestCaseFilter:\"FullyQualifiedName=SampleUnitTestProject.UnitTest1.FailingTest\"");
@@ -90,14 +88,13 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithNameTrait(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
             GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+            runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /TestCaseFilter:\"Name=PassingTest\"");
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 0, 0);
@@ -108,14 +105,13 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithOrOperatorTrait(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
             GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+            runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /TestCaseFilter:\"(TestCategory=CategoryA|Priority=2)\"");
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 1, 0);
@@ -126,14 +122,13 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithPriorityTrait(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
             GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+            runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /TestCaseFilter:\"Priority=2\"");
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 0, 0);
@@ -148,14 +143,13 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void TestCaseFilterShouldWorkIfOnlyPropertyValueGivenInExpression(RunnerInfo runnerInfo)
     {
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
             _testEnvironment.GetTestAsset("SimpleTestProject2.dll"),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+            runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /TestCaseFilter:UnitTest1");
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 1, 1);
@@ -169,20 +163,19 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void DiscoverMstestV1TestsWithAndOperatorTrait(RunnerInfo runnerInfo)
     {
-        if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
+        if (runnerInfo.IsNetRunner)
         {
-            Assert.Inconclusive("Mstest v1 tests not supported with .Netcore runner.");
+            Assert.Inconclusive("Mstest v1 tests not supported with .NET Core runner.");
             return;
         }
 
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
             _testEnvironment.GetTestAsset("MstestV1UnitTestProject.dll"),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+            runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /listtests /TestCaseFilter:\"(TestCategory!=CategoryA&Priority!=3)\"");
 
         InvokeVsTest(arguments);
@@ -202,21 +195,20 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void DiscoverTmiTestsWithOnlyPropertyValue(RunnerInfo runnerInfo)
     {
-        if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
+        if (runnerInfo.IsNetRunner)
         {
-            Assert.Inconclusive("Tmi tests not supported with .Netcore runner.");
+            Assert.Inconclusive("Tmi tests not supported with .NET Core runner.");
             return;
         }
 
-        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         string testAssemblyPath = _testEnvironment.GetTestAsset("MstestV1UnitTestProject.dll");
         var arguments = PrepareArguments(
             testAssemblyPath,
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+            runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         string testSettingsPath = Path.Combine(Path.GetDirectoryName(testAssemblyPath), "MstestV1UnitTestProjectTestSettings.testsettings");
         arguments = string.Concat(arguments, " /listtests /TestCaseFilter:PassingTest /settings:", testSettingsPath);
 

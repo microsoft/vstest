@@ -3,10 +3,13 @@
 
 #if WINDOWS_UWP
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <summary>
 /// Assembly Extensions
@@ -18,6 +21,7 @@ public static class PlatformAssemblyExtensions
     /// </summary>
     /// <param name="assembly">Assembly</param>
     /// <returns>Returns Assembly location as per platform</returns>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Part of the public API")]
     public static string GetAssemblyLocation(this Assembly assembly)
     {
         // In UWP all assemblies are packages inside Appx folder, so we return location of current directory

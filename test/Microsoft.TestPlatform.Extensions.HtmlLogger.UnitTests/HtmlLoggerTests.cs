@@ -1,30 +1,34 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
-using VisualStudio.TestTools.UnitTesting;
-using Moq;
-using ObjectModel = VisualStudio.TestPlatform.ObjectModel;
-using VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger;
-using HtmlLoggerConstants = VisualStudio.TestPlatform.Extensions.HtmlLogger.Constants;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using HtmlLogger = VisualStudio.TestPlatform.Extensions.HtmlLogger;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using System.Linq;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using System.Runtime.Serialization;
+
+using Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger;
 using Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
+using HtmlLoggerConstants = Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.Constants;
+using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests;
 
 [TestClass]
 public class HtmlLoggerTests
 {
     private Mock<TestLoggerEvents> _events;
-    private HtmlLogger.HtmlLogger _htmlLogger;
+    private VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger _htmlLogger;
     private Dictionary<string, string> _parameters;
     private static readonly string DefaultTestRunDirectory = Path.GetTempPath();
     private static readonly string DefaultLogFileNameParameterValue = "logfilevalue.html";
@@ -39,7 +43,7 @@ public class HtmlLoggerTests
         _mockFileHelper = new Mock<IFileHelper>();
         _mockHtmlTransformer = new Mock<IHtmlTransformer>();
         _mockXmlSerializer = new Mock<XmlObjectSerializer>();
-        _htmlLogger = new HtmlLogger.HtmlLogger(_mockFileHelper.Object, _mockHtmlTransformer.Object, _mockXmlSerializer.Object);
+        _htmlLogger = new VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger(_mockFileHelper.Object, _mockHtmlTransformer.Object, _mockXmlSerializer.Object);
         _parameters = new Dictionary<string, string>(2)
         {
             [DefaultLoggerParameterNames.TestRunDirectory] = DefaultTestRunDirectory,

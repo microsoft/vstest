@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -12,27 +10,30 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-using CoreUtilities.Helpers;
-
-using Common;
+using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
-using Common.DataCollector;
+using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
-using Common.ExtensionFramework;
-using Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-using CommunicationUtilitiesResources = Resources.Resources;
-using CoreUtilitiesConstants = CoreUtilities.Constants;
+using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 
 /// <summary>
 /// Handles test session events received from vstest console process.
@@ -150,6 +151,14 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
     {
         ValidateArg.NotNull(communicationManager, nameof(communicationManager));
         ValidateArg.NotNull(messageSink, nameof(messageSink));
+        // TODO: The MessageSink and DataCollectionRequestHandler have circular dependency.
+        // Message sink is injected into this Create method and then into constructor
+        // and into the constructor of DataCollectionRequestHandler. Data collection manager
+        // is then assigned to .Instace (which unlike many other .Instance is not populated
+        // directly in that property, but is created here). And then MessageSink depends on
+        // the .Instance. This is a very complicated way of solving the circular dependency,
+        // and should be replaced by adding a property to Message and assigning it.
+        // .Instance can then be removed.
         if (Instance == null)
         {
             lock (SyncObject)
@@ -196,10 +205,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
         {
             var message = _communicationManager.ReceiveMessage();
 
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : Datacollector received message: {0}", message);
-            }
+            EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests: Datacollector received message: {0}", message);
 
             switch (message.MessageType)
             {
@@ -304,10 +310,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
         catch (Exception e)
         {
             // If any exception is thrown while updating additional assemblies, log the exception in eqt trace.
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error("DataCollectionRequestHandler.AddExtensionAssemblies: Exception occurred: {0}", e);
-            }
+            EqtTrace.Error("DataCollectionRequestHandler.AddExtensionAssemblies: Exception occurred: {0}", e);
         }
     }
 

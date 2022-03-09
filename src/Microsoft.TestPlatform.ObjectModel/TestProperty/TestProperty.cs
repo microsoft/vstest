@@ -1,26 +1,22 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
 
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
 public delegate bool ValidateValueCallback(object value);
 
 [DataContract]
 public class TestProperty : IEquatable<TestProperty>
 {
-    #region Fields
-
     private Type _valueType;
-
-    #endregion Fields
-
-    #region Constructors
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestProperty"/> class.
@@ -76,10 +72,6 @@ public class TestProperty : IEquatable<TestProperty>
         _valueType = valueType;
     }
 
-    #endregion Constructors
-
-    #region Properties
-
     /// <summary>
     /// Gets or sets the Id for the property.
     /// </summary>
@@ -123,7 +115,6 @@ public class TestProperty : IEquatable<TestProperty>
     [DataMember]
     public string ValueType { get; set; }
 
-    #endregion Properties
 
     #region IEquatable
 
@@ -146,8 +137,6 @@ public class TestProperty : IEquatable<TestProperty>
     }
 
     #endregion IEquatable
-
-    #region Methods
 
     /// <inheritdoc/>
     public override string ToString()
@@ -245,20 +234,12 @@ public class TestProperty : IEquatable<TestProperty>
         return type;
     }
 
-    #endregion Methods
-
-    #region Static Fields
-
     private static readonly Dictionary<string, KeyValuePair<TestProperty, HashSet<Type>>> Properties = new();
 
 #if FullCLR
     private static string s_visualStudioPKT = "b03f5f7f11d50a3a";
     private static string s_windowsPhonePKT = "7cec85d7bea7798e";
 #endif
-
-    #endregion Static Fields
-
-    #region Static Methods
 
     public static void ClearRegisteredProperties()
     {
@@ -372,8 +353,6 @@ public class TestProperty : IEquatable<TestProperty>
         }
         return false;
     }
-
-    #endregion Static Methods
 
     public object GetRealObject(StreamingContext context)
     {

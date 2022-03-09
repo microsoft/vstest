@@ -1,12 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-
 using System;
 #if NETFRAMEWORK
 using System.Runtime.Serialization;
 #endif
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 /// <summary>
 /// Exception thrown on parsing error in user provided filter expression.
@@ -17,8 +19,6 @@ using System.Runtime.Serialization;
 #endif
 public class TestPlatformFormatException : Exception
 {
-    #region Constructors
-
     /// <summary>
     /// Creates a new TestPlatformFormatException
     /// </summary>
@@ -70,8 +70,6 @@ public class TestPlatformFormatException : Exception
     }
 
 #endif
-    #endregion
-
     /// <summary>
     /// Filter expression.
     /// </summary>
@@ -87,13 +85,8 @@ public class TestPlatformFormatException : Exception
     /// </summary>
     /// <param name="info">Serialization info to add to</param>
     /// <param name="context">not used</param>
-    public override void GetObjectData(SerializationInfo info, StreamingContext context)
+    public override void GetObjectData(SerializationInfo info!!, StreamingContext context)
     {
-        if (info == null)
-        {
-            throw new ArgumentNullException(nameof(info));
-        }
-
         base.GetObjectData(info, context);
         info.AddValue("FilterValue", FilterValue);
     }

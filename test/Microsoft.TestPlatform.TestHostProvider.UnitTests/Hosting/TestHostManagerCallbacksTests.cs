@@ -1,13 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.TestHostProvider.Hosting.UnitTests;
-
 using System;
 using System.Text;
 
 using Microsoft.TestPlatform.TestHostProvider.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace TestPlatform.TestHostProvider.Hosting.UnitTests;
 
 [TestClass]
 public class TestHostManagerCallbacksTests

@@ -1,14 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.SmokeTests;
-
-using TestUtilities;
-using VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Newtonsoft.Json.Linq;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.SmokeTests;
 
 [TestClass]
 // On Linux/Mac we don't download the same .NET SDK bundles
@@ -20,11 +24,10 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
     [DataRow("X86")]
     public void VerifyHostArchitecture(string architecture)
     {
-        using var workSpace = new TempDirectory();
         string dotnetPath = GetDownloadedDotnetMuxerFromTools(architecture);
         var vstestConsolePath = GetDotnetRunnerPath();
-        var dotnetRunnerPath = workSpace.CreateDirectory("dotnetrunner");
-        workSpace.CopyAll(new DirectoryInfo(Path.GetDirectoryName(vstestConsolePath)), dotnetRunnerPath);
+        var dotnetRunnerPath = TempDirectory.CreateDirectory("dotnetrunner");
+        TempDirectory.CopyDirectory(new DirectoryInfo(Path.GetDirectoryName(vstestConsolePath)), dotnetRunnerPath);
 
         // Patch the runner
         string sdkVersion = GetLatestSdkVersion(dotnetPath);
@@ -39,10 +42,10 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
             ["ExpectedArchitecture"] = architecture
         };
 
-        ExecuteApplication(dotnetPath, "new mstest", out string stdOut, out string stdError, out int exitCode, environmentVariables, workSpace.Path);
+        ExecuteApplication(dotnetPath, "new mstest", out _, out  _, out _, environmentVariables, TempDirectory.Path);
 
         // Patch test file
-        File.WriteAllText(Path.Combine(workSpace.Path, "UnitTest1.cs"),
+        File.WriteAllText(Path.Combine(TempDirectory.Path, "UnitTest1.cs"),
 @"
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -59,7 +62,7 @@ public class UnitTest1
     }
 }");
 
-        ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\"", out stdOut, out stdError, out exitCode, environmentVariables, workSpace.Path);
+        ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\"", out string stdOut, out _, out int exitCode, environmentVariables, TempDirectory.Path);
         Assert.AreEqual(0, exitCode, stdOut);
     }
 

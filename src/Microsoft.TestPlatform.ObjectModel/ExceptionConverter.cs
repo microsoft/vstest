@@ -1,9 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Base exception for all Rocksteady service exceptions
@@ -13,7 +15,7 @@ using System;
 #endif
 public class TestPlatformException : Exception
 {
-    public TestPlatformException(String message)
+    public TestPlatformException(string message)
         : base(message)
     {
     }
@@ -55,7 +57,7 @@ public class TestPlatformException : Exception
         /// <param name="innerException">actual exception that is to be wrapped</param>
         /// <returns>actual exception that is represented by the exception name</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Instantiating an instance of Exception class")]
-        private static Exception ConvertException(String exceptionType, String message, Exception innerException)
+        private static Exception ConvertException(string exceptionType, string message, Exception innerException)
         {
             try
             {

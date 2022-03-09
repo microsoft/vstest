@@ -1,14 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CoreUtilities.UnitTests;
-
 using System;
 using System.Collections.Generic;
 using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace TestPlatform.CoreUtilities.UnitTests;
 
 [TestClass]
 public class JobQueueTests
@@ -69,7 +71,7 @@ public class JobQueueTests
     {
         // Setup the job process handler to keep track of the jobs.
         var jobsProcessed = new List<int>();
-        Action<string> processHandler = (job) => jobsProcessed.Add(Thread.CurrentThread.ManagedThreadId);
+        Action<string> processHandler = (job) => jobsProcessed.Add(Environment.CurrentManagedThreadId);
 
         // Queue the jobs and verify they are processed on a background thread.
         using (var queue = new JobQueue<string>(processHandler, "dp", int.MaxValue, int.MaxValue, false, (message) => { }))
@@ -77,7 +79,7 @@ public class JobQueueTests
             queue.QueueJob("dp", 0);
         }
 
-        Assert.AreNotEqual(Thread.CurrentThread.ManagedThreadId, jobsProcessed[0]);
+        Assert.AreNotEqual(Environment.CurrentManagedThreadId, jobsProcessed[0]);
     }
 
     [TestMethod]
@@ -402,9 +404,9 @@ public class JobQueueTests
     /// a class that inherits from job queue and over rides the WaitForQueueToEmpty to allow for checking that blocking and
     /// unblocking work as expected.
     /// </summary>
-    internal class JobQueueWrapper : JobQueue<String>
+    internal class JobQueueWrapper : JobQueue<string>
     {
-        public JobQueueWrapper(Action<String> processJob,
+        public JobQueueWrapper(Action<string> processJob,
             int maxNoOfStringsQueueCanHold,
             int maxNoOfBytesQueueCanHold,
             bool isBoundsEnabled,
@@ -438,9 +440,9 @@ public class JobQueueTests
     /// a class that inherits from job queue and over rides the WaitForQueueToEmpty to simply setting a boolean to tell
     /// whether or not the queue entered the blocking method during the enqueue process.
     /// </summary>
-    internal class JobQueueNonBlocking : JobQueue<String>
+    internal class JobQueueNonBlocking : JobQueue<string>
     {
-        public JobQueueNonBlocking(Action<String> processHandler)
+        public JobQueueNonBlocking(Action<string> processHandler)
             : base(processHandler, "foo", 1, 5, true, (message) => { })
         {
             EnteredBlockingMethod = false;

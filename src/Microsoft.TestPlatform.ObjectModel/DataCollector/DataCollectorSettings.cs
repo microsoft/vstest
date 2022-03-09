@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Globalization;
 using System.Xml;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// The in procedure data collector settings.
@@ -159,7 +161,7 @@ public class DataCollectorSettings
                         }
                         catch (UriFormatException)
                         {
-                            throw new SettingsException(String.Format(CultureInfo.CurrentCulture, Resources.Resources.InvalidDataCollectorUriInSettings, reader.Value));
+                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.InvalidDataCollectorUriInSettings, reader.Value));
                         }
 
                         break;
@@ -184,7 +186,7 @@ public class DataCollectorSettings
 
                     default:
                         throw new SettingsException(
-                            String.Format(
+                            string.Format(
                                 CultureInfo.CurrentCulture,
                                 Resources.Resources.InvalidSettingsXmlAttribute,
                                 Constants.DataCollectionRunSettingsName,
@@ -210,7 +212,7 @@ public class DataCollectorSettings
 
                     default:
                         throw new SettingsException(
-                            String.Format(
+                            string.Format(
                                 CultureInfo.CurrentCulture,
                                 Resources.Resources.InvalidSettingsXmlElement,
                                 Constants.DataCollectionRunSettingsName,

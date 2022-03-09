@@ -167,6 +167,16 @@
         <target state="translated">Ustawienia runsettings uległy zmianie między czasem ustanowienia sesji testowej a czasem bieżącego żądania uruchomienia/odnajdywania.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="translated">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="translated">Załączniki:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

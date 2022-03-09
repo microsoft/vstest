@@ -1,29 +1,27 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
 using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Security.Principal;
 
-using Utility;
+using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
-using XML;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
-using TrxLoggerResources = VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
 /// Class having information about a test run.
 /// </summary>
 internal sealed class TestRun
 {
-    #region Fields
-
-    #region Summary fields
-
     // These fields will be valid when the test run summary is loaded from a results file.
     // The summary fields need to be first in the class so they get serialized first. When we
     // read the summary we don't want to parse the XML tags for other fields because they can
@@ -45,9 +43,6 @@ internal sealed class TestRun
 
     private TestRunConfiguration _runConfig;
 
-    #endregion Summary fields
-
-    #region Non-summary fields
     [StoreXmlSimpleField("Times/@creation")]
     private DateTime _created;
 
@@ -59,12 +54,6 @@ internal sealed class TestRun
 
     [StoreXmlSimpleField("Times/@finish")]
     private DateTime _finished;
-
-    #endregion
-
-    #endregion
-
-    #region Constructors
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRun"/> class.
@@ -79,8 +68,6 @@ internal sealed class TestRun
         EqtAssert.IsTrue(!Guid.Empty.Equals(runId), "Can't use Guid.Empty for run ID.");
         _id = runId;
     }
-
-    #endregion Constructors
 
     /// <summary>
     /// Gets or sets the run configuration.
@@ -176,13 +163,13 @@ internal sealed class TestRun
         if (RunConfiguration == null)
         {
             Debug.Fail("'RunConfiguration' is null");
-            throw new Exception(String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunConfigInRun));
+            throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunConfigInRun));
         }
 
         if (string.IsNullOrEmpty(RunConfiguration.RunDeploymentRootDirectory))
         {
             Debug.Fail("'RunConfiguration.RunDeploymentRootDirectory' is null or empty");
-            throw new Exception(String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunDeploymentRootInRunConfig));
+            throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunDeploymentRootInRunConfig));
         }
 
         return RunConfiguration.RunDeploymentInDirectory;
@@ -198,7 +185,7 @@ internal sealed class TestRun
     private void Initialize()
     {
         _id = Guid.NewGuid();
-        _name = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_TestRunName, Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
+        _name = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_TestRunName, Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
 
         // Fix for issue (https://github.com/Microsoft/vstest/issues/213). Since there is no way to find current user in linux machine.
         // We are catching PlatformNotSupportedException for non windows machine.

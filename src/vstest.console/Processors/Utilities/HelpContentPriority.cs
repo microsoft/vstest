@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
@@ -22,6 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 /// --ListTests
 /// --Parallel
 /// --TestAdapterPath
+/// --TestAdapterLoadingStrategy
 ///
 /// Diagnose/Report
 /// --Diag
@@ -33,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 /// --Port
 ///
 /// Help
-/// -–Help
+/// --Help
 /// </summary>
 internal enum HelpContentPriority
 {
@@ -96,6 +99,11 @@ internal enum HelpContentPriority
     /// TestAdapterPathArgumentProcessor Help
     /// </summary>
     TestAdapterPathArgumentProcessorHelpPriority,
+
+    /// <summary>
+    /// TestAdapterLoadingStrategyArgumentProcessor Help
+    /// </summary>
+    TestAdapterLoadingStrategyArgumentProcessorHelpPriority,
 
     /// <summary>
     /// EnableDiagArgumentProcessor Help

@@ -1,16 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using VisualStudio.TestPlatform.ObjectModel;
-using VisualStudio.TestPlatform.ObjectModel.Client;
+#nullable disable
+
+namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 
 [TestClass]
 public class TestRunCriteriaTests
@@ -32,7 +33,7 @@ public class TestRunCriteriaTests
     public void ConstructorForSourcesWithBaseTestRunCriteriaShouldInitializeAdapterSourceMap()
     {
         var sources = new List<string> { "s1.dll", "s2.dll" };
-        var testRunCriteria = new TestRunCriteria(sources, new TestRunCriteria(new List<String> { "temp.dll" }, 10));
+        var testRunCriteria = new TestRunCriteria(sources, new TestRunCriteria(new List<string> { "temp.dll" }, 10));
 
         Assert.IsNotNull(testRunCriteria.AdapterSourceMap);
         CollectionAssert.AreEqual(new List<string> { "_none_" }, testRunCriteria.AdapterSourceMap.Keys);
@@ -148,5 +149,5 @@ public class TestRunCriteriaTests
         Assert.AreEqual("foo", testRunCriteria.TestCaseFilter);
     }
 
-    #endregion 
+    #endregion
 }

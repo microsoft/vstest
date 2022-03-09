@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,14 +10,19 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Logging;
-using Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using NuGet.Frameworks;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+
 /// <summary>
 /// Logger for sending output to the console.
 /// All the console logger messages prints to Standard Output with respective color, except OutputLevel.Error messages
@@ -29,7 +32,6 @@ using CommandLineResources = Resources.Resources;
 [ExtensionUri(ExtensionUri)]
 internal class ConsoleLogger : ITestLoggerWithParameters
 {
-    #region Constants
     private const string TestMessageFormattingPrefix = " ";
 
     /// <summary>
@@ -82,7 +84,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// </summary>
     public const string ExecutionIdPropertyIdentifier = "ExecutionId";
 
-    // Figure out the longest result string (+1 for ! where applicable), so we don't 
+    // Figure out the longest result string (+1 for ! where applicable), so we don't
     // get misaligned output on non-english systems
     private static readonly int LongestResultIndicator = new[]
     {
@@ -92,8 +94,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         CommandLineResources.None.Length
     }.Max();
 
-    #endregion
-
     internal enum Verbosity
     {
         Quiet,
@@ -102,18 +102,12 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         Detailed
     }
 
-    #region Fields
-
-    private bool _testRunHasErrorMessages = false;
+    private bool _testRunHasErrorMessages;
 
     /// <summary>
     /// Framework on which the test runs.
     /// </summary>
     private string _targetFramework;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Default constructor.
@@ -125,16 +119,12 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <summary>
     /// Constructor added for testing purpose
     /// </summary>
-    /// <param name="output"></param>
-    internal ConsoleLogger(IOutput output, IProgressIndicator progressIndicator)
+    internal ConsoleLogger(IOutput output, IProgressIndicator progressIndicator, IFeatureFlag featureFlag)
     {
         Output = output;
         _progressIndicator = progressIndicator;
+        _featureFlag = featureFlag;
     }
-
-    #endregion
-
-    #region Properties 
 
     /// <summary>
     /// Gets instance of IOutput used for sending output.
@@ -147,6 +137,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     }
 
     private IProgressIndicator _progressIndicator;
+
+    private readonly IFeatureFlag _featureFlag = FeatureFlag.Instance;
 
     /// <summary>
     /// Get the verbosity level for the console logger
@@ -161,12 +153,11 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 #endif
 
     /// <summary>
-    /// Tracks leaf test outcomes per source. This is needed to correctly count hierarchical tests as well as 
+    /// Tracks leaf test outcomes per source. This is needed to correctly count hierarchical tests as well as
     /// tracking counts per source for the minimal and quiet output.
     /// </summary>
     private ConcurrentDictionary<Guid, MinimalTestResult> LeafTestResults { get; set; }
 
-    #endregion
 
     #region ITestLoggerWithParameters
 
@@ -175,13 +166,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="events">Events that can be registered for.</param>
     /// <param name="testRunDirectory">Test Run Directory</param>
-    public void Initialize(TestLoggerEvents events, string testRunDirectory)
+    public void Initialize(TestLoggerEvents events!!, string testRunDirectory)
     {
-        if (events == null)
-        {
-            throw new ArgumentNullException(nameof(events));
-        }
-
         if (Output == null)
         {
             Output = ConsoleOutput.Instance;
@@ -207,13 +193,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         // events.DiscoveredTests += DiscoveredTestsHandler;
     }
 
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters!!)
     {
-        if (parameters == null)
-        {
-            throw new ArgumentNullException(nameof(parameters));
-        }
-
         if (parameters.Count == 0)
         {
             throw new ArgumentException("No default parameters added", nameof(parameters));
@@ -228,26 +209,24 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         var prefixExists = parameters.TryGetValue(PrefixParam, out var prefix);
         if (prefixExists)
         {
-            bool.TryParse(prefix, out AppendPrefix);
+            _ = bool.TryParse(prefix, out AppendPrefix);
         }
 
         var progressArgExists = parameters.TryGetValue(ProgressIndicatorParam, out var enableProgress);
         if (progressArgExists)
         {
-            bool.TryParse(enableProgress, out EnableProgress);
+            _ = bool.TryParse(enableProgress, out EnableProgress);
         }
 
         parameters.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out _targetFramework);
         _targetFramework = !string.IsNullOrEmpty(_targetFramework) ? NuGetFramework.Parse(_targetFramework).GetShortFolderName() : _targetFramework;
 
-        Initialize(events, String.Empty);
+        Initialize(events, string.Empty);
     }
     #endregion
 
-    #region Private Methods
-
     /// <summary>
-    /// Prints the timespan onto console. 
+    /// Prints the timespan onto console.
     /// </summary>
     private static void PrintTimeSpan(TimeSpan timeSpan)
     {
@@ -279,7 +258,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             var sb = new StringBuilder();
             foreach (var message in testMessageCollection)
             {
-                var prefix = String.Format(CultureInfo.CurrentCulture, "{0}{1}", Environment.NewLine, TestMessageFormattingPrefix);
+                var prefix = string.Format(CultureInfo.CurrentCulture, "{0}{1}", Environment.NewLine, TestMessageFormattingPrefix);
                 var messageText = message.Text?.Replace(Environment.NewLine, prefix).TrimEnd(TestMessageFormattingPrefix.ToCharArray());
 
                 if (!string.IsNullOrWhiteSpace(messageText))
@@ -289,7 +268,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             }
             return sb.ToString();
         }
-        return String.Empty;
+        return string.Empty;
     }
 
     /// <summary>
@@ -312,19 +291,19 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         var addAdditionalNewLine = false;
 
         Debug.Assert(result != null, "a null result can not be displayed");
-        if (!String.IsNullOrEmpty(result.ErrorMessage))
+        if (!string.IsNullOrEmpty(result.ErrorMessage))
         {
             addAdditionalNewLine = true;
             Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.ErrorMessageBanner));
-            var errorMessage = String.Format(CultureInfo.CurrentCulture, "{0}{1}{2}", TestResultPrefix, TestMessageFormattingPrefix, result.ErrorMessage);
+            var errorMessage = string.Format(CultureInfo.CurrentCulture, "{0}{1}{2}", TestResultPrefix, TestMessageFormattingPrefix, result.ErrorMessage);
             Output.Information(false, ConsoleColor.Red, errorMessage);
         }
 
-        if (!String.IsNullOrEmpty(result.ErrorStackTrace))
+        if (!string.IsNullOrEmpty(result.ErrorStackTrace))
         {
             addAdditionalNewLine = false;
             Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.StacktraceBanner));
-            var stackTrace = String.Format(CultureInfo.CurrentCulture, "{0}{1}", TestResultPrefix, result.ErrorStackTrace);
+            var stackTrace = string.Format(CultureInfo.CurrentCulture, "{0}{1}", TestResultPrefix, result.ErrorStackTrace);
             Output.Information(false, ConsoleColor.Red, stackTrace);
         }
 
@@ -382,7 +361,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
         if (addAdditionalNewLine)
         {
-            Output.WriteLine(String.Empty, OutputLevel.Information);
+            Output.WriteLine(string.Empty, OutputLevel.Information);
         }
     }
 
@@ -419,10 +398,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         return executionId.Equals(Guid.Empty) ? Guid.NewGuid() : executionId;
     }
 
-    #endregion
-
-    #region Event Handlers
-
     /// <summary>
     /// Called when a test run start is received
     /// </summary>
@@ -454,7 +429,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         {
             case TestMessageLevel.Informational:
                 {
-                    if (VerbosityLevel == Verbosity.Quiet || VerbosityLevel == Verbosity.Minimal)
+                    if (VerbosityLevel is Verbosity.Quiet or Verbosity.Minimal)
                     {
                         break;
                     }
@@ -542,7 +517,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
         if (!LeafTestResults.TryAdd(executionId, new MinimalTestResult(e.Result)))
         {
-            // This would happen if the key already exists. This should not happen, because we are 
+            // This would happen if the key already exists. This should not happen, because we are
             // inserting by GUID key, so this would mean an error in our code.
             throw new InvalidOperationException($"ExecutionId {executionId} already exists.");
         }
@@ -594,7 +569,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
             case TestOutcome.Passed:
                 {
-                    if (VerbosityLevel == Verbosity.Normal || VerbosityLevel == Verbosity.Detailed)
+                    if (VerbosityLevel is Verbosity.Normal or Verbosity.Detailed)
                     {
                         // Pause the progress indicator before displaying test result information
                         _progressIndicator?.Pause();
@@ -689,13 +664,21 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         var runLevelAttachementCount = (e.AttachmentSets == null) ? 0 : e.AttachmentSets.Sum(attachmentSet => attachmentSet.Attachments.Count);
         if (runLevelAttachementCount > 0)
         {
-            Output.Information(false, CommandLineResources.AttachmentsBanner);
-            foreach (var attachmentSet in e.AttachmentSets)
+            // If ARTIFACTS_POSTPROCESSING is disabled
+            if (!_featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING) ||
+                // ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX(old UX) is enabled
+                _featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX) ||
+                // TestSessionCorrelationId is null(we're not running through the dotnet SDK).
+                CommandLineOptions.Instance.TestSessionCorrelationId is null)
             {
-                foreach (var uriDataAttachment in attachmentSet.Attachments)
+                Output.Information(false, CommandLineResources.AttachmentsBanner);
+                foreach (var attachmentSet in e.AttachmentSets)
                 {
-                    var attachmentOutput = string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath);
-                    Output.Information(false, attachmentOutput);
+                    foreach (var uriDataAttachment in attachmentSet.Attachments)
+                    {
+                        var attachmentOutput = string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath);
+                        Output.Information(false, attachmentOutput);
+                    }
                 }
             }
         }
@@ -730,7 +713,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                 }
             }
 
-            if (VerbosityLevel == Verbosity.Quiet || VerbosityLevel == Verbosity.Minimal)
+            if (VerbosityLevel is Verbosity.Quiet or Verbosity.Minimal)
             {
                 TestOutcome sourceOutcome = TestOutcome.None;
                 if (sourceSummary.FailedTests > 0)
@@ -746,24 +729,13 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     sourceOutcome = TestOutcome.Skipped;
                 }
 
-
-                string resultString;
-                switch (sourceOutcome)
+                string resultString = sourceOutcome switch
                 {
-                    case TestOutcome.Failed:
-                        resultString = (CommandLineResources.FailedTestIndicator + "!").PadRight(LongestResultIndicator);
-                        break;
-                    case TestOutcome.Passed:
-                        resultString = (CommandLineResources.PassedTestIndicator + "!").PadRight(LongestResultIndicator);
-                        break;
-                    case TestOutcome.Skipped:
-                        resultString = (CommandLineResources.SkippedTestIndicator + "!").PadRight(LongestResultIndicator);
-                        break;
-                    default:
-                        resultString = CommandLineResources.None.PadRight(LongestResultIndicator);
-                        break;
-                }
-
+                    TestOutcome.Failed => (CommandLineResources.FailedTestIndicator + "!").PadRight(LongestResultIndicator),
+                    TestOutcome.Passed => (CommandLineResources.PassedTestIndicator + "!").PadRight(LongestResultIndicator),
+                    TestOutcome.Skipped => (CommandLineResources.SkippedTestIndicator + "!").PadRight(LongestResultIndicator),
+                    _ => CommandLineResources.None.PadRight(LongestResultIndicator),
+                };
                 var failed = sourceSummary.FailedTests.ToString().PadLeft(5);
                 var passed = sourceSummary.PassedTests.ToString().PadLeft(5);
                 var skipped = sourceSummary.SkippedTests.ToString().PadLeft(5);
@@ -822,7 +794,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             totalTests += sourceSummary.TotalTests;
         }
 
-        if (VerbosityLevel == Verbosity.Quiet || VerbosityLevel == Verbosity.Minimal)
+        if (VerbosityLevel is Verbosity.Quiet or Verbosity.Minimal)
         {
             if (e.IsCanceled)
             {
@@ -899,8 +871,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             }
         }
     }
-    #endregion
-
     /// <summary>
     /// Raises test run warning occurred before console logger starts listening warning events.
     /// </summary>

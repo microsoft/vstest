@@ -1,9 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-
 using System;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 /// <summary>
 /// Provides properties for the connected communication channel.
@@ -13,6 +15,7 @@ public class ConnectedEventArgs : EventArgs
     /// <summary>
     /// Initializes a new instance of the <see cref="ConnectedEventArgs"/> class.
     /// </summary>
+    // TODO: Do we need this constructor?
     public ConnectedEventArgs()
     {
     }

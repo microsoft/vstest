@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,15 +10,17 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
+
 /// <summary>
 /// The blame logger.
 /// </summary>
-[FriendlyName(BlameLogger.FriendlyName)]
-[ExtensionUri(BlameLogger.ExtensionUri)]
+[FriendlyName(FriendlyName)]
+[ExtensionUri(ExtensionUri)]
 public class BlameLogger : ITestLogger
 {
-    #region Constants
-
     /// <summary>
     /// Uri used to uniquely identify the Blame logger.
     /// </summary>
@@ -40,10 +40,6 @@ public class BlameLogger : ITestLogger
     /// The output.
     /// </summary>
     private readonly IOutput _output;
-
-    #endregion
-
-    #region Constructor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BlameLogger"/> class.
@@ -65,7 +61,6 @@ public class BlameLogger : ITestLogger
         _blameReaderWriter = blameReaderWriter;
     }
 
-    #endregion
 
     #region ITestLogger
 
@@ -74,13 +69,8 @@ public class BlameLogger : ITestLogger
     /// </summary>
     /// <param name="events">Events that can be registered for.</param>
     /// <param name="testRunDictionary">Test Run Directory</param>
-    public void Initialize(TestLoggerEvents events, string testRunDictionary)
+    public void Initialize(TestLoggerEvents events!!, string testRunDictionary)
     {
-        if (events == null)
-        {
-            throw new ArgumentNullException(nameof(events));
-        }
-
         events.TestRunComplete += TestRunCompleteHandler;
     }
 
@@ -89,15 +79,10 @@ public class BlameLogger : ITestLogger
     /// </summary>
     /// <param name="sender">Sender</param>
     /// <param name="e">TestRunCompleteEventArgs</param>
-    private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
+    private void TestRunCompleteHandler(object sender!!, TestRunCompleteEventArgs e)
     {
-        if (sender == null)
-        {
-            throw new ArgumentNullException(nameof(sender));
-        }
-
-        ValidateArg.NotNull<object>(sender, nameof(sender));
-        ValidateArg.NotNull<TestRunCompleteEventArgs>(e, nameof(e));
+        ValidateArg.NotNull(sender, nameof(sender));
+        ValidateArg.NotNull(e, nameof(e));
 
         if (!e.IsAborted)
         {

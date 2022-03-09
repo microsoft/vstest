@@ -1,15 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Client;
-
-using CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Client;
 
 /// <summary>
 /// Defines the way in which test session events should be handled.
@@ -31,23 +33,22 @@ internal class TestSessionEventsHandler : ITestSessionEventsHandler
     }
 
     /// <inheritdoc />
-    public void HandleStartTestSessionComplete(TestSessionInfo testSessionInfo)
+    public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs eventArgs)
     {
         var ackPayload = new StartTestSessionAckPayload()
         {
-            TestSessionInfo = testSessionInfo
+            EventArgs = eventArgs
         };
 
         _communicationManager.SendMessage(MessageType.StartTestSessionCallback, ackPayload);
     }
 
     /// <inheritdoc />
-    public void HandleStopTestSessionComplete(TestSessionInfo testSessionInfo, bool stopped)
+    public void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs eventArgs)
     {
         var ackPayload = new StopTestSessionAckPayload()
         {
-            TestSessionInfo = testSessionInfo,
-            IsStopped = stopped
+            EventArgs = eventArgs
         };
 
         _communicationManager.SendMessage(MessageType.StopTestSessionCallback, ackPayload);

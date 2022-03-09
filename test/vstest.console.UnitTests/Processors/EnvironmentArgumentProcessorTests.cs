@@ -1,24 +1,24 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
-
-using System;
 using System.Linq;
 using System.Xml.Linq;
 
-using Microsoft.VisualStudio.TestPlatform.CommandLine;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-using Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-using TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
 using vstest.console.UnitTests.Processors;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 [TestClass]
 public class EnvironmentArgumentProcessorTests
@@ -153,8 +153,8 @@ public class EnvironmentArgumentProcessorTests
         // Arrange
         _settingsProvider.UpdateRunSettingsNode("RunConfiguration.EnvironmentVariables.VARIABLE",
             "Initial value");
-        var warningMessage = String.Format(CommandLineResources.CommandLineWarning,
-            String.Format(CommandLineResources.EnvironmentVariableXIsOverriden, "VARIABLE")
+        var warningMessage = string.Format(CommandLineResources.CommandLineWarning,
+            string.Format(CommandLineResources.EnvironmentVariableXIsOverriden, "VARIABLE")
         );
         _mockOutput.Setup(mock =>
             mock.WriteLine(

@@ -1,9 +1,5 @@
-
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using System;
 using System.Collections.Generic;
@@ -11,7 +7,11 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
-using CoreUtilities.Resources;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Helper to validate parameters.
@@ -142,7 +142,7 @@ public static class ValidateArg
     {
         NotNull(arg, parameterName);
 
-        if (!(arg is T))
+        if (arg is not T)
         {
             var message = string.Format(CultureInfo.CurrentCulture, Resources.Error_ArgumentNotTypeOf, typeof(T).FullName);
             throw new ArgumentException(message, parameterName);
@@ -218,7 +218,7 @@ public static class ValidateArgProperty
     {
         NotNull(arg, parameterName, propertyName);
 
-        if (!(arg is T))
+        if (arg is not T)
         {
             var message = string.Format(CultureInfo.CurrentCulture, Resources.Error_ArgumentPropertyNotTypeOf, propertyName, typeof(T).FullName);
             throw new ArgumentException(message, parameterName);

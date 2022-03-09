@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Client;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,31 +8,35 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Discovery;
-using Execution;
-using Common;
-using Common.ExtensionFramework;
-using Common.Hosting;
-using Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
+using Microsoft.VisualStudio.TestPlatform.Client.Execution;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using CrossPlatEngine;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
-using ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using PlatformAbstractions;
-using Utilities.Helpers;
-using Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-using ClientResources = Resources.Resources;
+using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Client;
 
 /// <summary>
 /// Implementation for TestPlatform.
 /// </summary>
 internal class TestPlatform : ITestPlatform
 {
-    private readonly TestRuntimeProviderManager _testHostProviderManager;
+    private readonly ITestRuntimeProviderManager _testHostProviderManager;
 
     private readonly IFileHelper _fileHelper;
 
@@ -64,10 +66,10 @@ internal class TestPlatform : ITestPlatform
     /// <param name="testEngine">The test engine.</param>
     /// <param name="filehelper">The file helper.</param>
     /// <param name="testHostProviderManager">The data.</param>
-    protected TestPlatform(
+    protected internal TestPlatform(
         ITestEngine testEngine,
         IFileHelper filehelper,
-        TestRuntimeProviderManager testHostProviderManager)
+        ITestRuntimeProviderManager testHostProviderManager)
     {
         TestEngine = testEngine;
         _fileHelper = filehelper;
@@ -82,34 +84,21 @@ internal class TestPlatform : ITestPlatform
     /// <inheritdoc/>
     public IDiscoveryRequest CreateDiscoveryRequest(
         IRequestData requestData,
-        DiscoveryCriteria discoveryCriteria,
+        DiscoveryCriteria discoveryCriteria!!,
         TestPlatformOptions options)
     {
-        if (discoveryCriteria == null)
-        {
-            throw new ArgumentNullException(nameof(discoveryCriteria));
-        }
-
-        // Update cache with Extension folder's files.
-        AddExtensionAssemblies(discoveryCriteria.RunSettings);
-
-        // Update extension assemblies from source when design mode is false.
-        var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
-        if (!runConfiguration.DesignMode)
-        {
-            AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
-        }
+        PopulateExtensions(discoveryCriteria.RunSettings, discoveryCriteria.Sources);
 
         // Initialize loggers.
-        var loggerManager = TestEngine.GetLoggerManager(requestData);
+        ITestLoggerManager loggerManager = TestEngine.GetLoggerManager(requestData);
         loggerManager.Initialize(discoveryCriteria.RunSettings);
 
-        var testHostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
-        ThrowExceptionIfTestHostManagerIsNull(testHostManager, discoveryCriteria.RunSettings);
+        ITestRuntimeProvider testHostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
+        TestPlatform.ThrowExceptionIfTestHostManagerIsNull(testHostManager, discoveryCriteria.RunSettings);
 
         testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
-        var discoveryManager = TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria);
+        IProxyDiscoveryManager discoveryManager = TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria);
         discoveryManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
         return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager, loggerManager);
@@ -118,30 +107,23 @@ internal class TestPlatform : ITestPlatform
     /// <inheritdoc/>
     public ITestRunRequest CreateTestRunRequest(
         IRequestData requestData,
-        TestRunCriteria testRunCriteria,
+        TestRunCriteria testRunCriteria!!,
         TestPlatformOptions options)
     {
-        if (testRunCriteria == null)
-        {
-            throw new ArgumentNullException(nameof(testRunCriteria));
-        }
-
-        AddExtensionAssemblies(testRunCriteria.TestRunSettings);
-
-        var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
-
-        // Update extension assemblies from source when design mode is false.
-        if (!runConfiguration.DesignMode)
-        {
-            AddExtensionAssembliesFromSource(testRunCriteria);
-        }
+        IEnumerable<string> sources = GetSources(testRunCriteria);
+        PopulateExtensions(testRunCriteria.TestRunSettings, sources);
 
         // Initialize loggers.
-        var loggerManager = TestEngine.GetLoggerManager(requestData);
+        ITestLoggerManager loggerManager = TestEngine.GetLoggerManager(requestData);
         loggerManager.Initialize(testRunCriteria.TestRunSettings);
 
-        var testHostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
-        ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
+        // TODO: PERF: this will create a testhost manager, and then it will pass that to GetExecutionManager, where it will
+        // be used only when we will run in-process. If we don't run in process, we will throw away the manager we just
+        // created and let the proxy parallel callbacks to create a new one. This seems to be very easy to move to the GetExecutionManager,
+        // and safe as well, so we create the manager only once.
+        // TODO: Of course TestEngine.GetExecutionManager is public api...
+        ITestRuntimeProvider testHostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
+        TestPlatform.ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
 
         testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
 
@@ -151,7 +133,7 @@ internal class TestPlatform : ITestPlatform
             testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
         }
 
-        var executionManager = TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria);
+        IProxyExecutionManager executionManager = TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria);
         executionManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
         return new TestRunRequest(requestData, testRunCriteria, executionManager, loggerManager);
@@ -160,34 +142,46 @@ internal class TestPlatform : ITestPlatform
     /// <inheritdoc/>
     public bool StartTestSession(
         IRequestData requestData,
-        StartTestSessionCriteria testSessionCriteria,
+        StartTestSessionCriteria testSessionCriteria!!,
         ITestSessionEventsHandler eventsHandler)
     {
-        if (testSessionCriteria == null)
-        {
-            throw new ArgumentNullException(nameof(testSessionCriteria));
-        }
+        RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testSessionCriteria.RunSettings);
+        TestAdapterLoadingStrategy strategy = runConfiguration.TestAdapterLoadingStrategy;
 
-        AddExtensionAssemblies(testSessionCriteria.RunSettings);
+        AddExtensionAssemblies(testSessionCriteria.RunSettings, strategy);
 
-        var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testSessionCriteria.RunSettings);
         if (!runConfiguration.DesignMode)
         {
             return false;
         }
 
-        var testSessionManager = TestEngine.GetTestSessionManager(requestData, testSessionCriteria);
+        IProxyTestSessionManager testSessionManager = TestEngine.GetTestSessionManager(requestData, testSessionCriteria);
         if (testSessionManager == null)
         {
             // The test session manager is null because the combination of runsettings and
             // sources tells us we should run in-process (i.e. in vstest.console). Because
             // of this no session will be created because there's no testhost to be launched.
             // Expecting a subsequent call to execute tests with the same set of parameters.
-            eventsHandler.HandleStartTestSessionComplete(null);
+            eventsHandler.HandleStartTestSessionComplete(new());
             return false;
         }
 
-        return testSessionManager.StartSession(eventsHandler);
+        return testSessionManager.StartSession(eventsHandler, requestData);
+    }
+
+    private void PopulateExtensions(string runSettings, IEnumerable<string> sources)
+    {
+        RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
+        TestAdapterLoadingStrategy strategy = runConfiguration.TestAdapterLoadingStrategy;
+
+        // Update cache with Extension folder's files.
+        AddExtensionAssemblies(runSettings, strategy);
+
+        // Update extension assemblies from source when design mode is false.
+        if (!runConfiguration.DesignMode)
+        {
+            AddLoggerAssembliesFromSource(sources, strategy);
+        }
     }
 
     /// <summary>
@@ -212,24 +206,19 @@ internal class TestPlatform : ITestPlatform
         TestEngine.GetExtensionManager().ClearExtensions();
     }
 
-    private void ThrowExceptionIfTestHostManagerIsNull(
+    private static void ThrowExceptionIfTestHostManagerIsNull(
         ITestRuntimeProvider testHostManager,
         string settingsXml)
     {
         if (testHostManager == null)
         {
-            EqtTrace.Error("TestPlatform.CreateTestRunRequest: No suitable testHostProvider found for runsettings : {0}", settingsXml);
+            EqtTrace.Error($"{nameof(TestPlatform)}.{nameof(ThrowExceptionIfTestHostManagerIsNull)}: No suitable testHostProvider found for runsettings: {settingsXml}");
             throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, ClientResources.NoTestHostProviderFound));
         }
     }
 
-    /// <summary>
-    /// Updates the test adapter paths provided through run settings to be used by the test
-    /// service.
-    /// </summary>
-    ///
-    /// <param name="runSettings">The run settings.</param>
-    private void AddExtensionAssemblies(string runSettings)
+
+    private void AddExtensionAssemblies(string runSettings, TestAdapterLoadingStrategy adapterLoadingStrategy)
     {
         IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings);
 
@@ -237,49 +226,15 @@ internal class TestPlatform : ITestPlatform
         {
             foreach (string customTestAdaptersPath in customTestAdaptersPaths)
             {
-                var adapterPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(customTestAdaptersPath));
-                if (!Directory.Exists(adapterPath))
-                {
-                    if (EqtTrace.IsWarningEnabled)
-                    {
-                        EqtTrace.Warning($"AdapterPath Not Found: {adapterPath}");
-                    }
+                IEnumerable<string> extensionAssemblies = ExpandTestAdapterPaths(customTestAdaptersPath, _fileHelper, adapterLoadingStrategy);
 
-                    continue;
-                }
-
-                var extensionAssemblies = new List<string>(
-                    _fileHelper.EnumerateFiles(
-                        adapterPath,
-                        SearchOption.AllDirectories,
-                        TestPlatformConstants.TestAdapterEndsWithPattern,
-                        TestPlatformConstants.TestLoggerEndsWithPattern,
-                        TestPlatformConstants.DataCollectorEndsWithPattern,
-                        TestPlatformConstants.RunTimeEndsWithPattern));
-
-                if (extensionAssemblies.Count > 0)
+                if (extensionAssemblies.Any())
                 {
                     UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
                 }
+
             }
         }
-    }
-
-    /// <summary>
-    /// Updates the extension assemblies from source directory.
-    /// </summary>
-    ///
-    /// <param name="testRunCriteria">The test run criteria.</param>
-    private void AddExtensionAssembliesFromSource(TestRunCriteria testRunCriteria)
-    {
-        IEnumerable<string> sources = testRunCriteria.Sources;
-        if (testRunCriteria.HasSpecificTests)
-        {
-            // If the test execution is with a test filter, group them by sources.
-            sources = testRunCriteria.Tests.Select(tc => tc.Source).Distinct();
-        }
-
-        AddExtensionAssembliesFromSource(sources);
     }
 
     /// <summary>
@@ -287,21 +242,28 @@ internal class TestPlatform : ITestPlatform
     /// </summary>
     ///
     /// <param name="sources">The list of sources.</param>
-    private void AddExtensionAssembliesFromSource(IEnumerable<string> sources)
+    private void AddLoggerAssembliesFromSource(IEnumerable<string> sources, TestAdapterLoadingStrategy strategy)
     {
-        // Currently we support discovering loggers only from Source directory.
-        var loggersToUpdate = new List<string>();
-
-        foreach (var source in sources)
+        // Skip discovery unless we're using the default behavior, or NextToSource is specified.
+        if (strategy != TestAdapterLoadingStrategy.Default && strategy.HasFlag(TestAdapterLoadingStrategy.NextToSource))
         {
-            var sourceDirectory = Path.GetDirectoryName(source);
-            if (!string.IsNullOrEmpty(sourceDirectory)
-                && _fileHelper.DirectoryExists(sourceDirectory))
+            return;
+        }
+
+        // Currently we support discovering loggers only from Source directory.
+        List<string> loggersToUpdate = new();
+
+        foreach (string source in sources)
+        {
+            string sourceDirectory = Path.GetDirectoryName(source);
+            if (!string.IsNullOrEmpty(sourceDirectory) && _fileHelper.DirectoryExists(sourceDirectory))
             {
+                SearchOption searchOption = GetSearchOption(strategy, SearchOption.TopDirectoryOnly);
+
                 loggersToUpdate.AddRange(
                     _fileHelper.EnumerateFiles(
                         sourceDirectory,
-                        SearchOption.TopDirectoryOnly,
+                        searchOption,
                         TestPlatformConstants.TestLoggerEndsWithPattern));
             }
         }
@@ -319,21 +281,127 @@ internal class TestPlatform : ITestPlatform
     /// </summary>
     private static void AddExtensionAssembliesFromExtensionDirectory()
     {
-        var fileHelper = new FileHelper();
-        var extensionsFolder = Path.Combine(
-            Path.GetDirectoryName(
-                typeof(TestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()),
-            "Extensions");
+        // This method needs to run statically before we have any adapter discovery.
+        // TestHostProviderManager get initialized just after this call and it
+        // requires DefaultExtensionPaths to be set to resolve a TestHostProvider.
+        // Since it's static, it forces us to set the adapter paths.
+        //
+        // Otherwise we will always get a "No suitable test runtime provider found for this run." error.
+        // I (@haplois) will modify this behavior later on, but we also need to consider legacy adapters
+        // and make sure they still work after modification.
+        string runSettings = RunSettingsManager.Instance.ActiveRunSettings.SettingsXml;
+        RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
+        TestAdapterLoadingStrategy strategy = runConfiguration.TestAdapterLoadingStrategy;
 
+        FileHelper fileHelper = new();
+        IEnumerable<string> defaultExtensionPaths = Enumerable.Empty<string>();
+
+        // Explicit adapter loading
+        if (strategy.HasFlag(TestAdapterLoadingStrategy.Explicit))
+        {
+            defaultExtensionPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings)
+                .SelectMany(path => ExpandTestAdapterPaths(path, fileHelper, strategy))
+                .Union(defaultExtensionPaths);
+        }
+
+        string extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()), "Extensions");
         if (fileHelper.DirectoryExists(extensionsFolder))
         {
-            var defaultExtensionPaths = fileHelper.EnumerateFiles(
-                extensionsFolder,
-                SearchOption.TopDirectoryOnly,
-                ".dll",
-                ".exe");
+            // Load default runtime providers
+            if (strategy.HasFlag(TestAdapterLoadingStrategy.DefaultRuntimeProviders))
+            {
+                defaultExtensionPaths = fileHelper
+                    .EnumerateFiles(extensionsFolder, SearchOption.TopDirectoryOnly, TestPlatformConstants.RunTimeEndsWithPattern)
+                    .Union(defaultExtensionPaths);
+            }
 
-            TestPluginCache.Instance.DefaultExtensionPaths = defaultExtensionPaths;
+            // Default extension loader
+            if (strategy == TestAdapterLoadingStrategy.Default || strategy.HasFlag(TestAdapterLoadingStrategy.ExtensionsDirectory))
+            {
+                defaultExtensionPaths = fileHelper
+                    .EnumerateFiles(extensionsFolder, SearchOption.TopDirectoryOnly, ".dll", ".exe")
+                    .Union(defaultExtensionPaths);
+            }
         }
+
+        TestPluginCache.Instance.DefaultExtensionPaths = defaultExtensionPaths.Distinct();
     }
+
+    private static SearchOption GetSearchOption(TestAdapterLoadingStrategy strategy, SearchOption defaultStrategyOption)
+    {
+        return strategy == TestAdapterLoadingStrategy.Default
+            ? defaultStrategyOption
+            : strategy.HasFlag(TestAdapterLoadingStrategy.Recursive) ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+    }
+
+    private static IEnumerable<string> ExpandTestAdapterPaths(string path, IFileHelper fileHelper, TestAdapterLoadingStrategy strategy)
+    {
+        string adapterPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(path));
+
+        // Default behavior is to only accept directories.
+        if (strategy == TestAdapterLoadingStrategy.Default)
+        {
+            return ExpandAdaptersWithDefaultStrategy(adapterPath, fileHelper);
+        }
+
+        IEnumerable<string> adapters = ExpandAdaptersWithExplicitStrategy(adapterPath, fileHelper, strategy);
+
+        return adapters.Distinct();
+    }
+
+    private static IEnumerable<string> ExpandAdaptersWithExplicitStrategy(string path, IFileHelper fileHelper, TestAdapterLoadingStrategy strategy)
+    {
+        if (strategy.HasFlag(TestAdapterLoadingStrategy.Explicit))
+        {
+            return Enumerable.Empty<string>();
+        }
+
+        if (fileHelper.Exists(path))
+        {
+            return new[] { path };
+        }
+        else if (fileHelper.DirectoryExists(path))
+        {
+            SearchOption searchOption = GetSearchOption(strategy, SearchOption.TopDirectoryOnly);
+
+            IEnumerable<string> adapterPaths = fileHelper.EnumerateFiles(
+                path,
+                searchOption,
+                TestPlatformConstants.TestAdapterEndsWithPattern,
+                TestPlatformConstants.TestLoggerEndsWithPattern,
+                TestPlatformConstants.DataCollectorEndsWithPattern,
+                TestPlatformConstants.RunTimeEndsWithPattern);
+
+            return adapterPaths;
+        }
+
+        EqtTrace.Warning($"{nameof(TestPlatform)}.{nameof(ExpandAdaptersWithExplicitStrategy)} AdapterPath Not Found: {path}");
+        return Enumerable.Empty<string>();
+    }
+
+    private static IEnumerable<string> ExpandAdaptersWithDefaultStrategy(string path, IFileHelper fileHelper)
+    {
+        // This is the legacy behavior, please do not modify this method unless you're sure of 
+        // side effect when running tests with legacy adapters.
+        if (!fileHelper.DirectoryExists(path))
+        {
+            EqtTrace.Warning($"{nameof(TestPlatform)}.{nameof(ExpandAdaptersWithDefaultStrategy)} AdapterPath Not Found: {path}");
+
+            return Enumerable.Empty<string>();
+        }
+
+        return fileHelper.EnumerateFiles(
+                path,
+                SearchOption.AllDirectories,
+                TestPlatformConstants.TestAdapterEndsWithPattern,
+                TestPlatformConstants.TestLoggerEndsWithPattern,
+                TestPlatformConstants.DataCollectorEndsWithPattern,
+                TestPlatformConstants.RunTimeEndsWithPattern);
+    }
+
+    private static IEnumerable<string> GetSources(TestRunCriteria testRunCriteria) =>
+        testRunCriteria.HasSpecificTests
+            // If the test execution is with a test filter, filter sources too.
+            ? testRunCriteria.Tests.Select(tc => tc.Source).Distinct()
+            : testRunCriteria.Sources;
 }

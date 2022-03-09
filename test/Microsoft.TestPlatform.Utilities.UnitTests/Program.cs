@@ -5,7 +5,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests;
 
 public static class Program
 {
-    public static void Main(string[] args)
+    public static void Main()
     {
     }
 }

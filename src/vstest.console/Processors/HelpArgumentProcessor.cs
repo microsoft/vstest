@@ -1,23 +1,22 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 // <summary>
 //     Argument Executor for the "-?|--Help|/?|/Help" Help command line argument.
 // </summary>
 internal class HelpArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the HelpArgumentExecutor handles.
     /// </summary>
@@ -29,8 +28,6 @@ internal class HelpArgumentProcessor : IArgumentProcessor
     public const string ShortCommandName = "/?";
 
 
-    #endregion
-
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
     private Lazy<IArgumentExecutor> _executor;
@@ -39,37 +36,16 @@ internal class HelpArgumentProcessor : IArgumentProcessor
     /// Gets the metadata.
     /// </summary>
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new HelpArgumentProcessorCapabilities());
-            }
-
-            return _metadata;
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() => new HelpArgumentProcessorCapabilities());
 
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor = new Lazy<IArgumentExecutor>(() => new HelpArgumentExecutor());
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() => new HelpArgumentExecutor());
 
-            return _executor;
-        }
-
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 }
 
@@ -96,8 +72,6 @@ internal class HelpArgumentProcessorCapabilities : BaseArgumentProcessorCapabili
 /// </summary>
 internal class HelpArgumentExecutor : IArgumentExecutor
 {
-    #region Constructor
-
     /// <summary>
     /// Constructs the HelpArgumentExecutor
     /// </summary>
@@ -106,16 +80,11 @@ internal class HelpArgumentExecutor : IArgumentExecutor
         Output = ConsoleOutput.Instance;
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets the output object
     /// </summary>
     internal IOutput Output { get; set; }
 
-    #endregion
 
     #region IArgumentExecutor Members
 
@@ -161,9 +130,6 @@ internal class HelpArgumentExecutor : IArgumentExecutor
     }
 
     #endregion
-
-    #region Private Methods
-
     /// <summary>
     /// Lookup the help description for the argument processor.
     /// </summary>
@@ -201,5 +167,4 @@ internal class HelpArgumentExecutor : IArgumentExecutor
         Output.WriteLine(string.Empty, OutputLevel.Information);
     }
 
-    #endregion
 }

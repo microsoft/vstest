@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
-
 using System;
 using System.Runtime.InteropServices;
 
@@ -11,15 +9,14 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 using NuGet.Frameworks;
 
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
+
 internal class CrashDumperFactory : ICrashDumperFactory
 {
-    public ICrashDumper Create(string targetFramework)
+    public ICrashDumper Create(string targetFramework!!)
     {
-        if (targetFramework is null)
-        {
-            throw new ArgumentNullException(nameof(targetFramework));
-        }
-
         EqtTrace.Info($"CrashDumperFactory: Creating dumper for {RuntimeInformation.OSDescription} with target framework {targetFramework}.");
 
         var tfm = NuGetFramework.Parse(targetFramework);

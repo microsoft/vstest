@@ -1,16 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-
 using System;
 using System.IO;
 
-using Interfaces;
-using Serialization;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
 /// JsonDataSerializes serializes and deserializes data using Json format
@@ -206,6 +208,15 @@ public class JsonDataSerializer : IDataSerializer
             version = 1;
         }
 
+        // 0: the original protocol with no versioning (Message). It is used during negotiation.
+        // 1: new protocol with versioning (VersionedMessage).
+        // 2: changed serialization because the serialization of properties in bag was too verbose,
+        //    so common properties are considered built-in and serialized without type info.
+        // 3: introduced because of changes to allow attaching debugger to external process.
+        // 4: introduced because 3 did not update this table and ended up using the serializer for protocol v1,
+        //    which is extremely slow. We negotiate 2 or 4, but never 3 unless the flag above is set.
+        // 5: ???
+        // 6: accepts abort and cancel with handlers that report the status.
         return version switch
         {
             // 0 is used during negotiation.
@@ -214,9 +225,9 @@ public class JsonDataSerializer : IDataSerializer
             // unless this is disabled by VSTEST_DISABLE_PROTOCOL_3_VERSION_DOWNGRADE
             // env variable.
             0 or 1 or 3 => s_payloadSerializer,
-            2 or 4 or 5 => s_payloadSerializer2,
-            _ => throw new NotSupportedException($"Protocol version {version} is not supported. " +
-                "Ensure it is compatible with the latest serializer or add a new one."),
+            2 or 4 or 5 or 6 => s_payloadSerializer2,
+            _ => throw new NotSupportedException($"Protocol version {version} is not supported. "
+                + "Ensure it is compatible with the latest serializer or add a new one."),
         };
     }
 }

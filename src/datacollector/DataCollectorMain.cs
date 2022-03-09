@@ -1,29 +1,31 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollector;
-
 using System;
 using System.Globalization;
 using System.Reflection;
 
-using CommunicationUtilities;
-using CommunicationUtilities.DataCollection;
-using CommunicationUtilities.DataCollection.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
 
-using CoreUtilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 
-using Execution;
+using Microsoft.VisualStudio.TestPlatform.Execution;
 
-using ObjectModel;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-using PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-using PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-using CommunicationUtilitiesResources = CommunicationUtilities.Resources.Resources;
-using CoreUtilitiesConstants = CoreUtilities.Constants;
+using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.DataCollector;
 
 public class DataCollectorMain
 {

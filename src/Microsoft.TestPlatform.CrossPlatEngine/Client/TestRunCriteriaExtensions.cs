@@ -1,15 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
-
 using System.Collections.Generic;
 using System.Linq;
-using ObjectModel;
-using ObjectModel.Host;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using ObjectModel.Engine.ClientProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 internal static class TestRunCriteriaExtensions
 {
@@ -69,6 +71,6 @@ internal static class TestRunCriteriaExtensions
     private static void UpdateTestSources(IEnumerable<string> sources, Dictionary<string, IEnumerable<string>> adapterSourceMap)
     {
         adapterSourceMap.Clear();
-        adapterSourceMap.Add(Constants.UnspecifiedAdapterPath, sources);
+        adapterSourceMap.Add(ObjectModel.Constants.UnspecifiedAdapterPath, sources);
     }
 }

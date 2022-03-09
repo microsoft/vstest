@@ -1,12 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace vstest.console.UnitTests.TestPlatformHelpers;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,25 +14,30 @@ using Microsoft.VisualStudio.TestPlatform.CommandLine;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using System.Runtime.Versioning;
-using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
 
 using Moq;
 
-using TestDoubles;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using vstest.console.UnitTests.TestDoubles;
+
+using Constants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
+
+#nullable disable
+
+namespace vstest.console.UnitTests.TestPlatformHelpers;
 
 [TestClass]
 public class TestRequestManagerTests
@@ -230,7 +234,7 @@ public class TestRequestManagerTests
             RunSettings = DefaultRunsettings
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 
         IRequestData actualRequestData = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
@@ -254,7 +258,7 @@ public class TestRequestManagerTests
         _testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
         // Verify.
-        Assert.AreEqual(5, actualRequestData.ProtocolConfig.Version);
+        Assert.AreEqual(6, actualRequestData.ProtocolConfig.Version);
     }
 
 
@@ -280,7 +284,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -329,7 +333,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -372,7 +376,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -415,7 +419,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -458,7 +462,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -513,7 +517,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -560,7 +564,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -607,7 +611,7 @@ public class TestRequestManagerTests
                             </RunSettings>"
         };
 
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
         IRequestData actualRequestData = null;
@@ -883,7 +887,7 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a" },
             RunSettings = DefaultRunsettings
         };
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         IRequestData actualRequestData = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -893,7 +897,7 @@ public class TestRequestManagerTests
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
         // Verify.
-        Assert.AreEqual(5, actualRequestData.ProtocolConfig.Version);
+        Assert.AreEqual(6, actualRequestData.ProtocolConfig.Version);
     }
 
     [TestMethod]
@@ -907,7 +911,7 @@ public class TestRequestManagerTests
             Sources = new List<string>() { "a" },
             RunSettings = DefaultRunsettings
         };
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         IRequestData actualRequestData = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -971,7 +975,7 @@ public class TestRequestManagerTests
                                     </LegacySettings>
                                </RunSettings>"
         };
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         IRequestData actualRequestData = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -1018,7 +1022,7 @@ public class TestRequestManagerTests
                                        </MSTest>
                                </RunSettings>"
         };
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         IRequestData actualRequestData = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -1063,7 +1067,7 @@ public class TestRequestManagerTests
                                 </MSPhoneTest>
                             </RunSettings>"
         };
-        var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+        var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         IRequestData actualRequestData = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -2321,6 +2325,154 @@ public class TestRequestManagerTests
         _mockTestPlatformEventSource.Verify(
             tpes => tpes.StartTestSessionStop(),
             Times.Once());
+    }
+
+    [TestMethod]
+    public void StopTestSessionShouldBeSuccessful()
+    {
+        var result = true;
+        var testSessionInfo = new TestSessionInfo();
+        var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+
+        var mockTestPool = new Mock<TestSessionPool>();
+        TestSessionPool.Instance = mockTestPool.Object;
+
+        mockTestPool.Setup(tp => tp.KillSession(testSessionInfo, It.IsAny<IRequestData>()))
+            .Returns((TestSessionInfo _, IRequestData rd) =>
+            {
+                rd.MetricsCollection.Add(TelemetryDataConstants.TestSessionId, testSessionInfo.Id.ToString());
+                return result;
+            });
+        mockEventsHandler.Setup(eh => eh.HandleStopTestSessionComplete(
+                It.IsAny<StopTestSessionCompleteEventArgs>()))
+            .Callback((StopTestSessionCompleteEventArgs eventArgs) =>
+            {
+                Assert.IsNotNull(eventArgs.TestSessionInfo);
+                Assert.IsNotNull(eventArgs.Metrics);
+                Assert.AreEqual(eventArgs.TestSessionInfo, testSessionInfo);
+                Assert.AreEqual(
+                    eventArgs.Metrics[TelemetryDataConstants.TestSessionId],
+                    testSessionInfo.Id.ToString());
+                Assert.AreEqual(eventArgs.IsStopped, result);
+            });
+
+        _testRequestManager.StopTestSession(
+            new()
+            {
+                TestSessionInfo = testSessionInfo,
+                CollectMetrics = true
+            },
+            mockEventsHandler.Object,
+            _protocolConfig);
+
+        mockTestPool.Verify(tp => tp.KillSession(
+                testSessionInfo,
+                It.IsAny<IRequestData>()),
+            Times.Once);
+        mockEventsHandler.Verify(eh => eh.HandleStopTestSessionComplete(
+                It.IsAny<StopTestSessionCompleteEventArgs>()),
+            Times.Once);
+
+        _mockTestPlatformEventSource.Verify(
+            tpes => tpes.StopTestSessionStart(),
+            Times.Once);
+        _mockTestPlatformEventSource.Verify(
+            tpes => tpes.StopTestSessionStop(),
+            Times.Once);
+    }
+
+    [TestMethod]
+    public void StopTestSessionShouldFail()
+    {
+        var result = false;
+        var testSessionInfo = new TestSessionInfo();
+        var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+
+        var mockTestPool = new Mock<TestSessionPool>();
+        TestSessionPool.Instance = mockTestPool.Object;
+
+        mockTestPool.Setup(tp => tp.KillSession(testSessionInfo, It.IsAny<IRequestData>()))
+            .Returns(result);
+        mockEventsHandler.Setup(eh => eh.HandleStopTestSessionComplete(
+                It.IsAny<StopTestSessionCompleteEventArgs>()))
+            .Callback((StopTestSessionCompleteEventArgs eventArgs) =>
+            {
+                Assert.IsNotNull(eventArgs.TestSessionInfo);
+                Assert.IsNull(eventArgs.Metrics);
+                Assert.AreEqual(eventArgs.TestSessionInfo, testSessionInfo);
+                Assert.AreEqual(eventArgs.IsStopped, result);
+            });
+
+        _testRequestManager.StopTestSession(
+            new()
+            {
+                TestSessionInfo = testSessionInfo,
+                CollectMetrics = true
+            },
+            mockEventsHandler.Object,
+            _protocolConfig);
+
+        mockTestPool.Verify(tp => tp.KillSession(
+                testSessionInfo,
+                It.IsAny<IRequestData>()),
+            Times.Once);
+        mockEventsHandler.Verify(eh => eh.HandleStopTestSessionComplete(
+                It.IsAny<StopTestSessionCompleteEventArgs>()),
+            Times.Once);
+
+        _mockTestPlatformEventSource.Verify(
+            tpes => tpes.StopTestSessionStart(),
+            Times.Once);
+        _mockTestPlatformEventSource.Verify(
+            tpes => tpes.StopTestSessionStop(),
+            Times.Once);
+    }
+
+    [TestMethod]
+    public void StopTestSessionShouldPropagateExceptionWhenKillSessionThrows()
+    {
+        var testSessionInfo = new TestSessionInfo();
+        var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+
+        var mockTestPool = new Mock<TestSessionPool>();
+        TestSessionPool.Instance = mockTestPool.Object;
+
+        mockTestPool.Setup(tp => tp.KillSession(testSessionInfo, It.IsAny<IRequestData>()))
+            .Throws(new Exception("DummyException"));
+        mockEventsHandler.Setup(eh => eh.HandleStopTestSessionComplete(
+                It.IsAny<StopTestSessionCompleteEventArgs>()))
+            .Callback((StopTestSessionCompleteEventArgs eventArgs) =>
+            {
+                Assert.IsNotNull(eventArgs.TestSessionInfo);
+                Assert.IsNotNull(eventArgs.Metrics);
+                Assert.AreEqual(eventArgs.TestSessionInfo, testSessionInfo);
+                Assert.AreEqual(eventArgs.IsStopped, false);
+            });
+
+        Assert.ThrowsException<Exception>(() =>
+            _testRequestManager.StopTestSession(
+                new()
+                {
+                    TestSessionInfo = testSessionInfo,
+                    CollectMetrics = true
+                },
+                mockEventsHandler.Object,
+                _protocolConfig));
+
+        mockTestPool.Verify(tp => tp.KillSession(
+                testSessionInfo,
+                It.IsAny<IRequestData>()),
+            Times.Once);
+        mockEventsHandler.Verify(eh => eh.HandleStopTestSessionComplete(
+                It.IsAny<StopTestSessionCompleteEventArgs>()),
+            Times.Never);
+
+        _mockTestPlatformEventSource.Verify(
+            tpes => tpes.StopTestSessionStart(),
+            Times.Once);
+        _mockTestPlatformEventSource.Verify(
+            tpes => tpes.StopTestSessionStop(),
+            Times.Once);
     }
 
     private static DiscoveryRequestPayload CreateDiscoveryPayload(string runsettings)

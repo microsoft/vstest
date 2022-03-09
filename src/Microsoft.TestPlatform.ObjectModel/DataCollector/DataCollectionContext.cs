@@ -1,9 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-
 using System.Runtime.Serialization;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
 /// Class representing the context in which data collection occurs.
@@ -11,8 +13,6 @@ using System.Runtime.Serialization;
 [DataContract]
 public class DataCollectionContext
 {
-    #region Constructors
-
     // NOTE: These constructors are protected internal to allow 3rd parties to
     //       do unit testing of their data collectors.
     //
@@ -71,10 +71,6 @@ public class DataCollectionContext
         TestCase = testCase;
 
     }
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// Gets test case.
     /// </summary>
@@ -103,10 +99,6 @@ public class DataCollectionContext
         get { return TestExecId != null; }
     }
 
-    #endregion
-
-    #region Equals and Hashcode
-
     public static bool operator ==(DataCollectionContext context1, DataCollectionContext context2)
     {
         return Equals(context1, context2);
@@ -131,10 +123,6 @@ public class DataCollectionContext
         return _hashCode;
     }
 
-    #endregion
-
-    #region Private Methods
-
     private int ComputeHashCode()
     {
         int hashCode = 17;
@@ -149,11 +137,6 @@ public class DataCollectionContext
         return hashCode;
     }
 
-    #endregion
-
-    #region Private Fields
-
     private readonly int _hashCode;
 
-    #endregion
 }

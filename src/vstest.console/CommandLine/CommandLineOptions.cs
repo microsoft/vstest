@@ -1,28 +1,29 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
-
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-using Utilities.Helpers;
-using Utilities.Helpers.Interfaces;
-
-using CommandLineResources = Resources.Resources;
 using vstest.console.Internal;
-using System.Globalization;
+
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
 /// <summary>
 /// Provides access to the command-line options.
 /// </summary>
 internal class CommandLineOptions
 {
-    #region Constants/Readonly
-
     /// <summary>
     /// The default batch size.
     /// </summary>
@@ -43,10 +44,6 @@ internal class CommandLineOptions
     /// </summary>
     private readonly TimeSpan _defaultRetrievalTimeout = new(0, 0, 0, 1, 500);
 
-    #endregion
-
-    #region PrivateMembers
-
     private static CommandLineOptions s_instance;
 
     private List<string> _sources = new();
@@ -55,43 +52,25 @@ internal class CommandLineOptions
 
     private Framework _frameworkVersion;
 
-    #endregion
-
     /// <summary>
     /// Gets the instance.
     /// </summary>
     internal static CommandLineOptions Instance
-    {
-        get
-        {
-            if (s_instance == null)
-            {
-                s_instance = new CommandLineOptions();
-            }
-
-            return s_instance;
-        }
-    }
-
-    #region Constructor
+        => s_instance ??= new CommandLineOptions();
 
     /// <summary>
     /// Default constructor.
     /// </summary>
-    protected CommandLineOptions()
+    internal CommandLineOptions()
     {
         BatchSize = DefaultBatchSize;
         TestStatsEventTimeout = _defaultRetrievalTimeout;
         FileHelper = new FileHelper();
         FilePatternParser = new FilePatternParser();
 #if TODO
-            UseVsixExtensions = Utilities.GetAppSettingValue(UseVsixExtensionsKey, false);
+        UseVsixExtensions = Utilities.GetAppSettingValue(UseVsixExtensionsKey, false);
 #endif
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Specifies whether parallel execution is on or off.
@@ -122,7 +101,7 @@ internal class CommandLineOptions
     /// <summary>
     /// Specifies whether the Fakes automatic configuration should be disabled.
     /// </summary>
-    public bool DisableAutoFakes { get; set; } = false;
+    public bool DisableAutoFakes { get; set; }
 
     /// <summary>
     /// Specifies whether vsixExtensions is enabled or not.
@@ -132,7 +111,12 @@ internal class CommandLineOptions
     /// <summary>
     /// Path to the custom test adapters.
     /// </summary>
-    public string TestAdapterPath { get; set; }
+    public string[] TestAdapterPath { get; set; }
+
+    /// <summary>
+    /// Test adapter loading strategy.
+    /// </summary>
+    public TestAdapterLoadingStrategy TestAdapterLoadingStrategy { get; set; }
 
     /// <summary>
     /// Process Id of the process which launched vstest runner
@@ -187,13 +171,9 @@ internal class CommandLineOptions
     /// <summary>
     /// Specifies whether the target device has a Windows Phone context or not
     /// </summary>
-    public bool HasPhoneContext
-    {
-        get
-        {
-            return !string.IsNullOrEmpty(TargetDevice);
-        }
-    }
+    public bool HasPhoneContext => !string.IsNullOrEmpty(TargetDevice);
+
+    public bool TestAdapterPathsSet => (TestAdapterPath?.Length ?? 0) != 0;
 
     /// <summary>
     /// Specifies the target platform type for test run.
@@ -272,9 +252,15 @@ internal class CommandLineOptions
     /// </summary>
     internal string SettingsFile { get; set; }
 
-    #endregion
+    /// <summary>
+    /// Gets or sets the /ArtifactsProcessingMode value.
+    /// </summary>
+    internal ArtifactProcessingMode ArtifactProcessingMode { get; set; }
 
-    #region Public Methods
+    /// <summary>
+    /// Gets or sets the /TestSessionCorrelationId value.
+    /// </summary>
+    internal string TestSessionCorrelationId { get; set; }
 
     /// <summary>
     /// Adds a source file to look for tests in.
@@ -282,7 +268,7 @@ internal class CommandLineOptions
     /// <param name="source">Path to source file to look for tests in.</param>
     public void AddSource(string source)
     {
-        if (String.IsNullOrWhiteSpace(source))
+        if (string.IsNullOrWhiteSpace(source))
         {
             throw new TestSourceException(CommandLineResources.CannotBeNullOrEmpty);
         }
@@ -304,10 +290,6 @@ internal class CommandLineOptions
         _sources = _sources.Union(matchingFiles).ToList();
     }
 
-    #endregion
-
-    #region Internal Methods
-
     /// <summary>
     /// Resets the options. Clears the sources.
     /// </summary>
@@ -316,5 +298,4 @@ internal class CommandLineOptions
         s_instance = null;
     }
 
-    #endregion
 }

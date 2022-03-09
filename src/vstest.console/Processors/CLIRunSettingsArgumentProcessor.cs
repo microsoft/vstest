@@ -1,34 +1,32 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Xml.XPath;
-using System.Collections.Generic;
 
-using Common;
-using Common.Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-
-using CommandLineResources = Resources.Resources;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// The argument processor for runsettings passed as argument through cli
 /// </summary>
 internal class CliRunSettingsArgumentProcessor : IArgumentProcessor
 {
-    #region Constants
-
     /// <summary>
     /// The name of the command line argument that the PortArgumentExecutor handles.
     /// </summary>
     public const string CommandName = "--";
-
-    #endregion
 
     private Lazy<IArgumentProcessorCapabilities> _metadata;
 
@@ -38,37 +36,18 @@ internal class CliRunSettingsArgumentProcessor : IArgumentProcessor
     /// Gets the metadata.
     /// </summary>
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new CliRunSettingsArgumentProcessorCapabilities());
-            }
-
-            return _metadata;
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new CliRunSettingsArgumentProcessorCapabilities());
 
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor = new Lazy<IArgumentExecutor>(() => new CliRunSettingsArgumentExecutor(RunSettingsManager.Instance, CommandLineOptions.Instance));
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new CliRunSettingsArgumentExecutor(RunSettingsManager.Instance, CommandLineOptions.Instance));
 
-            return _executor;
-        }
-
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 }
 
@@ -143,7 +122,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
 
         foreach (var arg in args)
         {
-            // when we see that the parameter begins with TestRunParameters 
+            // when we see that the parameter begins with TestRunParameters
             // but does not end with ") we start merging the params
             if (arg.StartsWith("TestRunParameters", StringComparison.OrdinalIgnoreCase))
             {
@@ -182,7 +161,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
 
         if (merge)
         {
-            // we tried to merge but never found the end of that 
+            // we tried to merge but never found the end of that
             // test paramter, add what we merged up until now
             mergedArgs.Add(mergedArg);
         }

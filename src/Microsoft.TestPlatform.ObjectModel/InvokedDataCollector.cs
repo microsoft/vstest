@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Runtime.Serialization;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 public sealed class InvokedDataCollector : IEquatable<InvokedDataCollector>
 {
@@ -15,12 +17,12 @@ public sealed class InvokedDataCollector : IEquatable<InvokedDataCollector>
     /// <param name="assemblyQualifiedName">Data collector assembly qualified name</param>
     /// <param name="filePath">Data collector file path</param>
     /// <param name="hasAttachmentProcessor">True if data collector registers an attachment processor</param>
-    public InvokedDataCollector(Uri uri, string friendlyName, string assemblyQualifiedName, string filePath, bool hasAttachmentProcessor)
+    public InvokedDataCollector(Uri uri!!, string friendlyName!!, string assemblyQualifiedName!!, string filePath!!, bool hasAttachmentProcessor)
     {
-        Uri = uri ?? throw new ArgumentNullException(nameof(uri));
-        FriendlyName = friendlyName ?? throw new ArgumentNullException(nameof(friendlyName));
-        AssemblyQualifiedName = assemblyQualifiedName ?? throw new ArgumentNullException(nameof(assemblyQualifiedName)); ;
-        FilePath = filePath ?? throw new ArgumentNullException(nameof(filePath)); ;
+        Uri = uri;
+        FriendlyName = friendlyName;
+        AssemblyQualifiedName = assemblyQualifiedName; ;
+        FilePath = filePath; ;
         HasAttachmentProcessor = hasAttachmentProcessor;
     }
 

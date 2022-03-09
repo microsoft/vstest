@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,7 +9,11 @@ using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 
 /// <summary>
 /// The test discoverer plugin information.

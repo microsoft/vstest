@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +9,8 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Interfaces;
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -20,14 +19,18 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
 using Newtonsoft.Json.Linq;
 
-using TestResult = VisualStudio.TestPlatform.ObjectModel.TestResult;
-using Payloads = VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+using Payloads = Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
 
 [TestClass]
 public class VsTestConsoleRequestSenderTests
@@ -38,7 +41,7 @@ public class VsTestConsoleRequestSenderTests
 
     private readonly int _waitTimeout = 2000;
 
-    private readonly int _protocolVersion = 5;
+    private readonly int _protocolVersion = 6;
     private readonly IDataSerializer _serializer = JsonDataSerializer.Instance;
 
     public VsTestConsoleRequestSenderTests()
@@ -427,6 +430,90 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
         mockHandler.Verify(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()), Times.Once, "DiscoveredTests must be called");
         mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Never, "TestMessage event must not be called");
+    }
+
+    [TestMethod]
+    public void DiscoverTestsShouldCompleteWithSingleFullyDiscoveredSource()
+    {
+        InitializeCommunication();
+
+        var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
+
+        List<string> sources = new() { "1.dll" };
+
+        var testCase = new TestCase("hello", new Uri("world://how"), source: sources[0]);
+        var testsFound = new Message()
+        {
+            MessageType = MessageType.TestCasesFound,
+            Payload = JToken.FromObject(new List<TestCase>() { testCase })
+        };
+
+        var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = null, IsAborted = false, FullyDiscoveredSources = sources };
+        var discoveryComplete = new Message()
+        {
+            MessageType = MessageType.DiscoveryComplete,
+            Payload = JToken.FromObject(payload)
+        };
+
+        DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
+
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
+        mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
+            .Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
+
+        mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
+            .Callback((DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> tests) => receivedDiscoveryCompleteEventArgs = discoveryCompleteEventArgs);
+
+        _requestSender.DiscoverTests(sources, null, new TestPlatformOptions(), null, mockHandler.Object);
+
+        mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
+        Assert.IsNotNull(receivedDiscoveryCompleteEventArgs.FullyDiscoveredSources);
+        Assert.AreEqual(1, receivedDiscoveryCompleteEventArgs.FullyDiscoveredSources.Count);
+    }
+
+    [TestMethod]
+    public void DiscoverTestsShouldCompleteWithCorrectAbortedValuesIfAbortingWasRequested()
+    {
+        // Arrange
+        InitializeCommunication();
+
+        var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
+
+        List<string> sources = new() { "1.dll" };
+
+        var testCase = new TestCase("hello", new Uri("world://how"), source: sources[0]);
+        var testsFound = new Message()
+        {
+            MessageType = MessageType.TestCasesFound,
+            Payload = JToken.FromObject(new List<TestCase>() { testCase })
+        };
+
+        var payload = new DiscoveryCompletePayload() { TotalTests = -1, LastDiscoveredTests = null, IsAborted = true, FullyDiscoveredSources = sources };
+        var discoveryComplete = new Message()
+        {
+            MessageType = MessageType.DiscoveryComplete,
+            Payload = JToken.FromObject(payload)
+        };
+
+        DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
+
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
+        mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
+            .Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
+
+        mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
+            .Callback((DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> tests) => receivedDiscoveryCompleteEventArgs = discoveryCompleteEventArgs);
+
+        // Act
+        _requestSender.DiscoverTests(sources, null, new TestPlatformOptions(), null, mockHandler.Object);
+        _requestSender.CancelDiscovery();
+
+        // Assert
+        mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
+        Assert.IsNotNull(receivedDiscoveryCompleteEventArgs.FullyDiscoveredSources);
+        Assert.AreEqual(1, receivedDiscoveryCompleteEventArgs.FullyDiscoveredSources.Count);
+        Assert.AreEqual(-1, receivedDiscoveryCompleteEventArgs.TotalCount);
+        Assert.AreEqual(true, receivedDiscoveryCompleteEventArgs.IsAborted);
     }
 
     [TestMethod]
@@ -888,7 +975,7 @@ public class VsTestConsoleRequestSenderTests
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -911,7 +998,7 @@ public class VsTestConsoleRequestSenderTests
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -1153,7 +1240,7 @@ public class VsTestConsoleRequestSenderTests
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -1176,7 +1263,7 @@ public class VsTestConsoleRequestSenderTests
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -2151,7 +2238,14 @@ public class VsTestConsoleRequestSenderTests
         InitializeCommunication(MinimumProtocolVersionWithTestSessionSupport - 1);
 
         var mockHandler = new Mock<ITestSessionEventsHandler>();
-        mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
+        mockHandler.Setup(
+            mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()))
+            .Callback((StartTestSessionCompleteEventArgs eventArgs) =>
+            {
+                Assert.IsNull(eventArgs.TestSessionInfo);
+                Assert.IsNull(eventArgs.Metrics);
+            });
 
         Assert.IsNull(_requestSender.StartTestSession(
             new List<string>() { "DummyTestAssembly.dll" },
@@ -2160,7 +2254,9 @@ public class VsTestConsoleRequestSenderTests
             mockHandler.Object,
             null));
 
-        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(null), Times.Once);
+        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()),
+            Times.Once);
     }
 
     [TestMethod]
@@ -2169,7 +2265,14 @@ public class VsTestConsoleRequestSenderTests
         await InitializeCommunicationAsync(MinimumProtocolVersionWithTestSessionSupport - 1).ConfigureAwait(false);
 
         var mockHandler = new Mock<ITestSessionEventsHandler>();
-        mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
+        mockHandler.Setup(
+            mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()))
+            .Callback((StartTestSessionCompleteEventArgs eventArgs) =>
+            {
+                Assert.IsNull(eventArgs.TestSessionInfo);
+                Assert.IsNull(eventArgs.Metrics);
+            });
 
         Assert.IsNull(await _requestSender.StartTestSessionAsync(
             new List<string>() { "DummyTestAssembly.dll" },
@@ -2178,7 +2281,9 @@ public class VsTestConsoleRequestSenderTests
             mockHandler.Object,
             null).ConfigureAwait(false));
 
-        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(null), Times.Once);
+        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()),
+            Times.Once);
     }
 
     [TestMethod]
@@ -2186,13 +2291,30 @@ public class VsTestConsoleRequestSenderTests
     {
         InitializeCommunication();
 
-        var mockHandler = new Mock<ITestSessionEventsHandler>();
-        mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
-
         var testSessionInfo = new TestSessionInfo();
+        var metrics = new Dictionary<string, object>();
+        metrics.Add(TelemetryDataConstants.TestSessionId, testSessionInfo.Id.ToString());
+
+        var mockHandler = new Mock<ITestSessionEventsHandler>();
+        mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()))
+            .Callback((StartTestSessionCompleteEventArgs eventArgs) =>
+            {
+                Assert.IsNotNull(eventArgs.TestSessionInfo);
+                Assert.IsNotNull(eventArgs.Metrics);
+                Assert.AreEqual(eventArgs.TestSessionInfo, testSessionInfo);
+                Assert.AreEqual(
+                    eventArgs.Metrics[TelemetryDataConstants.TestSessionId],
+                    testSessionInfo.Id.ToString());
+            });
+
         var ackPayload = new Payloads.StartTestSessionAckPayload()
         {
-            TestSessionInfo = testSessionInfo
+            EventArgs = new()
+            {
+                TestSessionInfo = testSessionInfo,
+                Metrics = metrics
+            }
         };
         var message = CreateMessage(
             MessageType.StartTestSessionCallback,
@@ -2213,7 +2335,9 @@ public class VsTestConsoleRequestSenderTests
                 null,
                 mockHandler.Object,
                 null));
-        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(testSessionInfo), Times.Once);
+        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()),
+            Times.Once);
     }
 
     [TestMethod]
@@ -2221,13 +2345,30 @@ public class VsTestConsoleRequestSenderTests
     {
         await InitializeCommunicationAsync().ConfigureAwait(false);
 
-        var mockHandler = new Mock<ITestSessionEventsHandler>();
-        mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
-
         var testSessionInfo = new TestSessionInfo();
+        var metrics = new Dictionary<string, object>();
+        metrics.Add(TelemetryDataConstants.TestSessionId, testSessionInfo.Id.ToString());
+
+        var mockHandler = new Mock<ITestSessionEventsHandler>();
+        mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()))
+            .Callback((StartTestSessionCompleteEventArgs eventArgs) =>
+            {
+                Assert.IsNotNull(eventArgs.TestSessionInfo);
+                Assert.IsNotNull(eventArgs.Metrics);
+                Assert.AreEqual(eventArgs.TestSessionInfo, testSessionInfo);
+                Assert.AreEqual(
+                    eventArgs.Metrics[TelemetryDataConstants.TestSessionId],
+                    testSessionInfo.Id.ToString());
+            });
+
         var ackPayload = new Payloads.StartTestSessionAckPayload()
         {
-            TestSessionInfo = testSessionInfo
+            EventArgs = new()
+            {
+                TestSessionInfo = testSessionInfo,
+                Metrics = metrics
+            }
         };
         var message = CreateMessage(
             MessageType.StartTestSessionCallback,
@@ -2248,6 +2389,9 @@ public class VsTestConsoleRequestSenderTests
                 null,
                 mockHandler.Object,
                 null).ConfigureAwait(false));
+        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()),
+            Times.Once);
     }
 
     [TestMethod]
@@ -2256,8 +2400,22 @@ public class VsTestConsoleRequestSenderTests
         InitializeCommunication();
 
         // Setup
+        var testSessionInfo = new TestSessionInfo();
+        var metrics = new Dictionary<string, object>();
+        metrics.Add(TelemetryDataConstants.TestSessionId, testSessionInfo.Id.ToString());
+
         var mockHandler = new Mock<ITestSessionEventsHandler>();
-        mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
+        mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()))
+            .Callback((StartTestSessionCompleteEventArgs eventArgs) =>
+            {
+                Assert.IsNotNull(eventArgs.TestSessionInfo);
+                Assert.IsNotNull(eventArgs.Metrics);
+                Assert.AreEqual(eventArgs.TestSessionInfo, testSessionInfo);
+                Assert.AreEqual(
+                    eventArgs.Metrics[TelemetryDataConstants.TestSessionId],
+                    testSessionInfo.Id.ToString());
+            });
         var mockTesthostLauncher = new Mock<ITestHostLauncher>();
         mockTesthostLauncher.Setup(tl => tl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(TesthostPid);
 
@@ -2266,10 +2424,13 @@ public class VsTestConsoleRequestSenderTests
             MessageType.CustomTestHostLaunch,
             launchInfo);
 
-        var testSessionInfo = new TestSessionInfo();
         var ackPayload = new Payloads.StartTestSessionAckPayload()
         {
-            TestSessionInfo = testSessionInfo
+            EventArgs = new()
+            {
+                TestSessionInfo = testSessionInfo,
+                Metrics = metrics
+            }
         };
         var ackMessage = CreateMessage(
             MessageType.StartTestSessionCallback,
@@ -2303,7 +2464,9 @@ public class VsTestConsoleRequestSenderTests
 
         // Verify
         mockTesthostLauncher.Verify(tl => tl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
-        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(testSessionInfo), Times.Once);
+        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()),
+            Times.Once);
     }
 
     [TestMethod]
@@ -2312,8 +2475,22 @@ public class VsTestConsoleRequestSenderTests
         await InitializeCommunicationAsync().ConfigureAwait(false);
 
         // Setup
+        var testSessionInfo = new TestSessionInfo();
+        var metrics = new Dictionary<string, object>();
+        metrics.Add(TelemetryDataConstants.TestSessionId, testSessionInfo.Id.ToString());
+
         var mockHandler = new Mock<ITestSessionEventsHandler>();
-        mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
+        mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()))
+            .Callback((StartTestSessionCompleteEventArgs eventArgs) =>
+            {
+                Assert.IsNotNull(eventArgs.TestSessionInfo);
+                Assert.IsNotNull(eventArgs.Metrics);
+                Assert.AreEqual(eventArgs.TestSessionInfo, testSessionInfo);
+                Assert.AreEqual(
+                    eventArgs.Metrics[TelemetryDataConstants.TestSessionId],
+                    testSessionInfo.Id.ToString());
+            });
         var mockTesthostLauncher = new Mock<ITestHostLauncher>();
         mockTesthostLauncher.Setup(tl => tl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(TesthostPid);
 
@@ -2322,10 +2499,13 @@ public class VsTestConsoleRequestSenderTests
             MessageType.CustomTestHostLaunch,
             launchInfo);
 
-        var testSessionInfo = new TestSessionInfo();
         var ackPayload = new Payloads.StartTestSessionAckPayload()
         {
-            TestSessionInfo = testSessionInfo
+            EventArgs = new()
+            {
+                TestSessionInfo = testSessionInfo,
+                Metrics = metrics
+            }
         };
         var ackMessage = CreateMessage(
             MessageType.StartTestSessionCallback,
@@ -2359,7 +2539,9 @@ public class VsTestConsoleRequestSenderTests
 
         // Verify
         mockTesthostLauncher.Verify(tl => tl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
-        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(testSessionInfo), Times.Once);
+        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()),
+            Times.Once);
     }
 
     [TestMethod]
@@ -2368,8 +2550,22 @@ public class VsTestConsoleRequestSenderTests
         InitializeCommunication();
 
         // Setup
+        var testSessionInfo = new TestSessionInfo();
+        var metrics = new Dictionary<string, object>();
+        metrics.Add(TelemetryDataConstants.TestSessionId, testSessionInfo.Id.ToString());
+
         var mockHandler = new Mock<ITestSessionEventsHandler>();
-        mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
+        mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()))
+            .Callback((StartTestSessionCompleteEventArgs eventArgs) =>
+            {
+                Assert.IsNotNull(eventArgs.TestSessionInfo);
+                Assert.IsNotNull(eventArgs.Metrics);
+                Assert.AreEqual(eventArgs.TestSessionInfo, testSessionInfo);
+                Assert.AreEqual(
+                    eventArgs.Metrics[TelemetryDataConstants.TestSessionId],
+                    testSessionInfo.Id.ToString());
+            });
         var mockTesthostLauncher = new Mock<ITestHostLauncher2>();
         mockTesthostLauncher.Setup(tl => tl.AttachDebuggerToProcess(TesthostPid)).Returns(true);
 
@@ -2377,10 +2573,13 @@ public class VsTestConsoleRequestSenderTests
             MessageType.EditorAttachDebugger,
             TesthostPid);
 
-        var testSessionInfo = new TestSessionInfo();
         var ackPayload = new Payloads.StartTestSessionAckPayload()
         {
-            TestSessionInfo = testSessionInfo
+            EventArgs = new()
+            {
+                TestSessionInfo = testSessionInfo,
+                Metrics = metrics
+            }
         };
         var ackMessage = CreateMessage(
             MessageType.StartTestSessionCallback,
@@ -2414,7 +2613,9 @@ public class VsTestConsoleRequestSenderTests
 
         // Verify
         mockTesthostLauncher.Verify(tl => tl.AttachDebuggerToProcess(TesthostPid), Times.Once);
-        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(testSessionInfo), Times.Once);
+        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()),
+            Times.Once);
     }
 
     [TestMethod]
@@ -2423,8 +2624,22 @@ public class VsTestConsoleRequestSenderTests
         await InitializeCommunicationAsync().ConfigureAwait(false);
 
         // Setup
+        var testSessionInfo = new TestSessionInfo();
+        var metrics = new Dictionary<string, object>();
+        metrics.Add(TelemetryDataConstants.TestSessionId, testSessionInfo.Id.ToString());
+
         var mockHandler = new Mock<ITestSessionEventsHandler>();
-        mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
+        mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()))
+            .Callback((StartTestSessionCompleteEventArgs eventArgs) =>
+            {
+                Assert.IsNotNull(eventArgs.TestSessionInfo);
+                Assert.IsNotNull(eventArgs.Metrics);
+                Assert.AreEqual(eventArgs.TestSessionInfo, testSessionInfo);
+                Assert.AreEqual(
+                    eventArgs.Metrics[TelemetryDataConstants.TestSessionId],
+                    testSessionInfo.Id.ToString());
+            });
         var mockTesthostLauncher = new Mock<ITestHostLauncher2>();
         mockTesthostLauncher.Setup(tl => tl.AttachDebuggerToProcess(TesthostPid)).Returns(true);
 
@@ -2432,10 +2647,13 @@ public class VsTestConsoleRequestSenderTests
             MessageType.EditorAttachDebugger,
             TesthostPid);
 
-        var testSessionInfo = new TestSessionInfo();
         var ackPayload = new Payloads.StartTestSessionAckPayload()
         {
-            TestSessionInfo = testSessionInfo
+            EventArgs = new()
+            {
+                TestSessionInfo = testSessionInfo,
+                Metrics = metrics
+            }
         };
         var ackMessage = CreateMessage(
             MessageType.StartTestSessionCallback,
@@ -2469,7 +2687,9 @@ public class VsTestConsoleRequestSenderTests
 
         // Verify
         mockTesthostLauncher.Verify(tl => tl.AttachDebuggerToProcess(TesthostPid), Times.Once);
-        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(testSessionInfo), Times.Once);
+        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()),
+            Times.Once);
     }
     #endregion
 
@@ -2515,7 +2735,7 @@ public class VsTestConsoleRequestSenderTests
         Assert.IsTrue(connectionSuccess, "Connection must succeed.");
     }
 
-    private void SetupMockCommunicationForRunRequest(Mock<ITestRunEventsHandler> mockHandler)
+    private void SetupMockCommunicationForRunRequest()
     {
         InitializeCommunication();
 

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,7 +14,11 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-using Resource = Resources.Resources;
+using Resource = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
 
 /// <summary>
 /// A data collector that collects event log data
@@ -25,8 +27,6 @@ using Resource = Resources.Resources;
 [DataCollectorFriendlyName("Event Log")]
 public class EventLogDataCollector : DataCollector
 {
-    #region Constants
-
     /// <summary>
     /// The event log file name.
     /// </summary>
@@ -36,10 +36,6 @@ public class EventLogDataCollector : DataCollector
     /// DataCollector URI.
     /// </summary>
     private const string DefaultUri = @"datacollector://Microsoft/EventLog/2.0";
-
-    #endregion
-
-    #region Private fields
 
     /// <summary>
     /// Event handler delegate for the SessionStart event
@@ -96,10 +92,6 @@ public class EventLogDataCollector : DataCollector
     /// </summary>
     private readonly IDictionary<string, IEventLogContainer> _eventLogContainerMap = new Dictionary<string, IEventLogContainer>();
 
-    #endregion
-
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="EventLogDataCollector"/> class.
     /// </summary>
@@ -126,10 +118,6 @@ public class EventLogDataCollector : DataCollector
         _fileHelper = fileHelper;
     }
 
-    #endregion
-
-    #region Internal Fields
-
     internal int MaxEntries { get; private set; }
 
     internal ISet<string> EventSources { get; private set; }
@@ -143,7 +131,6 @@ public class EventLogDataCollector : DataCollector
     /// </summary>
     internal Dictionary<DataCollectionContext, EventLogSessionContext> ContextMap { get; }
 
-    #endregion
 
     #region DataCollector Members
 
@@ -196,9 +183,6 @@ public class EventLogDataCollector : DataCollector
     }
 
     #endregion
-
-    #region Internal
-
     /// <summary>
     /// The write event logs.
     /// </summary>
@@ -278,32 +262,23 @@ public class EventLogDataCollector : DataCollector
 
         stopwatch.Stop();
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose(
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "EventLogDataContainer: Wrote {0} event log entries to file '{1}' in {2} seconds",
-                    eventLogEntries.Count,
-                    eventLogPath,
-                    stopwatch.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture)));
-        }
+        EqtTrace.Verbose(
+            "EventLogDataContainer: Wrote {0} event log entries to file '{1}' in {2} seconds",
+            eventLogEntries.Count,
+            eventLogPath,
+            stopwatch.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
 
         // Write the event log file
         FileTransferInformation fileTransferInformation =
             new(dataCollectionContext, eventLogPath, true, _fileHelper);
         _dataSink.SendFileAsync(fileTransferInformation);
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose(
-                "EventLogDataContainer: Event log successfully sent for data collection context '{0}'.",
-                dataCollectionContext.ToString());
-        }
+        EqtTrace.Verbose(
+            "EventLogDataContainer: Event log successfully sent for data collection context '{0}'.",
+            dataCollectionContext.ToString());
 
         return eventLogPath;
     }
-    #endregion
 
     #region IDisposable Members
 
@@ -313,6 +288,8 @@ public class EventLogDataCollector : DataCollector
     /// <param name="disposing">Not used since this class does not have a finalizer.</param>
     protected override void Dispose(bool disposing)
     {
+        base.Dispose(disposing);
+
         // Unregister events
         _events.SessionStart -= _sessionStartEventHandler;
         _events.SessionEnd -= _sessionEndEventHandler;
@@ -343,19 +320,14 @@ public class EventLogDataCollector : DataCollector
         return strings;
     }
 
-    #region Event Handlers
-
     private void OnSessionStart(object sender, SessionStartEventArgs e)
     {
         ValidateArg.NotNull(e, "SessionStartEventArgs");
         ValidateArg.NotNull(e.Context, "SessionStartEventArgs.Context");
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("EventLogDataCollector: SessionStart received");
-        }
+        EqtTrace.Verbose("EventLogDataCollector: SessionStart received");
 
-        StartCollectionForContext(e.Context, true);
+        StartCollectionForContext(e.Context);
     }
 
     private void OnSessionEnd(object sender, SessionEndEventArgs e)
@@ -363,10 +335,7 @@ public class EventLogDataCollector : DataCollector
         ValidateArg.NotNull(e, "SessionEndEventArgs");
         ValidateArg.NotNull(e.Context, "SessionEndEventArgs.Context");
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("EventLogDataCollector: SessionEnd received");
-        }
+        EqtTrace.Verbose("EventLogDataCollector: SessionEnd received");
 
         WriteCollectedEventLogEntries(e.Context, true, TimeSpan.MaxValue, DateTime.UtcNow);
     }
@@ -382,12 +351,9 @@ public class EventLogDataCollector : DataCollector
             ValidateArg.NotNull(e.Context.TestExecId, "TestCaseStartEventArgs.Context.HasTestCase");
         }
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose("EventLogDataCollector: TestCaseStart received for test '{0}'.", e.TestCaseName);
-        }
+        EqtTrace.Verbose("EventLogDataCollector: TestCaseStart received for test '{0}'.", e.TestCaseName);
 
-        StartCollectionForContext(e.Context, false);
+        StartCollectionForContext(e.Context);
     }
 
     private void OnTestCaseEnd(object sender, TestCaseEndEventArgs e)
@@ -397,20 +363,13 @@ public class EventLogDataCollector : DataCollector
         Debug.Assert(e.Context != null, "Context is null");
         Debug.Assert(e.Context.HasTestCase, "Context is not for a test case");
 
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose(
-                "EventLogDataCollector: TestCaseEnd received for test '{0}' with Test Outcome: {1}.",
-                e.TestCaseName,
-                e.TestOutcome);
-        }
+        EqtTrace.Verbose(
+            "EventLogDataCollector: TestCaseEnd received for test '{0}' with Test Outcome: {1}.",
+            e.TestCaseName,
+            e.TestOutcome);
 
         WriteCollectedEventLogEntries(e.Context, false, TimeSpan.MaxValue, DateTime.UtcNow);
     }
-
-    #endregion
-
-    #region Private methods
 
     private void RemoveTempEventLogDirs(List<string> tempDirs)
     {
@@ -424,7 +383,7 @@ public class EventLogDataCollector : DataCollector
         }
     }
 
-    private void StartCollectionForContext(DataCollectionContext dataCollectionContext, bool isSessionContext)
+    private void StartCollectionForContext(DataCollectionContext dataCollectionContext)
     {
         lock (ContextMap)
         {
@@ -487,11 +446,8 @@ public class EventLogDataCollector : DataCollector
         if (eventLogs != null)
         {
             EventLogNames = ParseCommaSeparatedList(eventLogs);
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose(
-                    "EventLogDataCollector configuration: " + EventLogConstants.SettingEventLogs + "=" + eventLogs);
-            }
+            EqtTrace.Verbose(
+                "EventLogDataCollector configuration: " + EventLogConstants.SettingEventLogs + "=" + eventLogs);
         }
         else
         {
@@ -517,13 +473,7 @@ public class EventLogDataCollector : DataCollector
                     _eventLogContainerMap.Add(eventLogName, eventLogContainer);
                 }
 
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose(string.Format(
-                        CultureInfo.InvariantCulture,
-                        "EventLogDataCollector: Created EventSource '{0}'",
-                        eventLogName));
-                }
+                EqtTrace.Verbose("EventLogDataCollector: Created EventSource '{0}'", eventLogName);
             }
             catch (Exception ex)
             {
@@ -540,12 +490,9 @@ public class EventLogDataCollector : DataCollector
         if (!string.IsNullOrEmpty(eventSourcesStr))
         {
             EventSources = ParseCommaSeparatedList(eventSourcesStr);
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose(
-                    "EventLogDataCollector configuration: " + EventLogConstants.SettingEventSources + "="
-                    + EventSources);
-            }
+            EqtTrace.Verbose(
+                "EventLogDataCollector configuration: " + EventLogConstants.SettingEventSources + "="
+                + EventSources);
         }
     }
 
@@ -561,12 +508,9 @@ public class EventLogDataCollector : DataCollector
                     (EventLogEntryType)Enum.Parse(typeof(EventLogEntryType), entryTypestring, true));
             }
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose(
-                    "EventLogDataCollector configuration: " + EventLogConstants.SettingEntryTypes + "="
-                    + EntryTypes);
-            }
+            EqtTrace.Verbose(
+                "EventLogDataCollector configuration: " + EventLogConstants.SettingEntryTypes + "="
+                + EntryTypes);
         }
         else
         {
@@ -596,12 +540,9 @@ public class EventLogDataCollector : DataCollector
                 MaxEntries = EventLogConstants.DefaultMaxEntries;
             }
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose(
-                    "EventLogDataCollector configuration: " + EventLogConstants.SettingMaxEntries + "="
-                    + MaxEntries);
-            }
+            EqtTrace.Verbose(
+                "EventLogDataCollector configuration: " + EventLogConstants.SettingMaxEntries + "="
+                + MaxEntries);
         }
         else
         {
@@ -630,5 +571,4 @@ public class EventLogDataCollector : DataCollector
         return eventLogSessionContext;
     }
 
-    #endregion
 }

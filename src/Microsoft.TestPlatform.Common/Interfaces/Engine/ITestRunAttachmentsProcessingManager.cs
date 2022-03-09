@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 /// <summary>

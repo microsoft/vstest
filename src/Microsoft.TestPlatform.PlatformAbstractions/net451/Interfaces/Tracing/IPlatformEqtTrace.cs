@@ -3,10 +3,12 @@
 
 #if NETFRAMEWORK
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Diagnostics;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 public partial interface IPlatformEqtTrace
 {

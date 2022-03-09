@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.Execution;
+
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+#nullable disable
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
-
-using Execution;
-
-using Utilities;
 
 /// <summary>
 /// Main entry point for the command line runner.

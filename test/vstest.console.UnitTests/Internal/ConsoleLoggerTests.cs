@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,19 +8,27 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Extensions.FileSystemGlobbing;
+
+using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
-using Processors;
-using Common.Logging;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Logging;
-using Utilities;
-using Utilities.Helpers.Interfaces;
-using TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using Moq;
+
 using vstest.console.Internal;
-using CommandLineResources = Resources.Resources;
+
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal;
 
 [TestClass]
 public class ConsoleLoggerTests
@@ -32,6 +38,7 @@ public class ConsoleLoggerTests
     private Mock<IOutput> _mockOutput;
     private ConsoleLogger _consoleLogger;
     private Mock<IProgressIndicator> _mockProgressIndicator;
+    private Mock<IFeatureFlag> _mockFeatureFlag;
 
     private const string PassedTestIndicator = "  Passed ";
     private const string FailedTestIndicator = "  Failed ";
@@ -1113,7 +1120,7 @@ public class ConsoleLoggerTests
         _mockOutput.Verify(o => o.Write(PassedTestIndicator, OutputLevel.Information), Times.Once());
         _mockOutput.Verify(o => o.WriteLine("TestName", OutputLevel.Information), Times.Once());
         _mockOutput.Verify(o => o.WriteLine(" Hello", OutputLevel.Information), Times.Once());
-        _mockOutput.Verify(o => o.WriteLine(String.Empty, OutputLevel.Information), Times.AtLeastOnce);
+        _mockOutput.Verify(o => o.WriteLine(string.Empty, OutputLevel.Information), Times.AtLeastOnce);
     }
 
     [TestMethod]
@@ -1230,11 +1237,13 @@ public class ConsoleLoggerTests
     {
         _mockRequestData = new Mock<IRequestData>();
         _mockMetricsCollection = new Mock<IMetricsCollection>();
+        _mockFeatureFlag = new Mock<IFeatureFlag>();
+        _mockFeatureFlag.Setup(x => x.IsEnabled(It.IsAny<string>())).Returns(true);
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
 
         _mockOutput = new Mock<IOutput>();
         _mockProgressIndicator = new Mock<IProgressIndicator>();
-        _consoleLogger = new ConsoleLogger(_mockOutput.Object, _mockProgressIndicator.Object);
+        _consoleLogger = new ConsoleLogger(_mockOutput.Object, _mockProgressIndicator.Object, _mockFeatureFlag.Object);
     }
 
     private List<ObjectModel.TestResult> GetTestResultsObject()

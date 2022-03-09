@@ -1,24 +1,29 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
+using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using VisualStudio.TestTools.UnitTesting;
-using ObjectModel;
-using TestPlatformObjectModel = VisualStudio.TestPlatform.ObjectModel;
-using TestOutcome = VisualStudio.TestPlatform.ObjectModel.TestOutcome;
-using TrxLoggerConstants = TrxLogger.Utility.Constants;
-using TrxLoggerOutcome = ObjectModel.TestOutcome;
-using UriDataAttachment = VisualStudio.TestPlatform.ObjectModel.UriDataAttachment;
-using Moq;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
+using TestOutcome = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome;
+using TestPlatformObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.Constants;
+using TrxLoggerOutcome = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel.TestOutcome;
+using UriDataAttachment = Microsoft.VisualStudio.TestPlatform.ObjectModel.UriDataAttachment;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility;
 
 [TestClass]
 public class ConverterTests

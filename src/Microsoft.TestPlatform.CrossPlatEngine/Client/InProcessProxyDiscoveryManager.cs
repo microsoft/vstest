@@ -1,20 +1,22 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Common.ExtensionFramework;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
-using ObjectModel.Engine.TesthostProtocol;
-using ObjectModel.Host;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 internal class InProcessProxyDiscoveryManager : IProxyDiscoveryManager
 {
@@ -22,7 +24,7 @@ internal class InProcessProxyDiscoveryManager : IProxyDiscoveryManager
     private readonly IDiscoveryManager _discoveryManager;
     private readonly ITestRuntimeProvider _testHostManager;
 
-    public bool IsInitialized { get; private set; } = false;
+    public bool IsInitialized { get; private set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InProcessProxyDiscoveryManager"/> class.
@@ -93,6 +95,12 @@ internal class InProcessProxyDiscoveryManager : IProxyDiscoveryManager
     public void Abort()
     {
         Task.Run(() => _testHostManagerFactory.GetDiscoveryManager().Abort());
+    }
+
+    /// <inheritdoc/>
+    public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
+    {
+        Task.Run(() => _testHostManagerFactory.GetDiscoveryManager().Abort(eventHandler));
     }
 
     private void InitializeExtensions(IEnumerable<string> sources)

@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.TestPlatform.TestUtilities.PerfInstrumentation;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
 namespace Microsoft.TestPlatform.PerformanceTests;
-
-using TestUtilities.PerfInstrumentation;
-
-using VisualStudio.TestTools.UnitTesting;
 
 /// <summary>
 /// The performance tests.

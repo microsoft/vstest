@@ -1,20 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
-
-using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-using ObjectModel;
-using ObjectModel.Client;
-using Utilities;
-using Utilities.Helpers.Interfaces;
-
-using NuGet.Frameworks;
-
-using ObjectModel.Logging;
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -24,10 +10,25 @@ using System.IO;
 using System.Text;
 using System.Xml;
 
-using ObjectModelConstants = ObjectModel.Constants;
+using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+using NuGet.Frameworks;
+
+using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
 using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.Constants;
 using TrxLoggerObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-using TrxLoggerResources = Resources.TrxResource;
+using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
 /// <summary>
 /// Logger for Generating TRX
@@ -36,8 +37,6 @@ using TrxLoggerResources = Resources.TrxResource;
 [ExtensionUri(TrxLoggerConstants.ExtensionUri)]
 public class TrxLogger : ITestLoggerWithParameters
 {
-    #region Constructor
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TrxLogger"/> class.
     /// </summary>
@@ -55,10 +54,6 @@ public class TrxLogger : ITestLoggerWithParameters
         _converter = new Converter(fileHelper, trxFileHelper);
         _trxFileHelper = trxFileHelper;
     }
-
-    #endregion
-
-    #region Fields
 
     /// <summary>
     /// Cache the TRX file path
@@ -96,18 +91,12 @@ public class TrxLogger : ITestLoggerWithParameters
     /// </summary>
     private string _testResultsDirPath;
 
-    #endregion
 
     #region ITestLogger
 
     /// <inheritdoc/>
-    public void Initialize(TestLoggerEvents events, string testResultsDirPath)
+    public void Initialize(TestLoggerEvents events!!, string testResultsDirPath)
     {
-        if (events == null)
-        {
-            throw new ArgumentNullException(nameof(events));
-        }
-
         if (string.IsNullOrEmpty(testResultsDirPath))
         {
             throw new ArgumentNullException(nameof(testResultsDirPath));
@@ -123,13 +112,8 @@ public class TrxLogger : ITestLoggerWithParameters
     }
 
     /// <inheritdoc/>
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters!!)
     {
-        if (parameters == null)
-        {
-            throw new ArgumentNullException(nameof(parameters));
-        }
-
         if (parameters.Count == 0)
         {
             throw new ArgumentException("No default parameters added", nameof(parameters));

@@ -1,15 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.Utilities;
-
-using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.Utilities;
 
 [TestClass]
 public class ArgumentProcessorUtilitiesTests
@@ -37,7 +38,7 @@ public class ArgumentProcessorUtilitiesTests
     public void GetArgumentListShouldReturnCorrectArgumentList(string argument)
     {
         var argumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, "test exception.");
-        argumentList.SequenceEqual(new string[] { "abc.txt", "tracelevel=info", "newkey=newvalue" });
+        Assert.IsTrue(argumentList.SequenceEqual(new string[] { "abc.txt", "tracelevel=info", "newkey=newvalue" }));
     }
 
     [TestMethod]
