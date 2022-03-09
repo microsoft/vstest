@@ -13,16 +13,23 @@
     from a build parameter would not be available, so I am writing this version from the build.ps1 script to keep it in sync -->
     <NETTestSdkVersion>17.2.0-dev</NETTestSdkVersion>
 
-    <MSTestFrameworkVersion>2.1.0</MSTestFrameworkVersion>
-    <MSTestAdapterVersion>2.1.0</MSTestAdapterVersion>
+    <MSTestFrameworkVersion>2.2.8</MSTestFrameworkVersion>
+    <MSTestAdapterVersion>2.2.8</MSTestAdapterVersion>
     <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
 
+    <!-- Properties for TestAssets project -->
+    <MSTestFrameworkLatestStableVersion>[2.2.8]</MSTestFrameworkLatestStableVersion>
+    <MSTestFrameworkLatestPreviewVersion>[2.2.9-preview-20220210-07]</MSTestFrameworkLatestPreviewVersion>
+    <MSTestFrameworkMostDownloadedVersion>[2.1.0]</MSTestFrameworkMostDownloadedVersion>
+    <MSTestFrameworkPreviousStableVersion>[2.1.0]</MSTestFrameworkPreviousStableVersion>
+    <MSTestFrameworkLegacyStableVersion>[1.4.0]</MSTestFrameworkLegacyStableVersion>
+
     <XUnitFrameworkVersion>2.3.1</XUnitFrameworkVersion>
-    <XUnitAdapterVersion>2.3.1</XUnitAdapterVersion>
-    <XUnitConsoleRunnerVersion>2.3.1</XUnitConsoleRunnerVersion>
+    <XUnitAdapterVersion>$(XUnitFrameworkVersion)</XUnitAdapterVersion>
+    <XUnitConsoleRunnerVersion>$(XUnitFrameworkVersion)</XUnitConsoleRunnerVersion>
 
     <NUnit3FrameworkVersion>3.10.1</NUnit3FrameworkVersion>
-    <NUnit3AdapterVersion>3.10.0</NUnit3AdapterVersion>
+    <NUnit3AdapterVersion>$(NUnit3FrameworkVersion)</NUnit3AdapterVersion>
     <NUnitConsoleRunnerVersion>3.8.0</NUnitConsoleRunnerVersion>
 
     <ChutzpahAdapterVersion>4.4.12</ChutzpahAdapterVersion>

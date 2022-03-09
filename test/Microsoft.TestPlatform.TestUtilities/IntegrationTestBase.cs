@@ -753,13 +753,29 @@ public class IntegrationTestBase
 
     protected string BuildMultipleAssemblyPath(params string[] assetNames)
     {
-        var assertFullPaths = new string[assetNames.Length];
+        var assetFullPath = new string[assetNames.Length];
         for (var i = 0; i < assetNames.Length; i++)
         {
-            assertFullPaths[i] = GetAssetFullPath(assetNames[i]).AddDoubleQuote();
+            assetFullPath[i] = GetAssetFullPath(assetNames[i]).AddDoubleQuote();
         }
 
-        return string.Join(" ", assertFullPaths);
+        return string.Join(" ", assetFullPath);
+    }
+
+    protected string BuildMultipleAssemblyPath(MSTestInfo msTestInfo, params string[] assetNames)
+    {
+        var assetFullPaths = new string[assetNames.Length];
+        var slash = Path.DirectorySeparatorChar;
+        for (var i = 0; i < assetNames.Length; i++)
+        {
+            var path = GetAssetFullPath(assetNames[i]);
+            var updatedPath = msTestInfo.UpdatePath(path);
+            Assert.IsTrue(File.Exists(updatedPath), "GetTestAsset: Path not found: {0}. Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", updatedPath);
+
+            assetFullPaths[i] = updatedPath.AddDoubleQuote();
+        }
+
+        return string.Join(" ", assetFullPaths);
     }
 
     protected static string GetDiagArg(string rootDir)
@@ -799,4 +815,30 @@ public class IntegrationTestBase
     }
 
     protected static string GetDotnetRunnerPath() => Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
+}
+
+public class MSTestInfo
+{
+    public MSTestInfo(string versionType, string version, string path)
+    {
+        VersionType = versionType;
+        Version = version;
+        Path = path;
+    }
+
+    public string VersionType { get; }
+    public string Version { get; }
+    public string Path { get; }
+
+    public override string ToString() => $" MSTest = {Version} [{VersionType}]";
+
+    public string UpdatePath(string path)
+    {
+        // Version is not directly used, below, but if it is not populated the path will be incorrect.
+        // We don't want to throw when creating MSTestInfo because that is happening too early, and has worse error reporting.
+        if (Version == null)
+            throw new InvalidOperationException($"Version was not correctly populated from TestPlatform.Dependencies.props, review that there is entry for MSTestFramework{VersionType}Version.");
+
+        return path.Replace($"{System.IO.Path.DirectorySeparatorChar}bin{System.IO.Path.DirectorySeparatorChar}", Path);
+    }
 }

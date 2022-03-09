@@ -235,7 +235,7 @@ public class IntegrationTestEnvironment
             targetFramework,
             assetName);
 
-        Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: {0}.", assetPath);
+        Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: {0}. Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", assetPath);
 
         return assetPath;
     }

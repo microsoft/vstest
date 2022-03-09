@@ -45,12 +45,18 @@ public class AcceptanceTestBase : IntegrationTestBase
     public const string DesktopRunnerTargetRuntime = "win7-x64";
     public const string CoreRunnerTargetRuntime = "";
     public const string InIsolation = "/InIsolation";
-
+    
     public const string NETFX452_48 = "net452;net461;net472;net48";
     public const string NETFX451_48 = "net452;net461;net472;net48";
     public const string NETCORE21_50 = "netcoreapp2.1;netcoreapp3.1;net5.0";
     public const string NETFX452_NET50 = "net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0";
     public const string NETFX452_NET31 = "net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1";
+    /// <summary>
+    /// Our current defaults for .NET and .NET Framework.
+    /// </summary>
+    public const string DEFAULT_NETFX_AND_NET = "net451;netcoreapp2.1"; 
+    public const string LATEST_LEGACY = "Latest;LatestStable;LatestPreview;MostDownloaded;PreviousStable;LegacyStable";
+    public const string LATESTSTABLE_LEGACY = "LatestStable;LatestPreview;MostDownloaded;PreviousStable;LegacyStable";
 
     public static string And(string left, string right)
     {

@@ -169,6 +169,31 @@ function Invoke-TestAssetsBuild
         Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution -- add NuGet source"
         Invoke-Exe -IgnoreExitCode 1 $nugetExe -Arguments "sources add -Name ""locally-built-testplatform-packages"" -Source $env:TP_TESTARTIFACTS\packages\ -ConfigFile ""$nugetConfig"""
         Invoke-Exe $dotnetExe -Arguments "build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$env:TP_OUT_DIR\log\$Configuration\TestAssets.binlog"""
+
+        $dependenciesPath = "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props"
+        $dependenciesXml = [xml](Get-Content -Raw -Encoding UTF8 $dependenciesPath)
+
+        $project = "$env:TP_ROOT_DIR\test\TestAssets\SimpleTestProject\SimpleTestProject.csproj"
+        $versionProperties = @(
+            "MSTestFrameworkLatestStableVersion" 
+            "MSTestFrameworkLatestPreviewVersion"
+            "MSTestFrameworkMostDownloadedVersion"
+            "MSTestFrameworkPreviousStableVersion"
+            "MSTestFrameworkLegacyStableVersion"
+        )
+
+        foreach ($propertyName in $versionProperties) {             
+            $mstestVersion = $dependenciesXml.Project.PropertyGroup.$propertyName
+
+            if (-not $mstestVersion)
+            {
+                throw "MSTestVersion for $propertyName is empty."
+            }
+            
+            $dirVersion = $mstestVersion  -replace "\[|\]" 
+            $dirPropertyName = $propertyName -replace "Framework" -replace "Version"
+            Invoke-Exe $dotnetExe -Arguments "build $project --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$env:TP_OUT_DIR\log\$Configuration\TestAssets.binlog"" -p:MSTestFrameworkVersion=$mstestVersion -p:MSTestAdapterVersion=$mstestVersion -p:BaseOutputPath=""bin\$dirPropertyName-$dirVersion\\"""
+        }
     }
     finally {
         Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution -- remove NuGet source"
@@ -1163,42 +1188,42 @@ Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | 
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 
-if ($Force -or $Steps -contains "InstallDotnet") {
-    Install-DotNetCli
-}
+# if ($Force -or $Steps -contains "InstallDotnet") {
+#     Install-DotNetCli
+# }
 
-if ($Force -or $Steps -contains "Restore") {
-    Clear-Package
-    Restore-Package
-}
+# if ($Force -or $Steps -contains "Restore") {
+#     Clear-Package
+#     Restore-Package
+# }
 
-if ($Force -or $Steps -contains "UpdateLocalization") {
-    Update-LocalizedResources
-}
+# if ($Force -or $Steps -contains "UpdateLocalization") {
+#     Update-LocalizedResources
+# }
 
-if ($Force -or $Steps -contains "Build") {
-    Invoke-Build
-}
+# if ($Force -or $Steps -contains "Build") {
+#     Invoke-Build
+# }
 
-if ($Force -or $Steps -contains "Publish") {
-    Publish-Package
-    Create-VsixPackage
-    Create-NugetPackages
-}
+# if ($Force -or $Steps -contains "Publish") {
+#     Publish-Package
+#     Create-VsixPackage
+#     Create-NugetPackages
+# }
 
-if ($Force -or $Steps -contains "Publish" -or $Steps -contains "Manifest") {
-    Generate-Manifest -PackageFolder $TPB_PackageOutDir
-    if (Test-Path $TPB_SourceBuildPackageOutDir)
-    {
-        Generate-Manifest -PackageFolder $TPB_SourceBuildPackageOutDir
-    }
-    Copy-PackageIntoStaticDirectory
-}
+# if ($Force -or $Steps -contains "Publish" -or $Steps -contains "Manifest") {
+#     Generate-Manifest -PackageFolder $TPB_PackageOutDir
+#     if (Test-Path $TPB_SourceBuildPackageOutDir)
+#     {
+#         Generate-Manifest -PackageFolder $TPB_SourceBuildPackageOutDir
+#     }
+#     Copy-PackageIntoStaticDirectory
+# }
 
 if ($Force -or $Steps -contains "PrepareAcceptanceTests") {
-    Publish-PatchedDotnet
+    # Publish-PatchedDotnet
     Invoke-TestAssetsBuild
-    Publish-Tests
+    # Publish-Tests
 }
 
 if ($Script:ScriptFailed) {
