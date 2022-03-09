@@ -818,8 +818,6 @@ function Create-NugetPackages
         "Microsoft.TestPlatform.AdapterUtilities.nuspec",
         "Microsoft.TestPlatform.nuspec",
         "Microsoft.TestPlatform.Portable.nuspec",
-        "TestPlatform.Build.nuspec",
-        "TestPlatform.CLI.nuspec",
         "TestPlatform.Extensions.TrxLogger.nuspec",
         "TestPlatform.ObjectModel.nuspec",
         "TestPlatform.TestHost.nuspec",
@@ -827,13 +825,33 @@ function Create-NugetPackages
         "TestPlatform.Internal.Uwp.nuspec"
     )
 
-    $targetFiles = @("Microsoft.CodeCoverage.targets")
-    $propFiles = @("Microsoft.NET.Test.Sdk.props", "Microsoft.CodeCoverage.props")
-    $contentDirs = @("netcoreapp", "netfx")
+    $projectFiles = @(
+        "Microsoft.TestPlatform.CLI.csproj",
+        "Microsoft.TestPlatform.Build.csproj"
+    )
+
+    $dependencies = @(   
+        "TestPlatform.Build.nuspec",
+        "TestPlatform.CLI.nuspec",
+
+        ## .target and .props Files
+        "Microsoft.NET.Test.Sdk.props", 
+        "Microsoft.CodeCoverage.props",
+        "Microsoft.CodeCoverage.targets",
+        
+        ## Content Directories
+        "netcoreapp", 
+        "netfx"
+    )
 
     # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
-    $skipAnalysis = @("TestPlatform.CLI.nuspec")
-    foreach ($item in $nuspecFiles + $targetFiles + $propFiles + $contentDirs) {
+    $skipAnalysis = @(
+        "TestPlatform.CLI.nuspec",
+        "Microsoft.TestPlatform.CLI.csproj"
+    )
+
+
+    foreach ($item in $nuspecFiles + $projectFiles + $dependencies) {
         Copy-Item $tpNuspecDir\$item $stagingDir -Force -Recurse
     }
 
@@ -858,6 +876,7 @@ function Create-NugetPackages
 
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
+    $dotnetExe = Get-DotNetPath
 
     # Pass Newtonsoft.Json version to nuget pack to keep the version consistent across all nuget packages.
     $JsonNetVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.JsonNetVersion
@@ -885,6 +904,17 @@ function Create-NugetPackages
         }
 
         Invoke-Exe $nugetExe -Arguments "pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version;JsonNetVersion=$JsonNetVersion;Runtime=$TPB_TargetRuntime;NetCoreTargetFramework=$TPB_TargetFrameworkCore20;FakesPackageDir=$FakesPackageDir;NetStandard10Framework=$TPB_TargetFrameworkNS10;NetStandard13Framework=$TPB_TargetFrameworkNS13;NetStandard20Framework=$TPB_TargetFrameworkNS20;Uap10Framework=$uap10Nuget;BranchName=$TPB_BRANCH;CommitId=$TPB_COMMIT $additionalArgs"
+    }
+
+    foreach ($file in $projectFiles) {
+        $additionalArgs = ""
+        if ($skipAnalysis -contains $file) {
+            $additionalArgs = "-NoPackageAnalysis"
+        }
+
+        Write-Host "Attempting to build package from '$file'."
+        Invoke-Exe $dotnetExe -Arguments "restore $stagingDir\$file" -CaptureOutput | Out-Null
+        Invoke-Exe $dotnetExe -Arguments "pack --no-build  $stagingDir\$file -o $packageOutputDir -p:Version=$TPB_Version -p:BranchName=`"$TPB_BRANCH`" -p:CommitId=`"$TPB_COMMIT`" /bl:pack_$file.binlog"
     }
 
     # Verifies that expected number of files gets shipped in nuget packages.
