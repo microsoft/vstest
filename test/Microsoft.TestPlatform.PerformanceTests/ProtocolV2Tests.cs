@@ -126,6 +126,5 @@ public class ProtocolV2Tests
     private static void VerifyPerformanceResult(string scenario, long expectedElapsedTime, long elapsedTime)
     {
         Assert.IsTrue(elapsedTime < expectedElapsedTime, $"Scenario '{scenario}' doesn't match with expected elapsed time.");
-        // File.AppendAllText(@"E:\ProtocolPerf.txt", $" {scenario} : " + elapsedTime);
     }
 }
