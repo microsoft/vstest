@@ -82,6 +82,7 @@ $TPB_TestAssets_CILAssets = Join-Path $TPB_TestAssets "CILProject\CILProject.pro
 $TPB_TargetFramework45 = "net45"
 $TPB_TargetFramework451 = "net451"
 $TPB_TargetFramework472 = "net472"
+$TPB_TargetFramework48 = "net48"
 $TPB_TargetFrameworkCore10 = "netcoreapp1.0"
 $TPB_TargetFrameworkCore20 = "netcoreapp2.1"
 $TPB_TargetFrameworkUap100 = "uap10.0"
@@ -639,7 +640,7 @@ function Publish-Tests
         Publish-PackageInternal $xunittest10kPerfProject $TPB_TargetFramework451 $xunittest10kPerfProjectDir
 
         $testPerfProject = Join-Path $env:TP_ROOT_DIR "test\Microsoft.TestPlatform.PerformanceTests"
-        Publish-PackageInternal $testPerfProject $TPB_TargetFramework451 $fullCLRTestDir
+        Publish-PackageInternal $testPerfProject $TPB_TargetFramework48 $fullCLRTestDir
     }
 }
 

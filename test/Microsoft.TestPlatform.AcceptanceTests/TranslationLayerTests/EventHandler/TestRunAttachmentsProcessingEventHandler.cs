@@ -64,7 +64,7 @@ public class TestRunAttachmentsProcessingEventHandler : ITestRunAttachmentsProce
         // No op
     }
 
-    public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
+    public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo _)
     {
         // No op
         return -1;

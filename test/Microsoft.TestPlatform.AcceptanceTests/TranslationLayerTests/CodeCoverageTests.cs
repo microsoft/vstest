@@ -33,13 +33,6 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     private RunEventHandler _runEventHandler;
     private TestRunAttachmentsProcessingEventHandler _testRunAttachmentsProcessingEventHandler;
 
-    static CodeCoverageTests()
-    {
-#pragma warning disable RS0030 // Do not used banned APIs - We need it temporary
-        Environment.SetEnvironmentVariable("VSTEST_FEATURE_FORCE_DATACOLLECTORS_ATTACHMENTPROCESSORS", "1");
-#pragma warning restore RS0030 // Do not used banned APIs - We need it temporary
-    }
-
     private void Setup()
     {
         _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _tempDirectory);
