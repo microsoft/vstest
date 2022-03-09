@@ -14,7 +14,7 @@
     <NETTestSdkVersion>17.2.0-dev</NETTestSdkVersion>
 
     <MSTestFrameworkVersion>2.2.8</MSTestFrameworkVersion>
-    <MSTestAdapterVersion>$(MSTestFrameworkVersion)</MSTestAdapterVersion>
+    <MSTestAdapterVersion>2.2.8</MSTestAdapterVersion>
     <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
 
     <XUnitFrameworkVersion>2.3.1</XUnitFrameworkVersion>
