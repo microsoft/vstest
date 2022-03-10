@@ -16,20 +16,30 @@ public record RunnerInfo(string RunnerFramework, string TargetFramework, string 
     /// <summary>
     /// Is running via .NET "Core" vstest.console?
     /// </summary>
-    public bool IsNetRunner => RunnerFramework.StartsWith("netcoreapp", StringComparison.InvariantCultureIgnoreCase);
+    public bool IsNetRunner => !IsNetFrameworkRunner;
 
     /// <summary>
     /// Is running via .NET Framework vstest.console?
     /// </summary>
-    public bool IsNetFrameworkRunner => !IsNetRunner;
+    public bool IsNetFrameworkRunner => RunnerFramework.StartsWith("net4", StringComparison.InvariantCultureIgnoreCase);
+
+    /// <summary>
+    /// Is running via .NET "Core" testhost?
+    /// </summary>
+    public bool IsNetTarget => !IsNetFrameworkTarget;
 
     /// <summary>
     /// Is running via .NET Framework testhost?
     /// </summary>
-    public bool IsNetTarget => TargetFramework.StartsWith("netcoreapp", StringComparison.InvariantCultureIgnoreCase);
+    public bool IsNetFrameworkTarget => TargetFramework.StartsWith("net4", StringComparison.InvariantCultureIgnoreCase);
 
-    /// <summary>
-    /// Is running via .NET Framework testhost?
-    /// </summary>
-    public bool IsNetFrameworkTarget => !IsNetTarget;
+    public override string ToString()
+        => string.Join(
+            ",",
+            new[]
+            {
+                "RunnerFramework = " + RunnerFramework,
+                " TargetFramework = " + TargetFramework,
+                string.IsNullOrEmpty(InIsolationValue) ? " InProcess" : " InIsolation",
+            });
 }
