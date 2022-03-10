@@ -5,7 +5,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
@@ -21,25 +20,18 @@ public class PlatformEnvironment : IEnvironment
     {
         get
         {
-            switch (RuntimeInformation.OSArchitecture)
+            return RuntimeInformation.OSArchitecture switch
             {
-                case System.Runtime.InteropServices.Architecture.X86:
-                    return PlatformArchitecture.X86;
-                case System.Runtime.InteropServices.Architecture.X64:
-                    return PlatformArchitecture.X64;
-                case System.Runtime.InteropServices.Architecture.Arm:
-                    return PlatformArchitecture.ARM;
-                case System.Runtime.InteropServices.Architecture.Arm64:
-                    return PlatformArchitecture.ARM64;
-
+                System.Runtime.InteropServices.Architecture.X86 => PlatformArchitecture.X86,
+                System.Runtime.InteropServices.Architecture.X64 => PlatformArchitecture.X64,
+                System.Runtime.InteropServices.Architecture.Arm => PlatformArchitecture.ARM,
+                System.Runtime.InteropServices.Architecture.Arm64 => PlatformArchitecture.ARM64,
                 // The symbolic value is only available with .NET 6
                 // preview 6 or later, so use the numerical value for now.
                 // case System.Runtime.InteropServices.Architecture.S390x:
-                case (Architecture)5:
-                    return PlatformArchitecture.S390x;
-                default:
-                    throw new NotSupportedException();
-            }
+                (Architecture)5 => PlatformArchitecture.S390x,
+                _ => throw new NotSupportedException(),
+            };
         }
     }
 

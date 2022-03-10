@@ -4,7 +4,6 @@
 #if NETFRAMEWORK || NETSTANDARD2_0
 
 using System;
-using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
