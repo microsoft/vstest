@@ -555,7 +555,7 @@ public class IntegrationTestBase
     /// </summary>
     public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
     {
-        return GetVsTestConsoleWrapper(TempDirectory);
+        return GetVsTestConsoleWrapper(TempDirectory, null);
     }
 
     /// <summary>
@@ -564,21 +564,24 @@ public class IntegrationTestBase
     public IVsTestConsoleWrapper GetVsTestConsoleWrapper(out TempDirectory logFileDir)
     {
         logFileDir = new TempDirectory();
-        return GetVsTestConsoleWrapper(logFileDir);
+        return GetVsTestConsoleWrapper(logFileDir, null);
+    }
+
+    /// <summary>
+    /// Returns the VsTestConsole Wrapper.
+    /// </summary>
+    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(TempDirectory tempDirectory)
+    {
+        return GetVsTestConsoleWrapper(tempDirectory, vsTestConsoleInfo: null);
     }
 
     /// <summary>
     /// Returns the VsTestConsole Wrapper.
     /// </summary>
     /// <returns></returns>
-    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(TempDirectory logFileDir)
+    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(TempDirectory logFileDir, VSTestConsoleInfo vsTestConsoleInfo)
     {
-        if (!Directory.Exists(logFileDir.Path))
-        {
-            Directory.CreateDirectory(logFileDir.Path);
-        }
-
-        // Directory is already unique so there is no need to have a unique file name.
+        // Temp directory is already unique so there is no need to have a unique file name.
         var logFilePath = Path.Combine(logFileDir.Path, "log.txt");
         if (!File.Exists(logFilePath))
         {
@@ -587,9 +590,11 @@ public class IntegrationTestBase
 
         Console.WriteLine($"Logging diagnostics in {logFilePath}");
 
-        var consoleRunnerPath = IsNetCoreRunner()
-            ? Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll")
-            : GetConsoleRunnerPath();
+        var consoleRunnerPath = vsTestConsoleInfo != null
+            ? vsTestConsoleInfo.Path
+            : IsNetCoreRunner()
+                ? Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll")
+                : GetConsoleRunnerPath();
         var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
         var dotnetPath = Path.Combine(_testEnvironment.ToolsDirectory, executablePath);
 
@@ -598,6 +603,12 @@ public class IntegrationTestBase
             throw new FileNotFoundException($"File '{dotnetPath}' was not found.");
         }
 
+        if (!File.Exists(consoleRunnerPath))
+        {
+            throw new FileNotFoundException($"File '{consoleRunnerPath}' was not found.");
+        }
+
+        Console.WriteLine($"Console runner path: {consoleRunnerPath}");
         var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath });
         vstestConsoleWrapper.StartSession();
 

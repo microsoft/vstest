@@ -25,7 +25,7 @@ public sealed class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo, M
     /// Initializes a new instance.
     /// </summary>
     /// <param name="targetFrameworks">To run tests with desktop runner(vstest.console.exe), use AcceptanceTestBase.Net452TargetFramework or alike values.</param>
-    public MSTestCompatibilityDataSource(string runners = AcceptanceTestBase.DEFAULT_RUNNER_NETFX_AND_NET, string targetFrameworks = AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET, string msTestVersions = AcceptanceTestBase.LATESTSTABLE_LEGACY)
+    public MSTestCompatibilityDataSource(string runners = AcceptanceTestBase.DEFAULT_RUNNER_NETFX_AND_NET, string targetFrameworks = AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET, string msTestVersions = AcceptanceTestBase.LATESTPREVIEW_LEGACY)
     {
         _runnerFrameworks = runners.Split(';');
         _targetFrameworks = targetFrameworks.Split(';');
@@ -85,9 +85,6 @@ public sealed class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo, M
 
     private MSTestInfo GetMSTestInfo(string msTestVersion)
     {
-        // TODO: replacing in the result string is lame, but I am not going to fight 20 GetAssetFullPath method overloads right now
-        // TODO: this could also be cached of course.
-
         var depsXml = GetDependenciesXml();
 
         // It is okay when node is null, we check that Version has value when we update paths by using MSTestInfo, and throw.
@@ -115,4 +112,3 @@ public sealed class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo, M
         return depsXml;
     }
 }
-

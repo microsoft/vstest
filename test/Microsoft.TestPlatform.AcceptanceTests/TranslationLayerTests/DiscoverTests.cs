@@ -40,15 +40,17 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
-    public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo)
+    [TranslationLayerCompatibilityDataSource()]
+    public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        Setup();
+        // Setup();
+        _discoveryEventHandler = new DiscoveryEventHandler();
+        _discoveryEventHandler2 = new DiscoveryEventHandler2();
 
-        _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), _discoveryEventHandler);
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper(TempDirectory, vsTestConsoleInfo);
+        vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), _discoveryEventHandler);
 
         // Assert.
         Assert.AreEqual(6, _discoveryEventHandler.DiscoveredTestCases.Count);

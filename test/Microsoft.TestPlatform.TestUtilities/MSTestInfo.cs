@@ -29,6 +29,7 @@ public class MSTestInfo
         if (Version == null)
             throw new InvalidOperationException($"Version was not correctly populated from TestPlatform.Dependencies.props, review that there is entry for MSTestFramework{VersionType}Version.");
 
+        // TODO: replacing in the result string is lame, but I am not going to fight 20 GetAssetFullPath method overloads right now
         return path.Replace($"{System.IO.Path.DirectorySeparatorChar}bin{System.IO.Path.DirectorySeparatorChar}", Path);
     }
 }

@@ -169,19 +169,23 @@ function Invoke-TestAssetsBuild
     try {
         Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution -- add NuGet source"
         Invoke-Exe -IgnoreExitCode 1 $nugetExe -Arguments "sources add -Name ""locally-built-testplatform-packages"" -Source $env:TP_TESTARTIFACTS\packages\ -ConfigFile ""$nugetConfig"""
-        Invoke-Exe $dotnetExe -Arguments "build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$env:TP_OUT_DIR\log\$Configuration\TestAssets.binlog"""
+        #Invoke-Exe $dotnetExe -Arguments "build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$env:TP_OUT_DIR\log\$Configuration\TestAssets.binlog"""
 
+        # Compatibility matrix build
         $dependenciesPath = "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props"
         $dependenciesXml = [xml](Get-Content -Raw -Encoding UTF8 $dependenciesPath)
 
+        
+        # build with multiple versions of MSTest
         $projects = @(
             "$env:TP_ROOT_DIR\test\TestAssets\SimpleTestProject\SimpleTestProject.csproj"
             "$env:TP_ROOT_DIR\test\TestAssets\SimpleTestProject2\SimpleTestProject2.csproj"
         )
 
         $versionProperties = @(
-            "MSTestFrameworkLatestStableVersion" 
             "MSTestFrameworkLatestPreviewVersion"
+            "MSTestFrameworkLatestStableVersion"
+            "MSTestFrameworkRecentStableVersion"
             "MSTestFrameworkMostDownloadedVersion"
             "MSTestFrameworkPreviousStableVersion"
             "MSTestFrameworkLegacyStableVersion"
@@ -201,6 +205,68 @@ function Invoke-TestAssetsBuild
                 Invoke-Exe $dotnetExe -Arguments "build $project --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:MSTestFrameworkVersion=$mstestVersion -p:MSTestAdapterVersion=$mstestVersion -p:BaseOutputPath=""bin\$dirPropertyName-$dirVersion\\""" 
             }
         }
+
+        # restore previous versions of TestPlatform (for vstest.console.exe), and TestPlatform.CLI (for vstest.console.dll)
+        $versionProperties = @(
+            "NETTestSdkVersion"
+            "VSTestConsoleLatestPreviewVersion"
+            "VSTestConsoleLatestStableVersion" 
+            "VSTestConsoleRecentStableVersion" 
+            "VSTestConsoleMostDownloadedVersion"
+            "VSTestConsolePreviousStableVersion"
+            "VSTestConsoleLegacyStableVersion"
+        )
+
+        foreach ($propertyName in $versionProperties) {
+            if ("VSTestConsoleLatestVersion" -eq $propertyName) { 
+                # NETTestSdkVersion has the version of the locally built package.
+                $vsTestConsoleVersion = $dependenciesXml.Project.PropertyGroup."NETTestSdkVersion"
+            }
+            else { 
+                $vsTestConsoleVersion = $dependenciesXml.Project.PropertyGroup.$propertyName
+            }
+            
+            # The command line tool does not like the package ranges.
+            $vsTestConsoleVersion = $vsTestConsoleVersion -replace "(\[|\])"
+            if (-not $vsTestConsoleVersion)
+            {
+                throw "VSTestConsoleVersion for $propertyName is empty."
+            }
+
+            $packages = @(
+                "Microsoft.TestPlatform"
+                "Microsoft.TestPlatform.CLI",
+                "Microsoft.TestPlatform.TranslationLayer"
+                "Microsoft.NET.Test.SDK"
+            )
+
+            foreach ($package in $packages) {
+                $packagePath = "$env:TP_ROOT_DIR\packages\$($package.ToLower())"
+                $cachePath = "$packagePath\$vstestConsoleVersion"
+
+                if ((Test-Path -Path $cachePath) -and (Get-ChildItem $cachePath)) { 
+                    "Package $package $vsTestConsoleVersion is already in nuget cache at $cachePath."
+                    continue
+                }
+
+                Invoke-Exe $nugetExe -Arguments "install $package -Version $vsTestConsoleVersion -OutputDirectory $packagePath -ConfigFile ""$nugetConfig"""
+
+                # Install puts it in packages/microsoft.testplatform/Microsoft.TestPlatform.17.1.0, 
+                # because we use that as our output folder. And it also caches it in packages/microsoft.testplatform/17.1.0
+                # unless the package is from local source, then it does not do that. So we need to rename the folder and remove
+                # the original one. 
+                if (-not (Test-Path -Path $cachePath) -or -not (Get-ChildItem $cachePath)) { 
+                    Rename-Item "$packagePath\$package.$vsTestConsoleVersion" $cachePath
+                    # nuget locks the locally copied package it seems.
+                    Start-Sleep -Milliseconds 300
+                }
+                if (Test-Path "$packagePath\$package.$vsTestConsoleVersion") {
+                    Remove-Item -Recurse -Force "$packagePath\$package.$vsTestConsoleVersion"
+                }
+            }
+        }
+
+        # end 
     }
     finally {
         Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution -- remove NuGet source"
@@ -835,9 +901,14 @@ function Create-NugetPackages
 
     Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "Icon.png") $stagingDir -Force
 
+    # Remove all locally built nuget packages before we start creating them
+    # we are leaving them in the folder after uzipping them for easier review.
+    if (Test-Path $packageOutputDir) {
+        Remove-Item $packageOutputDir -Recurse -Force
+    }
 
     if (-not (Test-Path $packageOutputDir)) {
-        New-Item $packageOutputDir -type directory -Force
+        New-Item $packageOutputDir -Type directory -Force
     }
 
     $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
@@ -1258,9 +1329,9 @@ Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Forma
 # }
 
 if ($Force -or $Steps -contains "PrepareAcceptanceTests") {
-    # Publish-PatchedDotnet
+    #Publish-PatchedDotnet
     Invoke-TestAssetsBuild
-    # Publish-Tests
+    #Publish-Tests
 }
 
 if ($Script:ScriptFailed) {

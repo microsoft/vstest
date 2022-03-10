@@ -56,7 +56,9 @@ function Verify-Nuget-Packages($packageDirectory, $version)
             Write-Error "Number of files are not equal $unzipNugetPackageDir, expected: $($expectedNumOfFiles[$packageKey]) actual: $actualNumOfFiles"
         }
 
-        Remove-Item -Force -Recurse $unzipNugetPackageDir | Out-Null
+        # Don't remove the directories after you unpacked them
+        # they are useful for reviewing what is in the package.
+        # Remove-Item -Force -Recurse $unzipNugetPackageDir | Out-Null
     }
 
     Write-Log "Completed Verify-Nuget-Packages."
