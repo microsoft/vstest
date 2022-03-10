@@ -9,15 +9,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 public class RunnerInfo
 {
-    public RunnerInfo(string runnerType, string targetFramework) : this(runnerType, targetFramework, "")
-    {
-    }
-
-    public RunnerInfo(string runnerType, string targetFramework, string inIsolation)
+    public RunnerInfo(string runnerType, string targetFramework, string inIsolation,
+        bool debugVSTestConsole, bool debugTesthost, bool debugDataCollector, bool noDefaultBreakpoints)
     {
         RunnerFramework = runnerType;
         TargetFramework = targetFramework;
         InIsolationValue = inIsolation;
+        DebugVSTestConsole = debugVSTestConsole;
+        DebugTesthost = debugTesthost;
+        DebugDataCollector = debugDataCollector;
+        NoDefaultBreakpoints = noDefaultBreakpoints;
         // The value is netcoreapp2.1.
         IsNetRunner = RunnerFramework.StartsWith("netcoreapp", StringComparison.InvariantCultureIgnoreCase);
         // The value is net451.
@@ -43,6 +44,10 @@ public class RunnerInfo
     {
         get; set;
     }
+    public bool DebugVSTestConsole { get; }
+    public bool DebugTesthost { get; }
+    public bool DebugDataCollector { get; }
+    public bool NoDefaultBreakpoints { get; }
 
     /// <summary>
     /// Gets the application type.

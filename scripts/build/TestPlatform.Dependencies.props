@@ -13,11 +13,14 @@
     from a build parameter would not be available, so I am writing this version from the build.ps1 script to keep it in sync -->
     <NETTestSdkVersion>17.2.0-dev</NETTestSdkVersion>
 
+    <!-- MSTest version used for running unit tests, and running acceptance tests. It is also used as the default version for projects
+    in TestAssets.sln to allow running tests from that solution directly in VS without having to run them via AcceptanceTests. -->
     <MSTestFrameworkVersion>2.2.8</MSTestFrameworkVersion>
     <MSTestAdapterVersion>2.2.8</MSTestAdapterVersion>
     <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
 
-    <!-- Properties for TestAssets project -->
+    <!-- MSTest versions that are used when building projects from TestAssets.sln for compatibility tests. See Invoke-TestAssetsBuild in scripts/build.ps1. 
+    Exact versions are used to avoid Nuget substituting them by closest match, if we make a typo. -->
     <MSTestFrameworkLatestStableVersion>[2.2.8]</MSTestFrameworkLatestStableVersion>
     <MSTestFrameworkLatestPreviewVersion>[2.2.9-preview-20220210-07]</MSTestFrameworkLatestPreviewVersion>
     <MSTestFrameworkMostDownloadedVersion>[2.1.0]</MSTestFrameworkMostDownloadedVersion>
@@ -29,7 +32,7 @@
     <XUnitConsoleRunnerVersion>$(XUnitFrameworkVersion)</XUnitConsoleRunnerVersion>
 
     <NUnit3FrameworkVersion>3.10.1</NUnit3FrameworkVersion>
-    <NUnit3AdapterVersion>$(NUnit3FrameworkVersion)</NUnit3AdapterVersion>
+    <NUnit3AdapterVersion>3.11.0</NUnit3AdapterVersion>
     <NUnitConsoleRunnerVersion>3.8.0</NUnitConsoleRunnerVersion>
 
     <ChutzpahAdapterVersion>4.4.12</ChutzpahAdapterVersion>

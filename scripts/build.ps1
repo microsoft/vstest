@@ -174,7 +174,11 @@ function Invoke-TestAssetsBuild
         $dependenciesPath = "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props"
         $dependenciesXml = [xml](Get-Content -Raw -Encoding UTF8 $dependenciesPath)
 
-        $project = "$env:TP_ROOT_DIR\test\TestAssets\SimpleTestProject\SimpleTestProject.csproj"
+        $projects = @(
+            "$env:TP_ROOT_DIR\test\TestAssets\SimpleTestProject\SimpleTestProject.csproj"
+            "$env:TP_ROOT_DIR\test\TestAssets\SimpleTestProject2\SimpleTestProject2.csproj"
+        )
+
         $versionProperties = @(
             "MSTestFrameworkLatestStableVersion" 
             "MSTestFrameworkLatestPreviewVersion"
@@ -182,18 +186,20 @@ function Invoke-TestAssetsBuild
             "MSTestFrameworkPreviousStableVersion"
             "MSTestFrameworkLegacyStableVersion"
         )
+        
+        foreach ($project in $projects) {
+            foreach ($propertyName in $versionProperties) {             
+                $mstestVersion = $dependenciesXml.Project.PropertyGroup.$propertyName
 
-        foreach ($propertyName in $versionProperties) {             
-            $mstestVersion = $dependenciesXml.Project.PropertyGroup.$propertyName
-
-            if (-not $mstestVersion)
-            {
-                throw "MSTestVersion for $propertyName is empty."
+                if (-not $mstestVersion)
+                {
+                    throw "MSTestVersion for $propertyName is empty."
+                }
+                
+                $dirVersion = $mstestVersion  -replace "\[|\]" 
+                $dirPropertyName = $propertyName -replace "Framework" -replace "Version"
+                Invoke-Exe $dotnetExe -Arguments "build $project --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:MSTestFrameworkVersion=$mstestVersion -p:MSTestAdapterVersion=$mstestVersion -p:BaseOutputPath=""bin\$dirPropertyName-$dirVersion\\""" 
             }
-            
-            $dirVersion = $mstestVersion  -replace "\[|\]" 
-            $dirPropertyName = $propertyName -replace "Framework" -replace "Version"
-            Invoke-Exe $dotnetExe -Arguments "build $project --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$env:TP_OUT_DIR\log\$Configuration\TestAssets.binlog"" -p:MSTestFrameworkVersion=$mstestVersion -p:MSTestAdapterVersion=$mstestVersion -p:BaseOutputPath=""bin\$dirPropertyName-$dirVersion\\"""
         }
     }
     finally {

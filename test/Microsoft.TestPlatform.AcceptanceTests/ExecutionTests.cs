@@ -16,28 +16,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestClass]
 public class ExecutionTests : AcceptanceTestBase
 {
+    // TODO: It looks like the first 3 tests would be useful to multiply by all 3 test frameworks, should we make the test even more generic, or duplicate them?
+
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSource]
-    public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
+    [MSTestCompatibilityDataSource(InProcess = true)]
+    public void RunMultipleTestAssemblies(RunnerInfo runnerInfo, MSTestInfo msTestInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
-
-        InvokeVsTestForExecution(assemblyPaths, GetTestAdapterPath(), FrameworkArgValue, string.Empty);
-
-        ValidateSummaryStatus(2, 2, 2);
-        ExitCodeEquals(1); // failing tests
-    }
-
-    [TestMethod]
-    [MSTestCompatibilityDataSource]
-    public void RunMultipleTestAssemblies2(RunnerInfo runnerInfo, MSTestInfo msTestInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        var assemblyPaths = BuildMultipleAssemblyPath(msTestInfo, "SimpleTestProject.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath(msTestInfo, "SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
 
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 
@@ -45,6 +32,10 @@ public class ExecutionTests : AcceptanceTestBase
         ExitCodeEquals(1); // failing tests
     }
 
+
+    // TODO: This one mixes different frameworks, I can make it work, but it is worth it? We are going to test
+    // the two respective versions together (e.g. latest xunit and latest mstest), but does using two different test
+    // frameworks have any added value over using 2 mstest dlls?
     [TestMethod]
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
@@ -58,7 +49,7 @@ public class ExecutionTests : AcceptanceTestBase
             _testEnvironment.GetTestAsset("XUTestProject.dll");
 
         assemblyPaths = string.Concat(assemblyPaths, "\" \"", xunitAssemblyPath);
-        InvokeVsTestForExecution(assemblyPaths, string.Empty, FrameworkArgValue, string.Empty);
+        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: string.Empty, FrameworkArgValue, string.Empty);
 
         ValidateSummaryStatus(2, 2, 1);
         ExitCodeEquals(1); // failing tests
@@ -68,15 +59,14 @@ public class ExecutionTests : AcceptanceTestBase
     // and after --arch feature implementation we won't find correct muxer on CI.
     [TestCategory("Windows")]
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
-    public void RunMultipleTestAssembliesInParallel(RunnerInfo runnerInfo)
+    [MSTestCompatibilityDataSource]
+    public void RunMultipleTestAssembliesInParallel(RunnerInfo runnerInfo, MSTestInfo msTestInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+        var assemblyPaths = BuildMultipleAssemblyPath(msTestInfo,"SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+        var arguments = PrepareArguments(assemblyPaths, testAdapterPath: null, runSettings: null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /Parallel");
         arguments = string.Concat(arguments, " /Platform:x86");
         arguments += GetDiagArg(tempDir.Path);

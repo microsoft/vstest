@@ -28,24 +28,31 @@ public class NetFrameworkRunner : Attribute, ITestDataSource
     /// <param name="targetFrameworks">To run tests with desktop runner(vstest.console.exe), use AcceptanceTestBase.Net452TargetFramework or alike values.</param>
     public NetFrameworkRunner(string targetFrameworks = AcceptanceTestBase.NETFX452_NET50)
     {
-        var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
-        if (!isWindows)
-        {
-            return;
-        }
-
-        foreach (var fmw in targetFrameworks.Split(';'))
-        {
-            _dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw, AcceptanceTestBase.InIsolation) });
-        }
-
+        _targetFrameworks = targetFrameworks;
     }
 
-    private readonly List<object[]> _dataRows = new();
+    public bool DebugVSTestConsole { get; set; }
+    public bool DebugTesthost { get; set; }
+    public bool DebugDataCollector { get; set; }
+    public bool NoDefaultBreakpoints { get; set; } = true;
+
+    private readonly string _targetFrameworks;
 
     public IEnumerable<object[]> GetData(MethodInfo methodInfo)
     {
-        return _dataRows;
+        var dataRows = new List<object[]>();
+        var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
+        if (!isWindows)
+        {
+            return dataRows;
+        }
+
+        foreach (var fmw in _targetFrameworks.Split(';'))
+        {
+            dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw, AcceptanceTestBase.InIsolation, DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints) });
+        }
+
+        return dataRows;
     }
 
     public string GetDisplayName(MethodInfo methodInfo, object[] data)

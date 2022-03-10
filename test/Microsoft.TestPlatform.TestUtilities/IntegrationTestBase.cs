@@ -128,6 +128,11 @@ public class IntegrationTestBase
 
         if (!string.IsNullOrWhiteSpace(inIsolation))
         {
+            if (inIsolation != "/InIsolation")
+            {
+                // TODO: The whole inIsolation should be just a bool, but it is not, and it's changing in other PR.
+                throw new InvalidOperationException("InIsolation value must be '/InIsolation'");
+            }
             arguments = string.Concat(arguments, " ", inIsolation);
         }
 
@@ -205,6 +210,32 @@ public class IntegrationTestBase
         Dictionary<string, string> environmentVariables = null)
     {
         var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
+
+        if (_testEnvironment.DebugVSTestConsole || _testEnvironment.DebugTesthost || _testEnvironment.DebugDataCollector)
+        {
+            environmentVariables ??= new Dictionary<string, string>();
+
+            if (_testEnvironment.DebugVSTestConsole)
+            {
+                environmentVariables.Add("VSTEST_RUNNER_DEBUG_ATTACHVS", "1");
+            }
+
+            if (_testEnvironment.DebugTesthost)
+            {
+                environmentVariables.Add("VSTEST_HOST_DEBUG_ATTACHVS", "1");
+            }
+
+            if (_testEnvironment.DebugDataCollector)
+            {
+                environmentVariables.Add("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS", "1");
+            }
+
+            if (_testEnvironment.NoDefaultBreakpoints)
+            {
+                environmentVariables.Add("VSTEST_DEBUG_NOBP", "1");
+            }
+        }
+
         InvokeVsTest(arguments, environmentVariables);
     }
 
@@ -780,7 +811,6 @@ public class IntegrationTestBase
     protected string BuildMultipleAssemblyPath(MSTestInfo msTestInfo, params string[] assetNames)
     {
         var assetFullPaths = new string[assetNames.Length];
-        var slash = Path.DirectorySeparatorChar;
         for (var i = 0; i < assetNames.Length; i++)
         {
             var path = GetAssetFullPath(assetNames[i]);
@@ -830,30 +860,4 @@ public class IntegrationTestBase
     }
 
     protected static string GetDotnetRunnerPath() => Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
-}
-
-public class MSTestInfo
-{
-    public MSTestInfo(string versionType, string version, string path)
-    {
-        VersionType = versionType;
-        Version = version;
-        Path = path;
-    }
-
-    public string VersionType { get; }
-    public string Version { get; }
-    public string Path { get; }
-
-    public override string ToString() => $" MSTest = {Version} [{VersionType}]";
-
-    public string UpdatePath(string path)
-    {
-        // Version is not directly used, below, but if it is not populated the path will be incorrect.
-        // We don't want to throw when creating MSTestInfo because that is happening too early, and has worse error reporting.
-        if (Version == null)
-            throw new InvalidOperationException($"Version was not correctly populated from TestPlatform.Dependencies.props, review that there is entry for MSTestFramework{VersionType}Version.");
-
-        return path.Replace($"{System.IO.Path.DirectorySeparatorChar}bin{System.IO.Path.DirectorySeparatorChar}", Path);
-    }
 }

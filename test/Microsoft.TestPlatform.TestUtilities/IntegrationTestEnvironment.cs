@@ -193,6 +193,10 @@ public class IntegrationTestEnvironment
 
     // A known AzureDevOps env variable meaning we are running in CI.
     public static bool IsCI { get; } = Environment.GetEnvironmentVariable("TF_BUILD") == "True";
+    public bool DebugVSTestConsole { get; set; }
+    public bool DebugTesthost { get; set; }
+    public bool DebugDataCollector { get; set; }
+    public bool NoDefaultBreakpoints { get; set; }
 
     /// <summary>
     /// Gets the full path to a test asset.
