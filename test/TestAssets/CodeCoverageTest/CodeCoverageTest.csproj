@@ -1,15 +1,15 @@
-﻿<?xml version="1.0" encoding="utf-16"?>
+<?xml version="1.0" encoding="utf-16"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
-  <!-- Package dependency versions -->
-  <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
 
   <PropertyGroup>
     <AssemblyName>CodeCoverageTest</AssemblyName>
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="MSTest.TestFramework">
       <Version>$(MSTestFrameworkVersion)</Version>

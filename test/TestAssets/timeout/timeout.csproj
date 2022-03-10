@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <!-- Package dependency versions -->
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
@@ -7,10 +7,11 @@
   </PropertyGroup>
   <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
-  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Dependencies.props" />
-  
+
   <PropertyGroup>
     <TargetFrameworks>net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>

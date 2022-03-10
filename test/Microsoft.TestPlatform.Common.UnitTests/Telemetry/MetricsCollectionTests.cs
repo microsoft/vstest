@@ -1,60 +1,60 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
+namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry;
+
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
+using VisualStudio.TestTools.UnitTesting;
+
+[TestClass]
+public class MetricsCollectionTests
 {
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    private readonly IMetricsCollection _metricsCollection;
 
-    [TestClass]
-    public class MetricsCollectionTests
+    public MetricsCollectionTests()
     {
-        private IMetricsCollection metricsCollection;
+        _metricsCollection = new MetricsCollection();
+    }
 
-        public MetricsCollectionTests()
-        {
-            this.metricsCollection = new MetricsCollection();
-        }
+    [TestMethod]
+    public void AddShouldAddMetric()
+    {
+        _metricsCollection.Add("DummyMessage", "DummyValue");
 
-        [TestMethod]
-        public void AddShouldAddMetric()
-        {
-            this.metricsCollection.Add("DummyMessage", "DummyValue");
+        Assert.IsTrue(_metricsCollection.Metrics.TryGetValue("DummyMessage", out var value));
+        Assert.AreEqual("DummyValue", value);
+    }
 
-            Assert.IsTrue(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out var value));
-            Assert.AreEqual("DummyValue", value);
-        }
+    [TestMethod]
+    public void AddShouldUpdateMetricIfSameKeyIsPresentAlready()
+    {
+        _metricsCollection.Add("DummyMessage", "DummyValue");
 
-        [TestMethod]
-        public void AddShouldUpdateMetricIfSameKeyIsPresentAlready()
-        {
-            this.metricsCollection.Add("DummyMessage", "DummyValue");
+        Assert.IsTrue(_metricsCollection.Metrics.TryGetValue("DummyMessage", out var value));
+        Assert.AreEqual("DummyValue", value);
 
-            Assert.IsTrue(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out var value));
-            Assert.AreEqual("DummyValue", value);
+        _metricsCollection.Add("DummyMessage", "newValue");
 
-            this.metricsCollection.Add("DummyMessage", "newValue");
+        Assert.IsTrue(_metricsCollection.Metrics.TryGetValue("DummyMessage", out var newValue));
+        Assert.AreEqual("newValue", newValue);
+    }
 
-            Assert.IsTrue(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out var newValue));
-            Assert.AreEqual("newValue", newValue);
-        }
+    [TestMethod]
+    public void MetricsShouldReturnValidMetricsIfValidItemsAreThere()
+    {
+        _metricsCollection.Add("DummyMessage", "DummyValue");
+        _metricsCollection.Add("DummyMessage2", "DummyValue");
 
-        [TestMethod]
-        public void MetricsShouldReturnValidMetricsIfValidItemsAreThere()
-        {
-            this.metricsCollection.Add("DummyMessage", "DummyValue");
-            this.metricsCollection.Add("DummyMessage2", "DummyValue");
+        Assert.AreEqual(2, _metricsCollection.Metrics.Count);
+        Assert.IsTrue(_metricsCollection.Metrics.ContainsKey("DummyMessage"));
+        Assert.IsTrue(_metricsCollection.Metrics.ContainsKey("DummyMessage2"));
+    }
 
-            Assert.AreEqual(2, this.metricsCollection.Metrics.Count);
-            Assert.IsTrue(this.metricsCollection.Metrics.ContainsKey("DummyMessage"));
-            Assert.IsTrue(this.metricsCollection.Metrics.ContainsKey("DummyMessage2"));
-        }
-
-        [TestMethod]
-        public void MetricsShouldReturnEmptyDictionaryIfMetricsIsEmpty()
-        {
-            Assert.AreEqual(0, this.metricsCollection.Metrics.Count);
-        }
+    [TestMethod]
+    public void MetricsShouldReturnEmptyDictionaryIfMetricsIsEmpty()
+    {
+        Assert.AreEqual(0, _metricsCollection.Metrics.Count);
     }
 }

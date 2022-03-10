@@ -1,46 +1,45 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
+namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting;
+
+using Interfaces;
+
+/// <summary>
+/// Hold data about the Test Host.
+/// </summary>
+public class TestRuntimeMetadata : ITestRuntimeCapabilities
 {
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    /// <summary>
+    /// Constructor for TestRuntimeMetadata
+    /// </summary>
+    /// <param name="extension">
+    /// Uri identifying the testhost.
+    /// </param>
+    /// <param name="friendlyName">
+    /// The friendly Name.
+    /// </param>
+    public TestRuntimeMetadata(string extension, string friendlyName)
+    {
+        ExtensionUri = extension;
+        FriendlyName = friendlyName;
+    }
 
     /// <summary>
-    /// Hold data about the Test Host.
+    /// Gets Uri identifying the testhost.
     /// </summary>
-    public class TestRuntimeMetadata : ITestRuntimeCapabilities
+    public string ExtensionUri
     {
-        /// <summary>
-        /// Constructor for TestRuntimeMetadata
-        /// </summary>
-        /// <param name="extension">
-        /// Uri identifying the testhost.
-        /// </param>
-        /// <param name="friendlyName">
-        /// The friendly Name.
-        /// </param>
-        public TestRuntimeMetadata(string extension, string friendlyName)
-        {
-            this.ExtensionUri = extension;
-            this.FriendlyName = friendlyName;
-        }
+        get;
+        private set;
+    }
 
-        /// <summary>
-        /// Gets Uri identifying the testhost.
-        /// </summary>
-        public string ExtensionUri
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Gets Friendly Name identifying the testhost.
-        /// </summary>
-        public string FriendlyName
-        {
-            get;
-            private set;
-        }
+    /// <summary>
+    /// Gets Friendly Name identifying the testhost.
+    /// </summary>
+    public string FriendlyName
+    {
+        get;
+        private set;
     }
 }

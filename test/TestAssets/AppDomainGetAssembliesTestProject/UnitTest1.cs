@@ -1,6 +1,9 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using System;
-using System.Linq;
 
 namespace AppDomainGetAssembliesTestProject
 {
@@ -15,7 +18,7 @@ namespace AppDomainGetAssembliesTestProject
 
             var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
 
-            foreach(var assembly in allAssemblies)
+            foreach (var assembly in allAssemblies)
             {
                 var typeInfo = assembly.GetTypes();
             }

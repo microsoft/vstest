@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <!-- Package dependency versions -->
   <PropertyGroup>
@@ -13,7 +13,7 @@
   <PropertyGroup>
     <AssemblyName>DisableAppdomainTest1</AssemblyName>
     <TargetFrameworks>net451</TargetFrameworks>
-    <OutputType Condition="$(NetCoreAppTargetFrameWork) == 'true' ">Exe</OutputType>
+    <OutputType Condition="$(NetCoreAppTargetFramework) == 'true' ">Exe</OutputType>
   </PropertyGroup>
 
 

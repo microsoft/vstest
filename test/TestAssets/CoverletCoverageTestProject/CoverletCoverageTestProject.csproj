@@ -1,11 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
-  <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
-  <!-- Package dependency versions -->
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 

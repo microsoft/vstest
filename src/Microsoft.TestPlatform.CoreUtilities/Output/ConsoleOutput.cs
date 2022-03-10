@@ -3,88 +3,87 @@
 
 #if !NETSTANDARD1_0 && !WINDOWS_UWP
 
-namespace Microsoft.VisualStudio.TestPlatform.Utilities
+namespace Microsoft.VisualStudio.TestPlatform.Utilities;
+
+using System;
+using System.IO;
+
+/// <summary>
+/// Sends output to the console.
+/// </summary>
+public class ConsoleOutput : IOutput
 {
-    using System;
-    using System.IO;
+    private static readonly object LockObject = new();
+    private static ConsoleOutput s_consoleOutput;
+
+    private readonly TextWriter _standardOutput;
+    private readonly TextWriter _standardError;
 
     /// <summary>
-    /// Sends output to the console.
+    /// Initializes a new instance of the <see cref="ConsoleOutput"/> class.
     /// </summary>
-    public class ConsoleOutput : IOutput
+    internal ConsoleOutput()
     {
-        private static object lockObject = new object();
-        private static ConsoleOutput consoleOutput = null;
+        _standardOutput = Console.Out;
+        _standardError = Console.Error;
+    }
 
-        private TextWriter standardOutput = null;
-        private TextWriter standardError = null;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConsoleOutput"/> class.
-        /// </summary>
-        internal ConsoleOutput()
+    /// <summary>
+    /// Gets the instance of <see cref="ConsoleOutput"/>.
+    /// </summary>
+    public static ConsoleOutput Instance
+    {
+        get
         {
-            this.standardOutput = Console.Out;
-            this.standardError = Console.Error;
-        }
-
-        /// <summary>
-        /// Gets the instance of <see cref="ConsoleOutput"/>.
-        /// </summary>
-        public static ConsoleOutput Instance
-        {
-            get
+            if (s_consoleOutput != null)
             {
-                if (consoleOutput != null)
-                {
-                    return consoleOutput;
-                }
-
-                lock (lockObject)
-                {
-                    if (consoleOutput == null)
-                    {
-                        consoleOutput = new ConsoleOutput();
-                    }
-                }
-
-                return consoleOutput;
+                return s_consoleOutput;
             }
-        }
 
-        /// <summary>
-        /// Writes the message with a new line.
-        /// </summary>
-        /// <param name="message">Message to be output.</param>
-        /// <param name="level">Level of the message.</param>
-        public void WriteLine(string message, OutputLevel level)
-        {
-            this.Write(message, level);
-            this.Write(Environment.NewLine, level);
-        }
-
-        /// <summary>
-        /// Writes the message with no new line.
-        /// </summary>
-        /// <param name="message">Message to be output.</param>
-        /// <param name="level">Level of the message.</param>
-        public void Write(string message, OutputLevel level)
-        {
-            switch (level)
+            lock (LockObject)
             {
-                case OutputLevel.Information:
-                case OutputLevel.Warning:
-                    this.standardOutput.Write(message);
-                    break;
-
-                case OutputLevel.Error:
-                    this.standardError.Write(message);
-                    break;
-
-                default:
-                    this.standardOutput.Write("ConsoleOutput.WriteLine: The output level is unrecognized: {0}", level);
-                    break;
+                if (s_consoleOutput == null)
+                {
+                    s_consoleOutput = new ConsoleOutput();
+                }
             }
+
+            return s_consoleOutput;
+        }
+    }
+
+    /// <summary>
+    /// Writes the message with a new line.
+    /// </summary>
+    /// <param name="message">Message to be output.</param>
+    /// <param name="level">Level of the message.</param>
+    public void WriteLine(string message, OutputLevel level)
+    {
+        Write(message, level);
+        Write(Environment.NewLine, level);
+    }
+
+    /// <summary>
+    /// Writes the message with no new line.
+    /// </summary>
+    /// <param name="message">Message to be output.</param>
+    /// <param name="level">Level of the message.</param>
+    public void Write(string message, OutputLevel level)
+    {
+        switch (level)
+        {
+            case OutputLevel.Information:
+            case OutputLevel.Warning:
+                _standardOutput.Write(message);
+                break;
+
+            case OutputLevel.Error:
+                _standardError.Write(message);
+                break;
+
+            default:
+                _standardOutput.Write("ConsoleOutput.WriteLine: The output level is unrecognized: {0}", level);
+                break;
         }
     }
 }

@@ -1,10 +1,16 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 
+#pragma warning disable IDE1006 // Naming Styles
 namespace child_crash
+#pragma warning restore IDE1006 // Naming Styles
 {
     [TestClass]
     public class UnitTest1

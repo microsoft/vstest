@@ -1,42 +1,41 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
+
+using System.Collections.Generic;
+
+using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using System;
+
+/// <summary>
+/// The cache for test execution information.
+/// </summary>
+internal interface ITestRunCache : IDisposable
 {
-    using System.Collections.Generic;
+    #region Properties
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using System;
+    ICollection<TestResult> TestResults { get; }
 
-    /// <summary>
-    /// The cache for test execution information.
-    /// </summary>
-    internal interface ITestRunCache : IDisposable
-    {
-        #region Properties
+    ICollection<TestCase> InProgressTests { get; }
+    long TotalExecutedTests { get; }
 
-        ICollection<TestResult> TestResults { get; }
+    TestRunStatistics TestRunStatistics { get; }
 
-        ICollection<TestCase> InProgressTests { get; }
-        long TotalExecutedTests { get; }
+    IDictionary<string, int> AdapterTelemetry { get; }
 
-        TestRunStatistics TestRunStatistics { get; }
+    #endregion
 
-        IDictionary<string, int> AdapterTelemetry { get; }
+    #region Methods
 
-        #endregion
+    void OnTestStarted(TestCase testCase);
 
-        #region Methods
+    void OnNewTestResult(TestResult testResult);
 
-        void OnTestStarted(TestCase testCase);
+    bool OnTestCompletion(TestCase completedTest);
 
-        void OnNewTestResult(TestResult testResult);
+    ICollection<TestResult> GetLastChunk();
 
-        bool OnTestCompletion(TestCase completedTest);
-
-        ICollection<TestResult> GetLastChunk();
-
-        #endregion
-    }
+    #endregion
 }

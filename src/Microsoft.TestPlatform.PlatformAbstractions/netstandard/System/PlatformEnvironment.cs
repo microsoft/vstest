@@ -3,52 +3,52 @@
 
 #if NETSTANDARD && !NETSTANDARD2_0
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+using System;
+
+using Interfaces;
+
+/// <inheritdoc />
+public class PlatformEnvironment : IEnvironment
 {
-    using System;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    /// <inheritdoc />
+    public PlatformArchitecture Architecture
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+    }
 
     /// <inheritdoc />
-    public class PlatformEnvironment : IEnvironment
+    public PlatformOperatingSystem OperatingSystem
     {
-        /// <inheritdoc />
-        public PlatformArchitecture Architecture
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        /// <inheritdoc />
-        public PlatformOperatingSystem OperatingSystem
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        /// <inheritdoc />
-        public string OperatingSystemVersion
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        /// <inheritdoc />
-        public void Exit(int exitcode)
+        get
         {
             throw new NotImplementedException();
         }
+    }
 
-        /// <inheritdoc />
-        public int GetCurrentManagedThreadId()
+    /// <inheritdoc />
+    public string OperatingSystemVersion
+    {
+        get
         {
             throw new NotImplementedException();
         }
+    }
+
+    /// <inheritdoc />
+    public void Exit(int exitcode)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc />
+    public int GetCurrentManagedThreadId()
+    {
+        throw new NotImplementedException();
     }
 }
 

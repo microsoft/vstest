@@ -131,6 +131,10 @@
     <file src="net451\$Runtime$\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\net451\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net451\$Runtime$\es\vstest.console.resources.dll"	target="tools\net451\es\vstest.console.resources.dll" />
     <file src="net451\$Runtime$\Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll"	target="tools\net451\Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" />
+    <file src="net451\$Runtime$\Extensions\DumpMinitool.exe" target="tools\net451\Extensions\DumpMinitool.exe" />
+    <file src="net451\$Runtime$\Extensions\DumpMinitool.exe.config" target="tools\net451\Extensions\DumpMinitool.exe.config" />
+    <file src="net451\$Runtime$\Extensions\DumpMinitool.x86.exe" target="tools\net451\Extensions\DumpMinitool.x86.exe" />
+    <file src="net451\$Runtime$\Extensions\DumpMinitool.x86.exe.config" target="tools\net451\Extensions\DumpMinitool.x86.exe.config" />
     <file src="net451\$Runtime$\Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll"	target="tools\net451\Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
     <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll"	target="tools\net451\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
     <file src="net451\$Runtime$\Extensions\cs\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\net451\Extensions\cs\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
@@ -366,6 +370,10 @@
     <file src="netcoreapp2.1\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\netcoreapp2.1\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="netcoreapp2.1\es\vstest.console.resources.dll"	target="tools\netcoreapp2.1\es\vstest.console.resources.dll" />
     <file src="netcoreapp2.1\Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll"	target="tools\netcoreapp2.1\Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" />
+    <file src="netcoreapp2.1\Extensions\DumpMinitool.exe" target="tools\netcoreapp2.1\Extensions\DumpMinitool.exe" />
+    <file src="netcoreapp2.1\Extensions\DumpMinitool.exe.config" target="tools\netcoreapp2.1\Extensions\DumpMinitool.exe.config" />
+    <file src="netcoreapp2.1\Extensions\DumpMinitool.x86.exe" target="tools\netcoreapp2.1\Extensions\DumpMinitool.x86.exe" />
+    <file src="netcoreapp2.1\Extensions\DumpMinitool.x86.exe.config" target="tools\netcoreapp2.1\Extensions\DumpMinitool.x86.exe.config" />
     <file src="netcoreapp2.1\Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll"	target="tools\netcoreapp2.1\Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
     <file src="netcoreapp2.1\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll"	target="tools\netcoreapp2.1\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
     <file src="netcoreapp2.1\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll"	target="tools\netcoreapp2.1\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" />

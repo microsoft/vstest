@@ -1,63 +1,60 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.TestExecutor
+namespace Microsoft.VisualStudio.TestPlatform.TestExecutor;
+
+using System.Threading.Tasks;
+
+using TestHost;
+
+/// <summary>
+/// Initialization point for Old UWP application
+/// </summary>
+public static class UnitTestClient
 {
-    using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestPlatform.TestHost;
+    /// <summary>
+    /// Create default UI for UWP app
+    /// </summary>
+    public static void CreateDefaultUI()
+    {
+    }
 
     /// <summary>
-    /// Initialization point for Old UWP application
+    /// Entry point for testhost, in App Model(UWP) scenario
     /// </summary>
-    public static class UnitTestClient
+    /// <param name="arguments">testhost initialization arguments</param>
+    public static void Run(string arguments)
     {
-        /// <summary>
-        /// Create default UI for UWP app
-        /// </summary>
-        public static void CreateDefaultUI()
-        {
-        }
+        Task.Run(() => Program.Run(SplitArguments(arguments)));
+    }
 
-        /// <summary>
-        /// Entry point for testhost, in App Model(UWP) scenario
-        /// </summary>
-        /// <param name="arguments">testhost initialization arguments</param>
-        public static void Run(string arguments)
+    /// <summary>
+    /// Split Arguments on space, if they are not inside Single/Double Quotes
+    /// </summary>
+    /// <param name="commandLine"></param>
+    /// <returns></returns>
+    internal static string[] SplitArguments(string commandLine)
+    {
+        var parmChars = commandLine.ToCharArray();
+        var inDoubleQuote = false;
+        var inSingleQuote = false;
+
+        for (var index = 0; index < parmChars.Length; index++)
         {
-            Task.Run(() =>
+            if (parmChars[index] == '"' && !inSingleQuote)
             {
-                Program.Run(SplitArguments(arguments));
-            });
-        }
-
-        /// <summary>
-        /// Split Arguments on space, if they are not inside Single/Double Quotes
-        /// </summary>
-        /// <param name="commandLine"></param>
-        /// <returns></returns>
-        internal static string[] SplitArguments(string commandLine)
-        {
-            var parmChars = commandLine.ToCharArray();
-            var inDoubleQuote = false;
-            var inSingleQuote = false;
-
-            for (var index = 0; index < parmChars.Length; index++)
-            {
-                if (parmChars[index] == '"' && !inSingleQuote)
-                {
-                    inDoubleQuote = !inDoubleQuote;
-                }
-
-                if (parmChars[index] == '\'' && !inDoubleQuote)
-                {
-                    inSingleQuote = !inSingleQuote;
-                }
-
-                if (!inSingleQuote && !inDoubleQuote && parmChars[index] == ' ')
-                    parmChars[index] = '\n';
+                inDoubleQuote = !inDoubleQuote;
             }
 
-            return (new string(parmChars)).Split(new[] { '\n' });
+            if (parmChars[index] == '\'' && !inDoubleQuote)
+            {
+                inSingleQuote = !inSingleQuote;
+            }
+
+            if (!inSingleQuote && !inDoubleQuote && parmChars[index] == ' ')
+                parmChars[index] = '\n';
         }
+
+        return (new string(parmChars)).Split(new[] { '\n' });
     }
 }

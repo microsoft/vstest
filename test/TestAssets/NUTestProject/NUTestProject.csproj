@@ -1,11 +1,14 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <!-- Package dependency versions -->
-  <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
+  <Import Project="..\..\..\scripts\build\TestAssets.props" />
 
   <PropertyGroup>
     <TargetFrameworks>net451;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <AssemblyName>NUTestProject</AssemblyName>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

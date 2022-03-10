@@ -1,232 +1,226 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CrossPlatEngine.UnitTests.Client
+namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
+
+using System;
+using System.Collections.Generic;
+
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
+[TestClass]
+public class ProxyExecutionManagerWithDataCollectionTests
 {
-    using System;
-    using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    private ProxyExecutionManager _testExecutionManager;
 
-    using Moq;
+    private Mock<ITestRuntimeProvider> _mockTestHostManager;
 
-    [TestClass]
-    public class ProxyExecutionManagerWithDataCollectionTests
+    private Mock<ITestRequestSender> _mockRequestSender;
+
+    private Mock<IProxyDataCollectionManager> _mockDataCollectionManager;
+
+    private Mock<IProcessHelper> _mockProcessHelper;
+
+    private ProxyExecutionManagerWithDataCollection _proxyExecutionManager;
+
+    private Mock<IDataSerializer> _mockDataSerializer;
+
+    private Mock<IRequestData> _mockRequestData;
+
+    private Mock<IMetricsCollection> _mockMetricsCollection;
+
+    private Mock<IFileHelper> _mockFileHelper;
+
+    [TestInitialize]
+    public void TestInit()
     {
-        private ProxyExecutionManager testExecutionManager;
+        _mockTestHostManager = new Mock<ITestRuntimeProvider>();
+        _mockRequestSender = new Mock<ITestRequestSender>();
+        _mockDataSerializer = new Mock<IDataSerializer>();
+        _mockRequestData = new Mock<IRequestData>();
+        _mockMetricsCollection = new Mock<IMetricsCollection>();
+        _mockFileHelper = new Mock<IFileHelper>();
+        _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
+        _testExecutionManager = new ProxyExecutionManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, _mockDataSerializer.Object, _mockFileHelper.Object);
+        _mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
+        _mockProcessHelper = new Mock<IProcessHelper>();
+        _proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, _mockDataCollectionManager.Object);
+    }
 
-        private Mock<ITestRuntimeProvider> mockTestHostManager;
+    [TestMethod]
+    public void InitializeShouldInitializeDataCollectionProcessIfDataCollectionIsEnabled()
+    {
+        _proxyExecutionManager.Initialize(false);
 
-        private Mock<ITestRequestSender> mockRequestSender;
+        _mockDataCollectionManager.Verify(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
+    }
 
-        private Mock<IProxyDataCollectionManager> mockDataCollectionManager;
+    [TestMethod]
+    public void InitializeShouldThrowExceptionIfThrownByDataCollectionManager()
+    {
+        _mockDataCollectionManager.Setup(x => x.Initialize()).Throws<Exception>();
 
-        private Mock<IProcessHelper> mockProcessHelper;
+        Assert.ThrowsException<Exception>(() => _proxyExecutionManager.Initialize(false));
+    }
 
-        private ProxyExecutionManagerWithDataCollection proxyExecutionManager;
+    [TestMethod]
+    public void InitializeShouldCallAfterTestRunIfExceptionIsThrownWhileCreatingDataCollectionProcess()
+    {
+        _mockDataCollectionManager.Setup(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Throws(new Exception("MyException"));
 
-        private Mock<IDataSerializer> mockDataSerializer;
+        Assert.ThrowsException<Exception>(() => _proxyExecutionManager.Initialize(false));
 
-        private Mock<IRequestData> mockRequestData;
+        _mockDataCollectionManager.Verify(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
+        _mockDataCollectionManager.Verify(dc => dc.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
+    }
 
-        private Mock<IMetricsCollection> mockMetricsCollection;
+    [TestMethod]
+    public void InitializeShouldSaveExceptionMessagesIfThrownByDataCollectionProcess()
+    {
+        var mockRequestSender = new Mock<IDataCollectionRequestSender>();
+        var testSources = new List<string>() { "abc.dll", "efg.dll" };
+        mockRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Throws(new Exception("MyException"));
+        mockRequestSender.Setup(x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
-        private Mock<IFileHelper> mockFileHelper;
+        var mockDataCollectionLauncher = new Mock<IDataCollectionLauncher>();
+        var proxyDataCollectonManager = new ProxyDataCollectionManager(_mockRequestData.Object, string.Empty, testSources, mockRequestSender.Object, _mockProcessHelper.Object, mockDataCollectionLauncher.Object);
 
-        [TestInitialize]
-        public void TestInit()
+        var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, proxyDataCollectonManager);
+        proxyExecutionManager.Initialize(false);
+        Assert.IsNotNull(proxyExecutionManager.DataCollectionRunEventsHandler.Messages);
+        Assert.AreEqual(TestMessageLevel.Error, proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item1);
+        StringAssert.Contains(proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item2, "MyException");
+    }
+
+    [TestMethod]
+    public void UpdateTestProcessStartInfoShouldUpdateDataCollectionPortArg()
+    {
+        _mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
+
+        var testProcessStartInfo = new TestProcessStartInfo();
+        testProcessStartInfo.Arguments = string.Empty;
+
+        var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(_mockRequestSender.Object, _mockTestHostManager.Object, _mockDataCollectionManager.Object);
+        proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
+
+        Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--datacollectionport 0"));
+    }
+
+    [TestMethod]
+    public void UpdateTestProcessStartInfoShouldUpdateTelemetryOptedInArgTrueIfTelemetryOptedIn()
+    {
+        var mockRequestData = new Mock<IRequestData>();
+        _mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(true);
+
+        _mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
+
+        var testProcessStartInfo = new TestProcessStartInfo();
+        testProcessStartInfo.Arguments = string.Empty;
+
+        var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, _mockDataCollectionManager.Object);
+
+        // Act.
+        proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
+
+        // Verify.
+        Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--telemetryoptedin true"));
+    }
+
+    [TestMethod]
+    public void UpdateTestProcessStartInfoShouldUpdateTelemetryOptedInArgFalseIfTelemetryOptedOut()
+    {
+        var mockRequestData = new Mock<IRequestData>();
+        _mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(false);
+
+        _mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
+
+        var testProcessStartInfo = new TestProcessStartInfo();
+        testProcessStartInfo.Arguments = string.Empty;
+
+        var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, _mockDataCollectionManager.Object);
+
+        // Act.
+        proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
+
+        // Verify.
+        Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--telemetryoptedin false"));
+    }
+
+    [TestMethod]
+    public void LaunchProcessWithDebuggerAttachedShouldUpdateEnvironmentVariables()
+    {
+        // Setup
+        var mockRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        TestProcessStartInfo launchedStartInfo = null;
+        mockRunEventsHandler.Setup(runHandler => runHandler.LaunchProcessWithDebuggerAttached(It.IsAny<TestProcessStartInfo>())).Callback
+            ((TestProcessStartInfo startInfo) => launchedStartInfo = startInfo);
+        var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, _mockDataCollectionManager.Object);
+        var mockTestRunCriteria = new Mock<TestRunCriteria>(new List<string> { "source.dll" }, 10);
+        var testProcessStartInfo = new TestProcessStartInfo
         {
-            this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
-            this.mockRequestSender = new Mock<ITestRequestSender>();
-            this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockMetricsCollection = new Mock<IMetricsCollection>();
-            this.mockFileHelper = new Mock<IFileHelper>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
-            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.mockFileHelper.Object);
-            this.mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
-            this.mockProcessHelper = new Mock<IProcessHelper>();
-            this.proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
-        }
-
-        [TestMethod]
-        public void InitializeShouldInitializeDataCollectionProcessIfDataCollectionIsEnabled()
-        {
-            this.proxyExecutionManager.Initialize(false);
-
-            mockDataCollectionManager.Verify(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void InitializeShouldThrowExceptionIfThrownByDataCollectionManager()
-        {
-            this.mockDataCollectionManager.Setup(x => x.Initialize()).Throws<Exception>();
-
-            Assert.ThrowsException<Exception>(() =>
+            Arguments = string.Empty,
+            EnvironmentVariables = new Dictionary<string, string>
             {
-                this.proxyExecutionManager.Initialize(false);
-            });
-        }
-
-        [TestMethod]
-        public void InitializeShouldCallAfterTestRunIfExceptionIsThrownWhileCreatingDataCollectionProcess()
-        {
-            mockDataCollectionManager.Setup(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Throws(new Exception("MyException"));
-
-            Assert.ThrowsException<Exception>(() =>
-            {
-                this.proxyExecutionManager.Initialize(false);
-            });
-
-            mockDataCollectionManager.Verify(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
-            mockDataCollectionManager.Verify(dc => dc.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void InitializeShouldSaveExceptionMessagesIfThrownByDataCollectionProcess()
-        {
-            var mockRequestSender = new Mock<IDataCollectionRequestSender>();
-            var testSources = new List<string>() { "abc.dll", "efg.dll" };
-            mockRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Throws(new Exception("MyException"));
-            mockRequestSender.Setup(x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-
-            var mockDataCollectionLauncher = new Mock<IDataCollectionLauncher>();
-            var proxyDataCollectonManager = new ProxyDataCollectionManager(this.mockRequestData.Object, string.Empty, testSources, mockRequestSender.Object, this.mockProcessHelper.Object, mockDataCollectionLauncher.Object);
-
-            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, proxyDataCollectonManager);
-            proxyExecutionManager.Initialize(false);
-            Assert.IsNotNull(proxyExecutionManager.DataCollectionRunEventsHandler.Messages);
-            Assert.AreEqual(TestMessageLevel.Error, proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item1);
-            StringAssert.Contains(proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item2, "MyException");
-        }
-
-        [TestMethod]
-        public void UpdateTestProcessStartInfoShouldUpdateDataCollectionPortArg()
-        {
-            this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
-
-            var testProcessStartInfo = new TestProcessStartInfo();
-            testProcessStartInfo.Arguments = string.Empty;
-
-            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
-            proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
-
-            Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--datacollectionport 0"));
-        }
-
-        [TestMethod]
-        public void UpdateTestProcessStartInfoShouldUpdateTelemetryOptedInArgTrueIfTelemetryOptedIn()
-        {
-            var mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(true);
-
-            this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
-
-            var testProcessStartInfo = new TestProcessStartInfo();
-            testProcessStartInfo.Arguments = string.Empty;
-
-            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
-
-            // Act.
-            proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
-
-            // Verify.
-            Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--telemetryoptedin true"));
-        }
-
-        [TestMethod]
-        public void UpdateTestProcessStartInfoShouldUpdateTelemetryOptedInArgFalseIfTelemetryOptedOut()
-        {
-            var mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(false);
-
-            this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
-
-            var testProcessStartInfo = new TestProcessStartInfo();
-            testProcessStartInfo.Arguments = string.Empty;
-
-            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
-
-            // Act.
-            proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
-
-            // Verify.
-            Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--telemetryoptedin false"));
-        }
-
-        [TestMethod]
-        public void LaunchProcessWithDebuggerAttachedShouldUpdateEnvironmentVariables()
-        {
-            // Setup
-            var mockRunEventsHandler = new Mock<ITestRunEventsHandler>();
-            TestProcessStartInfo launchedStartInfo = null;
-            mockRunEventsHandler.Setup(runHandler => runHandler.LaunchProcessWithDebuggerAttached(It.IsAny<TestProcessStartInfo>())).Callback
-                ((TestProcessStartInfo startInfo) => { launchedStartInfo = startInfo; });
-            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
-            var mockTestRunCriteria = new Mock<TestRunCriteria>(new List<string> { "source.dll" }, 10);
-            var testProcessStartInfo = new TestProcessStartInfo
-            {
-                Arguments = string.Empty,
-                EnvironmentVariables = new Dictionary<string, string>
-                {
-                    {"variable1", "value1" },
-                    {"variable2", "value2" }
-                }
-            };
-
-            // Act.
-            proxyExecutionManager.StartTestRun(mockTestRunCriteria.Object, mockRunEventsHandler.Object);
-            proxyExecutionManager.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
-
-            // Verify.
-            Assert.IsTrue(launchedStartInfo != null, "Failed to get the start info");
-            foreach (var envVaribale in testProcessStartInfo.EnvironmentVariables)
-            {
-                Assert.AreEqual(envVaribale.Value, launchedStartInfo.EnvironmentVariables[envVaribale.Key], $"Expected environment variable {envVaribale.Key} : {envVaribale.Value} not found");
+                {"variable1", "value1" },
+                {"variable2", "value2" }
             }
-        }
+        };
 
-        [TestMethod]
-        public void TestHostManagerHostLaunchedTriggerShouldSendTestHostLaunchedEvent()
+        // Act.
+        proxyExecutionManager.StartTestRun(mockTestRunCriteria.Object, mockRunEventsHandler.Object);
+        proxyExecutionManager.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+
+        // Verify.
+        Assert.IsTrue(launchedStartInfo != null, "Failed to get the start info");
+        foreach (var envVaribale in testProcessStartInfo.EnvironmentVariables)
         {
-            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
-
-            this.mockTestHostManager.Raise(x => x.HostLaunched += null, new HostProviderEventArgs("launched", 0, 1234));
-
-            this.mockDataCollectionManager.Verify(x => x.TestHostLaunched(It.IsAny<int>()));
+            Assert.AreEqual(envVaribale.Value, launchedStartInfo.EnvironmentVariables[envVaribale.Key], $"Expected environment variable {envVaribale.Key} : {envVaribale.Value} not found");
         }
     }
 
-    internal class TestableProxyExecutionManagerWithDataCollection : ProxyExecutionManagerWithDataCollection
+    [TestMethod]
+    public void TestHostManagerHostLaunchedTriggerShouldSendTestHostLaunchedEvent()
     {
-        public TestableProxyExecutionManagerWithDataCollection(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(new RequestData { MetricsCollection = new NoOpMetricsCollection() }, testRequestSender, testHostManager, proxyDataCollectionManager)
-        {
-        }
+        var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, _mockDataCollectionManager.Object);
 
-        public TestableProxyExecutionManagerWithDataCollection(IRequestData requestData, ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(requestData, testRequestSender, testHostManager, proxyDataCollectionManager)
-        {
-        }
+        _mockTestHostManager.Raise(x => x.HostLaunched += null, new HostProviderEventArgs("launched", 0, 1234));
 
-        public TestProcessStartInfo UpdateTestProcessStartInfoWrapper(TestProcessStartInfo testProcessStartInfo)
-        {
-            return this.UpdateTestProcessStartInfo(testProcessStartInfo);
-        }
+        _mockDataCollectionManager.Verify(x => x.TestHostLaunched(It.IsAny<int>()));
+    }
+}
 
-        public override TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
-        {
-            return base.UpdateTestProcessStartInfo(testProcessStartInfo);
-        }
+internal class TestableProxyExecutionManagerWithDataCollection : ProxyExecutionManagerWithDataCollection
+{
+    public TestableProxyExecutionManagerWithDataCollection(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(new RequestData { MetricsCollection = new NoOpMetricsCollection() }, testRequestSender, testHostManager, proxyDataCollectionManager)
+    {
+    }
+
+    public TestableProxyExecutionManagerWithDataCollection(IRequestData requestData, ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(requestData, testRequestSender, testHostManager, proxyDataCollectionManager)
+    {
+    }
+
+    public TestProcessStartInfo UpdateTestProcessStartInfoWrapper(TestProcessStartInfo testProcessStartInfo)
+    {
+        return UpdateTestProcessStartInfo(testProcessStartInfo);
+    }
+
+    public override TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
+    {
+        return base.UpdateTestProcessStartInfo(testProcessStartInfo);
     }
 }

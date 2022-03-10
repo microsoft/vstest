@@ -1,214 +1,207 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+
+using System;
+using System.Diagnostics.Contracts;
+using System.Globalization;
+using System.IO;
+using System.Text;
+using System.Xml;
+
+using Common;
+using Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+using CommandLineResources = Resources.Resources;
+
+internal class RunSettingsArgumentProcessor : IArgumentProcessor
 {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
-    using System.Globalization;
-    using System.IO;
-    using System.Text;
-    using System.Xml;
+    #region Constants
 
-    using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    /// <summary>
+    /// The name of the command line argument that the PortArgumentExecutor handles.
+    /// </summary>
+    public const string CommandName = "/Settings";
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    #endregion
 
-    internal class RunSettingsArgumentProcessor : IArgumentProcessor
+    private Lazy<IArgumentProcessorCapabilities> _metadata;
+
+    private Lazy<IArgumentExecutor> _executor;
+
+    /// <summary>
+    /// Gets the metadata.
+    /// </summary>
+    public Lazy<IArgumentProcessorCapabilities> Metadata
     {
-        #region Constants
-
-        /// <summary>
-        /// The name of the command line argument that the PortArgumentExecutor handles.
-        /// </summary>
-        public const string CommandName = "/Settings";
-
-        #endregion
-
-        private Lazy<IArgumentProcessorCapabilities> metadata;
-
-        private Lazy<IArgumentExecutor> executor;
-
-        /// <summary>
-        /// Gets the metadata.
-        /// </summary>
-        public Lazy<IArgumentProcessorCapabilities> Metadata
+        get
         {
-            get
+            if (_metadata == null)
             {
-                if (this.metadata == null)
-                {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new RunSettingsArgumentProcessorCapabilities());
-                }
-
-                return this.metadata;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the executor.
-        /// </summary>
-        public Lazy<IArgumentExecutor> Executor
-        {
-            get
-            {
-                if (this.executor == null)
-                {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new RunSettingsArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
-                }
-
-                return this.executor;
+                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new RunSettingsArgumentProcessorCapabilities());
             }
 
-            set
-            {
-                this.executor = value;
-            }
+            return _metadata;
         }
     }
 
-    internal class RunSettingsArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
+    /// <summary>
+    /// Gets or sets the executor.
+    /// </summary>
+    public Lazy<IArgumentExecutor> Executor
     {
-        public override string CommandName => RunSettingsArgumentProcessor.CommandName;
+        get
+        {
+            if (_executor == null)
+            {
+                _executor = new Lazy<IArgumentExecutor>(() => new RunSettingsArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
+            }
 
-        public override bool AllowMultiple => false;
+            return _executor;
+        }
 
-        public override bool IsAction => false;
+        set
+        {
+            _executor = value;
+        }
+    }
+}
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.RunSettings;
+internal class RunSettingsArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
+{
+    public override string CommandName => RunSettingsArgumentProcessor.CommandName;
 
-        public override string HelpContentResourceName => CommandLineResources.RunSettingsArgumentHelp;
+    public override bool AllowMultiple => false;
 
-        public override HelpContentPriority HelpPriority => HelpContentPriority.RunSettingsArgumentProcessorHelpPriority;
+    public override bool IsAction => false;
+
+    public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.RunSettings;
+
+    public override string HelpContentResourceName => CommandLineResources.RunSettingsArgumentHelp;
+
+    public override HelpContentPriority HelpPriority => HelpContentPriority.RunSettingsArgumentProcessorHelpPriority;
+}
+
+internal class RunSettingsArgumentExecutor : IArgumentExecutor
+{
+    private readonly CommandLineOptions _commandLineOptions;
+    private readonly IRunSettingsProvider _runSettingsManager;
+
+    internal IFileHelper FileHelper { get; set; }
+
+    internal RunSettingsArgumentExecutor(CommandLineOptions commandLineOptions, IRunSettingsProvider runSettingsManager)
+    {
+        _commandLineOptions = commandLineOptions;
+        _runSettingsManager = runSettingsManager;
+        FileHelper = new FileHelper();
     }
 
-    internal class RunSettingsArgumentExecutor : IArgumentExecutor
+    public void Initialize(string argument)
     {
-        private CommandLineOptions commandLineOptions;
-        private IRunSettingsProvider runSettingsManager;
-
-        internal IFileHelper FileHelper { get; set; }
-
-        internal RunSettingsArgumentExecutor(CommandLineOptions commandLineOptions, IRunSettingsProvider runSettingsManager)
+        if (string.IsNullOrWhiteSpace(argument))
         {
-            this.commandLineOptions = commandLineOptions;
-            this.runSettingsManager = runSettingsManager;
-            this.FileHelper = new FileHelper();
+            throw new CommandLineException(CommandLineResources.RunSettingsRequired);
         }
 
-        public void Initialize(string argument)
+        if (!FileHelper.Exists(argument))
         {
-            if (string.IsNullOrWhiteSpace(argument))
-            {
-                throw new CommandLineException(CommandLineResources.RunSettingsRequired);
-            }
-
-            if (!this.FileHelper.Exists(argument))
-            {
-                throw new CommandLineException(
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        CommandLineResources.RunSettingsFileNotFound,
-                        argument));
-            }
-
-            Contract.EndContractBlock();
-
-            // Load up the run settings and set it as the active run settings.
-            try
-            {
-                XmlDocument document = this.GetRunSettingsDocument(argument);
-
-                this.runSettingsManager.UpdateRunSettings(document.OuterXml);
-
-                // To determine whether to infer framework and platform.
-                ExtractFrameworkAndPlatform();
-
-                //Add default runsettings values if not exists in given runsettings file.
-                this.runSettingsManager.AddDefaultRunSettings();
-
-                this.commandLineOptions.SettingsFile = argument;
-
-                if (this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.EnvironmentVariables") != null)
-                {
-                    this.commandLineOptions.InIsolation = true;
-                    this.runSettingsManager.UpdateRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath, "true");
-                }
-
-                var testCaseFilter = this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestCaseFilter");
-                if (testCaseFilter != null)
-                {
-                    this.commandLineOptions.TestCaseFilterValue = testCaseFilter;
-                }
-            }
-            catch (XmlException exception)
-            {
-                throw new SettingsException(
-                        string.Format(CultureInfo.CurrentCulture, "{0} {1}", ObjectModel.Resources.CommonResources.MalformedRunSettingsFile, exception.Message),
-                        exception);
-            }
+            throw new CommandLineException(
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    CommandLineResources.RunSettingsFileNotFound,
+                    argument));
         }
 
-        private void ExtractFrameworkAndPlatform()
+        Contract.EndContractBlock();
+
+        // Load up the run settings and set it as the active run settings.
+        try
         {
-            var framworkStr = this.runSettingsManager.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath);
-            Framework framework = Framework.FromString(framworkStr);
-            if (framework != null)
+            XmlDocument document = GetRunSettingsDocument(argument);
+
+            _runSettingsManager.UpdateRunSettings(document.OuterXml);
+
+            // To determine whether to infer framework and platform.
+            ExtractFrameworkAndPlatform();
+
+            //Add default runsettings values if not exists in given runsettings file.
+            _runSettingsManager.AddDefaultRunSettings();
+
+            _commandLineOptions.SettingsFile = argument;
+
+            if (_runSettingsManager.QueryRunSettingsNode("RunConfiguration.EnvironmentVariables") != null)
             {
-                this.commandLineOptions.TargetFrameworkVersion = framework;
+                _commandLineOptions.InIsolation = true;
+                _runSettingsManager.UpdateRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath, "true");
             }
 
-            var platformStr = this.runSettingsManager.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath);
-            if (Enum.TryParse<Architecture>(platformStr, true, out var architecture))
+            var testCaseFilter = _runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestCaseFilter");
+            if (testCaseFilter != null)
             {
-                this.commandLineOptions.TargetArchitecture = architecture;
+                _commandLineOptions.TestCaseFilterValue = testCaseFilter;
             }
         }
-
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        protected virtual XmlReader GetReaderForFile(string runSettingsFile)
+        catch (XmlException exception)
         {
-            return XmlReader.Create(new StringReader(File.ReadAllText(runSettingsFile, Encoding.UTF8)), XmlRunSettingsUtilities.ReaderSettings);
+            throw new SettingsException(
+                string.Format(CultureInfo.CurrentCulture, "{0} {1}", ObjectModel.Resources.CommonResources.MalformedRunSettingsFile, exception.Message),
+                exception);
+        }
+    }
+
+    private void ExtractFrameworkAndPlatform()
+    {
+        var framworkStr = _runSettingsManager.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath);
+        Framework framework = Framework.FromString(framworkStr);
+        if (framework != null)
+        {
+            _commandLineOptions.TargetFrameworkVersion = framework;
         }
 
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        private XmlDocument GetRunSettingsDocument(string runSettingsFile)
+        var platformStr = _runSettingsManager.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath);
+        if (Enum.TryParse<Architecture>(platformStr, true, out var architecture))
         {
-            XmlDocument runSettingsDocument;
+            RunSettingsHelper.Instance.IsDefaultTargetArchitecture = false;
+            _commandLineOptions.TargetArchitecture = architecture;
+        }
+    }
 
-            if (!MSTestSettingsUtilities.IsLegacyTestSettingsFile(runSettingsFile))
-            {
-                using (XmlReader reader = this.GetReaderForFile(runSettingsFile))
-                {
-                    var settingsDocument = new XmlDocument();
-                    settingsDocument.Load(reader);
-                    ClientUtilities.FixRelativePathsInRunSettings(settingsDocument, runSettingsFile);
-                    runSettingsDocument = settingsDocument;
-                }
-            }
-            else
-            {
-                runSettingsDocument = XmlRunSettingsUtilities.CreateDefaultRunSettings();
-                runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument);
-            }
+    protected virtual XmlReader GetReaderForFile(string runSettingsFile)
+    {
+        return XmlReader.Create(new StringReader(File.ReadAllText(runSettingsFile, Encoding.UTF8)), XmlRunSettingsUtilities.ReaderSettings);
+    }
 
-            return runSettingsDocument;
+    private XmlDocument GetRunSettingsDocument(string runSettingsFile)
+    {
+        XmlDocument runSettingsDocument;
+
+        if (!MSTestSettingsUtilities.IsLegacyTestSettingsFile(runSettingsFile))
+        {
+            using XmlReader reader = GetReaderForFile(runSettingsFile);
+            var settingsDocument = new XmlDocument();
+            settingsDocument.Load(reader);
+            ClientUtilities.FixRelativePathsInRunSettings(settingsDocument, runSettingsFile);
+            runSettingsDocument = settingsDocument;
+        }
+        else
+        {
+            runSettingsDocument = XmlRunSettingsUtilities.CreateDefaultRunSettings();
+            runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument);
         }
 
-        public ArgumentProcessorResult Execute()
-        {
-            // Nothing to do here, the work was done in initialization.
-            return ArgumentProcessorResult.Success;
-        }
+        return runSettingsDocument;
+    }
+
+    public ArgumentProcessorResult Execute()
+    {
+        // Nothing to do here, the work was done in initialization.
+        return ArgumentProcessorResult.Success;
     }
 }

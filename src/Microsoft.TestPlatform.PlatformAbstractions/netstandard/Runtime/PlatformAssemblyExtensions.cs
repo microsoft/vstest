@@ -3,17 +3,16 @@
 
 #if NETSTANDARD && !NETSTANDARD2_0
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
-{
-    using System;
-    using System.Reflection;
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-    public static class PlatformAssemblyExtensions
+using System;
+using System.Reflection;
+
+public static class PlatformAssemblyExtensions
+{
+    public static string GetAssemblyLocation(this Assembly assembly)
     {
-        public static string GetAssemblyLocation(this Assembly assembly)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }
 

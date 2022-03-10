@@ -1,101 +1,98 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Interfaces;
+using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+
+/// <summary>
+/// Sends test case events to communication layer.
+/// </summary>
+internal class ProxyOutOfProcDataCollectionManager
+{
+    private readonly IDataCollectionTestCaseEventSender _dataCollectionTestCaseEventSender;
+    private readonly ITestEventsPublisher _testEventsPublisher;
+    private readonly Dictionary<Guid, Collection<AttachmentSet>> _attachmentsCache;
 
     /// <summary>
-    /// Sends test case events to communication layer.
+    /// Sync object for ensuring that only run is active at a time
     /// </summary>
-    internal class ProxyOutOfProcDataCollectionManager
+    private readonly object _syncObject = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ProxyOutOfProcDataCollectionManager"/> class.
+    /// </summary>
+    /// <param name="dataCollectionTestCaseEventSender">
+    /// The data collection test case event sender.
+    /// </param>
+    /// <param name="dataCollectionTestCaseEventManager">
+    /// The data collection test case event manager.
+    /// </param>
+    public ProxyOutOfProcDataCollectionManager(IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender, ITestEventsPublisher testEventsPublisher)
     {
-        private IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender;
-        private ITestEventsPublisher testEventsPublisher;
-        private Dictionary<Guid, Collection<AttachmentSet>> attachmentsCache;
+        _attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
+        _testEventsPublisher = testEventsPublisher;
+        _dataCollectionTestCaseEventSender = dataCollectionTestCaseEventSender;
 
-        /// <summary>
-        /// Sync object for ensuring that only run is active at a time
-        /// </summary>
-        private object syncObject = new object();
+        _testEventsPublisher.TestCaseStart += TriggerTestCaseStart;
+        _testEventsPublisher.TestCaseEnd += TriggerTestCaseEnd;
+        _testEventsPublisher.TestResult += TriggerSendTestResult;
+        _testEventsPublisher.SessionEnd += TriggerTestSessionEnd;
+        _attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyOutOfProcDataCollectionManager"/> class.
-        /// </summary>
-        /// <param name="dataCollectionTestCaseEventSender">
-        /// The data collection test case event sender.
-        /// </param>
-        /// <param name="dataCollectionTestCaseEventManager">
-        /// The data collection test case event manager.
-        /// </param>
-        public ProxyOutOfProcDataCollectionManager(IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender, ITestEventsPublisher testEventsPublisher)
+    private void TriggerTestCaseStart(object sender, TestCaseStartEventArgs e)
+    {
+        _dataCollectionTestCaseEventSender.SendTestCaseStart(e);
+    }
+
+    private void TriggerTestCaseEnd(object sender, TestCaseEndEventArgs e)
+    {
+        var attachments = _dataCollectionTestCaseEventSender.SendTestCaseEnd(e);
+
+        if (attachments != null)
         {
-            this.attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
-            this.testEventsPublisher = testEventsPublisher;
-            this.dataCollectionTestCaseEventSender = dataCollectionTestCaseEventSender;
-
-            this.testEventsPublisher.TestCaseStart += this.TriggerTestCaseStart;
-            this.testEventsPublisher.TestCaseEnd += this.TriggerTestCaseEnd;
-            this.testEventsPublisher.TestResult += TriggerSendTestResult;
-            this.testEventsPublisher.SessionEnd += this.TriggerTestSessionEnd;
-            this.attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
-        }
-
-        private void TriggerTestCaseStart(object sender, TestCaseStartEventArgs e)
-        {
-            this.dataCollectionTestCaseEventSender.SendTestCaseStart(e);
-        }
-
-        private void TriggerTestCaseEnd(object sender, TestCaseEndEventArgs e)
-        {
-            var attachments = this.dataCollectionTestCaseEventSender.SendTestCaseEnd(e);
-
-            if (attachments != null)
+            lock (_syncObject)
             {
-                lock (syncObject)
+                if (!_attachmentsCache.TryGetValue(e.TestCaseId, out Collection<AttachmentSet> attachmentSets))
                 {
-                    Collection<AttachmentSet> attachmentSets;
-                    if (!attachmentsCache.TryGetValue(e.TestCaseId, out attachmentSets))
-                    {
-                        attachmentSets = new Collection<AttachmentSet>();
-                        this.attachmentsCache.Add(e.TestCaseId, attachmentSets);
-                    }
+                    attachmentSets = new Collection<AttachmentSet>();
+                    _attachmentsCache.Add(e.TestCaseId, attachmentSets);
+                }
 
-                    foreach (var attachment in attachments)
-                    {
-                        attachmentSets.Add(attachment);
-                    }
+                foreach (var attachment in attachments)
+                {
+                    attachmentSets.Add(attachment);
                 }
             }
         }
+    }
 
-        private void TriggerSendTestResult(object sender, TestResultEventArgs e)
+    private void TriggerSendTestResult(object sender, TestResultEventArgs e)
+    {
+        lock (_syncObject)
         {
-            lock (syncObject)
+            if (_attachmentsCache.TryGetValue(e.TestCaseId, out Collection<AttachmentSet> attachmentSets))
             {
-                Collection<AttachmentSet> attachmentSets;
-                if (this.attachmentsCache.TryGetValue(e.TestCaseId, out attachmentSets))
+                foreach (var attachment in attachmentSets)
                 {
-                    foreach (var attachment in attachmentSets)
-                    {
-                        e.TestResult.Attachments.Add(attachment);
-                    }
+                    e.TestResult.Attachments.Add(attachment);
                 }
-
-                this.attachmentsCache.Remove(e.TestCaseId);
             }
-        }
 
-        private void TriggerTestSessionEnd(object sender, SessionEndEventArgs e)
-        {
-            this.dataCollectionTestCaseEventSender.SendTestSessionEnd(e);
+            _attachmentsCache.Remove(e.TestCaseId);
         }
+    }
+
+    private void TriggerTestSessionEnd(object sender, SessionEndEventArgs e)
+    {
+        _dataCollectionTestCaseEventSender.SendTestSessionEnd(e);
     }
 }

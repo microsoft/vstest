@@ -3,20 +3,20 @@
 
 #if NETSTANDARD && !NETSTANDARD2_0
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
-{
-    using System;
-    using System.IO;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
+using System;
+using System.IO;
+
+using Interfaces;
+
+/// <inheritdoc/>
+public class PlatformStream : IStream
+{
     /// <inheritdoc/>
-    public class PlatformStream : IStream
+    public Stream CreateBufferedStream(Stream stream, int bufferSize)
     {
-        /// <inheritdoc/>
-        public Stream CreateBufferedStream(Stream stream, int bufferSize)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }
 

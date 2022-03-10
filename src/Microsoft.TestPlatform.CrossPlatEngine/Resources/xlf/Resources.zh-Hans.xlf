@@ -157,6 +157,26 @@
         <target state="translated">ID 为 {0} 的代理已可用，无法重新排队。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="translated">对于此运行，未找到适合的测试运行时提供程序。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoProxyMatchesDescription">
+        <source>The runsettings changed between the time when the test session was established and the time of the current run/discovery request.</source>
+        <target state="translated">runsettings 在建立测试会话的时间和当前运行/发现请求的时间之间发生了更改。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="new">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="new">Attachments:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

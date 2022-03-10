@@ -1,46 +1,45 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
+namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
+
+using VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using VisualStudio.TestTools.UnitTesting;
+
+using System.Collections.Generic;
+using System.Linq;
+
+[TestClass]
+public class LiveUnitTestingTests : AcceptanceTestBase
 {
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System.Collections.Generic;
-    using System.Linq;
+    private IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private DiscoveryEventHandler _discoveryEventHandler;
+    private RunEventHandler _runEventHandler;
 
-    [TestClass]
-    public class LiveUnitTestingTests : AcceptanceTestBase
+    public void Setup()
     {
-        private IVsTestConsoleWrapper vstestConsoleWrapper;
-        private DiscoveryEventHandler discoveryEventHandler;
-        private DiscoveryEventHandler2 discoveryEventHandler2;
-        private RunEventHandler runEventHandler;
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _);
+        _discoveryEventHandler = new DiscoveryEventHandler();
+        _runEventHandler = new RunEventHandler();
+    }
 
-        public void Setup()
-        {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
-            this.discoveryEventHandler = new DiscoveryEventHandler();
-            this.discoveryEventHandler2 = new DiscoveryEventHandler2();
-            this.runEventHandler = new RunEventHandler();
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            this.vstestConsoleWrapper?.EndSession();
-        }
+    [TestCleanup]
+    public void Cleanup()
+    {
+        _vstestConsoleWrapper?.EndSession();
+    }
 
 
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void DiscoverTestsUsingLiveUnitTesting(RunnerInfo runnerInfo)
-        {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void DiscoverTestsUsingLiveUnitTesting(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        Setup();
 
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+        string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
                                         <RunConfiguration>
                                         <DisableAppDomain>true</DisableAppDomain>
@@ -48,24 +47,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                         </RunConfiguration>
                                     </RunSettings>";
 
-            this.vstestConsoleWrapper.DiscoverTests(
-               this.GetTestAssemblies(),
-                runSettingsXml,
-                this.discoveryEventHandler);
+        _vstestConsoleWrapper.DiscoverTests(
+            GetTestAssemblies(),
+            runSettingsXml,
+            _discoveryEventHandler);
 
-            // Assert
-            Assert.AreEqual(6, this.discoveryEventHandler.DiscoveredTestCases.Count);
-        }
+        // Assert
+        Assert.AreEqual(6, _discoveryEventHandler.DiscoveredTestCases.Count);
+    }
 
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void RunTestsWithLiveUnitTesting(RunnerInfo runnerInfo)
-        {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void RunTestsWithLiveUnitTesting(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        Setup();
 
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+        string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
                                         <RunConfiguration>
                                         <DisableAppDomain>true</DisableAppDomain>
@@ -73,27 +72,26 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                         </RunConfiguration>
                                     </RunSettings>";
 
-            this.vstestConsoleWrapper.RunTests(
-                this.GetTestAssemblies(),
-                runSettingsXml,
-                this.runEventHandler);
+        _vstestConsoleWrapper.RunTests(
+            GetTestAssemblies(),
+            runSettingsXml,
+            _runEventHandler);
 
-            // Assert
-            Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
-        }
+        // Assert
+        Assert.AreEqual(6, _runEventHandler.TestResults.Count);
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+    }
 
-        private IList<string> GetTestAssemblies()
+    private IList<string> GetTestAssemblies()
+    {
+        var testAssemblies = new List<string>
         {
-            var testAssemblies = new List<string>
-                                     {
-                                         this.GetAssetFullPath("SimpleTestProject.dll"),
-                                         this.GetAssetFullPath("SimpleTestProject2.dll")
-                                     };
+            GetAssetFullPath("SimpleTestProject.dll"),
+            GetAssetFullPath("SimpleTestProject2.dll")
+        };
 
-            return testAssemblies;
-        }
+        return testAssemblies;
     }
 }

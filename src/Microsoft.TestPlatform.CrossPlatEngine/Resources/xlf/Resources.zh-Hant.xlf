@@ -157,6 +157,26 @@
         <target state="translated">識別碼為 {0} 的 Proxy 已可供使用，但無法重新加入佇列。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="translated">找不到適用於此回合的測試執行階段提供者。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoProxyMatchesDescription">
+        <source>The runsettings changed between the time when the test session was established and the time of the current run/discovery request.</source>
+        <target state="translated">Runsettings 在測試工作階段建立時間與目前執行/探索要求的時間之間有所變更。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="new">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="new">Attachments:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

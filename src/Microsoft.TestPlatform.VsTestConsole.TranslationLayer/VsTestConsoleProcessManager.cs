@@ -1,235 +1,255 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
+namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Threading;
+
+using Interfaces;
+
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+using Resources = VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
+
+/// <summary>
+/// Vstest.console process manager
+/// </summary>
+internal class VsTestConsoleProcessManager : IProcessManager
 {
-    using Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.Threading;
-    using Resources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
+    #region Private Members
 
     /// <summary>
-    /// Vstest.console process manager
+    /// Port number for communicating with Vstest CLI
     /// </summary>
-    internal class VsTestConsoleProcessManager : IProcessManager
+    private const string PortArgument = "/port:{0}";
+
+    /// <summary>
+    /// Process Id of the Current Process which is launching Vstest CLI
+    /// Helps Vstest CLI in auto-exit if current process dies without notifying it
+    /// </summary>
+    private const string ParentProcessidArgument = "/parentprocessid:{0}";
+
+    /// <summary>
+    /// Diagnostics argument for Vstest CLI
+    /// Enables Diagnostic logging for Vstest CLI and TestHost - Optional
+    /// </summary>
+    private const string DiagArgument = "/diag:{0};tracelevel={1}";
+
+    /// <summary>
+    /// EndSession timeout
+    /// </summary>
+    private const int Endsessiontimeout = 1000;
+
+    private readonly string _vstestConsolePath;
+    private readonly object _syncObject = new();
+    private bool _vstestConsoleStarted;
+    private bool _vstestConsoleExited;
+    private readonly bool _isNetCoreRunner;
+    private readonly string _dotnetExePath;
+    private Process _process;
+    private readonly ManualResetEvent _processExitedEvent = new(false);
+
+    internal IFileHelper FileHelper { get; set; }
+
+    #endregion
+
+    /// <inheritdoc/>
+    public event EventHandler ProcessExited;
+
+    #region Constructor
+
+    /// <summary>
+    /// Creates an instance of VsTestConsoleProcessManager class.
+    /// </summary>
+    /// <param name="vstestConsolePath">The full path to vstest.console</param>
+    public VsTestConsoleProcessManager(string vstestConsolePath)
     {
-        #region Private Members
-
-        /// <summary>
-        /// Port number for communicating with Vstest CLI
-        /// </summary>
-        private const string PORT_ARGUMENT = "/port:{0}";
-
-        /// <summary>
-        /// Process Id of the Current Process which is launching Vstest CLI
-        /// Helps Vstest CLI in auto-exit if current process dies without notifying it
-        /// </summary>
-        private const string PARENT_PROCESSID_ARGUMENT = "/parentprocessid:{0}";
-
-        /// <summary>
-        /// Diagnostics argument for Vstest CLI
-        /// Enables Diagnostic logging for Vstest CLI and TestHost - Optional
-        /// </summary>
-        private const string DIAG_ARGUMENT = "/diag:{0};tracelevel={1}";
-
-        /// <summary>
-        /// EndSession timeout
-        /// </summary>
-        private const int ENDSESSIONTIMEOUT = 1000;
-
-        private string vstestConsolePath;
-        private object syncObject = new object();
-        private bool vstestConsoleStarted = false;
-        private bool vstestConsoleExited = false;
-        private readonly bool isNetCoreRunner;
-        private string dotnetExePath;
-        private Process process;
-        private ManualResetEvent processExitedEvent = new ManualResetEvent(false);
-
-        internal IFileHelper FileHelper { get; set; }
-
-        #endregion
-
-        /// <inheritdoc/>
-        public event EventHandler ProcessExited;
-
-        #region Constructor
-
-        /// <summary>
-        /// Creates an instance of VsTestConsoleProcessManager class.
-        /// </summary>
-        /// <param name="vstestConsolePath">The full path to vstest.console</param>
-        public VsTestConsoleProcessManager(string vstestConsolePath)
+        FileHelper = new FileHelper();
+        if (!FileHelper.Exists(vstestConsolePath))
         {
-            this.FileHelper = new FileHelper();
-            if (!this.FileHelper.Exists(vstestConsolePath))
-            {
-                EqtTrace.Error("Invalid File Path: {0}", vstestConsolePath);
-                throw new Exception(string.Format(CultureInfo.CurrentCulture, Resources.InvalidFilePath, vstestConsolePath));
-            }
-            this.vstestConsolePath = vstestConsolePath;
-            isNetCoreRunner = vstestConsolePath.EndsWith(".dll");
+            EqtTrace.Error("Invalid File Path: {0}", vstestConsolePath);
+            throw new Exception(string.Format(CultureInfo.CurrentCulture, Resources.InvalidFilePath, vstestConsolePath));
+        }
+        _vstestConsolePath = vstestConsolePath;
+        _isNetCoreRunner = vstestConsolePath.EndsWith(".dll");
+    }
+
+    public VsTestConsoleProcessManager(string vstestConsolePath, string dotnetExePath) : this(vstestConsolePath)
+    {
+        _dotnetExePath = dotnetExePath;
+    }
+
+    #endregion Constructor
+
+    /// <summary>
+    /// Checks if the process has been initialized.
+    /// </summary>
+    /// <returns>True if process is successfully initialized</returns>
+    public bool IsProcessInitialized()
+    {
+        lock (_syncObject)
+        {
+            return _vstestConsoleStarted && !_vstestConsoleExited && _process != null;
+        }
+    }
+
+    /// <summary>
+    /// Call vstest.console with the parameters previously specified
+    /// </summary>
+    public void StartProcess(ConsoleParameters consoleParameters)
+    {
+        var consoleRunnerPath = GetConsoleRunner();
+
+        // The console runner path we retrieve might have been escaped so we need to remove the
+        // extra double quotes before testing whether the file exists.
+        if (!File.Exists(consoleRunnerPath.Trim('"')))
+        {
+            throw new FileNotFoundException(string.Format(Resources.CannotFindConsoleRunner, consoleRunnerPath), consoleRunnerPath);
         }
 
-        public VsTestConsoleProcessManager(string vstestConsolePath, string dotnetExePath) : this(vstestConsolePath)
+        var arguments = string.Join(" ", BuildArguments(consoleParameters));
+        var info = new ProcessStartInfo(consoleRunnerPath, arguments)
         {
-            this.dotnetExePath = dotnetExePath;
-        }
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
+        };
 
-        #endregion Constructor
-
-        /// <summary>
-        /// Checks if the process has been initialized.
-        /// </summary>
-        /// <returns>True if process is successfully initialized</returns>
-        public bool IsProcessInitialized()
-        {
-            lock (syncObject)
-            {
-                return this.vstestConsoleStarted && !vstestConsoleExited &&
-                       this.process != null;
-            }
-        }
-
-        /// <summary>
-        /// Call vstest.console with the parameters previously specified
-        /// </summary>
-        public void StartProcess(ConsoleParameters consoleParameters)
-        {
-            var info = new ProcessStartInfo(GetConsoleRunner(), string.Join(" ", BuildArguments(consoleParameters)))
-            {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-
-            EqtTrace.Verbose("VsTestCommandLineWrapper: Process Start Info {0} {1}", info.FileName, info.Arguments);
+        EqtTrace.Verbose("VsTestCommandLineWrapper: Process Start Info {0} {1}", info.FileName, info.Arguments);
 
 #if NETFRAMEWORK
-            if (consoleParameters.EnvironmentVariables != null)
+        if (consoleParameters.EnvironmentVariables != null)
+        {
+            info.EnvironmentVariables.Clear();
+            foreach (var envVariable in consoleParameters.EnvironmentVariables)
             {
-                info.EnvironmentVariables.Clear();
-                foreach (var envVariable in consoleParameters.EnvironmentVariables)
+                if (envVariable.Key != null)
                 {
-                    if (envVariable.Key != null)
-                    {
-                        info.EnvironmentVariables.Add(envVariable.Key, envVariable.Value?.ToString());
-                    }
+                    info.EnvironmentVariables.Add(envVariable.Key, envVariable.Value?.ToString());
                 }
             }
+        }
 #endif
-            this.process = Process.Start(info);
-
-            lock (syncObject)
-            {
-                vstestConsoleExited = false;
-                vstestConsoleStarted = true;
-            }
-
-            this.process.EnableRaisingEvents = true;
-            this.process.Exited += Process_Exited;
-
-            this.process.OutputDataReceived += Process_OutputDataReceived;
-            this.process.ErrorDataReceived += Process_ErrorDataReceived;
-            this.process.BeginOutputReadLine();
-            this.process.BeginErrorReadLine();
-            processExitedEvent.Reset();
-        }
-
-        /// <summary>
-        /// Shutdown the vstest.console process
-        /// </summary>
-        public void ShutdownProcess()
+        try
         {
-            // Ideally process should die by itself
-            if (!processExitedEvent.WaitOne(ENDSESSIONTIMEOUT) && IsProcessInitialized())
-            {
-                EqtTrace.Info($"VsTestConsoleProcessManager.ShutDownProcess : Terminating vstest.console process after waiting for {ENDSESSIONTIMEOUT} milliseconds.");
-                vstestConsoleExited = true;
-                this.process.OutputDataReceived -= Process_OutputDataReceived;
-                this.process.ErrorDataReceived -= Process_ErrorDataReceived;
-                SafelyTerminateProcess();
-                this.process.Dispose();
-                this.process = null;
-            }
+            _process = Process.Start(info);
         }
-
-        private void SafelyTerminateProcess()
+        catch (Win32Exception ex)
         {
-            try
-            {
-                if (this.process != null && !this.process.HasExited)
-                {
-                    this.process.Kill();
-                }
-            }
-            catch (InvalidOperationException ex)
-            {
-                EqtTrace.Info("VsTestCommandLineWrapper: Error While Terminating Process {0} ", ex.Message);
-            }
+            throw new Exception(string.Format(Resources.ProcessStartWin32Failure, consoleRunnerPath, arguments), ex);
         }
 
-        private void Process_Exited(object sender, EventArgs e)
+        lock (_syncObject)
         {
-            lock (syncObject)
-            {
-                processExitedEvent.Set();
-                vstestConsoleExited = true;
-                this.ProcessExited?.Invoke(sender, e);
-            }
+            _vstestConsoleExited = false;
+            _vstestConsoleStarted = true;
         }
 
-        private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            if (e.Data != null)
-            {
-                EqtTrace.Error(e.Data);
-            }
-        }
+        _process.EnableRaisingEvents = true;
+        _process.Exited += Process_Exited;
 
-        private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            if (e.Data != null)
-            {
-                EqtTrace.Verbose(e.Data);
-            }
-        }
-
-        private string[] BuildArguments(ConsoleParameters parameters)
-        {
-            var args = new List<string>
-            {
-                // Start Vstest.console with args: --parentProcessId|/parentprocessid:<ppid> --port|/port:<port>
-                string.Format(CultureInfo.InvariantCulture, PARENT_PROCESSID_ARGUMENT, parameters.ParentProcessId),
-                string.Format(CultureInfo.InvariantCulture, PORT_ARGUMENT, parameters.PortNumber)
-            };
-
-            if (!string.IsNullOrEmpty(parameters.LogFilePath))
-            {
-                // Extra args: --diag|/diag:<PathToLogFile>;tracelevel=<tracelevel>
-                args.Add(string.Format(CultureInfo.InvariantCulture, DIAG_ARGUMENT, parameters.LogFilePath, parameters.TraceLevel));
-            }
-
-            if (isNetCoreRunner)
-            {
-                args.Insert(0, GetEscapeSequencedPath(vstestConsolePath));
-            }
-
-            return args.ToArray();
-        }
-
-        private string GetConsoleRunner()
-            => isNetCoreRunner ? (string.IsNullOrEmpty(this.dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : this.dotnetExePath) : GetEscapeSequencedPath(this.vstestConsolePath);
-
-        private string GetEscapeSequencedPath(string path)
-            => string.IsNullOrEmpty(path) ? path : $"\"{path.Trim('"')}\"";
+        _process.OutputDataReceived += Process_OutputDataReceived;
+        _process.ErrorDataReceived += Process_ErrorDataReceived;
+        _process.BeginOutputReadLine();
+        _process.BeginErrorReadLine();
+        _processExitedEvent.Reset();
     }
+
+    /// <summary>
+    /// Shutdown the vstest.console process
+    /// </summary>
+    public void ShutdownProcess()
+    {
+        // Ideally process should die by itself
+        if (!_processExitedEvent.WaitOne(Endsessiontimeout) && IsProcessInitialized())
+        {
+            EqtTrace.Info($"VsTestConsoleProcessManager.ShutDownProcess : Terminating vstest.console process after waiting for {Endsessiontimeout} milliseconds.");
+            _vstestConsoleExited = true;
+            _process.OutputDataReceived -= Process_OutputDataReceived;
+            _process.ErrorDataReceived -= Process_ErrorDataReceived;
+            SafelyTerminateProcess();
+            _process.Dispose();
+            _process = null;
+        }
+    }
+
+    private void SafelyTerminateProcess()
+    {
+        try
+        {
+            if (_process != null && !_process.HasExited)
+            {
+                _process.Kill();
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            EqtTrace.Info("VsTestCommandLineWrapper: Error While Terminating Process {0} ", ex.Message);
+        }
+    }
+
+    private void Process_Exited(object sender, EventArgs e)
+    {
+        lock (_syncObject)
+        {
+            _processExitedEvent.Set();
+            _vstestConsoleExited = true;
+            ProcessExited?.Invoke(sender, e);
+        }
+    }
+
+    private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+    {
+        if (e.Data != null)
+        {
+            EqtTrace.Error(e.Data);
+        }
+    }
+
+    private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
+    {
+        if (e.Data != null)
+        {
+            EqtTrace.Verbose(e.Data);
+        }
+    }
+
+    private string[] BuildArguments(ConsoleParameters parameters)
+    {
+        var args = new List<string>
+        {
+            // Start Vstest.console with args: --parentProcessId|/parentprocessid:<ppid> --port|/port:<port>
+            string.Format(CultureInfo.InvariantCulture, ParentProcessidArgument, parameters.ParentProcessId),
+            string.Format(CultureInfo.InvariantCulture, PortArgument, parameters.PortNumber)
+        };
+
+        if (!string.IsNullOrEmpty(parameters.LogFilePath))
+        {
+            // Extra args: --diag|/diag:<PathToLogFile>;tracelevel=<tracelevel>
+            args.Add(string.Format(CultureInfo.InvariantCulture, DiagArgument, parameters.LogFilePath, parameters.TraceLevel));
+        }
+
+        if (_isNetCoreRunner)
+        {
+            args.Insert(0, GetEscapeSequencedPath(_vstestConsolePath));
+        }
+
+        return args.ToArray();
+    }
+
+    private string GetConsoleRunner()
+        => _isNetCoreRunner ? (string.IsNullOrEmpty(_dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : _dotnetExePath) : GetEscapeSequencedPath(_vstestConsolePath);
+
+    private string GetEscapeSequencedPath(string path)
+        => string.IsNullOrEmpty(path) ? path : $"\"{path.Trim('"')}\"";
 }

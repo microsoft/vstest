@@ -1,47 +1,46 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+
+using System;
+
+/// <summary>
+/// Utility methods for manipulating strings.
+/// </summary>
+public static class StringUtilities
 {
-    using System;
+    /// <summary>
+    /// Prepares the string for output by converting null values to the "(null)" string
+    /// and removing any trailing new lines.
+    /// </summary>
+    /// <param name="input">The input string.</param>
+    /// <returns>The string that is prepared for output.</returns>
+    public static string PrepareForOutput(string input)
+    {
+        string result = input;
+        if (input == null)
+        {
+            result = Resources.Resources.NullString;
+        }
+
+        result = result.TrimEnd(Environment.NewLine.ToCharArray());
+
+        return result;
+    }
 
     /// <summary>
-    /// Utility methods for manipulating strings.
+    /// Checks if given string is null or a whitespace.
     /// </summary>
-    public static class StringUtilities
+    /// <param name="input">string to check</param>
+    /// <returns>True if string is null or a whitespace, false otherwise</returns>
+    public static bool IsNullOrWhiteSpace(string input)
     {
-        /// <summary>
-        /// Prepares the string for output by converting null values to the "(null)" string
-        /// and removing any trailing new lines.
-        /// </summary>
-        /// <param name="input">The input string.</param>
-        /// <returns>The string that is prepared for output.</returns>
-        public static string PrepareForOutput(string input)
+        if (input != null)
         {
-            string result = input;
-            if (input == null)
-            {
-                result = Resources.Resources.NullString;
-            }
-
-            result = result.TrimEnd(Environment.NewLine.ToCharArray());
-
-            return result;
+            input = input.Trim();
         }
 
-        /// <summary>
-        /// Checks if given string is null or a whitespace.
-        /// </summary>
-        /// <param name="input">string to check</param>
-        /// <returns>True if string is null or a whitespace, false otherwise</returns>
-        public static bool IsNullOrWhiteSpace(string input)
-        {
-            if (input != null)
-            {
-                input = input.Trim();
-            }
-
-            return string.IsNullOrEmpty(input);
-        }
+        return string.IsNullOrEmpty(input);
     }
 }

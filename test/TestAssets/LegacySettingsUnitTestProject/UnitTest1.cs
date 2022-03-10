@@ -10,7 +10,7 @@ namespace LegacySettingsUnitTestProject
 
     [TestClass]
     public class UnitTest1
-    {        
+    {
         /// <summary>
         /// Test for scripts
         /// </summary>

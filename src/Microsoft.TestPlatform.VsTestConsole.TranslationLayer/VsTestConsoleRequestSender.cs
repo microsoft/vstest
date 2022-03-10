@@ -1,1509 +1,1459 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
+namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+
+using Interfaces;
+
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+using TranslationLayerResources = VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
+
+/// <summary>
+/// Vstest console request sender for sending requests to vstest.console.exe
+/// </summary>
+internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading;
-    using System.Threading.Tasks;
+    /// <summary>
+    /// The minimum protocol version that has test session support.
+    /// </summary>
+    private const int MinimumProtocolVersionWithTestSessionSupport = 5;
 
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    private readonly ICommunicationManager _communicationManager;
 
-    using TranslationLayerResources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
+    private readonly IDataSerializer _dataSerializer;
+    private readonly ITestPlatformEventSource _testPlatformEventSource;
+
+    private readonly ManualResetEvent _handShakeComplete = new(false);
+
+    private bool _handShakeSuccessful;
+
+    private int _protocolVersion = 5;
 
     /// <summary>
-    /// Vstest console request sender for sending requests to vstest.console.exe
+    /// Used to cancel blocking tasks associated with the vstest.console process.
     /// </summary>
-    internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
+    private CancellationTokenSource _processExitCancellationTokenSource;
+
+    #region Constructor
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="VsTestConsoleRequestSender"/> class.
+    /// </summary>
+    public VsTestConsoleRequestSender()
+        : this(
+            new SocketCommunicationManager(),
+            JsonDataSerializer.Instance,
+            TestPlatformEventSource.Instance)
     {
-        /// <summary>
-        /// The minimum protocol version that has test session support.
-        /// </summary>
-        private const int MinimumProtocolVersionWithTestSessionSupport = 5;
+    }
 
-        private readonly ICommunicationManager communicationManager;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="VsTestConsoleRequestSender"/> class.
+    /// </summary>
+    /// 
+    /// <param name="communicationManager">The communication manager.</param>
+    /// <param name="dataSerializer">The data serializer.</param>
+    /// <param name="testPlatformEventSource">The test platform event source.</param>
+    internal VsTestConsoleRequestSender(
+        ICommunicationManager communicationManager,
+        IDataSerializer dataSerializer,
+        ITestPlatformEventSource testPlatformEventSource)
+    {
+        _communicationManager = communicationManager;
+        _dataSerializer = dataSerializer;
+        _testPlatformEventSource = testPlatformEventSource;
+    }
 
-        private readonly IDataSerializer dataSerializer;
-        private readonly ITestPlatformEventSource testPlatformEventSource;
+    #endregion
 
-        private readonly ManualResetEvent handShakeComplete = new ManualResetEvent(false);
+    #region ITranslationLayerRequestSender
 
-        private bool handShakeSuccessful = false;
+    /// <inheritdoc/>
+    public int InitializeCommunication()
+    {
+        EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Started.");
 
-        private int protocolVersion = 5;
-
-        /// <summary>
-        /// Used to cancel blocking tasks associated with the vstest.console process.
-        /// </summary>
-        private CancellationTokenSource processExitCancellationTokenSource;
-
-        #region Constructor
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="VsTestConsoleRequestSender"/> class.
-        /// </summary>
-        public VsTestConsoleRequestSender()
-            : this(
-                  new SocketCommunicationManager(),
-                  JsonDataSerializer.Instance,
-                  TestPlatformEventSource.Instance)
+        _processExitCancellationTokenSource = new CancellationTokenSource();
+        _handShakeSuccessful = false;
+        _handShakeComplete.Reset();
+        int port = -1;
+        try
         {
+            port = _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
+            _communicationManager.AcceptClientAsync();
+
+            Task.Run(() =>
+            {
+                _communicationManager.WaitForClientConnection(Timeout.Infinite);
+                _handShakeSuccessful = HandShakeWithVsTestConsole();
+                _handShakeComplete.Set();
+            });
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Error(
+                "VsTestConsoleRequestSender.InitializeCommunication: Error initializing communication with VstestConsole: {0}",
+                ex);
+            _handShakeComplete.Set();
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="VsTestConsoleRequestSender"/> class.
-        /// </summary>
-        /// 
-        /// <param name="communicationManager">The communication manager.</param>
-        /// <param name="dataSerializer">The data serializer.</param>
-        /// <param name="testPlatformEventSource">The test platform event source.</param>
-        internal VsTestConsoleRequestSender(
-            ICommunicationManager communicationManager,
-            IDataSerializer dataSerializer,
-            ITestPlatformEventSource testPlatformEventSource)
+        EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Ended.");
+
+        return port;
+    }
+
+    /// <inheritdoc/>
+    public bool WaitForRequestHandlerConnection(int clientConnectionTimeout)
+    {
+        var waitSucess = _handShakeComplete.WaitOne(clientConnectionTimeout);
+        return waitSucess && _handShakeSuccessful;
+    }
+
+    /// <inheritdoc/>
+    public async Task<int> InitializeCommunicationAsync(int clientConnectionTimeout)
+    {
+        EqtTrace.Info($"VsTestConsoleRequestSender.InitializeCommunicationAsync: Started with client connection timeout {clientConnectionTimeout} milliseconds.");
+
+        _processExitCancellationTokenSource = new CancellationTokenSource();
+        _handShakeSuccessful = false;
+        _handShakeComplete.Reset();
+        int port = -1;
+        try
         {
-            this.communicationManager = communicationManager;
-            this.dataSerializer = dataSerializer;
-            this.testPlatformEventSource = testPlatformEventSource;
+            port = _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
+            var timeoutSource = new CancellationTokenSource(clientConnectionTimeout);
+            await Task.Run(() =>
+                _communicationManager.AcceptClientAsync(), timeoutSource.Token).ConfigureAwait(false);
+
+            _handShakeSuccessful = await HandShakeWithVsTestConsoleAsync().ConfigureAwait(false);
+            _handShakeComplete.Set();
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Error(
+                "VsTestConsoleRequestSender.InitializeCommunicationAsync: Error initializing communication with VstestConsole: {0}",
+                ex);
+            _handShakeComplete.Set();
         }
 
-        #endregion
+        EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunicationAsync: Ended.");
 
-        #region ITranslationLayerRequestSender
+        return _handShakeSuccessful ? port : -1;
+    }
 
-        /// <inheritdoc/>
-        public int InitializeCommunication()
+    /// <inheritdoc/>
+    public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
+    {
+        EqtTrace.Info($"VsTestConsoleRequestSender.InitializeExtensions: Initializing extensions with additional extensions path {string.Join(",", pathToAdditionalExtensions.ToList())}.");
+
+        _communicationManager.SendMessage(
+            MessageType.ExtensionsInitialize,
+            pathToAdditionalExtensions,
+            _protocolVersion);
+    }
+
+    /// <inheritdoc/>
+    public void DiscoverTests(
+        IEnumerable<string> sources,
+        string runSettings,
+        TestPlatformOptions options,
+        TestSessionInfo testSessionInfo,
+        ITestDiscoveryEventsHandler2 eventHandler)
+    {
+        EqtTrace.Info("VsTestConsoleRequestSender.DiscoverTests: Starting test discovery.");
+
+        SendMessageAndListenAndReportTestCases(
+            sources,
+            runSettings,
+            options,
+            testSessionInfo,
+            eventHandler);
+    }
+
+    /// <inheritdoc/>
+    public async Task DiscoverTestsAsync(
+        IEnumerable<string> sources,
+        string runSettings,
+        TestPlatformOptions options,
+        TestSessionInfo testSessionInfo,
+        ITestDiscoveryEventsHandler2 eventHandler)
+    {
+        EqtTrace.Info("VsTestConsoleRequestSender.DiscoverTestsAsync: Starting test discovery.");
+
+        await SendMessageAndListenAndReportTestCasesAsync(
+            sources,
+            runSettings,
+            options,
+            testSessionInfo,
+            eventHandler).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public void StartTestRun(
+        IEnumerable<string> sources,
+        string runSettings,
+        TestPlatformOptions options,
+        TestSessionInfo testSessionInfo,
+        ITestRunEventsHandler runEventsHandler)
+    {
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
+
+        SendMessageAndListenAndReportTestResults(
+            MessageType.TestRunAllSourcesWithDefaultHost,
+            new TestRunRequestPayload()
+            {
+                Sources = sources.ToList(),
+                RunSettings = runSettings,
+                TestPlatformOptions = options,
+                TestSessionInfo = testSessionInfo
+            },
+            runEventsHandler,
+            null);
+    }
+
+    /// <inheritdoc/>
+    public async Task StartTestRunAsync(
+        IEnumerable<string> sources,
+        string runSettings,
+        TestPlatformOptions options,
+        TestSessionInfo testSessionInfo,
+        ITestRunEventsHandler runEventsHandler)
+    {
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
+
+        await SendMessageAndListenAndReportTestResultsAsync(
+            MessageType.TestRunAllSourcesWithDefaultHost,
+            new TestRunRequestPayload()
+            {
+                Sources = sources.ToList(),
+                RunSettings = runSettings,
+                TestPlatformOptions = options,
+                TestSessionInfo = testSessionInfo
+            },
+            runEventsHandler,
+            null).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public void StartTestRun(
+        IEnumerable<TestCase> testCases,
+        string runSettings,
+        TestPlatformOptions options,
+        TestSessionInfo testSessionInfo,
+        ITestRunEventsHandler runEventsHandler)
+    {
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
+
+        SendMessageAndListenAndReportTestResults(
+            MessageType.TestRunAllSourcesWithDefaultHost,
+            new TestRunRequestPayload()
+            {
+                TestCases = testCases.ToList(),
+                RunSettings = runSettings,
+                TestPlatformOptions = options,
+                TestSessionInfo = testSessionInfo
+            },
+            runEventsHandler,
+            null);
+    }
+
+    /// <inheritdoc/>
+    public async Task StartTestRunAsync(
+        IEnumerable<TestCase> testCases,
+        string runSettings,
+        TestPlatformOptions options,
+        TestSessionInfo testSessionInfo,
+        ITestRunEventsHandler runEventsHandler)
+    {
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
+
+        await SendMessageAndListenAndReportTestResultsAsync(
+            MessageType.TestRunAllSourcesWithDefaultHost,
+            new TestRunRequestPayload()
+            {
+                TestCases = testCases.ToList(),
+                RunSettings = runSettings,
+                TestPlatformOptions = options,
+                TestSessionInfo = testSessionInfo
+            },
+            runEventsHandler,
+            null).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public void StartTestRunWithCustomHost(
+        IEnumerable<string> sources,
+        string runSettings,
+        TestPlatformOptions options,
+        TestSessionInfo testSessionInfo,
+        ITestRunEventsHandler runEventsHandler,
+        ITestHostLauncher customHostLauncher)
+    {
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHost: Starting test run.");
+
+        SendMessageAndListenAndReportTestResults(
+            MessageType.GetTestRunnerProcessStartInfoForRunAll,
+            new TestRunRequestPayload()
+            {
+                Sources = sources.ToList(),
+                RunSettings = runSettings,
+                DebuggingEnabled = customHostLauncher.IsDebug,
+                TestPlatformOptions = options,
+                TestSessionInfo = testSessionInfo
+            },
+            runEventsHandler,
+            customHostLauncher);
+    }
+
+    /// <inheritdoc/>
+    public async Task StartTestRunWithCustomHostAsync(
+        IEnumerable<string> sources,
+        string runSettings,
+        TestPlatformOptions options,
+        TestSessionInfo testSessionInfo,
+        ITestRunEventsHandler runEventsHandler,
+        ITestHostLauncher customHostLauncher)
+    {
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHostAsync: Starting test run.");
+
+        await SendMessageAndListenAndReportTestResultsAsync(
+            MessageType.GetTestRunnerProcessStartInfoForRunAll,
+            new TestRunRequestPayload()
+            {
+                Sources = sources.ToList(),
+                RunSettings = runSettings,
+                DebuggingEnabled = customHostLauncher.IsDebug,
+                TestPlatformOptions = options,
+                TestSessionInfo = testSessionInfo
+            },
+            runEventsHandler,
+            customHostLauncher).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public void StartTestRunWithCustomHost(
+        IEnumerable<TestCase> testCases,
+        string runSettings,
+        TestPlatformOptions options,
+        TestSessionInfo testSessionInfo,
+        ITestRunEventsHandler runEventsHandler,
+        ITestHostLauncher customHostLauncher)
+    {
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHost: Starting test run.");
+
+        SendMessageAndListenAndReportTestResults(
+            MessageType.GetTestRunnerProcessStartInfoForRunSelected,
+            new TestRunRequestPayload
+            {
+                TestCases = testCases.ToList(),
+                RunSettings = runSettings,
+                DebuggingEnabled = customHostLauncher.IsDebug,
+                TestPlatformOptions = options,
+                TestSessionInfo = testSessionInfo
+            },
+            runEventsHandler,
+            customHostLauncher);
+    }
+
+    /// <inheritdoc/>
+    public async Task StartTestRunWithCustomHostAsync(
+        IEnumerable<TestCase> testCases,
+        string runSettings,
+        TestPlatformOptions options,
+        TestSessionInfo testSessionInfo,
+        ITestRunEventsHandler runEventsHandler,
+        ITestHostLauncher customHostLauncher)
+    {
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHostAsync: Starting test run.");
+
+        await SendMessageAndListenAndReportTestResultsAsync(
+            MessageType.GetTestRunnerProcessStartInfoForRunSelected,
+            new TestRunRequestPayload()
+            {
+                TestCases = testCases.ToList(),
+                RunSettings = runSettings,
+                DebuggingEnabled = customHostLauncher.IsDebug,
+                TestPlatformOptions = options,
+                TestSessionInfo = testSessionInfo
+            },
+            runEventsHandler,
+            customHostLauncher).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public TestSessionInfo StartTestSession(
+        IList<string> sources,
+        string runSettings,
+        TestPlatformOptions options,
+        ITestSessionEventsHandler eventsHandler,
+        ITestHostLauncher testHostLauncher)
+    {
+        // Make sure vstest.console knows how to handle start/stop test session messages.
+        // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
+        // that will never come.
+        if (_protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
         {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Started.");
-            }
-
-            this.processExitCancellationTokenSource = new CancellationTokenSource();
-            this.handShakeSuccessful = false;
-            this.handShakeComplete.Reset();
-            int port = -1;
-            try
-            {
-                port = this.communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
-                this.communicationManager.AcceptClientAsync();
-
-                Task.Run(() =>
-                {
-                    this.communicationManager.WaitForClientConnection(Timeout.Infinite);
-                    this.handShakeSuccessful = this.HandShakeWithVsTestConsole();
-                    this.handShakeComplete.Set();
-                });
-            }
-            catch (Exception ex)
-            {
-                EqtTrace.Error(
-                    "VsTestConsoleRequestSender.InitializeCommunication: Error initializing communication with VstestConsole: {0}",
-                    ex);
-                this.handShakeComplete.Set();
-            }
-
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Ended.");
-            }
-
-            return port;
-        }
-
-        /// <inheritdoc/>
-        public bool WaitForRequestHandlerConnection(int clientConnectionTimeout)
-        {
-            var waitSucess = this.handShakeComplete.WaitOne(clientConnectionTimeout);
-            return waitSucess && this.handShakeSuccessful;
-        }
-
-        /// <inheritdoc/>
-        public async Task<int> InitializeCommunicationAsync(int clientConnectionTimeout)
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info($"VsTestConsoleRequestSender.InitializeCommunicationAsync: Started with client connection timeout {clientConnectionTimeout} milliseconds.");
-            }
-
-            this.processExitCancellationTokenSource = new CancellationTokenSource();
-            this.handShakeSuccessful = false;
-            this.handShakeComplete.Reset();
-            int port = -1;
-            try
-            {
-                port = this.communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
-                var timeoutSource = new CancellationTokenSource(clientConnectionTimeout);
-                await Task.Run(() =>
-                    this.communicationManager.AcceptClientAsync(), timeoutSource.Token);
-
-                this.handShakeSuccessful = await this.HandShakeWithVsTestConsoleAsync();
-                this.handShakeComplete.Set();
-            }
-            catch (Exception ex)
-            {
-                EqtTrace.Error(
-                    "VsTestConsoleRequestSender.InitializeCommunicationAsync: Error initializing communication with VstestConsole: {0}",
-                    ex);
-                this.handShakeComplete.Set();
-            }
-
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunicationAsync: Ended.");
-            }
-
-            return this.handShakeSuccessful ? port : -1;
-        }
-
-        /// <inheritdoc/>
-        public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info($"VsTestConsoleRequestSender.InitializeExtensions: Initializing extensions with additional extensions path {string.Join(",", pathToAdditionalExtensions.ToList())}.");
-            }
-
-            this.communicationManager.SendMessage(
-                MessageType.ExtensionsInitialize,
-                pathToAdditionalExtensions,
-                this.protocolVersion);
-        }
-
-        /// <inheritdoc/>
-        public void DiscoverTests(
-            IEnumerable<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            ITestDiscoveryEventsHandler2 eventHandler)
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.DiscoverTests: Starting test discovery.");
-            }
-
-            this.SendMessageAndListenAndReportTestCases(
-                sources,
-                runSettings,
-                options,
-                eventHandler);
-        }
-
-        /// <inheritdoc/>
-        public async Task DiscoverTestsAsync(
-            IEnumerable<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            ITestDiscoveryEventsHandler2 eventHandler)
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.DiscoverTestsAsync: Starting test discovery.");
-            }
-
-            await this.SendMessageAndListenAndReportTestCasesAsync(
-                sources,
-                runSettings,
-                options,
-                eventHandler);
-        }
-
-        /// <inheritdoc/>
-        public void StartTestRun(
-            IEnumerable<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            TestSessionInfo testSessionInfo,
-            ITestRunEventsHandler runEventsHandler)
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
-            }
-
-            this.SendMessageAndListenAndReportTestResults(
-                MessageType.TestRunAllSourcesWithDefaultHost,
-                new TestRunRequestPayload()
-                {
-                    Sources = sources.ToList(),
-                    RunSettings = runSettings,
-                    TestPlatformOptions = options,
-                    TestSessionInfo = testSessionInfo
-                },
-                runEventsHandler,
-                null);
-        }
-
-        /// <inheritdoc/>
-        public async Task StartTestRunAsync(
-            IEnumerable<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            TestSessionInfo testSessionInfo,
-            ITestRunEventsHandler runEventsHandler)
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
-            }
-
-            await this.SendMessageAndListenAndReportTestResultsAsync(
-                MessageType.TestRunAllSourcesWithDefaultHost,
-                new TestRunRequestPayload()
-                {
-                    Sources = sources.ToList(),
-                    RunSettings = runSettings,
-                    TestPlatformOptions = options,
-                    TestSessionInfo = testSessionInfo
-                },
-                runEventsHandler,
-                null);
-        }
-
-        /// <inheritdoc/>
-        public void StartTestRun(
-            IEnumerable<TestCase> testCases,
-            string runSettings,
-            TestPlatformOptions options,
-            TestSessionInfo testSessionInfo,
-            ITestRunEventsHandler runEventsHandler)
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
-            }
-
-            this.SendMessageAndListenAndReportTestResults(
-                MessageType.TestRunAllSourcesWithDefaultHost,
-                new TestRunRequestPayload()
-                {
-                    TestCases = testCases.ToList(),
-                    RunSettings = runSettings,
-                    TestPlatformOptions = options,
-                    TestSessionInfo = testSessionInfo
-                },
-                runEventsHandler,
-                null);
-        }
-
-        /// <inheritdoc/>
-        public async Task StartTestRunAsync(
-            IEnumerable<TestCase> testCases,
-            string runSettings,
-            TestPlatformOptions options,
-            TestSessionInfo testSessionInfo,
-            ITestRunEventsHandler runEventsHandler)
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
-            }
-
-            await this.SendMessageAndListenAndReportTestResultsAsync(
-                MessageType.TestRunAllSourcesWithDefaultHost,
-                new TestRunRequestPayload()
-                {
-                    TestCases = testCases.ToList(),
-                    RunSettings = runSettings,
-                    TestPlatformOptions = options,
-                    TestSessionInfo = testSessionInfo
-                },
-                runEventsHandler,
-                null);
-        }
-
-        /// <inheritdoc/>
-        public void StartTestRunWithCustomHost(
-            IEnumerable<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            TestSessionInfo testSessionInfo,
-            ITestRunEventsHandler runEventsHandler,
-            ITestHostLauncher customHostLauncher)
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHost: Starting test run.");
-            }
-
-            this.SendMessageAndListenAndReportTestResults(
-                MessageType.GetTestRunnerProcessStartInfoForRunAll,
-                new TestRunRequestPayload()
-                {
-                    Sources = sources.ToList(),
-                    RunSettings = runSettings,
-                    DebuggingEnabled = customHostLauncher.IsDebug,
-                    TestPlatformOptions = options,
-                    TestSessionInfo = testSessionInfo
-                },
-                runEventsHandler,
-                customHostLauncher);
-        }
-
-        /// <inheritdoc/>
-        public async Task StartTestRunWithCustomHostAsync(
-            IEnumerable<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            TestSessionInfo testSessionInfo,
-            ITestRunEventsHandler runEventsHandler,
-            ITestHostLauncher customHostLauncher)
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHostAsync: Starting test run.");
-            }
-
-            await this.SendMessageAndListenAndReportTestResultsAsync(
-                MessageType.GetTestRunnerProcessStartInfoForRunAll,
-                new TestRunRequestPayload()
-                {
-                    Sources = sources.ToList(),
-                    RunSettings = runSettings,
-                    DebuggingEnabled = customHostLauncher.IsDebug,
-                    TestPlatformOptions = options,
-                    TestSessionInfo = testSessionInfo
-                },
-                runEventsHandler,
-                customHostLauncher);
-        }
-
-        /// <inheritdoc/>
-        public void StartTestRunWithCustomHost(
-            IEnumerable<TestCase> testCases,
-            string runSettings,
-            TestPlatformOptions options,
-            TestSessionInfo testSessionInfo,
-            ITestRunEventsHandler runEventsHandler,
-            ITestHostLauncher customHostLauncher)
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHost: Starting test run.");
-            }
-
-            this.SendMessageAndListenAndReportTestResults(
-                MessageType.GetTestRunnerProcessStartInfoForRunSelected,
-                new TestRunRequestPayload
-                {
-                    TestCases = testCases.ToList(),
-                    RunSettings = runSettings,
-                    DebuggingEnabled = customHostLauncher.IsDebug,
-                    TestPlatformOptions = options,
-                    TestSessionInfo = testSessionInfo
-                },
-                runEventsHandler,
-                customHostLauncher);
-        }
-
-        /// <inheritdoc/>
-        public async Task StartTestRunWithCustomHostAsync(
-            IEnumerable<TestCase> testCases,
-            string runSettings,
-            TestPlatformOptions options,
-            TestSessionInfo testSessionInfo,
-            ITestRunEventsHandler runEventsHandler,
-            ITestHostLauncher customHostLauncher)
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHostAsync: Starting test run.");
-            }
-
-            await this.SendMessageAndListenAndReportTestResultsAsync(
-                MessageType.GetTestRunnerProcessStartInfoForRunSelected,
-                new TestRunRequestPayload()
-                {
-                    TestCases = testCases.ToList(),
-                    RunSettings = runSettings,
-                    DebuggingEnabled = customHostLauncher.IsDebug,
-                    TestPlatformOptions = options,
-                    TestSessionInfo = testSessionInfo
-                },
-                runEventsHandler,
-                customHostLauncher);
-        }
-
-        /// <inheritdoc/>
-        public TestSessionInfo StartTestSession(
-            IList<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            ITestSessionEventsHandler eventsHandler,
-            ITestHostLauncher testHostLauncher)
-        {
-            // Make sure vstest.console knows how to handle start/stop test session messages.
-            // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
-            // that will never come.
-            if (this.protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
-            {
-                eventsHandler?.HandleStartTestSessionComplete(null);
-                return null;
-            }
-
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.StartTestSession: Starting test session.");
-            }
-
-            try
-            {
-                var payload = new StartTestSessionPayload
-                {
-                    // TODO (copoiena): When sharing the test host between test discovery and test
-                    // execution, should we use the test host launcher to launch it ? What side
-                    // effects does this have ?
-                    //
-                    // This is useful for profiling and maybe for launching hosts other than the
-                    // ones managed by us (i.e., the default host and the dotnet host), examples
-                    // including UWP and other hosts that don't implement the ITestRuntimeProvider2
-                    // interface and/or are not aware of the possibility of attaching to an already
-                    // running process.
-                    Sources = sources,
-                    RunSettings = runSettings,
-                    HasCustomHostLauncher = testHostLauncher != null,
-                    IsDebuggingEnabled = (testHostLauncher != null)
-                    && testHostLauncher.IsDebug,
-                    TestPlatformOptions = options
-                };
-
-                this.communicationManager.SendMessage(
-                    MessageType.StartTestSession,
-                    payload,
-                    this.protocolVersion);
-
-                while (true)
-                {
-                    var message = this.TryReceiveMessage();
-
-                    switch (message.MessageType)
-                    {
-                        case MessageType.StartTestSessionCallback:
-                            var ackPayload = this.dataSerializer
-                                .DeserializePayload<StartTestSessionAckPayload>(message);
-                            eventsHandler?.HandleStartTestSessionComplete(
-                                ackPayload.TestSessionInfo);
-                            return ackPayload.TestSessionInfo;
-
-                        case MessageType.CustomTestHostLaunch:
-                            this.HandleCustomHostLaunch(testHostLauncher, message);
-                            break;
-
-                        case MessageType.EditorAttachDebugger:
-                            this.AttachDebuggerToProcess(testHostLauncher, message);
-                            break;
-
-                        case MessageType.TestMessage:
-                            var testMessagePayload = this.dataSerializer
-                                .DeserializePayload<TestMessagePayload>(message);
-                            eventsHandler?.HandleLogMessage(
-                                testMessagePayload.MessageLevel,
-                                testMessagePayload.Message);
-                            break;
-
-                        default:
-                            EqtTrace.Warning(
-                                "VsTestConsoleRequestSender.StartTestSession: Unexpected message received: {0}",
-                                message.MessageType);
-                            break;
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                EqtTrace.Error(
-                    "Aborting StartTestSession operation due to error: {0}",
-                    exception);
-                eventsHandler?.HandleLogMessage(
-                    TestMessageLevel.Error,
-                    TranslationLayerResources.AbortedStartTestSession);
-
-                eventsHandler?.HandleStartTestSessionComplete(null);
-            }
-
-            this.testPlatformEventSource.TranslationLayerStartTestSessionStop();
+            eventsHandler?.HandleStartTestSessionComplete(new());
             return null;
         }
 
-        /// <inheritdoc/>
-        public async Task<TestSessionInfo> StartTestSessionAsync(
-            IList<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            ITestSessionEventsHandler eventsHandler,
-            ITestHostLauncher testHostLauncher)
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestSession: Starting test session.");
+
+        try
         {
-            // Make sure vstest.console knows how to handle start/stop test session messages.
-            // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
-            // that will never come.
-            if (this.protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
+            var payload = new StartTestSessionPayload
             {
-                eventsHandler?.HandleStartTestSessionComplete(null);
-                return await Task.FromResult((TestSessionInfo)null);
-            }
+                // TODO (copoiena): When sharing the test host between test discovery and test
+                // execution, should we use the test host launcher to launch it ? What side
+                // effects does this have ?
+                //
+                // This is useful for profiling and maybe for launching hosts other than the
+                // ones managed by us (i.e., the default host and the dotnet host), examples
+                // including UWP and other hosts that don't implement the ITestRuntimeProvider2
+                // interface and/or are not aware of the possibility of attaching to an already
+                // running process.
+                Sources = sources,
+                RunSettings = runSettings,
+                HasCustomHostLauncher = testHostLauncher != null,
+                IsDebuggingEnabled = (testHostLauncher != null)
+                                     && testHostLauncher.IsDebug,
+                TestPlatformOptions = options
+            };
 
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.StartTestSession: Starting test session.");
-            }
+            _communicationManager.SendMessage(
+                MessageType.StartTestSession,
+                payload,
+                _protocolVersion);
 
-            try
+            while (true)
             {
-                var payload = new StartTestSessionPayload
+                var message = TryReceiveMessage();
+
+                switch (message.MessageType)
                 {
-                    // TODO (copoiena): When sharing the test host between test discovery and test
-                    // execution, should we use the test host launcher to launch it ? What side
-                    // effects does this have ?
-                    //
-                    // This is useful for profiling and maybe for launching hosts other than the
-                    // ones managed by us (i.e., the default host and the dotnet host), examples
-                    // including UWP and other hosts that don't implement the ITestRuntimeProvider2
-                    // interface and/or are not aware of the possibility of attaching to an already
-                    // running process.
-                    Sources = sources,
-                    RunSettings = runSettings,
-                    HasCustomHostLauncher = testHostLauncher != null,
-                    IsDebuggingEnabled = (testHostLauncher != null) && testHostLauncher.IsDebug,
-                    TestPlatformOptions = options
-                };
+                    case MessageType.StartTestSessionCallback:
+                        var ackPayload = _dataSerializer
+                            .DeserializePayload<StartTestSessionAckPayload>(message);
+                        eventsHandler?.HandleStartTestSessionComplete(
+                            ackPayload.EventArgs);
+                        return ackPayload.EventArgs.TestSessionInfo;
 
-                this.communicationManager.SendMessage(
-                    MessageType.StartTestSession,
-                    payload,
-                    this.protocolVersion);
+                    case MessageType.CustomTestHostLaunch:
+                        HandleCustomHostLaunch(testHostLauncher, message);
+                        break;
 
-                while (true)
-                {
-                    var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
+                    case MessageType.EditorAttachDebugger:
+                        AttachDebuggerToProcess(testHostLauncher, message);
+                        break;
 
-                    switch (message.MessageType)
-                    {
-                        case MessageType.StartTestSessionCallback:
-                            var ackPayload = this.dataSerializer
-                                .DeserializePayload<StartTestSessionAckPayload>(message);
-                            eventsHandler?.HandleStartTestSessionComplete(
-                                ackPayload.TestSessionInfo);
-                            return ackPayload.TestSessionInfo;
+                    case MessageType.TestMessage:
+                        var testMessagePayload = _dataSerializer
+                            .DeserializePayload<TestMessagePayload>(message);
+                        eventsHandler?.HandleLogMessage(
+                            testMessagePayload.MessageLevel,
+                            testMessagePayload.Message);
+                        break;
 
-                        case MessageType.CustomTestHostLaunch:
-                            this.HandleCustomHostLaunch(testHostLauncher, message);
-                            break;
-
-                        case MessageType.EditorAttachDebugger:
-                            this.AttachDebuggerToProcess(testHostLauncher, message);
-                            break;
-
-                        case MessageType.TestMessage:
-                            var testMessagePayload = this.dataSerializer
-                                .DeserializePayload<TestMessagePayload>(message);
-                            eventsHandler?.HandleLogMessage(
-                                testMessagePayload.MessageLevel,
-                                testMessagePayload.Message);
-                            break;
-
-                        default:
-                            EqtTrace.Warning(
-                                "VsTestConsoleRequestSender.StartTestSession: Unexpected message received: {0}",
-                                message.MessageType);
-                            break;
-                    }
+                    default:
+                        EqtTrace.Warning(
+                            "VsTestConsoleRequestSender.StartTestSession: Unexpected message received: {0}",
+                            message.MessageType);
+                        break;
                 }
             }
-            catch (Exception exception)
-            {
-                EqtTrace.Error("Aborting StartTestSession operation due to error: {0}", exception);
-                eventsHandler?.HandleLogMessage(
-                    TestMessageLevel.Error,
-                    TranslationLayerResources.AbortedStartTestSession);
+        }
+        catch (Exception exception)
+        {
+            EqtTrace.Error(
+                "Aborting StartTestSession operation due to error: {0}",
+                exception);
+            eventsHandler?.HandleLogMessage(
+                TestMessageLevel.Error,
+                TranslationLayerResources.AbortedStartTestSession);
 
-                eventsHandler?.HandleStartTestSessionComplete(null);
-            }
-
-            this.testPlatformEventSource.TranslationLayerStartTestSessionStop();
-            return null;
+            eventsHandler?.HandleStartTestSessionComplete(new());
+        }
+        finally
+        {
+            _testPlatformEventSource.TranslationLayerStartTestSessionStop();
         }
 
-        /// <inheritdoc/>
-        public bool StopTestSession(
-            TestSessionInfo testSessionInfo,
-            ITestSessionEventsHandler eventsHandler)
+        return null;
+    }
+
+    /// <inheritdoc/>
+    public async Task<TestSessionInfo> StartTestSessionAsync(
+        IList<string> sources,
+        string runSettings,
+        TestPlatformOptions options,
+        ITestSessionEventsHandler eventsHandler,
+        ITestHostLauncher testHostLauncher)
+    {
+        // Make sure vstest.console knows how to handle start/stop test session messages.
+        // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
+        // that will never come.
+        if (_protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
         {
-            // Make sure vstest.console knows how to handle start/stop test session messages.
-            // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
-            // that will never come.
-            if (this.protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
-            {
-                eventsHandler?.HandleStopTestSessionComplete(testSessionInfo, false);
-                return false;
-            }
+            eventsHandler?.HandleStartTestSessionComplete(new());
+            return await Task.FromResult((TestSessionInfo)null);
+        }
 
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.StopTestSession: Stop test session.");
-            }
+        EqtTrace.Info("VsTestConsoleRequestSender.StartTestSession: Starting test session.");
 
-            // Due to various considertaions it is possible to end up with a null test session
-            // after doing the start test session call. However, we should filter out requests
-            // to stop such a session as soon as possible, at the request sender level.
-            //
-            // We do this here instead of on the wrapper level in order to benefit of the
-            // testplatform events being fired still.
-            if (testSessionInfo == null)
+        try
+        {
+            var payload = new StartTestSessionPayload
             {
-                this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
-                return true;
-            }
+                // TODO (copoiena): When sharing the test host between test discovery and test
+                // execution, should we use the test host launcher to launch it ? What side
+                // effects does this have ?
+                //
+                // This is useful for profiling and maybe for launching hosts other than the
+                // ones managed by us (i.e., the default host and the dotnet host), examples
+                // including UWP and other hosts that don't implement the ITestRuntimeProvider2
+                // interface and/or are not aware of the possibility of attaching to an already
+                // running process.
+                Sources = sources,
+                RunSettings = runSettings,
+                HasCustomHostLauncher = testHostLauncher != null,
+                IsDebuggingEnabled = (testHostLauncher != null) && testHostLauncher.IsDebug,
+                TestPlatformOptions = options
+            };
 
-            try
+            _communicationManager.SendMessage(
+                MessageType.StartTestSession,
+                payload,
+                _protocolVersion);
+
+            while (true)
             {
-                this.communicationManager.SendMessage(
-                    MessageType.StopTestSession,
-                    testSessionInfo,
-                    this.protocolVersion);
+                var message = await TryReceiveMessageAsync().ConfigureAwait(false);
 
-                while (true)
+                switch (message.MessageType)
                 {
-                    var message = this.TryReceiveMessage();
+                    case MessageType.StartTestSessionCallback:
+                        var ackPayload = _dataSerializer
+                            .DeserializePayload<StartTestSessionAckPayload>(message);
+                        eventsHandler?.HandleStartTestSessionComplete(
+                            ackPayload.EventArgs);
+                        return ackPayload.EventArgs.TestSessionInfo;
 
-                    switch (message.MessageType)
-                    {
-                        case MessageType.StopTestSessionCallback:
-                            var payload = this.dataSerializer.DeserializePayload<StopTestSessionAckPayload>(message);
-                            eventsHandler?.HandleStopTestSessionComplete(payload.TestSessionInfo, payload.IsStopped);
-                            return payload.IsStopped;
+                    case MessageType.CustomTestHostLaunch:
+                        HandleCustomHostLaunch(testHostLauncher, message);
+                        break;
 
-                        case MessageType.TestMessage:
-                            var testMessagePayload = this.dataSerializer
-                                .DeserializePayload<TestMessagePayload>(message);
-                            eventsHandler?.HandleLogMessage(
-                                testMessagePayload.MessageLevel,
-                                testMessagePayload.Message);
-                            break;
+                    case MessageType.EditorAttachDebugger:
+                        AttachDebuggerToProcess(testHostLauncher, message);
+                        break;
 
-                        default:
-                            EqtTrace.Warning(
-                                "VsTestConsoleRequestSender.StopTestSession: Unexpected message received: {0}",
-                                message.MessageType);
-                            break;
-                    }
+                    case MessageType.TestMessage:
+                        var testMessagePayload = _dataSerializer
+                            .DeserializePayload<TestMessagePayload>(message);
+                        eventsHandler?.HandleLogMessage(
+                            testMessagePayload.MessageLevel,
+                            testMessagePayload.Message);
+                        break;
+
+                    default:
+                        EqtTrace.Warning(
+                            "VsTestConsoleRequestSender.StartTestSession: Unexpected message received: {0}",
+                            message.MessageType);
+                        break;
                 }
             }
-            catch (Exception exception)
-            {
-                EqtTrace.Error(
-                    "Aborting StopTestSession operation for id {0} due to error: {1}",
-                    testSessionInfo?.Id,
-                    exception);
-                eventsHandler?.HandleLogMessage(
-                    TestMessageLevel.Error,
-                    TranslationLayerResources.AbortedStopTestSession);
+        }
+        catch (Exception exception)
+        {
+            EqtTrace.Error("Aborting StartTestSession operation due to error: {0}", exception);
+            eventsHandler?.HandleLogMessage(
+                TestMessageLevel.Error,
+                TranslationLayerResources.AbortedStartTestSession);
 
-                eventsHandler?.HandleStopTestSessionComplete(testSessionInfo, false);
-            }
+            eventsHandler?.HandleStartTestSessionComplete(new());
+        }
+        finally
+        {
+            _testPlatformEventSource.TranslationLayerStartTestSessionStop();
+        }
 
-            this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
+        return null;
+    }
+
+    /// <inheritdoc/>
+    public bool StopTestSession(
+        TestSessionInfo testSessionInfo,
+        TestPlatformOptions options,
+        ITestSessionEventsHandler eventsHandler)
+    {
+        // Make sure vstest.console knows how to handle start/stop test session messages.
+        // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
+        // that will never come.
+        if (_protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
+        {
+            eventsHandler?.HandleStopTestSessionComplete(new(testSessionInfo));
             return false;
         }
 
-        /// <inheritdoc/>
-        public async Task<bool> StopTestSessionAsync(
-            TestSessionInfo testSessionInfo,
-            ITestSessionEventsHandler eventsHandler)
+        EqtTrace.Info("VsTestConsoleRequestSender.StopTestSession: Stop test session.");
+
+        // Due to various considertaions it is possible to end up with a null test session
+        // after doing the start test session call. However, we should filter out requests
+        // to stop such a session as soon as possible, at the request sender level.
+        //
+        // We do this here instead of on the wrapper level in order to benefit from the
+        // testplatform events being fired still.
+        if (testSessionInfo == null)
         {
-            // Make sure vstest.console knows how to handle start/stop test session messages.
-            // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
-            // that will never come.
-            if (this.protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
-            {
-                eventsHandler?.HandleStopTestSessionComplete(testSessionInfo, false);
-                return await Task.FromResult(false);
-            }
+            _testPlatformEventSource.TranslationLayerStopTestSessionStop();
+            return true;
+        }
 
-            if (EqtTrace.IsInfoEnabled)
+        try
+        {
+            var stopTestSessionPayload = new StopTestSessionPayload
             {
-                EqtTrace.Info("VsTestConsoleRequestSender.StopTestSession: Stop test session.");
-            }
+                TestSessionInfo = testSessionInfo,
+                CollectMetrics = options?.CollectMetrics ?? false,
+            };
 
-            // Due to various considertaions it is possible to end up with a null test session
-            // after doing the start test session call. However, we should filter out requests
-            // to stop such a session as soon as possible, at the request sender level.
-            //
-            // We do this here instead of on the wrapper level in order to benefit of the
-            // testplatform events being fired still.
-            if (testSessionInfo == null)
+            _communicationManager.SendMessage(
+                MessageType.StopTestSession,
+                stopTestSessionPayload,
+                _protocolVersion);
+
+            while (true)
             {
-                this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
-                return true;
-            }
+                var message = TryReceiveMessage();
 
-            try
-            {
-                this.communicationManager.SendMessage(
-                    MessageType.StopTestSession,
-                    testSessionInfo,
-                    this.protocolVersion);
-
-                while (true)
+                switch (message.MessageType)
                 {
-                    var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
+                    case MessageType.StopTestSessionCallback:
+                        var payload = _dataSerializer.DeserializePayload<StopTestSessionAckPayload>(message);
+                        eventsHandler?.HandleStopTestSessionComplete(payload.EventArgs);
+                        return payload.EventArgs.IsStopped;
 
-                    switch (message.MessageType)
-                    {
-                        case MessageType.StopTestSessionCallback:
-                            var payload = this.dataSerializer.DeserializePayload<StopTestSessionAckPayload>(message);
-                            eventsHandler?.HandleStopTestSessionComplete(payload.TestSessionInfo, payload.IsStopped);
-                            return payload.IsStopped;
+                    case MessageType.TestMessage:
+                        var testMessagePayload = _dataSerializer
+                            .DeserializePayload<TestMessagePayload>(message);
+                        eventsHandler?.HandleLogMessage(
+                            testMessagePayload.MessageLevel,
+                            testMessagePayload.Message);
+                        break;
 
-                        case MessageType.TestMessage:
-                            var testMessagePayload = this.dataSerializer
-                                .DeserializePayload<TestMessagePayload>(message);
-                            eventsHandler?.HandleLogMessage(
-                                testMessagePayload.MessageLevel,
-                                testMessagePayload.Message);
-                            break;
-
-                        default:
-                            EqtTrace.Warning(
-                                "VsTestConsoleRequestSender.StopTestSession: Unexpected message received: {0}",
-                                message.MessageType);
-                            break;
-                    }
+                    default:
+                        EqtTrace.Warning(
+                            "VsTestConsoleRequestSender.StopTestSession: Unexpected message received: {0}",
+                            message.MessageType);
+                        break;
                 }
             }
-            catch (Exception exception)
+        }
+        catch (Exception exception)
+        {
+            EqtTrace.Error(
+                "Aborting StopTestSession operation for id {0} due to error: {1}",
+                testSessionInfo?.Id,
+                exception);
+            eventsHandler?.HandleLogMessage(
+                TestMessageLevel.Error,
+                TranslationLayerResources.AbortedStopTestSession);
+
+            eventsHandler?.HandleStopTestSessionComplete(new(testSessionInfo));
+        }
+        finally
+        {
+            _testPlatformEventSource.TranslationLayerStopTestSessionStop();
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    public async Task<bool> StopTestSessionAsync(
+        TestSessionInfo testSessionInfo,
+        TestPlatformOptions options,
+        ITestSessionEventsHandler eventsHandler)
+    {
+        // Make sure vstest.console knows how to handle start/stop test session messages.
+        // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
+        // that will never come.
+        if (_protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
+        {
+            eventsHandler?.HandleStopTestSessionComplete(new(testSessionInfo));
+            return await Task.FromResult(false);
+        }
+
+        EqtTrace.Info("VsTestConsoleRequestSender.StopTestSession: Stop test session.");
+
+        // Due to various considertaions it is possible to end up with a null test session
+        // after doing the start test session call. However, we should filter out requests
+        // to stop such a session as soon as possible, at the request sender level.
+        //
+        // We do this here instead of on the wrapper level in order to benefit from the
+        // testplatform events being fired still.
+        if (testSessionInfo == null)
+        {
+            _testPlatformEventSource.TranslationLayerStopTestSessionStop();
+            return true;
+        }
+
+        try
+        {
+            var stopTestSessionPayload = new StopTestSessionPayload
             {
+                TestSessionInfo = testSessionInfo,
+                CollectMetrics = options?.CollectMetrics ?? false,
+            };
+
+            _communicationManager.SendMessage(
+                MessageType.StopTestSession,
+                stopTestSessionPayload,
+                _protocolVersion);
+
+            while (true)
+            {
+                var message = await TryReceiveMessageAsync().ConfigureAwait(false);
+
+                switch (message.MessageType)
+                {
+                    case MessageType.StopTestSessionCallback:
+                        var payload = _dataSerializer.DeserializePayload<StopTestSessionAckPayload>(message);
+                        eventsHandler?.HandleStopTestSessionComplete(payload.EventArgs);
+                        return payload.EventArgs.IsStopped;
+
+                    case MessageType.TestMessage:
+                        var testMessagePayload = _dataSerializer
+                            .DeserializePayload<TestMessagePayload>(message);
+                        eventsHandler?.HandleLogMessage(
+                            testMessagePayload.MessageLevel,
+                            testMessagePayload.Message);
+                        break;
+
+                    default:
+                        EqtTrace.Warning(
+                            "VsTestConsoleRequestSender.StopTestSession: Unexpected message received: {0}",
+                            message.MessageType);
+                        break;
+                }
+            }
+        }
+        catch (Exception exception)
+        {
+            EqtTrace.Error(
+                "Aborting StopTestSession operation for id {0} due to error: {1}",
+                testSessionInfo?.Id,
+                exception);
+            eventsHandler?.HandleLogMessage(
+                TestMessageLevel.Error,
+                TranslationLayerResources.AbortedStopTestSession);
+
+            eventsHandler?.HandleStopTestSessionComplete(new(testSessionInfo));
+        }
+        finally
+        {
+            _testPlatformEventSource.TranslationLayerStopTestSessionStop();
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    public void CancelTestRun()
+    {
+        EqtTrace.Info("VsTestConsoleRequestSender.CancelTestRun: Canceling test run.");
+
+        _communicationManager.SendMessage(MessageType.CancelTestRun);
+    }
+
+    /// <inheritdoc/>
+    public void AbortTestRun()
+    {
+        EqtTrace.Info("VsTestConsoleRequestSender.AbortTestRun: Aborting test run.");
+
+        _communicationManager.SendMessage(MessageType.AbortTestRun);
+    }
+
+    /// <inheritdoc/>
+    public void CancelDiscovery()
+    {
+        EqtTrace.Info("VsTestConsoleRequestSender.CancelDiscovery: Canceling test discovery.");
+
+        _communicationManager.SendMessage(MessageType.CancelDiscovery);
+    }
+
+    /// <inheritdoc/>
+    public void OnProcessExited()
+    {
+        _processExitCancellationTokenSource.Cancel();
+    }
+
+    /// <inheritdoc/>
+    public void Close()
+    {
+        Dispose();
+    }
+
+    /// <inheritdoc/>
+    public void EndSession()
+    {
+        _communicationManager.SendMessage(MessageType.SessionEnd);
+    }
+
+    /// <inheritdoc/>
+    public Task ProcessTestRunAttachmentsAsync(
+        IEnumerable<AttachmentSet> attachments,
+        IEnumerable<InvokedDataCollector> invokedDataCollectors,
+        string runSettings,
+        bool collectMetrics,
+        ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler,
+        CancellationToken cancellationToken)
+    {
+        return SendMessageAndListenAndReportAttachmentsProcessingResultAsync(
+            attachments,
+            invokedDataCollectors,
+            runSettings,
+            collectMetrics,
+            testSessionEventsHandler,
+            cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        _communicationManager?.StopServer();
+    }
+
+    #endregion
+
+    private bool HandShakeWithVsTestConsole()
+    {
+        var success = false;
+        var message = _communicationManager.ReceiveMessage();
+
+        if (message.MessageType == MessageType.SessionConnected)
+        {
+            _communicationManager.SendMessage(
+                MessageType.VersionCheck,
+                _protocolVersion);
+
+            message = _communicationManager.ReceiveMessage();
+
+            if (message.MessageType == MessageType.VersionCheck)
+            {
+                _protocolVersion = _dataSerializer
+                    .DeserializePayload<int>(message);
+                success = true;
+            }
+            else if (message.MessageType == MessageType.ProtocolError)
+            {
+                // TODO : Payload for ProtocolError needs to finalized.
                 EqtTrace.Error(
-                    "Aborting StopTestSession operation for id {0} due to error: {1}",
-                    testSessionInfo?.Id,
-                    exception);
-                eventsHandler?.HandleLogMessage(
-                    TestMessageLevel.Error,
-                    TranslationLayerResources.AbortedStopTestSession);
-
-                eventsHandler?.HandleStopTestSessionComplete(testSessionInfo, false);
-            }
-
-            this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
-            return false;
-        }
-
-        /// <inheritdoc/>
-        public void CancelTestRun()
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.CancelTestRun: Canceling test run.");
-            }
-
-            this.communicationManager.SendMessage(MessageType.CancelTestRun);
-        }
-
-        /// <inheritdoc/>
-        public void AbortTestRun()
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.AbortTestRun: Aborting test run.");
-            }
-
-            this.communicationManager.SendMessage(MessageType.AbortTestRun);
-        }
-
-        /// <inheritdoc/>
-        public void CancelDiscovery()
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.CancelDiscovery: Canceling test discovery.");
-            }
-
-            this.communicationManager.SendMessage(MessageType.CancelDiscovery);
-        }
-
-        /// <inheritdoc/>
-        public void OnProcessExited()
-        {
-            this.processExitCancellationTokenSource.Cancel();
-        }
-
-        /// <inheritdoc/>
-        public void Close()
-        {
-            this.Dispose();
-        }
-
-        /// <inheritdoc/>
-        public void EndSession()
-        {
-            this.communicationManager.SendMessage(MessageType.SessionEnd);
-        }
-
-        /// <inheritdoc/>
-        public Task ProcessTestRunAttachmentsAsync(
-            IEnumerable<AttachmentSet> attachments,
-            bool collectMetrics,
-            ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler,
-            CancellationToken cancellationToken)
-        {
-            return this.SendMessageAndListenAndReportAttachmentsProcessingResultAsync(
-                attachments,
-                collectMetrics,
-                testSessionEventsHandler,
-                cancellationToken);
-        }
-
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            this.communicationManager?.StopServer();
-        }
-
-        #endregion
-
-        private bool HandShakeWithVsTestConsole()
-        {
-            var success = false;
-            var message = this.communicationManager.ReceiveMessage();
-
-            if (message.MessageType == MessageType.SessionConnected)
-            {
-                this.communicationManager.SendMessage(
-                    MessageType.VersionCheck,
-                    this.protocolVersion);
-
-                message = this.communicationManager.ReceiveMessage();
-
-                if (message.MessageType == MessageType.VersionCheck)
-                {
-                    this.protocolVersion = this.dataSerializer
-                        .DeserializePayload<int>(message);
-                    success = true;
-                }
-                else if (message.MessageType == MessageType.ProtocolError)
-                {
-                    // TODO : Payload for ProtocolError needs to finalized.
-                    EqtTrace.Error(
-                        "VsTestConsoleRequestSender.HandShakeWithVsTestConsole: Version Check failed. ProtolError was received from the runner");
-                }
-                else
-                {
-                    EqtTrace.Error(
-                        "VsTestConsoleRequestSender.HandShakeWithVsTestConsole: VersionCheck Message Expected but different message received: Received MessageType: {0}",
-                        message.MessageType);
-                }
+                    "VsTestConsoleRequestSender.HandShakeWithVsTestConsole: Version Check failed. ProtolError was received from the runner");
             }
             else
             {
                 EqtTrace.Error(
-                    "VsTestConsoleRequestSender.HandShakeWithVsTestConsole: SessionConnected Message Expected but different message received: Received MessageType: {0}",
+                    "VsTestConsoleRequestSender.HandShakeWithVsTestConsole: VersionCheck Message Expected but different message received: Received MessageType: {0}",
                     message.MessageType);
             }
-
-            return success;
+        }
+        else
+        {
+            EqtTrace.Error(
+                "VsTestConsoleRequestSender.HandShakeWithVsTestConsole: SessionConnected Message Expected but different message received: Received MessageType: {0}",
+                message.MessageType);
         }
 
-        private async Task<bool> HandShakeWithVsTestConsoleAsync()
+        return success;
+    }
+
+    private async Task<bool> HandShakeWithVsTestConsoleAsync()
+    {
+        var success = false;
+        var message = await _communicationManager.ReceiveMessageAsync(
+            _processExitCancellationTokenSource.Token).ConfigureAwait(false);
+
+        if (message.MessageType == MessageType.SessionConnected)
         {
-            var success = false;
-            var message = await this.communicationManager.ReceiveMessageAsync(
-                this.processExitCancellationTokenSource.Token);
+            _communicationManager.SendMessage(
+                MessageType.VersionCheck,
+                _protocolVersion);
 
-            if (message.MessageType == MessageType.SessionConnected)
+            message = await _communicationManager.ReceiveMessageAsync(
+                _processExitCancellationTokenSource.Token).ConfigureAwait(false);
+
+            if (message.MessageType == MessageType.VersionCheck)
             {
-                this.communicationManager.SendMessage(
-                    MessageType.VersionCheck,
-                    this.protocolVersion);
-
-                message = await this.communicationManager.ReceiveMessageAsync(
-                    this.processExitCancellationTokenSource.Token);
-
-                if (message.MessageType == MessageType.VersionCheck)
-                {
-                    this.protocolVersion = this.dataSerializer.DeserializePayload<int>(message);
-                    success = true;
-                }
-                else if (message.MessageType == MessageType.ProtocolError)
-                {
-                    // TODO : Payload for ProtocolError needs to finalized.
-                    EqtTrace.Error(
-                        "VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: Version Check failed. ProtolError was received from the runner");
-                }
-                else
-                {
-                    EqtTrace.Error(
-                        "VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: VersionCheck Message Expected but different message received: Received MessageType: {0}",
-                        message.MessageType);
-                }
+                _protocolVersion = _dataSerializer.DeserializePayload<int>(message);
+                success = true;
+            }
+            else if (message.MessageType == MessageType.ProtocolError)
+            {
+                // TODO : Payload for ProtocolError needs to finalized.
+                EqtTrace.Error(
+                    "VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: Version Check failed. ProtolError was received from the runner");
             }
             else
             {
                 EqtTrace.Error(
-                    "VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: SessionConnected Message Expected but different message received: Received MessageType: {0}",
+                    "VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: VersionCheck Message Expected but different message received: Received MessageType: {0}",
                     message.MessageType);
             }
-
-            return success;
+        }
+        else
+        {
+            EqtTrace.Error(
+                "VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: SessionConnected Message Expected but different message received: Received MessageType: {0}",
+                message.MessageType);
         }
 
-        private void SendMessageAndListenAndReportTestCases(
-            IEnumerable<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            ITestDiscoveryEventsHandler2 eventHandler)
+        return success;
+    }
+
+    private void SendMessageAndListenAndReportTestCases(
+        IEnumerable<string> sources,
+        string runSettings,
+        TestPlatformOptions options,
+        TestSessionInfo testSessionInfo,
+        ITestDiscoveryEventsHandler2 eventHandler)
+    {
+        try
         {
-            try
-            {
-                this.communicationManager.SendMessage(
-                    MessageType.StartDiscovery,
-                    new DiscoveryRequestPayload()
-                    {
-                        Sources = sources,
-                        RunSettings = runSettings,
-                        TestPlatformOptions = options
-                    },
-                    this.protocolVersion);
-                var isDiscoveryComplete = false;
-
-                // Cycle through the messages that vstest.console sends.
-                // Currently each operation is not a separate task since it should not take that
-                // much time to complete.
-                //
-                // This is just a notification.
-                while (!isDiscoveryComplete)
+            _communicationManager.SendMessage(
+                MessageType.StartDiscovery,
+                new DiscoveryRequestPayload()
                 {
-                    var message = this.TryReceiveMessage();
+                    Sources = sources,
+                    RunSettings = runSettings,
+                    TestPlatformOptions = options,
+                    TestSessionInfo = testSessionInfo
+                },
+                _protocolVersion);
+            var isDiscoveryComplete = false;
 
-                    if (string.Equals(MessageType.TestCasesFound, message.MessageType))
-                    {
-                        var testCases = this.dataSerializer
-                            .DeserializePayload<IEnumerable<TestCase>>(message);
+            // Cycle through the messages that vstest.console sends.
+            // Currently each operation is not a separate task since it should not take that
+            // much time to complete.
+            //
+            // This is just a notification.
+            while (!isDiscoveryComplete)
+            {
+                var message = TryReceiveMessage();
 
-                        eventHandler.HandleDiscoveredTests(testCases);
-                    }
-                    else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
-                    {
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info(
-                                "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestCases: Discovery complete.");
-                        }
+                if (string.Equals(MessageType.TestCasesFound, message.MessageType))
+                {
+                    var testCases = _dataSerializer
+                        .DeserializePayload<IEnumerable<TestCase>>(message);
 
-                        var discoveryCompletePayload =
-                            this.dataSerializer
-                                .DeserializePayload<DiscoveryCompletePayload>(message);
+                    eventHandler.HandleDiscoveredTests(testCases);
+                }
+                else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
+                {
+                    EqtTrace.Info(
+                        "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestCases: Discovery complete.");
 
-                        var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
-                            discoveryCompletePayload.TotalTests,
-                            discoveryCompletePayload.IsAborted);
+                    var discoveryCompletePayload =
+                        _dataSerializer
+                            .DeserializePayload<DiscoveryCompletePayload>(message);
 
-                        // Adding metrics from vstest.console.
-                        discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
+                    var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
+                        discoveryCompletePayload.TotalTests,
+                        discoveryCompletePayload.IsAborted);
 
-                        eventHandler.HandleDiscoveryComplete(
-                            discoveryCompleteEventArgs,
-                            discoveryCompletePayload.LastDiscoveredTests);
-                        isDiscoveryComplete = true;
-                    }
-                    else if (string.Equals(MessageType.TestMessage, message.MessageType))
-                    {
-                        var testMessagePayload = this.dataSerializer
-                            .DeserializePayload<TestMessagePayload>(message);
-                        eventHandler.HandleLogMessage(
-                            testMessagePayload.MessageLevel,
-                            testMessagePayload.Message);
-                    }
+                    // Adding metrics from vstest.console.
+                    discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
+
+                    eventHandler.HandleDiscoveryComplete(
+                        discoveryCompleteEventArgs,
+                        discoveryCompletePayload.LastDiscoveredTests);
+                    isDiscoveryComplete = true;
+                }
+                else if (string.Equals(MessageType.TestMessage, message.MessageType))
+                {
+                    var testMessagePayload = _dataSerializer
+                        .DeserializePayload<TestMessagePayload>(message);
+                    eventHandler.HandleLogMessage(
+                        testMessagePayload.MessageLevel,
+                        testMessagePayload.Message);
                 }
             }
-            catch (Exception exception)
-            {
-                EqtTrace.Error("Aborting Test Discovery Operation: {0}", exception);
-                eventHandler.HandleLogMessage(
-                    TestMessageLevel.Error,
-                    TranslationLayerResources.AbortedTestsDiscovery);
-                var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
-                eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
+        }
+        catch (Exception exception)
+        {
+            EqtTrace.Error("Aborting Test Discovery Operation: {0}", exception);
+            eventHandler.HandleLogMessage(
+                TestMessageLevel.Error,
+                TranslationLayerResources.AbortedTestsDiscovery);
+            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
+            eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
 
-                // Earlier we were closing the connection with vstest.console in case of exceptions.
-                // Removing that code because vstest.console might be in a healthy state and letting
-                // the client know of the error, so that the TL can wait for the next instruction
-                // from the client itself.
-                // Also, connection termination might not kill the process which could result in
-                // files being locked by testhost.
-            }
-
-            this.testPlatformEventSource.TranslationLayerDiscoveryStop();
+            // Earlier we were closing the connection with vstest.console in case of exceptions.
+            // Removing that code because vstest.console might be in a healthy state and letting
+            // the client know of the error, so that the TL can wait for the next instruction
+            // from the client itself.
+            // Also, connection termination might not kill the process which could result in
+            // files being locked by testhost.
         }
 
-        private async Task SendMessageAndListenAndReportTestCasesAsync(
-            IEnumerable<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            ITestDiscoveryEventsHandler2 eventHandler)
+        _testPlatformEventSource.TranslationLayerDiscoveryStop();
+    }
+
+    private async Task SendMessageAndListenAndReportTestCasesAsync(
+        IEnumerable<string> sources,
+        string runSettings,
+        TestPlatformOptions options,
+        TestSessionInfo testSessionInfo,
+        ITestDiscoveryEventsHandler2 eventHandler)
+    {
+        try
         {
-            try
-            {
-                this.communicationManager.SendMessage(
-                    MessageType.StartDiscovery,
-                    new DiscoveryRequestPayload()
-                    {
-                        Sources = sources,
-                        RunSettings = runSettings,
-                        TestPlatformOptions = options
-                    },
-                    this.protocolVersion);
-                var isDiscoveryComplete = false;
-
-                // Cycle through the messages that vstest.console sends.
-                // Currently each operation is not a separate task since it should not take that
-                // much time to complete.
-                //
-                // This is just a notification.
-                while (!isDiscoveryComplete)
+            _communicationManager.SendMessage(
+                MessageType.StartDiscovery,
+                new DiscoveryRequestPayload()
                 {
-                    var message = await this.TryReceiveMessageAsync();
+                    Sources = sources,
+                    RunSettings = runSettings,
+                    TestPlatformOptions = options,
+                    TestSessionInfo = testSessionInfo
+                },
+                _protocolVersion);
+            var isDiscoveryComplete = false;
 
-                    if (string.Equals(MessageType.TestCasesFound, message.MessageType))
-                    {
-                        var testCases = this.dataSerializer
-                            .DeserializePayload<IEnumerable<TestCase>>(message);
+            // Cycle through the messages that vstest.console sends.
+            // Currently each operation is not a separate task since it should not take that
+            // much time to complete.
+            //
+            // This is just a notification.
+            while (!isDiscoveryComplete)
+            {
+                var message = await TryReceiveMessageAsync().ConfigureAwait(false);
 
-                        eventHandler.HandleDiscoveredTests(testCases);
-                    }
-                    else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
-                    {
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info(
-                                "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestCasesAsync: Discovery complete.");
-                        }
+                if (string.Equals(MessageType.TestCasesFound, message.MessageType))
+                {
+                    var testCases = _dataSerializer
+                        .DeserializePayload<IEnumerable<TestCase>>(message);
 
-                        var discoveryCompletePayload =
-                            this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
+                    eventHandler.HandleDiscoveredTests(testCases);
+                }
+                else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
+                {
+                    EqtTrace.Info(
+                        "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestCasesAsync: Discovery complete.");
 
-                        var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
-                            discoveryCompletePayload.TotalTests,
-                            discoveryCompletePayload.IsAborted);
+                    var discoveryCompletePayload =
+                        _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
 
-                        // Adding Metrics from VsTestConsole
-                        discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
+                    var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
+                        discoveryCompletePayload.TotalTests,
+                        discoveryCompletePayload.IsAborted);
 
-                        eventHandler.HandleDiscoveryComplete(
-                            discoveryCompleteEventArgs,
-                            discoveryCompletePayload.LastDiscoveredTests);
-                        isDiscoveryComplete = true;
-                    }
-                    else if (string.Equals(MessageType.TestMessage, message.MessageType))
-                    {
-                        var testMessagePayload = this.dataSerializer
-                            .DeserializePayload<TestMessagePayload>(message);
-                        eventHandler.HandleLogMessage(
-                            testMessagePayload.MessageLevel,
-                            testMessagePayload.Message);
-                    }
+                    // Adding Metrics from VsTestConsole
+                    discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
+
+                    eventHandler.HandleDiscoveryComplete(
+                        discoveryCompleteEventArgs,
+                        discoveryCompletePayload.LastDiscoveredTests);
+                    isDiscoveryComplete = true;
+                }
+                else if (string.Equals(MessageType.TestMessage, message.MessageType))
+                {
+                    var testMessagePayload = _dataSerializer
+                        .DeserializePayload<TestMessagePayload>(message);
+                    eventHandler.HandleLogMessage(
+                        testMessagePayload.MessageLevel,
+                        testMessagePayload.Message);
                 }
             }
-            catch (Exception exception)
-            {
-                EqtTrace.Error("Aborting Test Discovery Operation: {0}", exception);
+        }
+        catch (Exception exception)
+        {
+            EqtTrace.Error("Aborting Test Discovery Operation: {0}", exception);
 
-                eventHandler.HandleLogMessage(
-                    TestMessageLevel.Error,
-                    TranslationLayerResources.AbortedTestsDiscovery);
+            eventHandler.HandleLogMessage(
+                TestMessageLevel.Error,
+                TranslationLayerResources.AbortedTestsDiscovery);
 
-                var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
-                eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
+            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
+            eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
 
-                // Earlier we were closing the connection with vstest.console in case of exceptions.
-                // Removing that code because vstest.console might be in a healthy state and letting
-                // the client know of the error, so that the TL can wait for the next instruction
-                // from the client itself.
-                // Also, connection termination might not kill the process which could result in
-                // files being locked by testhost.
-            }
-
-            this.testPlatformEventSource.TranslationLayerDiscoveryStop();
+            // Earlier we were closing the connection with vstest.console in case of exceptions.
+            // Removing that code because vstest.console might be in a healthy state and letting
+            // the client know of the error, so that the TL can wait for the next instruction
+            // from the client itself.
+            // Also, connection termination might not kill the process which could result in
+            // files being locked by testhost.
         }
 
-        private void SendMessageAndListenAndReportTestResults(
-            string messageType,
-            object payload,
-            ITestRunEventsHandler eventHandler,
-            ITestHostLauncher customHostLauncher)
+        _testPlatformEventSource.TranslationLayerDiscoveryStop();
+    }
+
+    private void SendMessageAndListenAndReportTestResults(
+        string messageType,
+        object payload,
+        ITestRunEventsHandler eventHandler,
+        ITestHostLauncher customHostLauncher)
+    {
+        try
         {
-            try
+            _communicationManager.SendMessage(messageType, payload, _protocolVersion);
+            var isTestRunComplete = false;
+
+            // Cycle through the messages that vstest.console sends.
+            // Currently each operation is not a separate task since it should not take that
+            // much time to complete.
+            //
+            // This is just a notification.
+            while (!isTestRunComplete)
             {
-                this.communicationManager.SendMessage(messageType, payload, this.protocolVersion);
-                var isTestRunComplete = false;
+                var message = TryReceiveMessage();
 
-                // Cycle through the messages that vstest.console sends.
-                // Currently each operation is not a separate task since it should not take that
-                // much time to complete.
-                //
-                // This is just a notification.
-                while (!isTestRunComplete)
+                if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                 {
-                    var message = this.TryReceiveMessage();
-
-                    if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
-                    {
-                        var testRunChangedArgs = this.dataSerializer
-                            .DeserializePayload<TestRunChangedEventArgs>(
+                    var testRunChangedArgs = _dataSerializer
+                        .DeserializePayload<TestRunChangedEventArgs>(
                             message);
-                        eventHandler.HandleTestRunStatsChange(testRunChangedArgs);
-                    }
-                    else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
-                    {
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info(
-                                "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestResults: Execution complete.");
-                        }
+                    eventHandler.HandleTestRunStatsChange(testRunChangedArgs);
+                }
+                else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
+                {
+                    EqtTrace.Info(
+                        "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestResults: Execution complete.");
 
-                        var testRunCompletePayload = this.dataSerializer
-                            .DeserializePayload<TestRunCompletePayload>(message);
+                    var testRunCompletePayload = _dataSerializer
+                        .DeserializePayload<TestRunCompletePayload>(message);
 
-                        eventHandler.HandleTestRunComplete(
-                            testRunCompletePayload.TestRunCompleteArgs,
-                            testRunCompletePayload.LastRunTests,
-                            testRunCompletePayload.RunAttachments,
-                            testRunCompletePayload.ExecutorUris);
-                        isTestRunComplete = true;
-                    }
-                    else if (string.Equals(MessageType.TestMessage, message.MessageType))
-                    {
-                        var testMessagePayload = this.dataSerializer
-                            .DeserializePayload<TestMessagePayload>(message);
-                        eventHandler.HandleLogMessage(
-                            testMessagePayload.MessageLevel,
-                            testMessagePayload.Message);
-                    }
-                    else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
-                    {
-                        this.HandleCustomHostLaunch(customHostLauncher, message);
-                    }
-                    else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
-                    {
-                        this.AttachDebuggerToProcess(customHostLauncher, message);
-                    }
+                    eventHandler.HandleTestRunComplete(
+                        testRunCompletePayload.TestRunCompleteArgs,
+                        testRunCompletePayload.LastRunTests,
+                        testRunCompletePayload.RunAttachments,
+                        testRunCompletePayload.ExecutorUris);
+                    isTestRunComplete = true;
+                }
+                else if (string.Equals(MessageType.TestMessage, message.MessageType))
+                {
+                    var testMessagePayload = _dataSerializer
+                        .DeserializePayload<TestMessagePayload>(message);
+                    eventHandler.HandleLogMessage(
+                        testMessagePayload.MessageLevel,
+                        testMessagePayload.Message);
+                }
+                else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
+                {
+                    HandleCustomHostLaunch(customHostLauncher, message);
+                }
+                else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
+                {
+                    AttachDebuggerToProcess(customHostLauncher, message);
                 }
             }
-            catch (Exception exception)
-            {
-                EqtTrace.Error("Aborting Test Run Operation: {0}", exception);
-                eventHandler.HandleLogMessage(
-                    TestMessageLevel.Error,
-                    TranslationLayerResources.AbortedTestsRun);
-                var completeArgs = new TestRunCompleteEventArgs(
-                    null, false, true, exception, null, TimeSpan.Zero);
-                eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
+        }
+        catch (Exception exception)
+        {
+            EqtTrace.Error("Aborting Test Run Operation: {0}", exception);
+            eventHandler.HandleLogMessage(
+                TestMessageLevel.Error,
+                TranslationLayerResources.AbortedTestsRun);
+            var completeArgs = new TestRunCompleteEventArgs(
+                null, false, true, exception, null, null, TimeSpan.Zero);
+            eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
 
-                // Earlier we were closing the connection with vstest.console in case of exceptions.
-                // Removing that code because vstest.console might be in a healthy state and letting
-                // the client know of the error, so that the TL can wait for the next instruction
-                // from the client itself.
-                // Also, connection termination might not kill the process which could result in
-                // files being locked by testhost.
-            }
-
-            this.testPlatformEventSource.TranslationLayerExecutionStop();
+            // Earlier we were closing the connection with vstest.console in case of exceptions.
+            // Removing that code because vstest.console might be in a healthy state and letting
+            // the client know of the error, so that the TL can wait for the next instruction
+            // from the client itself.
+            // Also, connection termination might not kill the process which could result in
+            // files being locked by testhost.
         }
 
-        private async Task SendMessageAndListenAndReportTestResultsAsync(
-            string messageType,
-            object payload,
-            ITestRunEventsHandler eventHandler,
-            ITestHostLauncher customHostLauncher)
-        {
-            try
-            {
-                this.communicationManager.SendMessage(messageType, payload, this.protocolVersion);
-                var isTestRunComplete = false;
+        _testPlatformEventSource.TranslationLayerExecutionStop();
+    }
 
+    private async Task SendMessageAndListenAndReportTestResultsAsync(
+        string messageType,
+        object payload,
+        ITestRunEventsHandler eventHandler,
+        ITestHostLauncher customHostLauncher)
+    {
+        try
+        {
+            _communicationManager.SendMessage(messageType, payload, _protocolVersion);
+            var isTestRunComplete = false;
+
+            // Cycle through the messages that vstest.console sends.
+            // Currently each operation is not a separate task since it should not take that
+            // much time to complete.
+            //
+            // This is just a notification.
+            while (!isTestRunComplete)
+            {
+                var message = await TryReceiveMessageAsync().ConfigureAwait(false);
+
+                if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
+                {
+                    var testRunChangedArgs = _dataSerializer
+                        .DeserializePayload<TestRunChangedEventArgs>(message);
+                    eventHandler.HandleTestRunStatsChange(testRunChangedArgs);
+                }
+                else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
+                {
+                    EqtTrace.Info(
+                        "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestResultsAsync: Execution complete.");
+
+                    var testRunCompletePayload = _dataSerializer
+                        .DeserializePayload<TestRunCompletePayload>(message);
+
+                    eventHandler.HandleTestRunComplete(
+                        testRunCompletePayload.TestRunCompleteArgs,
+                        testRunCompletePayload.LastRunTests,
+                        testRunCompletePayload.RunAttachments,
+                        testRunCompletePayload.ExecutorUris);
+                    isTestRunComplete = true;
+                }
+                else if (string.Equals(MessageType.TestMessage, message.MessageType))
+                {
+                    var testMessagePayload = _dataSerializer
+                        .DeserializePayload<TestMessagePayload>(message);
+                    eventHandler.HandleLogMessage(
+                        testMessagePayload.MessageLevel,
+                        testMessagePayload.Message);
+                }
+                else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
+                {
+                    HandleCustomHostLaunch(customHostLauncher, message);
+                }
+                else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
+                {
+                    AttachDebuggerToProcess(customHostLauncher, message);
+                }
+            }
+        }
+        catch (Exception exception)
+        {
+            EqtTrace.Error("Aborting Test Run Operation: {0}", exception);
+            eventHandler.HandleLogMessage(
+                TestMessageLevel.Error,
+                TranslationLayerResources.AbortedTestsRun);
+            var completeArgs = new TestRunCompleteEventArgs(
+                null, false, true, exception, null, null, TimeSpan.Zero);
+            eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
+
+            // Earlier we were closing the connection with vstest.console in case of exceptions.
+            // Removing that code because vstest.console might be in a healthy state and letting
+            // the client know of the error, so that the TL can wait for the next instruction
+            // from the client itself.
+            // Also, connection termination might not kill the process which could result in
+            // files being locked by testhost.
+        }
+
+        _testPlatformEventSource.TranslationLayerExecutionStop();
+    }
+
+    private async Task SendMessageAndListenAndReportAttachmentsProcessingResultAsync(
+        IEnumerable<AttachmentSet> attachments,
+        IEnumerable<InvokedDataCollector> invokedDataCollectors,
+        string runSettings,
+        bool collectMetrics,
+        ITestRunAttachmentsProcessingEventsHandler eventHandler,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var payload = new TestRunAttachmentsProcessingPayload
+            {
+                Attachments = attachments,
+                InvokedDataCollectors = invokedDataCollectors,
+                RunSettings = runSettings,
+                CollectMetrics = collectMetrics
+            };
+
+            _communicationManager.SendMessage(
+                MessageType.TestRunAttachmentsProcessingStart,
+                payload);
+            var isTestRunAttachmentsProcessingComplete = false;
+
+            using (cancellationToken.Register(() =>
+                       _communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingCancel)))
+            {
                 // Cycle through the messages that vstest.console sends.
                 // Currently each operation is not a separate task since it should not take that
                 // much time to complete.
                 //
                 // This is just a notification.
-                while (!isTestRunComplete)
+                while (!isTestRunAttachmentsProcessingComplete)
                 {
-                    var message = await this.TryReceiveMessageAsync();
+                    var message = await TryReceiveMessageAsync().ConfigureAwait(false);
 
-                    if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
-                    {
-                        var testRunChangedArgs = this.dataSerializer
-                            .DeserializePayload<TestRunChangedEventArgs>(message);
-                        eventHandler.HandleTestRunStatsChange(testRunChangedArgs);
-                    }
-                    else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
-                    {
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info(
-                                "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestResultsAsync: Execution complete.");
-                        }
-
-                        var testRunCompletePayload = this.dataSerializer
-                            .DeserializePayload<TestRunCompletePayload>(message);
-
-                        eventHandler.HandleTestRunComplete(
-                            testRunCompletePayload.TestRunCompleteArgs,
-                            testRunCompletePayload.LastRunTests,
-                            testRunCompletePayload.RunAttachments,
-                            testRunCompletePayload.ExecutorUris);
-                        isTestRunComplete = true;
-                    }
-                    else if (string.Equals(MessageType.TestMessage, message.MessageType))
-                    {
-                        var testMessagePayload = this.dataSerializer
-                            .DeserializePayload<TestMessagePayload>(message);
-                        eventHandler.HandleLogMessage(
-                            testMessagePayload.MessageLevel,
-                            testMessagePayload.Message);
-                    }
-                    else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
-                    {
-                        this.HandleCustomHostLaunch(customHostLauncher, message);
-                    }
-                    else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
-                    {
-                        this.AttachDebuggerToProcess(customHostLauncher, message);
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                EqtTrace.Error("Aborting Test Run Operation: {0}", exception);
-                eventHandler.HandleLogMessage(
-                    TestMessageLevel.Error,
-                    TranslationLayerResources.AbortedTestsRun);
-                var completeArgs = new TestRunCompleteEventArgs(
-                    null, false, true, exception, null, TimeSpan.Zero);
-                eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
-
-                // Earlier we were closing the connection with vstest.console in case of exceptions.
-                // Removing that code because vstest.console might be in a healthy state and letting
-                // the client know of the error, so that the TL can wait for the next instruction
-                // from the client itself.
-                // Also, connection termination might not kill the process which could result in
-                // files being locked by testhost.
-            }
-
-            this.testPlatformEventSource.TranslationLayerExecutionStop();
-        }
-
-        private async Task SendMessageAndListenAndReportAttachmentsProcessingResultAsync(
-            IEnumerable<AttachmentSet> attachments,
-            bool collectMetrics,
-            ITestRunAttachmentsProcessingEventsHandler eventHandler,
-            CancellationToken cancellationToken)
-        {
-            try
-            {
-                var payload = new TestRunAttachmentsProcessingPayload
-                {
-                    Attachments = attachments,
-                    CollectMetrics = collectMetrics
-                };
-
-                this.communicationManager.SendMessage(
-                    MessageType.TestRunAttachmentsProcessingStart,
-                    payload);
-                var isTestRunAttachmentsProcessingComplete = false;
-
-                using (cancellationToken.Register(() =>
-                    this.communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingCancel)))
-                {
-                    // Cycle through the messages that vstest.console sends.
-                    // Currently each operation is not a separate task since it should not take that
-                    // much time to complete.
-                    //
-                    // This is just a notification.
-                    while (!isTestRunAttachmentsProcessingComplete)
-                    {
-                        var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
-
-                        if (string.Equals(
+                    if (string.Equals(
                             MessageType.TestRunAttachmentsProcessingComplete,
                             message.MessageType))
-                        {
-                            if (EqtTrace.IsInfoEnabled)
-                            {
-                                EqtTrace.Info(
-                                    "VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachments: Process complete.");
-                            }
+                    {
+                        EqtTrace.Info(
+                            "VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachments: Process complete.");
 
-                            var testRunAttachmentsProcessingCompletePayload = this.dataSerializer
-                                .DeserializePayload<TestRunAttachmentsProcessingCompletePayload>(message);
+                        var testRunAttachmentsProcessingCompletePayload = _dataSerializer
+                            .DeserializePayload<TestRunAttachmentsProcessingCompletePayload>(message);
 
-                            eventHandler.HandleTestRunAttachmentsProcessingComplete(
-                                testRunAttachmentsProcessingCompletePayload.AttachmentsProcessingCompleteEventArgs,
-                                testRunAttachmentsProcessingCompletePayload.Attachments);
-                            isTestRunAttachmentsProcessingComplete = true;
-                        }
-                        else if (string.Equals(
-                            MessageType.TestRunAttachmentsProcessingProgress,
-                            message.MessageType))
-                        {
-                            var testRunAttachmentsProcessingProgressPayload = this.dataSerializer
-                                .DeserializePayload<TestRunAttachmentsProcessingProgressPayload>(message);
-                            eventHandler.HandleTestRunAttachmentsProcessingProgress(
-                                testRunAttachmentsProcessingProgressPayload.AttachmentsProcessingProgressEventArgs);
-                        }
-                        else if (string.Equals(MessageType.TestMessage, message.MessageType))
-                        {
-                            var testMessagePayload = this.dataSerializer
-                                .DeserializePayload<TestMessagePayload>(message);
-                            eventHandler.HandleLogMessage(
-                                testMessagePayload.MessageLevel,
-                                testMessagePayload.Message);
-                        }
-                        else
-                        {
-                            EqtTrace.Warning(
-                                $"VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachments: Unexpected message received {message.MessageType}.");
-                        }
+                        eventHandler.HandleTestRunAttachmentsProcessingComplete(
+                            testRunAttachmentsProcessingCompletePayload.AttachmentsProcessingCompleteEventArgs,
+                            testRunAttachmentsProcessingCompletePayload.Attachments);
+                        isTestRunAttachmentsProcessingComplete = true;
+                    }
+                    else if (string.Equals(
+                                 MessageType.TestRunAttachmentsProcessingProgress,
+                                 message.MessageType))
+                    {
+                        var testRunAttachmentsProcessingProgressPayload = _dataSerializer
+                            .DeserializePayload<TestRunAttachmentsProcessingProgressPayload>(message);
+                        eventHandler.HandleTestRunAttachmentsProcessingProgress(
+                            testRunAttachmentsProcessingProgressPayload.AttachmentsProcessingProgressEventArgs);
+                    }
+                    else if (string.Equals(MessageType.TestMessage, message.MessageType))
+                    {
+                        var testMessagePayload = _dataSerializer
+                            .DeserializePayload<TestMessagePayload>(message);
+                        eventHandler.HandleLogMessage(
+                            testMessagePayload.MessageLevel,
+                            testMessagePayload.Message);
+                    }
+                    else
+                    {
+                        EqtTrace.Warning(
+                            $"VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachments: Unexpected message received {message.MessageType}.");
                     }
                 }
             }
-            catch (Exception exception)
-            {
-                EqtTrace.Error("Aborting Test Session End Operation: {0}", exception);
-                eventHandler.HandleLogMessage(
-                    TestMessageLevel.Error,
-                    TranslationLayerResources.AbortedTestRunAttachmentsProcessing);               
-                eventHandler.HandleTestRunAttachmentsProcessingComplete(
-                    new TestRunAttachmentsProcessingCompleteEventArgs(false, exception),
-                    null);
-
-                // Earlier we were closing the connection with vstest.console in case of exceptions.
-                // Removing that code because vstest.console might be in a healthy state and letting
-                // the client know of the error, so that the TL can wait for the next instruction
-                // from the client itself.
-                // Also, connection termination might not kill the process which could result in
-                // files being locked by testhost.
-            }
-            finally
-            {
-                this.testPlatformEventSource.TranslationLayerTestRunAttachmentsProcessingStop();
-            }
         }
-
-        private Message TryReceiveMessage()
+        catch (Exception exception)
         {
-            Message message = null;
-            var receiverMessageTask = this.communicationManager.ReceiveMessageAsync(
-                this.processExitCancellationTokenSource.Token);
-            receiverMessageTask.Wait();
-            message = receiverMessageTask.Result;
+            EqtTrace.Error("Aborting Test Session End Operation: {0}", exception);
+            eventHandler.HandleLogMessage(
+                TestMessageLevel.Error,
+                TranslationLayerResources.AbortedTestRunAttachmentsProcessing);
+            eventHandler.HandleTestRunAttachmentsProcessingComplete(
+                new TestRunAttachmentsProcessingCompleteEventArgs(false, exception),
+                null);
 
-            if (message == null)
-            {
-                throw new TransationLayerException(
-                    TranslationLayerResources.FailedToReceiveMessage);
-            }
-
-            return message;
+            // Earlier we were closing the connection with vstest.console in case of exceptions.
+            // Removing that code because vstest.console might be in a healthy state and letting
+            // the client know of the error, so that the TL can wait for the next instruction
+            // from the client itself.
+            // Also, connection termination might not kill the process which could result in
+            // files being locked by testhost.
         }
-
-        private async Task<Message> TryReceiveMessageAsync()
+        finally
         {
-            Message message = await this.communicationManager.ReceiveMessageAsync(
-                this.processExitCancellationTokenSource.Token);
-
-            if (message == null)
-            {
-                throw new TransationLayerException(
-                    TranslationLayerResources.FailedToReceiveMessage);
-            }
-
-            return message;
+            _testPlatformEventSource.TranslationLayerTestRunAttachmentsProcessingStop();
         }
+    }
 
-        private void HandleCustomHostLaunch(ITestHostLauncher customHostLauncher, Message message)
+    private Message TryReceiveMessage()
+    {
+        var receiverMessageTask = _communicationManager.ReceiveMessageAsync(
+            _processExitCancellationTokenSource.Token);
+        receiverMessageTask.Wait();
+        Message message = receiverMessageTask.Result;
+
+        return message ?? throw new TransationLayerException(
+            TranslationLayerResources.FailedToReceiveMessage);
+    }
+
+    private async Task<Message> TryReceiveMessageAsync()
+    {
+        Message message = await _communicationManager.ReceiveMessageAsync(
+            _processExitCancellationTokenSource.Token).ConfigureAwait(false);
+
+        return message ?? throw new TransationLayerException(
+            TranslationLayerResources.FailedToReceiveMessage);
+    }
+
+    private void HandleCustomHostLaunch(ITestHostLauncher customHostLauncher, Message message)
+    {
+        var ackPayload = new CustomHostLaunchAckPayload()
         {
-            var ackPayload = new CustomHostLaunchAckPayload()
-            {
-                HostProcessId = -1,
-                ErrorMessage = null
-            };
+            HostProcessId = -1,
+            ErrorMessage = null
+        };
 
-            try
-            {
-                var testProcessStartInfo = this.dataSerializer
-                    .DeserializePayload<TestProcessStartInfo>(message);
+        try
+        {
+            var testProcessStartInfo = _dataSerializer
+                .DeserializePayload<TestProcessStartInfo>(message);
 
-                ackPayload.HostProcessId = customHostLauncher != null
-                    ? customHostLauncher.LaunchTestHost(testProcessStartInfo)
-                    : -1;
-            }
-            catch (Exception ex)
-            {
-                EqtTrace.Error("Error while launching custom host: {0}", ex);
-
-                // Vstest.console will send the abort message properly while cleaning up all the
-                // flow, so do not abort here.
-                // Let the ack go through and let vstest.console handle the error.
-                ackPayload.ErrorMessage = ex.Message;
-            }
-            finally
-            {
-                // Always unblock the vstest.console thread which is indefinitely waiting on this
-                // ACK.
-                this.communicationManager.SendMessage(
-                    MessageType.CustomTestHostLaunchCallback,
-                    ackPayload,
-                    this.protocolVersion);
-            }
+            ackPayload.HostProcessId = customHostLauncher != null
+                ? customHostLauncher.LaunchTestHost(testProcessStartInfo)
+                : -1;
         }
-
-        private void AttachDebuggerToProcess(ITestHostLauncher customHostLauncher, Message message)
+        catch (Exception ex)
         {
-            var ackPayload = new EditorAttachDebuggerAckPayload()
-            {
-                Attached = false,
-                ErrorMessage = null
-            };
+            EqtTrace.Error("Error while launching custom host: {0}", ex);
 
-            try
-            {
-                var pid = this.dataSerializer.DeserializePayload<int>(message);
+            // Vstest.console will send the abort message properly while cleaning up all the
+            // flow, so do not abort here.
+            // Let the ack go through and let vstest.console handle the error.
+            ackPayload.ErrorMessage = ex.Message;
+        }
+        finally
+        {
+            // Always unblock the vstest.console thread which is indefinitely waiting on this
+            // ACK.
+            _communicationManager.SendMessage(
+                MessageType.CustomTestHostLaunchCallback,
+                ackPayload,
+                _protocolVersion);
+        }
+    }
 
-                ackPayload.Attached = customHostLauncher is ITestHostLauncher2 launcher
-                && launcher.AttachDebuggerToProcess(pid);
-            }
-            catch (Exception ex)
-            {
-                EqtTrace.Error(
-                    "VsTestConsoleRequestSender.AttachDebuggerToProcess: Error while attaching debugger to process: {0}",
-                    ex);
+    private void AttachDebuggerToProcess(ITestHostLauncher customHostLauncher, Message message)
+    {
+        var ackPayload = new EditorAttachDebuggerAckPayload()
+        {
+            Attached = false,
+            ErrorMessage = null
+        };
 
-                // vstest.console will send the abort message properly while cleaning up all the
-                // flow, so do not abort here.
-                // Let the ack go through and let vstest.console handle the error.
-                ackPayload.ErrorMessage = ex.Message;
-            }
-            finally
-            {
-                // Always unblock the vstest.console thread which is indefintitely waiting on this
-                // ACK.
-                this.communicationManager.SendMessage(
-                    MessageType.EditorAttachDebuggerCallback,
-                    ackPayload,
-                    this.protocolVersion);
-            }
+        try
+        {
+            var pid = _dataSerializer.DeserializePayload<int>(message);
+
+            ackPayload.Attached = customHostLauncher is ITestHostLauncher2 launcher
+                                  && launcher.AttachDebuggerToProcess(pid);
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Error(
+                "VsTestConsoleRequestSender.AttachDebuggerToProcess: Error while attaching debugger to process: {0}",
+                ex);
+
+            // vstest.console will send the abort message properly while cleaning up all the
+            // flow, so do not abort here.
+            // Let the ack go through and let vstest.console handle the error.
+            ackPayload.ErrorMessage = ex.Message;
+        }
+        finally
+        {
+            // Always unblock the vstest.console thread which is indefintitely waiting on this
+            // ACK.
+            _communicationManager.SendMessage(
+                MessageType.EditorAttachDebuggerCallback,
+                ackPayload,
+                _protocolVersion);
         }
     }
 }

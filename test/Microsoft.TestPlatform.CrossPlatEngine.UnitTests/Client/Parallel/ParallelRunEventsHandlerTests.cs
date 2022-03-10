@@ -1,204 +1,203 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CrossPlatEngine.UnitTests.Client
+namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
+
+using System;
+using System.Collections.Generic;
+
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
+[TestClass]
+public class ParallelRunEventsHandlerTests
 {
-    using System;
-    using System.Collections.Generic;
+    private ParallelRunEventsHandler _parallelRunEventsHandler;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    private Mock<IProxyExecutionManager> _mockProxyExecutionManager;
 
-    using Moq;
+    private Mock<ITestRunEventsHandler> _mockTestRunEventsHandler;
 
-    [TestClass]
-    public class ParallelRunEventsHandlerTests
+    private Mock<IParallelProxyExecutionManager> _mockParallelProxyExecutionManager;
+
+    private Mock<IDataSerializer> _mockDataSerializer;
+
+    private Mock<IRequestData> _mockRequestData;
+
+    [TestInitialize]
+    public void TestInit()
     {
-        private ParallelRunEventsHandler parallelRunEventsHandler;
+        _mockProxyExecutionManager = new Mock<IProxyExecutionManager>();
+        _mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        _mockParallelProxyExecutionManager = new Mock<IParallelProxyExecutionManager>();
+        _mockDataSerializer = new Mock<IDataSerializer>();
+        _mockRequestData = new Mock<IRequestData>();
+        _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
 
-        private Mock<IProxyExecutionManager> mockProxyExecutionManager;
+        _parallelRunEventsHandler = new ParallelRunEventsHandler(_mockRequestData.Object, _mockProxyExecutionManager.Object,
+            _mockTestRunEventsHandler.Object, _mockParallelProxyExecutionManager.Object,
+            new ParallelRunDataAggregator(Constants.EmptyRunSettings), _mockDataSerializer.Object);
+    }
 
-        private Mock<ITestRunEventsHandler> mockTestRunEventsHandler;
+    [TestMethod]
+    public void HandleRawMessageShouldSendStatsChangeRawMessageToRunEventsHandler()
+    {
+        string payload = "RunStats";
+        _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
+            .Returns(new Message() { MessageType = MessageType.TestRunStatsChange, Payload = payload });
 
-        private Mock<IParallelProxyExecutionManager> mockParallelProxyExecutionManager;
+        _parallelRunEventsHandler.HandleRawMessage(payload);
 
-        private Mock<IDataSerializer> mockDataSerializer;
+        _mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
+    }
 
-        private Mock<IRequestData> mockRequestData;
+    [TestMethod]
+    public void HandleRawMessageShouldSendLoggerRawMessageToRunEventsHandler()
+    {
+        string payload = "LogMessage";
+        _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
+            .Returns(new Message() { MessageType = MessageType.TestMessage, Payload = payload });
 
-        [TestInitialize]
-        public void TestInit()
-        {
-            this.mockProxyExecutionManager = new Mock<IProxyExecutionManager>();
-            this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
-            this.mockParallelProxyExecutionManager = new Mock<IParallelProxyExecutionManager>();
-            this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+        _parallelRunEventsHandler.HandleRawMessage(payload);
 
-            this.parallelRunEventsHandler = new ParallelRunEventsHandler(this.mockRequestData.Object, this.mockProxyExecutionManager.Object,
-                this.mockTestRunEventsHandler.Object, this.mockParallelProxyExecutionManager.Object,
-                new ParallelRunDataAggregator(), this.mockDataSerializer.Object);
-        }
+        _mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
+    }
 
-        [TestMethod]
-        public void HandleRawMessageShouldSendStatsChangeRawMessageToRunEventsHandler()
-        {
-            string payload = "RunStats";
-            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
-                .Returns(new Message() { MessageType = MessageType.TestRunStatsChange, Payload = payload });
+    [TestMethod]
+    public void HandleRawMessageShouldNotSendRunCompleteEventRawMessageToRunEventsHandler()
+    {
+        string payload = "ExecComplete";
+        _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
+            .Returns(new Message() { MessageType = MessageType.ExecutionComplete, Payload = payload });
 
-            this.parallelRunEventsHandler.HandleRawMessage(payload);
+        _parallelRunEventsHandler.HandleRawMessage(payload);
 
-            this.mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
-        }
+        _mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Never);
+    }
 
-        [TestMethod]
-        public void HandleRawMessageShouldSendLoggerRawMessageToRunEventsHandler()
-        {
-            string payload = "LogMessage";
-            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
-                .Returns(new Message() { MessageType = MessageType.TestMessage, Payload = payload });
+    [TestMethod]
+    public void HandleLogMessageShouldJustPassOnTheEventToRunEventsHandler()
+    {
+        string log = "Hello";
+        _parallelRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, log);
 
-            this.parallelRunEventsHandler.HandleRawMessage(payload);
+        _mockTestRunEventsHandler.Verify(mt =>
+            mt.HandleLogMessage(TestMessageLevel.Error, log), Times.Once);
+    }
 
-            this.mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
-        }
+    [TestMethod]
+    public void HandleRunStatsChangeShouldJustPassOnTheEventToRunEventsHandler()
+    {
+        var eventArgs = new TestRunChangedEventArgs(null, null, null);
+        _parallelRunEventsHandler.HandleTestRunStatsChange(eventArgs);
 
-        [TestMethod]
-        public void HandleRawMessageShouldNotSendRunCompleteEventRawMessageToRunEventsHandler()
-        {
-            string payload = "ExecComplete";
-            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
-                .Returns(new Message() { MessageType = MessageType.ExecutionComplete, Payload = payload });
+        _mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunStatsChange(eventArgs), Times.Once);
+    }
 
-            this.parallelRunEventsHandler.HandleRawMessage(payload);
+    [TestMethod]
+    public void LaunchProcessWithDebuggerAttachedShouldJustPassOnTheEventToRunEventsHandler()
+    {
+        var testProcessStartInfo = new TestProcessStartInfo();
+        _parallelRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
 
-            this.mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Never);
-        }
+        _mockTestRunEventsHandler.Verify(mt => mt.LaunchProcessWithDebuggerAttached(testProcessStartInfo), Times.Once);
+    }
 
-        [TestMethod]
-        public void HandleLogMessageShouldJustPassOnTheEventToRunEventsHandler()
-        {
-            string log = "Hello";
-            this.parallelRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, log);
+    [TestMethod]
+    public void HandleRunCompleteShouldNotCallLastChunkResultsIfNotPresent()
+    {
+        var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.Zero);
 
-            this.mockTestRunEventsHandler.Verify(mt =>
-                mt.HandleLogMessage(TestMessageLevel.Error, log), Times.Once);
-        }
+        _mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
+            _mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(false);
 
-        [TestMethod]
-        public void HandleRunStatsChangeShouldJustPassOnTheEventToRunEventsHandler()
-        {
-            var eventArgs = new TestRunChangedEventArgs(null, null, null);
-            this.parallelRunEventsHandler.HandleTestRunStatsChange(eventArgs);
+        _parallelRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
 
-            this.mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunStatsChange(eventArgs), Times.Once);
-        }
+        // Raw message must be sent
+        _mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Never);
 
-        [TestMethod]
-        public void LaunchProcessWithDebuggerAttachedShouldJustPassOnTheEventToRunEventsHandler()
-        {
-            var testProcessStartInfo = new TestProcessStartInfo();
-            this.parallelRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+        _mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunStatsChange(null), Times.Never);
 
-            this.mockTestRunEventsHandler.Verify(mt => mt.LaunchProcessWithDebuggerAttached(testProcessStartInfo), Times.Once);
-        }
+        _mockParallelProxyExecutionManager.Verify(mp => mp.HandlePartialRunComplete(
+            _mockProxyExecutionManager.Object, completeArgs, null, null, null), Times.Once);
+    }
 
-        [TestMethod]
-        public void HandleRunCompleteShouldNotCallLastChunkResultsIfNotPresent()
-        {
-            var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero);
+    [TestMethod]
+    public void HandleRunCompleteShouldCallLastChunkResultsIfPresent()
+    {
+        string payload = "RunStats";
+        var lastChunk = new TestRunChangedEventArgs(null, null, null);
+        var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.Zero);
 
-             this.mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
-                    this.mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(false);
+        _mockDataSerializer.Setup(mds => mds.SerializePayload(MessageType.TestRunStatsChange, lastChunk))
+            .Returns(payload);
 
-            this.parallelRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
+        _mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
+            _mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(false);
 
-            // Raw message must be sent
-            this.mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Never);
+        _parallelRunEventsHandler.HandleTestRunComplete(completeArgs, lastChunk, null, null);
 
-            this.mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunStatsChange(null), Times.Never);
+        // Raw message must be sent
+        _mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
 
-            this.mockParallelProxyExecutionManager.Verify(mp => mp.HandlePartialRunComplete(
-                this.mockProxyExecutionManager.Object, completeArgs, null, null, null), Times.Once);
-        }
+        _mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunStatsChange(lastChunk), Times.Once);
 
-        [TestMethod]
-        public void HandleRunCompleteShouldCallLastChunkResultsIfPresent()
-        {
-            string payload = "RunStats";
-            var lastChunk = new TestRunChangedEventArgs(null, null, null);
-            var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero);
+        _mockParallelProxyExecutionManager.Verify(mp => mp.HandlePartialRunComplete(
+            _mockProxyExecutionManager.Object, completeArgs, null, null, null), Times.Once);
+    }
 
-            this.mockDataSerializer.Setup(mds => mds.SerializePayload(MessageType.TestRunStatsChange, lastChunk))
-                .Returns(payload);
+    [TestMethod]
+    public void HandleRunCompleteShouldCallTestRunCompleteOnActualHandlerIfParallelMaangerReturnsCompleteAsTrue()
+    {
+        string payload = "ExecComplete";
+        var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.Zero);
 
-            this.mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
-                    this.mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(false);
+        _mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
+            _mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(true);
 
-            this.parallelRunEventsHandler.HandleTestRunComplete(completeArgs, lastChunk, null, null);
+        _mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.ExecutionComplete)).Returns(payload);
 
-            // Raw message must be sent
-            this.mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
+        _parallelRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
 
-            this.mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunStatsChange(lastChunk), Times.Once);
+        _mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunStatsChange(null), Times.Never);
 
-            this.mockParallelProxyExecutionManager.Verify(mp => mp.HandlePartialRunComplete(
-                this.mockProxyExecutionManager.Object, completeArgs, null, null, null), Times.Once);
-        }
+        _mockParallelProxyExecutionManager.Verify(mp => mp.HandlePartialRunComplete(
+            _mockProxyExecutionManager.Object, completeArgs, null, null, null), Times.Once);
 
-        [TestMethod]
-        public void HandleRunCompleteShouldCallTestRunCompleteOnActualHandlerIfParallelMaangerReturnsCompleteAsTrue()
-        {
-            string payload = "ExecComplete";
-            var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero);
+        _mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Once);
 
-            this.mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
-                    this.mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(true);
+        _mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunComplete(
+            It.IsAny<TestRunCompleteEventArgs>(),
+            It.IsAny<TestRunChangedEventArgs>(),
+            It.IsAny<ICollection<AttachmentSet>>(),
+            It.IsAny<ICollection<string>>()), Times.Once);
+    }
 
-            this.mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.ExecutionComplete)).Returns(payload);
+    [TestMethod]
+    public void HandleRunCompleteShouldCollectMetrics()
+    {
+        var mockMetricsCollector = new Mock<IMetricsCollection>();
+        _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
-            this.parallelRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
+        var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.Zero);
 
-            this.mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunStatsChange(null), Times.Never);
+        _mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
+            _mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(true);
 
-            this.mockParallelProxyExecutionManager.Verify(mp => mp.HandlePartialRunComplete(
-                this.mockProxyExecutionManager.Object, completeArgs, null, null, null), Times.Once);
+        // Act
+        _parallelRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
 
-            this.mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Once);
-
-            this.mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunComplete(
-                It.IsAny<TestRunCompleteEventArgs>(),
-                It.IsAny<TestRunChangedEventArgs>(),
-                It.IsAny<ICollection<AttachmentSet>>(),
-                It.IsAny<ICollection<string>>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void HandleRunCompleteShouldCollectMetrics()
-        {
-            var mockMetricsCollector = new Mock<IMetricsCollection>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
-
-            var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero);
-
-            this.mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
-                this.mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(true);
-
-            // Act
-            this.parallelRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
-
-            // Verify.
-            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.RunState, It.IsAny<string>()), Times.Once);
-        }
+        // Verify.
+        mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.RunState, It.IsAny<string>()), Times.Once);
     }
 }

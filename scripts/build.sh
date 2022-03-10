@@ -125,7 +125,7 @@ function ReadGlobalVersion {
 #
 # Dotnet configuration
 #
-# Disable first run since we want to control all package sources 
+# Disable first run since we want to control all package sources
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 # Dotnet build doesnt support --packages yet. See https://github.com/dotnet/cli/issues/2712
 export NUGET_PACKAGES=$TP_PACKAGES_DIR
@@ -149,7 +149,7 @@ TPB_CIBuild=$CI_BUILD
 TPB_LocalizedBuild=$DISABLE_LOCALIZED_BUILD
 TPB_Verbose=$VERBOSE
 TPB_EXTERNALS_VERSION=$(grep TestPlatformExternalsVersion $TP_ROOT_DIR/scripts/build/TestPlatform.Dependencies.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
-TPB_CC_EXTERNALS_VERSION=$(grep CodeCoverageExternalsVersion $TP_ROOT_DIR/scripts/build/TestPlatform.Dependencies.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
+TPB_CC_EXTERNALS_VERSION=$(grep MicrosoftInternalCodeCoverageVersion $TP_ROOT_DIR/eng/Versions.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
 
 if [[ $TP_USE_REPO_API = 1 ]]; then
     TPB_TargetFrameworkCore="net6.0"
@@ -247,7 +247,7 @@ function restore_package()
         $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true
     else
         log ".. .. Restore: Source: $TP_ROOT_DIR/src/package/external/external_BuildFromSource.csproj"
-        $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj /bl:restore.binlog --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version -p:DotNetBuildFromSource=true || failed=true
+        $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj /bl:restore_external.binlog --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version -p:DotNetBuildFromSource=true || failed=true
     fi
 
     if [ "$failed" = true ]; then
@@ -266,7 +266,7 @@ function invoke_build()
     log "invoke_build: Start build."
     local start=$SECONDS
     log ".. .. Build: Source: $TPB_Solution"
-    
+
     # Workaround for https://github.com/dotnet/sdk/issues/335
     export FrameworkPathOverride=$TP_PACKAGES_DIR/microsoft.targetingpack.netframework.v4.7.2/1.0.0/lib/net472/
     if [ -z "$PROJECT_NAME_PATTERNS" ]
@@ -274,7 +274,7 @@ function invoke_build()
         if [[ $TP_USE_REPO_API = 0 ]]; then
             $dotnet build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:TestPlatform.binlog || failed=true
         else
-            $dotnet build $TPB_Build_From_Source_Solution /bl:build.binlog --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:DotNetBuildFromSource=true -bl:TestPlatform.binlog || failed=true
+            $dotnet build $TPB_Build_From_Source_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:DotNetBuildFromSource=true -bl:TestPlatform.binlog || failed=true
        fi
     else
         find . -name "$PROJECT_NAME_PATTERNS" | xargs -L 1 $dotnet build --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
@@ -296,7 +296,7 @@ function publish_package()
 
     log "publish_package: Started."
     local start=$SECONDS
-    
+
     local packageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFramework/$TPB_TargetRuntime
     local coreCLRPackageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore
     local frameworkPackageDirMap=( \
@@ -360,13 +360,13 @@ function publish_package()
         mkdir -p $extensionsDir
 
         #*************************************************************************************************************#
-        # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
+        # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too.
         # Ideally we should just be publishing the loggers to the Extensions folder.
         loggers=( \
             "Microsoft.TestPlatform.Extensions.TrxLogger/bin/$TPB_Configuration/$current_tfn/Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" \
             "Microsoft.TestPlatform.Extensions.TrxLogger/bin/$TPB_Configuration/$current_tfn/Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.pdb" \
             "Microsoft.TestPlatform.Extensions.HtmlLogger/bin/$TPB_Configuration/$current_tfn/Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" \
-            "Microsoft.TestPlatform.Extensions.HtmlLogger/bin/$TPB_Configuration/$current_tfn/Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.pdb" 
+            "Microsoft.TestPlatform.Extensions.HtmlLogger/bin/$TPB_Configuration/$current_tfn/Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.pdb"
         )
 
         for i in ${loggers[@]}; do
@@ -388,7 +388,7 @@ function publish_package()
             "DataCollectors/Microsoft.TestPlatform.Extensions.EventLogCollector/bin/$TPB_Configuration/$current_tfn/Microsoft.TestPlatform.Extensions.EventLogCollector.dll" \
             "DataCollectors/Microsoft.TestPlatform.Extensions.EventLogCollector/bin/$TPB_Configuration/$current_tfn/Microsoft.TestPlatform.Extensions.EventLogCollector.pdb"
         )
-        
+
         for i in ${blame[@]}; do
             if [[ $TP_USE_REPO_API = 1 ]]; then
                 log ".. Package: ${i} (Source Build)"
@@ -399,14 +399,14 @@ function publish_package()
         done
         # TODO: move loc files too
         #*************************************************************************************************************#
-        
+
         #*************************************************************************************************************#
         # Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
         runtimeproviders=( \
             "Microsoft.TestPlatform.TestHostProvider/bin/$TPB_Configuration/$current_tfn/Microsoft.TestPlatform.TestHostRuntimeProvider.dll" \
             "Microsoft.TestPlatform.TestHostProvider/bin/$TPB_Configuration/$current_tfn/Microsoft.TestPlatform.TestHostRuntimeProvider.pdb"
         )
-        
+
         for i in ${runtimeproviders[@]}; do
             if [[ $TP_USE_REPO_API = 1 ]]; then
                 log ".. Package: ${i} (Source Build)"
@@ -424,7 +424,7 @@ function publish_package()
             # "microsoft.internal.dia.interop/$TPB_EXTERNALS_VERSION/tools/net451" \ # no linux support (cp to $testhost)
             "microsoft.visualstudio.coverage.io/$TPB_CC_EXTERNALS_VERSION/lib/netstandard2.0/"
         )
-        
+
         for i in ${externals[@]}; do
             if [[ $TP_USE_REPO_API = 1 ]]; then
                 log ".. Package: ${i} (Source Build)"
@@ -450,9 +450,9 @@ function publish_package()
     #
     assemblies=( \
         "Microsoft.TestPlatform.PlatformAbstractions/bin/$TPB_Configuration/$current_tfn" \
-        "Microsoft.TestPlatform.ObjectModel/bin/$TPB_Configuration/$current_tfn" 
+        "Microsoft.TestPlatform.ObjectModel/bin/$TPB_Configuration/$current_tfn"
     )
-    
+
     for i in ${assemblies[@]}; do
         if [[ $TP_USE_REPO_API = 1 ]]; then
             log ".. Package: ${i} (Source Build)"
@@ -463,7 +463,7 @@ function publish_package()
     done
     # TODO: move loc files too
     #*************************************************************************************************************#
-    
+
     log "publish_package: Complete. Elapsed $(( SECONDS - start ))s."
 }
 
@@ -507,9 +507,17 @@ function create_package()
     cp -r "$TP_PACKAGE_NUSPEC_DIR/../licenses" $stagingDir
 
     for i in ${projectFiles[@]}; do
-        log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version" \
-        && $dotnet restore $stagingDir/${i} \
-        && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version /bl:pack_$i.binlog
+        if [[ $TP_USE_REPO_API = 0 ]]; then
+            log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version"
+
+            $dotnet restore $stagingDir/${i} \
+                && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version /bl:pack_$i.binlog
+        else
+            log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version (Source Build)"
+
+            $dotnet restore $stagingDir/${i} \
+                && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version /bl:pack_$i.binlog -p:DotNetBuildFromSource=true
+        fi
     done
 
     log "Create-NugetPackages: Elapsed $(( SECONDS - start ))s."

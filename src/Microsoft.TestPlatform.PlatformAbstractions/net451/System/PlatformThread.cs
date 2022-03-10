@@ -3,49 +3,48 @@
 
 #if NETFRAMEWORK || NETSTANDARD2_0
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+using System;
+using System.Runtime.ExceptionServices;
+using System.Threading;
+
+using Interfaces;
+
+public class PlatformThread : IThread
 {
-    using System;
-    using System.Runtime.ExceptionServices;
-    using System.Threading;
-
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-
-    public class PlatformThread : IThread
+    /// <inheritdoc/>
+    public void Run(Action action, PlatformApartmentState apartmentState, bool waitForCompletion)
     {
-        /// <inheritdoc/>
-        public void Run(Action action, PlatformApartmentState apartmentState, bool waitForCompletion)
+        if (action == null)
         {
-            if (action == null)
+            return;
+        }
+
+        Exception exThrown = null;
+        var thread = new Thread(() =>
+        {
+            try
             {
-                return;
+                action();
             }
-
-            Exception exThrown = null;
-            var thread = new System.Threading.Thread(() =>
+            catch (Exception e)
             {
-                try
-                {
-                    action();
-                }
-                catch (Exception e)
-                {
-                    exThrown = e;
-                }
-            });
+                exThrown = e;
+            }
+        });
 
-            ApartmentState state = Enum.TryParse(apartmentState.ToString(), out state) ? state : ApartmentState.MTA;
-            thread.SetApartmentState(state);
-            thread.IsBackground = true;
-            thread.Start();
-            if (waitForCompletion)
+        ApartmentState state = Enum.TryParse(apartmentState.ToString(), out state) ? state : ApartmentState.MTA;
+        thread.SetApartmentState(state);
+        thread.IsBackground = true;
+        thread.Start();
+        if (waitForCompletion)
+        {
+            thread.Join();
+            if (exThrown != null)
             {
-                thread.Join();
-                if (exThrown != null)
-                {
-                    // Preserve the stacktrace when re-throwing the exception.
-                    ExceptionDispatchInfo.Capture(exThrown).Throw();
-                }
+                // Preserve the stacktrace when re-throwing the exception.
+                ExceptionDispatchInfo.Capture(exThrown).Throw();
             }
         }
     }

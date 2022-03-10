@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <!-- Package dependency versions -->
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
@@ -7,10 +6,10 @@
   </PropertyGroup>
   <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
-  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Dependencies.props" />
-  
+
   <PropertyGroup>
     <TargetFrameworks>net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <RootNamespace>child_hang</RootNamespace>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -23,8 +22,6 @@
     <PackageReference Include="System.Memory" Version="4.5.4" />
     <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
   </ItemGroup>
-  
+
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
-
-

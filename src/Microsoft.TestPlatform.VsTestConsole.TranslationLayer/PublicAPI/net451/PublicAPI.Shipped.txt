@@ -1,0 +1,2 @@
+Microsoft.TestPlatform.VsTestConsole.TranslationLayer.ConsoleParameters.EnvironmentVariables.get -> System.Collections.Generic.Dictionary<string, string>
+Microsoft.TestPlatform.VsTestConsole.TranslationLayer.ConsoleParameters.EnvironmentVariables.set -> void

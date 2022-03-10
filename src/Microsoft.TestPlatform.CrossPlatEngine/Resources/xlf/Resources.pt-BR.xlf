@@ -157,6 +157,26 @@
         <target state="translated">O proxy com a ID {0} já está disponível e não pode ser enfileirado novamente.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="translated">Nenhum provedor de runtime de teste encontrado para esta execução.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoProxyMatchesDescription">
+        <source>The runsettings changed between the time when the test session was established and the time of the current run/discovery request.</source>
+        <target state="translated">As runsettings foram alteradas entre a hora em que a sessão de teste foi estabelecida e a hora da solicitação de execução/descoberta atual.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="new">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="new">Attachments:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

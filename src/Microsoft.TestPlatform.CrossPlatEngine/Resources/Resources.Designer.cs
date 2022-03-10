@@ -79,6 +79,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to   {0}.
+        /// </summary>
+        internal static string AttachmentOutputFormat {
+            get {
+                return ResourceManager.GetString("AttachmentOutputFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attachments:.
+        /// </summary>
+        internal static string AttachmentsBanner {
+            get {
+                return ResourceManager.GetString("AttachmentsBanner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DataCollector debugging is enabled. Please attach debugger to datacollector process to continue..
         /// </summary>
         internal static string DataCollectorDebuggerWarning {
@@ -241,11 +259,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The runsettings changed between the time when the test session was established and the time of the current run/discovery request..
+        /// </summary>
+        internal static string NoProxyMatchesDescription {
+            get {
+                return ResourceManager.GetString("NoProxyMatchesDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Proxy with id {0} is not managed by the current session manager..
         /// </summary>
         internal static string NoSuchProxyId {
             get {
                 return ResourceManager.GetString("NoSuchProxyId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No suitable test runtime provider found for this run..
+        /// </summary>
+        internal static string NoTestHostProviderFound {
+            get {
+                return ResourceManager.GetString("NoTestHostProviderFound", resourceCulture);
             }
         }
         

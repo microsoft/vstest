@@ -1,111 +1,123 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
+namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+/// <inheritdoc />
+public class RunEventHandler : ITestRunEventsHandler2
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    /// <summary>
+    /// Gets the test results.
+    /// </summary>
+    public List<TestResult> TestResults { get; private set; }
 
-    /// <inheritdoc />
-    public class RunEventHandler : ITestRunEventsHandler2
+    /// <summary>
+    /// Gets the attachments.
+    /// </summary>
+    public List<AttachmentSet> Attachments { get; private set; }
+
+    /// <summary>
+    /// Gets the list of the invoked data collectors.
+    /// </summary>
+    public List<InvokedDataCollector> InvokedDataCollectors { get; private set; }
+
+    /// <summary>
+    /// Gets the metrics.
+    /// </summary>
+    public IDictionary<string, object> Metrics { get; private set; }
+
+    /// <summary>
+    /// Gets the log message.
+    /// </summary>
+    public string LogMessage { get; private set; }
+
+    public List<string> Errors { get; set; }
+
+    /// <summary>
+    /// Gets the test message level.
+    /// </summary>
+    public TestMessageLevel TestMessageLevel { get; private set; }
+
+    public RunEventHandler()
     {
-        /// <summary>
-        /// Gets the test results.
-        /// </summary>
-        public List<TestResult> TestResults { get; private set; }
+        TestResults = new List<TestResult>();
+        Errors = new List<string>();
+        Attachments = new List<AttachmentSet>();
+        InvokedDataCollectors = new List<InvokedDataCollector>();
+    }
 
-        /// <summary>
-        /// Gets the attachments.
-        /// </summary>
-        public List<AttachmentSet> Attachments { get; private set; }
-
-        /// <summary>
-        /// Gets the metrics.
-        /// </summary>
-        public IDictionary<string, object> Metrics { get; private set; }
-
-        /// <summary>
-        /// Gets the log message.
-        /// </summary>
-        public string LogMessage { get; private set; }
-
-        public List<string> Errors { get; set; }
-
-        /// <summary>
-        /// Gets the test message level.
-        /// </summary>
-        public TestMessageLevel TestMessageLevel { get; private set; }
-
-        public RunEventHandler()
+    public void EnsureSuccess()
+    {
+        if (Errors.Any())
         {
-            this.TestResults = new List<TestResult>();
-            this.Errors = new List<string>();
-            this.Attachments = new List<AttachmentSet>();
+            throw new InvalidOperationException($"Test run reported errors:{Environment.NewLine}{string.Join(Environment.NewLine + Environment.NewLine, Errors)}");
+        }
+    }
+
+    public void HandleLogMessage(TestMessageLevel level, string message)
+    {
+        LogMessage = message;
+        TestMessageLevel = level;
+        if (level == TestMessageLevel.Error)
+        {
+            Errors.Add(message);
+        }
+    }
+
+    public void HandleTestRunComplete(
+        TestRunCompleteEventArgs testRunCompleteArgs,
+        TestRunChangedEventArgs lastChunkArgs,
+        ICollection<AttachmentSet> runContextAttachments,
+        ICollection<string> executorUris)
+    {
+        if (lastChunkArgs != null && lastChunkArgs.NewTestResults != null)
+        {
+            TestResults.AddRange(lastChunkArgs.NewTestResults);
         }
 
-        public void EnsureSuccess()
+        if (testRunCompleteArgs.AttachmentSets != null)
         {
-            if (this.Errors.Any())
-            {
-                throw new InvalidOperationException($"Test run reported errors:{Environment.NewLine}{string.Join(Environment.NewLine + Environment.NewLine, this.Errors)}");
-            }
+            Attachments.AddRange(testRunCompleteArgs.AttachmentSets);
         }
 
-        public void HandleLogMessage(TestMessageLevel level, string message)
+        if (testRunCompleteArgs.InvokedDataCollectors != null)
         {
-            this.LogMessage = message;
-            this.TestMessageLevel = level;
-            if (level == TestMessageLevel.Error) {
-                this.Errors.Add(message);
-            }
+            InvokedDataCollectors.AddRange(testRunCompleteArgs.InvokedDataCollectors);
         }
 
-        public void HandleTestRunComplete(
-            TestRunCompleteEventArgs testRunCompleteArgs,
-            TestRunChangedEventArgs lastChunkArgs,
-            ICollection<AttachmentSet> runContextAttachments,
-            ICollection<string> executorUris)
+        Metrics = testRunCompleteArgs.Metrics;
+    }
+
+    public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+    {
+        if (testRunChangedArgs != null && testRunChangedArgs.NewTestResults != null)
         {
-            if (lastChunkArgs != null && lastChunkArgs.NewTestResults != null)
-            {
-                this.TestResults.AddRange(lastChunkArgs.NewTestResults);
-            }
-
-            if (testRunCompleteArgs.AttachmentSets != null)
-            {
-                this.Attachments.AddRange(testRunCompleteArgs.AttachmentSets);
-            }
-
-            this.Metrics = testRunCompleteArgs.Metrics;
+            TestResults.AddRange(testRunChangedArgs.NewTestResults);
         }
+    }
 
-        public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
-        {
-            if (testRunChangedArgs != null && testRunChangedArgs.NewTestResults != null)
-            {
-                this.TestResults.AddRange(testRunChangedArgs.NewTestResults);
-            }
-        }
+    public void HandleRawMessage(string rawMessage)
+    {
+        // No op
+    }
 
-        public void HandleRawMessage(string rawMessage)
-        {
-            // No op
-        }
+    public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
+    {
+        // No op
+        return -1;
+    }
 
-        public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
-        {
-            // No op
-            return -1;
-        }
-
-        public bool AttachDebuggerToProcess(int pid)
-        {
-            // No op
-            return true;
-        }
+    public bool AttachDebuggerToProcess(int pid)
+    {
+        // No op
+        return true;
     }
 }

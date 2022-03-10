@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
@@ -8,9 +8,9 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
-	<OutputType Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">Exe</OutputType>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
+    <OutputType Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">Exe</OutputType>
     <AssemblyName>vstest.console.PlatformTests</AssemblyName>
-    <EnableCodeAnalysis>true</EnableCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\vstest.console\vstest.console.csproj" />

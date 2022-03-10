@@ -3,77 +3,77 @@
 
 #if NETCOREAPP
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+using System;
+using System.Runtime.InteropServices;
+using System.Threading;
+
+using Interfaces;
+
+/// <inheritdoc />
+public class PlatformEnvironment : IEnvironment
 {
-    using System;
-    using System.Runtime.InteropServices;
-    using System.Threading;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    /// <inheritdoc />
+    public PlatformArchitecture Architecture
+    {
+        get
+        {
+            switch (RuntimeInformation.OSArchitecture)
+            {
+                case System.Runtime.InteropServices.Architecture.X86:
+                    return PlatformArchitecture.X86;
+                case System.Runtime.InteropServices.Architecture.X64:
+                    return PlatformArchitecture.X64;
+                case System.Runtime.InteropServices.Architecture.Arm:
+                    return PlatformArchitecture.ARM;
+                case System.Runtime.InteropServices.Architecture.Arm64:
+                    return PlatformArchitecture.ARM64;
+
+                // The symbolic value is only available with .NET 6
+                // preview 6 or later, so use the numerical value for now.
+                // case System.Runtime.InteropServices.Architecture.S390x:
+                case (Architecture)5:
+                    return PlatformArchitecture.S390x;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+    }
 
     /// <inheritdoc />
-    public class PlatformEnvironment : IEnvironment
+    public PlatformOperatingSystem OperatingSystem
     {
-        /// <inheritdoc />
-        public PlatformArchitecture Architecture
+        get
         {
-            get
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                switch (RuntimeInformation.OSArchitecture)
-                {
-                    case System.Runtime.InteropServices.Architecture.X86:
-                        return PlatformArchitecture.X86;
-                    case System.Runtime.InteropServices.Architecture.X64:
-                        return PlatformArchitecture.X64;
-                    case System.Runtime.InteropServices.Architecture.Arm:
-                        return PlatformArchitecture.ARM;
-                    case System.Runtime.InteropServices.Architecture.Arm64:
-                        return PlatformArchitecture.ARM64;
-
-                    // The symbolic value is only available with .NET 6
-                    // preview 6 or later, so use the numerical value for now.
-                    // case System.Runtime.InteropServices.Architecture.S390x:
-                    case (Architecture)5:
-                        return PlatformArchitecture.S390x;
-                    default:
-                        throw new NotSupportedException();
-                }
+                return PlatformOperatingSystem.Windows;
             }
-        }
 
-        /// <inheritdoc />
-        public PlatformOperatingSystem OperatingSystem
+            return RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? PlatformOperatingSystem.OSX : PlatformOperatingSystem.Unix;
+        }
+    }
+
+    /// <inheritdoc />
+    public string OperatingSystemVersion
+    {
+        get
         {
-            get
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    return PlatformOperatingSystem.Windows;
-                }
-
-                return PlatformOperatingSystem.Unix;
-            }
+            return RuntimeInformation.OSDescription;
         }
+    }
 
-        /// <inheritdoc />
-        public string OperatingSystemVersion
-        {
-            get
-            {
-                return RuntimeInformation.OSDescription;
-            }
-        }
+    /// <inheritdoc />
+    public void Exit(int exitcode)
+    {
+        Environment.Exit(exitcode);
+    }
 
-        /// <inheritdoc />
-        public void Exit(int exitcode)
-        {
-            Environment.Exit(exitcode);
-        }
-
-        /// <inheritdoc />
-        public int GetCurrentManagedThreadId()
-        {
-            return Thread.CurrentThread.ManagedThreadId;
-        }
+    /// <inheritdoc />
+    public int GetCurrentManagedThreadId()
+    {
+        return Thread.CurrentThread.ManagedThreadId;
     }
 }
 

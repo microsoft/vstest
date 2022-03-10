@@ -3,19 +3,19 @@
 
 #if NETSTANDARD && !NETSTANDARD2_0
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
-{
-    using System;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
+using System;
+
+using Interfaces;
+
+/// <inheritdoc />
+public class PlatformThread : IThread
+{
     /// <inheritdoc />
-    public class PlatformThread : IThread
+    public void Run(Action action, PlatformApartmentState platformApartmentState, bool waitForCompletion)
     {
-        /// <inheritdoc />
-        public void Run(Action action, PlatformApartmentState platformApartmentState, bool waitForCompletion)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }
 

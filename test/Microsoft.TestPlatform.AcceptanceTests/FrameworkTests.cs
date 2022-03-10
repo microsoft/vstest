@@ -1,104 +1,101 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AcceptanceTests
+namespace Microsoft.TestPlatform.AcceptanceTests;
+
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+[TestClass]
+public class FrameworkTests : AcceptanceTestBase
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    [TestClass]
-    public class FrameworkTests : AcceptanceTestBase
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void FrameworkArgumentShouldWork(RunnerInfo runnerInfo)
     {
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void FrameworkArgumentShouldWork(RunnerInfo runnerInfo)
+        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: tempDir.Path);
+        arguments = string.Concat(arguments, " ", $"/Framework:{FrameworkArgValue}");
+
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 1);
+    }
+
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void FrameworkShortNameArgumentShouldWork(RunnerInfo runnerInfo)
+    {
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
+
+        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: tempDir.Path);
+        arguments = string.Concat(arguments, " ", $"/Framework:{_testEnvironment.TargetFramework}");
+
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 1, 1);
+    }
+
+    [TestMethod]
+    // framework runner not available on Linux
+    [TestCategory("Windows-Review")]
+    [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
+    //[NetCoreTargetFrameworkDataSource]
+    public void OnWrongFrameworkPassedTestRunShouldNotRun(RunnerInfo runnerInfo)
+    {
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
+
+        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: tempDir.Path);
+        if (runnerInfo.TargetFramework.Contains("netcore"))
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var resultsDir = GetResultsDirectory();
-
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: resultsDir);
-            arguments = string.Concat(arguments, " ", $"/Framework:{this.FrameworkArgValue}");
-
-            this.InvokeVsTest(arguments);
-            this.ValidateSummaryStatus(1, 1, 1);
-            TryRemoveDirectory(resultsDir);
+            arguments = string.Concat(arguments, " ", "/Framework:Framework45");
         }
-
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void FrameworkShortNameArgumentShouldWork(RunnerInfo runnerInfo)
+        else
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var resultsDir = GetResultsDirectory();
-
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: resultsDir);
-            arguments = string.Concat(arguments, " ", $"/Framework:{this.testEnvironment.TargetFramework}");
-
-            this.InvokeVsTest(arguments);
-            this.ValidateSummaryStatus(1, 1, 1);
-            TryRemoveDirectory(resultsDir);
+            arguments = string.Concat(arguments, " ", "/Framework:FrameworkCore10");
         }
+        InvokeVsTest(arguments);
 
-        [TestMethod]
-        // framework runner not available on Linux
-        [TestCategory("Windows-Review")]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void OnWrongFrameworkPassedTestRunShouldNotRun(RunnerInfo runnerInfo)
+        if (runnerInfo.TargetFramework.Contains("netcore"))
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var resultsDir = GetResultsDirectory();
-
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: resultsDir);
-            if (runnerInfo.TargetFramework.Contains("netcore"))
-            {
-                arguments = string.Concat(arguments, " ", "/Framework:Framework45");
-            }
-            else
-            {
-                arguments = string.Concat(arguments, " ", "/Framework:FrameworkCore10");
-            }
-            this.InvokeVsTest(arguments);
-
-            if (runnerInfo.TargetFramework.Contains("netcore"))
-            {
-                this.StdOutputContains("No test is available");
-            }
-            else
-            {
-                this.StdErrorContains("Test Run Aborted.");
-            }
-
-            TryRemoveDirectory(resultsDir);
+            StdOutputContains("No test is available");
         }
-
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public void RunSpecificTestsShouldWorkWithFrameworkInCompatibleWarning(RunnerInfo runnerInfo)
+        else
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var resultsDir = GetResultsDirectory();
+            // This test indirectly tests that we abort when incorrect framework is forced on a DLL, the failure message with the new fallback
+            // is uglier than then one before that suggests (incorrectly) to install Microsoft.NET.Test.Sdk into the project, which would work,
+            // but would not solve the problem. In either cases we should improve the message later.
+            StdErrorContains("Test Run Failed.");
+        }
+    }
 
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: resultsDir);
-            arguments = string.Concat(arguments, " ", "/tests:PassingTest");
-            arguments = string.Concat(arguments, " ", "/Framework:Framework40");
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void RunSpecificTestsShouldWorkWithFrameworkInCompatibleWarning(RunnerInfo runnerInfo)
+    {
+        AcceptanceTestBase.SetTestEnvironment(_testEnvironment, runnerInfo);
+        using var tempDir = new TempDirectory();
 
-            this.InvokeVsTest(arguments);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: tempDir.Path);
+        arguments = string.Concat(arguments, " ", "/tests:PassingTest");
+        arguments = string.Concat(arguments, " ", "/Framework:Framework40");
 
-            if (runnerInfo.TargetFramework.Contains("netcore"))
-            {
-                this.StdOutputContains("No test is available");
-            }
-            else
-            {
-                this.StdOutputContains("Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.0 framework and X86 platform.");
-                this.ValidateSummaryStatus(1, 0, 0);
-            }
+        InvokeVsTest(arguments);
 
-            TryRemoveDirectory(resultsDir);
+        if (runnerInfo.TargetFramework.Contains("netcore"))
+        {
+            StdOutputContains("No test is available");
+        }
+        else
+        {
+            StdOutputContains("Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.0 framework and X86 platform.");
+            ValidateSummaryStatus(1, 0, 0);
         }
     }
 }

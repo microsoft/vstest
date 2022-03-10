@@ -387,9 +387,9 @@
         <target state="translated">        URI: {0}</target>
       </trans-unit>
       <trans-unit id="InvalidPlatformType">
-        <source>Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.</source>
-        <note></note>
-        <target state="translated">プラットフォームの種類が無効です: {0}。有効なプラットフォームの種類は、x86、x64、および Arm です。</target>
+        <source>Invalid platform type: {0}. Valid platform types are {1}.</source>
+        <note>0 is the platform type e.g. x86, and 1 is a list of the built in platforms, e.g. x86, x64</note>
+        <target state="translated">プラットフォームの種類が無効です: {0}。有効なプラットフォームの種類は {1} です。</target>
       </trans-unit>
       <trans-unit id="PlatformTypeRequired">
         <source>The /Platform argument requires the target platform type for the test run to be provided.   Example:  /Platform:x86</source>
@@ -1106,6 +1106,11 @@
       <trans-unit id="TestRunAbortedWithError">
         <source>Test Run Aborted with error {0}.</source>
         <target state="translated">テストの実行がエラー {0} により中止されました。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidTestSessionCorrelationId">
+        <source>Invalid testSessionCorrelationId</source>
+        <target state="new">Invalid testSessionCorrelationId</target>
         <note></note>
       </trans-unit>
     </body>

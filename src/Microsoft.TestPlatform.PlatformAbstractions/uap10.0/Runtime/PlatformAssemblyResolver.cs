@@ -3,29 +3,28 @@
 
 #if WINDOWS_UWP
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+using Interfaces;
+
+/// <inheritdoc/>
+public class PlatformAssemblyResolver : IAssemblyResolver
 {
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    public PlatformAssemblyResolver()
+    {
+    }
 
     /// <inheritdoc/>
-    public class PlatformAssemblyResolver : IAssemblyResolver
+    public event AssemblyResolveEventHandler AssemblyResolve;
+
+    public void Dispose()
     {
-        public PlatformAssemblyResolver()
-        {
-        }
+    }
 
-        /// <inheritdoc/>
-        public event AssemblyResolveEventHandler AssemblyResolve;
-
-        public void Dispose()
-        {
-        }
-
-        private void DummyEventThrower()
-        {
-            // need to raise this event, else compiler throws error
-            this.AssemblyResolve(this, null);
-        }
+    private void DummyEventThrower()
+    {
+        // need to raise this event, else compiler throws error
+        AssemblyResolve(this, null);
     }
 }
 

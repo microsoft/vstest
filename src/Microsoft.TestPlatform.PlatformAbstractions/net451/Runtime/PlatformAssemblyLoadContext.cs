@@ -3,25 +3,24 @@
 
 #if NETFRAMEWORK || NETSTANDARD2_0
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+using System.Reflection;
+
+using Interfaces;
+
+/// <inheritdoc/>
+public class PlatformAssemblyLoadContext : IAssemblyLoadContext
 {
-    using System.Reflection;
-
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-
     /// <inheritdoc/>
-    public class PlatformAssemblyLoadContext : IAssemblyLoadContext
+    public AssemblyName GetAssemblyNameFromPath(string assemblyPath)
     {
-        /// <inheritdoc/>
-        public AssemblyName GetAssemblyNameFromPath(string assemblyPath)
-        {
-            return AssemblyName.GetAssemblyName(assemblyPath);
-        }
+        return AssemblyName.GetAssemblyName(assemblyPath);
+    }
 
-        public Assembly LoadAssemblyFromPath(string assemblyPath)
-        {
-            return Assembly.LoadFrom(assemblyPath);
-        }
+    public Assembly LoadAssemblyFromPath(string assemblyPath)
+    {
+        return Assembly.LoadFrom(assemblyPath);
     }
 }
 

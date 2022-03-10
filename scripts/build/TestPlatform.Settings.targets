@@ -5,7 +5,11 @@
     <!-- This version is read by vsts-prebuild.ps1 and is a base for the current version, this should be updated
     at the start of new iteration to the goal number. This is also used to version the local packages. This version needs to be statically
     readable when we read the file as xml, don't move it to a .props file, unless you change the build server process -->
-    <TPVersionPrefix>17.0.0</TPVersionPrefix>
+    <TPVersionPrefix>17.2.0</TPVersionPrefix>
+    <LangVersion>preview</LangVersion>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>preview</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <PropertyGroup>
     <!-- Versioning is defined from the build script. Use a default dev build if it's not defined.
@@ -16,7 +20,9 @@
          serialization. This is also defined in build script. -->
     <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">15.0.0</AssemblyVersion>
 
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- Treat warnings as errors only on CI to prevent painful development process because of unused usings... -->
+    <TreatWarningsAsErrors Condition="'$(CIBuild)' == 'true'">true</TreatWarningsAsErrors>
+
     <PublicSign Condition="'$(CIBuild)' == '' or '$(CIBuild)' == 'false'">true</PublicSign>
     <DelaySign Condition="'$(CIBuild)' == 'true'">true</DelaySign>
     <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
@@ -37,23 +43,35 @@
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
-  </PropertyGroup> 
+  </PropertyGroup>
 
   <!-- Package dependency versions -->
-  <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Dependencies.props" />
+  <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Dependencies.props" Condition=" '$(DependencyVersionsImported)' != 'true' "/>
 
-  <!-- Common dependencies for all projects -->
-  <ItemGroup>
-    <AdditionalFiles Include="$(TestPlatformRoot)scripts\stylecop.json">
-      <Link>stylecop.json</Link>
-    </AdditionalFiles>
-  </ItemGroup>
+  <!-- Include PublicApi analyzers into all projects that are in our src directory, this can't use TestProject == true
+  because some projects in test and playground are not tests, but we don't want to analyze those for public apis, because
+  we don't ship them.
+  -->
+  <Choose>
+    <!-- Use relative path between the project and the root to avoid including the analyzer if the path above the root contains 'src' (e.g. C:\src\vstest). -->
+    <When Condition="$([MSBuild]::MakeRelative($(TestPlatformRoot), $(MSBuildProjectFullPath)).StartsWith('src/')) OR $([MSBuild]::MakeRelative($(TestPlatformRoot), $(MSBuildProjectFullPath)).StartsWith('src\'))">
+      <ItemGroup>
+        <!-- We normally don't build against net6.0, so the public api analyzer errors would only appear in CI pipeline. -->
+        <PackageReference Condition=" '$(DotNetBuildFromSource)' != 'true' " Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="$(RoslynPublicApiAnalyzersVersion)">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+      </ItemGroup>
+    </When>
+  </Choose>
 
   <!-- Test project settings -->
   <Choose>
-    <When Condition="$(TestProject) == 'true'"> 
+    <When Condition="$(TestProject) == 'true'">
       <PropertyGroup>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <!-- Suppress warnings about testhost being x64 (AMD64)/x86 when imported into AnyCPU (MSIL) test projects. -->
+        <NoWarn>$(NoWarn);MSB3270</NoWarn>
       </PropertyGroup>
 
       <!-- Test projects are not discovered in test window without test container capability -->
@@ -103,15 +121,4 @@
       </ItemGroup>
     </When>
   </Choose>
-
-  <!-- Code analysis settings -->
-  <PropertyGroup>
-    <!-- Disable code analysis by default. Ignore SA0001 until we've xml documentation enabled for
-         all projects -->
-    <EnableCodeAnalysis>false</EnableCodeAnalysis>
-    <NoWarn>$(NoWarn);SA0001</NoWarn>
-
-    <CodeAnalysisRuleSet>$(TestPlatformRoot)scripts/stylecop.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRuleSet Condition="$(TestProject) == 'true'">$(TestPlatformRoot)scripts/stylecop.test.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
 </Project>

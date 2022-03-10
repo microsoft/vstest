@@ -157,6 +157,26 @@
         <target state="translated">ID が {0} のプロキシは、既に使用可能になっているため、再度エンキューすることはできません。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="translated">この実行に対して適切なテスト ランタイム プロバイダーが見つかりませんでした。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoProxyMatchesDescription">
+        <source>The runsettings changed between the time when the test session was established and the time of the current run/discovery request.</source>
+        <target state="translated">テスト セッションが確立された時刻と現在の実行/検出要求の時刻の間で、実行設定が変更されました。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="new">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="new">Attachments:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

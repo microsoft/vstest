@@ -1,0 +1,1 @@
+Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.InvalidManagedNameException.InvalidManagedNameException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) -> void

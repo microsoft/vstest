@@ -1,192 +1,156 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Xml;
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
-    using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+using System;
+using System.Collections.Generic;
+using System.Xml;
+
+using XML;
+
+/// <summary>
+/// XML object for saving test summary - Outcome and counts (passed, failed etc)
+/// </summary>
+internal class TestRunSummary : IXmlTestStore
+{
+    #region Fields
+
+    [StoreXmlSimpleField("Counters/@total")]
+    private readonly int _totalTests;
+    [StoreXmlSimpleField("Counters/@executed")]
+    private readonly int _executedTests;
+    [StoreXmlSimpleField("Counters/@passed")]
+    private readonly int _passedTests;
+    [StoreXmlSimpleField("Counters/@failed")]
+    private readonly int _failedTests;
+    [StoreXmlSimpleField("Counters/@error")]
+    private readonly int _errorTests;
+    [StoreXmlSimpleField("Counters/@timeout")]
+    private readonly int _timeoutTests;
+    [StoreXmlSimpleField("Counters/@aborted")]
+    private readonly int _abortedTests;
+    [StoreXmlSimpleField("Counters/@inconclusive")]
+    private readonly int _inconclusiveTests;
+    [StoreXmlSimpleField("Counters/@passedButRunAborted")]
+    private readonly int _passedButRunAborted;
+    [StoreXmlSimpleField("Counters/@notRunnable")]
+    private readonly int _notRunnable;
+    [StoreXmlSimpleField("Counters/@notExecuted")]
+    private readonly int _notExecuted;
+    [StoreXmlSimpleField("Counters/@disconnected")]
+    private readonly int _disconnected;
+    [StoreXmlSimpleField("Counters/@warning")]
+    private readonly int _warning;
+    [StoreXmlSimpleField("Counters/@completed")]
+    private readonly int _completed;
+    [StoreXmlSimpleField("Counters/@inProgress")]
+    private readonly int _inProgress;
+    [StoreXmlSimpleField("Counters/@pending")]
+    private readonly int _pending;
+    [StoreXmlSimpleField("@outcome")]
+    private readonly TestOutcome _outcome = TestOutcome.Pending;
+    [StoreXmlSimpleField("Output/StdOut", "")]
+    private readonly string _stdOut = string.Empty;
+
+    private readonly List<RunInfo> _runLevelErrorsAndWarnings;
+
+    private readonly List<CollectorDataEntry> _collectorDataEntries;
+
+    private readonly IList<String> _resultFiles;
+
+    #endregion
+
+    #region constructor
 
     /// <summary>
-    /// XML object for saving test summary - Outcome and counts (passed, failed etc)
+    /// Initializes a new instance of the <see cref="TestRunSummary"/> class.
     /// </summary>
-    internal class TestRunSummary : IXmlTestStore
+    /// <param name="total">
+    /// The total number of tests discover in this run.
+    /// </param>
+    /// <param name="executed">
+    /// The executed tests.
+    /// </param>
+    /// <param name="pass">
+    /// The pass tests.
+    /// </param>
+    /// <param name="fail">
+    /// The fail tests.
+    /// </param>
+    /// <param name="outcome">
+    /// The outcome.
+    /// </param>
+    /// <param name="runMessages">
+    /// The run messages.
+    /// </param>
+    /// <param name="stdOut">
+    /// The standard out.
+    /// </param>
+    /// <param name="resultFiles">
+    /// The result files.
+    /// </param>
+    /// <param name="dataCollectors">
+    /// The data collectors.
+    /// </param>
+    public TestRunSummary(
+        int total,
+        int executed,
+        int pass,
+        int fail,
+        TestOutcome outcome,
+        List<RunInfo> runMessages,
+        string stdOut,
+        IList<String> resultFiles,
+        List<CollectorDataEntry> dataCollectors)
     {
-        #region Fields
+        _totalTests = total;
+        _executedTests = executed;
+        _passedTests = pass;
+        _failedTests = fail;
+        int countForNonExistingResults = 0; // if below values are assigned constants 0, compiler gives warning CS0414
+        _abortedTests = countForNonExistingResults;
+        _errorTests = countForNonExistingResults;
+        _timeoutTests = countForNonExistingResults;
+        _inconclusiveTests = countForNonExistingResults;
+        _passedButRunAborted = countForNonExistingResults;
+        _notRunnable = countForNonExistingResults;
+        _notExecuted = countForNonExistingResults;
+        _disconnected = countForNonExistingResults;
+        _warning = countForNonExistingResults;
+        _completed = countForNonExistingResults;
+        _inProgress = countForNonExistingResults;
+        _pending = countForNonExistingResults;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@total")]
-        private int totalTests;
+        _outcome = outcome;
+        _stdOut = stdOut;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@executed")]
-        private int executedTests;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@passed")]
-        private int passedTests;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@failed")]
-        private int failedTests;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@error")]
-        private int errorTests;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@timeout")]
-        private int timeoutTests;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@aborted")]
-        private int abortedTests;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@inconclusive")]
-        private int inconclusiveTests;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@passedButRunAborted")]
-        private int passedButRunAborted;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@notRunnable")]
-        private int notRunnable;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@notExecuted")]
-        private int notExecuted;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@disconnected")]
-        private int disconnected;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@warning")]
-        private int warning;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@completed")]
-        private int completed;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@inProgress")]
-        private int inProgress;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Counters/@pending")]
-        private int pending;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField]
-        private TestOutcome outcome = TestOutcome.Pending;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Reviewed. Suppression is ok here.")]
-        [StoreXmlSimpleField("Output/StdOut", "")]
-        private string stdOut = string.Empty;
-
-        private List<RunInfo> runLevelErrorsAndWarnings;
-
-        private List<CollectorDataEntry> collectorDataEntries;
-
-        private IList<String> resultFiles;
-
-        #endregion
-
-        #region constructor
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TestRunSummary"/> class.
-        /// </summary>
-        /// <param name="total">
-        /// The total number of tests discover in this run.
-        /// </param>
-        /// <param name="executed">
-        /// The executed tests.
-        /// </param>
-        /// <param name="pass">
-        /// The pass tests.
-        /// </param>
-        /// <param name="fail">
-        /// The fail tests.
-        /// </param>
-        /// <param name="outcome">
-        /// The outcome.
-        /// </param>
-        /// <param name="runMessages">
-        /// The run messages.
-        /// </param>
-        /// <param name="stdOut">
-        /// The standard out.
-        /// </param>
-        /// <param name="resultFiles">
-        /// The result files.
-        /// </param>
-        /// <param name="dataCollectors">
-        /// The data collectors.
-        /// </param>
-        public TestRunSummary(
-            int total,
-            int executed,
-            int pass,
-            int fail,
-            TestOutcome outcome,
-            List<RunInfo> runMessages,
-            string stdOut,
-            IList<String> resultFiles,
-            List<CollectorDataEntry> dataCollectors)
-        {
-            this.totalTests = total;
-            this.executedTests = executed;
-            this.passedTests = pass;
-            this.failedTests = fail;
-            int countForNonExistingResults = 0; // if below values are assigned constants 0, compiler gives warning CS0414
-            this.abortedTests = countForNonExistingResults;
-            this.errorTests = countForNonExistingResults;
-            this.timeoutTests = countForNonExistingResults;
-            this.inconclusiveTests = countForNonExistingResults;
-            this.passedButRunAborted = countForNonExistingResults;
-            this.notRunnable = countForNonExistingResults;
-            this.notExecuted = countForNonExistingResults;
-            this.disconnected = countForNonExistingResults;
-            this.warning = countForNonExistingResults;
-            this.completed = countForNonExistingResults;
-            this.inProgress = countForNonExistingResults;
-            this.pending = countForNonExistingResults;
-
-            this.outcome = outcome;
-            this.stdOut = stdOut;
-
-            this.runLevelErrorsAndWarnings = runMessages;
-            this.resultFiles = resultFiles;
-            this.collectorDataEntries = dataCollectors;
-        }
-
-        #endregion
-
-        #region IXmlTestStore Members
-
-        /// <summary>
-        /// Saves the class under the XmlElement..
-        /// </summary>
-        /// <param name="element">
-        /// The parent xml.
-        /// </param>
-        /// <param name="parameters">
-        /// The parameter
-        /// </param>
-        public void Save(XmlElement element, XmlTestStoreParameters parameters)
-        {
-            XmlPersistence helper = new XmlPersistence();
-            helper.SaveSingleFields(element, this, parameters);
-            helper.SaveIEnumerable(this.runLevelErrorsAndWarnings, element, "RunInfos", ".", "RunInfo", parameters);
-            helper.SaveIEnumerable(this.resultFiles, element, "ResultFiles", "@path", "ResultFile", parameters);
-            helper.SaveIEnumerable(this.collectorDataEntries, element, "CollectorDataEntries", ".", "Collector", parameters);
-        }
-
-        #endregion
+        _runLevelErrorsAndWarnings = runMessages;
+        _resultFiles = resultFiles;
+        _collectorDataEntries = dataCollectors;
     }
+
+    #endregion
+
+    #region IXmlTestStore Members
+
+    /// <summary>
+    /// Saves the class under the XmlElement..
+    /// </summary>
+    /// <param name="element">
+    /// The parent xml.
+    /// </param>
+    /// <param name="parameters">
+    /// The parameter
+    /// </param>
+    public void Save(XmlElement element, XmlTestStoreParameters parameters)
+    {
+        XmlPersistence helper = new();
+        helper.SaveSingleFields(element, this, parameters);
+        helper.SaveIEnumerable(_runLevelErrorsAndWarnings, element, "RunInfos", ".", "RunInfo", parameters);
+        helper.SaveIEnumerable(_resultFiles, element, "ResultFiles", "@path", "ResultFile", parameters);
+        helper.SaveIEnumerable(_collectorDataEntries, element, "CollectorDataEntries", ".", "Collector", parameters);
+    }
+
+    #endregion
 }

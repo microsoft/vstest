@@ -22,12 +22,12 @@
     <dependencies>
       <group targetFramework="net45">
         <dependency id="System.Reflection.Metadata" version="[1.6.0, )" />
-        <dependency id="NuGet.Frameworks" version="[5.0.0, )" />
+        <dependency id="NuGet.Frameworks" version="[5.11.0, )" />
       </group>
       
       <group targetFramework="net451">
         <dependency id="System.Reflection.Metadata" version="[1.6.0, )" />
-        <dependency id="NuGet.Frameworks" version="[5.0.0, )" />
+        <dependency id="NuGet.Frameworks" version="[5.11.0, )" />
       </group>
 
       <group targetFramework="netcoreapp1.0">
@@ -37,7 +37,7 @@
             
       <group targetFramework="netcoreapp2.1">
         <dependency id="System.Reflection.Metadata" version="[1.6.0, )" />
-        <dependency id="NuGet.Frameworks" version="[5.0.0, )" />
+        <dependency id="NuGet.Frameworks" version="[5.11.0, )" />
       </group>
       
       <group targetFramework="netstandard1.0">
@@ -64,7 +64,7 @@
       </group>
       
       <group targetFramework="uap10.0">
-        <dependency id="NETStandard.Library" version="[1.6.1, )" />
+        <dependency id="NETStandard.Library" version="[1.6.0, )" />
         <dependency id="Microsoft.NETCore.UniversalWindowsPlatform" version="[5.0.0, )" />
         <dependency id="System.ComponentModel.TypeConverter" version="[4.0.0, )" />
         <dependency id="System.Xml.XPath" version="[4.0.0, )" />
@@ -76,7 +76,7 @@
 
       <group targetFramework="netstandard2.0">
         <dependency id="System.Reflection.Metadata" version="[1.6.0, )" />
-        <dependency id="NuGet.Frameworks" version="[5.0.0, )" />
+        <dependency id="NuGet.Frameworks" version="[5.11.0, )" />
       </group>
     </dependencies>
     

@@ -1,225 +1,220 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
+namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
+
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Text.RegularExpressions;
+
+using ObjectModel;
+
+internal sealed class FastFilter
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.Immutable;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    internal ImmutableDictionary<string, ISet<string>> FilterProperties { get; }
 
-    internal sealed class FastFilter
+    internal bool IsFilteredOutWhenMatched { get; }
+
+    internal Regex PropertyValueRegex { get; set; }
+
+    internal string PropertyValueRegexReplacement { get; set; }
+
+    internal FastFilter(ImmutableDictionary<string, ISet<string>> filterProperties, Operation filterOperation, Operator filterOperator)
     {
-        internal ImmutableDictionary<string, ISet<string>> FilterProperties { get; }
+        ValidateArg.NotNullOrEmpty(filterProperties, nameof(filterProperties));
 
-        internal bool IsFilteredOutWhenMatched { get; }
+        FilterProperties = filterProperties;
 
-        internal Regex PropertyValueRegex { get; set; }
-
-        internal string PropertyValueRegexReplacement { get; set; }
-
-        internal FastFilter(ImmutableDictionary<string, ISet<string>> filterProperties, Operation filterOperation, Operator filterOperator)
+        if (filterOperation == Operation.Equal && (filterOperator == Operator.Or || filterOperator == Operator.None))
         {
-            ValidateArg.NotNullOrEmpty(filterProperties, nameof(filterProperties));
-
-            this.FilterProperties = filterProperties;
-
-            if (filterOperation == Operation.Equal && (filterOperator == Operator.Or || filterOperator == Operator.None))
-            {
-                IsFilteredOutWhenMatched = false;
-            }
-            else if (filterOperation == Operation.NotEqual && (filterOperator == Operator.And || filterOperator == Operator.None))
-            {
-                IsFilteredOutWhenMatched = true;
-            }
-            else
-            {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.FastFilterException));
-            }
+            IsFilteredOutWhenMatched = false;
         }
-
-        internal string[] ValidForProperties(IEnumerable<string> properties)
+        else
         {
-            return this.FilterProperties.Keys.All(name => properties.Contains(name))
-                ? null
-                : this.FilterProperties.Keys.Where(name => !properties.Contains(name)).ToArray();
+            IsFilteredOutWhenMatched = filterOperation == Operation.NotEqual && (filterOperator == Operator.And || filterOperator == Operator.None)
+                ? true
+                : throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.FastFilterException));
         }
+    }
 
-        internal bool Evaluate(Func<string, Object> propertyValueProvider)
+    internal string[] ValidForProperties(IEnumerable<string> properties)
+    {
+        return FilterProperties.Keys.All(name => properties.Contains(name))
+            ? null
+            : FilterProperties.Keys.Where(name => !properties.Contains(name)).ToArray();
+    }
+
+    internal bool Evaluate(Func<string, Object> propertyValueProvider)
+    {
+        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
+
+        bool matched = false;
+        foreach (var name in FilterProperties.Keys)
         {
-            ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
-
-            bool matched = false;
-            foreach (var name in this.FilterProperties.Keys)
+            // If there is no value corresponding to given name, treat it as unmatched.
+            if (TryGetPropertyValue(name, propertyValueProvider, out var singleValue, out var multiValues))
             {
-                // If there is no value corresponding to given name, treat it as unmatched.
-                if (TryGetPropertyValue(name, propertyValueProvider, out var singleValue, out var multiValues))
+                if (singleValue != null)
                 {
-                    if (singleValue != null)
-                    {
-                        var value = PropertyValueRegex == null ? singleValue : ApplyRegex(singleValue);
-                        matched = value != null && this.FilterProperties[name].Contains(value);
-                    }
-                    else
-                    {
-                        matched = (PropertyValueRegex == null ? multiValues : multiValues.Select(value => ApplyRegex(value)))
-                            .Any(result => result != null && this.FilterProperties[name].Contains(result));
-                    }
-
-                    if (matched)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            return IsFilteredOutWhenMatched ? !matched : matched;
-        }
-
-        /// <summary>
-        /// Apply regex matching or replacement to given value.
-        /// </summary>
-        /// <returns>For matching, returns the result of matching, null if no match found. For replacement, returns the result of replacement.</returns>
-        private string ApplyRegex(string value)
-        {
-            Debug.Assert(PropertyValueRegex != null);
-
-            string result = null;
-            if (PropertyValueRegexReplacement == null)
-            {
-                var match = PropertyValueRegex.Match(value);
-                if (match.Success)
-                {
-                    result = match.Value;
-                }
-            }
-            else
-            {
-                result = PropertyValueRegex.Replace(value, PropertyValueRegexReplacement);
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Returns property value for Property using propertValueProvider.
-        /// </summary>
-        private static bool TryGetPropertyValue(string name, Func<string, Object> propertyValueProvider, out string singleValue, out string[] multiValues)
-        {
-            var propertyValue = propertyValueProvider(name);
-            if (null != propertyValue)
-            {
-                multiValues = propertyValue as string[];
-                singleValue = multiValues == null ? propertyValue.ToString() : null;
-                return true;
-            }
-
-            singleValue = null;
-            multiValues = null;
-            return false;
-        }
-
-        internal static Builder CreateBuilder()
-        {
-            return new Builder();
-        }
-
-        internal sealed class Builder
-        {
-            private bool operatorEncountered = false;
-            private Operator fastFilterOperator = Operator.None;
-
-            private bool conditionEncountered = false;
-            private Operation fastFilterOperation;
-            private ImmutableDictionary<string, ImmutableHashSet<string>.Builder>.Builder filterDictionaryBuilder = ImmutableDictionary.CreateBuilder<string, ImmutableHashSet<string>.Builder>(StringComparer.OrdinalIgnoreCase);
-
-            private bool containsValidFilter = true;
-
-            internal bool ContainsValidFilter => containsValidFilter && conditionEncountered;
-
-            internal void AddOperator(Operator @operator)
-            {
-                if (containsValidFilter && (@operator == Operator.And || @operator == Operator.Or))
-                {
-                    if (operatorEncountered)
-                    {
-                        containsValidFilter = fastFilterOperator == @operator;
-                    }
-                    else
-                    {
-                        operatorEncountered = true;
-                        fastFilterOperator = @operator;
-                        if ((fastFilterOperation == Operation.NotEqual && fastFilterOperator == Operator.Or)
-                            || (fastFilterOperation == Operation.Equal && fastFilterOperator == Operator.And))
-                        {
-                            containsValidFilter = false;
-                        }
-                    }
+                    var value = PropertyValueRegex == null ? singleValue : ApplyRegex(singleValue);
+                    matched = value != null && FilterProperties[name].Contains(value);
                 }
                 else
                 {
-                    containsValidFilter = false;
+                    matched = (PropertyValueRegex == null ? multiValues : multiValues.Select(value => ApplyRegex(value)))
+                        .Any(result => result != null && FilterProperties[name].Contains(result));
+                }
+
+                if (matched)
+                {
+                    break;
                 }
             }
+        }
 
-            internal void AddCondition(Condition condition)
+        return IsFilteredOutWhenMatched ? !matched : matched;
+    }
+
+    /// <summary>
+    /// Apply regex matching or replacement to given value.
+    /// </summary>
+    /// <returns>For matching, returns the result of matching, null if no match found. For replacement, returns the result of replacement.</returns>
+    private string ApplyRegex(string value)
+    {
+        Debug.Assert(PropertyValueRegex != null);
+
+        string result = null;
+        if (PropertyValueRegexReplacement == null)
+        {
+            var match = PropertyValueRegex.Match(value);
+            if (match.Success)
             {
-                if (!containsValidFilter)
-                {
-                    return;
-                }
+                result = match.Value;
+            }
+        }
+        else
+        {
+            result = PropertyValueRegex.Replace(value, PropertyValueRegexReplacement);
+        }
+        return result;
+    }
 
-                if (conditionEncountered)
+    /// <summary>
+    /// Returns property value for Property using propertValueProvider.
+    /// </summary>
+    private static bool TryGetPropertyValue(string name, Func<string, Object> propertyValueProvider, out string singleValue, out string[] multiValues)
+    {
+        var propertyValue = propertyValueProvider(name);
+        if (null != propertyValue)
+        {
+            multiValues = propertyValue as string[];
+            singleValue = multiValues == null ? propertyValue.ToString() : null;
+            return true;
+        }
+
+        singleValue = null;
+        multiValues = null;
+        return false;
+    }
+
+    internal static Builder CreateBuilder()
+    {
+        return new Builder();
+    }
+
+    internal sealed class Builder
+    {
+        private bool _operatorEncountered;
+        private Operator _fastFilterOperator = Operator.None;
+
+        private bool _conditionEncountered;
+        private Operation _fastFilterOperation;
+        private readonly ImmutableDictionary<string, ImmutableHashSet<string>.Builder>.Builder _filterDictionaryBuilder = ImmutableDictionary.CreateBuilder<string, ImmutableHashSet<string>.Builder>(StringComparer.OrdinalIgnoreCase);
+
+        private bool _containsValidFilter = true;
+
+        internal bool ContainsValidFilter => _containsValidFilter && _conditionEncountered;
+
+        internal void AddOperator(Operator @operator)
+        {
+            if (_containsValidFilter && (@operator == Operator.And || @operator == Operator.Or))
+            {
+                if (_operatorEncountered)
                 {
-                    if (condition.Operation == fastFilterOperation)
-                    {
-                        AddProperty(condition.Name, condition.Value);
-                    }
-                    else
-                    {
-                        containsValidFilter = false;
-                    }
+                    _containsValidFilter = _fastFilterOperator == @operator;
                 }
                 else
                 {
-                    conditionEncountered = true;
-                    fastFilterOperation = condition.Operation;
+                    _operatorEncountered = true;
+                    _fastFilterOperator = @operator;
+                    if ((_fastFilterOperation == Operation.NotEqual && _fastFilterOperator == Operator.Or)
+                        || (_fastFilterOperation == Operation.Equal && _fastFilterOperator == Operator.And))
+                    {
+                        _containsValidFilter = false;
+                    }
+                }
+            }
+            else
+            {
+                _containsValidFilter = false;
+            }
+        }
+
+        internal void AddCondition(Condition condition)
+        {
+            if (!_containsValidFilter)
+            {
+                return;
+            }
+
+            if (_conditionEncountered)
+            {
+                if (condition.Operation == _fastFilterOperation)
+                {
                     AddProperty(condition.Name, condition.Value);
-
-                    // Don't support `Contains`.
-                    if (fastFilterOperation != Operation.Equal && fastFilterOperation != Operation.NotEqual)
-                    {
-                        containsValidFilter = false;
-                    }
                 }
-            }
-
-            private void AddProperty(string name, string value)
-            {
-                if (!filterDictionaryBuilder.TryGetValue(name, out var values))
+                else
                 {
-                    values = ImmutableHashSet.CreateBuilder(StringComparer.OrdinalIgnoreCase);
-                    filterDictionaryBuilder.Add(name, values);
+                    _containsValidFilter = false;
                 }
-
-                values.Add(value);
             }
-
-            internal FastFilter ToFastFilter()
+            else
             {
-                if (ContainsValidFilter)
-                {
-                    return new FastFilter(
-                        filterDictionaryBuilder.ToImmutableDictionary(kvp => kvp.Key, kvp => (ISet<string>)filterDictionaryBuilder[kvp.Key].ToImmutable()),
-                        fastFilterOperation,
-                        fastFilterOperator);
-                }
+                _conditionEncountered = true;
+                _fastFilterOperation = condition.Operation;
+                AddProperty(condition.Name, condition.Value);
 
-                return null;
+                // Don't support `Contains`.
+                if (_fastFilterOperation is not Operation.Equal and not Operation.NotEqual)
+                {
+                    _containsValidFilter = false;
+                }
             }
+        }
+
+        private void AddProperty(string name, string value)
+        {
+            if (!_filterDictionaryBuilder.TryGetValue(name, out var values))
+            {
+                values = ImmutableHashSet.CreateBuilder(StringComparer.OrdinalIgnoreCase);
+                _filterDictionaryBuilder.Add(name, values);
+            }
+
+            values.Add(value);
+        }
+
+        internal FastFilter ToFastFilter()
+        {
+            return ContainsValidFilter
+                ? new FastFilter(
+                    _filterDictionaryBuilder.ToImmutableDictionary(kvp => kvp.Key, kvp => (ISet<string>)_filterDictionaryBuilder[kvp.Key].ToImmutable()),
+                    _fastFilterOperation,
+                    _fastFilterOperator)
+                : null;
         }
     }
 }

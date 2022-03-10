@@ -19,6 +19,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";NoDotnetMuxerFoundForArchitecture" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Could not find '{0}' host for the '{1}' architecture.]D;]A;]D;]A;You can resolve the problem by installing the '{1}' .NET.]D;]A;]D;]A;The specified framework can be found at:]D;]A;  - https://aka.ms/dotnet-download]D;]A;]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[No se encontró el host "{0}" para la arquitectura "{1}".]D;]A;]D;]A;Puede resolver el problema instalando el .NET "{1}".]D;]A;]D;]A;El marco especificado se puede encontrar en:]D;]A;  - https://aka.ms/dotnet-download]D;]A;]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";SuggestPublishTestProject" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Unable to find {0}. Please publish your test project and retry.]]></Val>

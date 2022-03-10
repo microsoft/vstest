@@ -157,6 +157,26 @@
         <target state="translated">Le proxy ayant l'ID {0} est déjà disponible et ne peut pas être empilé à nouveau.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="translated">Aucun fournisseur d'exécution de tests approprié n'a été trouvé pour cette série.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoProxyMatchesDescription">
+        <source>The runsettings changed between the time when the test session was established and the time of the current run/discovery request.</source>
+        <target state="translated">Les paramètres d'exécution ont changé entre le moment où la session de test a été établie et le moment de la demande d'exécution/découverte actuelle.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="new">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="new">Attachments:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -1,206 +1,205 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CrossPlatEngine.UnitTests.Client
+namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
+
+using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+
+[TestClass]
+public class InProcessProxyExecutionManagerTests
 {
-    using System;
-    using System.IO;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading;
-    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Moq;
+    private Mock<ITestHostManagerFactory> _mockTestHostManagerFactory;
+    private InProcessProxyExecutionManager _inProcessProxyExecutionManager;
+    private Mock<IExecutionManager> _mockExecutionManager;
+    private Mock<ITestRuntimeProvider> _mockTestHostManager;
 
-    [TestClass]
-    public class InProcessProxyExecutionManagerTests
+    public InProcessProxyExecutionManagerTests()
     {
-        private Mock<ITestHostManagerFactory> mockTestHostManagerFactory;
-        private InProcessProxyExecutionManager inProcessProxyExecutionManager;
-        private Mock<IExecutionManager> mockExecutionManager;
-        private Mock<ITestRuntimeProvider> mockTestHostManager;
+        _mockTestHostManagerFactory = new Mock<ITestHostManagerFactory>();
+        _mockExecutionManager = new Mock<IExecutionManager>();
+        _mockTestHostManager = new Mock<ITestRuntimeProvider>();
+        _mockTestHostManagerFactory.Setup(o => o.GetExecutionManager()).Returns(_mockExecutionManager.Object);
+        _inProcessProxyExecutionManager = new InProcessProxyExecutionManager(_mockTestHostManager.Object, _mockTestHostManagerFactory.Object);
+    }
 
-        public InProcessProxyExecutionManagerTests()
-        {
-            this.mockTestHostManagerFactory = new Mock<ITestHostManagerFactory>();
-            this.mockExecutionManager = new Mock<IExecutionManager>();
-            this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
-            this.mockTestHostManagerFactory.Setup(o => o.GetExecutionManager()).Returns(this.mockExecutionManager.Object);
-            this.inProcessProxyExecutionManager = new InProcessProxyExecutionManager(this.mockTestHostManager.Object, this.mockTestHostManagerFactory.Object);
-        }
-
-        [TestCleanup]
-        public void TestCleanup()
-        {
-            this.mockExecutionManager = null;
-            this.mockTestHostManagerFactory = null;
-            this.inProcessProxyExecutionManager = null;
-            this.mockTestHostManager = null;
-        }
+    [TestCleanup]
+    public void TestCleanup()
+    {
+        _mockExecutionManager = null;
+        _mockTestHostManagerFactory = null;
+        _inProcessProxyExecutionManager = null;
+        _mockTestHostManager = null;
+    }
 
 
-        [TestMethod]
-        public void StartTestRunShouldCallInitialize()
-        {
-            var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
-            var mockTestMessageEventHandler = new Mock<ITestMessageEventHandler>();
-            this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
+    [TestMethod]
+    public void StartTestRunShouldCallInitialize()
+    {
+        var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
+        var mockTestMessageEventHandler = new Mock<ITestMessageEventHandler>();
+        _inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
-            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>(), It.IsAny<ITestMessageEventHandler>()), Times.Once, "StartTestRun should call Initialize if not already initialized");
-        }
+        _mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>(), It.IsAny<ITestMessageEventHandler>()), Times.Once, "StartTestRun should call Initialize if not already initialized");
+    }
 
-        [TestMethod]
-        public void StartTestRunShouldUpdateTestPlauginCacheWithExtensionsReturnByTestHost()
-        {
-            var path = Path.Combine(Path.GetTempPath(), "dummy.dll");
-            this.mockTestHostManager.Setup(o => o.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string> { path });
-            var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
-            expectedResult.Add(path);
+    [TestMethod]
+    public void StartTestRunShouldUpdateTestPlauginCacheWithExtensionsReturnByTestHost()
+    {
+        var path = Path.Combine(Path.GetTempPath(), "dummy.dll");
+        _mockTestHostManager.Setup(o => o.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string> { path });
+        var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
+        expectedResult.Add(path);
 
-            var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
-            this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
+        var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
+        _inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
-            CollectionAssert.AreEquivalent(expectedResult, TestPluginCache.Instance.GetExtensionPaths(string.Empty));
-        }
+        CollectionAssert.AreEquivalent(expectedResult, TestPluginCache.Instance.GetExtensionPaths(string.Empty));
+    }
 
-        [TestMethod]
-        public void StartTestRunShouldCallExecutionManagerStartTestRunWithAdapterSourceMap()
-        {
-            var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
-            var manualResetEvent = new ManualResetEvent(true);
+    [TestMethod]
+    public void StartTestRunShouldCallExecutionManagerStartTestRunWithAdapterSourceMap()
+    {
+        var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
+        var manualResetEvent = new ManualResetEvent(true);
 
-            this.mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.AdapterSourceMap, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null)).Callback(
-                () => manualResetEvent.Set());
+        _mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.AdapterSourceMap, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null)).Callback(
+            () => manualResetEvent.Set());
 
-            this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
+        _inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
-            Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.StartTestRun should get called");
-        }
+        Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.StartTestRun should get called");
+    }
 
-        [TestMethod]
-        public void StartTestRunShouldAllowRuntimeProviderToUpdateAdapterSource()
-        {
-            var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
+    [TestMethod]
+    public void StartTestRunShouldAllowRuntimeProviderToUpdateAdapterSource()
+    {
+        var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
 
-            this.mockTestHostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources)).Returns(testRunCriteria.Sources);
+        _mockTestHostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources)).Returns(testRunCriteria.Sources);
 
-            this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
+        _inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
-            this.mockTestHostManager.Verify(hm => hm.GetTestSources(testRunCriteria.Sources), Times.Once);
-        }
+        _mockTestHostManager.Verify(hm => hm.GetTestSources(testRunCriteria.Sources), Times.Once);
+    }
 
-        [TestMethod]
-        public void StartTestRunShouldCallExecutionManagerStartTestRunWithTestCase()
-        {
-            var testRunCriteria = new TestRunCriteria(
-                    new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), "s.dll") },
-                    frequencyOfRunStatsChangeEvent: 10);
-            var manualResetEvent = new ManualResetEvent(true);
+    [TestMethod]
+    public void StartTestRunShouldCallExecutionManagerStartTestRunWithTestCase()
+    {
+        var testRunCriteria = new TestRunCriteria(
+            new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), "s.dll") },
+            frequencyOfRunStatsChangeEvent: 10);
+        var manualResetEvent = new ManualResetEvent(true);
 
-            this.mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.Tests, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null)).Callback(
-                () => manualResetEvent.Set());
+        _mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.Tests, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null)).Callback(
+            () => manualResetEvent.Set());
 
-            this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
+        _inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
-            Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.StartTestRun should get called");
-        }
+        Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.StartTestRun should get called");
+    }
 
-        [TestMethod]
-        public void StartTestRunShouldUpdateTestCaseSourceIfTestCaseSourceDiffersFromTestHostManagerSource()
-        {
-            var actualSources = new List<string> { "actualSource.dll" };
-            var inputSource = new List<string> { "inputPackage.appxrecipe" };
+    [TestMethod]
+    public void StartTestRunShouldUpdateTestCaseSourceIfTestCaseSourceDiffersFromTestHostManagerSource()
+    {
+        var actualSources = new List<string> { "actualSource.dll" };
+        var inputSource = new List<string> { "inputPackage.appxrecipe" };
 
-            var testRunCriteria = new TestRunCriteria(
-                    new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), inputSource.FirstOrDefault()) },
-                    frequencyOfRunStatsChangeEvent: 10);
-            var manualResetEvent = new ManualResetEvent(false);
+        var testRunCriteria = new TestRunCriteria(
+            new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), inputSource.FirstOrDefault()) },
+            frequencyOfRunStatsChangeEvent: 10);
+        var manualResetEvent = new ManualResetEvent(false);
 
-            this.mockTestHostManager.Setup(hm => hm.GetTestSources(inputSource)).Returns(actualSources);
+        _mockTestHostManager.Setup(hm => hm.GetTestSources(inputSource)).Returns(actualSources);
 
-            this.mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.Tests, inputSource.FirstOrDefault(), testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null))
-                .Callback(() => manualResetEvent.Set());
+        _mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.Tests, inputSource.FirstOrDefault(), testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null))
+            .Callback(() => manualResetEvent.Set());
 
-            this.inProcessProxyExecutionManager = new InProcessProxyExecutionManager(this.mockTestHostManager.Object, this.mockTestHostManagerFactory.Object);
+        _inProcessProxyExecutionManager = new InProcessProxyExecutionManager(_mockTestHostManager.Object, _mockTestHostManagerFactory.Object);
 
-            this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
+        _inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
-            Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.StartTestRun should get called");
-            this.mockExecutionManager.Verify(o => o.StartTestRun(testRunCriteria.Tests, inputSource.FirstOrDefault(), testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null));
-            this.mockTestHostManager.Verify(hm => hm.GetTestSources(inputSource), Times.Once);
-            Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault().Source);
-        }
+        Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.StartTestRun should get called");
+        _mockExecutionManager.Verify(o => o.StartTestRun(testRunCriteria.Tests, inputSource.FirstOrDefault(), testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null));
+        _mockTestHostManager.Verify(hm => hm.GetTestSources(inputSource), Times.Once);
+        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault().Source);
+    }
 
-        [TestMethod]
-        public void StartTestRunShouldNotUpdateTestCaseSourceIfTestCaseSourceDiffersFromTestHostManagerSource()
-        {
-            var actualSources = new List<string> { "actualSource.dll" };
-            var testRunCriteria = new TestRunCriteria(
-                    new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), actualSources.FirstOrDefault()) },
-                    frequencyOfRunStatsChangeEvent: 10);
-            var manualResetEvent = new ManualResetEvent(false);
+    [TestMethod]
+    public void StartTestRunShouldNotUpdateTestCaseSourceIfTestCaseSourceDiffersFromTestHostManagerSource()
+    {
+        var actualSources = new List<string> { "actualSource.dll" };
+        var testRunCriteria = new TestRunCriteria(
+            new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), actualSources.FirstOrDefault()) },
+            frequencyOfRunStatsChangeEvent: 10);
+        var manualResetEvent = new ManualResetEvent(false);
 
-            this.mockTestHostManager.Setup(hm => hm.GetTestSources(actualSources)).Returns(actualSources);
+        _mockTestHostManager.Setup(hm => hm.GetTestSources(actualSources)).Returns(actualSources);
 
-            this.mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.Tests, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null))
-                .Callback(() => manualResetEvent.Set());
+        _mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.Tests, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null))
+            .Callback(() => manualResetEvent.Set());
 
-            this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
+        _inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
-            Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.StartTestRun should get called");
-            this.mockExecutionManager.Verify(o => o.StartTestRun(testRunCriteria.Tests, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null));
-            this.mockTestHostManager.Verify(hm => hm.GetTestSources(actualSources));
-            Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault().Source);
-        }
+        Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.StartTestRun should get called");
+        _mockExecutionManager.Verify(o => o.StartTestRun(testRunCriteria.Tests, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null));
+        _mockTestHostManager.Verify(hm => hm.GetTestSources(actualSources));
+        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault().Source);
+    }
 
-        [TestMethod]
-        public void StartTestRunShouldCatchExceptionAndCallHandleRunComplete()
-        {
-            var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
-            var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
-            var manualResetEvent = new ManualResetEvent(true);
+    [TestMethod]
+    public void StartTestRunShouldCatchExceptionAndCallHandleRunComplete()
+    {
+        var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var manualResetEvent = new ManualResetEvent(true);
 
-            this.mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.AdapterSourceMap, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, mockTestRunEventsHandler.Object)).Callback(
-                () => throw new Exception());
+        _mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.AdapterSourceMap, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, mockTestRunEventsHandler.Object)).Callback(
+            () => throw new Exception());
 
-            mockTestRunEventsHandler.Setup(o => o.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null)).Callback(
-                () => manualResetEvent.Set());
+        mockTestRunEventsHandler.Setup(o => o.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null)).Callback(
+            () => manualResetEvent.Set());
 
-            this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, mockTestRunEventsHandler.Object);
+        _inProcessProxyExecutionManager.StartTestRun(testRunCriteria, mockTestRunEventsHandler.Object);
 
-            Assert.IsTrue(manualResetEvent.WaitOne(5000), "ITestRunEventsHandler.HandleTestRunComplete should get called");
-        }
+        Assert.IsTrue(manualResetEvent.WaitOne(5000), "ITestRunEventsHandler.HandleTestRunComplete should get called");
+    }
 
-        [TestMethod]
-        public void AbortShouldCallExecutionManagerAbort()
-        {
-            var manualResetEvent = new ManualResetEvent(true);
+    [TestMethod]
+    public void AbortShouldCallExecutionManagerAbort()
+    {
+        var manualResetEvent = new ManualResetEvent(true);
 
-            this.mockExecutionManager.Setup(o => o.Abort(It.IsAny<ITestRunEventsHandler>())).Callback(
-                () => manualResetEvent.Set());
+        _mockExecutionManager.Setup(o => o.Abort(It.IsAny<ITestRunEventsHandler>())).Callback(
+            () => manualResetEvent.Set());
 
-            this.inProcessProxyExecutionManager.Abort(It.IsAny<ITestRunEventsHandler>());
+        _inProcessProxyExecutionManager.Abort(It.IsAny<ITestRunEventsHandler>());
 
-            Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.Abort should get called");
-        }
+        Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.Abort should get called");
+    }
 
-        [TestMethod]
-        public void CancelShouldCallExecutionManagerCancel()
-        {
-            var manualResetEvent = new ManualResetEvent(true);
+    [TestMethod]
+    public void CancelShouldCallExecutionManagerCancel()
+    {
+        var manualResetEvent = new ManualResetEvent(true);
 
-            this.mockExecutionManager.Setup(o => o.Cancel(It.IsAny<ITestRunEventsHandler>())).Callback(
-                () => manualResetEvent.Set());
+        _mockExecutionManager.Setup(o => o.Cancel(It.IsAny<ITestRunEventsHandler>())).Callback(
+            () => manualResetEvent.Set());
 
-            this.inProcessProxyExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
+        _inProcessProxyExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
 
-            Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.Abort should get called");
-        }
+        Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.Abort should get called");
     }
 }

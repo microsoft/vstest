@@ -157,6 +157,26 @@
         <target state="translated">ID가 {0}인 프록시를 이미 사용할 수 있으며 큐에 다시 넣을 수 없습니다.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="translated">이 실행에 적합한 테스트 런타임 공급자를 찾지 못했습니다.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoProxyMatchesDescription">
+        <source>The runsettings changed between the time when the test session was established and the time of the current run/discovery request.</source>
+        <target state="translated">테스트 세션이 설정된 시간과 현재 실행/검색 요청의 시간 사이에 runsettings가 변경되었습니다.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="new">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="new">Attachments:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -1,64 +1,63 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
+using System;
+using System.Runtime.Serialization;
+
+/// <summary>
+/// Defines the test session info object to be passed around between vstest.console and
+/// vstest.console wrapper in order to identify the current session.
+/// </summary>
+[DataContract]
+public class TestSessionInfo : IEquatable<TestSessionInfo>
 {
-    using System;
-    using System.Runtime.Serialization;
+    /// <summary>
+    /// Creates an instance of the current class.
+    /// </summary>
+    public TestSessionInfo()
+    {
+        Id = Guid.NewGuid();
+    }
 
     /// <summary>
-    /// Defines the test session info object to be passed around between vstest.console and
-    /// vstest.console wrapper in order to indentify the current session.
+    /// Gets the session id.
     /// </summary>
-    [DataContract]
-    public class TestSessionInfo : IEquatable<TestSessionInfo>
+    [DataMember]
+    public Guid Id { get; private set; }
+
+    /// <summary>
+    /// Calculates the hash code for the current object.
+    /// </summary>
+    /// 
+    /// <returns>An integer representing the computed hashcode value.</returns>
+    public override int GetHashCode()
     {
-        /// <summary>
-        /// Creates an instance of the current class.
-        /// </summary>
-        public TestSessionInfo()
-        {
-            this.Id = Guid.NewGuid();
-        }
+        return Id.GetHashCode();
+    }
 
-        /// <summary>
-        /// Gets the session id.
-        /// </summary>
-        [DataMember]
-        public Guid Id { get; private set; }
+    /// <summary>
+    /// Checks if the specified object is equal to the current instance.
+    /// </summary>
+    /// 
+    /// <param name="obj">The object to be checked.</param>
+    /// 
+    /// <returns>True if the two objects are equal, false otherwise.</returns>
+    public override bool Equals(object obj)
+    {
+        return Equals(obj as TestSessionInfo);
+    }
 
-        /// <summary>
-        /// Calculates the hash code for the current object.
-        /// </summary>
-        /// 
-        /// <returns>An integer representing the computed hashcode value.</returns>
-        public override int GetHashCode()
-        {
-            return this.Id.GetHashCode();
-        }
-
-        /// <summary>
-        /// Checks if the specified object is equal to the current instance.
-        /// </summary>
-        /// 
-        /// <param name="obj">The object to be checked.</param>
-        /// 
-        /// <returns>True if the two objects are equal, false otherwise.</returns>
-        public override bool Equals(object obj)
-        {
-            return this.Equals(obj as TestSessionInfo);
-        }
-
-        /// <summary>
-        /// Checks if the specified session is equal to the current instance.
-        /// </summary>
-        /// 
-        /// <param name="other">The session to be checked.</param>
-        /// 
-        /// <returns>True if the two sessions are equal, false otherwise.</returns>
-        public bool Equals(TestSessionInfo other)
-        {
-            return other != null && this.Id == other.Id;
-        }
+    /// <summary>
+    /// Checks if the specified session is equal to the current instance.
+    /// </summary>
+    /// 
+    /// <param name="other">The session to be checked.</param>
+    /// 
+    /// <returns>True if the two sessions are equal, false otherwise.</returns>
+    public bool Equals(TestSessionInfo other)
+    {
+        return other != null && Id.Equals(other.Id);
     }
 }

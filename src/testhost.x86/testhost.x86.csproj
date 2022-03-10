@@ -1,32 +1,36 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
-    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+    <!-- MSB3270 Suppress warnings about testhost being x64 (AMD64)/x86 when imported into AnyCPU (MSIL) projects. -->
+    <!-- MSB3276 Suppress warnings about conflicts between different versions of the same dependent assembly -->
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3270;MSB3276</MSBuildWarningsAsMessages>
   </PropertyGroup>
+  <Import Project="$(TestPlatformRoot)src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems" Label="Shared" />
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>testhost.x86</AssemblyName>
     <TargetFrameworks>netcoreapp2.1;netcoreapp1.0;net451;net452;net46;net461;net462;net47;net471;net472;net48</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
-    <WarningsAsErrors>true</WarningsAsErrors>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>true</Prefer32Bit>
     <OutputType>Exe</OutputType>
+    <IsTestProject>false</IsTestProject>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp2.1' AND '$(TargetFramework)' != 'netcoreapp1.0' AND '$(TargetFramework)' != 'net6.0' ">
-    <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(DotNetBuildFromSource)' != 'true'">win7-x86</RuntimeIdentifier>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <TargetName Condition="'$(TargetFramework)' != 'net451'">$(AssemblyName.Replace('.x86', '')).$(TargetFramework).x86</TargetName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Diagnostics.StackTrace" Condition="'$(TargetFramework)' == 'netcoreapp1.0'" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.TraceSource" Condition="'$(TargetFramework)' == 'netcoreapp1.0'" Version="4.3.0" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp1.0'">
+    <PackageReference Include="System.Diagnostics.StackTrace" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
+    <PackageReference Include="System.Net.Http" Version="$(SystemNetHttpVersion)" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj" />
@@ -38,6 +42,10 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
+
+    <!-- CVE-2019-0657, CVE-2019-0980 and CVE-2019-0981 mitigation -->
+    <PackageReference Include="System.Private.Uri" Version="$(SystemUriVersion)" />
+    <!-- CVE-2019-0657, CVE-2019-0980 and CVE-2019-0981 mitigation -->
   </ItemGroup>
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) AND '$(OS)' != 'Windows_NT' ">
     <Reference Include="netstandard" />
@@ -46,6 +54,11 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- API that is common to all frameworks that we build for. -->
+    <AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

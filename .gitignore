@@ -108,6 +108,7 @@ packages
 artifacts
 [tT]ools
 
+*.dmp
 *.nupkg
 *.zip
 src/package/sign/sign.nuget.targets
@@ -138,3 +139,6 @@ src/package/sign/sign.nuget.targets
 # diag log files
 # ===========================
 logs/
+
+.fake
+.ionide

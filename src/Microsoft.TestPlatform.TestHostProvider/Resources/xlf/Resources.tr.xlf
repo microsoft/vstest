@@ -19,6 +19,23 @@
         <target state="translated">{0} bulunamıyor. Lütfen test projenizi yayımlayın ve yeniden deneyin.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoDotnetMuxerFoundForArchitecture">
+        <source>Could not find '{0}' host for the '{1}' architecture.
+
+You can resolve the problem by installing the '{1}' .NET.
+
+The specified framework can be found at:
+  - https://aka.ms/dotnet-download
+</source>
+        <target state="translated">'{1}' mimarisi için '{0}' ana bilgisayarı bulunamadı.
+
+‘{1}’ .NET'i yükleyerek sorunu çözebilirsiniz.
+
+Belirtilen çerçeve şu konumda bulunamadı:
+  - https://aka.ms/dotnet-download
+</target>
+        <note>'{0}' is the placeholder for 'dotnet.exe' or 'dotnet' value and depends on platform Windows/Unix, '{1}' is the placeholder for the architeture name like ARM64, X64 etc...</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

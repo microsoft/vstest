@@ -1,6 +1,15 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <!-- NU1702 suppresses warning about DumpMinitool being .NET Framework reference imported to a .NET project.
+    Unfortunately this can't be suppressed at single ProjectReference. Neither completely suppressed by using NoWarn.
+    Workaround is documented here: https://github.com/NuGet/Home/issues/8093, but this syntax and placement would be preferred:
+    https://github.com/dotnet/core/issues/869
+    -->
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);NU1702</MSBuildWarningsAsMessages>
+    <!-- MSB3270 Suppress warnings about testhost being x64 (AMD64)/x86 when imported into AnyCPU (MSIL) projects. -->
+    <!-- MSB3276 Suppress warnings about conflicts between different versions of the same dependent assembly -->
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3270;MSB3276</MSBuildWarningsAsMessages>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
@@ -10,9 +19,8 @@
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.Extensions.BlameDataCollector</AssemblyName>
     <TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;net6.0</TargetFrameworks>
-    <WarningsAsErrors>true</WarningsAsErrors>
-    <EnableCodeAnalysis>true</EnableCodeAnalysis>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
+    <IsTestProject>false</IsTestProject>
     <!-- to copy the netcore.client dependency to bin folder on build -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
@@ -25,6 +33,8 @@
   <ItemGroup>
     <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
     <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
+    <ProjectReference Include="$(TestPlatformRoot)src\DataCollectors\DumpMinitool.x86\DumpMinitool.x86.csproj" />
+    <ProjectReference Include="$(TestPlatformRoot)src\DataCollectors\DumpMinitool\DumpMinitool.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net472' AND '$(OS)' != 'Windows_NT' ">
     <Reference Include="System" />
@@ -48,6 +58,14 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- API that is common to all frameworks that we build for. -->
+    <AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
+    <!-- Framework specific API -->
+    <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

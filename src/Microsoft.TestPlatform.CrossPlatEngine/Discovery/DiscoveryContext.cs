@@ -1,66 +1,65 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+
+using Common.Filtering;
+using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+
+using CrossPlatEngineResources = Resources.Resources;
+
+/// <summary>
+/// Specifies the user specified RunSettings and framework provided context of the discovery.
+/// </summary>
+public class DiscoveryContext : IDiscoveryContext
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
-
-    using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-
-    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    /// <summary>
+    /// Gets the run settings specified for this request.
+    /// </summary>
+    public IRunSettings RunSettings { get; internal set; }
 
     /// <summary>
-    /// Specifies the user specified RunSettings and framework provided context of the discovery.
+    /// Returns TestCaseFilterExpression validated for supportedProperties.
+    /// If there is a parsing error in filter expression, TestPlatformFormatException() is thrown.
     /// </summary>
-    public class DiscoveryContext : IDiscoveryContext
+    /// <param name="supportedProperties"> The supported Properties. </param>
+    /// <param name="propertyProvider"> The property Provider. </param>
+    /// <returns> The <see cref="ITestCaseFilterExpression"/>. </returns>
+    public ITestCaseFilterExpression GetTestCaseFilter(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider)
     {
-        /// <summary>
-        /// Gets the run settings specified for this request.
-        /// </summary>
-        public IRunSettings RunSettings { get; internal set; }
-
-        /// <summary>
-        /// Returns TestCaseFilterExpression validated for supportedProperties.
-        /// If there is a parsing error in filter expression, TestPlatformFormatException() is thrown.
-        /// </summary>
-        /// <param name="supportedProperties"> The supported Properties. </param>
-        /// <param name="propertyProvider"> The property Provider. </param>
-        /// <returns> The <see cref="ITestCaseFilterExpression"/>. </returns>
-        public ITestCaseFilterExpression GetTestCaseFilter(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider)
+        TestCaseFilterExpression adapterSpecificTestCaseFilter = null;
+        if (FilterExpressionWrapper != null)
         {
-            TestCaseFilterExpression adapterSpecificTestCaseFilter = null;
-            if (this.FilterExpressionWrapper != null)
+            if (!string.IsNullOrEmpty(FilterExpressionWrapper.ParseError))
             {
-                if (!string.IsNullOrEmpty(this.FilterExpressionWrapper.ParseError))
-                {
-                    throw new TestPlatformFormatException(this.FilterExpressionWrapper.ParseError, this.FilterExpressionWrapper.FilterString);
-                }
-
-                adapterSpecificTestCaseFilter = new TestCaseFilterExpression(this.FilterExpressionWrapper);
-                var invalidProperties = adapterSpecificTestCaseFilter.ValidForProperties(supportedProperties, propertyProvider);
-
-                if (invalidProperties != null)
-                {
-                    var invalidPropertiesString = string.Join(CrossPlatEngineResources.StringSeperator, invalidProperties);
-                    var validPropertiesSttring = supportedProperties == null ? string.Empty : string.Join(CrossPlatEngineResources.StringSeperator, supportedProperties.ToArray());
-                    var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.UnsupportedPropertiesInTestCaseFilter, invalidPropertiesString, validPropertiesSttring);
-
-                    // For unsupported property don’t throw exception, just log the message. Later it is going to handle properly with TestCaseFilterExpression.MatchTestCase().
-                    EqtTrace.Info(errorMessage);
-                }
+                throw new TestPlatformFormatException(FilterExpressionWrapper.ParseError, FilterExpressionWrapper.FilterString);
             }
 
-            return adapterSpecificTestCaseFilter;
+            adapterSpecificTestCaseFilter = new TestCaseFilterExpression(FilterExpressionWrapper);
+            var invalidProperties = adapterSpecificTestCaseFilter.ValidForProperties(supportedProperties, propertyProvider);
+
+            if (invalidProperties != null)
+            {
+                var invalidPropertiesString = string.Join(CrossPlatEngineResources.StringSeperator, invalidProperties);
+                var validPropertiesSttring = supportedProperties == null ? string.Empty : string.Join(CrossPlatEngineResources.StringSeperator, supportedProperties.ToArray());
+                var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.UnsupportedPropertiesInTestCaseFilter, invalidPropertiesString, validPropertiesSttring);
+
+                // For unsupported property don’t throw exception, just log the message. Later it is going to handle properly with TestCaseFilterExpression.MatchTestCase().
+                EqtTrace.Info(errorMessage);
+            }
         }
 
-        /// <summary>
-        /// Gets or sets the FilterExpressionWrapper instance as created from filter string.
-        /// </summary>
-        internal FilterExpressionWrapper FilterExpressionWrapper {get; set; }
+        return adapterSpecificTestCaseFilter;
     }
+
+    /// <summary>
+    /// Gets or sets the FilterExpressionWrapper instance as created from filter string.
+    /// </summary>
+    internal FilterExpressionWrapper FilterExpressionWrapper { get; set; }
 }

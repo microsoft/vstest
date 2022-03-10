@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
+    <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+  </PropertyGroup>
+  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
+  <PropertyGroup>
+    <TargetFrameworks>net451</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <OutputType>Exe</OutputType>
+    <IsTestProject>false</IsTestProject>
+    <RuntimeIdentifier Condition=" '$(DotNetBuildFromSource)' != 'true' ">win7-x86</RuntimeIdentifier>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- API that is common to all frameworks that we build for. -->
+    <AdditionalFiles Include="..\DumpMinitool.x86\PublicAPI\PublicAPI.Shipped.txt" Link="PublicAPI\PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="..\DumpMinitool.x86\PublicAPI\PublicAPI.Unshipped.txt" Link="PublicAPI\PublicAPI.Unshipped.txt" />
+  </ItemGroup>
+
+  <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
+</Project>

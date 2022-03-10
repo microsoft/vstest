@@ -1,570 +1,591 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
+
+using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
+[TestClass]
+public class DataCollectionManagerTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using System.Xml;
+    private readonly DataCollectionManager _dataCollectionManager;
+    private readonly string _defaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
+    private readonly string _defaultDataCollectionSettings = "<DataCollector friendlyName=\"{0}\" uri=\"{1}\" assemblyQualifiedName=\"{2}\" codebase=\"{3}\" {4} />";
+    private string _dataCollectorSettings;
+    private readonly string _friendlyName;
+    private readonly string _uri;
+    private readonly Mock<IMessageSink> _mockMessageSink;
+    private readonly Mock<DataCollector2> _mockDataCollector;
+    private readonly Mock<CodeCoverageDataCollector> _mockCodeCoverageDataCollector;
+    private readonly List<KeyValuePair<string, string>> _envVarList;
+    private readonly List<KeyValuePair<string, string>> _codeCoverageEnvVarList;
+    private readonly Mock<IDataCollectionAttachmentManager> _mockDataCollectionAttachmentManager;
+    private readonly Mock<IDataCollectionTelemetryManager> _mockDataCollectionTelemetryManager;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using Moq;
-
-    [TestClass]
-    public class DataCollectionManagerTests
+    public DataCollectionManagerTests()
     {
-        private DataCollectionManager dataCollectionManager;
-        private string defaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
-        private string defaultDataCollectionSettings = "<DataCollector friendlyName=\"{0}\" uri=\"{1}\" assemblyQualifiedName=\"{2}\" codebase=\"{3}\" {4} />";
-        private string dataCollectorSettings;
-        private string friendlyName;
-        private string uri;
-        private Mock<IMessageSink> mockMessageSink;
-        private Mock<DataCollector2> mockDataCollector;
-        private Mock<CodeCoverageDataCollector> mockCodeCoverageDataCollector;
-        private List<KeyValuePair<string, string>> envVarList;
-        private List<KeyValuePair<string, string>> codeCoverageEnvVarList;
-        private Mock<IDataCollectionAttachmentManager> mockDataCollectionAttachmentManager;
-        private Mock<IDataCollectionTelemetryManager> mockDataCollectionTelemetryManager;
-
-        public DataCollectionManagerTests()
-        {
-            this.friendlyName = "CustomDataCollector";
-            this.uri = "my://custom/datacollector";
-            this.envVarList = new List<KeyValuePair<string, string>>();
-            this.codeCoverageEnvVarList = new List<KeyValuePair<string, string>>();
-            this.mockDataCollector = new Mock<DataCollector2>();
-            this.mockDataCollector.As<ITestExecutionEnvironmentSpecifier>().Setup(x => x.GetTestExecutionEnvironmentVariables()).Returns(this.envVarList);
-            this.mockCodeCoverageDataCollector = new Mock<CodeCoverageDataCollector>();
-            this.mockCodeCoverageDataCollector.As<ITestExecutionEnvironmentSpecifier>().Setup(x => x.GetTestExecutionEnvironmentVariables()).Returns(this.codeCoverageEnvVarList);
-            this.dataCollectorSettings = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, this.friendlyName, this.uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
-            this.mockMessageSink = new Mock<IMessageSink>();
-            this.mockDataCollectionAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
-            this.mockDataCollectionAttachmentManager.SetReturnsDefault<List<AttachmentSet>>(new List<AttachmentSet>());
-            this.mockDataCollectionTelemetryManager = new Mock<IDataCollectionTelemetryManager>();
-
-            this.dataCollectionManager = new TestableDataCollectionManager(this.mockDataCollectionAttachmentManager.Object, this.mockMessageSink.Object, this.mockDataCollector.Object, this.mockCodeCoverageDataCollector.Object, this.mockDataCollectionTelemetryManager.Object);
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldThrowExceptionIfSettingsXmlIsNull()
-        {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.dataCollectionManager.InitializeDataCollectors(null);
-            });
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldReturnEmptyDictionaryIfDataCollectorsAreNotConfigured()
-        {
-            var runSettings = string.Format(this.defaultRunSettings, string.Empty);
-            this.dataCollectionManager.InitializeDataCollectors(runSettings);
-
-            Assert.AreEqual(0, this.dataCollectionManager.RunDataCollectors.Count);
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldLoadDataCollector()
-        {
-            var dataCollectorSettings = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
-            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettings);
-
-            Assert.IsTrue(this.dataCollectionManager.RunDataCollectors.ContainsKey(this.mockDataCollector.Object.GetType()));
-            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void InitializeShouldNotAddDataCollectorIfItIsDisabled()
-        {
-            var dataCollectorSettingsDisabled = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled=\"false\""));
-            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsDisabled);
-
-            Assert.AreEqual(0, this.dataCollectionManager.RunDataCollectors.Count);
-            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Never);
-        }
-
-        [TestMethod]
-        public void InitializeShouldAddDataCollectorIfItIsEnabled()
-        {
-            var dataCollectorSettingsEnabled = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled=\"true\""));
-            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsEnabled);
-
-            Assert.IsTrue(this.dataCollectionManager.RunDataCollectors.ContainsKey(this.mockDataCollector.Object.GetType()));
-            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsNotCorrectAndUriIsCorrect()
-        {
-            var dataCollectorSettingsWithWrongFriendlyName = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, "anyFriendlyName", uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
-            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithWrongFriendlyName);
-
-            Assert.AreEqual(1, this.dataCollectionManager.RunDataCollectors.Count);
-            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsCorrectAndUriIsNotCorrect()
-        {
-            var dataCollectorSettingsWithWrongUri = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, "my://custom/WrongDatacollector", this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
-            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithWrongUri);
-
-            Assert.AreEqual(1, this.dataCollectionManager.RunDataCollectors.Count);
-            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsCorrectAndUriIsNull()
-        {
-            var dataCollectorSettingsWithNullUri = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, string.Empty, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty).Replace("uri=\"\"", string.Empty));
-            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithNullUri);
-
-            Assert.AreEqual(0, this.dataCollectionManager.RunDataCollectors.Count);
-            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Never);
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsNullAndUriIsCorrect()
-        {
-            var dataCollectorSettingsWithNullFriendlyName = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, string.Empty, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty).Replace("friendlyName=\"\"", string.Empty));
-            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithNullFriendlyName);
-
-            Assert.AreEqual(1, this.dataCollectionManager.RunDataCollectors.Count);
-            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsCorrectAndUriIsEmpty()
-        {
-            var dataCollectorSettingsWithEmptyUri = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, string.Empty, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
-            Assert.ThrowsException<ArgumentNullException>(() => this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithEmptyUri));
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsEmptyAndUriIsCorrect()
-        {
-            var dataCollectorSettingsWithEmptyFriendlyName = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, string.Empty, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
-            Assert.ThrowsException<ArgumentNullException>(() => this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithEmptyFriendlyName));
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldNotLoadDataCollectorIfFriendlyNameIsNotCorrectAndUriIsNotCorrect()
-        {
-            var dataCollectorSettingsWithWrongFriendlyNameAndWrongUri = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, "anyFriendlyName", "datacollector://data", this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
-            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithWrongFriendlyNameAndWrongUri);
-
-            Assert.AreEqual(0, this.dataCollectionManager.RunDataCollectors.Count);
-            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Never);
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldNotAddSameDataCollectorMoreThanOnce()
-        {
-            var datacollecterSettings = string.Format(this.defaultDataCollectionSettings, "CustomDataCollector", "my://custom/datacollector", this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled =\"true\"");
-            var runSettings = string.Format(this.defaultRunSettings, datacollecterSettings + datacollecterSettings);
-
-            this.dataCollectionManager.InitializeDataCollectors(runSettings);
-
-            Assert.IsTrue(this.dataCollectionManager.RunDataCollectors.ContainsKey(this.mockDataCollector.Object.GetType()));
-            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldLoadDataCollectorAndReturnEnvironmentVariables()
-        {
-            this.envVarList.Add(new KeyValuePair<string, string>("key", "value"));
-
-            var result = this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-
-            Assert.AreEqual("value", result["key"]);
-
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableAddition(It.IsAny<DataCollectorInformation>(), "key", "value"));
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldLogExceptionToMessageSinkIfInitializationFails()
-        {
-            this.mockDataCollector.Setup(
-                x =>
-                    x.Initialize(
-                        It.IsAny<XmlElement>(),
-                        It.IsAny<DataCollectionEvents>(),
-                        It.IsAny<DataCollectionSink>(),
-                        It.IsAny<DataCollectionLogger>(),
-                        It.IsAny<DataCollectionEnvironmentContext>())).Throws<Exception>();
-
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-
-            Assert.AreEqual(0, this.dataCollectionManager.RunDataCollectors.Count);
-            this.mockMessageSink.Verify(x => x.SendMessage(It.IsAny<DataCollectionMessageEventArgs>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldLogExceptionToMessageSinkIfSetEnvironmentVariableFails()
-        {
-            this.mockDataCollector.As<ITestExecutionEnvironmentSpecifier>().Setup(x => x.GetTestExecutionEnvironmentVariables()).Throws<Exception>();
-
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-
-            Assert.AreEqual(0, this.dataCollectionManager.RunDataCollectors.Count);
-            this.mockMessageSink.Verify(x => x.SendMessage(It.IsAny<DataCollectionMessageEventArgs>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldReturnFirstEnvironmentVariableIfMoreThanOneVariablesWithSameKeyIsSpecified()
-        {
-            this.envVarList.Add(new KeyValuePair<string, string>("key", "value"));
-            this.envVarList.Add(new KeyValuePair<string, string>("key", "value1"));
-
-            var result = this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-
-            Assert.AreEqual("value", result["key"]);
-
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableAddition(It.IsAny<DataCollectorInformation>(), "key", "value"));
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableConflict(It.IsAny<DataCollectorInformation>(), "key", "value1", "value"));
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldReturnOtherThanCodeCoverageEnvironmentVariableIfMoreThanOneVariablesWithSameKeyIsSpecified()
-        {
-            this.envVarList.Add(new KeyValuePair<string, string>("cor_profiler", "clrie"));
-            this.envVarList.Add(new KeyValuePair<string, string>("same_key", "same_value"));
-            this.codeCoverageEnvVarList.Add(new KeyValuePair<string, string>("cor_profiler", "direct"));
-            this.codeCoverageEnvVarList.Add(new KeyValuePair<string, string>("clrie_profiler_vanguard", "path"));
-            this.codeCoverageEnvVarList.Add(new KeyValuePair<string, string>("same_key", "same_value"));
-
-            this.dataCollectorSettings = string.Format(this.defaultRunSettings,
-                string.Format(this.defaultDataCollectionSettings, "Code Coverage", "my://custom/ccdatacollector", this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty) +
-                string.Format(this.defaultDataCollectionSettings, this.friendlyName, this.uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
-           
-            var result = this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);           
-
-            Assert.AreEqual(3, result.Count);
-            Assert.AreEqual("clrie", result["cor_profiler"]);
-            Assert.AreEqual("path", result["clrie_profiler_vanguard"]);
-            Assert.AreEqual("same_value", result["same_key"]);
-
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableAddition(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == this.friendlyName), "cor_profiler", "clrie"));
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableConflict(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == "Code Coverage"), "cor_profiler", "direct", "clrie"));
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableAddition(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == "Code Coverage"), "clrie_profiler_vanguard", "path"));
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableAddition(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == this.friendlyName), "same_key", "same_value"));
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableConflict(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == "Code Coverage"), "same_key", "same_value", "same_value"));
-        }
-
-        [TestMethod]
-        public void SessionStartedShouldReturnFalseIfDataCollectionIsNotConfiguredInRunSettings()
-        {
-            var runSettings = string.Format(this.defaultRunSettings, string.Empty);
-            this.dataCollectionManager.InitializeDataCollectors(runSettings);
-
-            var sessionStartEventArgs = new SessionStartEventArgs();
-            var result = this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
-
-            Assert.IsFalse(result);
-        }
-
-        [TestMethod]
-        public void SessionStartedShouldSendEventToDataCollector()
-        {
-            var isStartInvoked = false;
-            this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
-            {
-                b.SessionStart += (sender, eventArgs) => isStartInvoked = true;
-            });
-
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-
-            var sessionStartEventArgs = new SessionStartEventArgs();
-            var areTestCaseEventsSubscribed = this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
-
-            Assert.IsTrue(isStartInvoked);
-            Assert.IsFalse(areTestCaseEventsSubscribed);
-        }
-
-        [TestMethod]
-        public void SessionStartedShouldReturnTrueIfTestCaseStartIsSubscribed()
-        {
-            this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
-            {
-                b.TestCaseStart += (sender, eventArgs) => { };
-            });
-
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-
-            var sessionStartEventArgs = new SessionStartEventArgs();
-            var areTestCaseEventsSubscribed = this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
-
-            Assert.IsTrue(areTestCaseEventsSubscribed);
-        }
-
-        [TestMethod]
-        public void SessionStaretedShouldContinueDataCollectionIfExceptionIsThrownWhileSendingEventsToDataCollector()
-        {
-            this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
-            {
-                b.SessionStart += (sender, eventArgs) => throw new Exception();
-            });
-
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-
-            var sessionStartEventArgs = new SessionStartEventArgs();
-            var result = this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
-
-            Assert.IsFalse(result);
-        }
-
-        [TestMethod]
-        public void SessionStartedShouldReturnFalseIfDataCollectorsAreNotInitialized()
-        {
-            var sessionStartEventArgs = new SessionStartEventArgs();
-            var result = this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
-
-            Assert.IsFalse(result);
-        }
-
-        [TestMethod]
-        public void SessionStartedShouldHaveCorrectSessionContext()
-        {
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-
-            var sessionStartEventArgs = new SessionStartEventArgs();
-
-            Assert.AreEqual(new SessionId(Guid.Empty), sessionStartEventArgs.Context.SessionId);
-
-            this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
-
-            Assert.AreNotEqual(new SessionId(Guid.Empty), sessionStartEventArgs.Context.SessionId);
-        }
-
-        [TestMethod]
-        public void SessionEndedShouldReturnEmptyCollectionIfDataCollectionIsNotEnabled()
-        {
-            var runSettings = string.Format(this.defaultRunSettings, string.Empty);
-            this.dataCollectionManager.InitializeDataCollectors(runSettings);
-
-            var result = this.dataCollectionManager.SessionEnded();
-
-            Assert.AreEqual(0, result.Count);
-        }
-
-        [TestMethod]
-        public void SessionEndedShouldReturnAttachments()
-        {
-            var attachment = new AttachmentSet(new Uri("my://custom/datacollector"), "CustomDataCollector");
-            attachment.Attachments.Add(new UriDataAttachment(new Uri("my://filename.txt"), "filename.txt"));
-
-            this.mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Returns(new List<AttachmentSet>() { attachment });
-
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-            var sessionStartEventArgs = new SessionStartEventArgs();
-            this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
-
-            var result = this.dataCollectionManager.SessionEnded();
-
-            Assert.IsTrue(result[0].Attachments[0].Uri.ToString().Contains("filename.txt"));
-        }
-
-        [TestMethod]
-        public void SessionEndedShouldNotReturnAttachmentsIfExceptionIsThrownWhileGettingAttachments()
-        {
-            this.mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Throws<Exception>();
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-
-            var result = this.dataCollectionManager.SessionEnded();
-
-            Assert.AreEqual(0, result.Count);
-        }
-
-        [TestMethod]
-        public void SessionEndedShouldContinueDataCollectionIfExceptionIsThrownWhileSendingSessionEndEventToDataCollector()
-        {
-            var attachment = new AttachmentSet(new Uri("my://custom/datacollector"), "CustomDataCollector");
-            attachment.Attachments.Add(new UriDataAttachment(new Uri("my://filename.txt"), "filename.txt"));
-
-            this.mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Returns(new List<AttachmentSet>() { attachment });
-
-            this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
-            {
-                b.SessionEnd += (sender, ev) =>
-                    {
-                        c.SendFileAsync(e.SessionDataCollectionContext, "filename.txt", true);
-                        throw new Exception();
-                    };
-            });
-
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-            var sessionStartEventArgs = new SessionStartEventArgs();
-            this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
-
-            var result = this.dataCollectionManager.SessionEnded();
-
-            Assert.AreEqual(1, result.Count);
-        }
-
-        [TestMethod]
-        public void SessionEndedShouldCancelProcessingAttachmentRequestsIfSessionIsCancelled()
-        {
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-            var sessionStartEventArgs = new SessionStartEventArgs();
-            this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
-
-            var result = this.dataCollectionManager.SessionEnded(true);
-
-            this.mockDataCollectionAttachmentManager.Verify(x => x.Cancel(), Times.Once);
-        }
-
-        #region TestCaseEventsTest
-
-        [TestMethod]
-        public void TestCaseStartedShouldSendEventToDataCollector()
-        {
-            var isStartInvoked = false;
-            this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => { b.TestCaseStart += (sender, eventArgs) => isStartInvoked = true; });
-
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-            var args = new TestCaseStartEventArgs(new TestCase());
-            this.dataCollectionManager.TestCaseStarted(args);
-
-            Assert.IsTrue(isStartInvoked);
-        }
-
-        [TestMethod]
-        public void TestCaseStartedShouldNotSendEventToDataCollectorIfDataColletionIsNotEnbled()
-        {
-            var isStartInvoked = false;
-            this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => { b.TestCaseStart += (sender, eventArgs) => isStartInvoked = true; });
-
-            var args = new TestCaseStartEventArgs(new TestCase());
-            this.dataCollectionManager.TestCaseStarted(args);
-
-            Assert.IsFalse(isStartInvoked);
-        }
-
-        [TestMethod]
-        public void TestCaseEndedShouldSendEventToDataCollector()
-        {
-            var isEndInvoked = false;
-            this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => { b.TestCaseEnd += (sender, eventArgs) => isEndInvoked = true; });
-
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-            var args = new TestCaseEndEventArgs();
-            args.TestElement = new TestCase();
-            this.dataCollectionManager.TestCaseEnded(args);
-
-            Assert.IsTrue(isEndInvoked);
-        }
-
-        [TestMethod]
-        public void TestCaseEndedShouldNotSendEventToDataCollectorIfDataColletionIsNotEnbled()
-        {
-            var isEndInvoked = false;
-            var runSettings = string.Format(this.defaultRunSettings, this.dataCollectorSettings);
-            this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
-            {
-                b.TestCaseEnd += (sender, eventArgs) => isEndInvoked = true;
-            });
-
-            var args = new TestCaseEndEventArgs();
-            Assert.IsFalse(isEndInvoked);
-        }
-
-        private void SetupMockDataCollector(Action<XmlElement, DataCollectionEvents, DataCollectionSink, DataCollectionLogger, DataCollectionEnvironmentContext> callback)
-        {
-            this.mockDataCollector.Setup(
-                x =>
-                    x.Initialize(
-                        It.IsAny<XmlElement>(),
-                        It.IsAny<DataCollectionEvents>(),
-                        It.IsAny<DataCollectionSink>(),
-                        It.IsAny<DataCollectionLogger>(),
-                        It.IsAny<DataCollectionEnvironmentContext>())).Callback<XmlElement, DataCollectionEvents, DataCollectionSink, DataCollectionLogger, DataCollectionEnvironmentContext>((a, b, c, d, e) =>
-                        {
-                            callback.Invoke(a, b, c, d, e);
-                        });
-        }
-
-        #endregion
+        _friendlyName = "CustomDataCollector";
+        _uri = "my://custom/datacollector";
+        _envVarList = new List<KeyValuePair<string, string>>();
+        _codeCoverageEnvVarList = new List<KeyValuePair<string, string>>();
+        _mockDataCollector = new Mock<DataCollector2>();
+        _mockDataCollector.As<ITestExecutionEnvironmentSpecifier>().Setup(x => x.GetTestExecutionEnvironmentVariables()).Returns(_envVarList);
+        _mockCodeCoverageDataCollector = new Mock<CodeCoverageDataCollector>();
+        _mockCodeCoverageDataCollector.As<ITestExecutionEnvironmentSpecifier>().Setup(x => x.GetTestExecutionEnvironmentVariables()).Returns(_codeCoverageEnvVarList);
+        _dataCollectorSettings = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, _friendlyName, _uri, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
+        _mockMessageSink = new Mock<IMessageSink>();
+        _mockDataCollectionAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
+        _mockDataCollectionAttachmentManager.SetReturnsDefault<List<AttachmentSet>>(new List<AttachmentSet>());
+        _mockDataCollectionTelemetryManager = new Mock<IDataCollectionTelemetryManager>();
+
+        _dataCollectionManager = new TestableDataCollectionManager(_mockDataCollectionAttachmentManager.Object, _mockMessageSink.Object, _mockDataCollector.Object, _mockCodeCoverageDataCollector.Object, _mockDataCollectionTelemetryManager.Object);
     }
 
-    internal class TestableDataCollectionManager : DataCollectionManager
+    [TestMethod]
+    public void InitializeDataCollectorsShouldThrowExceptionIfSettingsXmlIsNull()
     {
-        DataCollector dataCollector;
-        DataCollector ccDataCollector;
-
-        public TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, DataCollector dataCollector, DataCollector ccDataCollector, IDataCollectionTelemetryManager dataCollectionTelemetryManager) : this(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager)
-        {
-            this.dataCollector = dataCollector;
-            this.ccDataCollector = ccDataCollector;
-        }
-
-        internal TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectionTelemetryManager dataCollectionTelemetryManager) : base(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager)
-        {
-        }
-
-        protected override bool TryGetUriFromFriendlyName(string friendlyName, out string dataCollectorUri)
-        {
-            if (friendlyName.Equals("CustomDataCollector"))
-            {
-                dataCollectorUri = "my://custom/datacollector";
-                return true;
-            }
-            else if (friendlyName.Equals("Code Coverage"))
-            {
-                dataCollectorUri = "my://custom/ccdatacollector";
-                return true;
-            }
-            else
-            {
-                dataCollectorUri = string.Empty;
-                return false;
-            }
-        }
-
-        protected override bool IsUriValid(string uri)
-        {
-            if (uri.Equals("my://custom/datacollector") || uri.Equals("my://custom/ccdatacollector"))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        protected override DataCollector TryGetTestExtension(string extensionUri)
-        {
-            if (extensionUri.Equals("my://custom/datacollector"))
-            {
-                return dataCollector;
-            }
-
-            if (extensionUri.Equals("my://custom/ccdatacollector"))
-            {
-                return ccDataCollector;
-            }
-
-            return null;
-        }
+        Assert.ThrowsException<ArgumentNullException>(() => _dataCollectionManager.InitializeDataCollectors(null));
     }
 
-    [DataCollectorFriendlyName("CustomDataCollector")]
-    [DataCollectorTypeUri("my://custom/datacollector")]
-    public abstract class DataCollector2 : DataCollector
+    [TestMethod]
+    public void InitializeDataCollectorsShouldReturnEmptyDictionaryIfDataCollectorsAreNotConfigured()
+    {
+        var runSettings = string.Format(_defaultRunSettings, string.Empty);
+        _dataCollectionManager.InitializeDataCollectors(runSettings);
+
+        Assert.AreEqual(0, _dataCollectionManager.RunDataCollectors.Count);
+    }
+
+    [TestMethod]
+    public void InitializeDataCollectorsShouldLoadDataCollector()
+    {
+        var dataCollectorSettings = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, _friendlyName, _uri, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
+        _dataCollectionManager.InitializeDataCollectors(dataCollectorSettings);
+
+        Assert.IsTrue(_dataCollectionManager.RunDataCollectors.ContainsKey(_mockDataCollector.Object.GetType()));
+        Assert.AreEqual(typeof(AttachmentProcessorDataCollector2), _dataCollectionManager.RunDataCollectors[_mockDataCollector.Object.GetType()].DataCollectorConfig.AttachmentsProcessorType);
+        Assert.IsTrue(_dataCollectionManager.RunDataCollectors[_mockDataCollector.Object.GetType()].DataCollectorConfig.Metadata.Contains(true));
+        _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
+    }
+
+    [TestMethod]
+    public void InitializeShouldNotAddDataCollectorIfItIsDisabled()
+    {
+        var dataCollectorSettingsDisabled = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, _friendlyName, _uri, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled=\"false\""));
+        _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsDisabled);
+
+        Assert.AreEqual(0, _dataCollectionManager.RunDataCollectors.Count);
+        _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Never);
+    }
+
+    [TestMethod]
+    public void InitializeShouldAddDataCollectorIfItIsEnabled()
+    {
+        var dataCollectorSettingsEnabled = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, _friendlyName, _uri, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled=\"true\""));
+        _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsEnabled);
+
+        Assert.IsTrue(_dataCollectionManager.RunDataCollectors.ContainsKey(_mockDataCollector.Object.GetType()));
+        _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
+    }
+
+    [TestMethod]
+    public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsNotCorrectAndUriIsCorrect()
+    {
+        var dataCollectorSettingsWithWrongFriendlyName = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, "anyFriendlyName", _uri, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
+        _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithWrongFriendlyName);
+
+        Assert.AreEqual(1, _dataCollectionManager.RunDataCollectors.Count);
+        _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
+    }
+
+    [TestMethod]
+    public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsCorrectAndUriIsNotCorrect()
+    {
+        var dataCollectorSettingsWithWrongUri = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, _friendlyName, "my://custom/WrongDatacollector", _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
+        _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithWrongUri);
+
+        Assert.AreEqual(1, _dataCollectionManager.RunDataCollectors.Count);
+        _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
+    }
+
+    [TestMethod]
+    public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsCorrectAndUriIsNull()
+    {
+        var dataCollectorSettingsWithNullUri = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, _friendlyName, string.Empty, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty).Replace("uri=\"\"", string.Empty));
+        _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithNullUri);
+
+        Assert.AreEqual(0, _dataCollectionManager.RunDataCollectors.Count);
+        _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Never);
+    }
+
+    [TestMethod]
+    public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsNullAndUriIsCorrect()
+    {
+        var dataCollectorSettingsWithNullFriendlyName = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, string.Empty, _uri, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty).Replace("friendlyName=\"\"", string.Empty));
+        _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithNullFriendlyName);
+
+        Assert.AreEqual(1, _dataCollectionManager.RunDataCollectors.Count);
+        _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
+    }
+
+    [TestMethod]
+    public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsCorrectAndUriIsEmpty()
+    {
+        var dataCollectorSettingsWithEmptyUri = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, _friendlyName, string.Empty, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
+        Assert.ThrowsException<ArgumentNullException>(() => _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithEmptyUri));
+    }
+
+    [TestMethod]
+    public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsEmptyAndUriIsCorrect()
+    {
+        var dataCollectorSettingsWithEmptyFriendlyName = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, _friendlyName, string.Empty, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
+        Assert.ThrowsException<ArgumentNullException>(() => _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithEmptyFriendlyName));
+    }
+
+    [TestMethod]
+    public void InitializeDataCollectorsShouldNotLoadDataCollectorIfFriendlyNameIsNotCorrectAndUriIsNotCorrect()
+    {
+        var dataCollectorSettingsWithWrongFriendlyNameAndWrongUri = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, "anyFriendlyName", "datacollector://data", _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
+        _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithWrongFriendlyNameAndWrongUri);
+
+        Assert.AreEqual(0, _dataCollectionManager.RunDataCollectors.Count);
+        _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Never);
+    }
+
+    [TestMethod]
+    public void InitializeDataCollectorsShouldNotAddSameDataCollectorMoreThanOnce()
+    {
+        var datacollecterSettings = string.Format(_defaultDataCollectionSettings, "CustomDataCollector", "my://custom/datacollector", _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled =\"true\"");
+        var runSettings = string.Format(_defaultRunSettings, datacollecterSettings + datacollecterSettings);
+
+        _dataCollectionManager.InitializeDataCollectors(runSettings);
+
+        Assert.IsTrue(_dataCollectionManager.RunDataCollectors.ContainsKey(_mockDataCollector.Object.GetType()));
+        _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
+    }
+
+    [TestMethod]
+    public void InitializeDataCollectorsShouldLoadDataCollectorAndReturnEnvironmentVariables()
+    {
+        _envVarList.Add(new KeyValuePair<string, string>("key", "value"));
+
+        var result = _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+
+        Assert.AreEqual("value", result["key"]);
+
+        _mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableAddition(It.IsAny<DataCollectorInformation>(), "key", "value"));
+    }
+
+    [TestMethod]
+    public void InitializeDataCollectorsShouldLogExceptionToMessageSinkIfInitializationFails()
+    {
+        _mockDataCollector.Setup(
+            x =>
+                x.Initialize(
+                    It.IsAny<XmlElement>(),
+                    It.IsAny<DataCollectionEvents>(),
+                    It.IsAny<DataCollectionSink>(),
+                    It.IsAny<DataCollectionLogger>(),
+                    It.IsAny<DataCollectionEnvironmentContext>())).Throws<Exception>();
+
+        _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+
+        Assert.AreEqual(0, _dataCollectionManager.RunDataCollectors.Count);
+        _mockMessageSink.Verify(x => x.SendMessage(It.IsAny<DataCollectionMessageEventArgs>()), Times.Once);
+    }
+
+    [TestMethod]
+    public void InitializeDataCollectorsShouldLogExceptionToMessageSinkIfSetEnvironmentVariableFails()
+    {
+        _mockDataCollector.As<ITestExecutionEnvironmentSpecifier>().Setup(x => x.GetTestExecutionEnvironmentVariables()).Throws<Exception>();
+
+        _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+
+        Assert.AreEqual(0, _dataCollectionManager.RunDataCollectors.Count);
+        _mockMessageSink.Verify(x => x.SendMessage(It.IsAny<DataCollectionMessageEventArgs>()), Times.Once);
+    }
+
+    [TestMethod]
+    public void InitializeDataCollectorsShouldReturnFirstEnvironmentVariableIfMoreThanOneVariablesWithSameKeyIsSpecified()
+    {
+        _envVarList.Add(new KeyValuePair<string, string>("key", "value"));
+        _envVarList.Add(new KeyValuePair<string, string>("key", "value1"));
+
+        var result = _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+
+        Assert.AreEqual("value", result["key"]);
+
+        _mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableAddition(It.IsAny<DataCollectorInformation>(), "key", "value"));
+        _mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableConflict(It.IsAny<DataCollectorInformation>(), "key", "value1", "value"));
+    }
+
+    [TestMethod]
+    public void InitializeDataCollectorsShouldReturnOtherThanCodeCoverageEnvironmentVariableIfMoreThanOneVariablesWithSameKeyIsSpecified()
+    {
+        _envVarList.Add(new KeyValuePair<string, string>("cor_profiler", "clrie"));
+        _envVarList.Add(new KeyValuePair<string, string>("same_key", "same_value"));
+        _codeCoverageEnvVarList.Add(new KeyValuePair<string, string>("cor_profiler", "direct"));
+        _codeCoverageEnvVarList.Add(new KeyValuePair<string, string>("clrie_profiler_vanguard", "path"));
+        _codeCoverageEnvVarList.Add(new KeyValuePair<string, string>("same_key", "same_value"));
+
+        _dataCollectorSettings = string.Format(_defaultRunSettings,
+            string.Format(_defaultDataCollectionSettings, "Code Coverage", "my://custom/ccdatacollector", _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty) +
+            string.Format(_defaultDataCollectionSettings, _friendlyName, _uri, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
+
+        var result = _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+
+        Assert.AreEqual(3, result.Count);
+        Assert.AreEqual("clrie", result["cor_profiler"]);
+        Assert.AreEqual("path", result["clrie_profiler_vanguard"]);
+        Assert.AreEqual("same_value", result["same_key"]);
+
+        _mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableAddition(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == _friendlyName), "cor_profiler", "clrie"));
+        _mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableConflict(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == "Code Coverage"), "cor_profiler", "direct", "clrie"));
+        _mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableAddition(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == "Code Coverage"), "clrie_profiler_vanguard", "path"));
+        _mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableAddition(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == _friendlyName), "same_key", "same_value"));
+        _mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableConflict(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == "Code Coverage"), "same_key", "same_value", "same_value"));
+    }
+
+    [TestMethod]
+    public void SessionStartedShouldReturnFalseIfDataCollectionIsNotConfiguredInRunSettings()
+    {
+        var runSettings = string.Format(_defaultRunSettings, string.Empty);
+        _dataCollectionManager.InitializeDataCollectors(runSettings);
+
+        var sessionStartEventArgs = new SessionStartEventArgs();
+        var result = _dataCollectionManager.SessionStarted(sessionStartEventArgs);
+
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public void SessionStartedShouldSendEventToDataCollector()
+    {
+        var isStartInvoked = false;
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.SessionStart += (sender, eventArgs) => isStartInvoked = true);
+
+        _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+
+        var sessionStartEventArgs = new SessionStartEventArgs();
+        var areTestCaseEventsSubscribed = _dataCollectionManager.SessionStarted(sessionStartEventArgs);
+
+        Assert.IsTrue(isStartInvoked);
+        Assert.IsFalse(areTestCaseEventsSubscribed);
+    }
+
+    [TestMethod]
+    public void SessionStartedShouldReturnTrueIfTestCaseStartIsSubscribed()
+    {
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.TestCaseStart += (sender, eventArgs) => { });
+
+        _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+
+        var sessionStartEventArgs = new SessionStartEventArgs();
+        var areTestCaseEventsSubscribed = _dataCollectionManager.SessionStarted(sessionStartEventArgs);
+
+        Assert.IsTrue(areTestCaseEventsSubscribed);
+    }
+
+    [TestMethod]
+    public void SessionStaretedShouldContinueDataCollectionIfExceptionIsThrownWhileSendingEventsToDataCollector()
+    {
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.SessionStart += (sender, eventArgs) => throw new Exception());
+
+        _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+
+        var sessionStartEventArgs = new SessionStartEventArgs();
+        var result = _dataCollectionManager.SessionStarted(sessionStartEventArgs);
+
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public void SessionStartedShouldReturnFalseIfDataCollectorsAreNotInitialized()
+    {
+        var sessionStartEventArgs = new SessionStartEventArgs();
+        var result = _dataCollectionManager.SessionStarted(sessionStartEventArgs);
+
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public void SessionStartedShouldHaveCorrectSessionContext()
+    {
+        _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+
+        var sessionStartEventArgs = new SessionStartEventArgs();
+
+        Assert.AreEqual(new SessionId(Guid.Empty), sessionStartEventArgs.Context.SessionId);
+
+        _dataCollectionManager.SessionStarted(sessionStartEventArgs);
+
+        Assert.AreNotEqual(new SessionId(Guid.Empty), sessionStartEventArgs.Context.SessionId);
+    }
+
+    [TestMethod]
+    public void SessionEndedShouldReturnEmptyCollectionIfDataCollectionIsNotEnabled()
+    {
+        var runSettings = string.Format(_defaultRunSettings, string.Empty);
+        _dataCollectionManager.InitializeDataCollectors(runSettings);
+
+        var result = _dataCollectionManager.SessionEnded();
+
+        Assert.AreEqual(0, result.Count);
+    }
+
+    [TestMethod]
+    public void GetInvokedDataCollectorsShouldReturnDataCollector()
+    {
+        var dataCollectorSettingsWithNullFriendlyName = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, string.Empty, _uri, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty).Replace("friendlyName=\"\"", string.Empty));
+        _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithNullFriendlyName);
+        var invokedDataCollector = _dataCollectionManager.GetInvokedDataCollectors();
+        Assert.AreEqual(1, invokedDataCollector.Count);
+        Assert.IsTrue(invokedDataCollector[0].HasAttachmentProcessor);
+    }
+
+    [TestMethod]
+    public void SessionEndedShouldReturnAttachments()
+    {
+        var attachment = new AttachmentSet(new Uri("my://custom/datacollector"), "CustomDataCollector");
+        attachment.Attachments.Add(new UriDataAttachment(new Uri("my://filename.txt"), "filename.txt"));
+
+        _mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Returns(new List<AttachmentSet>() { attachment });
+
+        _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+        var sessionStartEventArgs = new SessionStartEventArgs();
+        _dataCollectionManager.SessionStarted(sessionStartEventArgs);
+
+        var result = _dataCollectionManager.SessionEnded();
+
+        Assert.IsTrue(result[0].Attachments[0].Uri.ToString().Contains("filename.txt"));
+    }
+
+    [TestMethod]
+    public void SessionEndedShouldNotReturnAttachmentsIfExceptionIsThrownWhileGettingAttachments()
+    {
+        _mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Throws<Exception>();
+        _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+
+        var result = _dataCollectionManager.SessionEnded();
+
+        Assert.AreEqual(0, result.Count);
+    }
+
+    [TestMethod]
+    public void SessionEndedShouldContinueDataCollectionIfExceptionIsThrownWhileSendingSessionEndEventToDataCollector()
+    {
+        var attachment = new AttachmentSet(new Uri("my://custom/datacollector"), "CustomDataCollector");
+        attachment.Attachments.Add(new UriDataAttachment(new Uri("my://filename.txt"), "filename.txt"));
+
+        _mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Returns(new List<AttachmentSet>() { attachment });
+
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e)
+            => b.SessionEnd += (sender, ev) =>
+            {
+                c.SendFileAsync(e.SessionDataCollectionContext, "filename.txt", true);
+                throw new Exception();
+            });
+
+        _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+        var sessionStartEventArgs = new SessionStartEventArgs();
+        _dataCollectionManager.SessionStarted(sessionStartEventArgs);
+
+        var result = _dataCollectionManager.SessionEnded();
+
+        Assert.AreEqual(1, result.Count);
+    }
+
+    [TestMethod]
+    public void SessionEndedShouldCancelProcessingAttachmentRequestsIfSessionIsCancelled()
+    {
+        _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+        var sessionStartEventArgs = new SessionStartEventArgs();
+        _dataCollectionManager.SessionStarted(sessionStartEventArgs);
+
+        var result = _dataCollectionManager.SessionEnded(true);
+
+        _mockDataCollectionAttachmentManager.Verify(x => x.Cancel(), Times.Once);
+    }
+
+    #region TestCaseEventsTest
+
+    [TestMethod]
+    public void TestCaseStartedShouldSendEventToDataCollector()
+    {
+        var isStartInvoked = false;
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.TestCaseStart += (sender, eventArgs) => isStartInvoked = true);
+
+        _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+        var args = new TestCaseStartEventArgs(new TestCase());
+        _dataCollectionManager.TestCaseStarted(args);
+
+        Assert.IsTrue(isStartInvoked);
+    }
+
+    [TestMethod]
+    public void TestCaseStartedShouldNotSendEventToDataCollectorIfDataColletionIsNotEnbled()
+    {
+        var isStartInvoked = false;
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.TestCaseStart += (sender, eventArgs) => isStartInvoked = true);
+
+        var args = new TestCaseStartEventArgs(new TestCase());
+        _dataCollectionManager.TestCaseStarted(args);
+
+        Assert.IsFalse(isStartInvoked);
+    }
+
+    [TestMethod]
+    public void TestCaseEndedShouldSendEventToDataCollector()
+    {
+        var isEndInvoked = false;
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.TestCaseEnd += (sender, eventArgs) => isEndInvoked = true);
+
+        _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+        var args = new TestCaseEndEventArgs();
+        args.TestElement = new TestCase();
+        _dataCollectionManager.TestCaseEnded(args);
+
+        Assert.IsTrue(isEndInvoked);
+    }
+
+    [TestMethod]
+    public void TestCaseEndedShouldNotSendEventToDataCollectorIfDataColletionIsNotEnbled()
+    {
+        var isEndInvoked = false;
+        var runSettings = string.Format(_defaultRunSettings, _dataCollectorSettings);
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.TestCaseEnd += (sender, eventArgs) => isEndInvoked = true);
+
+        var args = new TestCaseEndEventArgs();
+        Assert.IsFalse(isEndInvoked);
+    }
+
+    private void SetupMockDataCollector(Action<XmlElement, DataCollectionEvents, DataCollectionSink, DataCollectionLogger, DataCollectionEnvironmentContext> callback)
+    {
+        _mockDataCollector.Setup(
+            x =>
+                x.Initialize(
+                    It.IsAny<XmlElement>(),
+                    It.IsAny<DataCollectionEvents>(),
+                    It.IsAny<DataCollectionSink>(),
+                    It.IsAny<DataCollectionLogger>(),
+                    It.IsAny<DataCollectionEnvironmentContext>())).Callback<XmlElement, DataCollectionEvents, DataCollectionSink, DataCollectionLogger, DataCollectionEnvironmentContext>(callback.Invoke);
+    }
+
+    #endregion
+}
+
+internal class TestableDataCollectionManager : DataCollectionManager
+{
+    private readonly DataCollector _dataCollector;
+    private readonly DataCollector _ccDataCollector;
+
+    public TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, DataCollector dataCollector, DataCollector ccDataCollector, IDataCollectionTelemetryManager dataCollectionTelemetryManager) : this(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager)
+    {
+        _dataCollector = dataCollector;
+        _ccDataCollector = ccDataCollector;
+    }
+
+    internal TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectionTelemetryManager dataCollectionTelemetryManager) : base(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager)
     {
     }
 
-    [DataCollectorFriendlyName("Code Coverage")]
-    [DataCollectorTypeUri("my://custom/ccdatacollector")]
-    public abstract class CodeCoverageDataCollector : DataCollector
+    protected override bool TryGetUriFromFriendlyName(string friendlyName, out string dataCollectorUri)
     {
+        if (friendlyName.Equals("CustomDataCollector"))
+        {
+            dataCollectorUri = "my://custom/datacollector";
+            return true;
+        }
+        else if (friendlyName.Equals("Code Coverage"))
+        {
+            dataCollectorUri = "my://custom/ccdatacollector";
+            return true;
+        }
+        else
+        {
+            dataCollectorUri = string.Empty;
+            return false;
+        }
+    }
+
+    protected override bool IsUriValid(string uri)
+    {
+        return uri.Equals("my://custom/datacollector") || uri.Equals("my://custom/ccdatacollector");
+    }
+
+    protected override DataCollector TryGetTestExtension(string extensionUri)
+    {
+        if (extensionUri.Equals("my://custom/datacollector"))
+        {
+            return _dataCollector;
+        }
+
+        if (extensionUri.Equals("my://custom/ccdatacollector"))
+        {
+            return _ccDataCollector;
+        }
+
+        return null;
+    }
+
+    protected override DataCollectorConfig TryGetDataCollectorConfig(string extensionUri)
+    {
+        if (extensionUri.Equals("my://custom/datacollector"))
+        {
+            var dc = new DataCollectorConfig(_dataCollector.GetType());
+            dc.FilePath = Path.GetTempFileName();
+            return dc;
+        }
+
+        if (extensionUri.Equals("my://custom/ccdatacollector"))
+        {
+            var dc = new DataCollectorConfig(_ccDataCollector.GetType());
+            dc.FilePath = Path.GetTempFileName();
+            return dc;
+        }
+
+        return null;
+    }
+}
+
+[DataCollectorFriendlyName("CustomDataCollector")]
+[DataCollectorTypeUri("my://custom/datacollector")]
+[DataCollectorAttachmentProcessor(typeof(AttachmentProcessorDataCollector2))]
+public abstract class DataCollector2 : DataCollector
+{
+}
+
+[DataCollectorFriendlyName("Code Coverage")]
+[DataCollectorTypeUri("my://custom/ccdatacollector")]
+public abstract class CodeCoverageDataCollector : DataCollector
+{
+}
+
+public class AttachmentProcessorDataCollector2 : IDataCollectorAttachmentProcessor
+{
+    public bool SupportsIncrementalProcessing => throw new NotImplementedException();
+
+    public IEnumerable<Uri> GetExtensionUris()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }

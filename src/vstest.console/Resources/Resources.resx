@@ -333,7 +333,8 @@
     <value>The --ParentProcessId|/ParentProcessId argument requires the process id which is an integer. Specify the process id of the parent process that launched this process.</value>
   </data>
   <data name="InvalidPlatformType" xml:space="preserve">
-    <value>Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.</value>
+    <value>Invalid platform type: {0}. Valid platform types are {1}.</value>
+    <comment>0 is the platform type e.g. x86, and 1 is a list of the built in platforms, e.g. x86, x64</comment>
   </data>
   <data name="InvalidPortArgument" xml:space="preserve">
     <value>The --Port|/Port argument requires the port number which is an integer. Specify the port for socket connection and receiving the event messages.</value>
@@ -765,5 +766,8 @@
   </data>
   <data name="TestRunAbortedWithError" xml:space="preserve">
     <value>Test Run Aborted with error {0}.</value>
+  </data>
+  <data name="InvalidTestSessionCorrelationId" xml:space="preserve">
+    <value>Invalid testSessionCorrelationId</value>
   </data>
 </root>

@@ -12,17 +12,18 @@ function Verify-Nuget-Packages($packageDirectory, $version)
 {
     Write-Log "Starting Verify-Nuget-Packages."
     $expectedNumOfFiles = @{
-        "Microsoft.CodeCoverage" = 59;
+        "Microsoft.CodeCoverage" = 53;
         "Microsoft.NET.Test.Sdk" = 27;
-        "Microsoft.TestPlatform" = 493;
+        "Microsoft.TestPlatform" = 590;
         "Microsoft.TestPlatform.Build" = 21;
-        "Microsoft.TestPlatform.CLI" = 367;
+        "Microsoft.TestPlatform.CLI" = 405;
         "Microsoft.TestPlatform.Extensions.TrxLogger" = 35;
         "Microsoft.TestPlatform.ObjectModel" = 238;
         "Microsoft.TestPlatform.AdapterUtilities" = 62;
-        "Microsoft.TestPlatform.Portable" = 596;
+        "Microsoft.TestPlatform.Portable" = 604;
         "Microsoft.TestPlatform.TestHost" = 214;
         "Microsoft.TestPlatform.TranslationLayer" = 123;
+        "Microsoft.TestPlatform.Internal.Uwp" = 86;
     }
 
     $nugetPackages = Get-ChildItem -Filter "*$version*.nupkg" $packageDirectory | % { $_.FullName }
@@ -46,12 +47,11 @@ function Verify-Nuget-Packages($packageDirectory, $version)
     foreach($unzipNugetPackageDir in $unzipNugetPackageDirs)
     {
         $actualNumOfFiles = (Get-ChildItem -Recurse -File -Path $unzipNugetPackageDir).Count
-        $versionLen = $TPB_Version.Length + 1  # +1 for dot
+        $versionLen = $version.Length + 1  # +1 for dot
         $packageKey = (Get-Item $unzipNugetPackageDir).BaseName -replace ".{$versionLen}$"
-
         Write-VerboseLog "verifying package $packageKey."
 
-        if( $expectedNumOfFiles[$packageKey] -ne $actualNumOfFiles)
+        if($expectedNumOfFiles[$packageKey] -ne $actualNumOfFiles)
         {
             Write-Error "Number of files are not equal $unzipNugetPackageDir, expected: $($expectedNumOfFiles[$packageKey]) actual: $actualNumOfFiles"
         }

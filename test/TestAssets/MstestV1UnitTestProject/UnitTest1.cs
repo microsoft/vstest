@@ -3,11 +3,6 @@
 
 namespace MstestV1UnitTestProject
 {
-    using System;
-    using System.Diagnostics;
-    using System.Threading;
-    using System.IO;
-    using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 
@@ -17,7 +12,6 @@ namespace MstestV1UnitTestProject
         /// <summary>
         /// The passing test.
         /// </summary>
-        [Priority(2)]
         [TestMethod]
         public void PassingTest1()
         {
@@ -34,7 +28,6 @@ namespace MstestV1UnitTestProject
         /// The failing test.
         /// </summary>
         [TestCategory("CategoryA")]
-        [Priority(3)]
         [TestMethod]
         public void FailingTest1()
         {

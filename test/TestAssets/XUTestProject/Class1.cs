@@ -1,11 +1,10 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#pragma warning disable IDE1006 // Naming Styles
 namespace xUnitTestProject
+#pragma warning restore IDE1006 // Naming Styles
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
     using Xunit;
 
     public class Class1

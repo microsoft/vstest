@@ -1,23 +1,17 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- Package dependency versions -->
-  <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
   <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
   <PropertyGroup>
     <AssemblyName>XUTestProject</AssemblyName>
     <TargetFrameworks>netcoreapp2.1;net46</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="xunit">
-      <Version>$(XUnitFrameworkVersion)</Version>
-    </PackageReference>
-    <PackageReference Include="xunit.runner.visualstudio">
-      <Version>$(XUnitAdapterVersion)</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk">
-      <Version>$(NETTestSdkVersion)</Version>
-    </PackageReference>
+    <PackageReference Include="xunit" Version="$(XUnitFrameworkVersion)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="$(XUnitAdapterVersion)" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(NETTestSdkVersion)" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />

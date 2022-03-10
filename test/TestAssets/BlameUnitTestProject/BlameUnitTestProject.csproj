@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- Package dependency versions -->
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
@@ -13,7 +12,7 @@
   <PropertyGroup>
     <AssemblyName>BlameUnitTestProject</AssemblyName>
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
-    <OutputType Condition="$(NetCoreAppTargetFrameWork) == 'true' ">Exe</OutputType>
+    <OutputType Condition="$(NetCoreAppTargetFramework) == 'true' ">Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>

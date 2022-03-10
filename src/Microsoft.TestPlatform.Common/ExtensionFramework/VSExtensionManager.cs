@@ -1,215 +1,207 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
+namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Reflection;
+using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Interfaces;
+using Resources;
+
+/// <summary>
+/// Manager for VisualStudio based extensions
+/// </summary>
+public class VSExtensionManager : IVSExtensionManager
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Reflection;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.Resources;
+    private const string ExtensionManagerService = "Microsoft.VisualStudio.ExtensionManager.ExtensionManagerService";
+    private const string ExtensionManagerAssemblyName = @"Microsoft.VisualStudio.ExtensionManager";
+    private const string ExtensionManagerImplAssemblyName = @"Microsoft.VisualStudio.ExtensionManager.Implementation";
+
+    private const string SettingsManagerTypeName = "Microsoft.VisualStudio.Settings.ExternalSettingsManager";
+    private const string SettingsManagerAssemblyName = @"Microsoft.VisualStudio.Settings.15.0";
+
+    private readonly IFileHelper _fileHelper;
+
+    private Assembly _extensionManagerAssembly;
+    private Assembly _extensionManagerImplAssembly;
+    private Type _extensionManagerServiceType;
+
+    private Assembly _settingsManagerAssembly;
+    private Type _settingsManagerType;
 
     /// <summary>
-    /// Manager for VisualStudio based extensions
+    /// Default constructor for manager for Visual Studio based extensions
     /// </summary>
-    public class VSExtensionManager : IVSExtensionManager
+    public VSExtensionManager()
+        : this(new FileHelper())
     {
-        private const string ExtensionManagerService = "Microsoft.VisualStudio.ExtensionManager.ExtensionManagerService";
-        private const string ExtensionManagerAssemblyName = @"Microsoft.VisualStudio.ExtensionManager";
-        private const string ExtensionManagerImplAssemblyName = @"Microsoft.VisualStudio.ExtensionManager.Implementation";
+    }
 
-        private const string SettingsManagerTypeName = "Microsoft.VisualStudio.Settings.ExternalSettingsManager";
-        private const string SettingsManagerAssemblyName = @"Microsoft.VisualStudio.Settings.15.0";
+    internal VSExtensionManager(IFileHelper fileHelper)
+    {
+        _fileHelper = fileHelper;
+    }
 
-        private readonly IFileHelper fileHelper;
-
-        private Assembly extensionManagerAssembly;
-        private Assembly extensionManagerImplAssembly;
-        private Type extensionManagerServiceType;
-
-        private Assembly settingsManagerAssembly;
-        private Type settingsManagerType;
-
-        /// <summary>
-        /// Default constructor for manager for Visual Studio based extensions
-        /// </summary>
-        public VSExtensionManager() : this(new FileHelper())
+    /// <summary>
+    /// Get the available unit test extensions installed.
+    /// If no extensions are installed then it returns an empty list.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<string> GetUnitTestExtensions()
+    {
+        try
         {
+            return GetTestExtensionsInternal(Constants.UnitTestExtensionType);
+        }
+        catch (Exception ex)
+        {
+            string message = string.Format(CultureInfo.CurrentCulture, Resources.FailedToFindInstalledUnitTestExtensions, ex);
+            throw new TestPlatformException(message, ex);
+        }
+    }
+
+    /// <summary>
+    /// Get the unit tests extensions
+    /// </summary>
+    private IEnumerable<string> GetTestExtensionsInternal(string extensionType)
+    {
+        IEnumerable<string> installedExtensions = new List<string>();
+
+        // Navigate up to the IDE folder
+        // In case of xcopyable vstest.console, this functionality is not supported.
+        var installContext = new InstallationContext(_fileHelper);
+        if (!installContext.TryGetVisualStudioDirectory(out string vsInstallPath))
+        {
+            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.VSInstallationNotFound));
         }
 
-        internal VSExtensionManager(IFileHelper fileHelper)
+        // Adding resolution paths for resolving dependencies.
+        var resolutionPaths = installContext.GetVisualStudioCommonLocations(vsInstallPath);
+        using (var assemblyResolver = new AssemblyResolver(resolutionPaths))
         {
-            this.fileHelper = fileHelper;
-        }
+            object extensionManager;
+            object settingsManager;
 
-        /// <summary>
-        /// Get the available unit test extensions installed.
-        /// If no extensions are installed then it returns an empty list.
-        /// </summary>
-        /// <returns></returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public IEnumerable<string> GetUnitTestExtensions()
-        {
-            try
+            settingsManager = SettingsManagerType.GetMethod("CreateForApplication", new Type[] { typeof(String) }).Invoke(null, new object[] { installContext.GetVisualStudioPath(vsInstallPath) });
+            if (settingsManager != null)
             {
-                return GetTestExtensionsInternal(Constants.UnitTestExtensionType);
-            }
-            catch (Exception ex)
-            {
-                string message = string.Format(CultureInfo.CurrentCulture, Resources.FailedToFindInstalledUnitTestExtensions, ex);
-                throw new TestPlatformException(message, ex);
-            }
-        }
-
-        /// <summary>
-        /// Get the unit tests extensions
-        /// </summary>
-        private IEnumerable<string> GetTestExtensionsInternal(string extensionType)
-        {
-            IEnumerable<string> installedExtensions = new List<string>();
-
-            // Navigate up to the IDE folder
-            // In case of xcopyable vstest.console, this functionality is not supported.
-            var installContext = new InstallationContext(this.fileHelper);
-            if (!installContext.TryGetVisualStudioDirectory(out string vsInstallPath))
-            {
-                throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.VSInstallationNotFound));
-            }
-
-            // Adding resolution paths for resolving dependencies.
-            var resolutionPaths = installContext.GetVisualStudioCommonLocations(vsInstallPath);
-            using (var assemblyResolver = new AssemblyResolver(resolutionPaths))
-            {
-                object extensionManager;
-                object settingsManager;
-
-                settingsManager = SettingsManagerType.GetMethod("CreateForApplication", new Type[] { typeof(String) }).Invoke(null, new object[] { installContext.GetVisualStudioPath(vsInstallPath) });
-                if (settingsManager != null)
+                try
                 {
-                    try
-                    {
-                        // create extension manager
-                        extensionManager = Activator.CreateInstance(ExtensionManagerServiceType, settingsManager);
+                    // create extension manager
+                    extensionManager = Activator.CreateInstance(ExtensionManagerServiceType, settingsManager);
 
-                        if (extensionManager != null)
-                        {
-                            installedExtensions = ExtensionManagerServiceType.GetMethod("GetEnabledExtensionContentLocations", new Type[] { typeof(String) }).Invoke(
-                                                       extensionManager, new object[] { extensionType }) as IEnumerable<string>;
-                        }
-                        else
-                        {
-                            if (EqtTrace.IsWarningEnabled)
-                            {
-                                EqtTrace.Warning("VSExtensionManager : Unable to create extension manager");
-                            }
-                        }
-                    }
-                    finally
+                    if (extensionManager != null)
                     {
-                        // Dispose the settings manager
-                        IDisposable disposable = (settingsManager as IDisposable);
-                        if (disposable != null)
-                        {
-                            disposable.Dispose();
-                        }
+                        installedExtensions = ExtensionManagerServiceType.GetMethod("GetEnabledExtensionContentLocations", new Type[] { typeof(String) }).Invoke(
+                            extensionManager, new object[] { extensionType }) as IEnumerable<string>;
+                    }
+                    else
+                    {
+                        EqtTrace.Warning("VSExtensionManager : Unable to create extension manager");
                     }
                 }
-                else
+                finally
                 {
-                    if(EqtTrace.IsWarningEnabled)
+                    // Dispose the settings manager
+                    IDisposable disposable = (settingsManager as IDisposable);
+                    if (disposable != null)
                     {
-                        EqtTrace.Warning("VSExtensionManager : Unable to create settings manager");
+                        disposable.Dispose();
                     }
                 }
             }
-
-            return installedExtensions;
-        }
-
-        /// <summary>
-        /// Used to explicitly load Microsoft.VisualStudio.ExtensionManager.dll
-        /// </summary>
-        private Assembly ExtensionManagerDefAssembly
-        {
-            get
+            else
             {
-                if (extensionManagerAssembly == null)
-                {
-                    extensionManagerAssembly = Assembly.Load(new AssemblyName(ExtensionManagerAssemblyName));
-                }
-                return extensionManagerAssembly;
+                EqtTrace.Warning("VSExtensionManager : Unable to create settings manager");
             }
         }
 
-        /// <summary>
-        /// Used to explicitly load Microsoft.VisualStudio.ExtensionManager.Implementation.dll
-        /// </summary>
-        private Assembly ExtensionManagerImplAssembly
-        {
-            get
-            {
-                if (extensionManagerImplAssembly == null)
-                {
-                    // Make sure ExtensionManager assembly is already loaded.
-                    Assembly extensionMgrAssembly = ExtensionManagerDefAssembly;
-                    if (extensionMgrAssembly != null)
-                    {
-                        extensionManagerImplAssembly = Assembly.Load(new AssemblyName(ExtensionManagerImplAssemblyName));
-                    }
-                }
+        return installedExtensions;
+    }
 
-                return extensionManagerImplAssembly;
+    /// <summary>
+    /// Used to explicitly load Microsoft.VisualStudio.ExtensionManager.dll
+    /// </summary>
+    private Assembly ExtensionManagerDefAssembly
+    {
+        get
+        {
+            if (_extensionManagerAssembly == null)
+            {
+                _extensionManagerAssembly = Assembly.Load(new AssemblyName(ExtensionManagerAssemblyName));
             }
+            return _extensionManagerAssembly;
         }
+    }
 
-        /// <summary>
-        /// Returns the Type of ExtensionManagerService.
-        /// </summary>
-        private Type ExtensionManagerServiceType
+    /// <summary>
+    /// Used to explicitly load Microsoft.VisualStudio.ExtensionManager.Implementation.dll
+    /// </summary>
+    private Assembly ExtensionManagerImplAssembly
+    {
+        get
         {
-            get
+            if (_extensionManagerImplAssembly == null)
             {
-                if (extensionManagerServiceType == null)
+                // Make sure ExtensionManager assembly is already loaded.
+                Assembly extensionMgrAssembly = ExtensionManagerDefAssembly;
+                if (extensionMgrAssembly != null)
                 {
-                    extensionManagerServiceType = ExtensionManagerImplAssembly.GetType(ExtensionManagerService);
+                    _extensionManagerImplAssembly = Assembly.Load(new AssemblyName(ExtensionManagerImplAssemblyName));
                 }
-                return extensionManagerServiceType;
             }
+
+            return _extensionManagerImplAssembly;
         }
+    }
 
-        /// <summary>
-        /// Used to explicitly load Microsoft.VisualStudio.Settings.15.0.dll
-        /// </summary>
-        private Assembly SettingsManagerAssembly
+    /// <summary>
+    /// Returns the Type of ExtensionManagerService.
+    /// </summary>
+    private Type ExtensionManagerServiceType
+    {
+        get
         {
-            get
+            if (_extensionManagerServiceType == null)
             {
-                if (settingsManagerAssembly == null)
-                {
-                    settingsManagerAssembly = Assembly.Load(new AssemblyName(SettingsManagerAssemblyName));
-                }
-
-                return settingsManagerAssembly;
+                _extensionManagerServiceType = ExtensionManagerImplAssembly.GetType(ExtensionManagerService);
             }
+            return _extensionManagerServiceType;
         }
+    }
 
-        private Type SettingsManagerType
+    /// <summary>
+    /// Used to explicitly load Microsoft.VisualStudio.Settings.15.0.dll
+    /// </summary>
+    private Assembly SettingsManagerAssembly
+    {
+        get
         {
-            get
+            if (_settingsManagerAssembly == null)
             {
-                if (settingsManagerType == null)
-                {
-                    settingsManagerType = SettingsManagerAssembly.GetType(SettingsManagerTypeName);
-                }
-
-                return settingsManagerType;
+                _settingsManagerAssembly = Assembly.Load(new AssemblyName(SettingsManagerAssemblyName));
             }
+
+            return _settingsManagerAssembly;
+        }
+    }
+
+    private Type SettingsManagerType
+    {
+        get
+        {
+            if (_settingsManagerType == null)
+            {
+                _settingsManagerType = SettingsManagerAssembly.GetType(SettingsManagerTypeName);
+            }
+
+            return _settingsManagerType;
         }
     }
 }
-

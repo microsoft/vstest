@@ -387,9 +387,9 @@
         <target state="translated">        URI: {0}</target>
       </trans-unit>
       <trans-unit id="InvalidPlatformType">
-        <source>Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.</source>
-        <note></note>
-        <target state="translated">Неверный тип платформы: {0}. Допустимые типы платформы: x86, x64 и Arm.</target>
+        <source>Invalid platform type: {0}. Valid platform types are {1}.</source>
+        <note>0 is the platform type e.g. x86, and 1 is a list of the built in platforms, e.g. x86, x64</note>
+        <target state="translated">Неверный тип платформы: {0}. Допустимые типы платформ: {1}.</target>
       </trans-unit>
       <trans-unit id="PlatformTypeRequired">
         <source>The /Platform argument requires the target platform type for the test run to be provided.   Example:  /Platform:x86</source>
@@ -1106,6 +1106,11 @@
       <trans-unit id="TestRunAbortedWithError">
         <source>Test Run Aborted with error {0}.</source>
         <target state="translated">Тестовый запуск прерван с ошибкой {0}.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidTestSessionCorrelationId">
+        <source>Invalid testSessionCorrelationId</source>
+        <target state="new">Invalid testSessionCorrelationId</target>
         <note></note>
       </trans-unit>
     </body>

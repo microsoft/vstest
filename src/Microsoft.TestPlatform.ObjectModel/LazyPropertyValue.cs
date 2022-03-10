@@ -1,61 +1,60 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
-{
-    using System;
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
+using System;
+
+/// <summary>
+/// Represents a lazy value calculation for a TestObject
+/// </summary>
+internal interface ILazyPropertyValue
+{
     /// <summary>
-    /// Represents a lazy value calculation for a TestObject
+    /// Forces calculation of the value
     /// </summary>
-    internal interface ILazyPropertyValue
+    object Value { get; }
+}
+
+/// <summary>
+/// Represents a lazy value calculation for a TestObject
+/// </summary>
+/// <typeparam name="T">The type of the value to be calculated</typeparam>
+public sealed class LazyPropertyValue<T> : ILazyPropertyValue
+{
+    private T _value;
+    private readonly Func<T> _getValue;
+    private bool _isValueCreated;
+
+    public LazyPropertyValue(Func<T> getValue)
     {
-        /// <summary>
-        /// Forces calculation of the value
-        /// </summary>
-        object Value { get; }
+        _isValueCreated = false;
+        _value = default;
+        _getValue = getValue;
     }
 
     /// <summary>
-    /// Represents a lazy value calculation for a TestObject
+    /// Forces calculation of the value
     /// </summary>
-    /// <typeparam name="T">The type of the value to be calculated</typeparam>
-    public sealed class LazyPropertyValue<T> : ILazyPropertyValue
+    public T Value
     {
-        private T value;
-        private Func<T> getValue;
-        private bool isValueCreated;
-
-        public LazyPropertyValue(Func<T> getValue)
+        get
         {
-            this.isValueCreated = false;
-            this.value = default(T);
-            this.getValue = getValue;
-        }
-
-        /// <summary>
-        /// Forces calculation of the value
-        /// </summary>
-        public T Value
-        {
-            get
+            if (!_isValueCreated)
             {
-                if (!isValueCreated)
-                {
-                    this.value = this.getValue();
-                    isValueCreated = true;
-                }
-
-                return this.value;
+                _value = _getValue();
+                _isValueCreated = true;
             }
+
+            return _value;
         }
+    }
 
-        object ILazyPropertyValue.Value
+    object ILazyPropertyValue.Value
+    {
+        get
         {
-            get
-            {
-                return this.Value;
-            }
+            return Value;
         }
     }
 }

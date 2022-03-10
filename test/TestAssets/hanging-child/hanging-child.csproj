@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <!-- Package dependency versions -->
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
@@ -7,8 +7,7 @@
   </PropertyGroup>
   <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
-  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Dependencies.props" />
-  
+
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
     <OutputType>Exe</OutputType>

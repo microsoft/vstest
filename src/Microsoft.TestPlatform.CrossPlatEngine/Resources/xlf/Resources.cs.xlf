@@ -157,6 +157,26 @@
         <target state="translated">Proxy s ID {0} je už k dispozici a nedá se znovu zařadit do fronty.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="translated">Pro tento běh se nenašel žádný vhodný zprostředkovatel testů v režimu runtime.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoProxyMatchesDescription">
+        <source>The runsettings changed between the time when the test session was established and the time of the current run/discovery request.</source>
+        <target state="translated">Soubor runsettings se změnil mezi časem, kdy byla relace testu vytvořena, a časem aktuálního požadavku spuštění nebo zjišťování.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="new">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="new">Attachments:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -2,6 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <!-- Not able to add TargetFrameworks here due to: https://github.com/dotnet/sdk/issues/1110 -->
-        <NetCoreAppTargetFrameWork Condition="'$(TargetFramework)' != '' AND $(TargetFramework.StartsWith('netcoreapp'))">true</NetCoreAppTargetFrameWork>
+        <NetCoreAppTargetFramework Condition="'$(TargetFramework)' != '' AND $(TargetFramework.StartsWith('netcoreapp'))">true</NetCoreAppTargetFramework>
+        <CheckEolTargetFramework>false</CheckEolTargetFramework>
     </PropertyGroup>
+
+    <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Dependencies.props" Condition=" '$(DependencyVersionsImported)' != 'true' "/>
 </Project>

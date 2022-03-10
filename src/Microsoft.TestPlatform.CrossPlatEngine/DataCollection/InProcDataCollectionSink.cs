@@ -1,100 +1,91 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
-{
-    using System;
-    using System.Collections.Generic;
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using System;
+using System.Collections.Generic;
+
+using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+
+// <inheritdoc />
+internal class InProcDataCollectionSink : IDataCollectionSink
+{
+    private readonly IDictionary<Guid, TestCaseDataCollectionData> _testCaseDataCollectionDataMap;
+
+    /// <summary>
+    /// In process data collection sink
+    /// </summary>
+    public InProcDataCollectionSink()
+    {
+        _testCaseDataCollectionDataMap = new Dictionary<Guid, TestCaseDataCollectionData>();
+    }
 
     // <inheritdoc />
-    internal class InProcDataCollectionSink : IDataCollectionSink
+    public void SendData(DataCollectionContext dataCollectionContext, string key, string value)
     {
-        private IDictionary<Guid, TestCaseDataCollectionData> testCaseDataCollectionDataMap;
+        ValidateArg.NotNullOrEmpty(key, nameof(key));
+        ValidateArg.NotNullOrEmpty(value, nameof(value));
+        ValidateArg.NotNullOrEmpty(dataCollectionContext.TestCase.Id.ToString(), "dataCollectionContext.TestCase.Id");
 
-        /// <summary>
-        /// In process data collection sink
-        /// </summary>
-        public InProcDataCollectionSink()
+        var testCaseId = dataCollectionContext.TestCase.Id;
+        AddKeyValuePairToDictionary(testCaseId, key, value);
+    }
+
+    /// <summary>
+    /// Gets the data collection data stored in the in process data collection sink
+    /// </summary>
+    /// <param name="testCaseId">valid test case id</param>
+    /// <returns>test data collection dictionary </returns>
+    public IDictionary<string, string> GetDataCollectionDataSetForTestCase(Guid testCaseId)
+    {
+
+        if (!_testCaseDataCollectionDataMap.TryGetValue(testCaseId, out TestCaseDataCollectionData testCaseDataCollection))
         {
-            this.testCaseDataCollectionDataMap = new Dictionary<Guid, TestCaseDataCollectionData>();
+            EqtTrace.Warning("No DataCollection Data set for the test case {0}", testCaseId);
+            return new Dictionary<string, string>();
+        }
+        else
+        {
+            _testCaseDataCollectionDataMap.Remove(testCaseId);
+            return testCaseDataCollection.CollectionData;
+        }
+    }
+
+    private void AddKeyValuePairToDictionary(Guid testCaseId, string key, string value)
+    {
+        if (!_testCaseDataCollectionDataMap.ContainsKey(testCaseId))
+        {
+            var testCaseCollectionData = new TestCaseDataCollectionData();
+            testCaseCollectionData.AddOrUpdateData(key, value);
+            _testCaseDataCollectionDataMap[testCaseId] = testCaseCollectionData;
+        }
+        else
+        {
+            _testCaseDataCollectionDataMap[testCaseId].AddOrUpdateData(key, value);
+        }
+    }
+
+    private class TestCaseDataCollectionData
+    {
+        public TestCaseDataCollectionData()
+        {
+            CollectionData = new Dictionary<string, string>();
         }
 
-        // <inheritdoc />
-        public void SendData(DataCollectionContext dataCollectionContext, string key, string value)
+        internal IDictionary<string, string> CollectionData { get; private set; }
+
+        internal void AddOrUpdateData(string key, string value)
         {
-            ValidateArg.NotNullOrEmpty(key, nameof(key));
-            ValidateArg.NotNullOrEmpty(value, nameof(value));
-            ValidateArg.NotNullOrEmpty(dataCollectionContext.TestCase.Id.ToString(), "dataCollectionContext.TestCase.Id");
-
-            var testCaseId = dataCollectionContext.TestCase.Id;
-            this.AddKeyValuePairToDictionary(testCaseId, key, value);
-        }
-
-        /// <summary>
-        /// Gets the data collection data stored in the in process data collection sink
-        /// </summary>
-        /// <param name="testCaseId">valid test case id</param>
-        /// <returns>test data collection dictionary </returns>
-        public IDictionary<string, string> GetDataCollectionDataSetForTestCase(Guid testCaseId)
-        {
-            TestCaseDataCollectionData testCaseDataCollection = null;
-
-            if (!this.testCaseDataCollectionDataMap.TryGetValue(testCaseId, out testCaseDataCollection))
+            if (!CollectionData.ContainsKey(key))
             {
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("No DataCollection Data set for the test case {0}", testCaseId);
-                }
-
-                return new Dictionary<string, string>();
+                CollectionData[key] = value;
             }
             else
             {
-                this.testCaseDataCollectionDataMap.Remove(testCaseId);
-                return testCaseDataCollection.CollectionData;
-            }
-        }
-
-        private void AddKeyValuePairToDictionary(Guid testCaseId, string key, string value)
-        {
-            if (!this.testCaseDataCollectionDataMap.ContainsKey(testCaseId))
-            {
-                var testCaseCollectionData = new TestCaseDataCollectionData();
-                testCaseCollectionData.AddOrUpdateData(key, value);
-                this.testCaseDataCollectionDataMap[testCaseId] = testCaseCollectionData;
-            }
-            else
-            {
-                this.testCaseDataCollectionDataMap[testCaseId].AddOrUpdateData(key, value);
-            }
-        }
-
-        private class TestCaseDataCollectionData
-        {
-            public TestCaseDataCollectionData()
-            {
-                this.CollectionData = new Dictionary<string, string>();
-            }
-
-            internal IDictionary<string, string> CollectionData { get; private set; }
-
-            internal void AddOrUpdateData(string key, string value)
-            {
-                if (!this.CollectionData.ContainsKey(key))
-                {
-                    this.CollectionData[key] = value;
-                }
-                else
-                {
-                    if (EqtTrace.IsWarningEnabled)
-                    {
-                        EqtTrace.Warning("The data for in-proc data collector with key {0} has already been set. Will be reset with new value", key);
-                    }
-                    this.CollectionData[key] = value;
-                }
+                EqtTrace.Warning("The data for in-proc data collector with key {0} has already been set. Will be reset with new value", key);
+                CollectionData[key] = value;
             }
         }
     }

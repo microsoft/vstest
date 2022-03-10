@@ -184,11 +184,29 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";NoProxyMatchesDescription" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[The runsettings changed between the time when the test session was established and the time of the current run/discovery request.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Die Ausführungseinstellungen wurden zwischen dem Zeitpunkt, zu dem die Testsitzung eingerichtet wurde, und dem Zeitpunkt der aktuellen Ausführungs-/Ermittlungsanforderung geändert.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";NoSuchProxyId" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Proxy with id {0} is not managed by the current session manager.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Der Proxy mit der ID {0} wird nicht vom aktuellen Sitzungs-Manager verwaltet.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";NoTestHostProviderFound" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[No suitable test runtime provider found for this run.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Für diese Ausführung wurde kein geeigneter Testlaufzeitanbieter gefunden.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

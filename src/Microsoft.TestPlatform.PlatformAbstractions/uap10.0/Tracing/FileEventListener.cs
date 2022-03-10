@@ -3,97 +3,96 @@
 
 #if WINDOWS_UWP
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Tracing;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+
+internal sealed class FileEventListener : EventListener
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Diagnostics.Tracing;
-    using System.IO;
-    using System.Threading;
-    using System.Threading.Tasks;
+    /// <summary>
+    /// Storage file to be used to write logs
+    /// </summary>
+    private FileStream _fileStream;
 
-    internal sealed class FileEventListener : EventListener
+    /// <summary>
+    /// StreamWriter to write logs to file
+    /// </summary>
+    private StreamWriter _streamWriter;
+
+    /// <summary>
+    /// Name of the current log file
+    /// </summary>
+    private readonly string _fileName;
+
+    /// <summary>
+    /// The format to be used by logging.
+    /// </summary>
+    private readonly string _format = "{0:yyyy-MM-dd HH\\:mm\\:ss\\:ffff}\tType: {1}\tId: {2}\tMessage: '{3}'";
+
+    private readonly SemaphoreSlim _semaphoreSlim = new(1);
+
+    public FileEventListener(string name)
     {
-        /// <summary>
-        /// Storage file to be used to write logs
-        /// </summary>
-        private FileStream fileStream = null;
+        _fileName = name;
 
-        /// <summary>
-        /// StreamWriter to write logs to file
-        /// </summary>
-        private StreamWriter streamWriter = null;
+        AssignLocalFile();
+    }
 
-        /// <summary>
-        /// Name of the current log file
-        /// </summary>
-        private string fileName;
-
-        /// <summary>
-        /// The format to be used by logging.
-        /// </summary>
-        private string format = "{0:yyyy-MM-dd HH\\:mm\\:ss\\:ffff}\tType: {1}\tId: {2}\tMessage: '{3}'";
-
-        private SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
-
-        public FileEventListener(string name)
+    protected override void OnEventWritten(EventWrittenEventArgs eventData)
+    {
+        if (_streamWriter == null)
         {
-            this.fileName = name;
-
-            this.AssignLocalFile();
+            return;
         }
 
-        protected override void OnEventWritten(EventWrittenEventArgs eventData)
+        var lines = new List<string>();
+
+        var newFormatedLine = string.Format(_format, DateTime.Now, eventData.Level, eventData.EventId, eventData.Payload[0]);
+
+        Debug.WriteLine(newFormatedLine);
+
+        lines.Add(newFormatedLine);
+
+        WriteToFile(lines);
+    }
+
+    private void AssignLocalFile()
+    {
+        _fileStream = new FileStream(_fileName, FileMode.Append | FileMode.OpenOrCreate);
+        _streamWriter = new StreamWriter(_fileStream)
         {
-            if (this.streamWriter == null)
+            AutoFlush = true
+        };
+    }
+
+    private async void WriteToFile(IEnumerable<string> lines)
+    {
+        await _semaphoreSlim.WaitAsync();
+
+        await Task.Run(async () =>
+        {
+            try
             {
-                return;
+                foreach (var line in lines)
+                {
+                    await _streamWriter.WriteLineAsync(line);
+                }
             }
-
-            var lines = new List<string>();
-
-            var newFormatedLine = string.Format(this.format, DateTime.Now, eventData.Level, eventData.EventId, eventData.Payload[0]);
-
-            Debug.WriteLine(newFormatedLine);
-
-            lines.Add(newFormatedLine);
-
-            this.WriteToFile(lines);
-        }
-
-        private void AssignLocalFile()
-        {
-            this.fileStream = new FileStream(this.fileName, FileMode.Append | FileMode.OpenOrCreate);
-            this.streamWriter = new StreamWriter(this.fileStream)
+            catch (Exception)
             {
-                AutoFlush = true
-            };
-        }
-
-        private async void WriteToFile(IEnumerable<string> lines)
-        {
-            await this.semaphoreSlim.WaitAsync();
-
-            await Task.Run(async () =>
+                // Ignore
+            }
+            finally
             {
-                try
-                {
-                    foreach (var line in lines)
-                    {
-                        await this.streamWriter.WriteLineAsync(line);
-                    }
-                }
-                catch (Exception)
-                {
-                    // Ignore
-                }
-                finally
-                {
-                    this.semaphoreSlim.Release();
-                }
-            });
-        }
+                _semaphoreSlim.Release();
+            }
+        });
     }
 }
 

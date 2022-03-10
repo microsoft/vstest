@@ -1,42 +1,41 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
+namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests;
+
+using TestUtilities;
+using VisualStudio.TestTools.UnitTesting;
+
+using System.Reflection;
+
+[TestClass]
+[TestCategory("Windows")]
+[TestCategory("AcceptanceTests")]
+public class SpecialNameTests
 {
-    using Microsoft.TestPlatform.TestUtilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using System.Reflection;
-
-    [TestClass]
-    [TestCategory("Windows")]
-    [TestCategory("AcceptanceTests")]
-    public class SpecialNameTests
+    [TestMethod]
+    public void VerifyThatInvalidIdentifierNamesAreParsed()
     {
-        [TestMethod]
-        public void VerifyThatInvalidIdentifierNamesAreParsed()
+        var environment = new IntegrationTestEnvironment();
+        var asset = environment.GetTestAsset("CILProject.dll", "net451");
+        var assembly = Assembly.LoadFrom(asset);
+        var types = assembly.GetTypes();
+
+        foreach (var type in types)
         {
-            var environment = new IntegrationTestEnvironment();
-            var asset = environment.GetTestAsset("CILProject.dll", "net451");
-            var assembly = Assembly.LoadFrom(asset);
-            var types = assembly.GetTypes();
+            var methods = type.GetMethods();
 
-            foreach (var type in types)
+            foreach (var method in methods)
             {
-                var methods = type.GetMethods();
+                if (method.DeclaringType != type) continue;
 
-                foreach (var method in methods)
-                {
-                    if (method.DeclaringType != type) continue;
+                ManagedNameHelper.GetManagedName(method, out var typeName, out var methodName);
+                var methodInfo = ManagedNameHelper.GetMethod(assembly, typeName, methodName);
+                ManagedNameHelper.GetManagedName(methodInfo, out var typeName2, out var methodName2);
 
-                    ManagedNameHelper.GetManagedName(method, out var typeName, out var methodName);
-                    var methodInfo = ManagedNameHelper.GetMethod(assembly, typeName, methodName);
-                    ManagedNameHelper.GetManagedName(methodInfo, out var typeName2, out var methodName2);
-
-                    Assert.IsTrue(method == methodInfo);
-                    Assert.AreEqual(typeName, typeName2, $"Type parse roundtrip test failed: {method} ({typeName} != {typeName2})");
-                    Assert.AreEqual(methodName, methodName2, $"Method parse roundtrip test failed: {method} ({methodName} != {methodName2})");
-                }
+                Assert.IsTrue(method == methodInfo);
+                Assert.AreEqual(typeName, typeName2, $"Type parse roundtrip test failed: {method} ({typeName} != {typeName2})");
+                Assert.AreEqual(methodName, methodName2, $"Method parse roundtrip test failed: {method} ({methodName} != {methodName2})");
             }
         }
     }

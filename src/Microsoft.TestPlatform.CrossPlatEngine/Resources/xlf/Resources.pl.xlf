@@ -157,6 +157,26 @@
         <target state="translated">Serwer proxy o identyfikatorze {0} jest już dostępny i nie można go ponownie umieścić w kolejce.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="translated">Nie znaleziono odpowiedniego dostawcy testowego środowiska uruchomieniowego dla tego uruchomienia.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoProxyMatchesDescription">
+        <source>The runsettings changed between the time when the test session was established and the time of the current run/discovery request.</source>
+        <target state="translated">Ustawienia runsettings uległy zmianie między czasem ustanowienia sesji testowej a czasem bieżącego żądania uruchomienia/odnajdywania.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="new">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="new">Attachments:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

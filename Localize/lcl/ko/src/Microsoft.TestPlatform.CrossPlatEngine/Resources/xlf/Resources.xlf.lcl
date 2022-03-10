@@ -184,11 +184,29 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";NoProxyMatchesDescription" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[The runsettings changed between the time when the test session was established and the time of the current run/discovery request.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[테스트 세션이 설정된 시간과 현재 실행/검색 요청의 시간 사이에 runsettings가 변경되었습니다.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";NoSuchProxyId" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Proxy with id {0} is not managed by the current session manager.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[ID가 {0}인 프록시가 현재 세션 관리자에서 관리되지 않습니다.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";NoTestHostProviderFound" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[No suitable test runtime provider found for this run.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[이 실행에 적합한 테스트 런타임 공급자를 찾지 못했습니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

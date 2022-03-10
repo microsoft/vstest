@@ -1,63 +1,45 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+
+using System;
+using System.Runtime.Serialization;
+
+/// <summary>
+/// Class identifying a session.
+/// </summary>
+[DataContract]
+public sealed class SessionId
 {
-    using System;
-    using System.Runtime.Serialization;
-
-    /// <summary>
-    /// Class identifying a session.
-    /// </summary>
-    [DataContract]
-    public sealed class SessionId
+    public SessionId()
     {
-        private Guid sessionId;
+        Id = Guid.NewGuid();
+    }
 
-        private static SessionId empty = new SessionId(Guid.Empty);
+    public SessionId(Guid id)
+    {
+        Id = id;
+    }
 
-        public SessionId()
-        {
-            sessionId = Guid.NewGuid();
-        }
+    [DataMember]
+    public static SessionId Empty { get; } = new SessionId(Guid.Empty);
 
-        public SessionId(Guid id)
-        {
-            sessionId = id;
-        }
+    [DataMember]
+    public Guid Id { get; }
 
-        [DataMember]
-        public static SessionId Empty
-        {
-            get { return empty; }
-        }
+    public override bool Equals(object obj)
+    {
+        return obj is SessionId sessionId && Id.Equals(sessionId.Id);
+    }
 
-        [DataMember]
-        public Guid Id
-        {
-            get { return sessionId; }
-        }
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
 
-        public override bool Equals(object obj)
-        {
-            SessionId id = obj as SessionId;
-
-            if (id == null)
-            {
-                return false;
-            }
-
-            return sessionId.Equals(id.sessionId);
-        }
-
-        public override int GetHashCode()
-        {
-            return sessionId.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return sessionId.ToString("B");
-        }
+    public override string ToString()
+    {
+        return Id.ToString("B");
     }
 }

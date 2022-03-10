@@ -1,128 +1,124 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
+
+using System;
+using System.ComponentModel;
+using System.IO;
+
+using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using TestTools.UnitTesting;
+
+using Moq;
+
+[TestClass]
+public class TestPlatformDataCollectionSinkTests
 {
-    using System;
-    using System.ComponentModel;
-    using System.IO;
+    private readonly Mock<IDataCollectionAttachmentManager> _attachmentManager;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    private readonly DataCollectorConfig _dataCollectorConfig;
 
-    using Moq;
+    private TestPlatformDataCollectionSink _dataCollectionSink;
 
-    [TestClass]
-    public class TestPlatformDataCollectionSinkTests
+    private bool _isEventHandlerInvoked;
+    private static readonly string TempDirectoryPath = Path.GetTempPath();
+
+    public TestPlatformDataCollectionSinkTests()
     {
-        private Mock<IDataCollectionAttachmentManager> attachmentManager;
+        _attachmentManager = new Mock<IDataCollectionAttachmentManager>();
+        _dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollector));
+        _dataCollectionSink = new TestPlatformDataCollectionSink(_attachmentManager.Object, _dataCollectorConfig);
+        _isEventHandlerInvoked = false;
+    }
 
-        private DataCollectorConfig dataCollectorConfig;
+    [TestCleanup]
+    public void Cleanup()
+    {
+        File.Delete(Path.Combine(TempDirectoryPath, "filename.txt"));
+    }
 
-        private TestPlatformDataCollectionSink dataCollectionSink;
+    [TestMethod]
+    public void SendFileAsyncShouldThrowExceptionIfFileTransferInformationIsNull()
+    {
+        Assert.ThrowsException<ArgumentNullException>(() => _dataCollectionSink.SendFileAsync(default));
+    }
 
-        private bool isEventHandlerInvoked = false;
-        private static readonly string TempDirectoryPath = Path.GetTempPath();
+    [TestMethod]
+    public void SendFileAsyncShouldInvokeAttachmentManagerWithValidFileTransferInfo()
+    {
+        var filename = Path.Combine(TempDirectoryPath, "filename.txt");
+        File.WriteAllText(filename, string.Empty);
 
-        public TestPlatformDataCollectionSinkTests()
-        {
-            this.attachmentManager = new Mock<IDataCollectionAttachmentManager>();
-            this.dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollector));
-            this.dataCollectionSink = new TestPlatformDataCollectionSink(this.attachmentManager.Object, this.dataCollectorConfig);
-            this.isEventHandlerInvoked = false;
-        }
+        var guid = Guid.NewGuid();
+        var sessionId = new SessionId(guid);
+        var context = new DataCollectionContext(sessionId);
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            File.Delete(Path.Combine(TempDirectoryPath, "filename.txt"));
-        }
+        var fileTransferInfo = new FileTransferInformation(context, filename, false);
 
-        [TestMethod]
-        public void SendFileAsyncShouldThrowExceptionIfFileTransferInformationIsNull()
-        {
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.dataCollectionSink.SendFileAsync(default);
-            });
-        }
+        _dataCollectionSink.SendFileAsync(fileTransferInfo);
 
-        [TestMethod]
-        public void SendFileAsyncShouldInvokeAttachmentManagerWithValidFileTransferInfo()
-        {
-            var filename = Path.Combine(TempDirectoryPath, "filename.txt");
-            File.WriteAllText(filename, string.Empty);
+        _attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
+    }
 
-            var guid = Guid.NewGuid();
-            var sessionId = new SessionId(guid);
-            var context = new DataCollectionContext(sessionId);
+    [TestMethod]
+    public void SendFileAsyncShouldInvokeSendFileCompletedIfRegistered()
+    {
+        var filename = Path.Combine(TempDirectoryPath, "filename.txt");
+        File.WriteAllText(filename, string.Empty);
 
-            var fileTransferInfo = new FileTransferInformation(context, filename, false);
+        var guid = Guid.NewGuid();
+        var sessionId = new SessionId(guid);
+        var context = new DataCollectionContext(sessionId);
 
-            this.dataCollectionSink.SendFileAsync(fileTransferInfo);
+        var fileTransferInfo = new FileTransferInformation(context, filename, false);
 
-            this.attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
-        }
+        var attachmentManager = new DataCollectionAttachmentManager();
+        attachmentManager.Initialize(sessionId, TempDirectoryPath, new Mock<IMessageSink>().Object);
 
-        [TestMethod]
-        public void SendFileAsyncShouldInvokeSendFileCompletedIfRegistered()
-        {
-            var filename = Path.Combine(TempDirectoryPath, "filename.txt");
-            File.WriteAllText(filename, string.Empty);
+        _dataCollectionSink = new TestPlatformDataCollectionSink(attachmentManager, _dataCollectorConfig);
+        _dataCollectionSink.SendFileCompleted += SendFileCompleted_Handler;
+        _dataCollectionSink.SendFileAsync(fileTransferInfo);
 
-            var guid = Guid.NewGuid();
-            var sessionId = new SessionId(guid);
-            var context = new DataCollectionContext(sessionId);
+        var result = attachmentManager.GetAttachments(context);
 
-            var fileTransferInfo = new FileTransferInformation(context, filename, false);
+        Assert.IsNotNull(result);
+        Assert.IsTrue(_isEventHandlerInvoked);
+    }
 
-            var attachmentManager = new DataCollectionAttachmentManager();
-            attachmentManager.Initialize(sessionId, TempDirectoryPath, new Mock<IMessageSink>().Object);
+    [TestMethod]
+    public void SendFileAsyncShouldInvokeAttachmentManagerWithValidFileTransferInfoOverLoaded1()
+    {
+        var filename = Path.Combine(TempDirectoryPath, "filename.txt");
+        File.WriteAllText(filename, string.Empty);
 
-            this.dataCollectionSink = new TestPlatformDataCollectionSink(attachmentManager, this.dataCollectorConfig);
-            this.dataCollectionSink.SendFileCompleted += SendFileCompleted_Handler;
-            this.dataCollectionSink.SendFileAsync(fileTransferInfo);
+        var guid = Guid.NewGuid();
+        var sessionId = new SessionId(guid);
+        var context = new DataCollectionContext(sessionId);
 
-            var result = attachmentManager.GetAttachments(context);
+        _dataCollectionSink.SendFileAsync(context, filename, false);
 
-            Assert.IsNotNull(result);
-            Assert.IsTrue(this.isEventHandlerInvoked);
-        }
+        _attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
+    }
 
-        [TestMethod]
-        public void SendFileAsyncShouldInvokeAttachmentManagerWithValidFileTransferInfoOverLoaded1()
-        {
-            var filename = Path.Combine(TempDirectoryPath, "filename.txt");
-            File.WriteAllText(filename, string.Empty);
+    [TestMethod]
+    public void SendFileAsyncShouldInvokeAttachmentManagerWithValidFileTransferInfoOverLoaded2()
+    {
+        var filename = Path.Combine(TempDirectoryPath, "filename.txt");
+        File.WriteAllText(filename, string.Empty);
 
-            var guid = Guid.NewGuid();
-            var sessionId = new SessionId(guid);
-            var context = new DataCollectionContext(sessionId);
+        var guid = Guid.NewGuid();
+        var sessionId = new SessionId(guid);
+        var context = new DataCollectionContext(sessionId);
 
-            this.dataCollectionSink.SendFileAsync(context, filename, false);
+        _dataCollectionSink.SendFileAsync(context, filename, string.Empty, false);
 
-            this.attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
-        }
+        _attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
+    }
 
-        [TestMethod]
-        public void SendFileAsyncShouldInvokeAttachmentManagerWithValidFileTransferInfoOverLoaded2()
-        {
-            var filename = Path.Combine(TempDirectoryPath, "filename.txt");
-            File.WriteAllText(filename, string.Empty);
-
-            var guid = Guid.NewGuid();
-            var sessionId = new SessionId(guid);
-            var context = new DataCollectionContext(sessionId);
-
-            this.dataCollectionSink.SendFileAsync(context, filename, string.Empty, false);
-
-            this.attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
-        }
-
-        void SendFileCompleted_Handler(object sender, AsyncCompletedEventArgs e)
-        {
-            this.isEventHandlerInvoked = true;
-        }
+    void SendFileCompleted_Handler(object sender, AsyncCompletedEventArgs e)
+    {
+        _isEventHandlerInvoked = true;
     }
 }

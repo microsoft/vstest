@@ -9,10 +9,16 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <MicrosoftDotNetBuildTasksFeedFilePath Condition=" '$(MicrosoftDotNetBuildTasksFeedFilePath)' == '' ">$(NuGetPackageRoot)microsoft.dotnet.build.tasks.feed\$(MicrosoftDotNetBuildTasksFeedVersion)\tools\$(TargetFramework)\Microsoft.DotNet.Build.Tasks.Feed.dll</MicrosoftDotNetBuildTasksFeedFilePath>
-        <PackagesPath Condition=" '$(PackagesPath)' == '' ">$(ArtifactsDir)\$(Configuration)\packages\</PackagesPath>
-        <AssetManifestFilePath Condition=" '$(AssetManifestFilePath)' == '' ">$(PackagesPath)manifest\manifest.xml</AssetManifestFilePath>
-        <PackagesToPublishPattern Condition=" '$(PackagesToPublishPattern)' == '' ">$(PackagesPath)*.nupkg</PackagesToPublishPattern>
+        <MicrosoftDotNetBuildTasksFeedFilePath Condition=" '$(MicrosoftDotNetBuildTasksFeedFilePath)' == '' ">$(NuGetPackageRoot)microsoft.dotnet.build.tasks.feed/$(MicrosoftDotNetBuildTasksFeedVersion)/</MicrosoftDotNetBuildTasksFeedFilePath>
+        <MicrosoftDotNetBuildTasksFeedTaskDir>$(MicrosoftDotNetBuildTasksFeedFilePath)tools/net472/</MicrosoftDotNetBuildTasksFeedTaskDir>
+        <MicrosoftDotNetBuildTasksFeedTaskDir Condition="'$(MSBuildRuntimeType)' == 'Core'">$(MicrosoftDotNetBuildTasksFeedFilePath)tools/netcoreapp3.1/</MicrosoftDotNetBuildTasksFeedTaskDir>
+
+        <PackagesPathWithTrailingSlash>$(PackagesPath)</PackagesPathWithTrailingSlash>
+        <PackagesPathWithTrailingSlash Condition=" '$(PackagesPathWithTrailingSlash)' == '' ">$(ArtifactsDir)\$(Configuration)\packages\</PackagesPathWithTrailingSlash>
+        <PackagesPathWithTrailingSlash Condition=" !$(PackagesPathWithTrailingSlash.EndsWith('\')) ">$(PackagesPathWithTrailingSlash)\</PackagesPathWithTrailingSlash>
+
+        <AssetManifestFilePath Condition=" '$(AssetManifestFilePath)' == '' ">$(PackagesPathWithTrailingSlash)manifest\manifest.xml</AssetManifestFilePath>
+        <PackagesToPublishPattern Condition=" '$(PackagesToPublishPattern)' == '' ">$(PackagesPathWithTrailingSlash)*.nupkg</PackagesToPublishPattern>
         <FeedUrl Condition=" '$(FeedUrl)' == '' ">https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json</FeedUrl>
     </PropertyGroup>
     
@@ -23,9 +29,16 @@
 
     <ItemGroup>
         <ManifestBuildData Include="Location=$(FeedUrl)" />
+        <!-- <ManifestBuildData Include="InitialAssetsLocation=https://dev.azure.com/url/to/my/feed/index.json" /> -->
+        <ManifestBuildData Include="AzureDevOpsBuildId=$(BUILD_BUILDID)" />
+        <ManifestBuildData Include="AzureDevOpsBuildDefinitionId=$(SYSTEM_DEFINITIONID)" />
+        <ManifestBuildData Include="AzureDevOpsProject=$(SYSTEM_TEAMPROJECT)" />
+        <ManifestBuildData Include="AzureDevOpsBuildNumber=$(BUILD_BUILDNUMBER)" />
+        <ManifestBuildData Include="AzureDevOpsRepository=$(BUILD_REPOSITORY_URI)" />
+        <ManifestBuildData Include="AzureDevOpsBranch=$(BUILD_SOURCEBRANCH)" />
     </ItemGroup>
 
-    <UsingTask TaskName="GenerateBuildManifest" AssemblyFile="$(MicrosoftDotNetBuildTasksFeedFilePath)" />
+    <UsingTask TaskName="GenerateBuildManifest" AssemblyFile="$(MicrosoftDotNetBuildTasksFeedTaskDir)Microsoft.DotNet.Build.Tasks.Feed.dll" />
 
     <Target Name="PublishToBuildAssetRegistry">
         <GenerateBuildManifest Artifacts="@(ItemsToPush)"

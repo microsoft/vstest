@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -814,7 +814,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid platform type:{0}. Valid platform types are x86, x64 and Arm..
+        ///   Looks up a localized string similar to Invalid platform type: {0}. Valid platform types are {1}..
         /// </summary>
         internal static string InvalidPlatformType {
             get {
@@ -865,6 +865,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         internal static string InvalidTestRunParameterArgument {
             get {
                 return ResourceManager.GetString("InvalidTestRunParameterArgument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid testSessionCorrelationId.
+        /// </summary>
+        internal static string InvalidTestSessionCorrelationId {
+            get {
+                return ResourceManager.GetString("InvalidTestSessionCorrelationId", resourceCulture);
             }
         }
         
@@ -1575,7 +1584,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Test Run Aborted with error: {0}..
+        ///   Looks up a localized string similar to Test Run Aborted with error {0}..
         /// </summary>
         internal static string TestRunAbortedWithError {
             get {

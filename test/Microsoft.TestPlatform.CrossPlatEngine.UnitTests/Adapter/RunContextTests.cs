@@ -1,66 +1,63 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
+namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter;
+
+using System.Collections.Generic;
+
+using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+[TestClass]
+public class RunContextTests
 {
-    using System.Collections.Generic;
+    private RunContext _runContext;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using MSTest.TestFramework.AssertExtensions;
-
-    [TestClass]
-    public class RunContextTests
+    [TestInitialize]
+    public void TestInit()
     {
-        private RunContext runContext;
+        _runContext = new RunContext();
+    }
 
-        [TestInitialize]
-        public void TestInit()
-        {
-            this.runContext = new RunContext();
-        }
+    [TestMethod]
+    public void GetTestCaseFilterShouldReturnNullIfFilterExpressionIsNull()
+    {
+        _runContext.FilterExpressionWrapper = null;
 
-        [TestMethod]
-        public void GetTestCaseFilterShouldReturnNullIfFilterExpressionIsNull()
-        {
-            this.runContext.FilterExpressionWrapper = null;
+        Assert.IsNull(_runContext.GetTestCaseFilter(null, (s) => null));
+    }
 
-            Assert.IsNull(this.runContext.GetTestCaseFilter(null, (s) => { return null; }));
-        }
+    /// <summary>
+    /// If only property value passed, consider property key and operation defaults.
+    /// </summary>
+    [TestMethod]
+    public void GetTestCaseFilterShouldNotThrowIfPropertyValueOnlyPassed()
+    {
+        _runContext.FilterExpressionWrapper = new FilterExpressionWrapper("Infinity");
 
-        /// <summary>
-        /// If only property value passed, consider property key and operation defaults.
-        /// </summary>
-        [TestMethod]
-        public void GetTestCaseFilterShouldNotThrowIfPropertyValueOnlyPassed()
-        {
-            this.runContext.FilterExpressionWrapper = new FilterExpressionWrapper("Infinity");
+        var filter = _runContext.GetTestCaseFilter(new List<string> { "FullyQualifiedName" }, (s) => null);
 
-            var filter = this.runContext.GetTestCaseFilter(new List<string>{ "FullyQualifiedName" }, (s) => { return null; });
+        Assert.IsNotNull(filter);
+    }
 
-            Assert.IsNotNull(filter);
-        }
+    [TestMethod]
+    public void GetTestCaseFilterShouldNotThrowOnInvalidProperties()
+    {
+        _runContext.FilterExpressionWrapper = new FilterExpressionWrapper("highlyunlikelyproperty=unused");
 
-        [TestMethod]
-        public void GetTestCaseFilterShouldNotThrowOnInvalidProperties()
-        {
-            this.runContext.FilterExpressionWrapper = new FilterExpressionWrapper("highlyunlikelyproperty=unused");
+        var filter = _runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => null);
 
-            var filter = this.runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => { return null; });
+        Assert.IsNotNull(filter);
+    }
 
-            Assert.IsNotNull(filter);
-        }
+    [TestMethod]
+    public void GetTestCaseFilterShouldReturnTestCaseFilter()
+    {
+        _runContext.FilterExpressionWrapper = new FilterExpressionWrapper("TestCategory=Important");
+        var filter = _runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => null);
 
-        [TestMethod]
-        public void GetTestCaseFilterShouldReturnTestCaseFilter()
-        {
-            this.runContext.FilterExpressionWrapper = new FilterExpressionWrapper("TestCategory=Important");
-            var filter = this.runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => { return null; });
-
-            Assert.IsNotNull(filter);
-            Assert.AreEqual("TestCategory=Important", filter.TestCaseFilterValue);
-        }
+        Assert.IsNotNull(filter);
+        Assert.AreEqual("TestCategory=Important", filter.TestCaseFilterValue);
     }
 }

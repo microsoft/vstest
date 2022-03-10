@@ -1,69 +1,97 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
+namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
+
+using System;
+using System.Runtime.InteropServices;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+using NuGet.Frameworks;
+
+internal class HangDumperFactory : IHangDumperFactory
 {
-    using System;
-    using System.Runtime.InteropServices;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using NuGet.Frameworks;
+    public Action<string> LogWarning { get; set; }
 
-    internal class HangDumperFactory : IHangDumperFactory
+    public IHangDumper Create(string targetFramework)
     {
-        public Action<string> LogWarning { get; set; }
-
-        public IHangDumper Create(string targetFramework)
+        if (targetFramework is null)
         {
-            if (targetFramework is null)
+            throw new ArgumentNullException(nameof(targetFramework));
+        }
+
+        EqtTrace.Info($"HangDumperFactory: Creating dumper for {RuntimeInformation.OSDescription} with target framework {targetFramework}.");
+        var procdumpOverride = Environment.GetEnvironmentVariable("VSTEST_DUMP_FORCEPROCDUMP")?.Trim();
+        var netdumpOverride = Environment.GetEnvironmentVariable("VSTEST_DUMP_FORCENETDUMP")?.Trim();
+        EqtTrace.Verbose($"HangDumperFactory: Overrides for dumpers: VSTEST_DUMP_FORCEPROCDUMP={procdumpOverride};VSTEST_DUMP_FORCENETDUMP={netdumpOverride}");
+
+        var tfm = NuGetFramework.Parse(targetFramework);
+
+        if (tfm == null || tfm.IsUnsupported)
+        {
+            EqtTrace.Error($"HangDumperFactory: Could not parse target framework {targetFramework}, to a supported framework version.");
+            throw new NotSupportedException($"Could not parse target framework {targetFramework}, to a supported framework version.");
+        }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            // On some system the interop dumper will thrown AccessViolationException, add an option to force procdump.
+            var forceUsingProcdump = !string.IsNullOrWhiteSpace(procdumpOverride) && procdumpOverride != "0";
+            if (forceUsingProcdump)
             {
-                throw new ArgumentNullException(nameof(targetFramework));
+                EqtTrace.Info($"HangDumperFactory: This is Windows on  Forcing the use of ProcDumpHangDumper that uses ProcDump utility, via VSTEST_DUMP_FORCEPROCDUMP={procdumpOverride}.");
+                return new ProcDumpDumper();
             }
 
-            EqtTrace.Info($"HangDumperFactory: Creating dumper for {RuntimeInformation.OSDescription} with target framework {targetFramework}.");
-
-            var tfm = NuGetFramework.Parse(targetFramework);
-
-            if (tfm == null || tfm.IsUnsupported)
-            {
-                EqtTrace.Error($"HangDumperFactory: Could not parse target framework {targetFramework}, to a supported framework version.");
-                throw new NotSupportedException($"Could not parse target framework {targetFramework}, to a supported framework version.");
-            }
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                EqtTrace.Info($"HangDumperFactory: This is Windows, returning the default WindowsHangDumper that P/Invokes MiniDumpWriteDump.");
-                return new WindowsHangDumper(this.LogWarning);
-            }
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                var isLessThan31 = tfm.Framework == ".NETCoreApp" && tfm.Version < Version.Parse("3.1.0.0");
-                if (isLessThan31)
-                {
-                    EqtTrace.Info($"HangDumperFactory: This is Linux on netcoreapp2.1, returning SigtrapDumper.");
-
-                    return new SigtrapDumper();
-                }
-
-                EqtTrace.Info($"HangDumperFactory: This is Linux netcoreapp3.1 or newer, returning the standard NETClient library dumper.");
-                return new NetClientHangDumper();
-            }
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            // On some system the interop dumper will thrown AccessViolationException, add an option to force procdump.
+            var forceUsingNetdump = !string.IsNullOrWhiteSpace(netdumpOverride) && netdumpOverride != "0";
+            if (forceUsingNetdump)
             {
                 var isLessThan50 = tfm.Framework == ".NETCoreApp" && tfm.Version < Version.Parse("5.0.0.0");
-                if (isLessThan50)
+                if (!isLessThan50)
                 {
-                    EqtTrace.Info($"HangDumperFactory: This is OSX on {targetFramework}, This combination of OS and framework is not supported.");
-
-                    throw new PlatformNotSupportedException($"Unsupported target framework {targetFramework} on OS {RuntimeInformation.OSDescription}");
+                    EqtTrace.Info($"HangDumperFactory: This is Windows on {tfm.Framework} {tfm.Version}, VSTEST_DUMP_FORCENETDUMP={netdumpOverride} is active, forcing use of .NetClientHangDumper");
+                    return new NetClientHangDumper();
                 }
-
-                EqtTrace.Info($"HangDumperFactory: This is OSX on net5.0 or newer, returning the standard NETClient library dumper.");
-                return new NetClientHangDumper();
+                else
+                {
+                    EqtTrace.Info($"HangDumperFactory: This is Windows on {tfm.Framework} {tfm.Version}, VSTEST_DUMP_FORCENETDUMP={netdumpOverride} is active, but only applies to .NET 5.0 and newer. Falling back to default hang dumper.");
+                }
             }
 
-            throw new PlatformNotSupportedException($"Unsupported operating system: {RuntimeInformation.OSDescription}");
+            EqtTrace.Info($"HangDumperFactory: This is Windows, returning the default WindowsHangDumper that P/Invokes MiniDumpWriteDump.");
+            return new WindowsHangDumper(LogWarning);
         }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            var isLessThan31 = tfm.Framework == ".NETCoreApp" && tfm.Version < Version.Parse("3.1.0.0");
+            if (isLessThan31)
+            {
+                EqtTrace.Info($"HangDumperFactory: This is Linux on netcoreapp2.1, returning SigtrapDumper.");
+
+                return new SigtrapDumper();
+            }
+
+            EqtTrace.Info($"HangDumperFactory: This is Linux netcoreapp3.1 or newer, returning the standard NETClient library dumper.");
+            return new NetClientHangDumper();
+        }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            var isLessThan50 = tfm.Framework == ".NETCoreApp" && tfm.Version < Version.Parse("5.0.0.0");
+            if (isLessThan50)
+            {
+                EqtTrace.Info($"HangDumperFactory: This is OSX on {targetFramework}, This combination of OS and framework is not supported.");
+
+                throw new PlatformNotSupportedException($"Unsupported target framework {targetFramework} on OS {RuntimeInformation.OSDescription}");
+            }
+
+            EqtTrace.Info($"HangDumperFactory: This is OSX on net5.0 or newer, returning the standard NETClient library dumper.");
+            return new NetClientHangDumper();
+        }
+
+        throw new PlatformNotSupportedException($"Unsupported operating system: {RuntimeInformation.OSDescription}");
     }
 }

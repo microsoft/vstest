@@ -3,70 +3,65 @@
 
 #if WINDOWS_UWP
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+using System;
+using System.Runtime.InteropServices;
+
+using Interfaces;
+
+/// <inheritdoc />
+public class PlatformEnvironment : IEnvironment
 {
-    using System;
-    using System.Runtime.InteropServices;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    /// <inheritdoc />
+    public PlatformArchitecture Architecture
+    {
+        get
+        {
+            switch (RuntimeInformation.OSArchitecture)
+            {
+                case System.Runtime.InteropServices.Architecture.X86:
+                    return PlatformArchitecture.X86;
+                case System.Runtime.InteropServices.Architecture.X64:
+                    return PlatformArchitecture.X64;
+                case System.Runtime.InteropServices.Architecture.Arm:
+                    return PlatformArchitecture.ARM;
+                case System.Runtime.InteropServices.Architecture.Arm64:
+                    return PlatformArchitecture.ARM64;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+    }
 
     /// <inheritdoc />
-    public class PlatformEnvironment : IEnvironment
+    public PlatformOperatingSystem OperatingSystem
     {
-        /// <inheritdoc />
-        public PlatformArchitecture Architecture
+        get
         {
-            get
-            {
-                switch (RuntimeInformation.OSArchitecture)
-                {
-                    case System.Runtime.InteropServices.Architecture.X86:
-                        return PlatformArchitecture.X86;
-                    case System.Runtime.InteropServices.Architecture.X64:
-                        return PlatformArchitecture.X64;
-                    case System.Runtime.InteropServices.Architecture.Arm:
-                        return PlatformArchitecture.ARM;
-                    case System.Runtime.InteropServices.Architecture.Arm64:
-                        return PlatformArchitecture.ARM64;
-                    default:
-                        throw new NotSupportedException();
-                }
-            }
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? PlatformOperatingSystem.Windows : PlatformOperatingSystem.Unix;
         }
+    }
 
-        /// <inheritdoc />
-        public PlatformOperatingSystem OperatingSystem
+    /// <inheritdoc />
+    public string OperatingSystemVersion
+    {
+        get
         {
-            get
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    return PlatformOperatingSystem.Windows;
-                }
-
-                return PlatformOperatingSystem.Unix;
-            }
+            return RuntimeInformation.OSDescription;
         }
+    }
 
-        /// <inheritdoc />
-        public string OperatingSystemVersion
-        {
-            get
-            {
-                return RuntimeInformation.OSDescription;
-            }
-        }
+    /// <inheritdoc />
+    public void Exit(int exitcode)
+    {
+        Environment.FailFast("Process terminating with exit code: " + exitcode);
+    }
 
-        /// <inheritdoc />
-        public void Exit(int exitcode)
-        {
-            Environment.FailFast("Process terminating with exit code: " + exitcode);
-        }
-
-        /// <inheritdoc />
-        public int GetCurrentManagedThreadId()
-        {
-            return Environment.CurrentManagedThreadId;
-        }
+    /// <inheritdoc />
+    public int GetCurrentManagedThreadId()
+    {
+        return Environment.CurrentManagedThreadId;
     }
 }
 

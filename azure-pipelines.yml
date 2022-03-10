@@ -4,7 +4,7 @@ jobs:
 - job: Windows
   timeoutInMinutes: 120
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-latest'
   variables:
     buildConfiguration: 'Release'
   steps:
@@ -15,15 +15,6 @@ jobs:
       arguments: '-verbose -configuration $(buildConfiguration) -steps "InstallDotnet, Restore, UpdateLocalization, Build, Publish"'
       modifyEnvironment: false
       failOnStandardError: true
-
-  - task: CmdLine@1
-    displayName: 'Delete stale pdb files'
-    inputs:
-      filename: del
-      arguments: '/S /F *.pdb'
-      workingFolder: '$(SystemRoot)'
-    continueOnError: true
-    condition: always()
 
   - task: BatchScript@1
     displayName: 'Run Unit Tests'
@@ -50,7 +41,7 @@ jobs:
   dependsOn: Windows
   timeoutInMinutes: 120
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-latest'
   variables:
     buildConfiguration: 'Release'
   steps:
@@ -69,7 +60,7 @@ jobs:
     displayName: 'Run script build.cmd'
     inputs:
       filename: build.cmd
-      # build should not be needed in the end, we are copying the build task from the build folder, but we should get 
+      # build should not be needed in the end, we are copying the build task from the build folder, but we should get
       # it either from artifacts, if present, or from extracted package file
       # Adding it at the moment to avoid this error: #[error]Copy-Item : Cannot find path 'D:\a\1\s\src\Microsoft.TestPlatform.Build\bin\Release\netstandard2.0' because it does  not exist.
       arguments: '-verbose -configuration $(buildConfiguration) -steps "InstallDotnet, Restore, Build, PrepareAcceptanceTests"'
@@ -140,12 +131,19 @@ jobs:
     vmImage: $[ variables['vmImage'] ]
   variables:
       buildConfiguration: 'Release'
+      VSTestRTMBuild: 'false'
   steps:
-  - script: ./build.sh -c $(buildConfiguration)
+  - script: chmod +x ./scripts/vsts-prebuild.sh
+    displayName: 'Preparing for set version'
+
+  - script: ./scripts/vsts-prebuild.sh -build "preview-$(Build.BuildNumber)" -rtm "$(VSTestRTMBuild)" -branch "$(Build.SourceBranch)"
+    displayName: 'Set Version'
+
+  - script: ./build.sh -c $(buildConfiguration) -v "$(BuildVersionPrefix)" -vs "$(BuildVersionSuffix)" -ci true -verbose
     displayName: 'Build'
 
   - script: ./test.sh -c $(buildConfiguration) -p Unit
-    displayName: 'Unit tests'  
+    displayName: 'Unit tests'
 
   - task: DownloadPipelineArtifact@2
     inputs:

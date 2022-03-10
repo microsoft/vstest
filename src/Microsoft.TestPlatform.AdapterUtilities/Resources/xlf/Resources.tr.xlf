@@ -42,12 +42,12 @@ Example: 'System.Reflection.MethodBase' is not implemented on this platform!</no
       <trans-unit id="ErrorInvalidSequenceAt">
         <source>Invalid escape sequence! (segment: {0}, pos: {1})</source>
         <target state="translated">Kaçış dizisi geçersiz! (segment: {0}, pos: {1})</target>
-        <note>An escape sequence started with '\', but it wasn't legal. {0}: Invalid string, {1}: starting postion of invalid sequence.</note>
+        <note>An escape sequence started with '\', but it wasn't legal. {0}: Invalid string, {1}: starting position of invalid sequence.</note>
       </trans-unit>
       <trans-unit id="ErrorNoClosingQuote">
         <source>A closing single quote was expected at the end of the segment! (segment: {0})</source>
         <target state="translated">Segmentin sonunda bir kapanış tek tırnak işareti bekleniyordu! (segment: {0})</target>
-        <note>An error thrown when the type name ended but opened single qoute was not matched.</note>
+        <note>An error thrown when the type name ended but opened single quote was not matched.</note>
       </trans-unit>
     </body>
   </file>

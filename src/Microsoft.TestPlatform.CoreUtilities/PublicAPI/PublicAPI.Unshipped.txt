@@ -1,0 +1,1 @@
+﻿static Microsoft.VisualStudio.TestPlatform.Utilities.MulticastDelegateUtilities.SafeInvoke(this System.Delegate delegates, object sender, object args, string traceDisplayName) -> void

@@ -3,27 +3,27 @@
 
 #if WINDOWS_UWP
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+using System.IO;
+using System.Reflection;
+
+using Interfaces;
+
+/// <inheritdoc/>
+public class PlatformAssemblyLoadContext : IAssemblyLoadContext
 {
-    using System.IO;
-    using System.Reflection;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    /// <inheritdoc/>
+    public AssemblyName GetAssemblyNameFromPath(string assemblyPath)
+    {
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(assemblyPath);
+        return new AssemblyName(fileNameWithoutExtension);
+    }
 
     /// <inheritdoc/>
-    public class PlatformAssemblyLoadContext : IAssemblyLoadContext
+    public Assembly LoadAssemblyFromPath(string assemblyPath)
     {
-        /// <inheritdoc/>
-        public AssemblyName GetAssemblyNameFromPath(string assemblyPath)
-        {
-            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(assemblyPath);
-            return new AssemblyName(fileNameWithoutExtension);
-        }
-
-        /// <inheritdoc/>
-        public Assembly LoadAssemblyFromPath(string assemblyPath)
-        {
-            return Assembly.Load(this.GetAssemblyNameFromPath(assemblyPath));
-        }
+        return Assembly.Load(GetAssemblyNameFromPath(assemblyPath));
     }
 }
 

@@ -715,12 +715,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";InvalidPlatformType" ItemType="0" PsrId="308" Leaf="true">
+      <Item ItemId=";InvalidPlatformType" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.]]></Val>
+          <Val><![CDATA[Invalid platform type: {0}. Valid platform types are {1}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Tipo de plataforma inválido: {0}. Os tipos de plataforma válidos são x86, x64 e Arm.]]></Val>
+            <Val><![CDATA[Tipo de plataforma inválido: {0}. Os tipos de plataforma válidos {1}.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>

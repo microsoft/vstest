@@ -3,19 +3,19 @@
 
 #if WINDOWS_UWP
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
-{
-    using System.IO;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
+using System.IO;
+
+using Interfaces;
+
+/// <inheritdoc/>
+public class PlatformStream : IStream
+{
     /// <inheritdoc/>
-    public class PlatformStream : IStream
+    public Stream CreateBufferedStream(Stream stream, int bufferSize)
     {
-        /// <inheritdoc/>
-        public Stream CreateBufferedStream(Stream stream, int bufferSize)
-        {
-            return stream;
-        }
+        return stream;
     }
 }
 
