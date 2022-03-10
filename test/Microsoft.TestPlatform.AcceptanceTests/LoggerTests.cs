@@ -183,7 +183,7 @@ public class LoggerTests : AcceptanceTestBase
         }
     }
 
-    private void IsFileAndContentEqual(string filePath)
+    private static void IsFileAndContentEqual(string filePath)
     {
         StringBuilder sb = new();
         using (var sr = new StreamReader(filePath))
@@ -192,7 +192,7 @@ public class LoggerTests : AcceptanceTestBase
         }
 
         string filePathContent = sb.ToString();
-        string[] divs = { "Total tests", "Passed", "Failed", "Skipped", "Run duration", "Pass percentage", "SampleUnitTestProject.UnitTest1.PassingTest" };
+        string[] divs = { "Total tests", "Passed", "Failed", "Skipped", "Run duration", "Pass percentage", "PassingTest" };
         foreach (string str in divs)
         {
             StringAssert.Contains(filePathContent, str);
