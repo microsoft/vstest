@@ -347,7 +347,6 @@ function Publish-Package
     # Copy over the Full CLR built datacollector package assemblies to the Core CLR package folder along with testhost
     Publish-PackageWithRuntimeInternal $dataCollectorProject $TPB_TargetFramework472 $TPB_ARM64_Runtime false $fullDestDir
     Publish-PackageWithRuntimeInternal $dataCollectorProject $TPB_TargetFramework472 $TPB_X64_Runtime false $fullDestDir
-    Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework472 $fullDestDir
     
     New-Item -ItemType directory -Path $fullCLRPackage451Dir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullCLRPackage451Dir -Force -Recurse
