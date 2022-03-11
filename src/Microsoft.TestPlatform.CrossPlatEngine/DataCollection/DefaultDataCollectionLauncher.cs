@@ -59,7 +59,7 @@ internal class DefaultDataCollectionLauncher : DataCollectionLauncher
 
         var currentProcessPath = _processHelper.GetCurrentProcessFileName();
 
-        // If current process is dotnet/dotnet.exe and you are here, datacollector.exe/datacollector.arm.exe is present in TestHost folder.
+        // If current process is dotnet/dotnet.exe and you are here, datacollector.exe/datacollector.arm64.exe is present in TestHost folder.
         string dataCollectorProcessName = _processHelper.GetCurrentProcessArchitecture() == PlatformArchitecture.ARM64 ? DataCollectorProcessNameArm64 : DataCollectorProcessName;
         string dataCollectorProcessPath = currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                                           || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase)
