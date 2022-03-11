@@ -53,7 +53,7 @@ public class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
         var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
         if (_useCoreRunner && isWindows)
         {
-            dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, inIsolation: null, DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints) });
+            dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, InIsolationValue: null, DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints) });
         }
 
         if (_useDesktopRunner && isWindows)
@@ -65,7 +65,7 @@ public class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
 
             if (_inProcess)
             {
-                dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, inIsolation: null, DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints) });
+                dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, InIsolationValue: null, DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints) });
             }
         }
 

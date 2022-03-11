@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -54,7 +53,7 @@ public sealed class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo, M
         {
             foreach (var msTestVersion in _msTestVersions)
             {
-                var runnerInfo = new RunnerInfo(AcceptanceTestBase.DEFAULT_RUNNER_NETFX, AcceptanceTestBase.DEFAULT_RUNNER_NETFX, inIsolation: null,
+                var runnerInfo = new RunnerInfo(AcceptanceTestBase.DEFAULT_RUNNER_NETFX, AcceptanceTestBase.DEFAULT_RUNNER_NETFX, InIsolationValue: null,
                     DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints);
                 var msTestInfo = GetMSTestInfo(msTestVersion);
                 // We run in the .NET Framework runner process, the runner and target framework must agree.

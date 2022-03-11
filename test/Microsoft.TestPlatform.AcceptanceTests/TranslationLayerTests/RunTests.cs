@@ -40,14 +40,15 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
-    public void RunAllTests(RunnerInfo runnerInfo)
+    [TranslationLayerCompatibilityDataSource]
+    public void RunAllTests(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
+        // Setup();
 
-        _vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetDefaultRunSettings(), _runEventHandler);
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper(TempDirectory, vsTestConsoleInfo);
+        _runEventHandler = new RunEventHandler();
+        vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetDefaultRunSettings(), _runEventHandler);
 
         // Assert
         Assert.AreEqual(6, _runEventHandler.TestResults.Count);

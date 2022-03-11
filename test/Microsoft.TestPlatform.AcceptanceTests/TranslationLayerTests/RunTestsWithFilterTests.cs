@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -35,19 +36,18 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
-    public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo)
+    [TranslationLayerCompatibilityDataSource]
+    public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
+        // Setup();
 
-        var sources = new List<string>
-                              {
-                                  GetAssetFullPath("SimpleTestProject.dll")
-                              };
+        _runEventHandler = new RunEventHandler();
 
-        _vstestConsoleWrapper.RunTests(
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper(TempDirectory, vsTestConsoleInfo);
+        var sources = new List<string> { GetAssetFullPath("SimpleTestProject.dll") };
+
+        vstestConsoleWrapper.RunTests(
             sources,
             GetDefaultRunSettings(),
             new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName=SampleUnitTestProject.UnitTest1.PassingTest" },
@@ -66,10 +66,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
-        var sources = new List<string>
-                              {
-                                  GetAssetFullPath("SimpleTestProject.dll")
-                              };
+        var sources = new List<string> { GetAssetFullPath("SimpleTestProject.dll") };
 
         _vstestConsoleWrapper.RunTests(
             sources,

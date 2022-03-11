@@ -11,9 +11,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// <param name="RunnerFramework"></param>
 /// <param name="TargetFramework"></param>
 /// <param name="InIsolationValue">Supported value = <c>/InIsolation</c>.</param>
-public record RunnerInfo(string RunnerFramework, string TargetFramework, string InIsolationValue = "",
-    bool DebugVSTestConsole = false, bool DebugTestHost = false, bool DebugDataCollector = false, bool NoDefaultBreakpoints = true)
+public record RunnerInfo(string RunnerFramework, string TargetFramework, string? InIsolationValue = "",
+    bool DebugVSTestConsole = false, bool DebugTesthost = false, bool DebugDataCollector = false, bool NoDefaultBreakpoints = true)
 {
+    /// <summary>
+    /// Is running via .NET "Core" vstest.console?
+    /// </summary>
+    public bool IsNetRunner => !IsNetFrameworkRunner;
+
     /// <summary>
     /// Is running via .NET Framework vstest.console?
     /// </summary>

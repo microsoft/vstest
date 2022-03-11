@@ -169,14 +169,14 @@ function Invoke-TestAssetsBuild
     try {
         Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution -- add NuGet source"
         Invoke-Exe -IgnoreExitCode 1 $nugetExe -Arguments "sources add -Name ""locally-built-testplatform-packages"" -Source $env:TP_TESTARTIFACTS\packages\ -ConfigFile ""$nugetConfig"""
-        #Invoke-Exe $dotnetExe -Arguments "build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$env:TP_OUT_DIR\log\$Configuration\TestAssets.binlog"""
+        Invoke-Exe $dotnetExe -Arguments "build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$env:TP_OUT_DIR\log\$Configuration\TestAssets.binlog"""
 
-        # Compatibility matrix build
+        # Compatibility matrix build.
         $dependenciesPath = "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props"
         $dependenciesXml = [xml](Get-Content -Raw -Encoding UTF8 $dependenciesPath)
 
         
-        # build with multiple versions of MSTest
+        # Build with multiple versions of MSTest.
         $projects = @(
             "$env:TP_ROOT_DIR\test\TestAssets\SimpleTestProject\SimpleTestProject.csproj"
             "$env:TP_ROOT_DIR\test\TestAssets\SimpleTestProject2\SimpleTestProject2.csproj"
@@ -206,7 +206,7 @@ function Invoke-TestAssetsBuild
             }
         }
 
-        # restore previous versions of TestPlatform (for vstest.console.exe), and TestPlatform.CLI (for vstest.console.dll)
+        # Restore previous versions of TestPlatform (for vstest.console.exe), and TestPlatform.CLI (for vstest.console.dll).
         $versionProperties = @(
             "NETTestSdkVersion"
             "VSTestConsoleLatestPreviewVersion"
@@ -257,7 +257,7 @@ function Invoke-TestAssetsBuild
                 # the original one. 
                 if (-not (Test-Path -Path $cachePath) -or -not (Get-ChildItem $cachePath)) { 
                     Rename-Item "$packagePath\$package.$vsTestConsoleVersion" $cachePath
-                    # nuget locks the locally copied package it seems.
+                    # Nuget locks the locally copied package from time to time.
                     Start-Sleep -Milliseconds 300
                 }
                 if (Test-Path "$packagePath\$package.$vsTestConsoleVersion") {
@@ -1296,42 +1296,42 @@ Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | 
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 
-# if ($Force -or $Steps -contains "InstallDotnet") {
-#     Install-DotNetCli
-# }
+if ($Force -or $Steps -contains "InstallDotnet") {
+    Install-DotNetCli
+}
 
-# if ($Force -or $Steps -contains "Restore") {
-#     Clear-Package
-#     Restore-Package
-# }
+if ($Force -or $Steps -contains "Restore") {
+    Clear-Package
+    Restore-Package
+}
 
-# if ($Force -or $Steps -contains "UpdateLocalization") {
-#     Update-LocalizedResources
-# }
+if ($Force -or $Steps -contains "UpdateLocalization") {
+    Update-LocalizedResources
+}
 
-# if ($Force -or $Steps -contains "Build") {
-#     Invoke-Build
-# }
+if ($Force -or $Steps -contains "Build") {
+    Invoke-Build
+}
 
-# if ($Force -or $Steps -contains "Publish") {
-#     Publish-Package
-#     Create-VsixPackage
-#     Create-NugetPackages
-# }
+if ($Force -or $Steps -contains "Publish") {
+    Publish-Package
+    Create-VsixPackage
+    Create-NugetPackages
+}
 
-# if ($Force -or $Steps -contains "Publish" -or $Steps -contains "Manifest") {
-#     Generate-Manifest -PackageFolder $TPB_PackageOutDir
-#     if (Test-Path $TPB_SourceBuildPackageOutDir)
-#     {
-#         Generate-Manifest -PackageFolder $TPB_SourceBuildPackageOutDir
-#     }
-#     Copy-PackageIntoStaticDirectory
-# }
+if ($Force -or $Steps -contains "Publish" -or $Steps -contains "Manifest") {
+    Generate-Manifest -PackageFolder $TPB_PackageOutDir
+    if (Test-Path $TPB_SourceBuildPackageOutDir)
+    {
+        Generate-Manifest -PackageFolder $TPB_SourceBuildPackageOutDir
+    }
+    Copy-PackageIntoStaticDirectory
+}
 
 if ($Force -or $Steps -contains "PrepareAcceptanceTests") {
-    #Publish-PatchedDotnet
+    Publish-PatchedDotnet
     Invoke-TestAssetsBuild
-    #Publish-Tests
+    Publish-Tests
 }
 
 if ($Script:ScriptFailed) {

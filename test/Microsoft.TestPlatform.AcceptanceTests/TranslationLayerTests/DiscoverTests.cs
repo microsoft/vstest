@@ -40,7 +40,7 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TranslationLayerCompatibilityDataSource()]
+    [TranslationLayerCompatibilityDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

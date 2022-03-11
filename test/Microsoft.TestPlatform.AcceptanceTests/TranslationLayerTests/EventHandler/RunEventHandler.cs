@@ -117,7 +117,7 @@ public class RunEventHandler : ITestRunEventsHandler2
         return -1;
     }
 
-    public bool AttachDebuggerToProcess(int pid)
+    public virtual bool AttachDebuggerToProcess(int pid)
     {
         // No op
         return true;

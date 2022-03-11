@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -605,11 +606,44 @@ public class IntegrationTestBase
 
         if (!File.Exists(consoleRunnerPath))
         {
-            throw new FileNotFoundException($"File '{consoleRunnerPath}' was not found.");
+            throw new FileNotFoundException($"File '{consoleRunnerPath}' was not found.") ;
         }
 
         Console.WriteLine($"Console runner path: {consoleRunnerPath}");
-        var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath });
+
+        VsTestConsoleWrapper vstestConsoleWrapper;
+        if (_testEnvironment.DebugVSTestConsole || _testEnvironment.DebugTesthost || _testEnvironment.DebugDataCollector)
+        {
+            var environmentVariables = new Dictionary<string, string>();
+            Environment.GetEnvironmentVariables().OfType<DictionaryEntry>().ToList().ForEach(e=> environmentVariables.Add(e.Key.ToString(), e.Value.ToString()));
+
+            if (_testEnvironment.DebugVSTestConsole)
+            {
+                environmentVariables.Add("VSTEST_RUNNER_DEBUG_ATTACHVS", "1");
+            }
+
+            if (_testEnvironment.DebugTesthost)
+            {
+                environmentVariables.Add("VSTEST_HOST_DEBUG_ATTACHVS", "1");
+            }
+
+            if (_testEnvironment.DebugDataCollector)
+            {
+                environmentVariables.Add("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS", "1");
+            }
+
+            if (_testEnvironment.NoDefaultBreakpoints)
+            {
+                environmentVariables.Add("VSTEST_DEBUG_NOBP", "1");
+            }
+
+            // This clears all variables
+            vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath, EnvironmentVariables = environmentVariables });
+        }
+        else
+        {
+            vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath });
+        }
         vstestConsoleWrapper.StartSession();
 
         return vstestConsoleWrapper;
