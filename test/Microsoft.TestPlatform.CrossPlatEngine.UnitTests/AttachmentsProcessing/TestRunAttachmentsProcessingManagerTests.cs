@@ -455,6 +455,10 @@ public class TestRunAttachmentsProcessingManagerTests
         _mockEventsHandler.Setup(h => h.HandleTestRunAttachmentsProcessingComplete(It.IsAny<TestRunAttachmentsProcessingCompleteEventArgs>(), It.IsAny<IEnumerable<AttachmentSet>>()))
             .Callback((TestRunAttachmentsProcessingCompleteEventArgs _, IEnumerable<AttachmentSet> _) => attachmentProcessingComplete.Set());
 
+        ManualResetEventSlim handleLogMessage = new(false);
+        _mockEventsHandler.Setup(h => h.HandleLogMessage(TestMessageLevel.Informational, "Attachments processing was cancelled."))
+            .Callback((TestMessageLevel _, string _) => handleLogMessage.Set());
+
         // act
         await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, _cancellationTokenSource.Token);
         Console.WriteLine("Attachments processing done");
@@ -465,6 +469,9 @@ public class TestRunAttachmentsProcessingManagerTests
 
         // Wait for the HandleTestRunAttachmentsProcessingComplete
         Assert.IsTrue(attachmentProcessingComplete.Wait(TimeSpan.FromMinutes(1)));
+
+        // Wait for the HandleLogMessage
+        Assert.IsTrue(handleLogMessage.Wait(TimeSpan.FromMinutes(1)));
 
         // assert
         VerifyCompleteEvent(true, false, inputAttachments[0]);
