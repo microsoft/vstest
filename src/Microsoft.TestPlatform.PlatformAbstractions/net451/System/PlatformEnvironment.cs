@@ -40,7 +40,7 @@ public class PlatformEnvironment : IEnvironment
                 throw new Win32Exception();
             }
 
-            // If nativeMachine is IMAGE_FILE_MACHINE_ARM64 mean that we're running on ARM64 architecture device.
+            // If nativeMachine is IMAGE_FILE_MACHINE_ARM64 it means that we're running on ARM64 architecture device.
             return nativeMachine == NativeMethods.IMAGE_FILE_MACHINE_ARM64;
         }
         catch (Exception ex)
