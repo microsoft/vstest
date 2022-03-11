@@ -50,7 +50,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private const string DotnetTestHostUri = "HostProvider://DotnetTestHost";
     private const string DotnetTestHostFriendlyName = "DotnetTestHost";
     private const string TestAdapterRegexPattern = @"TestAdapter.dll";
-    private const string PROCESSOR_ARCHITECTURE = "PROCESSOR_ARCHITECTURE";
+    private const string PROCESSOR_ARCHITECTURE = nameof(PROCESSOR_ARCHITECTURE);
 
     private readonly IDotnetHostHelper _dotnetHostHelper;
     private readonly IEnvironment _platformEnvironment;
