@@ -10,16 +10,17 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyName>datacollector</AssemblyName>
+    <AssemblyName Condition=" '$(RuntimeIdentifier)' == 'win10-arm64' ">datacollector.arm64</AssemblyName>
     <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' == 'WINDOWS_NT' ">$(TargetFrameworks);net472</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'WINDOWS_NT' ">$(TargetFrameworks);net451</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
-    <PlatformTarget Condition="$(TargetFramework.StartsWith('net4'))">AnyCPU</PlatformTarget>
+    <PlatformTarget Condition=" $(TargetFramework.StartsWith('net4')) AND '$(RuntimeIdentifier)' == '' ">AnyCPU</PlatformTarget>
     <OutputType>Exe</OutputType>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
   <PropertyGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <RuntimeIdentifiers>win7-x64;win10-arm64</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj" />
