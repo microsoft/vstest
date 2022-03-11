@@ -460,18 +460,18 @@ public class TestRunAttachmentsProcessingManagerTests
             .Callback((TestMessageLevel _, string _) => handleLogMessage.Set());
 
         // act
-        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, _cancellationTokenSource.Token);
+        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _mockEventsHandler.Object, _cancellationTokenSource.Token);
         Console.WriteLine("Attachments processing done");
         await innerTaskCompletionSource.Task;
 
         // Wait to drain all progress events
-        Assert.IsTrue(expectedProgress.Wait(TimeSpan.FromMinutes(1)));
+        Assert.IsTrue(expectedProgress.Wait(TimeSpan.FromMinutes(1)), "expectedProgress not signaled");
 
         // Wait for the HandleTestRunAttachmentsProcessingComplete
-        Assert.IsTrue(attachmentProcessingComplete.Wait(TimeSpan.FromMinutes(1)));
+        Assert.IsTrue(attachmentProcessingComplete.Wait(TimeSpan.FromMinutes(1)), "attachmentProcessingComplete not signaled");
 
         // Wait for the HandleLogMessage
-        Assert.IsTrue(handleLogMessage.Wait(TimeSpan.FromMinutes(1)));
+        Assert.IsTrue(handleLogMessage.Wait(TimeSpan.FromMinutes(1)), "handleLogMessage not signaled");
 
         // assert
         VerifyCompleteEvent(true, false, inputAttachments[0]);
