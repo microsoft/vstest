@@ -267,7 +267,7 @@ function Publish-Package
     Publish-PackageInternal $settingsMigratorProject $TPB_TargetFramework451 $fullCLRPackage451Dir
 
     Write-Log "Package: Publish src\datacollector\datacollector.csproj"
-    # We build datacollector.arm64.exe before and we ship in the same folder as win7-x64.
+    # We build datacollector.arm64.exe before building datacollector.exe and we put it in the same folder, so they end up shipping together.
     Publish-PackageWithRuntimeInternal $dataCollectorProject $TPB_TargetFramework472 $TPB_ARM64_Runtime false $fullCLRPackage451Dir
     Publish-PackageWithRuntimeInternal $dataCollectorProject $TPB_TargetFramework472 $TPB_X64_Runtime false $fullCLRPackage451Dir
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
