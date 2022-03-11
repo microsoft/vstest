@@ -57,14 +57,17 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
-    public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
+    [TranslationLayerCompatibilityDataSource()]
+    public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
+        // Setup();
 
-        _vstestConsoleWrapper.DiscoverTests(
+        _discoveryEventHandler = new DiscoveryEventHandler();
+        _discoveryEventHandler2 = new DiscoveryEventHandler2();
+
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper(TempDirectory, vsTestConsoleInfo);
+        vstestConsoleWrapper.DiscoverTests(
             GetTestAssemblies(),
             GetDefaultRunSettings(),
             new TestPlatformOptions() { CollectMetrics = false },
