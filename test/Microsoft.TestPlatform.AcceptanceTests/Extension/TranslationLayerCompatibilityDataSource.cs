@@ -18,7 +18,7 @@ public sealed class TranslationLayerCompatibilityDataSource : TestDataSource<Run
     private static XmlDocument? _depsXml;
     private readonly string[] _runnerFrameworks;
     private readonly string[] _targetFrameworks;
-    private readonly string[] _translationLayerVersions;
+    // private readonly string[] _translationLayerVersions;
     private readonly string[] _vstestConsoleVersions;
 
     /// <summary>
