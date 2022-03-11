@@ -59,16 +59,12 @@ internal class DefaultDataCollectionLauncher : DataCollectionLauncher
 
         var currentProcessPath = _processHelper.GetCurrentProcessFileName();
 
-        // If current process is dotnet/dotnet.exe and you are here, datacollector.exe is present in TestHost folder.
-        // It's unexpected we have DotnetDataCollectionLauncher for .NET Core and we're not shipping arm64 version inside the SDK
-        // because everything there is AnyCPU and will be "Ready to Run" compiled for the specific architecture shipped.
-        // We'll eventually run emulated x64.
+        // If current process is dotnet/dotnet.exe and you are here, datacollector.exe/datacollector.arm.exe is present in TestHost folder.
+        string dataCollectorProcessName = _processHelper.GetCurrentProcessArchitecture() == PlatformArchitecture.ARM64 ? DataCollectorProcessNameArm64 : DataCollectorProcessName;
         string dataCollectorProcessPath = currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                                           || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase)
-            ? Path.Combine(dataCollectorDirectory, "TestHost", DataCollectorProcessName)
-            : Path.Combine(dataCollectorDirectory, _processHelper.GetCurrentProcessArchitecture() == PlatformArchitecture.ARM64
-                                                    ? DataCollectorProcessNameArm64
-                                                    : DataCollectorProcessName);
+            ? Path.Combine(dataCollectorDirectory, "TestHost", dataCollectorProcessName)
+            : Path.Combine(dataCollectorDirectory, dataCollectorProcessName);
 
         var argumentsString = string.Join(" ", commandLineArguments);
         var dataCollectorProcess = _processHelper.LaunchProcess(dataCollectorProcessPath, argumentsString, Directory.GetCurrentDirectory(), environmentVariables, ErrorReceivedCallback, ExitCallBack, null);
