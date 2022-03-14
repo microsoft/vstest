@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// <param name="RunnerFramework"></param>
 /// <param name="TargetFramework"></param>
 /// <param name="InIsolationValue">Supported value = <c>/InIsolation</c>.</param>
-public record RunnerInfo(string RunnerFramework, string TargetFramework, string InIsolationValue = "")
+public record struct RunnerInfo(string RunnerFramework, string TargetFramework, string InIsolationValue = "")
 {
     /// <summary>
     /// Is running via .NET "Core" vstest.console?
