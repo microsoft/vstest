@@ -25,7 +25,7 @@ public sealed class TesthostCompatibilityDataSource : TestDataSource<RunnerInfo,
     /// </summary>
     /// <param name="targetFrameworks">To run tests with desktop runner(vstest.console.exe), use AcceptanceTestBase.Net452TargetFramework or alike values.</param>
     public TesthostCompatibilityDataSource(string runners = AcceptanceTestBase.DEFAULT_RUNNER_NETFX_AND_NET, string targetFrameworks = AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET,
-        string runnerVersions = AcceptanceTestBase.LATESTPREVIEW_LEGACY, string testhostVersions = AcceptanceTestBase.LATESTPREVIEW_LEGACY)
+        string runnerVersions = AcceptanceTestBase.LATESTPREVIEW_TO_LEGACY, string testhostVersions = AcceptanceTestBase.LATESTPREVIEW_TO_LEGACY)
     {
         _runnerFrameworks = runners.Split(';');
         _targetFrameworks = targetFrameworks.Split(';');

@@ -30,7 +30,7 @@ public sealed class TranslationLayerCompatibilityDataSource : TestDataSource<Run
     public TranslationLayerCompatibilityDataSource(
         string runners = AcceptanceTestBase.DEFAULT_RUNNER_NETFX_AND_NET,
         string targetFrameworks = AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET,
-        string vstestConsoleVersions = AcceptanceTestBase.LATEST_LEGACY)
+        string vstestConsoleVersions = AcceptanceTestBase.LATEST_TO_LEGACY)
     {
         // TODO: We actually don't generate values to use different translation layers, because we don't have a good way to do
         // that right now. Translation layer is loaded directly into the acceptance test, and so we don't have easy way to substitute it.
@@ -68,7 +68,7 @@ public sealed class TranslationLayerCompatibilityDataSource : TestDataSource<Run
         if (AfterFeature != null)
         {
             var feature = Features.Table[AfterFeature];
-            afterVersion = SemVersion.Parse(feature.Version.TrimStart('v')); 
+            afterVersion = SemVersion.Parse(feature.Version.TrimStart('v'));
         }
 
         var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
@@ -139,23 +139,6 @@ public sealed class TranslationLayerCompatibilityDataSource : TestDataSource<Run
 
         return new VSTestConsoleInfo(vstestConsoleVersion, version, vstestConsolePath);
     }
-
-    //private MSTestInfo GetTranslationLayerInfo(string translationLayerVersion)
-    //{
-    //    // TODO: replacing in the result string is lame, but I am not going to fight 20 GetAssetFullPath method overloads right now
-    //    // TODO: this could also be cached of course.
-
-    //    var depsXml = GetDependenciesXml();
-
-    //    // It is okay when node is null, we check that Version has value when we update paths by using MSTestInfo, and throw.
-    //    // This way it throws in the body of the test which has better error reporting than throwing in the data source.
-    //    XmlNode? node = depsXml.DocumentElement?.SelectSingleNode($"PropertyGroup/TranslationLayer{translationLayerVersion}Version");
-    //    var version = node?.InnerText.Replace("[", "").Replace("]", "");
-    //    var slash = Path.DirectorySeparatorChar;
-    //    var dllPath = $"{slash}bin{slash}MSTest{translationLayerVersion}-{version}{slash}";
-
-    //    return new TranslationLayerInfo(dllPath, version, versionSpecificBinPath);
-    //}
 
     private static XmlDocument GetDependenciesXml()
     {

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -176,7 +177,7 @@ public class IntegrationTestBase
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
     public void InvokeDotnetTest(string arguments)
     {
-        var vstestConsolePath = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
+        var vstestConsolePath = GetDotnetRunnerPath();
         var env = "VSTEST_CONSOLE_PATH";
         var originalVstestConsolePath = Environment.GetEnvironmentVariable(env);
 
@@ -275,6 +276,13 @@ public class IntegrationTestBase
     /// <param name="skippedTestsCount">Skipped test count</param>
     public void ValidateSummaryStatus(int passedTestsCount, int failedTestsCount, int skippedTestsCount)
     {
+        // TODO: Switch on the actual version of vstest console when we have that set on test environment.
+        if (_testEnvironment.VSTestConsolePath.Contains($"{Path.DirectorySeparatorChar}15."))
+        {
+            ValidateSummaryStatusv15(passedTestsCount, failedTestsCount, skippedTestsCount);
+            return;
+        }
+
         var totalTestCount = passedTestsCount + failedTestsCount + skippedTestsCount;
         if (totalTestCount == 0)
         {
@@ -310,6 +318,57 @@ public class IntegrationTestBase
             if (skippedTestsCount != 0)
             {
                 summaryStatus += string.Format(SkippedTestsMessage, skippedTestsCount);
+            }
+
+            Assert.IsTrue(
+                _standardTestOutput.Contains(summaryStatus),
+                "The Test summary does not match.{3}Expected summary: {1}{3}Test Output: {0}{3}Standard Error: {2}{3}Arguments: {4}{3}",
+                _standardTestOutput,
+                summaryStatus,
+                _standardTestError,
+                Environment.NewLine,
+                _arguments);
+        }
+    }
+
+    /// <summary>
+    /// Validate if the overall test count and results are matching.
+    /// </summary>
+    /// <param name="passedTestsCount">Passed test count</param>
+    /// <param name="failedTestsCount">Failed test count</param>
+    /// <param name="skippedTestsCount">Skipped test count</param>
+    public void ValidateSummaryStatusv15(int passedTestsCount, int failedTestsCount, int skippedTestsCount)
+    {
+        // example: Total tests: 6. Passed: 2. Failed: 2. Skipped: 2.
+        var totalTestCount = passedTestsCount + failedTestsCount + skippedTestsCount;
+        if (totalTestCount == 0)
+        {
+            // No test should be found/run
+            StringAssert.DoesNotMatch(
+                _standardTestOutput,
+                new Regex("Total tests\\:"),
+                "Excepted: There should not be test summary{2}Actual: {0}{2}Standard Error: {1}{2}Arguments: {3}{2}",
+                _standardTestOutput,
+                _standardTestError,
+                Environment.NewLine,
+                _arguments);
+        }
+        else
+        {
+            var summaryStatus = $"Total tests: {totalTestCount}.";
+            if (passedTestsCount != 0)
+            {
+                summaryStatus += $" Passed: {passedTestsCount}.";
+            }
+
+            if (failedTestsCount != 0)
+            {
+                summaryStatus += $" Failed: {failedTestsCount}.";
+            }
+
+            if (skippedTestsCount != 0)
+            {
+                summaryStatus += $" Skipped: {skippedTestsCount}.";
             }
 
             Assert.IsTrue(
@@ -417,7 +476,7 @@ public class IntegrationTestBase
                        || _standardTestOutput.Contains(GetTestMethodName(test));
             Assert.IsTrue(flag, $"Test {test} does not appear in discovered tests list." +
                                 $"{Environment.NewLine}Std Output: {_standardTestOutput}" +
-                                $"{Environment.NewLine}Std Error: { _standardTestError}");
+                                $"{Environment.NewLine}Std Error: {_standardTestError}");
         }
     }
 
@@ -433,7 +492,7 @@ public class IntegrationTestBase
                        || _standardTestOutput.Contains(GetTestMethodName(test));
             Assert.IsFalse(flag, $"Test {test} should not appear in discovered tests list." +
                                 $"{Environment.NewLine}Std Output: {_standardTestOutput}" +
-                                $"{Environment.NewLine}Std Error: { _standardTestError}");
+                                $"{Environment.NewLine}Std Error: {_standardTestError}");
         }
     }
 
@@ -448,7 +507,7 @@ public class IntegrationTestBase
                        || fileOutput.Contains(GetTestMethodName(test));
             Assert.IsTrue(flag, $"Test {test} does not appear in discovered tests list." +
                                 $"{Environment.NewLine}Std Output: {_standardTestOutput}" +
-                                $"{Environment.NewLine}Std Error: { _standardTestError}");
+                                $"{Environment.NewLine}Std Error: {_standardTestError}");
         }
     }
 
@@ -472,7 +531,7 @@ public class IntegrationTestBase
         var assets = new List<string>();
         foreach (var assetName in assetNames)
         {
-           assets.Add(dllInfo.UpdatePath(GetAssetFullPath(assetName)));
+            assets.Add(dllInfo.UpdatePath(GetAssetFullPath(assetName)));
         }
 
         return assets;
@@ -524,7 +583,7 @@ public class IntegrationTestBase
     }
 
     /// <summary>
-    /// Gets the path to <c>vstest.console.exe</c>.
+    /// Gets the path to <c>vstest.console.exe</c> or <c>dotnet.exe</c>.
     /// </summary>
     /// <returns>
     /// Full path to test runner
@@ -554,15 +613,13 @@ public class IntegrationTestBase
             Assert.Fail("Unknown Runner framework - [{0}]", _testEnvironment.RunnerFramework);
         }
 
-        
-
         Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
         return consoleRunnerPath;
     }
 
     protected virtual string SetVSTestConsoleDLLPathInArgs(string args)
     {
-        var vstestConsoleDll = Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll");
+        var vstestConsoleDll = GetDotnetRunnerPath();
         vstestConsoleDll = vstestConsoleDll.AddDoubleQuote();
         args = string.Concat(
             vstestConsoleDll,
@@ -588,9 +645,7 @@ public class IntegrationTestBase
         Console.WriteLine($"Logging diagnostics in {logFilePath}");
 
         var consoleRunnerPath = IsNetCoreRunner()
-                ? _testEnvironment.VSTestConsolePath != null
-                    ? _testEnvironment.VSTestConsolePath
-                    : Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll")
+                ? GetDotnetRunnerPath()
                 : GetConsoleRunnerPath();
         var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
         var dotnetPath = Path.Combine(_testEnvironment.ToolsDirectory, executablePath);
@@ -602,7 +657,7 @@ public class IntegrationTestBase
 
         if (!File.Exists(consoleRunnerPath))
         {
-            throw new FileNotFoundException($"File '{consoleRunnerPath}' was not found.") ;
+            throw new FileNotFoundException($"File '{consoleRunnerPath}' was not found.");
         }
 
         Console.WriteLine($"Console runner path: {consoleRunnerPath}");
@@ -611,7 +666,7 @@ public class IntegrationTestBase
         if (_testEnvironment.DebugVSTestConsole || _testEnvironment.DebugTesthost || _testEnvironment.DebugDataCollector)
         {
             var environmentVariables = new Dictionary<string, string>();
-            Environment.GetEnvironmentVariables().OfType<DictionaryEntry>().ToList().ForEach(e=> environmentVariables.Add(e.Key.ToString(), e.Value.ToString()));
+            Environment.GetEnvironmentVariables().OfType<DictionaryEntry>().ToList().ForEach(e => environmentVariables.Add(e.Key.ToString(), e.Value.ToString()));
 
             if (_testEnvironment.DebugVSTestConsole)
             {
@@ -900,5 +955,5 @@ public class IntegrationTestBase
         return path;
     }
 
-    protected static string GetDotnetRunnerPath() => Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
+    protected string GetDotnetRunnerPath() => _testEnvironment.VSTestConsolePath ?? Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll");
 }

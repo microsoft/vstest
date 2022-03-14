@@ -24,7 +24,7 @@ public sealed class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo, M
     /// Initializes a new instance.
     /// </summary>
     /// <param name="targetFrameworks">To run tests with desktop runner(vstest.console.exe), use AcceptanceTestBase.Net452TargetFramework or alike values.</param>
-    public MSTestCompatibilityDataSource(string runners = AcceptanceTestBase.DEFAULT_RUNNER_NETFX_AND_NET, string targetFrameworks = AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET, string msTestVersions = AcceptanceTestBase.LATESTPREVIEW_LEGACY)
+    public MSTestCompatibilityDataSource(string runners = AcceptanceTestBase.DEFAULT_RUNNER_NETFX_AND_NET, string targetFrameworks = AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET, string msTestVersions = AcceptanceTestBase.LATESTPREVIEW_TO_LEGACY)
     {
         _runnerFrameworks = runners.Split(';');
         _targetFrameworks = targetFrameworks.Split(';');

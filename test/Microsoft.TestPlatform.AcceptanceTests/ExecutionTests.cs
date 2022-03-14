@@ -33,6 +33,23 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    //[TestPlatformCompatibilityDataSource("netcoreapp2.1", "LegacyStable", "netcoreapp2.1", "Latest", "LatestPreview")]
+    [TestPlatformCompatibilityDataSource("netcoreapp2.1", AcceptanceTestBase.LATEST_TO_LEGACY, "netcoreapp2.1", AcceptanceTestBase.LATEST_TO_LEGACY, AcceptanceTestBase.LATESTPREVIEW_TO_LEGACY)]
+    //[TestPlatformCompatibilityDataSource()]
+
+    public void RunMultipleTestAssemblies223(RunnerInfo runnerInfo, VSTestConsoleInfo consoleInfo, MSTestInfo msTestInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo, consoleInfo);
+
+        var assemblyPaths = BuildMultipleAssemblyPath(msTestInfo, "SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+
+        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
+
+        ValidateSummaryStatus(2, 2, 2);
+        ExitCodeEquals(1); // failing tests
+    }
+
+    [TestMethod]
     [TesthostCompatibilityDataSource]
     public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo, TesthostInfo testhostInfo)
     {

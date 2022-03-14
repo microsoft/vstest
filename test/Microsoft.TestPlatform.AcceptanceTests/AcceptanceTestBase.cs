@@ -57,9 +57,10 @@ public class AcceptanceTestBase : IntegrationTestBase
     /// </summary>
     public const string DEFAULT_RUNNER_NETFX_AND_NET = $"{DEFAULT_RUNNER_NETFX};netcoreapp2.1"; 
     public const string DEFAULT_HOST_NETFX_AND_NET = "net451;netcoreapp2.1";
-    public const string LATEST_LEGACY = "Latest;LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
-    public const string LATESTPREVIEW_LEGACY = "LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
+    public const string LATEST_TO_LEGACY = "Latest;LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
+    public const string LATESTPREVIEW_TO_LEGACY = "LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
     public const string LATEST = "Latest";
+    internal const string MSTEST="MSTest";
 
     public static string And(string left, string right)
     {
