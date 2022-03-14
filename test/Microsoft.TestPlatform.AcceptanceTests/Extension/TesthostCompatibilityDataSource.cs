@@ -99,7 +99,7 @@ public sealed class TesthostCompatibilityDataSource : TestDataSource<RunnerInfo,
         return string.Format(CultureInfo.CurrentCulture, "{0} ({1})", methodInfo.Name, string.Join(",", data));
     }
 
-    private TesthostInfo GetTesthostInfo(string testhostVersionType)
+    internal static TesthostInfo GetTesthostInfo(string testhostVersionType)
     {
         var depsXml = GetDependenciesXml();
 

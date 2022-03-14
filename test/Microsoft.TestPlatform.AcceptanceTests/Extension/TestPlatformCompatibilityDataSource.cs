@@ -15,7 +15,7 @@ using Semver;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerInfo, VSTestConsoleInfo, MSTestInfo>
+public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerInfo, VSTestConsoleInfo, TesthostInfo, MSTestInfo>
 {
     private static XmlDocument? s_depsXml;
     private readonly string[] _runnerFrameworks;
@@ -58,7 +58,7 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
 
     public override void CreateData(MethodInfo methodInfo)
     {
-        var dataRows = new List<KeyValuePair<RunnerInfo, KeyValuePair<VSTestConsoleInfo, MSTestInfo>>>();
+        var dataRows = new List<(RunnerInfo runnerInfo, VSTestConsoleInfo vstestConsoleInfo, TesthostInfo testhostInfo, MSTestInfo mstestInfo)>();
         AddEveryVersionOfRunner(dataRows);
 
         // with every version of host
@@ -100,11 +100,11 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
 
         foreach (var dataRow in dataRows)
         {
-            AddData(dataRow.Key, dataRow.Value.Key, dataRow.Value.Value);
+            AddData(dataRow.runnerInfo, dataRow.vstestConsoleInfo, dataRow.testhostInfo, dataRow.mstestInfo);
         }
     }
 
-    private void AddOlderConfigurations(List<KeyValuePair<RunnerInfo, KeyValuePair<VSTestConsoleInfo, MSTestInfo>>> dataRows)
+    private void AddOlderConfigurations(List<(RunnerInfo, VSTestConsoleInfo, TesthostInfo, MSTestInfo)> dataRows)
     {
         // Older configurations where the runner, host and adapter version are the same.
         // We already added the row where all are newest when adding combination with all runners.
@@ -126,7 +126,7 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
         }
     }
 
-    private void AddEveryVersionOfAdapter(List<KeyValuePair<RunnerInfo, KeyValuePair<VSTestConsoleInfo, MSTestInfo>>> dataRows)
+    private void AddEveryVersionOfAdapter(List<(RunnerInfo, VSTestConsoleInfo, TesthostInfo, MSTestInfo)> dataRows)
     {
         var runnerVersion = _runnerVersions[0];
         foreach (var runnerFramework in _runnerFrameworks)
@@ -149,7 +149,7 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
         }
     }
 
-    private void AddEveryVersionOfHost(List<KeyValuePair<RunnerInfo, KeyValuePair<VSTestConsoleInfo, MSTestInfo>>> dataRows)
+    private void AddEveryVersionOfHost(List<(RunnerInfo, VSTestConsoleInfo, TesthostInfo, MSTestInfo)> dataRows)
     {
         var runnerVersion = _runnerVersions[0];
 
@@ -176,7 +176,7 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
         }
     }
 
-    private void AddEveryVersionOfRunner(List<KeyValuePair<RunnerInfo, KeyValuePair<VSTestConsoleInfo, MSTestInfo>>> dataRows)
+    private void AddEveryVersionOfRunner(List<(RunnerInfo, VSTestConsoleInfo, TesthostInfo, MSTestInfo)> dataRows)
     {
         foreach (var runnerVersion in _runnerVersions)
         {
@@ -199,13 +199,14 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
         }
     }
 
-    private void AddRow(List<KeyValuePair<RunnerInfo, KeyValuePair<VSTestConsoleInfo, MSTestInfo>>> dataRows,
+    private void AddRow(List<(RunnerInfo, VSTestConsoleInfo, TesthostInfo, MSTestInfo)> dataRows,
         string runnerVersion, string runnerFramework, string hostVersion, string hostFramework, string adapter, string adapterVersion)
     {
-        var mstestInfo = GetMSTestInfo(adapterVersion);
         RunnerInfo runnerInfo = GetRunnerInfo(runnerFramework, hostFramework, inIsolation: true);
         var vstestConsoleInfo = GetVSTestConsoleInfo(runnerVersion, runnerInfo);
-        dataRows.Add(new KeyValuePair<RunnerInfo, KeyValuePair<VSTestConsoleInfo, MSTestInfo>>(runnerInfo, new KeyValuePair<VSTestConsoleInfo, MSTestInfo>(vstestConsoleInfo, mstestInfo)));
+        var testhostInfo = TesthostCompatibilityDataSource.GetTesthostInfo(hostVersion);
+        var mstestInfo = GetMSTestInfo(adapterVersion);
+        dataRows.Add(new(runnerInfo, vstestConsoleInfo, testhostInfo, mstestInfo));
     }
 
     private RunnerInfo GetRunnerInfo(string runnerFramework, string hostFramework, bool inIsolation)

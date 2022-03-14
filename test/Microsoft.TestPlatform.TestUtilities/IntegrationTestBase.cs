@@ -919,6 +919,21 @@ public class IntegrationTestBase
         return string.Join(" ", assetFullPaths);
     }
 
+    protected string BuildMultipleAssemblyPath(TesthostInfo testhostInfo, DllInfo adapterInfo, params string[] assetNames)
+    {
+        var assetFullPaths = new string[assetNames.Length];
+        for (var i = 0; i < assetNames.Length; i++)
+        {
+            var path = GetAssetFullPath(assetNames[i]);
+            var updatedPath = testhostInfo.UpdatePath(adapterInfo.UpdatePath(path));
+            Assert.IsTrue(File.Exists(updatedPath), "GetTestAsset: Path not found: {0}. Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", updatedPath);
+
+            assetFullPaths[i] = updatedPath.AddDoubleQuote();
+        }
+
+        return string.Join(" ", assetFullPaths);
+    }
+
     protected static string GetDiagArg(string rootDir)
         => " --diag:" + Path.Combine(rootDir, "log.txt");
 
