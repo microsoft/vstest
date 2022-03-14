@@ -467,6 +467,17 @@ public class IntegrationTestBase
         return _testEnvironment.GetTestAsset(assetName, targetFramework);
     }
 
+    protected List<string> GetAssetFullPath(DllInfo dllInfo, params string[] assetNames)
+    {
+        var assets = new List<string>();
+        foreach (var assetName in assetNames)
+        {
+           assets.Add(dllInfo.UpdatePath(GetAssetFullPath(assetName)));
+        }
+
+        return assets;
+    }
+
     protected string GetProjectFullPath(string projectName)
     {
         return _testEnvironment.GetTestProject(projectName);
@@ -524,7 +535,14 @@ public class IntegrationTestBase
 
         if (IsDesktopRunner())
         {
-            consoleRunnerPath = Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.exe");
+            if (!string.IsNullOrWhiteSpace(_testEnvironment.VSTestConsolePath))
+            {
+                consoleRunnerPath = _testEnvironment.VSTestConsolePath;
+            }
+            else
+            {
+                consoleRunnerPath = Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.exe");
+            }
         }
         else if (IsNetCoreRunner())
         {
@@ -535,6 +553,8 @@ public class IntegrationTestBase
         {
             Assert.Fail("Unknown Runner framework - [{0}]", _testEnvironment.RunnerFramework);
         }
+
+        
 
         Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
         return consoleRunnerPath;
@@ -551,39 +571,15 @@ public class IntegrationTestBase
         return args;
     }
 
-    /// <summary>
-    /// Returns the VsTestConsole Wrapper.
-    /// </summary>
-    public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
-    {
-        return GetVsTestConsoleWrapper(TempDirectory, null);
-    }
-
-    /// <summary>
-    /// Returns the VsTestConsole Wrapper.
-    /// </summary>
-    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(out TempDirectory logFileDir)
-    {
-        logFileDir = new TempDirectory();
-        return GetVsTestConsoleWrapper(logFileDir, null);
-    }
-
-    /// <summary>
-    /// Returns the VsTestConsole Wrapper.
-    /// </summary>
-    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(TempDirectory tempDirectory)
-    {
-        return GetVsTestConsoleWrapper(tempDirectory, vsTestConsoleInfo: null);
-    }
 
     /// <summary>
     /// Returns the VsTestConsole Wrapper.
     /// </summary>
     /// <returns></returns>
-    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(TempDirectory logFileDir, VSTestConsoleInfo vsTestConsoleInfo)
+    public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
     {
         // Temp directory is already unique so there is no need to have a unique file name.
-        var logFilePath = Path.Combine(logFileDir.Path, "log.txt");
+        var logFilePath = Path.Combine(TempDirectory.Path, "log.txt");
         if (!File.Exists(logFilePath))
         {
             File.Create(logFilePath).Close();
@@ -591,10 +587,10 @@ public class IntegrationTestBase
 
         Console.WriteLine($"Logging diagnostics in {logFilePath}");
 
-        var consoleRunnerPath = vsTestConsoleInfo != null
-            ? vsTestConsoleInfo.Path
-            : IsNetCoreRunner()
-                ? Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll")
+        var consoleRunnerPath = IsNetCoreRunner()
+                ? _testEnvironment.VSTestConsolePath != null
+                    ? _testEnvironment.VSTestConsolePath
+                    : Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll")
                 : GetConsoleRunnerPath();
         var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
         var dotnetPath = Path.Combine(_testEnvironment.ToolsDirectory, executablePath);
@@ -853,13 +849,13 @@ public class IntegrationTestBase
         return string.Join(" ", assetFullPath);
     }
 
-    protected string BuildMultipleAssemblyPath(MSTestInfo msTestInfo, params string[] assetNames)
+    protected string BuildMultipleAssemblyPath(DllInfo dllInfo, params string[] assetNames)
     {
         var assetFullPaths = new string[assetNames.Length];
         for (var i = 0; i < assetNames.Length; i++)
         {
             var path = GetAssetFullPath(assetNames[i]);
-            var updatedPath = msTestInfo.UpdatePath(path);
+            var updatedPath = dllInfo.UpdatePath(path);
             Assert.IsTrue(File.Exists(updatedPath), "GetTestAsset: Path not found: {0}. Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", updatedPath);
 
             assetFullPaths[i] = updatedPath.AddDoubleQuote();

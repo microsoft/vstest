@@ -3,10 +3,10 @@
 
 namespace Microsoft.TestPlatform.TestUtilities;
 
-public class MSTestInfo : DllInfo
+public class TesthostInfo : DllInfo
 {
-    public MSTestInfo(string versionType, string? version, string path)
-        : base(name: "MSTest", propertyName: "MSTest", versionType, version, path)
+    public TesthostInfo(string versionType, string? version, string path)
+        : base(name: "Testhost", propertyName: "VSTestConsole", versionType, version, path)
     {
     }
 }

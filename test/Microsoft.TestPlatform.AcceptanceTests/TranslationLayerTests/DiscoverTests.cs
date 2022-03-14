@@ -28,7 +28,7 @@ public class DiscoverTests : AcceptanceTestBase
 
     public void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _discoveryEventHandler = new DiscoveryEventHandler();
         _discoveryEventHandler2 = new DiscoveryEventHandler2();
     }
@@ -43,13 +43,13 @@ public class DiscoverTests : AcceptanceTestBase
     [TranslationLayerCompatibilityDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo, vsTestConsoleInfo);
 
         // Setup();
         _discoveryEventHandler = new DiscoveryEventHandler();
         _discoveryEventHandler2 = new DiscoveryEventHandler2();
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper(TempDirectory, vsTestConsoleInfo);
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), _discoveryEventHandler);
 
         // Assert.
@@ -60,13 +60,13 @@ public class DiscoverTests : AcceptanceTestBase
     [TranslationLayerCompatibilityDataSource()]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo, vsTestConsoleInfo);
         // Setup();
 
         _discoveryEventHandler = new DiscoveryEventHandler();
         _discoveryEventHandler2 = new DiscoveryEventHandler2();
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper(TempDirectory, vsTestConsoleInfo);
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         vstestConsoleWrapper.DiscoverTests(
             GetTestAssemblies(),
             GetDefaultRunSettings(),

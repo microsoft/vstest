@@ -37,8 +37,8 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TranslationLayerCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER)]
     public void RunTestsWithCustomTestHostLauncherLaunchesTheProcessUsingTheProvidedLauncher(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(TempDirectory, vsTestConsoleInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo, vsTestConsoleInfo);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _runEventHandler = new RunEventHandler();
 
         var customTestHostLauncher = new TestHostLauncherV1();
@@ -58,8 +58,8 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TranslationLayerCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER)]
     public void RunTestsWithCustomTestHostLauncherLaunchesTheProcessUsingTheProvidedLauncherWhenITestHostLauncher2IsProvided(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(TempDirectory, vsTestConsoleInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo, vsTestConsoleInfo);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _runEventHandler = new RunEventHandler();
 
         var customTestHostLauncher = new TestHostLauncherV2();
@@ -80,8 +80,8 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TranslationLayerCompatibilityDataSource(AfterFeature = Features.ATTACH_DEBUGGER)]
     public void RunTestsWithCustomTestHostLauncherAttachesToDebuggerUsingTheProvidedLauncher(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(TempDirectory, vsTestConsoleInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo, vsTestConsoleInfo);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _runEventHandler = new RunEventHandler();
 
         var customTestHostLauncher = new TestHostLauncherV2();
@@ -105,8 +105,8 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TranslationLayerCompatibilityDataSource("net451", "net451", "Latest", AfterFeature = Features.ATTACH_DEBUGGER, DebugVSTestConsole = true, DebugTesthost=true)]
     public void RunTestsWithCustomTestHostLauncherUsesLaunchWhenGivenAnOutdatedITestHostLauncher(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(TempDirectory, vsTestConsoleInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo, vsTestConsoleInfo);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _runEventHandler = new RunEventHandler();
 
         var customTestHostLauncher = new TestHostLauncherV1();

@@ -197,6 +197,7 @@ public class IntegrationTestEnvironment
     public bool DebugTesthost { get; set; }
     public bool DebugDataCollector { get; set; }
     public bool NoDefaultBreakpoints { get; set; }
+    public string VSTestConsolePath { get; set; }
 
     /// <summary>
     /// Gets the full path to a test asset.

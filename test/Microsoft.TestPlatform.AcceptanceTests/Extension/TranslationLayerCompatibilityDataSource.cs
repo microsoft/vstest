@@ -17,7 +17,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 public sealed class TranslationLayerCompatibilityDataSource : TestDataSource<RunnerInfo, VSTestConsoleInfo>
 {
-    private static XmlDocument? _depsXml;
+    private static XmlDocument? s_depsXml;
     private readonly string[] _runnerFrameworks;
     private readonly string[] _targetFrameworks;
     // private readonly string[] _translationLayerVersions;
@@ -72,7 +72,7 @@ public sealed class TranslationLayerCompatibilityDataSource : TestDataSource<Run
         }
 
         var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
-        // Only run .NET Framework tests on Windows.
+        // Run .NET Framework tests only on Windows.
         Func<string, bool> filter = tfm => isWindows || !tfm.StartsWith("net4");
 
         // TODO: maybe we should throw if we don't end up generating any data
@@ -106,7 +106,7 @@ public sealed class TranslationLayerCompatibilityDataSource : TestDataSource<Run
         return string.Format(CultureInfo.CurrentCulture, "{0} ({1})", methodInfo.Name, string.Join(",", data));
     }
 
-    private VSTestConsoleInfo GetVSTestConsoleInfo(string vstestConsoleVersion, RunnerInfo runnerInfo)
+    internal static VSTestConsoleInfo GetVSTestConsoleInfo(string vstestConsoleVersion, RunnerInfo runnerInfo)
     {
         var depsXml = GetDependenciesXml();
 
@@ -159,8 +159,8 @@ public sealed class TranslationLayerCompatibilityDataSource : TestDataSource<Run
 
     private static XmlDocument GetDependenciesXml()
     {
-        if (_depsXml != null)
-            return _depsXml;
+        if (s_depsXml != null)
+            return s_depsXml;
 
         var depsXmlPath = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "scripts", "build", "TestPlatform.Dependencies.props");
         var fileStream = File.OpenRead(depsXmlPath);
@@ -168,7 +168,7 @@ public sealed class TranslationLayerCompatibilityDataSource : TestDataSource<Run
         var depsXml = new XmlDocument();
         depsXml.Load(xmlTextReader);
 
-        _depsXml = depsXml;
+        s_depsXml = depsXml;
         return depsXml;
     }
 }

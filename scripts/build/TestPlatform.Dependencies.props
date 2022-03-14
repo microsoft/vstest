@@ -46,7 +46,7 @@
     See Invoke-TestAssetsBuild in scripts/build.ps1. Exact versions are used to avoid Nuget substituting them by closest match, if we make a typo. 
     These versions need to be "statically" readable because we read this file as xml in our build and tests. -->
     <!-- <VSTestConsoleLatestVersion></VSTestConsoleLatestVersion> is not here, NETTestSdkVersion is used instead, because that is the version of the locally built latest package.  -->
-    <VSTestConsoleLatestPreviewVersion>17.2.0-preview-20220131-20</VSTestConsoleLatestPreviewVersion>
+    <VSTestConsoleLatestPreviewVersion>[17.2.0-preview-20220131-20]</VSTestConsoleLatestPreviewVersion>
     <VSTestConsoleLatestStableVersion>[17.1.0]</VSTestConsoleLatestStableVersion>
     <VSTestConsoleRecentStableVersion>[17.0.0]</VSTestConsoleRecentStableVersion>
     <VSTestConsoleMostDownloadedVersion>[16.9.4]</VSTestConsoleMostDownloadedVersion>

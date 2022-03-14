@@ -46,7 +46,7 @@ public sealed class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo, M
     public override void CreateData(MethodInfo methodInfo)
     {
         var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
-        // Only run .NET Framework tests on Windows.
+        // Run .NET Framework tests only on Windows.
         Func<string, bool> filter = tfm => isWindows || !tfm.StartsWith("net4");
 
         if (InProcess)
@@ -111,3 +111,4 @@ public sealed class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo, M
         return depsXml;
     }
 }
+

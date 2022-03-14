@@ -68,8 +68,12 @@ public class AcceptanceTestBase : IntegrationTestBase
 
     protected string FrameworkArgValue => DeriveFrameworkArgValue(_testEnvironment);
 
-    protected static void SetTestEnvironment(IntegrationTestEnvironment testEnvironment, RunnerInfo runnerInfo)
+    protected static void SetTestEnvironment(IntegrationTestEnvironment testEnvironment, RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo = null)
     {
+        if (vsTestConsoleInfo != null)
+        {
+            testEnvironment.VSTestConsolePath = vsTestConsoleInfo.Path;
+        }
         testEnvironment.RunnerFramework = runnerInfo.RunnerFramework;
         testEnvironment.TargetFramework = runnerInfo.TargetFramework;
         testEnvironment.InIsolationValue = runnerInfo.InIsolationValue;

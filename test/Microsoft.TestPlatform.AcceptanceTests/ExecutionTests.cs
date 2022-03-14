@@ -32,6 +32,20 @@ public class ExecutionTests : AcceptanceTestBase
         ExitCodeEquals(1); // failing tests
     }
 
+    [TestMethod]
+    [TesthostCompatibilityDataSource]
+    public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo, TesthostInfo testhostInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo, vsTestConsoleInfo);
+
+        var assemblyPaths = BuildMultipleAssemblyPath(testhostInfo, "SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+
+        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
+
+        ValidateSummaryStatus(2, 2, 2);
+        ExitCodeEquals(1); // failing tests
+    }
+
 
     // TODO: This one mixes different frameworks, I can make it work, but it is worth it? We are going to test
     // the two respective versions together (e.g. latest xunit and latest mstest), but does using two different test

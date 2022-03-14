@@ -175,40 +175,10 @@ function Invoke-TestAssetsBuild
         $dependenciesPath = "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props"
         $dependenciesXml = [xml](Get-Content -Raw -Encoding UTF8 $dependenciesPath)
 
-        
-        # Build with multiple versions of MSTest.
-        $projects = @(
-            "$env:TP_ROOT_DIR\test\TestAssets\SimpleTestProject\SimpleTestProject.csproj"
-            "$env:TP_ROOT_DIR\test\TestAssets\SimpleTestProject2\SimpleTestProject2.csproj"
-        )
-
-        $versionProperties = @(
-            "MSTestFrameworkLatestPreviewVersion"
-            "MSTestFrameworkLatestStableVersion"
-            "MSTestFrameworkRecentStableVersion"
-            "MSTestFrameworkMostDownloadedVersion"
-            "MSTestFrameworkPreviousStableVersion"
-            "MSTestFrameworkLegacyStableVersion"
-        )
-        
-        foreach ($project in $projects) {
-            foreach ($propertyName in $versionProperties) {             
-                $mstestVersion = $dependenciesXml.Project.PropertyGroup.$propertyName
-
-                if (-not $mstestVersion)
-                {
-                    throw "MSTestVersion for $propertyName is empty."
-                }
-                
-                $dirVersion = $mstestVersion  -replace "\[|\]" 
-                $dirPropertyName = $propertyName -replace "Framework" -replace "Version"
-                Invoke-Exe $dotnetExe -Arguments "build $project --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:MSTestFrameworkVersion=$mstestVersion -p:MSTestAdapterVersion=$mstestVersion -p:BaseOutputPath=""bin\$dirPropertyName-$dirVersion\\""" 
-            }
-        }
-
         # Restore previous versions of TestPlatform (for vstest.console.exe), and TestPlatform.CLI (for vstest.console.dll).
-        $versionProperties = @(
-            "NETTestSdkVersion"
+        # These properties are coming from TestPlatform.Dependencies.props.
+        $vstestConsoleVersionProperties = @(
+            "VSTestConsoleLatestVersion"
             "VSTestConsoleLatestPreviewVersion"
             "VSTestConsoleLatestStableVersion" 
             "VSTestConsoleRecentStableVersion" 
@@ -217,7 +187,7 @@ function Invoke-TestAssetsBuild
             "VSTestConsoleLegacyStableVersion"
         )
 
-        foreach ($propertyName in $versionProperties) {
+        foreach ($propertyName in $vstestConsoleVersionProperties) {
             if ("VSTestConsoleLatestVersion" -eq $propertyName) { 
                 # NETTestSdkVersion has the version of the locally built package.
                 $vsTestConsoleVersion = $dependenciesXml.Project.PropertyGroup."NETTestSdkVersion"
@@ -263,6 +233,59 @@ function Invoke-TestAssetsBuild
                 if (Test-Path "$packagePath\$package.$vsTestConsoleVersion") {
                     Remove-Item -Recurse -Force "$packagePath\$package.$vsTestConsoleVersion"
                 }
+            }
+        }
+
+        
+        # Build with multiple versions of MSTest.
+        $projects = @(
+            "$env:TP_ROOT_DIR\test\TestAssets\SimpleTestProject\SimpleTestProject.csproj"
+            "$env:TP_ROOT_DIR\test\TestAssets\SimpleTestProject2\SimpleTestProject2.csproj"
+        )
+
+        $msTestVersionProperties = @(
+            "MSTestFrameworkLatestPreviewVersion"
+            "MSTestFrameworkLatestStableVersion"
+            "MSTestFrameworkRecentStableVersion"
+            "MSTestFrameworkMostDownloadedVersion"
+            "MSTestFrameworkPreviousStableVersion"
+            "MSTestFrameworkLegacyStableVersion"
+        )
+        
+        foreach ($project in $projects) {
+            foreach ($propertyName in $msTestVersionProperties) {  
+                $mstestVersion = $dependenciesXml.Project.PropertyGroup.$propertyName
+
+                if (-not $mstestVersion)
+                {
+                    throw "MSTestVersion for $propertyName is empty."
+                }
+                
+                $dirMSTestVersion = $mstestVersion  -replace "\[|\]" 
+                $dirMSTestPropertyName = $propertyName -replace "Framework" -replace "Version"
+                Invoke-Exe $dotnetExe -Arguments "build $project --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:MSTestFrameworkVersion=$mstestVersion -p:MSTestAdapterVersion=$mstestVersion -p:BaseOutputPath=""bin\$dirMSTestPropertyName-$dirMSTestVersion\\"""
+            }
+        }
+
+        foreach ($project in $projects) {
+            # We use the same version properties for NET.Test.Sdk as for VSTestConsole, for now.
+            foreach ($propertyName in $vstestConsoleVersionProperties) {
+                if ("VSTestConsoleLatestVersion" -eq $propertyName) { 
+                    # NETTestSdkVersion has the version of the locally built package.
+                    $netTestSdkVersion = $dependenciesXml.Project.PropertyGroup."NETTestSdkVersion"
+                }
+                else { 
+                    $netTestSdkVersion = $dependenciesXml.Project.PropertyGroup.$propertyName
+                }
+
+                if (-not $netTestSdkVersion)
+                {
+                    throw "NetTestSdkVersion for $propertyName is empty."
+                }
+
+                $dirNetTestSdkVersion = $netTestSdkVersion  -replace "\[|\]" 
+                $dirNetTestSdkPropertyName = $propertyName -replace "Framework" -replace "Version" -replace "VSTestConsole", "NETTestSdk"
+                Invoke-Exe $dotnetExe -Arguments "build $project --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:NETTestSdkVersion=$netTestSdkVersion -p:BaseOutputPath=""bin\$dirNetTestSdkPropertyName-$dirNetTestSdkVersion\\"""
             }
         }
 
@@ -1289,49 +1312,49 @@ if ($ProjectNamePatterns.Count -ne 0)
 }
 
 # Execute build
-$timer = Start-Timer
-Write-Log "Build started: args = '$args'"
-Write-Log "Test platform environment variables: "
-Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
-Write-Log "Test platform build variables: "
-Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
+# $timer = Start-Timer
+# Write-Log "Build started: args = '$args'"
+# Write-Log "Test platform environment variables: "
+# Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
+# Write-Log "Test platform build variables: "
+# Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 
-if ($Force -or $Steps -contains "InstallDotnet") {
-    Install-DotNetCli
-}
+# if ($Force -or $Steps -contains "InstallDotnet") {
+#     Install-DotNetCli
+# }
 
-if ($Force -or $Steps -contains "Restore") {
-    Clear-Package
-    Restore-Package
-}
+# if ($Force -or $Steps -contains "Restore") {
+#     Clear-Package
+#     Restore-Package
+# }
 
-if ($Force -or $Steps -contains "UpdateLocalization") {
-    Update-LocalizedResources
-}
+# if ($Force -or $Steps -contains "UpdateLocalization") {
+#     Update-LocalizedResources
+# }
 
-if ($Force -or $Steps -contains "Build") {
-    Invoke-Build
-}
+# if ($Force -or $Steps -contains "Build") {
+#     Invoke-Build
+# }
 
-if ($Force -or $Steps -contains "Publish") {
-    Publish-Package
-    Create-VsixPackage
-    Create-NugetPackages
-}
+# if ($Force -or $Steps -contains "Publish") {
+#     Publish-Package
+#     Create-VsixPackage
+#     Create-NugetPackages
+# }
 
-if ($Force -or $Steps -contains "Publish" -or $Steps -contains "Manifest") {
-    Generate-Manifest -PackageFolder $TPB_PackageOutDir
-    if (Test-Path $TPB_SourceBuildPackageOutDir)
-    {
-        Generate-Manifest -PackageFolder $TPB_SourceBuildPackageOutDir
-    }
-    Copy-PackageIntoStaticDirectory
-}
+# if ($Force -or $Steps -contains "Publish" -or $Steps -contains "Manifest") {
+#     Generate-Manifest -PackageFolder $TPB_PackageOutDir
+#     if (Test-Path $TPB_SourceBuildPackageOutDir)
+#     {
+#         Generate-Manifest -PackageFolder $TPB_SourceBuildPackageOutDir
+#     }
+#     Copy-PackageIntoStaticDirectory
+# }
 
 if ($Force -or $Steps -contains "PrepareAcceptanceTests") {
-    Publish-PatchedDotnet
+   #Publish-PatchedDotnet
     Invoke-TestAssetsBuild
-    Publish-Tests
+    #Publish-Tests
 }
 
 if ($Script:ScriptFailed) {

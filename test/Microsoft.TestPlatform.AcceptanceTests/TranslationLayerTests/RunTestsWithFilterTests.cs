@@ -25,7 +25,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
 
     private void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _runEventHandler = new RunEventHandler();
     }
 
@@ -39,12 +39,12 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
     [TranslationLayerCompatibilityDataSource]
     public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo, vsTestConsoleInfo);
         // Setup();
 
         _runEventHandler = new RunEventHandler();
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper(TempDirectory, vsTestConsoleInfo);
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var sources = new List<string> { GetAssetFullPath("SimpleTestProject.dll") };
 
         vstestConsoleWrapper.RunTests(

@@ -31,8 +31,8 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
 
     private void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out var logsDir);
-        _logsDir = logsDir;
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _logsDir = TempDirectory;
         _runEventHandler = new RunEventHandler();
     }
 

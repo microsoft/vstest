@@ -29,7 +29,7 @@ public class RunTests : AcceptanceTestBase
 
     private void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _runEventHandler = new RunEventHandler();
     }
 
@@ -43,18 +43,17 @@ public class RunTests : AcceptanceTestBase
     [TranslationLayerCompatibilityDataSource]
     public void RunAllTests(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        // Setup();
-
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper(TempDirectory, vsTestConsoleInfo);
-        _runEventHandler = new RunEventHandler();
-        vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetDefaultRunSettings(), _runEventHandler);
+        SetTestEnvironment(_testEnvironment, runnerInfo, vsTestConsoleInfo);
+        
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        var runEventHandler = new RunEventHandler();
+        vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetDefaultRunSettings(), runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+        Assert.AreEqual(6, runEventHandler.TestResults.Count);
+        Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+        Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
     }
 
     [TestMethod]
@@ -189,12 +188,10 @@ public class RunTests : AcceptanceTestBase
 
     private IList<string> GetTestAssemblies()
     {
-        var testAssemblies = new List<string>
+        return new List<string>
         {
             GetAssetFullPath("SimpleTestProject.dll"),
             GetAssetFullPath("SimpleTestProject2.dll")
         };
-
-        return testAssemblies;
     }
 }

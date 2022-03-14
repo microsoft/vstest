@@ -69,3 +69,34 @@ public abstract class TestDataSource<T1, T2> : Attribute, ITestDataSource
     }
 }
 
+[AttributeUsage(AttributeTargets.Method)]
+public abstract class TestDataSource<T1, T2, T3> : Attribute, ITestDataSource
+    where T1 : notnull
+    where T2 : notnull
+    where T3 : notnull
+{
+    private readonly List<object[]> _data = new();
+
+    public abstract void CreateData(MethodInfo methodInfo);
+
+    public void AddData(T1 value1, T2 value2, T3 value3)
+    {
+        _data.Add(new object[] { value1, value2, value3 });
+    }
+
+    public virtual string GetDisplayName(MethodInfo methodInfo, T1 value1, T2 value2, T3 value3)
+    {
+        return $"{methodInfo.Name} ({value1}, {value2}, {value3})";
+    }
+
+    IEnumerable<object[]> ITestDataSource.GetData(MethodInfo methodInfo)
+    {
+        CreateData(methodInfo);
+        return _data;
+    }
+
+    string ITestDataSource.GetDisplayName(MethodInfo methodInfo, object[] data)
+    {
+        return GetDisplayName(methodInfo, (T1)data[0], (T2)data[1], (T3)data[2]);
+    }
+}
