@@ -11,7 +11,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// <param name="RunnerFramework"></param>
 /// <param name="TargetFramework"></param>
 /// <param name="InIsolationValue">Supported value = <c>/InIsolation</c>.</param>
-public record struct RunnerInfo(string RunnerFramework, string TargetFramework, string InIsolationValue = "")
+[Serializable] // Type should be serializable to allow the tree-view behavior of test discovery in Test Explorer
+public record RunnerInfo(string RunnerFramework, string TargetFramework, string InIsolationValue = "")
 {
     /// <summary>
     /// Is running via .NET "Core" vstest.console?
