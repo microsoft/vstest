@@ -34,7 +34,7 @@ internal class AppDomainEngineInvoker<T> : IEngineInvoker where T : MarshalByRef
         TestPlatformEventSource.Instance.TestHostAppDomainCreationStart();
 
         _appDomain = CreateNewAppDomain(testSourcePath);
-        _actualInvoker = AppDomainEngineInvoker<T>.CreateInvokerInAppDomain(_appDomain);
+        _actualInvoker = CreateInvokerInAppDomain(_appDomain);
 
         TestPlatformEventSource.Instance.TestHostAppDomainCreationStop();
     }
