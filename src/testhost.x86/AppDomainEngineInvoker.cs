@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
 #if NETFRAMEWORK
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,8 +13,6 @@ using System.Xml.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.TestHost;
 
@@ -27,17 +25,16 @@ internal class AppDomainEngineInvoker<T> : IEngineInvoker where T : MarshalByRef
     private const string XmlNamespace = "urn:schemas-microsoft-com:asm.v1";
 
     protected readonly AppDomain _appDomain;
-
     protected readonly IEngineInvoker _actualInvoker;
 
-    private string _mergedTempConfigFile;
+    private string? _mergedTempConfigFile;
 
     public AppDomainEngineInvoker(string testSourcePath)
     {
         TestPlatformEventSource.Instance.TestHostAppDomainCreationStart();
 
         _appDomain = CreateNewAppDomain(testSourcePath);
-        _actualInvoker = CreateInvokerInAppDomain(_appDomain);
+        _actualInvoker = AppDomainEngineInvoker<T>.CreateInvokerInAppDomain(_appDomain);
 
         TestPlatformEventSource.Instance.TestHostAppDomainCreationStop();
     }
@@ -46,7 +43,7 @@ internal class AppDomainEngineInvoker<T> : IEngineInvoker where T : MarshalByRef
     /// Invokes the Engine with the arguments
     /// </summary>
     /// <param name="argsDictionary">Arguments for the engine</param>
-    public void Invoke(IDictionary<string, string> argsDictionary)
+    public void Invoke(IDictionary<string, string?> argsDictionary)
     {
         try
         {
@@ -99,7 +96,7 @@ internal class AppDomainEngineInvoker<T> : IEngineInvoker where T : MarshalByRef
     /// <param name="testSourcePath">Test Source to run/discover tests for</param>
     /// <param name="mergedConfigFile">Merged config file if there is any merging of test config and test host config</param>
     /// <returns></returns>
-    private IEngineInvoker CreateInvokerInAppDomain(AppDomain appDomain)
+    private static IEngineInvoker CreateInvokerInAppDomain(AppDomain appDomain)
     {
         // Create CustomAssembly setup that sets a custom assembly resolver to be able to resolve TestPlatform assemblies
         // and also sets the correct UI culture to propagate the dotnet or VS culture to the adapters running in the app domain
@@ -109,7 +106,7 @@ internal class AppDomainEngineInvoker<T> : IEngineInvoker where T : MarshalByRef
             false,
             BindingFlags.Default,
             null,
-            new object[] { CultureInfo.DefaultThreadCurrentUICulture?.Name, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) },
+            new object?[] { CultureInfo.DefaultThreadCurrentUICulture?.Name, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) },
             null,
             null);
 
@@ -153,9 +150,9 @@ internal class AppDomainEngineInvoker<T> : IEngineInvoker where T : MarshalByRef
         }
     }
 
-    private static string GetConfigFile(string testSource, string testSourceFolder)
+    private static string? GetConfigFile(string testSource, string testSourceFolder)
     {
-        string configFile = null;
+        string? configFile = null;
 
         if (File.Exists(testSource + ".config"))
         {
@@ -234,12 +231,12 @@ internal class AppDomainEngineInvoker<T> : IEngineInvoker where T : MarshalByRef
 }
 
 /// <summary>
-/// Custom domain setup that sets UICulture and an Assembly resolver for child app domain to resolve testplatform assemblies    
+/// Custom domain setup that sets UICulture and an Assembly resolver for child app domain to resolve testplatform assemblies
 /// </summary>
 // The normal AppDomainInitializer api was not used to do this because it cannot load the assemblies for testhost. --JJR
 internal class CustomAssemblySetup : MarshalByRefObject
 {
-    private readonly IDictionary<string, Assembly> _resolvedAssemblies;
+    private readonly IDictionary<string, Assembly?> _resolvedAssemblies;
 
     private readonly string[] _resolverPaths;
 
@@ -251,15 +248,15 @@ internal class CustomAssemblySetup : MarshalByRefObject
         }
 
         _resolverPaths = new string[] { testPlatformPath, Path.Combine(testPlatformPath, "Extensions") };
-        _resolvedAssemblies = new Dictionary<string, Assembly>();
+        _resolvedAssemblies = new Dictionary<string, Assembly?>();
         AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
     }
 
-    private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+    private Assembly? CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
     {
         var assemblyName = new AssemblyName(args.Name);
 
-        Assembly assembly = null;
+        Assembly? assembly = null;
         lock (_resolvedAssemblies)
         {
             try

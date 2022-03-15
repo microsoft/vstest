@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.TestExecutor;
 
 /// <summary>

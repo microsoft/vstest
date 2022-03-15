@@ -3,16 +3,14 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.TestHost;
 
 internal sealed class DebugAssertException : Exception
 {
-    public DebugAssertException(string message, string stackTrace) : base(message)
+    public DebugAssertException(string? message, string? stackTrace) : base(message)
     {
         StackTrace = stackTrace;
     }
 
-    public override string StackTrace { get; }
+    public override string? StackTrace { get; }
 }
