@@ -17,8 +17,6 @@ using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resourc
 
 #nullable disable
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
