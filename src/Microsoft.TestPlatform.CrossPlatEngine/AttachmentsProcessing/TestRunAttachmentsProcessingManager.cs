@@ -65,12 +65,12 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var taskCompletionSource = new TaskCompletionSource<Collection<AttachmentSet>>();
-            using (cancellationToken.Register(() => taskCompletionSource.TrySetCanceled()))
+            var cancelAttachmentProcessingCompletionSource = new TaskCompletionSource<Collection<AttachmentSet>>();
+            using (cancellationToken.Register(() => cancelAttachmentProcessingCompletionSource.TrySetCanceled()))
             {
                 Task<Collection<AttachmentSet>> task = Task.Run(async () => await ProcessAttachmentsAsync(runSettingsXml, new Collection<AttachmentSet>(attachments.ToList()), invokedDataCollector, eventHandler, cancellationToken));
 
-                var completedTask = await Task.WhenAny(task, taskCompletionSource.Task).ConfigureAwait(false);
+                var completedTask = await Task.WhenAny(task, cancelAttachmentProcessingCompletionSource.Task).ConfigureAwait(false);
 
                 if (completedTask == task)
                 {
@@ -83,8 +83,15 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
                 }
             }
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
+            // If it's OperationCanceledException of our cancellationToken we log like in case of cancelAttachmentProcessingCompletionSource
+            // there's a possible exception race task vs cancelAttachmentProcessingCompletionSource.Task
+            if (ex.CancellationToken == cancellationToken)
+            {
+                eventHandler?.HandleLogMessage(TestMessageLevel.Informational, "Attachments processing was cancelled.");
+            }
+
             EqtTrace.Warning("TestRunAttachmentsProcessingManager: Operation was cancelled.");
             return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(true, null), attachments, stopwatch, eventHandler);
         }

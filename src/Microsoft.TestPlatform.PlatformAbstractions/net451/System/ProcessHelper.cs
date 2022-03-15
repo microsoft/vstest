@@ -7,7 +7,6 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -18,12 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 public partial class ProcessHelper : IProcessHelper
 {
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern bool IsWow64Process2(IntPtr process, out ushort processMachine, out ushort nativeMachine);
-
-    private const ushort IMAGE_FILE_MACHINE_ARM64 = 0xAA64;
-    private const ushort IMAGE_FILE_MACHINE_UNKNOWN = 0;
-
     /// <inheritdoc/>
     public string GetCurrentProcessLocation()
         => Path.GetDirectoryName(GetCurrentProcessFileName());
@@ -46,14 +39,14 @@ public partial class ProcessHelper : IProcessHelper
         try
         {
             var currentProcess = Process.GetCurrentProcess();
-            if (!IsWow64Process2(currentProcess.Handle, out ushort processMachine, out ushort nativeMachine))
+            if (!NativeMethods.IsWow64Process2(currentProcess.Handle, out ushort processMachine, out ushort nativeMachine))
             {
                 throw new Win32Exception();
             }
 
             // If processMachine is IMAGE_FILE_MACHINE_UNKNOWN mean that we're not running using WOW64 x86 emulation.
             // If nativeMachine is IMAGE_FILE_MACHINE_ARM64 mean that we're running on ARM64 architecture device.
-            if (processMachine == IMAGE_FILE_MACHINE_UNKNOWN && nativeMachine == IMAGE_FILE_MACHINE_ARM64)
+            if (processMachine == NativeMethods.IMAGE_FILE_MACHINE_UNKNOWN && nativeMachine == NativeMethods.IMAGE_FILE_MACHINE_ARM64)
             {
                 // To distinguish between ARM64 and x64 emulated on ARM64 we check the PE header of the current running executable.
                 return IsArm64Executable(currentProcess.MainModule.FileName);
@@ -109,7 +102,7 @@ public partial class ProcessHelper : IProcessHelper
 
         // https://docs.microsoft.com/windows/win32/debug/pe-format#optional-header-image-only
         ushort magic = reader.ReadUInt16();
-        return magic is 0x010B or 0x020B && machine == IMAGE_FILE_MACHINE_ARM64;
+        return magic is 0x010B or 0x020B && machine == NativeMethods.IMAGE_FILE_MACHINE_ARM64;
     }
 }
 
