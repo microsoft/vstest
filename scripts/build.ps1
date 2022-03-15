@@ -657,13 +657,13 @@ function Publish-Tests
 function Publish-PackageInternal($packagename, $framework, $output)
 {
     $dotnetExe = Get-DotNetPath
-    Invoke-Exe $dotnetExe -Arguments "publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
+    Invoke-Exe $dotnetExe -Arguments "publish $packagename --no-restore --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
 }
 
 function Publish-PackageWithRuntimeInternal($packagename, $framework, $runtime, $selfcontained, $output)
 {
     $dotnetExe = Get-DotNetPath
-    Invoke-Exe $dotnetExe -Arguments "publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --runtime $runtime --self-contained $selfcontained --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
+    Invoke-Exe $dotnetExe -Arguments "publish $packagename --configuration $TPB_Configuration --framework $framework --runtime $runtime --self-contained $selfcontained --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
 }
 
 function Copy-Loc-Files($sourceDir, $destinationDir, $dllName)
