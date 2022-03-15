@@ -51,6 +51,20 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
     public bool DebugDataCollector { get; set; }
     public bool NoDefaultBreakpoints { get; set; } = true;
 
+    /// <summary>
+    /// Add run for in-process using the selected .NET Framework runners, and and all selected adapters.
+    /// </summary>
+    public bool WithInProcess { get; set; }
+
+    public bool WithEveryVersionOfRunner { get; set; } = true;
+
+    public bool WithEveryVersionOfHost { get; set; } = true;
+
+    public bool WithEveryVersionOfAdapter { get; set; } = true;
+
+    public bool WithOlderConfigurations { get; set; } = true;
+
+
     public string? BeforeFeature { get; set; }
     public string? AfterFeature { get; set; }
     public string? BeforeAdapterFeature { get; set; }
@@ -59,14 +73,21 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
     public override void CreateData(MethodInfo methodInfo)
     {
         var dataRows = new List<(RunnerInfo runnerInfo, VSTestConsoleInfo vstestConsoleInfo, TesthostInfo testhostInfo, MSTestInfo mstestInfo)>();
-        AddEveryVersionOfRunner(dataRows);
 
-        // with every version of host
-        AddEveryVersionOfHost(dataRows);
+        if (WithEveryVersionOfRunner)
+            AddEveryVersionOfRunner(dataRows);
 
-        AddEveryVersionOfAdapter(dataRows);
+        if (WithEveryVersionOfHost)
+            AddEveryVersionOfHost(dataRows);
 
-        AddOlderConfigurations(dataRows);
+        if (WithEveryVersionOfAdapter)
+            AddEveryVersionOfAdapter(dataRows);
+
+        if (WithOlderConfigurations)
+            AddOlderConfigurations(dataRows);
+
+        if (WithInProcess)
+            AddInProcess(dataRows);
 
         var c = dataRows.Count();
 
@@ -104,6 +125,28 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
         }
     }
 
+    private void AddInProcess(List<(RunnerInfo runnerInfo, VSTestConsoleInfo vstestConsoleInfo, TesthostInfo testhostInfo, MSTestInfo mstestInfo)> dataRows)
+    {
+        foreach (var runnerFramework in _runnerFrameworks)
+        {
+            if (!runnerFramework.StartsWith("net4"))
+            {
+                continue;
+            }
+
+            foreach (var runnerVersion in _runnerVersions)
+            {
+                foreach (var adapter in _adapters)
+                {
+                    foreach (var adapterVersion in _adapterVersions)
+                    {
+                        AddRow(dataRows, runnerVersion, runnerFramework, runnerVersion, runnerFramework, adapter, adapterVersion, inIsolation: false);
+                    }
+                }
+            }
+        }
+    }
+
     private void AddOlderConfigurations(List<(RunnerInfo, VSTestConsoleInfo, TesthostInfo, MSTestInfo)> dataRows)
     {
         // Older configurations where the runner, host and adapter version are the same.
@@ -119,7 +162,7 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
                     foreach (var adapter in _adapters)
                     {
                         var adapterVersion = runnerVersion;
-                        AddRow(dataRows, runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion);
+                        AddRow(dataRows, runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
                     }
                 }
             }
@@ -142,7 +185,7 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
                     // We already used the newest when adding combination with every runner
                     foreach (var adapterVersion in _adapterVersions.Skip(1))
                     {
-                        AddRow(dataRows, runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion);
+                        AddRow(dataRows, runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
                     }
                 }
             }
@@ -169,7 +212,7 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
                     {
                         // use the newest
                         var adapterVersion = _adapterVersions[0];
-                        AddRow(dataRows, runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion);
+                        AddRow(dataRows, runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
                     }
                 }
             }
@@ -192,7 +235,7 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
                     {
                         // use the newest
                         var adapterVersion = _adapterVersions[0];
-                        AddRow(dataRows, runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion);
+                        AddRow(dataRows, runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
                     }
                 }
             }
@@ -200,9 +243,9 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
     }
 
     private void AddRow(List<(RunnerInfo, VSTestConsoleInfo, TesthostInfo, MSTestInfo)> dataRows,
-        string runnerVersion, string runnerFramework, string hostVersion, string hostFramework, string adapter, string adapterVersion)
+        string runnerVersion, string runnerFramework, string hostVersion, string hostFramework, string adapter, string adapterVersion, bool inIsolation)
     {
-        RunnerInfo runnerInfo = GetRunnerInfo(runnerFramework, hostFramework, inIsolation: true);
+        RunnerInfo runnerInfo = GetRunnerInfo(runnerFramework, hostFramework, inIsolation);
         var vstestConsoleInfo = GetVSTestConsoleInfo(runnerVersion, runnerInfo);
         var testhostInfo = TesthostCompatibilityDataSource.GetTesthostInfo(hostVersion);
         var mstestInfo = GetMSTestInfo(adapterVersion);

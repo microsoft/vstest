@@ -17,7 +17,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class ExecutionTests : AcceptanceTestBase
 {
     // TODO: It looks like the first 3 tests would be useful to multiply by all 3 test frameworks, should we make the test even more generic, or duplicate them?
-
     [TestMethod]
     [MSTestCompatibilityDataSource(InProcess = true)]
     public void RunMultipleTestAssemblies(RunnerInfo runnerInfo, TesthostInfo testhostInfo, MSTestInfo msTestInfo)
@@ -33,15 +32,15 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestPlatformCompatibilityDataSource("netcoreapp2.1", "LegacyStable", "netcoreapp2.1", "Latest", "LatestPreview")]
+    //[TestPlatformCompatibilityDataSource("netcoreapp2.1", "LegacyStable", "netcoreapp2.1", "Latest", "LatestPreview")]
     // [TestPlatformCompatibilityDataSource("netcoreapp2.1", LATEST_TO_LEGACY, "netcoreapp2.1", LATEST_TO_LEGACY, LATESTPREVIEW_TO_LEGACY)]
-    //[TestPlatformCompatibilityDataSource()]
+    [TestPlatformCompatibilityDataSource( WithInProcess = true)]
 
     public void RunMultipleTestAssemblies223(RunnerInfo runnerInfo, VSTestConsoleInfo consoleInfo, TesthostInfo testhostInfo, MSTestInfo msTestInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo, consoleInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath(testhostInfo, msTestInfo, "SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath(testhostInfo, msTestInfo, "SimpleTestProject.dll", "MSTestProject2.dll").Trim('\"');
 
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 

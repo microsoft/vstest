@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 public sealed class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo, MSTestInfo>
 {
-    private static XmlDocument? _depsXml;
+    private static XmlDocument? s_depsXml;
     private readonly string[] _runnerFrameworks;
     private readonly string[] _targetFrameworks;
     private readonly string[] _msTestVersions;
@@ -98,8 +98,8 @@ public sealed class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo, M
 
     private static XmlDocument GetDependenciesXml()
     {
-        if (_depsXml != null)
-            return _depsXml;
+        if (s_depsXml != null)
+            return s_depsXml;
 
         var depsXmlPath = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "scripts", "build", "TestPlatform.Dependencies.props");
         var fileStream = File.OpenRead(depsXmlPath);
@@ -107,7 +107,7 @@ public sealed class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo, M
         var depsXml = new XmlDocument();
         depsXml.Load(xmlTextReader);
 
-        _depsXml = depsXml;
+        s_depsXml = depsXml;
         return depsXml;
     }
 }
