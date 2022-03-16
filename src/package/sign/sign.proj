@@ -95,6 +95,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestPlatform.Common.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)datacollector.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)datacollector.arm64.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)vstest.console.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)vstest.console.arm64.exe" />
 
