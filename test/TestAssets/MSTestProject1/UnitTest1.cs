@@ -3,7 +3,7 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace MSTestProject2;
+namespace MSTestProject1;
 
 [TestClass]
 public class UnitTest1

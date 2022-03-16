@@ -231,9 +231,10 @@ function Invoke-TestAssetsBuild {
         }
 
         
-        # Build with multiple versions of MSTest.
+        # Build with multiple versions of MSTest. The projects are directly in the root.
+        # The folder structure in VS is not echoed in the TestAssets directory.
         $projects = @(
-            "$env:TP_ROOT_DIR\test\TestAssets\SimpleTestProject\SimpleTestProject.csproj"
+            "$env:TP_ROOT_DIR\test\TestAssets\MSTestProject1\MSTestProject1.csproj"
             "$env:TP_ROOT_DIR\test\TestAssets\MSTestProject2\MSTestProject2.csproj"
             # Don't use this one, it does not use the variables for mstest and test sdk.
             # "$env:TP_ROOT_DIR\test\TestAssets\SimpleTestProject2\SimpleTestProject2.csproj"
@@ -275,7 +276,7 @@ function Invoke-TestAssetsBuild {
                 
                     $dirMSTestVersion = $mstestVersion -replace "\[|\]" 
                     $dirMSTestPropertyName = $propertyName -replace "Framework" -replace "Version"
-                    Invoke-Exe $dotnetExe -Arguments "build $project --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:MSTestFrameworkVersion=$mstestVersion -p:MSTestAdapterVersion=$mstestVersion -p:NETTestSdkVersion=$netTestSdkVersion -p:BaseOutputPath=""bin\$dirNetTestSdkPropertyName-$dirNetTestSdkVersion\$dirMSTestPropertyName-$dirMSTestVersion\\"" -bl:""$env:TP_OUT_DIR\log\$Configuration\perm.binlog"""
+                    Invoke-Exe $dotnetExe -Arguments "build $project --configuration $TPB_Configuration --no-restore -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:MSTestFrameworkVersion=$mstestVersion -p:MSTestAdapterVersion=$mstestVersion -p:NETTestSdkVersion=$netTestSdkVersion -p:BaseOutputPath=""bin\$dirNetTestSdkPropertyName-$dirNetTestSdkVersion\$dirMSTestPropertyName-$dirMSTestVersion\\"" -bl:""$env:TP_OUT_DIR\log\$Configuration\perm.binlog"""
                 }
             }
         }
@@ -1282,9 +1283,9 @@ if ($ProjectNamePatterns.Count -ne 0) {
 # Write-Log "Test platform build variables: "
 # Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 
-# if ($Force -or $Steps -contains "InstallDotnet") {
-#     Install-DotNetCli
-# }
+if ($Force -or $Steps -contains "InstallDotnet") {
+    Install-DotNetCli
+}
 
 # if ($Force -or $Steps -contains "Restore") {
 #     Clear-Package

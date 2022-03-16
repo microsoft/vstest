@@ -102,7 +102,17 @@ public class IntegrationTestBase
         var arguments = "";
         foreach (var path in testAssemblies)
         {
-            arguments += path.AddDoubleQuote() + " ";
+            // The incoming testAssembly path is either a single dll path in quotes or without quotes. 
+            // Or multiple assembly paths in a single string each double quoted and joined by space. 
+            // We trim, and add quotes here to get either:
+            // C:\1.dll -> "C:\1.dll"
+            // "C:\1.dll" -> "C:\1.dll"
+            // "C:\1.dll" "C:\2.dll" -> "C:\1.dll" "C:\2.dll"
+            // 
+            // For unquoted multi path string C:\1.dll C:\2.dll, we will get "C:\1.dll C:\2.dll"
+            // which is wrong and will fail later, but it's the test's fault for doing it wrong
+            // rather than providing an array of strings that this overload takes.
+            arguments += path.Trim('\"').AddDoubleQuote() + " ";
         }
 
         arguments = arguments.Trim();
@@ -270,19 +280,19 @@ public class IntegrationTestBase
     /// <summary>
     /// Validate if the overall test count and results are matching.
     /// </summary>
-    /// <param name="passedTestsCount">Passed test count</param>
-    /// <param name="failedTestsCount">Failed test count</param>
-    /// <param name="skippedTestsCount">Skipped test count</param>
-    public void ValidateSummaryStatus(int passedTestsCount, int failedTestsCount, int skippedTestsCount)
+    /// <param name="passed">Passed test count</param>
+    /// <param name="failed">Failed test count</param>
+    /// <param name="skipped">Skipped test count</param>
+    public void ValidateSummaryStatus(int passed, int failed, int skipped)
     {
         // TODO: Switch on the actual version of vstest console when we have that set on test environment.
         if (_testEnvironment.VSTestConsolePath.Contains($"{Path.DirectorySeparatorChar}15."))
         {
-            ValidateSummaryStatusv15(passedTestsCount, failedTestsCount, skippedTestsCount);
+            ValidateSummaryStatusv15(passed, failed, skipped);
             return;
         }
 
-        var totalTestCount = passedTestsCount + failedTestsCount + skippedTestsCount;
+        var totalTestCount = passed + failed + skipped;
         if (totalTestCount == 0)
         {
             // No test should be found/run
@@ -304,19 +314,19 @@ public class IntegrationTestBase
         else
         {
             var summaryStatus = string.Format(TotalTestsMessage, totalTestCount);
-            if (passedTestsCount != 0)
+            if (passed != 0)
             {
-                summaryStatus += string.Format(PassedTestsMessage, passedTestsCount);
+                summaryStatus += string.Format(PassedTestsMessage, passed);
             }
 
-            if (failedTestsCount != 0)
+            if (failed != 0)
             {
-                summaryStatus += string.Format(FailedTestsMessage, failedTestsCount);
+                summaryStatus += string.Format(FailedTestsMessage, failed);
             }
 
-            if (skippedTestsCount != 0)
+            if (skipped != 0)
             {
-                summaryStatus += string.Format(SkippedTestsMessage, skippedTestsCount);
+                summaryStatus += string.Format(SkippedTestsMessage, skipped);
             }
 
             Assert.IsTrue(
@@ -333,13 +343,13 @@ public class IntegrationTestBase
     /// <summary>
     /// Validate if the overall test count and results are matching.
     /// </summary>
-    /// <param name="passedTestsCount">Passed test count</param>
-    /// <param name="failedTestsCount">Failed test count</param>
-    /// <param name="skippedTestsCount">Skipped test count</param>
-    public void ValidateSummaryStatusv15(int passedTestsCount, int failedTestsCount, int skippedTestsCount)
+    /// <param name="passed">Passed test count</param>
+    /// <param name="failed">Failed test count</param>
+    /// <param name="skipped">Skipped test count</param>
+    public void ValidateSummaryStatusv15(int passed, int failed, int skipped)
     {
         // example: Total tests: 6. Passed: 2. Failed: 2. Skipped: 2.
-        var totalTestCount = passedTestsCount + failedTestsCount + skippedTestsCount;
+        var totalTestCount = passed + failed + skipped;
         if (totalTestCount == 0)
         {
             // No test should be found/run
@@ -355,19 +365,19 @@ public class IntegrationTestBase
         else
         {
             var summaryStatus = $"Total tests: {totalTestCount}.";
-            if (passedTestsCount != 0)
+            if (passed != 0)
             {
-                summaryStatus += $" Passed: {passedTestsCount}.";
+                summaryStatus += $" Passed: {passed}.";
             }
 
-            if (failedTestsCount != 0)
+            if (failed != 0)
             {
-                summaryStatus += $" Failed: {failedTestsCount}.";
+                summaryStatus += $" Failed: {failed}.";
             }
 
-            if (skippedTestsCount != 0)
+            if (skipped != 0)
             {
-                summaryStatus += $" Skipped: {skippedTestsCount}.";
+                summaryStatus += $" Skipped: {skipped}.";
             }
 
             Assert.IsTrue(
@@ -612,7 +622,7 @@ public class IntegrationTestBase
             Assert.Fail("Unknown Runner framework - [{0}]", _testEnvironment.RunnerFramework);
         }
 
-        Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
+        Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: \"{0}\"", consoleRunnerPath);
         return consoleRunnerPath;
     }
 
@@ -910,7 +920,7 @@ public class IntegrationTestBase
         {
             var path = GetAssetFullPath(assetNames[i]);
             var updatedPath = dllInfo.UpdatePath(path);
-            Assert.IsTrue(File.Exists(updatedPath), "GetTestAsset: Path not found: {0}. Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", updatedPath);
+            Assert.IsTrue(File.Exists(updatedPath), "GetTestAsset: Path not found: \"{0}\". Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", updatedPath);
 
             assetFullPaths[i] = updatedPath.AddDoubleQuote();
         }
@@ -925,7 +935,7 @@ public class IntegrationTestBase
         {
             var path = GetAssetFullPath(assetNames[i]);
             var updatedPath = testhostInfo.UpdatePath(adapterInfo.UpdatePath(path));
-            Assert.IsTrue(File.Exists(updatedPath), "GetTestAsset: Path not found: {0}. Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", updatedPath);
+            Assert.IsTrue(File.Exists(updatedPath), "GetTestAsset: Path not found: \"{0}\". Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", updatedPath);
 
             assetFullPaths[i] = updatedPath.AddDoubleQuote();
         }

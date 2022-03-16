@@ -537,7 +537,7 @@ public class RunsettingsTests : AcceptanceTestBase
         string runSettingsArgs, string additionalArgs, IEnumerable<string> testhostProcessNames, int expectedNumOfProcessCreated)
     {
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll");
 
         var runsettingsPath = string.Empty;
 

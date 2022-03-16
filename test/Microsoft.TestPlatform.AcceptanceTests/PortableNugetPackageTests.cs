@@ -43,7 +43,7 @@ public class PortableNugetPackageTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll");
 
         InvokeVsTestForExecution(assemblyPaths, GetTestAdapterPath(), FrameworkArgValue, string.Empty);
 

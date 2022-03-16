@@ -19,11 +19,11 @@ public class ExecutionTests : AcceptanceTestBase
     // TODO: It looks like the first 3 tests would be useful to multiply by all 3 test frameworks, should we make the test even more generic, or duplicate them?
     [TestMethod]
     [MSTestCompatibilityDataSource(InProcess = true)]
-    public void RunMultipleTestAssemblies(RunnerInfo runnerInfo, TesthostInfo testhostInfo, MSTestInfo msTestInfo)
+    public void RunMultipleTestAssemblies(RunnerInfo runnerInfo, MSTestInfo msTestInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath(msTestInfo, "SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath(msTestInfo, "SimpleTestProject.dll", "SimpleTestProject2.dll");
 
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 
@@ -32,19 +32,17 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    //[TestPlatformCompatibilityDataSource("netcoreapp2.1", "LegacyStable", "netcoreapp2.1", "Latest", "LatestPreview")]
-    // [TestPlatformCompatibilityDataSource("netcoreapp2.1", LATEST_TO_LEGACY, "netcoreapp2.1", LATEST_TO_LEGACY, LATESTPREVIEW_TO_LEGACY)]
-    [TestPlatformCompatibilityDataSource( WithInProcess = true)]
+    [TestPlatformCompatibilityDataSource(WithInProcess = true)]
 
-    public void RunMultipleTestAssemblies223(RunnerInfo runnerInfo, VSTestConsoleInfo consoleInfo, TesthostInfo testhostInfo, MSTestInfo msTestInfo)
+    public void RunTestsFromMultipleMSTestAssemblies(RunnerInfo runnerInfo, VSTestConsoleInfo consoleInfo, TesthostInfo testhostInfo, MSTestInfo msTestInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo, consoleInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath(testhostInfo, msTestInfo, "SimpleTestProject.dll", "MSTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath(testhostInfo, msTestInfo, "MSTestProject1.dll", "MSTestProject2.dll");
 
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 
-        ValidateSummaryStatus(2, 2, 2);
+        ValidateSummaryStatus(passed: 2, failed: 2, skipped: 2);
         ExitCodeEquals(1); // failing tests
     }
 
@@ -54,7 +52,7 @@ public class ExecutionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo, vsTestConsoleInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath(testhostInfo, "SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath(testhostInfo, "SimpleTestProject.dll", "SimpleTestProject2.dll");
 
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 
@@ -73,7 +71,7 @@ public class ExecutionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll");
         var xunitAssemblyPath = _testEnvironment.TargetFramework.Equals("net451") ?
             _testEnvironment.GetTestAsset("XUTestProject.dll", "net46") :
             _testEnvironment.GetTestAsset("XUTestProject.dll");
@@ -95,7 +93,7 @@ public class ExecutionTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
-        var assemblyPaths = BuildMultipleAssemblyPath(msTestInfo,"SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath(msTestInfo,"SimpleTestProject.dll", "SimpleTestProject2.dll");
         var arguments = PrepareArguments(assemblyPaths, testAdapterPath: null, runSettings: null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /Parallel");
         arguments = string.Concat(arguments, " /Platform:x86");
@@ -126,7 +124,7 @@ public class ExecutionTests : AcceptanceTestBase
         using var tempDir = new TempDirectory();
 
         var assemblyPaths =
-            BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
+            BuildMultipleAssemblyPath("SimpleTestProject3.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /TestCaseFilter:TestSessionTimeoutTest");
 
@@ -147,7 +145,7 @@ public class ExecutionTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SampleProjectWithOldTestHost.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SampleProjectWithOldTestHost.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
         InvokeVsTest(arguments);
@@ -164,7 +162,7 @@ public class ExecutionTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject3.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /tests:WorkingDirectoryTest");
 
@@ -192,7 +190,7 @@ public class ExecutionTests : AcceptanceTestBase
         var diagLogFilePath = Path.Combine(tempDir.Path, $"std_error_log_{Guid.NewGuid()}.txt");
         File.Delete(diagLogFilePath);
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject3.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
         arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
@@ -223,7 +221,7 @@ public class ExecutionTests : AcceptanceTestBase
         File.Delete(diagLogFilePath);
 
         var assemblyPaths =
-            BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
+            BuildMultipleAssemblyPath("SimpleTestProject3.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /testcasefilter:ExitwithUnhandleException");
         arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
@@ -245,7 +243,7 @@ public class ExecutionTests : AcceptanceTestBase
 
         var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X86 platform. SimpleTestProject3.dll is built for Framework .NETFramework,Version=v4.5.1 and Platform X64";
         var assemblyPaths =
-            BuildMultipleAssemblyPath("SimpleTestProject3.dll", "SimpleTestProjectx86.dll").Trim('\"');
+            BuildMultipleAssemblyPath("SimpleTestProject3.dll", "SimpleTestProjectx86.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /testcasefilter:PassingTestx86");
 
@@ -317,7 +315,7 @@ public class ExecutionTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll");
 
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
@@ -338,7 +336,7 @@ public class ExecutionTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
         // Setting /TestCaseFilter to the test name, which does not exists in the assembly, so we will have 0 tests executed
@@ -358,7 +356,7 @@ public class ExecutionTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll");
 
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
@@ -377,7 +375,7 @@ public class ExecutionTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
         arguments = string.Concat(arguments, " -- RunConfiguration.TreatNoTestsAsError=false");
