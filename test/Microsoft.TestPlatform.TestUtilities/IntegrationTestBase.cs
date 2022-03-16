@@ -222,26 +222,26 @@ public class IntegrationTestBase
     {
         var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
 
-        if (_testEnvironment.DebugVSTestConsole || _testEnvironment.DebugTesthost || _testEnvironment.DebugDataCollector)
+        if (_testEnvironment.DebugInfo.DebugVSTestConsole || _testEnvironment.DebugInfo.DebugTesthost || _testEnvironment.DebugInfo.DebugDataCollector)
         {
             environmentVariables ??= new Dictionary<string, string>();
 
-            if (_testEnvironment.DebugVSTestConsole)
+            if (_testEnvironment.DebugInfo.DebugVSTestConsole)
             {
                 environmentVariables.Add("VSTEST_RUNNER_DEBUG_ATTACHVS", "1");
             }
 
-            if (_testEnvironment.DebugTesthost)
+            if (_testEnvironment.DebugInfo.DebugTesthost)
             {
                 environmentVariables.Add("VSTEST_HOST_DEBUG_ATTACHVS", "1");
             }
 
-            if (_testEnvironment.DebugDataCollector)
+            if (_testEnvironment.DebugInfo.DebugDataCollector)
             {
                 environmentVariables.Add("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS", "1");
             }
 
-            if (_testEnvironment.NoDefaultBreakpoints)
+            if (_testEnvironment.DebugInfo.NoDefaultBreakpoints)
             {
                 environmentVariables.Add("VSTEST_DEBUG_NOBP", "1");
             }
@@ -286,7 +286,7 @@ public class IntegrationTestBase
     public void ValidateSummaryStatus(int passed, int failed, int skipped)
     {
         // TODO: Switch on the actual version of vstest console when we have that set on test environment.
-        if (_testEnvironment.VSTestConsolePath.Contains($"{Path.DirectorySeparatorChar}15."))
+        if (_testEnvironment.VSTestConsoleInfo != null && _testEnvironment.VSTestConsoleInfo.Path.Contains($"{Path.DirectorySeparatorChar}15."))
         {
             ValidateSummaryStatusv15(passed, failed, skipped);
             return;
@@ -603,9 +603,9 @@ public class IntegrationTestBase
 
         if (IsDesktopRunner())
         {
-            if (!string.IsNullOrWhiteSpace(_testEnvironment.VSTestConsolePath))
+            if (!string.IsNullOrWhiteSpace(_testEnvironment?.VSTestConsoleInfo.Path))
             {
-                consoleRunnerPath = _testEnvironment.VSTestConsolePath;
+                consoleRunnerPath = _testEnvironment.VSTestConsoleInfo.Path;
             }
             else
             {
@@ -672,27 +672,27 @@ public class IntegrationTestBase
         Console.WriteLine($"Console runner path: {consoleRunnerPath}");
 
         VsTestConsoleWrapper vstestConsoleWrapper;
-        if (_testEnvironment.DebugVSTestConsole || _testEnvironment.DebugTesthost || _testEnvironment.DebugDataCollector)
+        if (_testEnvironment.DebugInfo.DebugVSTestConsole || _testEnvironment.DebugInfo.DebugTesthost || _testEnvironment.DebugInfo.DebugDataCollector)
         {
             var environmentVariables = new Dictionary<string, string>();
             Environment.GetEnvironmentVariables().OfType<DictionaryEntry>().ToList().ForEach(e => environmentVariables.Add(e.Key.ToString(), e.Value.ToString()));
 
-            if (_testEnvironment.DebugVSTestConsole)
+            if (_testEnvironment.DebugInfo.DebugVSTestConsole)
             {
                 environmentVariables.Add("VSTEST_RUNNER_DEBUG_ATTACHVS", "1");
             }
 
-            if (_testEnvironment.DebugTesthost)
+            if (_testEnvironment.DebugInfo.DebugTesthost)
             {
                 environmentVariables.Add("VSTEST_HOST_DEBUG_ATTACHVS", "1");
             }
 
-            if (_testEnvironment.DebugDataCollector)
+            if (_testEnvironment.DebugInfo.DebugDataCollector)
             {
                 environmentVariables.Add("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS", "1");
             }
 
-            if (_testEnvironment.NoDefaultBreakpoints)
+            if (_testEnvironment.DebugInfo.NoDefaultBreakpoints)
             {
                 environmentVariables.Add("VSTEST_DEBUG_NOBP", "1");
             }
@@ -904,40 +904,21 @@ public class IntegrationTestBase
 
     protected string BuildMultipleAssemblyPath(params string[] assetNames)
     {
-        var assetFullPath = new string[assetNames.Length];
-        for (var i = 0; i < assetNames.Length; i++)
-        {
-            assetFullPath[i] = GetAssetFullPath(assetNames[i]).AddDoubleQuote();
-        }
-
-        return string.Join(" ", assetFullPath);
-    }
-
-    protected string BuildMultipleAssemblyPath(DllInfo dllInfo, params string[] assetNames)
-    {
         var assetFullPaths = new string[assetNames.Length];
         for (var i = 0; i < assetNames.Length; i++)
         {
             var path = GetAssetFullPath(assetNames[i]);
-            var updatedPath = dllInfo.UpdatePath(path);
-            Assert.IsTrue(File.Exists(updatedPath), "GetTestAsset: Path not found: \"{0}\". Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", updatedPath);
+            if (_testEnvironment.DllInfos.Count > 0)
+            {
+                foreach (var dllInfo in _testEnvironment.DllInfos)
+                {
+                    path = dllInfo.UpdatePath(path);
+                }
 
-            assetFullPaths[i] = updatedPath.AddDoubleQuote();
-        }
+                Assert.IsTrue(File.Exists(path), "GetTestAsset: Path not found: \"{0}\". Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", path);
+            }
 
-        return string.Join(" ", assetFullPaths);
-    }
-
-    protected string BuildMultipleAssemblyPath(TesthostInfo testhostInfo, DllInfo adapterInfo, params string[] assetNames)
-    {
-        var assetFullPaths = new string[assetNames.Length];
-        for (var i = 0; i < assetNames.Length; i++)
-        {
-            var path = GetAssetFullPath(assetNames[i]);
-            var updatedPath = testhostInfo.UpdatePath(adapterInfo.UpdatePath(path));
-            Assert.IsTrue(File.Exists(updatedPath), "GetTestAsset: Path not found: \"{0}\". Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", updatedPath);
-
-            assetFullPaths[i] = updatedPath.AddDoubleQuote();
+            assetFullPaths[i] = path.AddDoubleQuote();
         }
 
         return string.Join(" ", assetFullPaths);
@@ -979,5 +960,5 @@ public class IntegrationTestBase
         return path;
     }
 
-    protected string GetDotnetRunnerPath() => _testEnvironment.VSTestConsolePath ?? Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll");
+    protected string GetDotnetRunnerPath() => _testEnvironment?.VSTestConsoleInfo.Path ?? Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll");
 }

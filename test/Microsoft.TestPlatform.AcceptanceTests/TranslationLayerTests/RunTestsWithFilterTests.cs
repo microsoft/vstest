@@ -37,9 +37,9 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
 
     [TestMethod]
     [TranslationLayerCompatibilityDataSource]
-    public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
+    public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo, vsTestConsoleInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         // Setup();
 
         _runEventHandler = new RunEventHandler();

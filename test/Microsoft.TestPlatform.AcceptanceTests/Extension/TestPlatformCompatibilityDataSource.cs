@@ -15,7 +15,7 @@ using Semver;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerInfo, VSTestConsoleInfo, TesthostInfo, MSTestInfo>
+public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerInfo>
 {
     private static XmlDocument? s_depsXml;
     private readonly string[] _runnerFrameworks;
@@ -54,7 +54,7 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
     /// <summary>
     /// Add run for in-process using the selected .NET Framework runners, and and all selected adapters.
     /// </summary>
-    public bool WithInProcess { get; set; }
+    public bool WithInProcess { get; set; } = true;
 
     public bool WithEveryVersionOfRunner { get; set; } = true;
 
@@ -72,7 +72,7 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
 
     public override void CreateData(MethodInfo methodInfo)
     {
-        var dataRows = new List<(RunnerInfo runnerInfo, VSTestConsoleInfo vstestConsoleInfo, TesthostInfo testhostInfo, MSTestInfo mstestInfo)>();
+        var dataRows = new List<RunnerInfo>();
 
         if (WithEveryVersionOfRunner)
             AddEveryVersionOfRunner(dataRows);
@@ -121,11 +121,11 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
 
         foreach (var dataRow in dataRows)
         {
-            AddData(dataRow.runnerInfo, dataRow.vstestConsoleInfo, dataRow.testhostInfo, dataRow.mstestInfo);
+            AddData(dataRow);
         }
     }
 
-    private void AddInProcess(List<(RunnerInfo runnerInfo, VSTestConsoleInfo vstestConsoleInfo, TesthostInfo testhostInfo, MSTestInfo mstestInfo)> dataRows)
+    private void AddInProcess(List<RunnerInfo> dataRows)
     {
         foreach (var runnerFramework in _runnerFrameworks)
         {
@@ -147,7 +147,7 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
         }
     }
 
-    private void AddOlderConfigurations(List<(RunnerInfo, VSTestConsoleInfo, TesthostInfo, MSTestInfo)> dataRows)
+    private void AddOlderConfigurations(List<RunnerInfo> dataRows)
     {
         // Older configurations where the runner, host and adapter version are the same.
         // We already added the row where all are newest when adding combination with all runners.
@@ -169,7 +169,7 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
         }
     }
 
-    private void AddEveryVersionOfAdapter(List<(RunnerInfo, VSTestConsoleInfo, TesthostInfo, MSTestInfo)> dataRows)
+    private void AddEveryVersionOfAdapter(List<RunnerInfo> dataRows)
     {
         var runnerVersion = _runnerVersions[0];
         foreach (var runnerFramework in _runnerFrameworks)
@@ -192,7 +192,7 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
         }
     }
 
-    private void AddEveryVersionOfHost(List<(RunnerInfo, VSTestConsoleInfo, TesthostInfo, MSTestInfo)> dataRows)
+    private void AddEveryVersionOfHost(List<RunnerInfo> dataRows)
     {
         var runnerVersion = _runnerVersions[0];
 
@@ -219,7 +219,7 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
         }
     }
 
-    private void AddEveryVersionOfRunner(List<(RunnerInfo, VSTestConsoleInfo, TesthostInfo, MSTestInfo)> dataRows)
+    private void AddEveryVersionOfRunner(List<RunnerInfo> dataRows)
     {
         foreach (var runnerVersion in _runnerVersions)
         {
@@ -242,20 +242,38 @@ public sealed class TestPlatformCompatibilityDataSource : TestDataSource<RunnerI
         }
     }
 
-    private void AddRow(List<(RunnerInfo, VSTestConsoleInfo, TesthostInfo, MSTestInfo)> dataRows,
+    private void AddRow(List<RunnerInfo> dataRows,
         string runnerVersion, string runnerFramework, string hostVersion, string hostFramework, string adapter, string adapterVersion, bool inIsolation)
     {
         RunnerInfo runnerInfo = GetRunnerInfo(runnerFramework, hostFramework, inIsolation);
-        var vstestConsoleInfo = GetVSTestConsoleInfo(runnerVersion, runnerInfo);
-        var testhostInfo = TesthostCompatibilityDataSource.GetTesthostInfo(hostVersion);
-        var mstestInfo = GetMSTestInfo(adapterVersion);
-        dataRows.Add(new(runnerInfo, vstestConsoleInfo, testhostInfo, mstestInfo));
+        runnerInfo.DebugInfo = GetDebugInfo();
+        runnerInfo.VSTestConsoleInfo = GetVSTestConsoleInfo(runnerVersion, runnerInfo);
+
+        // The order in which we add them matters. We end up both modifying the same path
+        // and adding to it. So the first one added will be later in the path. E.g.:
+        // Adding testSdk first:
+        // C:\p\vstest\test\TestAssets\MSTestProject1\bin\MSTestLatestPreview-2.2.9-preview-20220210-07\NETTestSdkLatest-17.2.0-dev\Debug\net451\MSTestProject1.dll
+        // versus adding testSdk second:
+        // C:\p\vstest\test\TestAssets\MSTestProject1\bin\NETTestSdkLatest-17.2.0-dev\MSTestLatestPreview-2.2.9-preview-20220210-07\Debug\net451\MSTestProject1.dll
+        runnerInfo.DllInfos.Add(GetMSTestInfo(adapterVersion));
+        runnerInfo.DllInfos.Add(TesthostCompatibilityDataSource.GetNetTestSdkInfo(hostVersion));
+        dataRows.Add(runnerInfo);
+    }
+
+    private DebugInfo GetDebugInfo()
+    {
+        return new DebugInfo
+        {
+            DebugDataCollector = DebugDataCollector,
+            DebugTesthost = DebugTesthost,
+            DebugVSTestConsole = DebugVSTestConsole,
+            NoDefaultBreakpoints = NoDefaultBreakpoints
+        };
     }
 
     private RunnerInfo GetRunnerInfo(string runnerFramework, string hostFramework, bool inIsolation)
     {
-        return new RunnerInfo(runnerFramework, hostFramework, inIsolation ? AcceptanceTestBase.InIsolation : null,
-            DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints);
+        return new RunnerInfo(runnerFramework, hostFramework, inIsolation ? AcceptanceTestBase.InIsolation : null);
     }
 
     public string GetDisplayName(MethodInfo methodInfo, object[] data)

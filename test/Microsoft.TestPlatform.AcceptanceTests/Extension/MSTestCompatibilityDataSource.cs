@@ -13,7 +13,7 @@ using Microsoft.TestPlatform.TestUtilities;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-public sealed class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo, MSTestInfo>
+public sealed class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo>
 {
     private static XmlDocument? s_depsXml;
     private readonly string[] _runnerFrameworks;
@@ -53,11 +53,18 @@ public sealed class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo, M
         {
             foreach (var msTestVersion in _msTestVersions)
             {
-                var runnerInfo = new RunnerInfo(AcceptanceTestBase.DEFAULT_RUNNER_NETFX, AcceptanceTestBase.DEFAULT_RUNNER_NETFX, InIsolationValue: null,
-                    DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints);
-                var msTestInfo = GetMSTestInfo(msTestVersion);
                 // We run in the .NET Framework runner process, the runner and target framework must agree.
-                AddData(runnerInfo, msTestInfo);
+                var runnerInfo = new RunnerInfo(AcceptanceTestBase.DEFAULT_RUNNER_NETFX, AcceptanceTestBase.DEFAULT_RUNNER_NETFX, inIsolationValue: null);
+                runnerInfo.DebugInfo = new DebugInfo
+                {
+                    DebugVSTestConsole = DebugVSTestConsole,
+                    DebugTesthost = DebugTesthost,
+                    DebugDataCollector = DebugDataCollector,
+                    NoDefaultBreakpoints = NoDefaultBreakpoints,
+                };
+                runnerInfo.DllInfos.Add(GetMSTestInfo(msTestVersion));
+
+                AddData(runnerInfo);
             }
         }
 
@@ -67,11 +74,17 @@ public sealed class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo, M
             {
                 foreach (var msTestVersion in _msTestVersions)
                 {
-                    var runnerInfo = new RunnerInfo(runner, fmw, AcceptanceTestBase.InIsolation,
-                        DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints);
-                    var msTestInfo = GetMSTestInfo(msTestVersion);
+                    var runnerInfo = new RunnerInfo(runner, fmw, AcceptanceTestBase.InIsolation);
+                    runnerInfo.DebugInfo = new DebugInfo
+                    {
+                        DebugVSTestConsole = DebugVSTestConsole,
+                        DebugTesthost = DebugTesthost,
+                        DebugDataCollector = DebugDataCollector,
+                        NoDefaultBreakpoints = NoDefaultBreakpoints,
+                    };
+                    runnerInfo.DllInfos.Add(GetMSTestInfo(msTestVersion));
 
-                    AddData(runnerInfo, msTestInfo);
+                    AddData(runnerInfo);
                 }
             }
         }

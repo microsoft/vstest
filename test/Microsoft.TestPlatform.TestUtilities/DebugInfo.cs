@@ -6,10 +6,12 @@ using System;
 namespace Microsoft.TestPlatform.TestUtilities;
 
 [Serializable]
-public class MSTestInfo : DllInfo
+public class DebugInfo
 {
-    public MSTestInfo(string versionType, string? version, string path)
-        : base(name: "MSTest", propertyName: "MSTest", versionType, version, path)
-    {
-    }
+    public bool DebugVSTestConsole { get; set; }
+    public bool DebugTesthost { get; set; }
+    public bool DebugDataCollector { get; set; }
+    public bool NoDefaultBreakpoints { get; set; } = true;
 }
+
+

@@ -13,7 +13,7 @@ using Microsoft.TestPlatform.TestUtilities;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-public sealed class TesthostCompatibilityDataSource : TestDataSource<RunnerInfo, VSTestConsoleInfo, TesthostInfo>
+public sealed class TesthostCompatibilityDataSource : TestDataSource<RunnerInfo>
 {
     private static XmlDocument? s_depsXml;
     private readonly string[] _runnerFrameworks;
@@ -58,13 +58,18 @@ public sealed class TesthostCompatibilityDataSource : TestDataSource<RunnerInfo,
                 var testhostVersions = runner.StartsWith("net4") ? onlyLatest : _testhostVersions;
                 foreach (var testhostVersion in testhostVersions)
                 {
-                    var runnerInfo = new RunnerInfo(runner, fmw, AcceptanceTestBase.InIsolation,
-                        DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints);
+                    var runnerInfo = new RunnerInfo(runner, fmw, AcceptanceTestBase.InIsolation);
+                    runnerInfo.DebugInfo = new DebugInfo
+                    {
+                        DebugDataCollector = DebugDataCollector,
+                        DebugTesthost = DebugTesthost,
+                        DebugVSTestConsole = DebugVSTestConsole,
+                        NoDefaultBreakpoints = NoDefaultBreakpoints
+                    };
+                    runnerInfo.VSTestConsoleInfo = TranslationLayerCompatibilityDataSource.GetVSTestConsoleInfo(AcceptanceTestBase.LATEST, runnerInfo);
+                    runnerInfo.DllInfos.Add(GetNetTestSdkInfo(testhostVersion));
 
-                    var vstestConsoleInfo = TranslationLayerCompatibilityDataSource.GetVSTestConsoleInfo(AcceptanceTestBase.LATEST, runnerInfo);
-                    var testhostInfo = GetTesthostInfo(testhostVersion);
-
-                    AddData(runnerInfo, vstestConsoleInfo, testhostInfo);
+                    AddData(runnerInfo);
                 }
             }
         }
@@ -81,14 +86,18 @@ public sealed class TesthostCompatibilityDataSource : TestDataSource<RunnerInfo,
                 var consoleVersions = runner.StartsWith("net4") ? onlyLatest : _testhostVersions;
                 foreach (var consoleVersion in consoleVersions)
                 {
-                    var runnerInfo = new RunnerInfo(runner, fmw, AcceptanceTestBase.InIsolation,
-                        DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints);
+                    var runnerInfo = new RunnerInfo(runner, fmw, AcceptanceTestBase.InIsolation);
+                    runnerInfo.DebugInfo = new DebugInfo
+                    {
+                        DebugDataCollector = DebugDataCollector,
+                        DebugTesthost = DebugTesthost,
+                        DebugVSTestConsole = DebugVSTestConsole,
+                        NoDefaultBreakpoints = NoDefaultBreakpoints
+                    };
+                    runnerInfo.VSTestConsoleInfo = TranslationLayerCompatibilityDataSource.GetVSTestConsoleInfo(consoleVersion, runnerInfo);
+                    runnerInfo.DllInfos.Add(GetNetTestSdkInfo(AcceptanceTestBase.LATEST));
 
-                    var vstestConsoleInfo = TranslationLayerCompatibilityDataSource.GetVSTestConsoleInfo(consoleVersion, runnerInfo);
-                    // Generate only for latest testhsot, 
-                    var testhostInfo = GetTesthostInfo(AcceptanceTestBase.LATEST);
-
-                    AddData(runnerInfo, vstestConsoleInfo, testhostInfo);
+                    AddData(runnerInfo);
                 }
             }
         }
@@ -99,7 +108,7 @@ public sealed class TesthostCompatibilityDataSource : TestDataSource<RunnerInfo,
         return string.Format(CultureInfo.CurrentCulture, "{0} ({1})", methodInfo.Name, string.Join(",", data));
     }
 
-    internal static TesthostInfo GetTesthostInfo(string testhostVersionType)
+    internal static NetTestSdkInfo GetNetTestSdkInfo(string testhostVersionType)
     {
         var depsXml = GetDependenciesXml();
 
@@ -119,7 +128,7 @@ public sealed class TesthostCompatibilityDataSource : TestDataSource<RunnerInfo,
         var slash = Path.DirectorySeparatorChar;
         var versionSpecificBinPath = $"{slash}bin{slash}NETTestSdk{testhostVersionType}-{version}{slash}";
 
-        return new TesthostInfo(testhostVersionType, version, versionSpecificBinPath);
+        return new NetTestSdkInfo(testhostVersionType, version, versionSpecificBinPath);
     }
 
     private static XmlDocument GetDependenciesXml()

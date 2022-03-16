@@ -55,7 +55,14 @@ public class NetCoreTargetFrameworkDataSource : Attribute, ITestDataSource
 
     private void AddRunnerDataRow(List<object[]> dataRows, string runnerFramework, string targetFramework)
     {
-        var runnerInfo = new RunnerInfo(runnerFramework, targetFramework, InIsolationValue: null, DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints);
+        var runnerInfo = new RunnerInfo(runnerFramework, targetFramework, inIsolationValue: null);
+        runnerInfo.DebugInfo = new DebugInfo
+        {
+            DebugDataCollector = DebugDataCollector,
+            DebugTesthost = DebugTesthost,
+            DebugVSTestConsole = DebugVSTestConsole,
+            NoDefaultBreakpoints = NoDefaultBreakpoints,
+        };
         dataRows.Add(new object[] { runnerInfo });
     }
 

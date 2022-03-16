@@ -41,9 +41,9 @@ public class DiscoverTests : AcceptanceTestBase
 
     [TestMethod]
     [TranslationLayerCompatibilityDataSource]
-    public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
+    public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo, vsTestConsoleInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         // Setup();
         _discoveryEventHandler = new DiscoveryEventHandler();
@@ -58,9 +58,9 @@ public class DiscoverTests : AcceptanceTestBase
 
     [TestMethod]
     [TranslationLayerCompatibilityDataSource()]
-    public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
+    public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo, vsTestConsoleInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         // Setup();
 
         _discoveryEventHandler = new DiscoveryEventHandler();

@@ -19,11 +19,11 @@ public class ExecutionTests : AcceptanceTestBase
     // TODO: It looks like the first 3 tests would be useful to multiply by all 3 test frameworks, should we make the test even more generic, or duplicate them?
     [TestMethod]
     [MSTestCompatibilityDataSource(InProcess = true)]
-    public void RunMultipleTestAssemblies(RunnerInfo runnerInfo, MSTestInfo msTestInfo)
+    public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath(msTestInfo, "SimpleTestProject.dll", "SimpleTestProject2.dll");
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll");
 
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 
@@ -32,13 +32,13 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestPlatformCompatibilityDataSource(WithInProcess = true)]
+    [TestPlatformCompatibilityDataSource(WithInProcess = true, WithEveryVersionOfAdapter = false, WithEveryVersionOfHost = false, WithEveryVersionOfRunner = false, WithOlderConfigurations = false)]
 
-    public void RunTestsFromMultipleMSTestAssemblies(RunnerInfo runnerInfo, VSTestConsoleInfo consoleInfo, TesthostInfo testhostInfo, MSTestInfo msTestInfo)
+    public void RunTestsFromMultipleMSTestAssemblies(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo, consoleInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath(testhostInfo, msTestInfo, "MSTestProject1.dll", "MSTestProject2.dll");
+        var assemblyPaths = BuildMultipleAssemblyPath("MSTestProject1.dll", "MSTestProject2.dll");
 
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 
@@ -48,11 +48,11 @@ public class ExecutionTests : AcceptanceTestBase
 
     [TestMethod]
     [TesthostCompatibilityDataSource]
-    public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo, TesthostInfo testhostInfo)
+    public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo, vsTestConsoleInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath(testhostInfo, "SimpleTestProject.dll", "SimpleTestProject2.dll");
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll");
 
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 
@@ -93,7 +93,7 @@ public class ExecutionTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();
 
-        var assemblyPaths = BuildMultipleAssemblyPath(msTestInfo,"SimpleTestProject.dll", "SimpleTestProject2.dll");
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll");
         var arguments = PrepareArguments(assemblyPaths, testAdapterPath: null, runSettings: null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /Parallel");
         arguments = string.Concat(arguments, " /Platform:x86");

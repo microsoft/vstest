@@ -5,6 +5,7 @@ using System;
 
 namespace Microsoft.TestPlatform.TestUtilities;
 
+[Serializable]
 public abstract class DllInfo
 {
     protected DllInfo(string name, string propertyName, string versionType, string? version, string path)

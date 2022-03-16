@@ -47,7 +47,15 @@ public class NetCoreRunner : Attribute, ITestDataSource
         Func<string, bool> filter = tfm => isWindows || !tfm.StartsWith("net4");
         foreach (var fmw in _targetFrameworks.Split(';').Where(filter))
         {
-            dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, fmw, InIsolationValue: null, DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints) });
+            var runnerInfo = new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, fmw, inIsolationValue: null);
+            runnerInfo.DebugInfo = new DebugInfo
+            {
+                DebugVSTestConsole = DebugVSTestConsole,
+                DebugTesthost = DebugTesthost,
+                DebugDataCollector = DebugDataCollector,
+                NoDefaultBreakpoints = NoDefaultBreakpoints,
+            };
+            dataRows.Add(new object[] { runnerInfo });
         }
 
         return dataRows;

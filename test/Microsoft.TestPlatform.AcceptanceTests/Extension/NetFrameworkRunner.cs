@@ -49,7 +49,16 @@ public class NetFrameworkRunner : Attribute, ITestDataSource
 
         foreach (var fmw in _targetFrameworks.Split(';'))
         {
-            dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw, AcceptanceTestBase.InIsolation, DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints) });
+            var runnerInfo = new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw, AcceptanceTestBase.InIsolation);
+            runnerInfo.DebugInfo = new DebugInfo
+            {
+                DebugVSTestConsole = DebugVSTestConsole,
+                DebugTesthost = DebugTesthost,
+                DebugDataCollector = DebugDataCollector,
+                NoDefaultBreakpoints = NoDefaultBreakpoints,
+            };
+
+            dataRows.Add(new object[] { runnerInfo });
         }
 
         return dataRows;

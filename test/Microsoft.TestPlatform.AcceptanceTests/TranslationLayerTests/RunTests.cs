@@ -41,9 +41,9 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [TranslationLayerCompatibilityDataSource]
-    public void RunAllTests(RunnerInfo runnerInfo, VSTestConsoleInfo vsTestConsoleInfo)
+    public void RunAllTests(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo, vsTestConsoleInfo);
+        SetTestEnvironment(_testEnvironment, runnerInfo);
         
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();

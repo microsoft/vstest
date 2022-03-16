@@ -85,8 +85,14 @@ public sealed class TranslationLayerCompatibilityDataSource : TestDataSource<Run
             {
                 foreach (var vstestConsoleVersion in _vstestConsoleVersions)
                 {
-                    var runnerInfo = new RunnerInfo(runner, fmw, AcceptanceTestBase.InIsolation,
-                        DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints);
+                    var runnerInfo = new RunnerInfo(runner, fmw, AcceptanceTestBase.InIsolation);
+                    runnerInfo.DebugInfo = new DebugInfo
+                    {
+                        DebugVSTestConsole = DebugVSTestConsole,
+                        DebugTesthost = DebugTesthost,
+                        DebugDataCollector = DebugDataCollector,
+                        NoDefaultBreakpoints = NoDefaultBreakpoints,
+                    };
                     var vsTestConsoleInfo = GetVSTestConsoleInfo(vstestConsoleVersion, runnerInfo);
 
                     if (beforeVersion != null && vsTestConsoleInfo.Version > beforeVersion)
@@ -156,7 +162,18 @@ public sealed class TranslationLayerCompatibilityDataSource : TestDataSource<Run
     }
 }
 
-public readonly record struct Feature(string Version, string Issue);
+public class Feature
+{
+    public Feature (string version, string issue)
+    {
+        Version = version;
+        Issue = issue;
+    }
+
+    public string Version { get; }
+    public string Issue { get; }
+}
+
 
 public static class Features
 {
@@ -164,6 +181,6 @@ public static class Features
 
     public static Dictionary<string, Feature> Table { get; } = new Dictionary<string, Feature>
     {
-        [ATTACH_DEBUGGER] = new(Version: "v16.7.0-preview-20200519-01", Issue: "https://github.com/microsoft/vstest/pull/2325")
+        [ATTACH_DEBUGGER] = new(version: "v16.7.0-preview-20200519-01", issue: "https://github.com/microsoft/vstest/pull/2325")
     };
 }

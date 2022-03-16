@@ -53,19 +53,43 @@ public class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
         var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
         if (_useCoreRunner && isWindows)
         {
-            dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, InIsolationValue: null, DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints) });
+            var runnerInfo = new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, inIsolationValue: null);
+            runnerInfo.DebugInfo = new DebugInfo
+            {
+                DebugVSTestConsole = DebugVSTestConsole,
+                DebugTesthost = DebugTesthost,
+                DebugDataCollector = DebugDataCollector,
+                NoDefaultBreakpoints = NoDefaultBreakpoints,
+            };
+            dataRows.Add(new object[] { runnerInfo });
         }
 
         if (_useDesktopRunner && isWindows)
         {
             if (_inIsolation)
             {
-                dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.InIsolation, DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints) });
+                var runnerInfo = new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.InIsolation);
+                runnerInfo.DebugInfo = new DebugInfo
+                {
+                    DebugVSTestConsole = DebugVSTestConsole,
+                    DebugTesthost = DebugTesthost,
+                    DebugDataCollector = DebugDataCollector,
+                    NoDefaultBreakpoints = NoDefaultBreakpoints,
+                };
+                dataRows.Add(new object[] { runnerInfo });
             }
 
             if (_inProcess)
             {
-                dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, InIsolationValue: null, DebugVSTestConsole, DebugTesthost, DebugDataCollector, NoDefaultBreakpoints) });
+                var runnerInfo = new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, inIsolationValue: null);
+                runnerInfo.DebugInfo = new DebugInfo
+                {
+                    DebugVSTestConsole = DebugVSTestConsole,
+                    DebugTesthost = DebugTesthost,
+                    DebugDataCollector = DebugDataCollector,
+                    NoDefaultBreakpoints = NoDefaultBreakpoints,
+                };
+                dataRows.Add(new object[] { runnerInfo });
             }
         }
 
