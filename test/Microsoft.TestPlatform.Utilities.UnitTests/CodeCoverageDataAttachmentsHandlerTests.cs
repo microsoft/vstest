@@ -19,21 +19,19 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Utilities.UnitTests;
 
 [TestClass]
 public class CodeCoverageDataAttachmentsHandlerTests
 {
     private readonly Mock<IProgress<int>> _mockProgressReporter;
-    private readonly XmlElement _configurationElement;
+    private readonly XmlElement? _configurationElement;
     private readonly CodeCoverageDataAttachmentsHandler _coverageDataAttachmentsHandler;
     private readonly string _filePrefix;
 
-    public TestContext TestContext { get; set; }
+    public TestContext? TestContext { get; set; }
 
-    internal string TestFilesDirectory => Path.Combine(TestContext.DeploymentDirectory, "TestFiles");
+    internal string TestFilesDirectory => Path.Combine(TestContext!.DeploymentDirectory, "TestFiles");
 
     public CodeCoverageDataAttachmentsHandlerTests()
     {

@@ -5,8 +5,6 @@ using System.IO;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.TestUtilities;
 
 public static class FileAssert

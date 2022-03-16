@@ -12,8 +12,6 @@ using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 
 [TestClass]
@@ -21,7 +19,7 @@ public class TelemetryPerfTestbase
 {
     private const string TelemetryInstrumentationKey = "76b373ba-8a55-45dd-b6db-7f1a83288691";
     private readonly TelemetryClient _client;
-    private readonly DirectoryInfo _currentDirectory = new DirectoryInfo(typeof(DiscoveryPerfTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent;
+    private readonly DirectoryInfo _currentDirectory = new DirectoryInfo(typeof(DiscoveryPerfTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent!;
 
     public TelemetryPerfTestbase()
     {
@@ -34,21 +32,24 @@ public class TelemetryPerfTestbase
     /// </summary>
     /// <param name="perfScenario"></param>
     /// <param name="handlerMetrics"></param>
-    public void PostTelemetry(string perfScenario, IDictionary<string, object> handlerMetrics)
+    public void PostTelemetry(string perfScenario, IDictionary<string, object>? handlerMetrics)
     {
-        var properties = new Dictionary<string, string>();
+        var properties = new Dictionary<string, string?>();
         var metrics = new Dictionary<string, double>();
 
-        foreach (var entry in handlerMetrics)
+        if (handlerMetrics is not null)
         {
-            var stringValue = entry.Value.ToString();
-            if (double.TryParse(stringValue, out var doubleValue))
+            foreach (var entry in handlerMetrics)
             {
-                metrics.Add(entry.Key, doubleValue);
-            }
-            else
-            {
-                properties.Add(entry.Key, stringValue);
+                var stringValue = entry.Value.ToString();
+                if (double.TryParse(stringValue, out var doubleValue))
+                {
+                    metrics.Add(entry.Key, doubleValue);
+                }
+                else
+                {
+                    properties.Add(entry.Key, stringValue);
+                }
             }
         }
         _client.TrackEvent(perfScenario, properties, metrics);
@@ -93,7 +94,7 @@ public class TelemetryPerfTestbase
     private string GetConsoleRunnerPath()
     {
         // Find the root
-        var root = _currentDirectory.Parent.Parent.Parent;
+        var root = _currentDirectory.Parent!.Parent!.Parent!;
         // Path to artifacts vstest.console
         return Path.Combine(root.FullName, BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
     }

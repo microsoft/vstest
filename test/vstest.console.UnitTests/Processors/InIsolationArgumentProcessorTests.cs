@@ -9,18 +9,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using vstest.console.UnitTests.Processors;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 [TestClass]
 public class InIsolationArgumentProcessorTests
 {
-    private InIsolationArgumentExecutor _executor;
-    private TestableRunSettingsProvider _runSettingsProvider;
+    private readonly InIsolationArgumentExecutor _executor;
+    private readonly TestableRunSettingsProvider _runSettingsProvider;
 
-    [TestInitialize]
-    public void Init()
+    public InIsolationArgumentProcessorTests()
     {
         _runSettingsProvider = new TestableRunSettingsProvider();
         _executor = new InIsolationArgumentExecutor(CommandLineOptions.Instance, _runSettingsProvider);

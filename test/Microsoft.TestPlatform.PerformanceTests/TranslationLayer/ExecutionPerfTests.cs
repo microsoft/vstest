@@ -7,15 +7,13 @@ using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 
 [TestClass]
 public class ExecutionPerfTests : TelemetryPerfTestbase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private RunEventHandler _runEventHandler;
+    private readonly IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private readonly RunEventHandler _runEventHandler;
 
     public ExecutionPerfTests()
     {

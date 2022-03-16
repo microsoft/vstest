@@ -4,8 +4,6 @@
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace vstest.console.UnitTests.Publisher;
 
 [TestClass]

@@ -7,8 +7,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 
 /// <inheritdoc />
@@ -22,7 +20,7 @@ public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
     /// <summary>
     /// Gets the metrics.
     /// </summary>
-    public IDictionary<string, object> Metrics { get; private set; }
+    public IDictionary<string, object>? Metrics { get; private set; }
 
     public DiscoveryEventHandler2()
     {

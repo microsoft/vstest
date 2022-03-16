@@ -5,8 +5,6 @@ using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility;
 
 [TestClass]

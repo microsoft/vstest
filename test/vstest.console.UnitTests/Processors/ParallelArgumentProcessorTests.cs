@@ -7,18 +7,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using vstest.console.UnitTests.Processors;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 [TestClass]
 public class ParallelArgumentProcessorTests
 {
-    private ParallelArgumentExecutor _executor;
-    private TestableRunSettingsProvider _runSettingsProvider;
+    private readonly ParallelArgumentExecutor _executor;
+    private readonly TestableRunSettingsProvider _runSettingsProvider;
 
-    [TestInitialize]
-    public void Init()
+    public ParallelArgumentProcessorTests()
     {
         _runSettingsProvider = new TestableRunSettingsProvider();
         _executor = new ParallelArgumentExecutor(CommandLineOptions.Instance, _runSettingsProvider);

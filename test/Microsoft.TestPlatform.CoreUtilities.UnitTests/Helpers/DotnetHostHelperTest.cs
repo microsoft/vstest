@@ -15,12 +15,10 @@ using Microsoft.Win32;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers;
 
 [TestClass]
-public class DotnetHostHelperTest : IDisposable
+public sealed class DotnetHostHelperTest : IDisposable
 {
     private readonly Mock<IFileHelper> _fileHelper = new();
     private readonly Mock<IProcessHelper> _processHelper = new();
@@ -71,13 +69,11 @@ public class DotnetHostHelperTest : IDisposable
         // Arrange
         string dotnetRootX64 = _muxerHelper.RenameMuxerAndReturnPath(platformSystem, PlatformArchitecture.X64);
         string dotnetRootArm64 = _muxerHelper.RenameMuxerAndReturnPath(platformSystem, PlatformArchitecture.ARM64);
-        string dotnetRootX86 = null;
-        if (platformSystem == PlatformOperatingSystem.Windows)
-        {
-            dotnetRootX86 = _muxerHelper.RenameMuxerAndReturnPath(platformSystem, PlatformArchitecture.X86);
-        }
+        string? dotnetRootX86 = platformSystem == PlatformOperatingSystem.Windows
+            ? _muxerHelper.RenameMuxerAndReturnPath(platformSystem, PlatformArchitecture.X86)
+            : null;
         string dotnetRoot = _muxerHelper.RenameMuxerAndReturnPath(platformSystem, targetArchitecture);
-        Dictionary<string, string> envVars = new()
+        Dictionary<string, string?> envVars = new()
         {
             { "DOTNET_ROOT_X64", dotnetRootX64 },
             { "DOTNET_ROOT_ARM64", dotnetRootArm64 },
@@ -87,13 +83,13 @@ public class DotnetHostHelperTest : IDisposable
 
         _environmentHelper.SetupGet(x => x.Architecture).Returns(platformArchitecture);
         _environmentHelper.SetupGet(x => x.OperatingSystem).Returns(platformSystem);
-        _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable(envVar)).Returns(Path.GetDirectoryName(envVars[envVar]));
+        _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable(envVar)).Returns(Path.GetDirectoryName(envVars[envVar])!);
         _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable("ProgramFiles")).Returns("notfound");
         _fileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(envVars[envVar]))).Returns(true);
         _fileHelper.Setup(x => x.Exists(envVars[envVar])).Returns(true);
         if (found)
         {
-            _fileHelper.Setup(x => x.GetStream(envVars[envVar], FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(envVars[envVar]));
+            _fileHelper.Setup(x => x.GetStream(envVars[envVar], FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(envVars[envVar]!));
         }
 
         // Act & Assert
@@ -122,8 +118,8 @@ public class DotnetHostHelperTest : IDisposable
 
         _environmentHelper.SetupGet(x => x.Architecture).Returns(platformArchitecture);
         _environmentHelper.SetupGet(x => x.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
-        _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable(notExists)).Returns(Path.GetDirectoryName(envVars[notExists]));
-        _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable(nextEnv)).Returns(Path.GetDirectoryName(envVars[nextEnv]));
+        _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable(notExists)).Returns(Path.GetDirectoryName(envVars[notExists])!);
+        _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable(nextEnv)).Returns(Path.GetDirectoryName(envVars[nextEnv])!);
         _fileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(envVars[nextEnv]))).Returns(true);
         _fileHelper.Setup(x => x.Exists(envVars[nextEnv])).Returns(true);
         _fileHelper.Setup(x => x.GetStream(envVars[nextEnv], FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(envVars[nextEnv]));
@@ -146,7 +142,7 @@ public class DotnetHostHelperTest : IDisposable
         Mock<IRegistryKey> nativeArchSubKey = new();
         installedVersionKey.Setup(x => x.OpenSubKey(It.IsAny<string>())).Returns(architectureSubKey.Object);
         architectureSubKey.Setup(x => x.OpenSubKey(It.IsAny<string>())).Returns(nativeArchSubKey.Object);
-        nativeArchSubKey.Setup(x => x.GetValue(It.IsAny<string>())).Returns(Path.GetDirectoryName(dotnetMuxer));
+        nativeArchSubKey.Setup(x => x.GetValue(It.IsAny<string>())).Returns(Path.GetDirectoryName(dotnetMuxer)!);
         _windowsRegistrytHelper.Setup(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)).Returns(installedVersionKey.Object);
         _fileHelper.Setup(x => x.Exists(dotnetMuxer)).Returns(true);
         _fileHelper.Setup(x => x.GetStream(dotnetMuxer, FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(dotnetMuxer));
@@ -168,13 +164,17 @@ public class DotnetHostHelperTest : IDisposable
         Mock<IRegistryKey> installedVersionKey = new();
         Mock<IRegistryKey> architectureSubKey = new();
         Mock<IRegistryKey> nativeArchSubKey = new();
-        installedVersionKey.Setup(x => x.OpenSubKey(It.IsAny<string>())).Returns(nullArchitecture ? null : architectureSubKey.Object);
-        architectureSubKey.Setup(x => x.OpenSubKey(It.IsAny<string>())).Returns(nullNative ? null : nativeArchSubKey.Object);
-        nativeArchSubKey.Setup(x => x.GetValue(It.IsAny<string>())).Returns(nullInstallLocation ? null : "");
-        _windowsRegistrytHelper.Setup(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)).Returns(nullInstalledVersion ? null : installedVersionKey.Object);
+        installedVersionKey.Setup(x => x.OpenSubKey(It.IsAny<string>()))
+            .Returns(nullArchitecture ? null! : architectureSubKey.Object);
+        architectureSubKey.Setup(x => x.OpenSubKey(It.IsAny<string>()))
+            .Returns(nullNative ? null! : nativeArchSubKey.Object);
+        nativeArchSubKey.Setup(x => x.GetValue(It.IsAny<string>()))
+            .Returns(nullInstallLocation ? null! : "");
+        _windowsRegistrytHelper.Setup(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+            .Returns(nullInstalledVersion ? null! : installedVersionKey.Object);
         _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable("ProgramFiles")).Returns("notfound");
 
-        //Act & Assert
+        // Act & Assert
         var dotnetHostHelper = new DotnetHostHelper(_fileHelper.Object, _environmentHelper.Object, _windowsRegistrytHelper.Object, _environmentVariableHelper.Object, _processHelper.Object);
         Assert.IsFalse(dotnetHostHelper.TryGetDotnetPathByArchitecture(PlatformArchitecture.X64, out string muxerPath));
     }
@@ -198,7 +198,7 @@ public class DotnetHostHelperTest : IDisposable
         _environmentHelper.SetupGet(x => x.OperatingSystem).Returns(os);
         _fileHelper.Setup(x => x.Exists(installLocation)).Returns(true);
         _fileHelper.Setup(x => x.Exists(dotnetMuxer)).Returns(true);
-        _fileHelper.Setup(x => x.GetStream(installLocation, FileMode.Open, FileAccess.Read)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(Path.GetDirectoryName(dotnetMuxer))));
+        _fileHelper.Setup(x => x.GetStream(installLocation, FileMode.Open, FileAccess.Read)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(Path.GetDirectoryName(dotnetMuxer)!)));
         if (found)
         {
             _fileHelper.Setup(x => x.GetStream(dotnetMuxer, FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(dotnetMuxer));
@@ -226,7 +226,7 @@ public class DotnetHostHelperTest : IDisposable
         if (found)
         {
             _fileHelper.Setup(x => x.Exists(dotnetMuxer)).Returns(true);
-            _fileHelper.Setup(x => x.GetStream(dotnetMuxer, FileMode.Open, FileAccess.Read)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(Path.GetDirectoryName(dotnetMuxer))));
+            _fileHelper.Setup(x => x.GetStream(dotnetMuxer, FileMode.Open, FileAccess.Read)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(Path.GetDirectoryName(dotnetMuxer)!)));
             _fileHelper.Setup(x => x.GetStream(dotnetMuxer, FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(dotnetMuxer));
         }
 
@@ -254,7 +254,7 @@ public class DotnetHostHelperTest : IDisposable
         _environmentHelper.Setup(x => x.Architecture).Returns(platformArchitecture);
         string expectedMuxerPath = Path.Combine(expectedFolder, "dotnet");
         _fileHelper.Setup(x => x.Exists(expectedMuxerPath)).Returns(true);
-        _fileHelper.Setup(x => x.GetStream(expectedMuxerPath, FileMode.Open, FileAccess.Read)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(Path.GetDirectoryName(dotnetMuxer))));
+        _fileHelper.Setup(x => x.GetStream(expectedMuxerPath, FileMode.Open, FileAccess.Read)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(Path.GetDirectoryName(dotnetMuxer)!)));
         if (found)
         {
             _fileHelper.Setup(x => x.GetStream(expectedMuxerPath, FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(dotnetMuxer));
@@ -268,8 +268,7 @@ public class DotnetHostHelperTest : IDisposable
 
     public void Dispose() => _muxerHelper.Dispose();
 
-
-    class MockMuxerHelper : IDisposable
+    private class MockMuxerHelper : IDisposable
     {
         private static readonly string DotnetMuxerWinX86 = "TestAssets/dotnetWinX86.exe";
         private static readonly string DotnetMuxerWinX64 = "TestAssets/dotnetWinX64.exe";
@@ -296,7 +295,7 @@ public class DotnetHostHelperTest : IDisposable
                 case PlatformOperatingSystem.Windows:
                     {
                         muxerPath = Path.Combine(tmpDirectory, Guid.NewGuid().ToString("N"), subfolder, "dotnet.exe");
-                        Directory.CreateDirectory(Path.GetDirectoryName(muxerPath));
+                        Directory.CreateDirectory(Path.GetDirectoryName(muxerPath)!);
                         if (architecture == PlatformArchitecture.ARM64)
                         {
                             File.Copy(DotnetMuxerWinArm64, muxerPath);
@@ -318,7 +317,7 @@ public class DotnetHostHelperTest : IDisposable
                 case PlatformOperatingSystem.OSX:
                     {
                         muxerPath = Path.Combine(tmpDirectory, Guid.NewGuid().ToString("N"), subfolder, "dotnet");
-                        Directory.CreateDirectory(Path.GetDirectoryName(muxerPath));
+                        Directory.CreateDirectory(Path.GetDirectoryName(muxerPath)!);
                         if (architecture == PlatformArchitecture.ARM64)
                         {
                             File.Copy(DotnetMuxerMacArm64, muxerPath);
@@ -335,7 +334,7 @@ public class DotnetHostHelperTest : IDisposable
                 case PlatformOperatingSystem.Unix:
                     {
                         muxerPath = Path.Combine(tmpDirectory, Guid.NewGuid().ToString("N"), subfolder, "dotnet");
-                        Directory.CreateDirectory(Path.GetDirectoryName(muxerPath));
+                        Directory.CreateDirectory(Path.GetDirectoryName(muxerPath)!);
                         File.WriteAllText(muxerPath, "not supported");
                         break;
                     }
@@ -351,7 +350,7 @@ public class DotnetHostHelperTest : IDisposable
         {
             foreach (var muxer in _muxers)
             {
-                Directory.Delete(Path.GetDirectoryName(muxer), true);
+                Directory.Delete(Path.GetDirectoryName(muxer)!, true);
             }
         }
     }

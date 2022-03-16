@@ -27,27 +27,19 @@ using Moq;
 
 using Newtonsoft.Json.Linq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode;
 
 [TestClass]
 public class DesignModeClientTests
 {
     private const int Timeout = 15 * 1000;
-
     private const int PortNumber = 123;
 
     private readonly Mock<ITestRequestManager> _mockTestRequestManager;
-
     private readonly Mock<ICommunicationManager> _mockCommunicationManager;
-
     private readonly DesignModeClient _designModeClient;
-
     private readonly int _protocolVersion = 6;
-
     private readonly AutoResetEvent _completeEvent;
-
     private readonly Mock<IEnvironment> _mockPlatformEnvrironment;
 
     public DesignModeClientTests()
@@ -177,7 +169,7 @@ public class DesignModeClientTests
         };
 
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
-        TestRunRequestPayload receivedTestRunPayload = null;
+        TestRunRequestPayload? receivedTestRunPayload = null;
         var allTasksComplete = new ManualResetEvent(false);
 
         // Setup mocks.
@@ -240,7 +232,7 @@ public class DesignModeClientTests
         };
 
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
-        TestRunRequestPayload receivedTestRunPayload = null;
+        TestRunRequestPayload? receivedTestRunPayload = null;
         var allTasksComplete = new ManualResetEvent(false);
 
         // Setup mocks.
@@ -653,12 +645,12 @@ public class DesignModeClientTests
         {
         }
 
-        public void InvokeCustomHostLaunchAckCallback(int processId, string errorMessage)
+        public void InvokeCustomHostLaunchAckCallback(int processId, string? errorMessage)
         {
             var payload = new CustomHostLaunchAckPayload()
             {
                 HostProcessId = processId,
-                ErrorMessage = errorMessage
+                ErrorMessage = errorMessage,
             };
             onCustomTestHostLaunchAckReceived?.Invoke(
                 new Message() { MessageType = MessageType.CustomTestHostLaunchCallback, Payload = JToken.FromObject(payload) });

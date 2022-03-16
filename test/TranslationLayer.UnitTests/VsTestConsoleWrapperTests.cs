@@ -18,33 +18,24 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
 
 [TestClass]
 public class VsTestConsoleWrapperTests
 {
-    private IVsTestConsoleWrapper _consoleWrapper;
-
-    private Mock<IProcessManager> _mockProcessManager;
-
-    private Mock<IProcessHelper> _mockProcessHelper;
-
-    private Mock<ITranslationLayerRequestSender> _mockRequestSender;
-
+    private readonly IVsTestConsoleWrapper _consoleWrapper;
+    private readonly Mock<IProcessManager> _mockProcessManager;
+    private readonly Mock<IProcessHelper> _mockProcessHelper;
+    private readonly Mock<ITranslationLayerRequestSender> _mockRequestSender;
     private readonly List<string> _testSources = new() { "Hello", "World" };
-
     private readonly List<TestCase> _testCases = new()
     {
         new TestCase("a.b.c", new Uri("d://uri"), "a.dll"),
         new TestCase("d.e.f", new Uri("g://uri"), "d.dll")
     };
+    private readonly ConsoleParameters _consoleParameters;
 
-    private ConsoleParameters _consoleParameters;
-
-    [TestInitialize]
-    public void TestInitialize()
+    public VsTestConsoleWrapperTests()
     {
         _consoleParameters = new ConsoleParameters();
 

@@ -21,13 +21,12 @@ using Moq;
 
 using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Constants;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
 
 [TestClass]
 public class InProcDataCollectionExtensionManagerTests
 {
+    private static readonly string Temp = Path.GetTempPath();
     private readonly string _settingsXml = @"<RunSettings>
                                     <InProcDataCollectionRunSettings>
                                         <InProcDataCollectors>
@@ -39,15 +38,14 @@ public class InProcDataCollectionExtensionManagerTests
                                         </InProcDataCollectors>
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
-    private Mock<ITestEventsPublisher> _mockTestEventsPublisher;
-    private TestableInProcDataCollectionExtensionManager _inProcDataCollectionManager;
-    private static readonly string Temp = Path.GetTempPath();
+    private readonly Mock<ITestEventsPublisher> _mockTestEventsPublisher;
     private readonly string _defaultCodebase = Path.Combine(Temp, "repos", "MSTest", "src", "managed", "TestPlatform", "TestImpactListener.Tests", "bin", "Debug");
-    private Mock<IFileHelper> _mockFileHelper;
-    private TestPluginCache _testPluginCache;
+    private readonly Mock<IFileHelper> _mockFileHelper;
+    private readonly TestPluginCache _testPluginCache;
 
-    [TestInitialize]
-    public void TestInit()
+    private TestableInProcDataCollectionExtensionManager _inProcDataCollectionManager;
+
+    public InProcDataCollectionExtensionManagerTests()
     {
         _mockTestEventsPublisher = new Mock<ITestEventsPublisher>();
         _mockFileHelper = new Mock<IFileHelper>();
@@ -58,7 +56,7 @@ public class InProcDataCollectionExtensionManagerTests
     [TestMethod]
     public void InProcDataCollectionExtensionManagerShouldLoadsDataCollectorsFromRunSettings()
     {
-        var dataCollector = _inProcDataCollectionManager.InProcDataCollectors.First().Value as MockDataCollector;
+        var dataCollector = (MockDataCollector)_inProcDataCollectionManager.InProcDataCollectors.First().Value;
 
         Assert.IsTrue(_inProcDataCollectionManager.IsInProcDataCollectionEnabled, "InProcDataCollection must be enabled if runsettings contains inproc datacollectors.");
         Assert.AreEqual(1, _inProcDataCollectionManager.InProcDataCollectors.Count, "One Datacollector must be registered");
@@ -86,7 +84,7 @@ public class InProcDataCollectionExtensionManagerTests
         _mockFileHelper.Setup(fh => fh.Exists(Path.Combine(Temp, "repos", "MSTest", "src", "managed", "TestPlatform", "TestImpactListener.Tests", "bin", "Debug", "TestImpactListener.Tests.dll"))).Returns(true);
         _inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, _mockTestEventsPublisher.Object, _defaultCodebase, _testPluginCache, _mockFileHelper.Object);
 
-        var codebase = (_inProcDataCollectionManager.InProcDataCollectors.Values.First() as MockDataCollector).CodeBase;
+        var codebase = ((MockDataCollector)_inProcDataCollectionManager.InProcDataCollectors.Values.First()).CodeBase;
         Assert.AreEqual(Path.Combine(Temp, "repos", "MSTest", "src", "managed", "TestPlatform", "TestImpactListener.Tests", "bin", "Debug", "TestImpactListener.Tests.dll"), codebase);
     }
 
@@ -110,7 +108,7 @@ public class InProcDataCollectionExtensionManagerTests
 
         _inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, _mockTestEventsPublisher.Object, _defaultCodebase, _testPluginCache, _mockFileHelper.Object);
 
-        var codebase = (_inProcDataCollectionManager.InProcDataCollectors.Values.First() as MockDataCollector).CodeBase;
+        var codebase = ((MockDataCollector)_inProcDataCollectionManager.InProcDataCollectors.Values.First()).CodeBase;
         Assert.AreEqual(Path.Combine(Temp, "source", ".nuget", "TestImpactListenerDataCollector.dll"), codebase);
     }
 
@@ -130,7 +128,7 @@ public class InProcDataCollectionExtensionManagerTests
                                 </RunSettings>";
         _inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, _mockTestEventsPublisher.Object, _defaultCodebase, _testPluginCache, _mockFileHelper.Object);
 
-        var codebase = (_inProcDataCollectionManager.InProcDataCollectors.Values.First() as MockDataCollector).CodeBase;
+        var codebase = ((MockDataCollector)_inProcDataCollectionManager.InProcDataCollectors.Values.First()).CodeBase;
         Assert.AreEqual("\\\\DummyPath\\TestImpactListener.Tests.dll", codebase);
     }
 
@@ -159,8 +157,8 @@ public class InProcDataCollectionExtensionManagerTests
 
         _inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(multiSettingsXml, _mockTestEventsPublisher.Object, _defaultCodebase, _testPluginCache, _mockFileHelper.Object);
         bool secondOne = false;
-        MockDataCollector dataCollector1 = null;
-        MockDataCollector dataCollector2 = null;
+        MockDataCollector? dataCollector1 = null;
+        MockDataCollector? dataCollector2 = null;
 
         foreach (var inProcDc in _inProcDataCollectionManager.InProcDataCollectors.Values)
         {
@@ -175,11 +173,11 @@ public class InProcDataCollectionExtensionManagerTests
             }
         }
 
-        Assert.IsTrue(string.Equals(dataCollector1.AssemblyQualifiedName, "TestImpactListener.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a", StringComparison.OrdinalIgnoreCase));
+        Assert.IsTrue(string.Equals(dataCollector1!.AssemblyQualifiedName, "TestImpactListener.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a", StringComparison.OrdinalIgnoreCase));
         Assert.IsTrue(string.Equals(dataCollector1.CodeBase, Path.Combine(temp, "repos", "MSTest", "src", "managed", "TestPlatform", "TestImpactListener.Tests", "bin", "Debug", "TestImpactListener.Tests1.dll"), StringComparison.OrdinalIgnoreCase));
         Assert.IsTrue(string.Equals(dataCollector1.Configuration.OuterXml, @"<Configuration><Port>4312</Port></Configuration>", StringComparison.OrdinalIgnoreCase));
 
-        Assert.IsTrue(string.Equals(dataCollector2.AssemblyQualifiedName, "TestImpactListener.Tests, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a", StringComparison.OrdinalIgnoreCase));
+        Assert.IsTrue(string.Equals(dataCollector2!.AssemblyQualifiedName, "TestImpactListener.Tests, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a", StringComparison.OrdinalIgnoreCase));
         Assert.IsTrue(string.Equals(dataCollector2.CodeBase, Path.Combine(temp, "repos", "MSTest", "src", "managed", "TestPlatform", "TestImpactListener.Tests", "bin", "Debug", "TestImpactListener.Tests2.dll"), StringComparison.OrdinalIgnoreCase));
         Assert.IsTrue(string.Equals(dataCollector2.Configuration.OuterXml, @"<Configuration><Port>4313</Port></Configuration>", StringComparison.OrdinalIgnoreCase));
     }
@@ -210,11 +208,12 @@ public class InProcDataCollectionExtensionManagerTests
             { "TestSources", new List<string>() { "testsource1.dll", "testsource2.dll" } }
         };
 
-        var mockDataCollector = _inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
+        var mockDataCollector = (MockDataCollector)_inProcDataCollectionManager.InProcDataCollectors.Values.First();
 
         _mockTestEventsPublisher.Raise(x => x.SessionStart += null, new SessionStartEventArgs(properties));
         Assert.IsTrue((mockDataCollector.TestSessionStartCalled == 1), "TestSessionStart must be called on datacollector");
 
+        Assert.IsNotNull(mockDataCollector.TestSources);
         Assert.IsTrue(mockDataCollector.TestSources.Contains("testsource1.dll"));
         Assert.IsTrue(mockDataCollector.TestSources.Contains("testsource2.dll"));
     }
@@ -225,7 +224,7 @@ public class InProcDataCollectionExtensionManagerTests
     {
         _mockTestEventsPublisher.Raise(x => x.SessionStart += null, new SessionStartEventArgs());
 
-        var mockDataCollector = _inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
+        var mockDataCollector = (MockDataCollector)_inProcDataCollectionManager.InProcDataCollectors.Values.First();
         Assert.IsTrue((mockDataCollector.TestSessionStartCalled == 1), "TestSessionStart must be called on datacollector");
         Assert.IsTrue((mockDataCollector.TestSessionEndCalled == 0), "TestSessionEnd must NOT be called on datacollector");
         Assert.IsTrue((mockDataCollector.TestCaseStartCalled == 0), "TestCaseStart must NOT be called on datacollector");
@@ -237,7 +236,7 @@ public class InProcDataCollectionExtensionManagerTests
     {
         _mockTestEventsPublisher.Raise(x => x.SessionEnd += null, new SessionEndEventArgs());
 
-        var mockDataCollector = _inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
+        var mockDataCollector = (MockDataCollector)_inProcDataCollectionManager.InProcDataCollectors.Values.First();
         Assert.IsTrue((mockDataCollector.TestSessionStartCalled == 0), "TestSessionEnd must NOT be called on datacollector");
         Assert.IsTrue((mockDataCollector.TestSessionEndCalled == 1), "TestSessionStart must be called on datacollector");
         Assert.IsTrue((mockDataCollector.TestCaseStartCalled == 0), "TestCaseStart must NOT be called on datacollector");
@@ -252,7 +251,7 @@ public class InProcDataCollectionExtensionManagerTests
         testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
         _mockTestEventsPublisher.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testCase));
 
-        var mockDataCollector = _inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
+        var mockDataCollector = (MockDataCollector)_inProcDataCollectionManager.InProcDataCollectors.Values.First();
 
         Assert.IsTrue((mockDataCollector.TestCaseStartCalled == 1), "TestCaseStart must be called on datacollector");
         Assert.IsTrue((mockDataCollector.TestCaseEndCalled == 0), "TestCaseEnd must NOT be called on datacollector");
@@ -269,7 +268,7 @@ public class InProcDataCollectionExtensionManagerTests
         _mockTestEventsPublisher.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testCase));
         _mockTestEventsPublisher.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testCase, TestOutcome.Failed));
 
-        var mockDataCollector = _inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
+        var mockDataCollector = (MockDataCollector)_inProcDataCollectionManager.InProcDataCollectors.Values.First();
         Assert.IsTrue((mockDataCollector.TestCaseStartCalled == 2), "TestCaseStart must only be called once");
         Assert.IsTrue((mockDataCollector.TestCaseEndCalled == 2), "TestCaseEnd must only be called once");
     }
@@ -296,33 +295,14 @@ public class InProcDataCollectionExtensionManagerTests
             Configuration = configuration;
         }
 
-        public string AssemblyQualifiedName
-        {
-            get;
-            private set;
-        }
-
-        public string CodeBase
-        {
-            get;
-            private set;
-        }
-
-        public XmlElement Configuration
-        {
-            get;
-            private set;
-        }
-
+        public string AssemblyQualifiedName { get; private set; }
+        public string CodeBase { get; private set; }
+        public XmlElement Configuration { get; private set; }
         public int TestSessionStartCalled { get; private set; }
         public int TestSessionEndCalled { get; private set; }
         public int TestCaseStartCalled { get; private set; }
         public int TestCaseEndCalled { get; private set; }
-        public IEnumerable<string> TestSources
-        {
-            get;
-            private set;
-        }
+        public IEnumerable<string>? TestSources { get; private set; }
 
         public void LoadDataCollector(IDataCollectionSink inProcDataCollectionSink)
         {
@@ -333,7 +313,7 @@ public class InProcDataCollectionExtensionManagerTests
         {
             switch (methodName)
             {
-                case Constants.TestSessionStartMethodName: TestSessionStartMethodCalled(methodArg as TestSessionStartArgs); break;
+                case Constants.TestSessionStartMethodName: TestSessionStartMethodCalled((TestSessionStartArgs)methodArg); break;
                 case Constants.TestSessionEndMethodName: TestSessionEndCalled++; break;
                 case Constants.TestCaseStartMethodName: TestCaseStartCalled++; break;
                 case Constants.TestCaseEndMethodName: TestCaseEndCalled++; break;

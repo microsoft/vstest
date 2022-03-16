@@ -25,9 +25,9 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using vstest.ProgrammerTests.Fakes;
 
 namespace vstest.ProgrammerTests;
+
 // Tests are run by Intent library that is executed from our Program.Main. To debug press F5 in VS, and maybe mark just a single test with [Only].
 // To just run, press Ctrl+F5 to run without debugging. It will use short timeout for abort in case something is wrong with your test.
-
 public class TestDiscoveryTests
 {
     public async Task GivenAnMSTestAssemblyWith108Tests_WhenTestsAreRun_Then108TestsAreExecuted()

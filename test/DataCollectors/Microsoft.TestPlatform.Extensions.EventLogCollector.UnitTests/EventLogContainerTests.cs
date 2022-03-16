@@ -10,30 +10,20 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests;
 
 [TestClass]
 public class EventLogContainerTests
 {
     private readonly HashSet<string> _eventSources;
-
     private readonly HashSet<EventLogEntryType> _entryTypes;
-
     private readonly Mock<DataCollectionLogger> _logger;
-
     private readonly DataCollectionContext _dataCollectionContext;
-
     private readonly EventLog _eventLog;
-
-    private EventLogContainer _eventLogContainer;
-
     private readonly EntryWrittenEventArgs _entryWrittenEventArgs;
-
-
     private readonly string _eventLogName = "Application";
 
+    private EventLogContainer _eventLogContainer;
 
     public EventLogContainerTests()
     {

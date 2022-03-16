@@ -9,17 +9,15 @@ using System.Reflection;
 
 using Microsoft.CodeAnalysis;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests;
 
 internal static class FindMethodExtensions
 {
     private const BindingFlags PrivateBindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
-    internal static MethodInfo FindMethod(this Type type, string signature)
+    internal static MethodInfo? FindMethod(this Type type, string signature)
         => type.FindMembers(MemberTypes.Method, PrivateBindingFlags,
-            (mbr, sig) => mbr.ToString() == (string)sig, signature).FirstOrDefault() as MethodInfo;
+            (mbr, sig) => mbr.ToString() == (string?)sig, signature).FirstOrDefault() as MethodInfo;
 
     internal static IMethodSymbol FindMethod(
         this INamedTypeSymbol type,
@@ -54,7 +52,7 @@ internal static class FindMethodExtensions
         }
 
         Debug.Assert(candidates.Any() && !candidates.Skip(1).Any());
-        return candidates.SingleOrDefault();
+        return candidates.Single();
     }
 
     internal static IMethodSymbol FindMethod(
@@ -85,7 +83,7 @@ internal static class FindMethodExtensions
         candidates = candidates.Where(selector);
 
         Debug.Assert(candidates.Any() && !candidates.Skip(1).Any());
-        return candidates.SingleOrDefault();
+        return candidates.Single();
     }
 
     private static IEnumerable<IMethodSymbol> GetCandidateMethods(INamedTypeSymbol type, string methodName)

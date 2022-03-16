@@ -18,8 +18,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
 
 [TestClass]
@@ -27,7 +25,7 @@ public class InProcDataCollectorTests
 {
     private readonly Mock<IAssemblyLoadContext> _assemblyLoadContext;
 
-    private IInProcDataCollector _inProcDataCollector;
+    private IInProcDataCollector? _inProcDataCollector;
 
     public InProcDataCollectorTests()
     {
@@ -55,7 +53,7 @@ public class InProcDataCollectorTests
     public void InProcDataCollectorShouldNotThrowExceptionIfAssemblyDoesNotContainAnyInProcDataCollector()
     {
         _assemblyLoadContext.Setup(alc => alc.LoadAssemblyFromPath(It.IsAny<string>()))
-            .Returns(Assembly.GetEntryAssembly());
+            .Returns(Assembly.GetEntryAssembly()!);
 
         _inProcDataCollector = new InProcDataCollector(
             string.Empty,
@@ -93,7 +91,7 @@ public class InProcDataCollectorTests
     {
         var typeInfo = typeof(CoverletInProcDataCollector).GetTypeInfo();
 
-        Assert.AreEqual("9.9.9.9", typeInfo.Assembly.GetName().Version.ToString());
+        Assert.AreEqual("9.9.9.9", typeInfo.Assembly.GetName().Version!.ToString());
 
         _assemblyLoadContext.Setup(alc => alc.LoadAssemblyFromPath(It.IsAny<string>()))
             .Returns(typeInfo.Assembly);

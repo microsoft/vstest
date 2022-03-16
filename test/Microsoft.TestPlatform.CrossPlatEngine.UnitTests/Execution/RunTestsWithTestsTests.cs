@@ -19,28 +19,19 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations;
-
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Execution;
 
 [TestClass]
 public class RunTestsWithTestsTests
 {
-    private TestableTestRunCache _testableTestRunCache;
-    private TestExecutionContext _testExecutionContext;
-    private Mock<ITestRunEventsHandler> _mockTestRunEventsHandler;
-    private TestableRunTestsWithTests _runTestsInstance;
-    private Mock<IRequestData> _mockRequestData;
-    private Mock<IMetricsCollection> _mockMetricsCollection;
+    private readonly TestExecutionContext _testExecutionContext;
+    private readonly Mock<ITestRunEventsHandler> _mockTestRunEventsHandler;
+    private TestableRunTestsWithTests? _runTestsInstance;
+    private readonly Mock<IRequestData> _mockRequestData;
+    private readonly Mock<IMetricsCollection> _mockMetricsCollection;
 
-    private const string RunTestsWithSourcesTestsExecutorUri = "executor://RunTestWithSourcesDiscoverer/";
-
-    [TestInitialize]
-    public void TestInit()
+    public RunTestsWithTestsTests()
     {
-        _testableTestRunCache = new TestableTestRunCache();
         _mockMetricsCollection = new Mock<IMetricsCollection>();
         _mockRequestData = new Mock<IRequestData>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
@@ -139,7 +130,7 @@ public class RunTestsWithTestsTests
 
         var testExecutor = new RunTestsWithSourcesTests.RunTestWithSourcesExecutor();
         var extension = new LazyExtension<ITestExecutor, ITestExecutorCapabilities>(testExecutor, new TestExecutorMetadata("e://d/"));
-        IEnumerable<TestCase> receivedTests = null;
+        IEnumerable<TestCase>? receivedTests = null;
         RunTestsWithSourcesTests.RunTestWithSourcesExecutor.RunTestsWithTestsCallback = (t, rc, fh) => receivedTests = t;
 
         _runTestsInstance.CallInvokeExecutor(extension, executorUriExtensionTuple, null, null);
@@ -200,15 +191,17 @@ public class RunTestsWithTestsTests
     private class TestableRunTestsWithTests : RunTestsWithTests
     {
         public TestableRunTestsWithTests(IEnumerable<TestCase> testCases,
-            string runSettings, TestExecutionContext testExecutionContext,
-            ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler,
+            string? runSettings, TestExecutionContext testExecutionContext,
+            ITestCaseEventsHandler? testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler,
             IRequestData requestData)
             : base(requestData, testCases, null, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler)
         {
         }
 
 
-        internal TestableRunTestsWithTests(IEnumerable<TestCase> testCases, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList, IRequestData requestData)
+        internal TestableRunTestsWithTests(IEnumerable<TestCase> testCases, string? runSettings, TestExecutionContext testExecutionContext,
+            ITestCaseEventsHandler? testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>,
+                List<TestCase>> executorUriVsTestList, IRequestData requestData)
             : base(
                 requestData, testCases, null, runSettings, testExecutionContext,
                 testCaseEventsHandler, testRunEventsHandler, executorUriVsTestList)
@@ -222,7 +215,7 @@ public class RunTestsWithTestsTests
         }
 
         public void CallInvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
-            Tuple<Uri, string> executorUriExtensionTuple, RunContext runContext, IFrameworkHandle frameworkHandle)
+            Tuple<Uri, string> executorUriExtensionTuple, RunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             InvokeExecutor(executor, executorUriExtensionTuple, runContext, frameworkHandle);
         }

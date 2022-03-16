@@ -12,8 +12,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests;
 
 /// <summary>
@@ -73,7 +71,7 @@ public class BlameLoggerTests
         // Initialize Blame Logger
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        _blameLogger.Initialize(loggerEvents, (string)null);
+        _blameLogger.Initialize(loggerEvents, null);
 
         // Setup and Raise event
         _mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>()));
@@ -96,7 +94,7 @@ public class BlameLoggerTests
         // Initialize Blame Logger
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        _blameLogger.Initialize(loggerEvents, (string)null);
+        _blameLogger.Initialize(loggerEvents, null);
 
         // Setup and Raise event
         loggerEvents.CompleteTestRun(null, false, true, null, new Collection<AttachmentSet>(attachmentSetList), new Collection<InvokedDataCollector>(), new TimeSpan(1, 0, 0, 0));
@@ -127,7 +125,7 @@ public class BlameLoggerTests
         // Initialize Blame Logger
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        _blameLogger.Initialize(loggerEvents, (string)null);
+        _blameLogger.Initialize(loggerEvents, null);
 
         var testCaseList = new List<BlameTestObject>
         {

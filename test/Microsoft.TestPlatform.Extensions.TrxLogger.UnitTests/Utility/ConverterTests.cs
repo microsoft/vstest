@@ -21,8 +21,6 @@ using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.C
 using TrxLoggerOutcome = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel.TestOutcome;
 using UriDataAttachment = Microsoft.VisualStudio.TestPlatform.ObjectModel.UriDataAttachment;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility;
 
 [TestClass]
@@ -199,7 +197,7 @@ public class ConverterTests
         expectedClassName = expectedTestName = fullyQualifiedName = source = testName = "test1";
 
         TestCase testCase = new(fullyQualifiedName, new Uri("some://uri"), source);
-        var unitTestElement = _converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase) as UnitTestElement;
+        var unitTestElement = (UnitTestElement)_converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase);
 
         Assert.AreEqual(expectedClassName, unitTestElement.TestMethod.ClassName);
         Assert.AreEqual(expectedTestName, unitTestElement.TestMethod.Name);
@@ -209,7 +207,7 @@ public class ConverterTests
     {
         TestCase testCase = CreateTestCase(fullyQualifiedName);
 
-        var unitTestElement = _converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase) as UnitTestElement;
+        var unitTestElement = (UnitTestElement)_converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase);
 
         Assert.AreEqual(expectedClassName, unitTestElement.TestMethod.ClassName);
         Assert.AreEqual(expectedTestName, unitTestElement.TestMethod.Name);

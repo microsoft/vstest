@@ -9,8 +9,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Utilities.UnitTests;
 
 [TestClass]

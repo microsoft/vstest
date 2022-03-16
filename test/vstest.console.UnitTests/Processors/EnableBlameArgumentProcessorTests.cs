@@ -19,8 +19,6 @@ using Moq;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace vstest.console.UnitTests.Processors;
 
 [TestClass]

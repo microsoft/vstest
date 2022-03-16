@@ -22,20 +22,17 @@ using Moq;
 
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery;
 
 [TestClass]
 public class DiscoveryManagerTests
 {
-    private DiscoveryManager _discoveryManager;
-    private Mock<IRequestData> _mockRequestData;
-    private Mock<IMetricsCollection> _mockMetricsCollection;
-    private TestSessionMessageLogger _sessionLogger;
+    private readonly DiscoveryManager _discoveryManager;
+    private readonly Mock<IRequestData> _mockRequestData;
+    private readonly Mock<IMetricsCollection> _mockMetricsCollection;
+    private readonly TestSessionMessageLogger _sessionLogger;
 
-    [TestInitialize]
-    public void TestInit()
+    public DiscoveryManagerTests()
     {
         _mockRequestData = new Mock<IRequestData>();
         _mockMetricsCollection = new Mock<IMetricsCollection>();
@@ -189,7 +186,7 @@ public class DiscoveryManagerTests
 
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(metricsCollector);
 
-        DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
+        DiscoveryCompleteEventArgs? receivedDiscoveryCompleteEventArgs = null;
 
         TestPluginCacheHelper.SetupMockExtensions(
             new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
@@ -212,7 +209,7 @@ public class DiscoveryManagerTests
         _discoveryManager.DiscoverTests(criteria, mockLogger.Object);
 
         // Assert
-        Assert.IsNotNull(receivedDiscoveryCompleteEventArgs.Metrics);
+        Assert.IsNotNull(receivedDiscoveryCompleteEventArgs!.Metrics);
         Assert.IsTrue(receivedDiscoveryCompleteEventArgs.Metrics.Any());
         Assert.IsTrue(receivedDiscoveryCompleteEventArgs.Metrics.ContainsKey("DummyMessage"));
     }
@@ -277,7 +274,7 @@ public class DiscoveryManagerTests
         var criteria = new DiscoveryCriteria(sources, 100, null);
         var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
-        DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
+        DiscoveryCompleteEventArgs? receivedDiscoveryCompleteEventArgs = null;
 
         mockHandler.Setup(ml => ml.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
             .Callback((DiscoveryCompleteEventArgs complete, IEnumerable<TestCase> tests) => receivedDiscoveryCompleteEventArgs = complete);
@@ -287,7 +284,7 @@ public class DiscoveryManagerTests
         _discoveryManager.Abort(mockHandler.Object);
 
         // Assert
-        Assert.AreEqual(true, receivedDiscoveryCompleteEventArgs.IsAborted);
+        Assert.AreEqual(true, receivedDiscoveryCompleteEventArgs!.IsAborted);
         Assert.AreEqual(-1, receivedDiscoveryCompleteEventArgs.TotalCount);
     }
 

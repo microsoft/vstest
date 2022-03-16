@@ -18,17 +18,14 @@ using Moq;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
 
 [TestClass]
 public class ExecutorUnitTests
 {
-    private Mock<ITestPlatformEventSource> _mockTestPlatformEventSource;
+    private readonly Mock<ITestPlatformEventSource> _mockTestPlatformEventSource;
 
-    [TestInitialize]
-    public void TestInit()
+    public ExecutorUnitTests()
     {
         _mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
     }
@@ -41,7 +38,7 @@ public class ExecutorUnitTests
     {
         var mockOutput = new MockOutput();
         var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object).Execute("/badArgument");
-        var assemblyVersion = typeof(Executor).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+        var assemblyVersion = typeof(Executor).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
 
         Assert.AreEqual(1, exitCode, "Exit code must be One for bad arguments");
 
@@ -315,7 +312,7 @@ public class ExecutorUnitTests
 
     private class OutputMessage
     {
-        public string Message { get; set; }
+        public string Message { get; set; } = "";
         public OutputLevel Level { get; set; }
     }
 }

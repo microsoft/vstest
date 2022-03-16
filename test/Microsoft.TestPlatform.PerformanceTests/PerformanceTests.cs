@@ -5,8 +5,6 @@ using Microsoft.TestPlatform.TestUtilities.PerfInstrumentation;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.PerformanceTests;
 
 /// <summary>

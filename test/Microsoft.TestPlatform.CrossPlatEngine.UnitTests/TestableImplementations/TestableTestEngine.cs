@@ -5,8 +5,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests;
 
 public class TestableTestEngine : TestEngine

@@ -26,10 +26,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery;
 [TestClass]
 public class DiscoveryRequestTests
 {
-    readonly DiscoveryRequest _discoveryRequest;
-    readonly Mock<IProxyDiscoveryManager> _discoveryManager;
+    private readonly DiscoveryRequest _discoveryRequest;
+    private readonly Mock<IProxyDiscoveryManager> _discoveryManager;
     private readonly Mock<ITestLoggerManager> _loggerManager;
-    readonly DiscoveryCriteria _discoveryCriteria;
+    private readonly DiscoveryCriteria _discoveryCriteria;
     private readonly Mock<IRequestData> _mockRequestData;
     private readonly Mock<IDataSerializer> _mockDataSerializer;
 

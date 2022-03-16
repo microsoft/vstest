@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 
 [TestClass]
@@ -68,6 +66,7 @@ public class CustomKeyValueConverterTests
 
         var data = _customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
 
+        Assert.IsNotNull(data);
         Assert.AreEqual(1, data.Length);
         Assert.AreEqual(string.Empty, data[0].Key);
         Assert.AreEqual(string.Empty, data[0].Value);

@@ -17,8 +17,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.TestUtilities;
 
 /// <summary>
@@ -70,7 +68,7 @@ public class IntegrationTestBase
 
     public TempDirectory TempDirectory { get; }
 
-    public TestContext TestContext { get; set; }
+    public TestContext? TestContext { get; set; }
 
     public string BuildConfiguration { get; }
 
@@ -80,7 +78,7 @@ public class IntegrationTestBase
     public void TempDirectoryCleanup()
     {
         // Delete the directory only when the test succeeded, so we can look at results and logs of failed tests.
-        if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+        if (TestContext?.CurrentTestOutcome == UnitTestOutcome.Passed)
         {
             TempDirectory.Dispose();
         }
@@ -96,7 +94,7 @@ public class IntegrationTestBase
     /// <param name="inIsolation"></param>
     /// <returns>Command line arguments string.</returns>
     public static string PrepareArguments(string[] testAssemblies, string testAdapterPath, string runSettings,
-        string framework, string inIsolation = "", string resultsDirectory = null)
+        string framework, string inIsolation = "", string? resultsDirectory = null)
     {
         var arguments = "";
         foreach (var path in testAssemblies)
@@ -150,7 +148,7 @@ public class IntegrationTestBase
     /// <param name="inIsolation"></param>
     /// <returns>Command line arguments string.</returns>
     public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings,
-        string framework, string inIsolation = "", string resultsDirectory = null)
+        string framework, string inIsolation = "", string? resultsDirectory = null)
         => PrepareArguments(new string[] { testAssembly }, testAdapterPath, runSettings, framework, inIsolation, resultsDirectory);
 
 
@@ -158,7 +156,7 @@ public class IntegrationTestBase
     /// Invokes <c>vstest.console</c> with specified arguments.
     /// </summary>
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
-    public void InvokeVsTest(string arguments, Dictionary<string, string> environmentVariables = null)
+    public void InvokeVsTest(string arguments, Dictionary<string, string>? environmentVariables = null)
     {
         ExecuteVsTestConsole(arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, environmentVariables);
         FormatStandardOutCome();
@@ -202,9 +200,9 @@ public class IntegrationTestBase
         string testAdapterPath,
         string framework,
         string runSettings = "",
-        Dictionary<string, string> environmentVariables = null)
+        Dictionary<string, string>? environmentVariables = null)
     {
-        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
+        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue!, resultsDirectory: TempDirectory.Path);
         InvokeVsTest(arguments, environmentVariables);
     }
 
@@ -214,9 +212,10 @@ public class IntegrationTestBase
     /// <param name="testAssembly">A test assembly.</param>
     /// <param name="testAdapterPath">Path to test adapters.</param>
     /// <param name="runSettings">Run settings for execution.</param>
-    public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "", Dictionary<string, string> environmentVariables = null)
+    public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "",
+        Dictionary<string, string>? environmentVariables = null)
     {
-        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
+        var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, _testEnvironment.InIsolationValue!, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /listtests");
         InvokeVsTest(arguments, environmentVariables);
     }
@@ -443,7 +442,7 @@ public class IntegrationTestBase
     protected string GetProjectAssetFullPath(string projectName, string assetName)
     {
         var projectPath = _testEnvironment.GetTestProject(projectName);
-        return Path.Combine(Path.GetDirectoryName(projectPath), assetName);
+        return Path.Combine(Path.GetDirectoryName(projectPath)!, assetName);
     }
 
     protected string GetTestAdapterPath(UnitTestFramework testFramework = UnitTestFramework.MSTest)
@@ -591,7 +590,7 @@ public class IntegrationTestBase
         return testMethodName;
     }
 
-    protected void ExecuteVsTestConsole(string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null)
+    protected void ExecuteVsTestConsole(string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string>? environmentVariables = null)
     {
         if (IsNetCoreRunner())
         {
@@ -624,7 +623,8 @@ public class IntegrationTestBase
         ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
     }
 
-    protected static void ExecuteApplication(string path, string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null, string workingDirectory = null)
+    protected static void ExecuteApplication(string path, string args, out string stdOut, out string stdError, out int exitCode,
+        Dictionary<string, string>? environmentVariables = null, string? workingDirectory = null)
     {
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -786,7 +786,8 @@ public class IntegrationTestBase
     protected static int CountTestHostLogs(string diagLogsDir)
         => Directory.GetFiles(diagLogsDir, "*.host.*").Length;
 
-    protected static void AssertExpectedNumberOfHostProcesses(int expectedNumOfProcessCreated, string diagLogsDir, IEnumerable<string> testHostProcessNames, string arguments = null, string runnerPath = null)
+    protected static void AssertExpectedNumberOfHostProcesses(int expectedNumOfProcessCreated, string diagLogsDir, IEnumerable<string> testHostProcessNames,
+        string? arguments = null, string? runnerPath = null)
     {
         var processCreatedCount = CountTestHostLogs(diagLogsDir);
         Assert.AreEqual(

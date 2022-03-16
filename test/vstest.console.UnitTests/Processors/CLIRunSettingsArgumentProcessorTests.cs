@@ -13,16 +13,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace vstest.console.UnitTests.Processors;
 
 [TestClass]
 public class CliRunSettingsArgumentProcessorTests
 {
-    private TestableRunSettingsProvider _settingsProvider;
-    private CliRunSettingsArgumentExecutor _executor;
-    private CommandLineOptions _commandLineOptions;
+    private readonly TestableRunSettingsProvider _settingsProvider;
+    private readonly CliRunSettingsArgumentExecutor _executor;
+    private readonly CommandLineOptions _commandLineOptions;
     private readonly string _defaultRunSettings = string.Join(Environment.NewLine,
         "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
         "<RunSettings>",
@@ -53,8 +51,7 @@ public class CliRunSettingsArgumentProcessorTests
         "  </MSTest>",
         "</RunSettings>");
 
-    [TestInitialize]
-    public void Init()
+    public CliRunSettingsArgumentProcessorTests()
     {
         _commandLineOptions = CommandLineOptions.Instance;
         _settingsProvider = new TestableRunSettingsProvider();
@@ -108,7 +105,7 @@ public class CliRunSettingsArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldNotThrowExceptionIfArgumentIsNull()
     {
-        _executor.Initialize((string[])null);
+        _executor.Initialize((string[]?)null);
 
         Assert.IsNull(_settingsProvider.ActiveRunSettings);
     }

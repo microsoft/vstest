@@ -20,31 +20,29 @@ using Moq;
 using HtmlLoggerConstants = Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.Constants;
 using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests;
 
 [TestClass]
 public class HtmlLoggerTests
 {
-    private Mock<TestLoggerEvents> _events;
-    private VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger _htmlLogger;
-    private Dictionary<string, string> _parameters;
     private static readonly string DefaultTestRunDirectory = Path.GetTempPath();
     private static readonly string DefaultLogFileNameParameterValue = "logfilevalue.html";
-    private Mock<IFileHelper> _mockFileHelper;
-    private Mock<XmlObjectSerializer> _mockXmlSerializer;
-    private Mock<IHtmlTransformer> _mockHtmlTransformer;
 
-    [TestInitialize]
-    public void TestInitialize()
+    private Mock<TestLoggerEvents> _events;
+    private readonly VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger _htmlLogger;
+    private readonly Dictionary<string, string?> _parameters;
+    private readonly Mock<IFileHelper> _mockFileHelper;
+    private readonly Mock<XmlObjectSerializer> _mockXmlSerializer;
+    private readonly Mock<IHtmlTransformer> _mockHtmlTransformer;
+
+    public HtmlLoggerTests()
     {
         _events = new Mock<TestLoggerEvents>();
         _mockFileHelper = new Mock<IFileHelper>();
         _mockHtmlTransformer = new Mock<IHtmlTransformer>();
         _mockXmlSerializer = new Mock<XmlObjectSerializer>();
         _htmlLogger = new VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger(_mockFileHelper.Object, _mockHtmlTransformer.Object, _mockXmlSerializer.Object);
-        _parameters = new Dictionary<string, string>(2)
+        _parameters = new Dictionary<string, string?>(2)
         {
             [DefaultLoggerParameterNames.TestRunDirectory] = DefaultTestRunDirectory,
             [HtmlLoggerConstants.LogFileNameKey] = DefaultLogFileNameParameterValue
@@ -123,7 +121,7 @@ public class HtmlLoggerTests
     [TestMethod]
     public void TestCompleteHandlerShouldThrowExceptionIfParametersAreNull()
     {
-        Dictionary<string, string> parameters = null;
+        Dictionary<string, string>? parameters = null;
         var events = new Mock<TestLoggerEvents>();
         Assert.ThrowsException<ArgumentNullException>(() => _htmlLogger.Initialize(events.Object, parameters));
     }
@@ -400,7 +398,7 @@ public class HtmlLoggerTests
     [TestMethod]
     public void TestCompleteHandlerShouldCreateCustumHtmlFileNamewithLogFileNameKey()
     {
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             [HtmlLoggerConstants.LogFileNameKey] = null,
             [DefaultLoggerParameterNames.TestRunDirectory] = "dsa"
@@ -459,7 +457,7 @@ public class HtmlLoggerTests
     [TestMethod]
     public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefixNull()
     {
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             [HtmlLoggerConstants.LogFilePrefixKey] = null,
             [DefaultLoggerParameterNames.TestRunDirectory] = "dsa",
