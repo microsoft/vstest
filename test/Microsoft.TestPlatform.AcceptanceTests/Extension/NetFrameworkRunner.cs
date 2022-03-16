@@ -49,7 +49,12 @@ public class NetFrameworkRunner : Attribute, ITestDataSource
 
         foreach (var fmw in _targetFrameworks.Split(';'))
         {
-            var runnerInfo = new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw, AcceptanceTestBase.InIsolation);
+            var runnerInfo = new RunnerInfo
+            {
+                RunnerFramework = IntegrationTestBase.DesktopRunnerFramework,
+                TargetFramework = fmw,
+                InIsolationValue = AcceptanceTestBase.InIsolation
+            };
             runnerInfo.DebugInfo = new DebugInfo
             {
                 DebugVSTestConsole = DebugVSTestConsole,

@@ -40,7 +40,7 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TranslationLayerCompatibilityDataSource]
+    [RunnerCompatibilityDataSource]
     public void RunAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

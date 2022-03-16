@@ -276,7 +276,7 @@ function Invoke-TestAssetsBuild {
                 
                     $dirMSTestVersion = $mstestVersion -replace "\[|\]" 
                     $dirMSTestPropertyName = $propertyName -replace "Framework" -replace "Version"
-                    Invoke-Exe $dotnetExe -Arguments "build $project --configuration $TPB_Configuration --no-restore -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:MSTestFrameworkVersion=$mstestVersion -p:MSTestAdapterVersion=$mstestVersion -p:NETTestSdkVersion=$netTestSdkVersion -p:BaseOutputPath=""bin\$dirNetTestSdkPropertyName-$dirNetTestSdkVersion\$dirMSTestPropertyName-$dirMSTestVersion\\"" -bl:""$env:TP_OUT_DIR\log\$Configuration\perm.binlog"""
+                    Invoke-Exe $dotnetExe -Arguments "build $project --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:MSTestFrameworkVersion=$mstestVersion -p:MSTestAdapterVersion=$mstestVersion -p:NETTestSdkVersion=$netTestSdkVersion -p:BaseOutputPath=""bin\$dirNetTestSdkPropertyName-$dirNetTestSdkVersion\$dirMSTestPropertyName-$dirMSTestVersion\\"" -bl:""$env:TP_OUT_DIR\log\$Configuration\perm.binlog"""
                 }
             }
         }
@@ -1276,49 +1276,49 @@ if ($ProjectNamePatterns.Count -ne 0) {
 }
 
 # Execute build
-# $timer = Start-Timer
-# Write-Log "Build started: args = '$args'"
-# Write-Log "Test platform environment variables: "
-# Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
-# Write-Log "Test platform build variables: "
-# Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
+$timer = Start-Timer
+Write-Log "Build started: args = '$args'"
+Write-Log "Test platform environment variables: "
+Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
+Write-Log "Test platform build variables: "
+Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 
 if ($Force -or $Steps -contains "InstallDotnet") {
     Install-DotNetCli
 }
 
-# if ($Force -or $Steps -contains "Restore") {
-#     Clear-Package
-#     Restore-Package
-# }
+if ($Force -or $Steps -contains "Restore") {
+    Clear-Package
+    Restore-Package
+}
 
-# if ($Force -or $Steps -contains "UpdateLocalization") {
-#     Update-LocalizedResources
-# }
+if ($Force -or $Steps -contains "UpdateLocalization") {
+    Update-LocalizedResources
+}
 
-# if ($Force -or $Steps -contains "Build") {
-#     Invoke-Build
-# }
+if ($Force -or $Steps -contains "Build") {
+    Invoke-Build
+}
 
-# if ($Force -or $Steps -contains "Publish") {
-#     Publish-Package
-#     Create-VsixPackage
-#     Create-NugetPackages
-# }
+if ($Force -or $Steps -contains "Publish") {
+    Publish-Package
+    Create-VsixPackage
+    Create-NugetPackages
+}
 
-# if ($Force -or $Steps -contains "Publish" -or $Steps -contains "Manifest") {
-#     Generate-Manifest -PackageFolder $TPB_PackageOutDir
-#     if (Test-Path $TPB_SourceBuildPackageOutDir)
-#     {
-#         Generate-Manifest -PackageFolder $TPB_SourceBuildPackageOutDir
-#     }
-#     Copy-PackageIntoStaticDirectory
-# }
+if ($Force -or $Steps -contains "Publish" -or $Steps -contains "Manifest") {
+    Generate-Manifest -PackageFolder $TPB_PackageOutDir
+    if (Test-Path $TPB_SourceBuildPackageOutDir)
+    {
+        Generate-Manifest -PackageFolder $TPB_SourceBuildPackageOutDir
+    }
+    Copy-PackageIntoStaticDirectory
+}
 
 if ($Force -or $Steps -contains "PrepareAcceptanceTests") {
-    #Publish-PatchedDotnet
+    Publish-PatchedDotnet
     Invoke-TestAssetsBuild
-    #Publish-Tests
+    Publish-Tests
 }
 
 if ($Script:ScriptFailed) {

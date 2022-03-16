@@ -8,7 +8,6 @@ using System.Threading;
 
 using FluentAssertions;
 
-using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -34,7 +33,7 @@ public class CustomTestHostTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TranslationLayerCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER)]
+    [RunnerCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER)]
     public void RunTestsWithCustomTestHostLauncherLaunchesTheProcessUsingTheProvidedLauncher(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -55,7 +54,7 @@ public class CustomTestHostTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TranslationLayerCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER)]
+    [RunnerCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER)]
     public void RunTestsWithCustomTestHostLauncherLaunchesTheProcessUsingTheProvidedLauncherWhenITestHostLauncher2IsProvided(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -77,7 +76,7 @@ public class CustomTestHostTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TranslationLayerCompatibilityDataSource(AfterFeature = Features.ATTACH_DEBUGGER)]
+    [RunnerCompatibilityDataSource(AfterFeature = Features.ATTACH_DEBUGGER)]
     public void RunTestsWithCustomTestHostLauncherAttachesToDebuggerUsingTheProvidedLauncher(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -99,10 +98,10 @@ public class CustomTestHostTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [Ignore("This is not working. The compatibility code only checks the protocol version (in handler), which is dictated by testhost. "
-        + "It sees 6 but does not realize that the provided CustomTesthostLauncher is not supporting the new feature, it ends up calling back to EditoAttachDebugger" +
-        "in translation layer, and that just silently skips the call.")]
-    [TranslationLayerCompatibilityDataSource("net451", "net451", "Latest", AfterFeature = Features.ATTACH_DEBUGGER, DebugVSTestConsole = true, DebugTesthost=true)]
+    //[Ignore("This is not working. The compatibility code only checks the protocol version (in handler), which is dictated by testhost. "
+    //    + "It sees 6 but does not realize that the provided CustomTesthostLauncher is not supporting the new feature, it ends up calling back to EditoAttachDebugger" +
+    //    "in translation layer, and that just silently skips the call.")]
+    [RunnerCompatibilityDataSource("net451", "net451", "Latest", AfterFeature = Features.ATTACH_DEBUGGER, DebugVSTestConsole = true, DebugTesthost=true)]
     public void RunTestsWithCustomTestHostLauncherUsesLaunchWhenGivenAnOutdatedITestHostLauncher(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

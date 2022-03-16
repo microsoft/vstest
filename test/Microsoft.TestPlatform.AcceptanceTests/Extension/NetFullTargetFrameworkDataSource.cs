@@ -53,7 +53,12 @@ public class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
         var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
         if (_useCoreRunner && isWindows)
         {
-            var runnerInfo = new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, inIsolationValue: null);
+            var runnerInfo = new RunnerInfo
+            {
+                RunnerFramework = IntegrationTestBase.CoreRunnerFramework,
+                TargetFramework = AcceptanceTestBase.DesktopTargetFramework,
+                InIsolationValue = null
+            };
             runnerInfo.DebugInfo = new DebugInfo
             {
                 DebugVSTestConsole = DebugVSTestConsole,
@@ -68,7 +73,12 @@ public class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
         {
             if (_inIsolation)
             {
-                var runnerInfo = new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.InIsolation);
+                var runnerInfo = new RunnerInfo
+                {
+                    RunnerFramework = IntegrationTestBase.DesktopRunnerFramework,
+                    TargetFramework = AcceptanceTestBase.DesktopTargetFramework,
+                    InIsolationValue = AcceptanceTestBase.InIsolation
+                };
                 runnerInfo.DebugInfo = new DebugInfo
                 {
                     DebugVSTestConsole = DebugVSTestConsole,
@@ -81,7 +91,12 @@ public class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
 
             if (_inProcess)
             {
-                var runnerInfo = new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, inIsolationValue: null);
+                var runnerInfo = new RunnerInfo
+                {
+                    RunnerFramework = IntegrationTestBase.DesktopRunnerFramework,
+                    TargetFramework = AcceptanceTestBase.DesktopTargetFramework,
+                    InIsolationValue = null
+                };
                 runnerInfo.DebugInfo = new DebugInfo
                 {
                     DebugVSTestConsole = DebugVSTestConsole,

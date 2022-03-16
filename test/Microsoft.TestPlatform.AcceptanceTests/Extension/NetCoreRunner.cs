@@ -47,7 +47,12 @@ public class NetCoreRunner : Attribute, ITestDataSource
         Func<string, bool> filter = tfm => isWindows || !tfm.StartsWith("net4");
         foreach (var fmw in _targetFrameworks.Split(';').Where(filter))
         {
-            var runnerInfo = new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, fmw, inIsolationValue: null);
+            var runnerInfo = new RunnerInfo
+            {
+                RunnerFramework = IntegrationTestBase.CoreRunnerFramework,
+                TargetFramework = fmw,
+                InIsolationValue = null
+            };
             runnerInfo.DebugInfo = new DebugInfo
             {
                 DebugVSTestConsole = DebugVSTestConsole,

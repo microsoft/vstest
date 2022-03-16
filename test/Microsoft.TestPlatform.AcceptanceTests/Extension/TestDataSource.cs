@@ -106,6 +106,7 @@ public abstract class TestDataSource<T1, T2, T3, T4> : Attribute, ITestDataSourc
     where T1 : notnull
     where T2 : notnull
     where T3 : notnull
+    where T4 : notnull
 {
     private readonly List<object[]> _data = new();
 

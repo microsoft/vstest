@@ -40,7 +40,7 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TranslationLayerCompatibilityDataSource]
+    [RunnerCompatibilityDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -57,7 +57,7 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TranslationLayerCompatibilityDataSource()]
+    [RunnerCompatibilityDataSource()]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

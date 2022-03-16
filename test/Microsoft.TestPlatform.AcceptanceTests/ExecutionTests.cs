@@ -23,16 +23,18 @@ public class ExecutionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll");
+        var assemblyPaths = BuildMultipleAssemblyPath("MSTestProject1.dll", "MSTestProject2.dll");
 
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 
         ValidateSummaryStatus(2, 2, 2);
         ExitCodeEquals(1); // failing tests
+        StdErrHasTestRunFailedMessageButNoOtherError();
+        StdOutHasNoWarnings();
     }
 
     [TestMethod]
-    [TestPlatformCompatibilityDataSource(WithInProcess = true, WithEveryVersionOfAdapter = false, WithEveryVersionOfHost = false, WithEveryVersionOfRunner = false, WithOlderConfigurations = false)]
+    [TestPlatformCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER, AfterAdapterFeature = Features.MSTEST_IFRAMEWORK_HANDLE_99)]
 
     public void RunTestsFromMultipleMSTestAssemblies(RunnerInfo runnerInfo)
     {
@@ -44,15 +46,32 @@ public class ExecutionTests : AcceptanceTestBase
 
         ValidateSummaryStatus(passed: 2, failed: 2, skipped: 2);
         ExitCodeEquals(1); // failing tests
+        StdErrHasTestRunFailedMessageButNoOtherError();
+        StdOutHasNoWarnings();
     }
 
     [TestMethod]
-    [TesthostCompatibilityDataSource]
+    [HostCompatibilityDataSource]
     public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll");
+        var assemblyPaths = BuildMultipleAssemblyPath("MSTestProject1.dll", "MSTestProject2.dll");
+
+        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
+
+        ValidateSummaryStatus(2, 2, 2);
+        ExitCodeEquals(1); // failing tests
+    }
+
+
+    [TestMethod]
+    [RunnerCompatibilityDataSource]
+    public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations2(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPaths = BuildMultipleAssemblyPath("MSTestProject1.dll", "MSTestProject2.dll");
 
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 

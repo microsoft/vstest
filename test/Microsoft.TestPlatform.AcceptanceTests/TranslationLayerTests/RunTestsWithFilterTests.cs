@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -36,7 +35,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TranslationLayerCompatibilityDataSource]
+    [RunnerCompatibilityDataSource]
     public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

@@ -11,6 +11,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 
+using FluentAssertions;
+
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
@@ -960,5 +962,15 @@ public class IntegrationTestBase
         return path;
     }
 
-    protected string GetDotnetRunnerPath() => _testEnvironment?.VSTestConsoleInfo.Path ?? Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll");
+    protected string GetDotnetRunnerPath() => _testEnvironment.VSTestConsoleInfo?.Path ?? Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll");
+
+    protected void StdOutHasNoWarnings()
+    {
+        StdOut.Should().NotContainEquivalentOf("warning");
+    }
+
+    protected void StdErrHasTestRunFailedMessageButNoOtherError()
+    {
+        StdErr?.Trim().Should().Be("Test Run Failed.");
+    }
 }
