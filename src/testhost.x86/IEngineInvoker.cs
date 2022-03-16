@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.TestHost;
 
 /// <summary>
@@ -16,5 +14,5 @@ public interface IEngineInvoker
     /// Invokes the Engine with the arguments
     /// </summary>
     /// <param name="argsDictionary">Arguments for the engine</param>
-    void Invoke(IDictionary<string, string> argsDictionary);
+    void Invoke(IDictionary<string, string?> argsDictionary);
 }
