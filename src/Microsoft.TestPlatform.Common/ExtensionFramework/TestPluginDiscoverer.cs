@@ -181,7 +181,7 @@ internal class TestPluginDiscoverer
 
             if (!types.Any())
             {
-                types.AddRange(assembly.GetTypes().Where(type => type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract));
+                types.AddRange(assembly.GetTypes().Where(type => type.GetTypeInfo() is { } typeInfo && typeInfo.IsClass && !typeInfo.IsAbstract));
             }
         }
         catch (ReflectionTypeLoadException e)
