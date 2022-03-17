@@ -21,7 +21,7 @@ public class DotnetTestTests : AcceptanceTestBase
         var projectName = "SimpleTestProject.csproj";
         var projectPath = GetProjectFullPath(projectName);
 
-        InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal""");
+        InvokeDotnetTest($@"{projectPath} --no-build -- --logger:""Console;Verbosity=normal""");
 
         // ensure our dev version is used
         StdOutputContains("-dev");
@@ -57,7 +57,7 @@ public class DotnetTestTests : AcceptanceTestBase
 
         var projectName = "ParametrizedTestProject.csproj";
         var projectPath = GetProjectFullPath(projectName);
-        InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name =\""weburl\"", value=\""http://localhost//def\"")");
+        InvokeDotnetTest($@"{projectPath} --no-build --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name =\""weburl\"", value=\""http://localhost//def\"")");
         ValidateSummaryStatus(1, 0, 0);
         ExitCodeEquals(0);
     }
