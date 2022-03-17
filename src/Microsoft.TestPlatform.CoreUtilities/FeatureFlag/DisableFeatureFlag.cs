@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
-/// !!!NEVER USE A FLAG TO ENABLE A FUNCTIONALITY!!!
+/// !!!NEVER USE A FLAG TO ENABLE FUNCTIONALITY!!!
 /// 
 /// The reasoning is:
 /// 
