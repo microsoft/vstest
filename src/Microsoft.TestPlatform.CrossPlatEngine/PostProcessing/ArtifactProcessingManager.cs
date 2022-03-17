@@ -36,7 +36,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
     private readonly string? _processArtifactFolder;
     private readonly IDataSerializer _dataSerialized;
     private readonly ITestRunAttachmentsProcessingEventsHandler _testRunAttachmentsProcessingEventsHandler;
-    private readonly IFeatureFlag _featureFlag;
+    private readonly IDisableFeatureFlag _disableFeatureFlag;
 
     public ArtifactProcessingManager(string testSessionCorrelationId) :
         this(testSessionCorrelationId,
@@ -44,7 +44,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
             new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new DataCollectorAttachmentsProcessorsFactory()),
             JsonDataSerializer.Instance,
             new PostProcessingTestRunAttachmentsProcessingEventsHandler(ConsoleOutput.Instance),
-            FeatureFlag.Instance)
+            DisableFeatureFlag.Instance)
     { }
 
     public ArtifactProcessingManager(string? testSessionCorrelationId,
@@ -52,13 +52,13 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
         ITestRunAttachmentsProcessingManager testRunAttachmentsProcessingManager!!,
         IDataSerializer dataSerialized!!,
         ITestRunAttachmentsProcessingEventsHandler testRunAttachmentsProcessingEventsHandler!!,
-        IFeatureFlag featureFlag!!)
+        IDisableFeatureFlag disableFeatureFlag!!)
     {
         _fileHelper = fileHelper;
         _testRunAttachmentsProcessingManager = testRunAttachmentsProcessingManager;
         _dataSerialized = dataSerialized;
         _testRunAttachmentsProcessingEventsHandler = testRunAttachmentsProcessingEventsHandler;
-        _featureFlag = featureFlag;
+        _disableFeatureFlag = disableFeatureFlag;
 
         // We don't validate for null, it's expected, we'll have testSessionCorrelationId only in case of .NET SDK run.
         if (testSessionCorrelationId is not null)
@@ -71,7 +71,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
 
     public void CollectArtifacts(TestRunCompleteEventArgs testRunCompleteEventArgs!!, string runSettingsXml!!)
     {
-        if (!_featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING))
+        if (_disableFeatureFlag.IsDisabled(DisableFeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING))
         {
             EqtTrace.Verbose("ArtifactProcessingManager.CollectArtifacts: Feature disabled");
             return;
@@ -107,7 +107,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
 
     public async Task PostProcessArtifactsAsync()
     {
-        if (!_featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING))
+        if (_disableFeatureFlag.IsDisabled(DisableFeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING))
         {
             EqtTrace.Verbose("ArtifactProcessingManager.PostProcessArtifacts: Feature disabled");
             return;

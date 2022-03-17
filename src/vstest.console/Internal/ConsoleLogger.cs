@@ -119,11 +119,11 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <summary>
     /// Constructor added for testing purpose
     /// </summary>
-    internal ConsoleLogger(IOutput output, IProgressIndicator progressIndicator, IFeatureFlag featureFlag)
+    internal ConsoleLogger(IOutput output, IProgressIndicator progressIndicator, IDisableFeatureFlag disableFeatureFlag)
     {
         Output = output;
         _progressIndicator = progressIndicator;
-        _featureFlag = featureFlag;
+        _disableFeatureFlag = disableFeatureFlag;
     }
 
     /// <summary>
@@ -138,7 +138,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
     private IProgressIndicator _progressIndicator;
 
-    private readonly IFeatureFlag _featureFlag = FeatureFlag.Instance;
+    private readonly IDisableFeatureFlag _disableFeatureFlag = DisableFeatureFlag.Instance;
 
     /// <summary>
     /// Get the verbosity level for the console logger
@@ -665,9 +665,9 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         if (runLevelAttachementCount > 0)
         {
             // If ARTIFACTS_POSTPROCESSING is disabled
-            if (!_featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING) ||
-                // ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX(old UX) is enabled
-                _featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX) ||
+            if (_disableFeatureFlag.IsDisabled(DisableFeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING) ||
+                // DISABLE_ARTIFACTS_POSTPROCESSING_NEWSDKUX(old UX) is disabled
+                _disableFeatureFlag.IsDisabled(DisableFeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING_NEWSDKUX) ||
                 // TestSessionCorrelationId is null(we're not running through the dotnet SDK).
                 CommandLineOptions.Instance.TestSessionCorrelationId is null)
             {

@@ -7,11 +7,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.CoreUtilities.UnitTests;
 
 [TestClass]
-public class FeatureFlagTests
+public class DisableFeatureFlagTests
 {
     [TestMethod]
     public void SingletonAlwaysReturnsTheSameInstance()
     {
-        Assert.IsTrue(ReferenceEquals(FeatureFlag.Instance, FeatureFlag.Instance));
+        Assert.IsTrue(ReferenceEquals(DisableFeatureFlag.Instance, DisableFeatureFlag.Instance));
     }
 }

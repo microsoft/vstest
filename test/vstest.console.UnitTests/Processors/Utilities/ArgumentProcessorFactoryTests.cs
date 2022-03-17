@@ -152,8 +152,8 @@ public class ArgumentProcessorFactoryTests
             xplatShortCommandName.Add(name.Replace('/', '-'));
         }
 
-        Mock<IFeatureFlag> featureFlag = new();
-        featureFlag.Setup(x => x.IsEnabled(It.IsAny<string>())).Returns(true);
+        Mock<IDisableFeatureFlag> featureFlag = new();
+        featureFlag.Setup(x => x.IsDisabled(It.IsAny<string>())).Returns(false);
         ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create(featureFlag.Object);
 
         // Expect command processors to contain both long and short commands.
