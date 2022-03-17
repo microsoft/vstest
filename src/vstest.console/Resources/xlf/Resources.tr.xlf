@@ -1174,6 +1174,11 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
         <target state="translated">Test bağdaştırıcısı yükleme stratejisi "{0}" belirtilirken /TestAdapterPath parametresi belirtilmelidir!</target>
         <note>{0} is the strategy name, "Explicit" for example.</note>
       </trans-unit>
+      <trans-unit id="WarningEmulatedOnArm64">
+        <source>For better performance, please consider running the native arm64 runner, vstest.console.arm64.exe</source>
+        <target state="new">For better performance, please consider running the native arm64 runner, vstest.console.arm64.exe</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -1515,7 +1515,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("SwitchToNoIsolation", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to --TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
         ///      This affects adapter loading behavior.
@@ -1539,7 +1539,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("TestAdapterLoadingStrategyValueInvalid", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to &quot;Recursive&quot; adapter loading strategy is cannot be used by itself. Please specify at least one of: {0}.
         /// </summary>
@@ -1805,6 +1805,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         internal static string VstestDiagLogOutputPath {
             get {
                 return ResourceManager.GetString("VstestDiagLogOutputPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For better performance, please consider running the native arm64 runner, vstest.console.arm64.exe.
+        /// </summary>
+        internal static string WarningEmulatedOnArm64 {
+            get {
+                return ResourceManager.GetString("WarningEmulatedOnArm64", resourceCulture);
             }
         }
     }

@@ -968,6 +968,11 @@ Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")
         <target state="new">The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!</target>
         <note>{0} is the strategy name, "Explicit" for example.</note>
       </trans-unit>
+      <trans-unit id="WarningEmulatedOnArm64">
+        <source>For better performance, please consider running the native arm64 runner, vstest.console.arm64.exe</source>
+        <target state="new">For better performance, please consider running the native arm64 runner, vstest.console.arm64.exe</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -1174,6 +1174,11 @@
         <target state="translated">指定“{0}”测试适配器加载策略时，需要提供 /TestAdapterPath 参数!</target>
         <note>{0} is the strategy name, "Explicit" for example.</note>
       </trans-unit>
+      <trans-unit id="WarningEmulatedOnArm64">
+        <source>For better performance, please consider running the native arm64 runner, vstest.console.arm64.exe</source>
+        <target state="new">For better performance, please consider running the native arm64 runner, vstest.console.arm64.exe</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

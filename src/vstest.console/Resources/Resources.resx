@@ -807,4 +807,7 @@
   <data name="InvalidTestSessionCorrelationId" xml:space="preserve">
     <value>Invalid testSessionCorrelationId</value>
   </data>
+  <data name="WarningEmulatedOnArm64" xml:space="preserve">
+    <value>For better performance, please consider running the native arm64 runner, vstest.console.arm64.exe</value>
+  </data>
 </root>

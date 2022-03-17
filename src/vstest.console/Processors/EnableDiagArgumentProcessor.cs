@@ -10,6 +10,8 @@ using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -58,7 +60,7 @@ internal class EnableDiagArgumentProcessor : IArgumentProcessor
     /// </summary>
     public Lazy<IArgumentExecutor> Executor
     {
-        get => _executor ??= new Lazy<IArgumentExecutor>(() => new EnableDiagArgumentExecutor(_fileHelper));
+        get => _executor ??= new Lazy<IArgumentExecutor>(() => new EnableDiagArgumentExecutor(_fileHelper, new ProcessHelper()));
 
         set => _executor = value;
     }
@@ -88,6 +90,7 @@ internal class EnableDiagArgumentProcessorCapabilities : BaseArgumentProcessorCa
 internal class EnableDiagArgumentExecutor : IArgumentExecutor
 {
     private readonly IFileHelper _fileHelper;
+    private readonly IProcessHelper _processHelper;
 
     /// <summary>
     /// Parameter for trace level
@@ -98,9 +101,10 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
     /// Default constructor.
     /// </summary>
     /// <param name="fileHelper">The file helper.</param>
-    public EnableDiagArgumentExecutor(IFileHelper fileHelper)
+    public EnableDiagArgumentExecutor(IFileHelper fileHelper, IProcessHelper processHelper)
     {
         _fileHelper = fileHelper;
+        _processHelper = processHelper;
     }
 
 
@@ -137,7 +141,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
 
         // Write version to the log here, because that is the
         // first place where we know if we log or not.
-        EqtTrace.Verbose($"Version: {Product.Version}");
+        EqtTrace.Verbose($"Version: {Product.Version} Current process architecture: {_processHelper.GetCurrentProcessArchitecture()}");
     }
 
     /// <summary>
