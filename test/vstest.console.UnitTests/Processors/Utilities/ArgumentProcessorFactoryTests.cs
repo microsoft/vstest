@@ -153,7 +153,7 @@ public class ArgumentProcessorFactoryTests
         }
 
         Mock<IFeatureFlag> featureFlag = new();
-        featureFlag.Setup(x => x.IsEnabled(It.IsAny<string>())).Returns(true);
+        featureFlag.Setup(x => x.IsDisabled(It.IsAny<string>())).Returns(false);
         ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create(featureFlag.Object);
 
         // Expect command processors to contain both long and short commands.
