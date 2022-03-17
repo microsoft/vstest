@@ -49,7 +49,7 @@ public class NetCoreTargetFrameworkDataSource : Attribute, ITestDataSource
     }
 
     public bool DebugVSTestConsole { get; set; }
-    public bool DebugTesthost { get; set; }
+    public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
     public bool NoDefaultBreakpoints { get; set; } = true;
 
@@ -64,7 +64,7 @@ public class NetCoreTargetFrameworkDataSource : Attribute, ITestDataSource
         runnerInfo.DebugInfo = new DebugInfo
         {
             DebugDataCollector = DebugDataCollector,
-            DebugTesthost = DebugTesthost,
+            DebugTestHost = DebugTestHost,
             DebugVSTestConsole = DebugVSTestConsole,
             NoDefaultBreakpoints = NoDefaultBreakpoints,
         };

@@ -153,7 +153,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
-            GetAssetFullPath("NUTestProject.dll"),
+            GetTestDll("NUTestProject.dll"),
             GetTestAdapterPath(UnitTestFramework.NUnit),
             string.Empty, FrameworkArgValue,
             runnerInfo.InIsolationValue, TempDirectory.Path);

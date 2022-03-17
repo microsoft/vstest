@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
 
@@ -18,16 +18,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class RunnerInfo
 {
     public string? RunnerFramework { get; set; }
-
     public VSTestConsoleInfo? VSTestConsoleInfo { get; set; }
-
-
     public string? TargetFramework { get; set; }
     public string? InIsolationValue { get; set; }
-
     public DebugInfo? DebugInfo { get; set; }
+    public NetTestSdkInfo? TestHostInfo { get; set; }
+    public DllInfo? AdapterInfo { get; set; }
 
-    public List<DllInfo> DllInfos { get; set; } = new();
+    public string? Batch { get; set; }
 
     /// <summary>
     /// Is running via .NET "Core" vstest.console?
@@ -49,5 +47,17 @@ public class RunnerInfo
     /// </summary>
     public bool IsNetFrameworkTarget => TargetFramework!.StartsWith("net4", StringComparison.InvariantCultureIgnoreCase);
 
-    public override string ToString() => $"Runner = {RunnerFramework}, TargetFramework = {TargetFramework}, {(string.IsNullOrEmpty(InIsolationValue) ? "InProcess" : "InIsolation")}, {VSTestConsoleInfo}, {string.Join(",", DllInfos)}";
+    public override string ToString()
+    {
+        return string.Join(", ", new[]
+        {
+            Batch != null ? $"{Batch}" : null,
+            $"Runner = {RunnerFramework}",
+            $"TargetFramework = {TargetFramework}",
+            string.IsNullOrEmpty(InIsolationValue) ? "InProcess" : "InIsolation",
+            VSTestConsoleInfo == null ? null : VSTestConsoleInfo.ToString(),
+            TestHostInfo == null ? null : string.Join(",", TestHostInfo),
+            AdapterInfo == null ? null : string.Join(",", AdapterInfo)
+        }.Where(s => s != null));
+    }
 }

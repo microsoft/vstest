@@ -58,7 +58,7 @@ public class PortableNugetPackageTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        InvokeVsTestForDiscovery(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue);
+        InvokeVsTestForDiscovery(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue);
 
         var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
         ValidateDiscoveredTests(listOfTests);

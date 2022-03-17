@@ -50,7 +50,7 @@ public class DiscoverTests : AcceptanceTestBase
         _discoveryEventHandler2 = new DiscoveryEventHandler2();
 
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
-        vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), _discoveryEventHandler);
+        vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetRunSettingsWithCurrentTargetFramework(), _discoveryEventHandler);
 
         // Assert.
         Assert.AreEqual(6, _discoveryEventHandler.DiscoveredTestCases.Count);
@@ -69,7 +69,7 @@ public class DiscoverTests : AcceptanceTestBase
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         vstestConsoleWrapper.DiscoverTests(
             GetTestAssemblies(),
-            GetDefaultRunSettings(),
+            GetRunSettingsWithCurrentTargetFramework(),
             new TestPlatformOptions() { CollectMetrics = false },
             _discoveryEventHandler2);
 
@@ -86,7 +86,7 @@ public class DiscoverTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
-        _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _discoveryEventHandler2);
+        _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetRunSettingsWithCurrentTargetFramework(), new TestPlatformOptions() { CollectMetrics = true }, _discoveryEventHandler2);
 
         // Assert.
         Assert.AreEqual(6, _discoveryEventHandler2.DiscoveredTestCases.Count);
@@ -164,7 +164,7 @@ public class DiscoverTests : AcceptanceTestBase
 
         _vstestConsoleWrapper.DiscoverTests(
             GetTestAssemblies(),
-            GetDefaultRunSettings(),
+            GetRunSettingsWithCurrentTargetFramework(),
             null,
             eventHandler2);
 
@@ -182,7 +182,7 @@ public class DiscoverTests : AcceptanceTestBase
 
         _vstestConsoleWrapper.DiscoverTests(
             GetTestAssemblies(),
-            GetDefaultRunSettings(),
+            GetRunSettingsWithCurrentTargetFramework(),
             _discoveryEventHandler);
 
         // Assert.
@@ -209,9 +209,9 @@ public class DiscoverTests : AcceptanceTestBase
         // Setup
         var testAssemblies = new List<string>
         {
-            GetAssetFullPath("DiscoveryTestProject.dll"),
-            GetAssetFullPath("SimpleTestProject.dll"),
-            GetAssetFullPath("SimpleTestProject2.dll")
+            GetTestDll("DiscoveryTestProject.dll"),
+            GetTestDll("SimpleTestProject.dll"),
+            GetTestDll("SimpleTestProject2.dll")
         };
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -223,7 +223,7 @@ public class DiscoverTests : AcceptanceTestBase
             ((IEnumerable<TestCase> testcases) => discoveredTests.AddRange(testcases));
 
         // Act
-        var discoveryTask = Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), discoveryEvents.Object));
+        var discoveryTask = Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, GetRunSettingsWithCurrentTargetFramework(), discoveryEvents.Object));
 
         Task.Delay(2000).Wait();
         _vstestConsoleWrapper.CancelDiscovery();
@@ -238,8 +238,8 @@ public class DiscoverTests : AcceptanceTestBase
     {
         var testAssemblies = new List<string>
         {
-            GetAssetFullPath("SimpleTestProject.dll"),
-            GetAssetFullPath("SimpleTestProject2.dll")
+            GetTestDll("SimpleTestProject.dll"),
+            GetTestDll("SimpleTestProject2.dll")
         };
 
         return testAssemblies;

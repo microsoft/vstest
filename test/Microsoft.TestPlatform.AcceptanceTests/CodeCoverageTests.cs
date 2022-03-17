@@ -251,7 +251,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         TestParameters testParameters,
         out string trxFilePath)
     {
-        var assemblyPaths = GetAssetFullPath(testParameters.AssemblyName);
+        var assemblyPaths = GetTestDll(testParameters.AssemblyName);
 
         string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
             "artifacts", IntegrationTestEnvironment.BuildConfiguration, "Microsoft.CodeCoverage");

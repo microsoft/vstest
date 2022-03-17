@@ -10,11 +10,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 ///
 /// When that adds up to no configuration exception is thrown.
 /// </summary>
-public class HostCompatibilityDataSource : TestDataSource<RunnerInfo>
+public class TestHostCompatibilityDataSource : TestDataSource<RunnerInfo>
 {
     private readonly CompatibilityRowsBuilder _builder;
 
-    public HostCompatibilityDataSource(
+    public TestHostCompatibilityDataSource(
         string runnerFrameworks = AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET,
         string hostFrameworks = AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET,
         string hostVersions = AcceptanceTestBase.LATEST_TO_LEGACY)
@@ -37,14 +37,12 @@ public class HostCompatibilityDataSource : TestDataSource<RunnerInfo>
     }
 
     public bool DebugVSTestConsole { get; set; }
-    public bool DebugTesthost { get; set; }
+    public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
     public bool NoDefaultBreakpoints { get; set; } = true;
 
     public string? BeforeFeature { get; set; }
     public string? AfterFeature { get; set; }
-    public string? BeforeAdapterFeature { get; set; }
-    public string? AfterAdapterFeature { get; set; }
 
     public override void CreateData(MethodInfo methodInfo)
     {
@@ -54,14 +52,12 @@ public class HostCompatibilityDataSource : TestDataSource<RunnerInfo>
         _builder.WithOlderConfigurations = false;
         _builder.WithInProcess = false;
 
-        _builder.BeforeFeature = BeforeFeature;
-        _builder.AfterFeature = AfterFeature;
-        _builder.BeforeAdapterFeature = BeforeAdapterFeature;
-        _builder.AfterAdapterFeature = AfterAdapterFeature;
+        _builder.BeforeTestHostFeature = BeforeFeature;
+        _builder.AfterTestHostFeature = AfterFeature;
 
         _builder.DebugDataCollector = DebugDataCollector;
         _builder.DebugVSTestConsole = DebugVSTestConsole;
-        _builder.DebugTesthost = DebugTesthost;
+        _builder.DebugTestHost = DebugTestHost;
         _builder.NoDefaultBreakpoints = NoDefaultBreakpoints;
 
         var data = _builder.CreateData();

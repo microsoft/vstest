@@ -6,10 +6,11 @@ using System;
 namespace Microsoft.TestPlatform.TestUtilities;
 
 [Serializable]
-public class MSTestInfo : DllInfo
+public class NetTestSdkInfo : DllInfo
 {
-    public MSTestInfo(string versionType, string? version, string path)
-        : base(name: "MSTest", propertyName: "MSTest", versionType, version, path)
+    public NetTestSdkInfo()
     {
+        Name = "Testhost";
+        PropertyName = "VSTestConsole";
     }
 }

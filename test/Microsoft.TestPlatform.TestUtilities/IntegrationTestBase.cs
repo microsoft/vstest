@@ -224,7 +224,7 @@ public class IntegrationTestBase
     {
         var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
 
-        if (_testEnvironment.DebugInfo.DebugVSTestConsole || _testEnvironment.DebugInfo.DebugTesthost || _testEnvironment.DebugInfo.DebugDataCollector)
+        if (_testEnvironment.DebugInfo.DebugVSTestConsole || _testEnvironment.DebugInfo.DebugTestHost || _testEnvironment.DebugInfo.DebugDataCollector)
         {
             environmentVariables ??= new Dictionary<string, string>();
 
@@ -233,7 +233,7 @@ public class IntegrationTestBase
                 environmentVariables.Add("VSTEST_RUNNER_DEBUG_ATTACHVS", "1");
             }
 
-            if (_testEnvironment.DebugInfo.DebugTesthost)
+            if (_testEnvironment.DebugInfo.DebugTestHost)
             {
                 environmentVariables.Add("VSTEST_HOST_DEBUG_ATTACHVS", "1");
             }
@@ -522,27 +522,27 @@ public class IntegrationTestBase
         }
     }
 
-    protected string GetSampleTestAssembly()
+    protected string GetSampleTestDll()
     {
-        return GetAssetFullPath("SimpleTestProject.dll");
+        return GetTestDll("SimpleTestProject.dll");
     }
 
-    protected string GetAssetFullPath(string assetName)
+    protected string GetTestDll(string assetName)
     {
         return _testEnvironment.GetTestAsset(assetName);
     }
 
-    protected string GetAssetFullPath(string assetName, string targetFramework)
+    protected string GetTestDllForFramework(string assetName, string targetFramework)
     {
         return _testEnvironment.GetTestAsset(assetName, targetFramework);
     }
 
-    protected List<string> GetAssetFullPath(DllInfo dllInfo, params string[] assetNames)
+    protected List<string> GetTestDlls(params string[] assetNames)
     {
         var assets = new List<string>();
         foreach (var assetName in assetNames)
         {
-            assets.Add(dllInfo.UpdatePath(GetAssetFullPath(assetName)));
+            assets.Add(GetTestDll(assetName));
         }
 
         return assets;
@@ -674,7 +674,7 @@ public class IntegrationTestBase
         Console.WriteLine($"Console runner path: {consoleRunnerPath}");
 
         VsTestConsoleWrapper vstestConsoleWrapper;
-        if (_testEnvironment.DebugInfo.DebugVSTestConsole || _testEnvironment.DebugInfo.DebugTesthost || _testEnvironment.DebugInfo.DebugDataCollector)
+        if (_testEnvironment.DebugInfo.DebugVSTestConsole || _testEnvironment.DebugInfo.DebugTestHost || _testEnvironment.DebugInfo.DebugDataCollector)
         {
             var environmentVariables = new Dictionary<string, string>();
             Environment.GetEnvironmentVariables().OfType<DictionaryEntry>().ToList().ForEach(e => environmentVariables.Add(e.Key.ToString(), e.Value.ToString()));
@@ -684,7 +684,7 @@ public class IntegrationTestBase
                 environmentVariables.Add("VSTEST_RUNNER_DEBUG_ATTACHVS", "1");
             }
 
-            if (_testEnvironment.DebugInfo.DebugTesthost)
+            if (_testEnvironment.DebugInfo.DebugTestHost)
             {
                 environmentVariables.Add("VSTEST_HOST_DEBUG_ATTACHVS", "1");
             }
@@ -906,24 +906,7 @@ public class IntegrationTestBase
 
     protected string BuildMultipleAssemblyPath(params string[] assetNames)
     {
-        var assetFullPaths = new string[assetNames.Length];
-        for (var i = 0; i < assetNames.Length; i++)
-        {
-            var path = GetAssetFullPath(assetNames[i]);
-            if (_testEnvironment.DllInfos.Count > 0)
-            {
-                foreach (var dllInfo in _testEnvironment.DllInfos)
-                {
-                    path = dllInfo.UpdatePath(path);
-                }
-
-                Assert.IsTrue(File.Exists(path), "GetTestAsset: Path not found: \"{0}\". Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", path);
-            }
-
-            assetFullPaths[i] = path.AddDoubleQuote();
-        }
-
-        return string.Join(" ", assetFullPaths);
+        return string.Join(" ", GetTestDlls(assetNames));
     }
 
     protected static string GetDiagArg(string rootDir)

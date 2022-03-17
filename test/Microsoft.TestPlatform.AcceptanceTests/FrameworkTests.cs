@@ -19,7 +19,7 @@ public class FrameworkTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: TempDirectory.Path);
+        var arguments = PrepareArguments(GetSampleTestDll(), string.Empty, string.Empty, string.Empty, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " ", $"/Framework:{FrameworkArgValue}");
 
         InvokeVsTest(arguments);
@@ -33,7 +33,7 @@ public class FrameworkTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: TempDirectory.Path);
+        var arguments = PrepareArguments(GetSampleTestDll(), string.Empty, string.Empty, string.Empty, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " ", $"/Framework:{_testEnvironment.TargetFramework}");
 
         InvokeVsTest(arguments);
@@ -49,7 +49,7 @@ public class FrameworkTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: TempDirectory.Path);
+        var arguments = PrepareArguments(GetSampleTestDll(), string.Empty, string.Empty, string.Empty, resultsDirectory: TempDirectory.Path);
         if (runnerInfo.TargetFramework.Contains("netcore"))
         {
             arguments = string.Concat(arguments, " ", "/Framework:Framework45");
@@ -80,7 +80,7 @@ public class FrameworkTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: TempDirectory.Path);
+        var arguments = PrepareArguments(GetSampleTestDll(), string.Empty, string.Empty, string.Empty, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " ", "/tests:PassingTest");
         arguments = string.Concat(arguments, " ", "/Framework:Framework40");
 

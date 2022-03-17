@@ -47,13 +47,15 @@ public class CompatibilityRowsBuilder
     public bool WithEveryVersionOfAdapter { get; set; } = true;
     public bool WithOlderConfigurations { get; set; } = true;
 
-    public string? BeforeFeature { get; set; }
-    public string? AfterFeature { get; set; }
+    public string? BeforeRunnerFeature { get; set; }
+    public string? AfterRunnerFeature { get; set; }
+    public string? BeforeTestHostFeature { get; set; }
+    public string? AfterTestHostFeature { get; set; }
     public string? BeforeAdapterFeature { get; set; }
     public string? AfterAdapterFeature { get; set; }
 
     public bool DebugVSTestConsole { get; set; }
-    public bool DebugTesthost { get; set; }
+    public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
     public bool NoDefaultBreakpoints { get; set; } = true;
 
@@ -79,26 +81,40 @@ public class CompatibilityRowsBuilder
 
         var minVersion = SemVersion.Parse("0.0.0-alpha.1");
         var maxVersion = SemVersion.Parse("9999.0.0");
-        SemVersion? beforeVersion = maxVersion;
-        SemVersion? afterVersion = minVersion;
+        SemVersion? beforeRunnerVersion = maxVersion;
+        SemVersion? afterRunnerVersion = minVersion;
+        SemVersion? beforeTestHostVersion = maxVersion;
+        SemVersion? afterTestHostVersion = minVersion;
         SemVersion? beforeAdapterVersion = maxVersion;
         SemVersion? afterAdapterVersion = minVersion;
 
-        if (BeforeFeature != null)
+        if (BeforeRunnerFeature != null)
         {
-            var feature = Features.TestPlatformFeatures[BeforeFeature];
-            beforeVersion = SemVersion.Parse(feature.Version.TrimStart('v'));
+            var feature = Features.TestPlatformFeatures[BeforeRunnerFeature];
+            beforeRunnerVersion = SemVersion.Parse(feature.Version.TrimStart('v'));
         }
 
-        if (AfterFeature != null)
+        if (AfterRunnerFeature != null)
         {
-            var feature = Features.TestPlatformFeatures[AfterFeature];
-            afterVersion = SemVersion.Parse(feature.Version.TrimStart('v'));
+            var feature = Features.TestPlatformFeatures[AfterRunnerFeature];
+            afterRunnerVersion = SemVersion.Parse(feature.Version.TrimStart('v'));
         }
 
-        if (BeforeFeature != null)
+        if (BeforeTestHostFeature != null)
         {
-            var feature = Features.TestPlatformFeatures[BeforeFeature];
+            var feature = Features.TestPlatformFeatures[BeforeTestHostFeature];
+            beforeTestHostVersion = SemVersion.Parse(feature.Version.TrimStart('v'));
+        }
+
+        if (AfterTestHostFeature != null)
+        {
+            var feature = Features.TestPlatformFeatures[AfterTestHostFeature];
+            afterTestHostVersion = SemVersion.Parse(feature.Version.TrimStart('v'));
+        }
+
+        if (BeforeAdapterFeature != null)
+        {
+            var feature = Features.TestPlatformFeatures[BeforeAdapterFeature];
             beforeAdapterVersion = SemVersion.Parse(feature.Version.TrimStart('v'));
         }
 
@@ -120,16 +136,21 @@ public class CompatibilityRowsBuilder
         Func<SemVersion, SemVersion, SemVersion, bool> isInRange = (version, before, after) => version < before && after < version;
 
         var rows = dataRows.Where(r => r.VSTestConsoleInfo != null
-            && isInRange(r.VSTestConsoleInfo.Version, beforeVersion, afterVersion)
-            && r.DllInfos.All(d => d is NetTestSdkInfo ? isInRange(d.Version, beforeVersion, afterVersion) : isInRange(d.Version, beforeAdapterVersion, afterAdapterVersion))).ToList();
+            && isInRange(r.VSTestConsoleInfo.Version, beforeRunnerVersion, afterRunnerVersion)
+            && r.TestHostInfo != null && isInRange(r.TestHostInfo.Version, beforeTestHostVersion, afterTestHostVersion)
+            && r.AdapterInfo != null && isInRange(r.AdapterInfo.Version, beforeAdapterVersion, afterAdapterVersion)).ToList();
 
-        if (rows.Count == 0)
+        // We use ToString to determine which values are unique. Not great solution, but works better than using records.
+        var distinctRows = new Dictionary<string, RunnerInfo>();
+        rows.ForEach(r => distinctRows[r.ToString()] = r);
+
+        if (distinctRows.Count == 0)
         {
-            // TODO: This needs to be way more specific about what happened.
+            // TODO: This needs to be way more specific about what happened. And possibly propagate as inconclusive state if we decide to update versions automatically?
             throw new InvalidOperationException("There were no rows that matched the specified criteria.");
         }
 
-        return rows;
+        return distinctRows.Values.ToList();
     }
 
     private void AddInProcess(List<RunnerInfo> dataRows)
@@ -147,7 +168,7 @@ public class CompatibilityRowsBuilder
                 {
                     foreach (var adapterVersion in _adapterVersions)
                     {
-                        AddRow(dataRows, runnerVersion, runnerFramework, runnerVersion, runnerFramework, adapter, adapterVersion, inIsolation: false);
+                        AddRow(dataRows, "In process", runnerVersion, runnerFramework, runnerVersion, runnerFramework, adapter, adapterVersion, inIsolation: false);
                     }
                 }
             }
@@ -158,7 +179,7 @@ public class CompatibilityRowsBuilder
     {
         // Older configurations where the runner, host and adapter version are the same.
         // We already added the row where all are newest when adding combination with all runners.
-        foreach (var runnerVersion in _runnerVersions.Skip(1))
+        foreach (var runnerVersion in _runnerVersions)
         {
             foreach (var runnerFramework in _runnerFrameworks)
             {
@@ -168,8 +189,8 @@ public class CompatibilityRowsBuilder
                     var hostVersion = runnerVersion;
                     foreach (var adapter in _adapters)
                     {
-                        var adapterVersion = runnerVersion;
-                        AddRow(dataRows, runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
+                        var adapterVersion = _adapterVersions[0];
+                        AddRow(dataRows, "Older", runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
                     }
                 }
             }
@@ -190,10 +211,9 @@ public class CompatibilityRowsBuilder
                 var hostVersion = isNetFramework ? runnerVersion : _hostVersions[0];
                 foreach (var adapter in _adapters)
                 {
-                    // We already used the newest when adding combination with every runner
-                    foreach (var adapterVersion in _adapterVersions.Skip(1))
+                    foreach (var adapterVersion in _adapterVersions)
                     {
-                        AddRow(dataRows, runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
+                        AddRow(dataRows, "Every adapter", runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
                     }
                 }
             }
@@ -211,16 +231,15 @@ public class CompatibilityRowsBuilder
                 var isNetFramework = hostFramework.StartsWith("net4");
                 // .NET Framework testhost ships with the runner, and the version from the
                 // runner directory is always the same as the runner. There are no variations
-                // so we just need to add host versions for .NET testhosts. We also skip the
-                // newest version because we already added it when AddEveryVersionOfRunner
-                var hostVersions = isNetFramework ? Array.Empty<string>() : _hostVersions.Skip(1).ToArray();
+                // so we just need to add host versions for .NET testhosts.
+                var hostVersions = isNetFramework ? Array.Empty<string>() : _hostVersions.ToArray();
                 foreach (var hostVersion in hostVersions)
                 {
                     foreach (var adapter in _adapters)
                     {
                         // use the newest
                         var adapterVersion = _adapterVersions[0];
-                        AddRow(dataRows, runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
+                        AddRow(dataRows, "Every host", runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
                     }
                 }
             }
@@ -243,17 +262,17 @@ public class CompatibilityRowsBuilder
                     {
                         // use the newest
                         var adapterVersion = _adapterVersions[0];
-                        AddRow(dataRows, runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
+                        AddRow(dataRows, "Every runner", runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
                     }
                 }
             }
         }
     }
 
-    private void AddRow(List<RunnerInfo> dataRows,
+    private void AddRow(List<RunnerInfo> dataRows, string batch,
 string runnerVersion, string runnerFramework, string hostVersion, string hostFramework, string adapter, string adapterVersion, bool inIsolation)
     {
-        RunnerInfo runnerInfo = GetRunnerInfo(runnerFramework, hostFramework, inIsolation);
+        RunnerInfo runnerInfo = GetRunnerInfo(batch, runnerFramework, hostFramework, inIsolation);
         runnerInfo.DebugInfo = GetDebugInfo();
         runnerInfo.VSTestConsoleInfo = GetVSTestConsoleInfo(runnerVersion, runnerInfo);
 
@@ -263,8 +282,8 @@ string runnerVersion, string runnerFramework, string hostVersion, string hostFra
         // C:\p\vstest\test\TestAssets\MSTestProject1\bin\MSTestLatestPreview-2.2.9-preview-20220210-07\NETTestSdkLatest-17.2.0-dev\Debug\net451\MSTestProject1.dll
         // versus adding testSdk second:
         // C:\p\vstest\test\TestAssets\MSTestProject1\bin\NETTestSdkLatest-17.2.0-dev\MSTestLatestPreview-2.2.9-preview-20220210-07\Debug\net451\MSTestProject1.dll
-        runnerInfo.DllInfos.Add(GetMSTestInfo(adapterVersion));
-        runnerInfo.DllInfos.Add(GetNetTestSdkInfo(hostVersion));
+        runnerInfo.TestHostInfo = GetNetTestSdkInfo(hostVersion);
+        runnerInfo.AdapterInfo = GetMSTestInfo(adapterVersion);
         dataRows.Add(runnerInfo);
     }
 
@@ -273,24 +292,25 @@ string runnerVersion, string runnerFramework, string hostVersion, string hostFra
         return new DebugInfo
         {
             DebugDataCollector = DebugDataCollector,
-            DebugTesthost = DebugTesthost,
+            DebugTestHost = DebugTestHost,
             DebugVSTestConsole = DebugVSTestConsole,
             NoDefaultBreakpoints = NoDefaultBreakpoints
         };
     }
 
 
-    private RunnerInfo GetRunnerInfo(string runnerFramework, string hostFramework, bool inIsolation)
+    private RunnerInfo GetRunnerInfo(string batch, string runnerFramework, string hostFramework, bool inIsolation)
     {
         return new RunnerInfo
         {
+            Batch = batch,
             RunnerFramework = runnerFramework,
             TargetFramework = hostFramework,
             InIsolationValue = inIsolation ? AcceptanceTestBase.InIsolation : null
         };
     }
 
-    private MSTestInfo GetMSTestInfo(string msTestVersion)
+    private DllInfo GetMSTestInfo(string msTestVersion)
     {
         var depsXml = GetDependenciesXml();
 
@@ -301,7 +321,14 @@ string runnerVersion, string runnerFramework, string hostVersion, string hostFra
         var slash = Path.DirectorySeparatorChar;
         var versionSpecificBinPath = $"{slash}bin{slash}MSTest{msTestVersion}-{version}{slash}";
 
-        return new MSTestInfo(msTestVersion, version, versionSpecificBinPath);
+        return new DllInfo
+        {
+            Name = "MSTest",
+            PropertyName = "MSTest",
+            VersionType = msTestVersion,
+            Version = version,
+            Path = versionSpecificBinPath,
+        };
     }
 
     private static VSTestConsoleInfo GetVSTestConsoleInfo(string vstestConsoleVersion, RunnerInfo runnerInfo)
@@ -335,7 +362,12 @@ string runnerVersion, string runnerFramework, string hostVersion, string hostFra
             vstestConsolePath = vstestConsolePath.Replace("netcoreapp2.1", "netcoreapp2.0");
         }
 
-        return new VSTestConsoleInfo(vstestConsoleVersion, version, vstestConsolePath);
+        return new VSTestConsoleInfo
+        {
+            VersionType = vstestConsoleVersion,
+            Version = version,
+            Path = vstestConsolePath,
+        };
     }
 
     private static NetTestSdkInfo GetNetTestSdkInfo(string testhostVersionType)
@@ -358,7 +390,12 @@ string runnerVersion, string runnerFramework, string hostVersion, string hostFra
         var slash = Path.DirectorySeparatorChar;
         var versionSpecificBinPath = $"{slash}bin{slash}NETTestSdk{testhostVersionType}-{version}{slash}";
 
-        return new NetTestSdkInfo(testhostVersionType, version, versionSpecificBinPath);
+        return new NetTestSdkInfo
+        {
+            VersionType = testhostVersionType,
+            Version = version,
+            Path = versionSpecificBinPath
+        };
     }
 
 

@@ -38,7 +38,7 @@ public class AppDomainTests : AcceptanceTestBase
 
         var runsettingsFilePath = GetInProcDataCollectionRunsettingsFile(true, TempDirectory);
         var arguments = PrepareArguments(
-            GetSampleTestAssembly(),
+            GetSampleTestDll(),
             GetTestAdapterPath(),
             runsettingsFilePath,
             FrameworkArgValue,

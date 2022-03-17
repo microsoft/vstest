@@ -7,13 +7,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 public static class Features
 {
-    public const string ATTACH_DEBUGGER = nameof(ATTACH_DEBUGGER);
+    public const string ATTACH_DEBUGGER_FLOW = nameof(ATTACH_DEBUGGER_FLOW);
     public const string MSTEST_IFRAMEWORK_HANDLE_99 = nameof(MSTEST_IFRAMEWORK_HANDLE_99);
 
 
     public static Dictionary<string, Feature> TestPlatformFeatures { get; } = new Dictionary<string, Feature>
     {
-        [ATTACH_DEBUGGER] = new(version: "v16.7.0-preview-20200519-01", issue: "https://github.com/microsoft/vstest/pull/2325"),
+        [ATTACH_DEBUGGER_FLOW] = new(version: "v16.7.0-preview-20200519-01", issue: "https://github.com/microsoft/vstest/pull/2325"),
     };
 
     public static Dictionary<string, Feature> AdapterFeatures { get; internal set; } = new Dictionary<string, Feature>

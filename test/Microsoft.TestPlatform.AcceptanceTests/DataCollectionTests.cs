@@ -87,7 +87,7 @@ public class DataCollectionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.1"), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
+        var arguments = PrepareArguments(GetTestDllForFramework("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.1"), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 0, 0);
@@ -100,7 +100,7 @@ public class DataCollectionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll"), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
+        var arguments = PrepareArguments(GetTestDll("AppDomainGetAssembliesTestProject.dll"), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 0, 0);

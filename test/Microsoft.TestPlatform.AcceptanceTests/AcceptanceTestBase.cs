@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
 
@@ -73,7 +74,8 @@ public class AcceptanceTestBase : IntegrationTestBase
     protected static void SetTestEnvironment(IntegrationTestEnvironment testEnvironment, RunnerInfo runnerInfo)
     {
         testEnvironment.VSTestConsoleInfo = runnerInfo.VSTestConsoleInfo;
-        testEnvironment.DllInfos = runnerInfo.DllInfos;
+        // The order here matters, it changes how the resulting path is built when we resolve test dlls and other assets.
+        testEnvironment.DllInfos = new[] { runnerInfo.AdapterInfo, runnerInfo.TestHostInfo }.Where(d => d != null).ToList();
         testEnvironment.DebugInfo = runnerInfo.DebugInfo;
 
         testEnvironment.RunnerFramework = runnerInfo.RunnerFramework;
@@ -111,17 +113,37 @@ public class AcceptanceTestBase : IntegrationTestBase
     }
 
     /// <summary>
-    /// Default RunSettings
+    /// Empty runsettings, just with the RunSettings tag that we require.
     /// </summary>
     /// <returns></returns>
-    public string GetDefaultRunSettings()
+    public string GetEmptyRunsettings()
     {
-        string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
-                                    <RunSettings>
-                                        <RunConfiguration>
-                                        <TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion>
-                                        </RunConfiguration>
-                                    </RunSettings>";
+        return "<RunSettings></RunSettings>";
+    }
+
+    /// <summary>
+    /// Almost empty runsettings, just specifying the target framework from the currently set test environment.
+    /// </summary>
+    public string GetRunSettingsWithCurrentTargetFramework()
+    {
+        return GetRunSettingsWithTargetFramework(FrameworkArgValue);
+    }
+
+    /// <summary>
+    /// Almost empty runsettings, just specifying the given target framework.
+    /// Use the overload without any parameters to get the target framework from the currently set test environment.
+    /// </summary>
+    /// <returns></returns>
+    public string GetRunSettingsWithTargetFramework(string targetFramework)
+    {
+        string runSettingsXml =
+            $@"<?xml version=""1.0"" encoding=""utf-8""?>
+            <RunSettings>
+                <RunConfiguration>
+                    <TargetFrameworkVersion>{targetFramework}</TargetFrameworkVersion>
+                </RunConfiguration>
+            </RunSettings>";
+
         return runSettingsXml;
     }
 }

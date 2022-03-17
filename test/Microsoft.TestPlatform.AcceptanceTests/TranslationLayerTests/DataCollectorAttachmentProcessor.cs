@@ -124,5 +124,5 @@ public class DataCollectorAttachmentProcessor : AcceptanceTestBase
     }
 
     private IList<string> GetTestAssemblies()
-        => new List<string> { "SimpleTestProject.dll", "SimpleTestProject2.dll" }.Select(p => GetAssetFullPath(p)).ToList();
+        => new List<string> { "SimpleTestProject.dll", "SimpleTestProject2.dll" }.Select(p => GetTestDll(p)).ToList();
 }

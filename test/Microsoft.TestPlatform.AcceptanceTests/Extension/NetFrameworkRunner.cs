@@ -32,7 +32,7 @@ public class NetFrameworkRunner : Attribute, ITestDataSource
     }
 
     public bool DebugVSTestConsole { get; set; }
-    public bool DebugTesthost { get; set; }
+    public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
     public bool NoDefaultBreakpoints { get; set; } = true;
 
@@ -58,7 +58,7 @@ public class NetFrameworkRunner : Attribute, ITestDataSource
             runnerInfo.DebugInfo = new DebugInfo
             {
                 DebugVSTestConsole = DebugVSTestConsole,
-                DebugTesthost = DebugTesthost,
+                DebugTestHost = DebugTestHost,
                 DebugDataCollector = DebugDataCollector,
                 NoDefaultBreakpoints = NoDefaultBreakpoints,
             };

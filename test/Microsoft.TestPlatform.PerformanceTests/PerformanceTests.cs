@@ -18,7 +18,7 @@ public class PerformanceTests : PerformanceTestBase
     [TestMethod]
     public void ExecutionPerformanceTest()
     {
-        RunExecutionPerformanceTests(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty);
+        RunExecutionPerformanceTests(GetSampleTestDll(), GetTestAdapterPath(), string.Empty);
 
         ValidateSummaryStatus(1, 1, 1);
         ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
@@ -35,7 +35,7 @@ public class PerformanceTests : PerformanceTestBase
     [TestMethod]
     public void DiscoveryPerformanceTest()
     {
-        RunDiscoveryPerformanceTests(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty);
+        RunDiscoveryPerformanceTests(GetSampleTestDll(), GetTestAdapterPath(), string.Empty);
 
         ValidateDiscoveredTests(
             "SampleUnitTestProject.UnitTest1.PassingTest",
@@ -52,7 +52,7 @@ public class PerformanceTests : PerformanceTestBase
     [TestMethod]
     public void VsTestConsolePerformanceTest()
     {
-        RunExecutionPerformanceTests(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty);
+        RunExecutionPerformanceTests(GetSampleTestDll(), GetTestAdapterPath(), string.Empty);
 
         ValidateSummaryStatus(1, 1, 1);
         ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
@@ -69,7 +69,7 @@ public class PerformanceTests : PerformanceTestBase
     [TestMethod]
     public void TestHostPerformanceTest()
     {
-        RunExecutionPerformanceTests(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty);
+        RunExecutionPerformanceTests(GetSampleTestDll(), GetTestAdapterPath(), string.Empty);
 
         ValidateSummaryStatus(1, 1, 1);
         ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
@@ -86,7 +86,7 @@ public class PerformanceTests : PerformanceTestBase
     [TestMethod]
     public void MsTestV2AdapterPerformanceTest()
     {
-        RunExecutionPerformanceTests(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty);
+        RunExecutionPerformanceTests(GetSampleTestDll(), GetTestAdapterPath(), string.Empty);
 
         ValidateSummaryStatus(1, 1, 1);
         ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");

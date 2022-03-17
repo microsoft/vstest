@@ -34,7 +34,8 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestPlatformCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER, AfterAdapterFeature = Features.MSTEST_IFRAMEWORK_HANDLE_99)]
+    [TestPlatformCompatibilityDataSource()]
+    //[TestPlatformCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER, AfterAdapterFeature = Features.MSTEST_IFRAMEWORK_HANDLE_99)]
 
     public void RunTestsFromMultipleMSTestAssemblies(RunnerInfo runnerInfo)
     {
@@ -51,7 +52,7 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [HostCompatibilityDataSource]
+    [TestHostCompatibilityDataSource]
     public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -107,7 +108,7 @@ public class ExecutionTests : AcceptanceTestBase
     [TestCategory("Windows")]
     [TestMethod]
     [MSTestCompatibilityDataSource]
-    public void RunMultipleTestAssembliesInParallel(RunnerInfo runnerInfo, MSTestInfo msTestInfo)
+    public void RunMultipleTestAssembliesInParallel(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
         using var tempDir = new TempDirectory();

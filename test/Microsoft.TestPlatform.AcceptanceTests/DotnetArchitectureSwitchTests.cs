@@ -78,7 +78,7 @@ public class DotnetArchitectureSwitchTests : AcceptanceTestBase
         AssertSwitch(stdOut);
 
         // Verify switch using test container
-        var buildAssemblyPath = GetAssetFullPath("ArchitectureSwitch.dll", "net6.0");
+        var buildAssemblyPath = GetTestDllForFramework("ArchitectureSwitch.dll", "net6.0");
         ExecuteApplication(GetDefaultDotnetMuxerLocation, $"test {buildAssemblyPath} --arch x64", out stdOut, out _, out _, env, projectDirectory);
         AssertSwitch(stdOut);
 
@@ -148,7 +148,7 @@ public class DotnetArchitectureSwitchTests : AcceptanceTestBase
         AssertSwitch(stdOut);
 
         // Verify switch using test container
-        var buildAssemblyPath = GetAssetFullPath("ArchitectureSwitch.dll", "net6.0");
+        var buildAssemblyPath = GetTestDllForFramework("ArchitectureSwitch.dll", "net6.0");
         ExecuteApplication($"{s_privateX64Installation}/{GetMuxerName}", $"test {buildAssemblyPath} --framework net6.0 --arch x64", out stdOut, out _, out _, env, projectDirectory);
         AssertSwitch(stdOut);
 
@@ -192,7 +192,7 @@ public class DotnetArchitectureSwitchTests : AcceptanceTestBase
         AssertSwitch(stdOut);
 
         // Verify switch using test container
-        var buildAssemblyPath = GetAssetFullPath("ArchitectureSwitch.dll", "net6.0");
+        var buildAssemblyPath = GetTestDllForFramework("ArchitectureSwitch.dll", "net6.0");
         ExecuteApplication($"{s_privateX64Installation}/{GetMuxerName}", $"test {buildAssemblyPath} --framework net6.0 --arch arm64", out stdOut, out _, out _, env, projectDirectory);
         AssertSwitch(stdOut);
 
@@ -249,7 +249,7 @@ public class DotnetArchitectureSwitchTests : AcceptanceTestBase
         AssertSwitch(stdOut);
 
         // Verify switch using test container
-        var buildAssemblyPath = GetAssetFullPath("ArchitectureSwitch.dll", "net6.0");
+        var buildAssemblyPath = GetTestDllForFramework("ArchitectureSwitch.dll", "net6.0");
         ExecuteApplication($"{s_privateX64Installation}/{GetMuxerName}", $"test {buildAssemblyPath} --framework net6.0 --arch arm64", out stdOut, out _, out _, env, projectDirectory);
         AssertSwitch(stdOut);
 

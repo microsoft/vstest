@@ -90,8 +90,8 @@ public class LiveUnitTestingTests : AcceptanceTestBase
     {
         var testAssemblies = new List<string>
         {
-            GetAssetFullPath("SimpleTestProject.dll"),
-            GetAssetFullPath("SimpleTestProject2.dll")
+            GetTestDll("SimpleTestProject.dll"),
+            GetTestDll("SimpleTestProject2.dll")
         };
 
         return testAssemblies;

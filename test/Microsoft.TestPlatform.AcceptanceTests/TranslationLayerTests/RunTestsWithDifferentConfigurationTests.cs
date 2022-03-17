@@ -56,7 +56,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
 
         _vstestConsoleWrapper.RunTests(
             GetTestAssemblies(),
-            GetDefaultRunSettings(),
+            GetRunSettingsWithCurrentTargetFramework(),
             _runEventHandler);
 
         // Assert
@@ -115,7 +115,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
         var runSettings = $"<RunSettings><RunConfiguration><TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion></RunConfiguration><MSTest><SettingsFile>" + testsettingsFile + "</SettingsFile></MSTest></RunSettings>";
         var sources = new List<string>
         {
-            GetAssetFullPath("MstestV1UnitTestProject.dll")
+            GetTestDll("MstestV1UnitTestProject.dll")
         };
 
         _vstestConsoleWrapper.RunTests(
@@ -140,7 +140,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
 
         var sources = new List<string>
         {
-            GetAssetFullPath("SimpleTestProject3.dll")
+            GetTestDll("SimpleTestProject3.dll")
         };
 
 
@@ -149,7 +149,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
 
         _vstestConsoleWrapper.RunTests(
             sources,
-            GetDefaultRunSettings(),
+            GetRunSettingsWithCurrentTargetFramework(),
             new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName = SampleUnitTestProject3.UnitTest1.WorkingDirectoryTest" },
             _runEventHandler);
 
@@ -163,8 +163,8 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     {
         var testAssemblies = new List<string>
         {
-            GetAssetFullPath("SimpleTestProject.dll"),
-            GetAssetFullPath("SimpleTestProject2.dll")
+            GetTestDll("SimpleTestProject.dll"),
+            GetTestDll("SimpleTestProject2.dll")
         };
 
         return testAssemblies;
