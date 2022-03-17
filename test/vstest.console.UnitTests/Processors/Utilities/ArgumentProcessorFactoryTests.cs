@@ -152,7 +152,7 @@ public class ArgumentProcessorFactoryTests
             xplatShortCommandName.Add(name.Replace('/', '-'));
         }
 
-        Mock<IDisableFeatureFlag> featureFlag = new();
+        Mock<IFeatureFlag> featureFlag = new();
         featureFlag.Setup(x => x.IsDisabled(It.IsAny<string>())).Returns(false);
         ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create(featureFlag.Object);
 

@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
-internal interface IDisableFeatureFlag
+internal interface IFeatureFlag
 {
     bool IsDisabled(string featureName);
 }

@@ -38,7 +38,7 @@ public class ConsoleLoggerTests
     private Mock<IOutput> _mockOutput;
     private ConsoleLogger _consoleLogger;
     private Mock<IProgressIndicator> _mockProgressIndicator;
-    private Mock<IDisableFeatureFlag> _mockFeatureFlag;
+    private Mock<IFeatureFlag> _mockFeatureFlag;
 
     private const string PassedTestIndicator = "  Passed ";
     private const string FailedTestIndicator = "  Failed ";
@@ -1237,7 +1237,7 @@ public class ConsoleLoggerTests
     {
         _mockRequestData = new Mock<IRequestData>();
         _mockMetricsCollection = new Mock<IMetricsCollection>();
-        _mockFeatureFlag = new Mock<IDisableFeatureFlag>();
+        _mockFeatureFlag = new Mock<IFeatureFlag>();
         _mockFeatureFlag.Setup(x => x.IsDisabled(It.IsAny<string>())).Returns(false);
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
 

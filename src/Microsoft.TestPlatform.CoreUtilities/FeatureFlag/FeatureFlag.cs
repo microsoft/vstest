@@ -23,16 +23,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 /// </summary>
 
 // !!! FEATURES MUST BE KEPT IN SYNC WITH https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestFeatureFlag.cs !!!
-internal partial class DisableFeatureFlag : IDisableFeatureFlag
+internal partial class FeatureFlag : IFeatureFlag
 {
     private static readonly Dictionary<string, bool> FeatureFlags = new();
 
-    // NEVER USE A FLAG TO ENABLE A FUNCTIONALITY
-    private const string VSTEST_FEATURE_DISABLE = nameof(VSTEST_FEATURE_DISABLE);
+    private const string VSTEST_ = nameof(VSTEST_);
 
-    public static IDisableFeatureFlag Instance { get; } = new DisableFeatureFlag();
+    public static IFeatureFlag Instance { get; } = new FeatureFlag();
 
-    static DisableFeatureFlag()
+    static FeatureFlag()
     {
         FeatureFlags.Add(DISABLE_ARTIFACTS_POSTPROCESSING, false);
         FeatureFlags.Add(DISABLE_ARTIFACTS_POSTPROCESSING_NEWSDKUX, false);
@@ -40,12 +39,12 @@ internal partial class DisableFeatureFlag : IDisableFeatureFlag
 
     // Added for artifact post-processing, it enable/disable the post processing.
     // Added in 17.2-preview 7.0-preview
-    public const string DISABLE_ARTIFACTS_POSTPROCESSING = VSTEST_FEATURE_DISABLE + "_" + "ARTIFACTS_POSTPROCESSING";
+    public const string DISABLE_ARTIFACTS_POSTPROCESSING = VSTEST_ + "_" + nameof(DISABLE_ARTIFACTS_POSTPROCESSING);
 
     // Added for artifact post-processing, it will show old output for dotnet sdk scenario.
     // It can be useful if we need to restore old UX in case users are parsing the console output.
     // Added in 17.2-preview 7.0-preview
-    public const string DISABLE_ARTIFACTS_POSTPROCESSING_NEWSDKUX = VSTEST_FEATURE_DISABLE + "_" + "ARTIFACTS_POSTPROCESSING_NEWSDKUX";
+    public const string DISABLE_ARTIFACTS_POSTPROCESSING_NEWSDKUX = VSTEST_ + "_" + nameof(DISABLE_ARTIFACTS_POSTPROCESSING_NEWSDKUX);
 
     // For now we're checking env var.
     // We could add it also to some section inside the runsettings.

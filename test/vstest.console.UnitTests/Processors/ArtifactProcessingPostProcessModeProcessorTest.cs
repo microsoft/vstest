@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 public class ArtifactProcessingPostProcessModeProcessorTest
 {
     private readonly Mock<IArtifactProcessingManager> _artifactProcessingManagerMock = new();
-    private readonly Mock<IDisableFeatureFlag> _featureFlagMock = new();
+    private readonly Mock<IFeatureFlag> _featureFlagMock = new();
 
     [TestMethod]
     public void ProcessorExecutorInitialize_ShouldFailIfNullCtor()

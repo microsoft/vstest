@@ -44,8 +44,8 @@ internal class ArtifactProcessingPostProcessModeProcessor : IArgumentProcessor
         set => _executor = value;
     }
 
-    public static bool ContainsPostProcessCommand(string[]? args, IDisableFeatureFlag? featureFlag = null)
-        => !(featureFlag ?? DisableFeatureFlag.Instance).IsDisabled(DisableFeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING) &&
+    public static bool ContainsPostProcessCommand(string[]? args, IFeatureFlag? featureFlag = null)
+        => !(featureFlag ?? FeatureFlag.Instance).IsDisabled(FeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING) &&
             (args?.Contains("--artifactsProcessingMode-postprocess", StringComparer.OrdinalIgnoreCase) == true ||
             args?.Contains(CommandName, StringComparer.OrdinalIgnoreCase) == true);
 }

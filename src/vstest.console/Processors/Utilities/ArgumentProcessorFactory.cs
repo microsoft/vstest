@@ -58,11 +58,11 @@ internal class ArgumentProcessorFactory
     /// The feature flag support.
     /// </param>
     /// <returns>ArgumentProcessorFactory.</returns>
-    internal static ArgumentProcessorFactory Create(IDisableFeatureFlag disableFeatureFlag = null)
+    internal static ArgumentProcessorFactory Create(IFeatureFlag disableFeatureFlag = null)
     {
         var defaultArgumentProcessor = DefaultArgumentProcessors;
 
-        if (!(disableFeatureFlag ?? DisableFeatureFlag.Instance).IsDisabled(DisableFeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING))
+        if (!(disableFeatureFlag ?? FeatureFlag.Instance).IsDisabled(FeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING))
         {
             defaultArgumentProcessor.Add(new ArtifactProcessingCollectModeProcessor());
             defaultArgumentProcessor.Add(new ArtifactProcessingPostProcessModeProcessor());

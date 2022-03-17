@@ -12,6 +12,6 @@ public class DisableFeatureFlagTests
     [TestMethod]
     public void SingletonAlwaysReturnsTheSameInstance()
     {
-        Assert.IsTrue(ReferenceEquals(DisableFeatureFlag.Instance, DisableFeatureFlag.Instance));
+        Assert.IsTrue(ReferenceEquals(FeatureFlag.Instance, FeatureFlag.Instance));
     }
 }

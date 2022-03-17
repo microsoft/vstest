@@ -31,7 +31,7 @@ public class ArtifactProcessingTests
     private readonly Mock<IFileHelper> _fileHelperMock = new();
     private readonly Mock<ITestRunAttachmentsProcessingManager> _testRunAttachmentsProcessingManagerMock = new();
     private readonly Mock<ITestRunAttachmentsProcessingEventsHandler> _testRunAttachmentsProcessingEventsHandlerMock = new();
-    private readonly Mock<IDisableFeatureFlag> _featureFlagMock = new();
+    private readonly Mock<IFeatureFlag> _featureFlagMock = new();
     private readonly Mock<IDataSerializer> _dataSerializer = new();
     private readonly Mock<ITestRunStatistics> _testRunStatistics = new();
     private ArtifactProcessingManager _artifactProcessingManager;
