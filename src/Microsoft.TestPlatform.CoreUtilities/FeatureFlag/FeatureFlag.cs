@@ -34,7 +34,7 @@ internal partial class FeatureFlag : IFeatureFlag
     static FeatureFlag()
     {
         FeatureFlags.Add(DISABLE_ARTIFACTS_POSTPROCESSING, false);
-        FeatureFlags.Add(DISABLE_ARTIFACTS_POSTPROCESSING_NEWSDKUX, false);
+        FeatureFlags.Add(DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX, false);
     }
 
     // Added for artifact post-processing, it enable/disable the post processing.
@@ -44,7 +44,7 @@ internal partial class FeatureFlag : IFeatureFlag
     // Added for artifact post-processing, it will show old output for dotnet sdk scenario.
     // It can be useful if we need to restore old UX in case users are parsing the console output.
     // Added in 17.2-preview 7.0-preview
-    public const string DISABLE_ARTIFACTS_POSTPROCESSING_NEWSDKUX = VSTEST_ + "_" + nameof(DISABLE_ARTIFACTS_POSTPROCESSING_NEWSDKUX);
+    public const string DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX = VSTEST_ + "_" + nameof(DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX);
 
     // For now we're checking env var.
     // We could add it also to some section inside the runsettings.
