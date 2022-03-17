@@ -666,8 +666,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         {
             // If ARTIFACTS_POSTPROCESSING is disabled
             if (_featureFlag.IsDisabled(FeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING) ||
-                // DISABLE_ARTIFACTS_POSTPROCESSING_NEWSDKUX(new UX) is disabled
-                _featureFlag.IsDisabled(FeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING_NEWSDKUX) ||
+                // DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX(new UX) is disabled
+                _featureFlag.IsDisabled(FeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX) ||
                 // TestSessionCorrelationId is null(we're not running through the dotnet SDK).
                 CommandLineOptions.Instance.TestSessionCorrelationId is null)
             {
