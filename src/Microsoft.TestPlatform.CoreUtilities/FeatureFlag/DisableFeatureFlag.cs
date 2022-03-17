@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 /// * If we remove the flag from our code, we will do it after the feature is the new default, or after the functionality was completely removed from our codebase.
 /// * If there is a very outdated version of an assembly that for some reason loaded with the newest version of TP and it cannot find a feature flag, because we removed that feature flag in the meantime, it will just run with all it's newest features enabled.
 ///
-/// Use constants so the feature name will be hosted directly inside the assembly that reference this one avoiding back compatibility issue.
+/// Use constants so the feature name will be compiled directly into the assembly that references this, to avoid backwards compatibility issues, when the flag is removed in newer version.
 /// </summary>
 
 // !!! FEATURES MUST BE KEPT IN SYNC WITH https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestFeatureFlag.cs !!!
