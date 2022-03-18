@@ -63,7 +63,7 @@ public class ArtifactProcessingPostProcessModeProcessorTest
     [TestMethod]
     public void ArtifactProcessingPostProcessMode_ContainsPostProcessCommand()
     {
-        _featureFlagMock.Setup(x => x.IsEnabled(It.IsAny<string>())).Returns(true);
+        _featureFlagMock.Setup(x => x.IsDisabled(It.IsAny<string>())).Returns(false);
         Assert.IsTrue(ArtifactProcessingPostProcessModeProcessor.ContainsPostProcessCommand(new string[] { "--artifactsProcessingMode-postprocess" }, _featureFlagMock.Object));
         Assert.IsTrue(ArtifactProcessingPostProcessModeProcessor.ContainsPostProcessCommand(new string[] { "--ARTIfactsProcessingMode-postprocess" }, _featureFlagMock.Object));
         Assert.IsFalse(ArtifactProcessingPostProcessModeProcessor.ContainsPostProcessCommand(new string[] { "-ARTIfactsProcessingMode-postprocess" }, _featureFlagMock.Object));
