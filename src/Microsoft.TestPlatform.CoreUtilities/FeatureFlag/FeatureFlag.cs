@@ -38,12 +38,12 @@ internal partial class FeatureFlag : IFeatureFlag
 
     // Added for artifact post-processing, it enable/disable the post processing.
     // Added in 17.2-preview 7.0-preview
-    public const string DISABLE_ARTIFACTS_POSTPROCESSING = VSTEST_ + "_" + nameof(DISABLE_ARTIFACTS_POSTPROCESSING);
+    public const string DISABLE_ARTIFACTS_POSTPROCESSING = VSTEST_ + nameof(DISABLE_ARTIFACTS_POSTPROCESSING);
 
     // Added for artifact post-processing, it will show old output for dotnet sdk scenario.
     // It can be useful if we need to restore old UX in case users are parsing the console output.
     // Added in 17.2-preview 7.0-preview
-    public const string DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX = VSTEST_ + "_" + nameof(DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX);
+    public const string DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX = VSTEST_ + nameof(DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX);
 }
 
 #endif
