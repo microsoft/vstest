@@ -38,7 +38,7 @@ public class ArtifactProcessingTests
 
     public ArtifactProcessingTests()
     {
-        _featureFlagMock.Setup(x => x.IsDisabled(It.IsAny<string>())).Returns(false);
+        _featureFlagMock.Setup(x => x.IsSet(It.IsAny<string>())).Returns(false);
         _fileHelperMock.Setup(x => x.GetTempPath()).Returns("/tmp");
 
         _artifactProcessingManager =

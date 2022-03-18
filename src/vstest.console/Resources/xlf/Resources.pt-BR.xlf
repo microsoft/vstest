@@ -1174,6 +1174,11 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
         <target state="translated">O parâmetro /TestAdapterPath precisa ser fornecido quando a "{0}" estratégia de carregamento do adaptador de teste for especificada!</target>
         <note>{0} is the strategy name, "Explicit" for example.</note>
       </trans-unit>
+      <trans-unit id="WarningEmulatedOnArm64">
+        <source>vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.</source>
+        <target state="new">vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

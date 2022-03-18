@@ -17,8 +17,9 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-# if DEBUG
+#if DEBUG
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 #endif
 
@@ -96,6 +97,7 @@ public class TestDiscoveryTests
 
         var testRunResultAggregator = new TestRunResultAggregator();
         var fakeTestPlatformEventSource = new FakeTestPlatformEventSource(fakeErrorAggregator);
+        var fakeEnvironment = new FakeEnvironment();
 
         var fakeAssemblyMetadataProvider = new FakeAssemblyMetadataProvider(fakeFileHelper, fakeErrorAggregator);
         var inferHelper = new InferHelper(fakeAssemblyMetadataProvider);
@@ -114,8 +116,8 @@ public class TestDiscoveryTests
             inferHelper,
             fakeMetricsPublisherTask,
             fakeProcessHelper,
-            testRunAttachmentsProcessingManager
-            );
+            testRunAttachmentsProcessingManager,
+            fakeEnvironment);
 
         // -- act
 
