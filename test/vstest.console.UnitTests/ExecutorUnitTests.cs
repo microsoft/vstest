@@ -324,7 +324,7 @@ public class ExecutorUnitTests
     }
 
     [TestMethod]
-    public void ExecutorShouldPrintsRunnerArchitecture()
+    public void ExecutorShouldPrintRunnerArchitecture()
     {
         var mockOutput = new MockOutput();
         Mock<IProcessHelper> processHelper = new();
