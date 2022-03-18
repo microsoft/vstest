@@ -9,6 +9,7 @@ namespace vstest.ProgrammerTests.Fakes;
 internal class FakeEnvironment : IEnvironment
 {
     private readonly IEnvironment _environment = new PlatformEnvironment();
+
     public PlatformArchitecture Architecture => _environment.Architecture;
 
     public PlatformOperatingSystem OperatingSystem => _environment.OperatingSystem;

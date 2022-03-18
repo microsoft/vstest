@@ -1175,7 +1175,7 @@
         <note>{0} is the strategy name, "Explicit" for example.</note>
       </trans-unit>
       <trans-unit id="WarningEmulatedOnArm64">
-        <source>For better performance, please consider running the native arm64 runner, vstest.console.arm64.exe</source>
+        <source>vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.</source>
         <target state="new">For better performance, please consider running the native arm64 runner, vstest.console.arm64.exe</target>
         <note></note>
       </trans-unit>
