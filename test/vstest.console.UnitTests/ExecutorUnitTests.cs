@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
@@ -301,6 +302,7 @@ public class ExecutorUnitTests
     }
 
     [TestMethod]
+    [TestCategory("Windows")]
     public void ExecutorShouldPrintsWarningIfRunningEmulatedOnARM64()
     {
         var mockOutput = new MockOutput();
@@ -315,8 +317,6 @@ public class ExecutorUnitTests
         var assemblyVersion = typeof(Executor).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
         Assert.AreEqual(5, mockOutput.Messages.Count);
-        Assert.AreEqual("Microsoft (R) Test Execution Command Line Tool Version 17.2.0-dev (x64)", mockOutput.Messages[0].Message);
-        Assert.AreEqual(OutputLevel.Information, mockOutput.Messages[0].Level);
         Assert.AreEqual("vstest.console.exe is running in emulated mode as x64. For better performance, please consider using the native runner vstest.console.arm64.exe.",
             mockOutput.Messages[2].Message);
         Assert.AreEqual(OutputLevel.Warning,
@@ -337,7 +337,7 @@ public class ExecutorUnitTests
         var assemblyVersion = typeof(Executor).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
         Assert.AreEqual(4, mockOutput.Messages.Count);
-        Assert.AreEqual("Microsoft (R) Test Execution Command Line Tool Version 17.2.0-dev (x64)", mockOutput.Messages[0].Message);
+        Assert.IsTrue(Regex.IsMatch(mockOutput.Messages[0].Message, @"Microsoft \(R\) Test Execution Command Line Tool Version .* \(x64\)"));
         Assert.IsFalse(mockOutput.Messages.Any(message => message.Message.Contains("vstest.console.exe is running in emulated mode")));
     }
 
