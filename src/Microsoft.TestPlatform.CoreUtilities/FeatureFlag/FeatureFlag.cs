@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 /// Use constants so the feature name will be compiled directly into the assembly that references this, to avoid backwards compatibility issues, when the flag is removed in newer version.
 /// </summary>
 
-// !!! SDK USED FEATURES MUST BE KEPT IN SYNC IN https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestFeatureFlag.cs !!!
+// !!! SDK USED FEATURE NAMES MUST BE KEPT IN SYNC IN https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestFeatureFlag.cs !!!
 internal partial class FeatureFlag : IFeatureFlag
 {
     private readonly ConcurrentDictionary<string, bool> _cache = new();
