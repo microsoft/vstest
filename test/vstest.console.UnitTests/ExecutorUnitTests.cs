@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -297,6 +298,47 @@ public class ExecutorUnitTests
             File.Delete(runSettingsFile);
             RunSettingsManager.Instance.SetActiveRunSettings(activeRunSetting);
         }
+    }
+
+    [TestMethod]
+    public void ExecutorShouldPrintsWarningIfRunningEmulatedOnARM64()
+    {
+        var mockOutput = new MockOutput();
+        Mock<IProcessHelper> processHelper = new();
+        processHelper.Setup(x => x.GetCurrentProcessArchitecture()).Returns(PlatformArchitecture.X64);
+        processHelper.Setup(x => x.GetCurrentProcessId()).Returns(0);
+        processHelper.Setup(x => x.GetCurrentProcessFileName()).Returns(@"c:\vstest.console.exe");
+        Mock<IEnvironment> environment = new();
+        environment.Setup(x => x.Architecture).Returns(PlatformArchitecture.ARM64);
+
+        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, processHelper.Object, environment.Object).Execute();
+        var assemblyVersion = typeof(Executor).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+
+        Assert.AreEqual(5, mockOutput.Messages.Count);
+        Assert.AreEqual("Microsoft (R) Test Execution Command Line Tool Version 17.2.0-dev (x64)", mockOutput.Messages[0].Message);
+        Assert.AreEqual(OutputLevel.Information, mockOutput.Messages[0].Level);
+        Assert.AreEqual("vstest.console.exe is running in emulated mode as x64. For better performance, please consider using the native runner vstest.console.arm64.exe.",
+            mockOutput.Messages[2].Message);
+        Assert.AreEqual(OutputLevel.Warning,
+            mockOutput.Messages[2].Level);
+    }
+
+    [TestMethod]
+    public void ExecutorShouldPrintsRunnerArchitecture()
+    {
+        var mockOutput = new MockOutput();
+        Mock<IProcessHelper> processHelper = new();
+        processHelper.Setup(x => x.GetCurrentProcessArchitecture()).Returns(PlatformArchitecture.X64);
+        processHelper.Setup(x => x.GetCurrentProcessId()).Returns(0);
+        Mock<IEnvironment> environment = new();
+        environment.Setup(x => x.Architecture).Returns(PlatformArchitecture.X64);
+
+        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, processHelper.Object, environment.Object).Execute();
+        var assemblyVersion = typeof(Executor).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+
+        Assert.AreEqual(4, mockOutput.Messages.Count);
+        Assert.AreEqual("Microsoft (R) Test Execution Command Line Tool Version 17.2.0-dev (x64)", mockOutput.Messages[0].Message);
+        Assert.IsFalse(mockOutput.Messages.Any(message => message.Message.Contains("vstest.console.exe is running in emulated mode")));
     }
 
     private class MockOutput : IOutput

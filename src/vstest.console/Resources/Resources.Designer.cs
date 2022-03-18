@@ -1515,15 +1515,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("SwitchToNoIsolation", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to --TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
         ///      This affects adapter loading behavior.
         ///
-        ///      Currently supported behaviours:
-        ///        - Explicit: Test Plarform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). 
+        ///      Currently supported behaviors:
+        ///        - Explicit: Test Platform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). 
         ///                    If a specific adapter path is provided, adapter will be loaded; if a directory path is provided adapters directly in that folder will be loaded, unless Recursive option is also specified.
-        ///            [rest of string was truncated]&quot;;.
+        ///             [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string TestAdapterLoadingStrategyHelp {
             get {
@@ -1539,9 +1539,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("TestAdapterLoadingStrategyValueInvalid", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to &quot;Recursive&quot; adapter loading strategy is cannot be used by itself. Please specify at least one of: {0}.
+        ///   Looks up a localized string similar to Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}.
         /// </summary>
         internal static string TestAdapterLoadingStrategyValueInvalidRecursive {
             get {
@@ -1809,7 +1809,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to For better performance, please consider running the native arm64 runner, vstest.console.arm64.exe.
+        ///   Looks up a localized string similar to vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe..
         /// </summary>
         internal static string WarningEmulatedOnArm64 {
             get {

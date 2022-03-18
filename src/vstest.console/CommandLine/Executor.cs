@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 /// </summary>
 internal class Executor
 {
-    private const string NonARMRunnerName = "vstest.console.exe";
+    private const string NonARM64RunnerName = "vstest.console.exe";
     private readonly ITestPlatformEventSource _testPlatformEventSource;
     private readonly IProcessHelper _processHelper;
     private readonly IEnvironment _environment;
@@ -430,11 +430,12 @@ internal class Executor
     /// </summary>
     private void PrintWarningIfRunningEmulatedOnArm64()
     {
-        if (Path.GetFileName(_processHelper.GetCurrentProcessFileName()) == NonARMRunnerName &&
+        var currentProcessArchitecture = _processHelper.GetCurrentProcessArchitecture();
+        if (Path.GetFileName(_processHelper.GetCurrentProcessFileName()) == NonARM64RunnerName &&
             _environment.Architecture == PlatformArchitecture.ARM64 &&
-            _processHelper.GetCurrentProcessArchitecture() != PlatformArchitecture.ARM64)
+            currentProcessArchitecture != PlatformArchitecture.ARM64)
         {
-            Output.Warning(false, CommandLineResources.WarningEmulatedOnArm64);
+            Output.Warning(false, CommandLineResources.WarningEmulatedOnArm64, currentProcessArchitecture.ToString().ToLowerInvariant());
         }
     }
 
