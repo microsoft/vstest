@@ -309,7 +309,7 @@ public class ExecutorUnitTests
         Mock<IProcessHelper> processHelper = new();
         processHelper.Setup(x => x.GetCurrentProcessArchitecture()).Returns(PlatformArchitecture.X64);
         processHelper.Setup(x => x.GetCurrentProcessId()).Returns(0);
-        processHelper.Setup(x => x.GetCurrentProcessFileName()).Returns(@"c:\vstest.console.exe");
+        processHelper.Setup(x => x.GetCurrentProcessFileName()).Returns(@"X:\vstest.console.exe");
         Mock<IEnvironment> environment = new();
         environment.Setup(x => x.Architecture).Returns(PlatformArchitecture.ARM64);
 
