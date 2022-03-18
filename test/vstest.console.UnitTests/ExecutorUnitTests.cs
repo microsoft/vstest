@@ -303,7 +303,7 @@ public class ExecutorUnitTests
 
     [TestMethod]
     [TestCategory("Windows")]
-    public void ExecutorShouldPrintsWarningIfRunningEmulatedOnARM64()
+    public void ExecutorShouldPrintWarningIfRunningEmulatedOnARM64()
     {
         var mockOutput = new MockOutput();
         Mock<IProcessHelper> processHelper = new();
