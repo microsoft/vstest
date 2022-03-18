@@ -56,38 +56,45 @@ internal class DiscoverySourceStatusCache
 
     public void MarkSourcesBasedOnDiscoveredTestCases(IEnumerable<TestCase>? testCases, bool isComplete)
     {
-        // When all testcases count in source is dividable by chunk size (e.g. 100 tests and chunk
-        // size of 10) then lastChunk is coming as empty. Otherwise, we receive the remaining test
-        // cases to process.
-        if (testCases is not null)
-        {
-            foreach (var testCase in testCases)
-            {
-                var currentSource = testCase.Source;
-
-                // We rely on the fact that sources are processed in a sequential way, which means that
-                // when we receive a different source than the previous, we can assume that the previous
-                // source was fully discovered.
-                if (_previousSource is null || _previousSource == currentSource)
-                {
-                    MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
-                }
-                else if (currentSource != _previousSource)
-                {
-                    MarkSourcesWithStatus(new[] { _previousSource }, DiscoveryStatus.FullyDiscovered);
-                    MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
-                }
-
-                _previousSource = currentSource;
-            }
-        }
-
-        // When discovery is complete (i.e. not aborted0, then the last discovered source might
-        // still be marked as partially discovered in our cache, so we need to mark it as fully
-        // discovered.
+        // When discovery is complete (i.e.not aborted), then we can assume that all partially
+        // discovered sources are now fully discovered. We should also mark all not discovered
+        // sources as fully discovered because that means that the source is considered as tests
+        // but contains no test so we never received the partially or fully discovered event.
         if (isComplete)
         {
-            MarkSourcesWithStatus(new[] { _previousSource }, DiscoveryStatus.FullyDiscovered);
+            MarkSourcesWithStatus(testCases?.Select(x => x.Source), DiscoveryStatus.FullyDiscovered);
+            MarkSourcesWithStatus(GetSourcesWithStatus(DiscoveryStatus.NotDiscovered), DiscoveryStatus.FullyDiscovered);
+            MarkSourcesWithStatus(GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered), DiscoveryStatus.FullyDiscovered);
+            // Reset last source (not mandatory but done for the sake of completness).
+            _previousSource = null;
+        }
+        else
+        {
+            // When all testcases count in source is dividable by chunk size (e.g. 100 tests and
+            // chunk size of 10) then lastChunk is coming as empty. Otherwise, we receive the
+            // remaining test cases to process.
+            if (testCases is not null)
+            {
+                foreach (var testCase in testCases)
+                {
+                    var currentSource = testCase.Source;
+
+                    // We rely on the fact that sources are processed in a sequential way, which
+                    // means that when we receive a different source than the previous, we can
+                    // assume that the previous source was fully discovered.
+                    if (_previousSource is null || _previousSource == currentSource)
+                    {
+                        MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
+                    }
+                    else if (currentSource != _previousSource)
+                    {
+                        MarkSourcesWithStatus(new[] { _previousSource }, DiscoveryStatus.FullyDiscovered);
+                        MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
+                    }
+
+                    _previousSource = currentSource;
+                }
+            }
         }
     }
 
