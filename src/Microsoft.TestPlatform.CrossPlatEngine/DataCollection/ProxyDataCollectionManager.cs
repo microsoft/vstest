@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -12,25 +8,30 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
-using CoreUtilities.Helpers;
-using Common.Telemetry;
+
+using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using CoreUtilities.Extensions;
-using Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-using CrossPlatEngineResources = Resources.Resources;
-using CommunicationUtilitiesResources = CommunicationUtilities.Resources.Resources;
-using CoreUtilitiesConstants = CoreUtilities.Constants;
-using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
+using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 /// <summary>
 /// Managed datacollector interaction from runner process.

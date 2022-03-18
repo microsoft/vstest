@@ -3,17 +3,17 @@
 
 #if !NETSTANDARD1_0
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-
-using Interfaces;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 /// <summary>
 /// The file helper.

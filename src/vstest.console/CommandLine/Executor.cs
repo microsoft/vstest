@@ -1,6 +1,26 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
 // General Flow:
 // Create a command processor for each argument.
 //   If there is no matching command processor for an argument, output error, display help and exit.
@@ -24,26 +44,6 @@
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-
-using Internal;
-using Processors;
-using TestPlatformHelpers;
-using Common;
-using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using CoreUtilities.Tracing;
-using CoreUtilities.Tracing.Interfaces;
-using ObjectModel;
-using Utilities;
-
-using CommandLineResources = Resources.Resources;
 
 /// <summary>
 /// Performs the execution based on the arguments provided.
@@ -224,7 +224,7 @@ internal class Executor
         var processorsToAlwaysExecute = processorFactory.GetArgumentProcessorsToAlwaysExecute();
         foreach (var processor in processorsToAlwaysExecute)
         {
-            if (processors.Any(i => i.Metadata.Value.CommandName == processor.Metadata.Value.CommandName)) 
+            if (processors.Any(i => i.Metadata.Value.CommandName == processor.Metadata.Value.CommandName))
             {
                 continue;
             }
@@ -470,7 +470,7 @@ internal class Executor
             return true;
         }
 
-        return !string.IsNullOrEmpty(args) && CommandLineUtilities.SplitCommandLineIntoArguments(args, out arguments);
+        return !string.IsNullOrEmpty(args) && Utilities.CommandLineUtilities.SplitCommandLineIntoArguments(args, out arguments);
     }
 
     private bool GetContentUsingFile(string fileName, out string contents)

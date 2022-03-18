@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,27 +11,30 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Extensions.DependencyModel;
+using Microsoft.Extensions.DependencyModel;
 using Microsoft.TestPlatform.TestHostProvider.Hosting;
 using Microsoft.TestPlatform.TestHostProvider.Resources;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
-using Helpers;
-using Helpers.Interfaces;
-using ObjectModel;
-using ObjectModel.Client.Interfaces;
-using ObjectModel.Host;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using PlatformAbstractions;
-using PlatformAbstractions.Interfaces;
-using Utilities;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-using Win32;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
 
 /// <summary>
 /// A host manager for <c>dotnet</c> core runtime.
@@ -51,6 +50,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private const string DotnetTestHostUri = "HostProvider://DotnetTestHost";
     private const string DotnetTestHostFriendlyName = "DotnetTestHost";
     private const string TestAdapterRegexPattern = @"TestAdapter.dll";
+    private const string PROCESSOR_ARCHITECTURE = nameof(PROCESSOR_ARCHITECTURE);
 
     private readonly IDotnetHostHelper _dotnetHostHelper;
     private readonly IEnvironment _platformEnvironment;
@@ -499,19 +499,11 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             bool isWinOnArm = false;
             if (_platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows)
             {
-                using IRegistryKey hklm = _windowsRegistryHelper.OpenBaseKey(RegistryHive.LocalMachine, Environment.Is64BitProcess ? RegistryView.Registry64 : RegistryView.Registry32);
-                if (hklm != null)
+                string processorArchitecture = Environment.GetEnvironmentVariable(PROCESSOR_ARCHITECTURE, EnvironmentVariableTarget.Machine);
+                if (processorArchitecture is not null)
                 {
-                    using IRegistryKey environment = hklm.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Session Manager\Environment");
-                    if (environment != null)
-                    {
-                        var processorArchitecture = environment.GetValue("PROCESSOR_ARCHITECTURE");
-                        if (processorArchitecture != null)
-                        {
-                            EqtTrace.Verbose($"DotnetTestHostmanager.IsWinOnArm: Current PROCESSOR_ARCHITECTURE from registry '{processorArchitecture}'");
-                            isWinOnArm = processorArchitecture.ToString().ToLowerInvariant().Contains("arm");
-                        }
-                    }
+                    EqtTrace.Verbose($"DotnetTestHostmanager.IsWinOnArm: Current PROCESSOR_ARCHITECTURE from environment variable '{processorArchitecture}'");
+                    isWinOnArm = processorArchitecture.ToString().ToLowerInvariant().Contains("arm");
                 }
             }
 
@@ -696,7 +688,12 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private string GetTestHostPath(string runtimeConfigDevPath, string depsFilePath, string sourceDirectory)
     {
         string testHostPackageName = "microsoft.testplatform.testhost";
-        string testHostPath = null;
+        // This must be empty string, otherwise the Path.Combine below
+        // will fail if a very specific setup is used where you add our dlls
+        // as assemblies directly, but you have no RuntimeAssemblyGroups in deps.json
+        // because you don't add our nuget package. In such case we just want to move on
+        // to the next fallback.
+        string testHostPath = string.Empty;
 
         if (_fileHelper.Exists(depsFilePath))
         {

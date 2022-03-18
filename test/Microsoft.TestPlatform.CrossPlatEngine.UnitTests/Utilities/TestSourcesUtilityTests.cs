@@ -1,17 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter;
-
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter;
 
 [TestClass]
 public class TestSourcesUtilityTests

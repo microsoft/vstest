@@ -57,7 +57,7 @@ done
 #
 # Variables
 #
-PROJECT_NAME_PATTERNS=**$PROJECT_NAME_PATTERNS*bin*$CONFIGURATION*netcoreapp2.1*${PROJECT_NAME_PATTERNS}Tests*dll
+PROJECT_NAME_PATTERNS=**$PROJECT_NAME_PATTERNS*bin*$CONFIGURATION*net6.0*$PROJECT_NAME_PATTERNS*Tests*dll
 TP_ROOT_DIR=$(cd "$(dirname "$0")"; pwd -P)
 TP_TOOLS_DIR="$TP_ROOT_DIR/tools"
 TP_PACKAGES_DIR="$TP_ROOT_DIR/packages"
@@ -120,7 +120,7 @@ function invoke_test()
     local dotnet=$(_get_dotnet_path)
     local vstest=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore/vstest.console.dll
 
-    find ./test -path $PROJECT_NAME_PATTERNS | xargs $dotnet $vstest --parallel --testcasefilter:"TestCategory!=Windows&TestCategory!=Windows-Review" --logger:"trx"
+    find ./test -ipath $PROJECT_NAME_PATTERNS | xargs $dotnet $vstest --parallel --testcasefilter:"TestCategory!=Windows&TestCategory!=Windows-Review" --logger:"trx"
 }
 
 #

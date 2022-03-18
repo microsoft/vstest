@@ -1,20 +1,20 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 
-using ObjectModel.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests;
 
 [DataCollectorFriendlyName("CustomDataCollector")]
 [DataCollectorTypeUri("my://custom/datacollector")]
-public class CustomDataCollector : DataCollector, ITestExecutionEnvironmentSpecifier
+public class CustomDataCollector : ObjectModel.DataCollection.DataCollector, ITestExecutionEnvironmentSpecifier
 {
     private DataCollectionSink _dataCollectionSink;
     private DataCollectionEnvironmentContext _context;

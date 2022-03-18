@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +8,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Interfaces;
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -25,7 +21,11 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-using TranslationLayerResources = VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
+using TranslationLayerResources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
 /// <summary>
 /// Vstest console request sender for sending requests to vstest.console.exe

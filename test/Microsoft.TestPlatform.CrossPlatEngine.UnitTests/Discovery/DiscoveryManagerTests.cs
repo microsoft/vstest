@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery;
-
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -25,6 +21,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+
+#nullable disable
+
+namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery;
 
 [TestClass]
 public class DiscoveryManagerTests

@@ -1,16 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
-
 using System;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 /// <summary>
 /// Stores and provides telemetry information for data collection.

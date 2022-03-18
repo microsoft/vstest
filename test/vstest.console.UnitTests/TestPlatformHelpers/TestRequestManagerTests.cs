@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace vstest.console.UnitTests.TestPlatformHelpers;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -35,9 +31,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using TestDoubles;
+using vstest.console.UnitTests.TestDoubles;
 
 using Constants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
+
+#nullable disable
+
+namespace vstest.console.UnitTests.TestPlatformHelpers;
 
 [TestClass]
 public class TestRequestManagerTests

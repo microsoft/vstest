@@ -30,7 +30,6 @@
     <ProjectReference Include="..\MSTest1\MSTest1.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) AND '$(OS)' != 'Windows_NT' ">
-    <Reference Include="netstandard" />
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Xml" />

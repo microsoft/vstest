@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace vstest.console.UnitTests.Processors;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -22,6 +18,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace vstest.console.UnitTests.Processors;
 
 [TestClass]
 public class EnableBlameArgumentProcessorTests

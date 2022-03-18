@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Reflection;
+#if !NETFRAMEWORK
+using System.Runtime.Loader;
+#endif
+
 #nullable disable
 
 namespace Microsoft.TestPlatform.TestUtilities;
-
-using System.Reflection;
-#if !NET451
-using System.Runtime.Loader;
-#endif
 
 /// <summary>
 /// Assembly utility to perform assembly related functions.
@@ -22,7 +22,7 @@ public class AssemblyUtility
     /// <returns></returns>
     public static AssemblyName GetAssemblyName(string assemblyPath)
     {
-#if !NET451
+#if !NETFRAMEWORK
         return AssemblyLoadContext.GetAssemblyName(assemblyPath);
 #else
         return AssemblyName.GetAssemblyName(assemblyPath);

@@ -1405,6 +1405,33 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";TestAdapterLoadingStrategyHelp" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:<strategy>]D;]A;      This affects adapter loading behavior.]D;]A;]D;]A;      Currently supported behaviors:]D;]A;        - Explicit: Test Platform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). ]D;]A;                    If a specific adapter path is provided, adapter will be loaded; if a directory path is provided adapters directly in that folder will be loaded, unless Recursive option is also specified.]D;]A;                    If no adapter path is specified, test run will fail.]D;]A;                    This will imply /InIsolation switch and force the tests to be run in an isolated process.]D;]A;        ]D;]A;        - Default: Test Platform will load adapters is if this argument has not been specified. ]D;]A;                   It will pick up extensions from next to source, provided additional adapter paths and from the default directory.]D;]A;]D;]A;        - DefaultRuntimeProviders: Load default runtime providers shipped with Test Platform. ]D;]A;                                   If this is not specified when "Explicit" option is set, a test host provider need to be specified explicitly.]D;]A;]D;]A;        - ExtensionsDirectory: Load adapters inside Extensions folder.]D;]A;]D;]A;        - NextToSource: Load adapters next to source. ]D;]A;]D;]A;        - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:<strategy>]D;]A;      Cela affecte le comportement de chargement de l’adaptateur.]D;]A;]D;]A;Comportements actuellement pris en charge :]D;]A;        - Explicite : Test Platform charge uniquement les adaptateurs spécifiés par /TestAdapterPath (ou le nœud RunConfiguration.TestAdaptersPaths). ]D;]A;                    Si un chemin d’adaptateur spécifique est fourni, l’adaptateur est chargé ; si un chemin d’accès au répertoire est fourni, les adaptateurs directement dans ce dossier sont chargés, sauf si l’option Récursive est également spécifiée.]D;]A;                    Si aucun chemin d’adaptateur n’est spécifié, la série de tests échoue.]D;]A;                    Cela implique le commutateur /InIsolation et force l’exécution des tests dans un processus isolé.]D;]A;        ]D;]A;- Valeur par défaut : la plateforme de test charge les adaptateurs si cet argument n’a pas été spécifié. ]D;]A;                   Il va récupérer les extensions à côté de la source, les chemins d’adaptateur supplémentaires fournis et le répertoire par défaut.]D;]A;]D;]A;- DefaultRuntimeProviders : chargez les fournisseurs de runtime par défaut livrés avec la plateforme de test. ]D;]A;                                   Si cette option n’est pas spécifiée lorsque l’option « Explicit » est définie, un fournisseur d’hôtes de test doit être spécifié explicitement.]D;]A;]D;]A;- ExtensionsDirectory : charge les adaptateurs dans le dossier Extensions.]D;]A;]D;]A;- NextToSource : chargez les adaptateurs à côté de la source. ]D;]A;]D;]A;- Récursif : recherche récursive des dossiers lors du chargement des adaptateurs. Pour ce faire, vous devez spécifier également « Explicit » ou « NextToSource ».]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestAdapterLoadingStrategyValueInvalid" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[La valeur spécifiée ({0}) pour /TestAdapterLoadingStrategy n’est pas valide !]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestAdapterLoadingStrategyValueInvalidRecursive" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[La stratégie de chargement de carte récursive ne peut pas être utilisée seule. Effectuez une combinaison avec un ou plusieurs des éléments suivants : {0}]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";TestAdapterPathDoesNotExist" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[The custom test adapter search path provided was not found, provide a valid path and try again.]]></Val>
@@ -1428,6 +1455,15 @@
           <Val><![CDATA[The /TestAdapterPath parameter requires a value, which is path of a location containing custom test adapters. Example:  /TestAdapterPath:c:\MyCustomAdapters]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Le paramètre /TestAdapterPath nécessite une valeur qui représente le chemin des adaptateurs de tests personnalisés. Exemple : /TestAdapterPath:c:\MyCustomAdapters]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestAdapterPathValueRequiredWhenStrategyXIsUsed" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Le paramètre /TestAdapterPath doit être fourni lorsque la stratégie de chargement de l’adaptateur de test «{0}» est spécifiée !]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

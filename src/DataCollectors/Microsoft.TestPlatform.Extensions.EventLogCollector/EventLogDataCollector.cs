@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,7 +14,11 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-using Resource = Resources.Resources;
+using Resource = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
 
 /// <summary>
 /// A data collector that collects event log data
@@ -327,7 +327,7 @@ public class EventLogDataCollector : DataCollector
 
         EqtTrace.Verbose("EventLogDataCollector: SessionStart received");
 
-        StartCollectionForContext(e.Context, true);
+        StartCollectionForContext(e.Context);
     }
 
     private void OnSessionEnd(object sender, SessionEndEventArgs e)
@@ -353,7 +353,7 @@ public class EventLogDataCollector : DataCollector
 
         EqtTrace.Verbose("EventLogDataCollector: TestCaseStart received for test '{0}'.", e.TestCaseName);
 
-        StartCollectionForContext(e.Context, false);
+        StartCollectionForContext(e.Context);
     }
 
     private void OnTestCaseEnd(object sender, TestCaseEndEventArgs e)
@@ -383,7 +383,7 @@ public class EventLogDataCollector : DataCollector
         }
     }
 
-    private void StartCollectionForContext(DataCollectionContext dataCollectionContext, bool isSessionContext)
+    private void StartCollectionForContext(DataCollectionContext dataCollectionContext)
     {
         lock (ContextMap)
         {

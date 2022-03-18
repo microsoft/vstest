@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.AcceptanceTests;
+using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using System.IO;
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 public class FilePatternParserTests : AcceptanceTestBase
@@ -19,7 +19,6 @@ public class FilePatternParserTests : AcceptanceTestBase
     public void WildCardPatternShouldCorrectlyWorkOnFiles(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
         testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
@@ -28,7 +27,7 @@ public class FilePatternParserTests : AcceptanceTestBase
            testAssembly,
            GetTestAdapterPath(),
            string.Empty, FrameworkArgValue,
-           runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+           runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 1, 1);
@@ -40,18 +39,21 @@ public class FilePatternParserTests : AcceptanceTestBase
     public void WildCardPatternShouldCorrectlyWorkOnArbitraryDepthDirectories(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
-        var oldAssemblyPath = Path.Combine("Debug", _testEnvironment.TargetFramework, "SimpleTestProject.dll");
-        var newAssemblyPath = Path.Combine("**", _testEnvironment.TargetFramework, "*TestProj*.dll");
-        testAssembly = testAssembly.Replace(oldAssemblyPath, newAssemblyPath);
+
+        // Add one more directory to the temp path, so we can substitute it with **
+        // and copy then whole directory there.
+        TempDirectory.CopyDirectory(Path.GetDirectoryName(testAssembly), Path.Combine(TempDirectory.Path, "dir1"));
+
+        // The path will end up looking like <random temp dir>\**\"*TestProj*.dll".
+        var wildcardedPath = Path.Combine(TempDirectory.Path, "**", "*TestProj*.dll");
 
         var arguments = PrepareArguments(
-           testAssembly,
+           wildcardedPath,
            GetTestAdapterPath(),
            string.Empty, string.Empty,
-           runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+           runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 1, 1);
@@ -63,7 +65,6 @@ public class FilePatternParserTests : AcceptanceTestBase
     public void WildCardPatternShouldCorrectlyWorkForRelativeAssemblyPath(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
         testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
@@ -78,7 +79,7 @@ public class FilePatternParserTests : AcceptanceTestBase
            testAssembly,
            GetTestAdapterPath(),
            string.Empty, string.Empty,
-           runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+           runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 1, 1);
@@ -90,7 +91,6 @@ public class FilePatternParserTests : AcceptanceTestBase
     public void WildCardPatternShouldCorrectlyWorkOnMultipleFiles(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
         var testAssembly = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
         testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
@@ -100,7 +100,7 @@ public class FilePatternParserTests : AcceptanceTestBase
            testAssembly,
            GetTestAdapterPath(),
            string.Empty, FrameworkArgValue,
-           runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+           runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         ValidateSummaryStatus(2, 2, 2);

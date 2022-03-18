@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,7 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -27,6 +22,10 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 /// <summary>
 /// Orchestrates test execution operations for the engine communicating with the client.
@@ -359,6 +358,9 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     /// <inheritdoc/>
     public void HandleRawMessage(string rawMessage)
     {
+        // TODO: PERF: - why do we have to deserialize the messages here only to read that this is
+        // execution complete? Why can't we act on it somewhere else where the result of deserialization is not
+        // thrown away?
         var message = _dataSerializer.DeserializeMessage(rawMessage);
 
         if (string.Equals(message.MessageType, MessageType.ExecutionComplete))

@@ -1,22 +1,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.Utilities;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using TestPlatform.CommandLine.Processors;
+#nullable disable
 
-using TestTools.UnitTesting;
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.Utilities;
 
 [TestClass]
 public class ArgumentProcessorFactoryTests
@@ -155,7 +153,7 @@ public class ArgumentProcessorFactoryTests
         }
 
         Mock<IFeatureFlag> featureFlag = new();
-        featureFlag.Setup(x => x.IsEnabled(It.IsAny<string>())).Returns(true);
+        featureFlag.Setup(x => x.IsDisabled(It.IsAny<string>())).Returns(false);
         ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create(featureFlag.Object);
 
         // Expect command processors to contain both long and short commands.

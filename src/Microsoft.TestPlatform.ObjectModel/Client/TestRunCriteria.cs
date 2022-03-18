@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -12,9 +8,11 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
-using Resources;
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
 /// Defines the test run criterion.
@@ -482,7 +480,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
             runStatsChangeEventTimeout,
             testHostLauncher)
     {
-        var testCases = tests as IList<TestCase> ?? tests.ToList();
+        var testCases = tests as IList<TestCase> ?? tests?.ToList();
         ValidateArg.NotNullOrEmpty(testCases, nameof(tests));
 
         Tests = testCases;
@@ -537,7 +535,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         {
             if (value != null && !HasSpecificSources)
             {
-                throw new InvalidOperationException(Resources.NoTestCaseFilterForSpecificTests);
+                throw new InvalidOperationException(Resources.Resources.NoTestCaseFilterForSpecificTests);
             }
 
             _testCaseFilter = value;
@@ -560,7 +558,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         {
             if (value != null && !HasSpecificSources)
             {
-                throw new InvalidOperationException(Resources.NoTestCaseFilterForSpecificTests);
+                throw new InvalidOperationException(Resources.Resources.NoTestCaseFilterForSpecificTests);
             }
 
             _filterOptions = value;
@@ -775,14 +773,14 @@ public class BaseTestRunCriteria
         {
             throw new ArgumentOutOfRangeException(
                 nameof(frequencyOfRunStatsChangeEvent),
-                Resources.NotificationFrequencyIsNotPositive);
+                Resources.Resources.NotificationFrequencyIsNotPositive);
         }
 
         if (runStatsChangeEventTimeout <= TimeSpan.MinValue)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(runStatsChangeEventTimeout),
-                Resources.NotificationTimeoutIsZero);
+                Resources.Resources.NotificationTimeoutIsZero);
         }
 
         FrequencyOfRunStatsChangeEvent = frequencyOfRunStatsChangeEvent;

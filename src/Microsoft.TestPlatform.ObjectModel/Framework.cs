@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 #if !NETSTANDARD1_0
 using NuGet.Frameworks;
 
 using static NuGet.Frameworks.FrameworkConstants;
 #endif
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Class for target Framework for the test container

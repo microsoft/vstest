@@ -1,21 +1,21 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-
 using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-using Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
 /// Communication server implementation over sockets.
@@ -65,17 +65,25 @@ public class SocketServer : ICommunicationEndPoint
 
     public string Start(string endPoint)
     {
-        _tcpListener = new TcpListener(endPoint.GetIpEndPoint());
+        try
+        {
+            _tcpListener = new TcpListener(endPoint.GetIpEndPoint());
 
-        _tcpListener.Start();
+            _tcpListener.Start();
 
-        _endPoint = _tcpListener.LocalEndpoint.ToString();
-        EqtTrace.Info("SocketServer.Start: Listening on endpoint : {0}", _endPoint);
+            _endPoint = _tcpListener.LocalEndpoint.ToString();
+            EqtTrace.Info("SocketServer.Start: Listening on endpoint : {0}", _endPoint);
 
-        // Serves a single client at the moment. An error in connection, or message loop just
-        // terminates the entire server.
-        _tcpListener.AcceptTcpClientAsync().ContinueWith(t => OnClientConnected(t.Result));
-        return _endPoint;
+            // Serves a single client at the moment. An error in connection, or message loop just
+            // terminates the entire server.
+            _tcpListener.AcceptTcpClientAsync().ContinueWith(t => OnClientConnected(t.Result));
+            return _endPoint;
+        }
+        catch (SocketException ex)
+        {
+            EqtTrace.Error("Failed for address {0}, with: {1}", endPoint, ex);
+            throw;
+        }
     }
 
     /// <inheritdoc />
@@ -102,11 +110,16 @@ public class SocketServer : ICommunicationEndPoint
             EqtTrace.Verbose("SocketServer.OnClientConnected: Client connected for endPoint: {0}, starting MessageLoopAsync:", _endPoint);
 
             // Start the message loop
-            Task.Run(() => _tcpClient.MessageLoopAsync(_channel, error => Stop(error), _cancellation.Token)).ConfigureAwait(false);
+            Task.Run(() => _tcpClient.MessageLoopAsync(_channel, error => StopOnError(error), _cancellation.Token)).ConfigureAwait(false);
         }
     }
 
-    private void Stop(Exception error)
+    /// <summary>
+    /// Stop the connection when error was encountered. Dispose all communication, and notify subscribers of Disconnected event
+    /// that we aborted.
+    /// </summary>
+    /// <param name="error"></param>
+    private void StopOnError(Exception error)
     {
         EqtTrace.Info("SocketServer.PrivateStop: Stopping server endPoint: {0} error: {1}", _endPoint, error);
 

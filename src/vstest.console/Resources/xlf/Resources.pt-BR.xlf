@@ -1134,36 +1134,36 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
         - NextToSource: Load adapters next to source. 
 
         - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</source>
-        <target state="new">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
-      This affects adapter loading behavior.
+        <target state="translated">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+      Isto afeta o comportamento de carregamento do adaptador.
 
-      Currently supported behaviors:
-        - Explicit: Test Platform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). 
-                    If a specific adapter path is provided, adapter will be loaded; if a directory path is provided adapters directly in that folder will be loaded, unless Recursive option is also specified.
-                    If no adapter path is specified, test run will fail.
-                    This will imply /InIsolation switch and force the tests to be run in an isolated process.
+      Comportamentos suportados atualmente:
+        - Explicito: Plataforma de Teste somente carregará adaptadores especificados por /TestAdapterPath (ou RunConfiguration.TestAdaptersPaths node).
+                    Se um caminho específico do adaptador for fornecido, o adaptador será carregado; se um caminho de diretório for fornecido adaptadores diretamente naquela pasta será carregado, a menos que a opção Recursive também seja especificada.
+                    Se nenhum caminho de adaptador for especificado, a execução do teste falhará.
+                    Isto implicará /InIsolation switch e forçará os testes a serem executados em um processo isolado.
         
-        - Default: Test Platform will load adapters is if this argument has not been specified. 
-                   It will pick up extensions from next to source, provided additional adapter paths and from the default directory.
+        - Padrão: Plataforma de teste carregará adaptadores é se este argumento não tiver sido especificado.
+                   Ela captará extensões ao lado da fonte, desde que os caminhos do adaptador adicionais e a partir do diretório padrão.
 
-        - DefaultRuntimeProviders: Load default runtime providers shipped with Test Platform. 
-                                   If this is not specified when "Explicit" option is set, a test host provider need to be specified explicitly.
+        - DefaultRuntimeProviders: Carregar os provedores de tempo de execução padrão enviados com a Plataforma de Teste. 
+                                   Se isto não for especificado quando a opção "Explicit" estiver definida, um provedor de host de teste precisa ser especificado explicitamente.
 
-        - ExtensionsDirectory: Load adapters inside Extensions folder.
+        - ExtensionsDirectory: Carregar adaptadores dentro da pasta Extensões.
 
-        - NextToSource: Load adapters next to source. 
+        - NextToSource: Adaptadores de carga ao lado da fonte. 
 
-        - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</target>
+        - Recursivo: Buscar recursivamente as pastas ao carregar adaptadores. Isto requer que "Explicit" ou "NextToSource" seja especificado também.</target>
         <note>Do not translate "Default", "DefaultRuntimeProviders", "ExtensionsDirectory", "NextToSource" or "Recursive".</note>
       </trans-unit>
       <trans-unit id="TestAdapterLoadingStrategyValueInvalid">
         <source>Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!</source>
-        <target state="new">Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!</target>
+        <target state="translated">O valor especificado ({0}) para /TestAdapterLoadingStrategy é inválido!</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestAdapterLoadingStrategyValueInvalidRecursive">
         <source>Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}</source>
-        <target state="new">Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}</target>
+        <target state="translated">A estratégia de carregamento do adaptador recursivo não pode ser usada por si só. Combine com um ou mais de: {0}</target>
         <note>
         - Do not translate "Recursive",
         - {0} is the strategy names, seperated by comma: for example "Explicit, NextToSource"
@@ -1171,7 +1171,7 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
       </trans-unit>
       <trans-unit id="TestAdapterPathValueRequiredWhenStrategyXIsUsed">
         <source>The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!</source>
-        <target state="new">The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!</target>
+        <target state="translated">O parâmetro /TestAdapterPath precisa ser fornecido quando a "{0}" estratégia de carregamento do adaptador de teste for especificada!</target>
         <note>{0} is the strategy name, "Explicit" for example.</note>
       </trans-unit>
     </body>

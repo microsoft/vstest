@@ -1,15 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 #if NETFRAMEWORK
 using System.Runtime.Serialization;
 #endif
 
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Exception thrown by Run Settings when an error with a settings provider

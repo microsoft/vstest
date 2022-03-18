@@ -1,18 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
-
 using System.Collections.Generic;
 using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollectorUnitTests;
+
 [DataCollectorFriendlyName("CustomDataCollector")]
 [DataCollectorTypeUri("my://custom/datacollector")]
-public class CustomDataCollector : DataCollector, ITestExecutionEnvironmentSpecifier
+public class CustomDataCollector : ObjectModel.DataCollection.DataCollector, ITestExecutionEnvironmentSpecifier
 {
     public DataCollectionEnvironmentContext DataCollectionEnvironmentContext { get; set; }
 
@@ -34,7 +34,7 @@ public class CustomDataCollector : DataCollector, ITestExecutionEnvironmentSpeci
 }
 
 [DataCollectorFriendlyName("CustomDataCollector")]
-public class CustomDataCollectorWithoutUri : DataCollector
+public class CustomDataCollectorWithoutUri : ObjectModel.DataCollection.DataCollector
 {
     public override void Initialize(
         XmlElement configurationElement,
@@ -47,7 +47,7 @@ public class CustomDataCollectorWithoutUri : DataCollector
 }
 
 [DataCollectorTypeUri("my://custom/datacollector")]
-public class CustomDataCollectorWithoutFriendlyName : DataCollector
+public class CustomDataCollectorWithoutFriendlyName : ObjectModel.DataCollection.DataCollector
 {
     public override void Initialize(
         XmlElement configurationElement,
@@ -61,7 +61,7 @@ public class CustomDataCollectorWithoutFriendlyName : DataCollector
 
 [DataCollectorFriendlyName("")]
 [DataCollectorTypeUri("my://custom/datacollector")]
-public class CustomDataCollectorWithEmptyFriendlyName : DataCollector
+public class CustomDataCollectorWithEmptyFriendlyName : ObjectModel.DataCollection.DataCollector
 {
     public override void Initialize(
         XmlElement configurationElement,

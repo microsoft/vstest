@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.ComponentModel;
+
+using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
-
-using System.ComponentModel;
-
-using Interfaces;
-using ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
 /// The test platform data collection sink.

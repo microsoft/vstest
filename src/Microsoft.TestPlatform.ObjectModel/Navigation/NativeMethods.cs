@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
-
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-using PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
 internal static class HResult
 {

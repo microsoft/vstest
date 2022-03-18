@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Build.Tasks;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,10 +9,12 @@ using System.Threading;
 
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using Resources;
-using Utils;
+using Microsoft.TestPlatform.Build.Trace;
+using Microsoft.TestPlatform.Build.Utils;
 
-using Trace;
+#nullable disable
+
+namespace Microsoft.TestPlatform.Build.Tasks;
 
 public class VSTestTask : Task, ICancelableTask
 {
@@ -204,7 +202,7 @@ public class VSTestTask : Task, ICancelableTask
         _vsTestForwardingApp = new VSTestForwardingApp(VSTestConsolePath, CreateArgument());
         if (!string.IsNullOrEmpty(VSTestFramework))
         {
-            Console.WriteLine(Resources.TestRunningSummary, TestFileFullPath, VSTestFramework);
+            Console.WriteLine(Resources.Resources.TestRunningSummary, TestFileFullPath, VSTestFramework);
         }
 
         return _vsTestForwardingApp.Execute() == 0;
@@ -420,7 +418,7 @@ public class VSTestTask : Task, ICancelableTask
                 {
                     // Not showing message in runsettings scenario, because we are not sure that code coverage is enabled.
                     // User might be using older Microsoft.NET.Test.Sdk which don't have CodeCoverage infra.
-                    Console.WriteLine(Resources.UpdateTestSdkForCollectingCodeCoverage);
+                    Console.WriteLine(Resources.Resources.UpdateTestSdkForCollectingCodeCoverage);
                 }
             }
         }

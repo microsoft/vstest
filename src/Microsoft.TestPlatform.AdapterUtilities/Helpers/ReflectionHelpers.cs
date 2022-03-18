@@ -1,16 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.AdapterUtilities.Helpers;
-
-using Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
-using Microsoft.TestPlatform.AdapterUtilities.Resources;
-
 using System;
 using System.Globalization;
 using System.Text;
+
+using Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
 internal static partial class ReflectionHelpers
 {
@@ -19,7 +18,7 @@ internal static partial class ReflectionHelpers
     {
         if (obj == null)
         {
-            throw new NotImplementedException(string.Format(Resources.MethodNotImplementedOnPlatform, className, methodName));
+            throw new NotImplementedException(string.Format(Resources.Resources.MethodNotImplementedOnPlatform, className, methodName));
         }
     }
 
@@ -69,7 +68,7 @@ internal static partial class ReflectionHelpers
                         catch
                         {
                             throw new InvalidManagedNameException(
-                                string.Format(CultureInfo.CurrentCulture, Resources.ErrorInvalidSequenceAt, escapedStringSegment, i)
+                                string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorInvalidSequenceAt, escapedStringSegment, i)
                             );
                         }
 
@@ -92,7 +91,7 @@ internal static partial class ReflectionHelpers
             }
         }
 
-        string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorNoClosingQuote, escapedStringSegment);
+        string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorNoClosingQuote, escapedStringSegment);
         throw new InvalidManagedNameException(message);
     }
 }

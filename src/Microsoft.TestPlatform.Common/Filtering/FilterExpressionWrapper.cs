@@ -1,17 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
-
-using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-
-using ObjectModel;
-using ObjectModel.Client;
-using System.Diagnostics;
 
 /// <summary>
 /// Class holds information related to filtering criteria.
@@ -112,7 +112,7 @@ public class FilterExpressionWrapper
     /// <summary>
     /// Validate if underlying filter expression is valid for given set of supported properties.
     /// </summary>
-    public string[] ValidForProperties(IEnumerable<String> supportedProperties, Func<string, TestProperty> propertyProvider)
+    public string[] ValidForProperties(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider)
     {
         return UseFastFilter ? FastFilter.ValidForProperties(supportedProperties) : _filterExpression?.ValidForProperties(supportedProperties, propertyProvider);
     }

@@ -1,16 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.IO;
+using System.Linq;
+
+using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
 #nullable disable
 
 namespace Microsoft.TestPlatform.Common.UnitTests.Utilities;
-
-using System.IO;
-using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-using VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System.Linq;
 
 [TestClass]
 public class InstallationContextTests

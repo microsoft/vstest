@@ -1,17 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace TestPlatform.CrossPlatEngine.UnitTests.Execution;
-
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Xml;
 
 using Microsoft.TestPlatform.TestUtilities;
-
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -22,15 +17,18 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using static RunTestsWithSourcesTests;
+using static TestPlatform.CrossPlatEngine.UnitTests.Execution.RunTestsWithSourcesTests;
+
+#nullable disable
+
+namespace TestPlatform.CrossPlatEngine.UnitTests.Execution;
 
 [TestClass]
 public class ExecutionManagerTests

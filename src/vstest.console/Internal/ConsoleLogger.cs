@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,14 +10,19 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Logging;
-using Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using NuGet.Frameworks;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+
 /// <summary>
 /// Logger for sending output to the console.
 /// All the console logger messages prints to Standard Output with respective color, except OutputLevel.Error messages
@@ -220,7 +221,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         parameters.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out _targetFramework);
         _targetFramework = !string.IsNullOrEmpty(_targetFramework) ? NuGetFramework.Parse(_targetFramework).GetShortFolderName() : _targetFramework;
 
-        Initialize(events, String.Empty);
+        Initialize(events, string.Empty);
     }
     #endregion
 
@@ -257,7 +258,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             var sb = new StringBuilder();
             foreach (var message in testMessageCollection)
             {
-                var prefix = String.Format(CultureInfo.CurrentCulture, "{0}{1}", Environment.NewLine, TestMessageFormattingPrefix);
+                var prefix = string.Format(CultureInfo.CurrentCulture, "{0}{1}", Environment.NewLine, TestMessageFormattingPrefix);
                 var messageText = message.Text?.Replace(Environment.NewLine, prefix).TrimEnd(TestMessageFormattingPrefix.ToCharArray());
 
                 if (!string.IsNullOrWhiteSpace(messageText))
@@ -267,7 +268,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             }
             return sb.ToString();
         }
-        return String.Empty;
+        return string.Empty;
     }
 
     /// <summary>
@@ -290,19 +291,19 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         var addAdditionalNewLine = false;
 
         Debug.Assert(result != null, "a null result can not be displayed");
-        if (!String.IsNullOrEmpty(result.ErrorMessage))
+        if (!string.IsNullOrEmpty(result.ErrorMessage))
         {
             addAdditionalNewLine = true;
             Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.ErrorMessageBanner));
-            var errorMessage = String.Format(CultureInfo.CurrentCulture, "{0}{1}{2}", TestResultPrefix, TestMessageFormattingPrefix, result.ErrorMessage);
+            var errorMessage = string.Format(CultureInfo.CurrentCulture, "{0}{1}{2}", TestResultPrefix, TestMessageFormattingPrefix, result.ErrorMessage);
             Output.Information(false, ConsoleColor.Red, errorMessage);
         }
 
-        if (!String.IsNullOrEmpty(result.ErrorStackTrace))
+        if (!string.IsNullOrEmpty(result.ErrorStackTrace))
         {
             addAdditionalNewLine = false;
             Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.StacktraceBanner));
-            var stackTrace = String.Format(CultureInfo.CurrentCulture, "{0}{1}", TestResultPrefix, result.ErrorStackTrace);
+            var stackTrace = string.Format(CultureInfo.CurrentCulture, "{0}{1}", TestResultPrefix, result.ErrorStackTrace);
             Output.Information(false, ConsoleColor.Red, stackTrace);
         }
 
@@ -360,7 +361,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
         if (addAdditionalNewLine)
         {
-            Output.WriteLine(String.Empty, OutputLevel.Information);
+            Output.WriteLine(string.Empty, OutputLevel.Information);
         }
     }
 
@@ -664,9 +665,9 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         if (runLevelAttachementCount > 0)
         {
             // If ARTIFACTS_POSTPROCESSING is disabled
-            if (!_featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING) ||
-                // ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX(old UX) is enabled
-                _featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX) ||
+            if (_featureFlag.IsDisabled(FeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING) ||
+                // DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX(new UX) is disabled
+                _featureFlag.IsDisabled(FeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX) ||
                 // TestSessionCorrelationId is null(we're not running through the dotnet SDK).
                 CommandLineOptions.Instance.TestSessionCorrelationId is null)
             {

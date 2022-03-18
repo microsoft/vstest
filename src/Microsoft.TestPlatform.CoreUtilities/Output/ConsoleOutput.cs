@@ -3,12 +3,12 @@
 
 #if !NETSTANDARD1_0 && !WINDOWS_UWP
 
+using System;
+using System.IO;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
-
-using System;
-using System.IO;
 
 /// <summary>
 /// Sends output to the console.

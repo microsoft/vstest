@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-
-using System;
 
 /// <summary>
 /// Class used by data collectors to send messages to the client (e.g. Manual Test Runner, Visual Studio IDE, MSTest).

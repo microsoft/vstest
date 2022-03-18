@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Wrapper class for tracing.
@@ -25,7 +25,7 @@ using System.Text;
 /// </summary>
 public static class EqtTrace
 {
-    private static readonly IPlatformEqtTrace TraceImpl = new PlatformEqtTrace();
+    private static readonly IPlatformEqtTrace TraceImpl = PlatformEqtTrace.Instance;
 
 #if NETFRAMEWORK
     public static void SetupRemoteEqtTraceListeners(AppDomain childDomain)

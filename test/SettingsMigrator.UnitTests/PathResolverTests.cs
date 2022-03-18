@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests;
-
 using System;
 using System.Globalization;
 using System.IO;
 
-using TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests;
 
 [TestClass]
 public class PathResolverTests

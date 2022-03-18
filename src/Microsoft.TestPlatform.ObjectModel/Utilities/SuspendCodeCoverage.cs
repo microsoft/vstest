@@ -1,11 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if NETFRAMEWORK
+using System;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-#if NETFRAMEWORK
-using System;
 
 /// <summary>
 /// Suspends the instrumentation (for code coverage) of the modules which are loaded

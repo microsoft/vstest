@@ -1,20 +1,20 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
-
 using System;
 
-using TestPlatform.CommandLine.Processors;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
-using TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 [TestClass]
 public class ArtifactProcessingCollectModeProcessorTest
 {
     [TestMethod]
     public void ProcessorExecutorInitialize_ShouldFailIfNullCommandOption() =>
-        Assert.ThrowsException<ArgumentNullException>(() => new ArtifactProcessingCollectModeProcessorExecutor(null));
+        Assert.ThrowsException<ArgumentNullException>(() => new ArtifactProcessingCollectModeProcessorExecutor(null!));
 
     [TestMethod]
     public void ProcessorExecutorInitialize_ShouldNotFailIfNullArg()

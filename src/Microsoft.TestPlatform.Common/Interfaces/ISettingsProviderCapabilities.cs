@@ -4,6 +4,7 @@
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+
 /// <summary>
 /// Metadata that is available from Settings Providers.
 /// </summary>

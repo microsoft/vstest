@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-
+using System;
 using System.Collections.Generic;
-using ObjectModel;
+using System.Collections.ObjectModel;
+
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using System.Collections.ObjectModel;
-using System;
 
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 internal class NullPathConverter : IPathConverter
 {
     private static readonly Lazy<NullPathConverter> LazyInstance = new(() => new NullPathConverter());

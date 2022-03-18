@@ -1,18 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.AcceptanceTests;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 public class TelemetryTests : AcceptanceTestBase
@@ -28,7 +28,7 @@ public class TelemetryTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        RunTests(runnerInfo.RunnerFramework);
+        RunTests(runnerInfo);
     }
 
     [TestMethod]
@@ -38,12 +38,12 @@ public class TelemetryTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        DiscoverTests(runnerInfo.RunnerFramework);
+        DiscoverTests(runnerInfo);
     }
 
-    private void RunTests(string runnerFramework)
+    private void RunTests(RunnerInfo runnerInfo)
     {
-        if (runnerFramework.StartsWith("netcoreapp"))
+        if (runnerInfo.IsNetRunner)
         {
             Assert.Inconclusive("Telemetry API is not supported for .NetCore runner");
             return;
@@ -51,21 +51,20 @@ public class TelemetryTests : AcceptanceTestBase
 
         var assemblyPaths = GetAssetFullPath("SimpleTestProject2.dll");
 
-        using var tempDir = new TempDirectory();
         var env = new Dictionary<string, string>
         {
-            [LOG_TELEMETRY_PATH] = tempDir.Path,
+            [LOG_TELEMETRY_PATH] = TempDirectory.Path,
             [TELEMETRY_OPTEDIN] = "1",
             [LOG_TELEMETRY] = "1",
         };
 
         InvokeVsTestForExecution(assemblyPaths, GetTestAdapterPath(), FrameworkArgValue, string.Empty, env);
-        ValidateOutput("Execution", tempDir);
+        ValidateOutput("Execution", TempDirectory);
     }
 
-    private void DiscoverTests(string runnerFramework)
+    private void DiscoverTests(RunnerInfo runnerInfo)
     {
-        if (runnerFramework.StartsWith("netcoreapp"))
+        if (runnerInfo.IsNetRunner)
         {
             Assert.Inconclusive("Telemetry API is not supported for .NetCore runner");
             return;
@@ -73,27 +72,26 @@ public class TelemetryTests : AcceptanceTestBase
 
         var assemblyPaths = GetAssetFullPath("SimpleTestProject2.dll");
 
-        using var tempDir = new TempDirectory();
         var env = new Dictionary<string, string>
         {
-            [LOG_TELEMETRY_PATH] = tempDir.Path,
+            [LOG_TELEMETRY_PATH] = TempDirectory.Path,
             [TELEMETRY_OPTEDIN] = "1",
             [LOG_TELEMETRY] = "1",
         };
 
         InvokeVsTestForDiscovery(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, env);
-        ValidateOutput("Discovery", tempDir);
+        ValidateOutput("Discovery", TempDirectory);
     }
 
-    private void ValidateOutput(string command, TempDirectory tempDir)
+    private void ValidateOutput(string command, TempDirectory tempDirectory)
     {
-        if (!Directory.Exists(tempDir.Path))
+        if (!Directory.Exists(tempDirectory.Path))
         {
-            Assert.Fail("Could not find the telemetry logs folder at {0}", tempDir.Path);
+            Assert.Fail("Could not find the telemetry logs folder at {0}", tempDirectory.Path);
         }
 
         bool isValid = false;
-        var directory = new DirectoryInfo(tempDir.Path);
+        var directory = new DirectoryInfo(tempDirectory.Path);
         var file = directory.GetFiles().OrderByDescending(f => f.CreationTime).First();
 
         string[] lines = File.ReadAllLines(file.FullName);

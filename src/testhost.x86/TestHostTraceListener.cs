@@ -1,17 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.TestHost;
 #if NETCOREAPP
-using ObjectModel;
 
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+namespace Microsoft.VisualStudio.TestPlatform.TestHost;
 
 internal class TestHostTraceListener : DefaultTraceListener
 {
@@ -33,16 +32,16 @@ internal class TestHostTraceListener : DefaultTraceListener
 
         EqtTrace.Verbose("TestPlatformTraceListener.Setup: Added test platform trace listener.");
 
-        // this is a netcoreapp2.1 only fix, but because we always compile against netcoreapp2.1 
-        // and upgrade the executable as necessary this needs to be a runtime check and not a compile time 
+        // this is a netcoreapp2.1 only fix, but because we always compile against netcoreapp2.1
+        // and upgrade the executable as necessary this needs to be a runtime check and not a compile time
         // check. This call returns ".NET Core 4.6.xxx" on netcore 2.1 and older, and ".NET Core 3.1.xxx"
         // or the respective version on the newer runtimes
         if (System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core 4.6"))
         {
             try
             {
-                // workaround for netcoreapp2.1 where the trace listener api is not called when 
-                // Debug.Assert fails. This method is internal, but the class is on purpose keeping the 
+                // workaround for netcoreapp2.1 where the trace listener api is not called when
+                // Debug.Assert fails. This method is internal, but the class is on purpose keeping the
                 // callback settable so tests can set the callback
                 var field = typeof(Debug).GetField("s_ShowDialog", BindingFlags.Static | BindingFlags.NonPublic);
                 if (field != null)
@@ -78,7 +77,7 @@ internal class TestHostTraceListener : DefaultTraceListener
         throw GetException(text);
     }
 
-    private static DebugAssertException GetException(string message)
+    private static DebugAssertException GetException(string? message)
     {
         var debugTypes = new Type[] { typeof(Debug), typeof(Trace) };
 #if NETCOREAPP1_0
@@ -99,7 +98,7 @@ internal class TestHostTraceListener : DefaultTraceListener
 
         var debugMethodFound = false;
         var frameCount = 0;
-        MethodBase method = null;
+        MethodBase? method = null;
         foreach (var f in stack.GetFrames())
         {
             var m = f.GetMethod();

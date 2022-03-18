@@ -1,16 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
-
 using System;
 
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 /// <summary>
 /// Factory for creating DataCollectionLauncher
@@ -25,7 +25,7 @@ internal static class DataCollectionLauncherFactory
     /// </returns>
     internal static IDataCollectionLauncher GetDataCollectorLauncher(IProcessHelper processHelper, string settingsXml)
     {
-        // Always launch datacollector.exe if code coverage is configured.
+        // Event log datacollector is built for .NET Framework and we need to load inside .NET Framework process.
         if (!string.IsNullOrWhiteSpace(settingsXml))
         {
             var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settingsXml);

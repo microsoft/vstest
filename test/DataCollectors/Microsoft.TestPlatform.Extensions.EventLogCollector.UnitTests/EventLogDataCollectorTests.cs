@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests;
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,9 +11,13 @@ using System.Xml;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests;
 
 [TestClass]
 public class EventLogDataCollectorTests
@@ -217,11 +217,10 @@ public class EventLogDataCollectorTests
     {
         var testableDataCollectionEvents = new TestableDataCollectionEvents();
         _eventLogDataCollector.Initialize(null, testableDataCollectionEvents, _mockDataCollectionSink, _mockDataCollectionLogger.Object, _dataCollectionEnvironmentContext);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestHostLaunchedInvocationList().Length);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseStartInvocationList().Length);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseEndInvocationList().Length);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionEndInvocationList().Length);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionStartInvocationList().Length);
+        Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseStartInvocationList()?.Length, "GetTestCaseStartInvocationList");
+        Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseEndInvocationList()?.Length, "GetTestCaseEndInvocationList");
+        Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionEndInvocationList()?.Length, "GetTestSessionEndInvocationList");
+        Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionStartInvocationList()?.Length, "GetTestSessionStartInvocationList");
     }
 
     [TestMethod]

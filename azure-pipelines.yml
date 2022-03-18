@@ -100,7 +100,7 @@ jobs:
     displayName: 'Run Acceptance Tests'
     inputs:
       filename: test.cmd
-      arguments: '-verbose -configuration $(buildConfiguration) -p AcceptanceTests -f net451'
+      arguments: '-verbose -configuration $(buildConfiguration) -p AcceptanceTests -f net48'
       modifyEnvironment: false
       failOnStandardError: true
 

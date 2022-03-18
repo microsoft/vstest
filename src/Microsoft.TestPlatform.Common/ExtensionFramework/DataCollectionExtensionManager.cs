@@ -1,23 +1,22 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
+
+using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-
-using System.Collections.Generic;
-
-using DataCollector;
-using Utilities;
-using Interfaces;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 /// <summary>
 /// Manages loading and provides access to data collector extensions implementing the
 /// DataCollector interface.
 /// </summary>
-internal class DataCollectorExtensionManager : TestExtensionManager<DataCollector, IDataCollectorCapabilities>
+internal class DataCollectorExtensionManager : TestExtensionManager<ObjectModel.DataCollection.DataCollector, IDataCollectorCapabilities>
 {
     /// <summary>
     /// Default constructor.
@@ -35,8 +34,8 @@ internal class DataCollectorExtensionManager : TestExtensionManager<DataCollecto
     /// The constructor is not public because the factory method should be used to get instances of this class.
     /// </remarks>
     protected DataCollectorExtensionManager(
-        IEnumerable<LazyExtension<DataCollector, Dictionary<string, object>>> unfilteredTestExtensions,
-        IEnumerable<LazyExtension<DataCollector, IDataCollectorCapabilities>> testExtensions,
+        IEnumerable<LazyExtension<ObjectModel.DataCollection.DataCollector, Dictionary<string, object>>> unfilteredTestExtensions,
+        IEnumerable<LazyExtension<ObjectModel.DataCollection.DataCollector, IDataCollectorCapabilities>> testExtensions,
         IMessageLogger logger)
         : base(unfilteredTestExtensions, testExtensions, logger)
     {
@@ -53,7 +52,7 @@ internal class DataCollectorExtensionManager : TestExtensionManager<DataCollecto
     /// </returns>
     public static DataCollectorExtensionManager Create(IMessageLogger messageLogger)
     {
-        TestPluginManager.GetSpecificTestExtensions<DataCollectorConfig, DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
+        TestPluginManager.GetSpecificTestExtensions<DataCollectorConfig, ObjectModel.DataCollection.DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
             TestPlatformConstants.DataCollectorEndsWithPattern,
             out var unfilteredTestExtensions,
             out var filteredTestExtensions);
@@ -78,7 +77,7 @@ internal class DataCollectorExtensionManager : TestExtensionManager<DataCollecto
     /// </returns>
     public static DataCollectorExtensionManager Create(string extensionAssemblyFilePath, bool skipCache, IMessageLogger messageLogger)
     {
-        TestPluginManager.GetTestExtensions<DataCollectorConfig, DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
+        TestPluginManager.GetTestExtensions<DataCollectorConfig, ObjectModel.DataCollection.DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
             extensionAssemblyFilePath,
             out var unfilteredTestExtensions,
             out var filteredTestExtensions,

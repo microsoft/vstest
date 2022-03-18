@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Utilities.UnitTests;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,10 +12,16 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using Moq;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Utilities.UnitTests;
 
 [TestClass]
 public class CodeCoverageDataAttachmentsHandlerTests

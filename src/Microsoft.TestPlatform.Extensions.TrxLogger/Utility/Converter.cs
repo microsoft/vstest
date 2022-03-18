@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,13 +9,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-using ObjectModel;
+using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-using ObjectModel = VisualStudio.TestPlatform.ObjectModel;
-using TrxLoggerResources = VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
-using TrxObjectModel = ObjectModel;
+using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+using TrxObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
 /// <summary>
 /// The converter class.
@@ -104,7 +103,7 @@ internal class Converter
         TestListCategoryId testCategoryId,
         TrxObjectModel.TestOutcome testOutcome,
         TestRun testRun,
-        ObjectModel.TestResult rockSteadyTestResult)
+        VisualStudio.TestPlatform.ObjectModel.TestResult rockSteadyTestResult)
     {
         var resultName = !string.IsNullOrEmpty(rockSteadyTestResult.DisplayName) ? rockSteadyTestResult.DisplayName : testName;
         var testResult = CreateTestResult(testRun.Id, testId, executionId, parentExecutionId, resultName, testOutcome, testType, testCategoryId);
@@ -143,21 +142,21 @@ internal class Converter
     /// <returns>
     /// The <see cref="TestOutcome"/>.
     /// </returns>
-    public TrxObjectModel.TestOutcome ToOutcome(ObjectModel.TestOutcome rockSteadyOutcome)
+    public TrxObjectModel.TestOutcome ToOutcome(VisualStudio.TestPlatform.ObjectModel.TestOutcome rockSteadyOutcome)
     {
         TrxObjectModel.TestOutcome outcome = TrxObjectModel.TestOutcome.Failed;
 
         switch (rockSteadyOutcome)
         {
-            case ObjectModel.TestOutcome.Failed:
+            case Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed:
                 outcome = TrxObjectModel.TestOutcome.Failed;
                 break;
-            case ObjectModel.TestOutcome.Passed:
+            case Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Passed:
                 outcome = TrxObjectModel.TestOutcome.Passed;
                 break;
-            case ObjectModel.TestOutcome.Skipped:
-            case ObjectModel.TestOutcome.None:
-            case ObjectModel.TestOutcome.NotFound:
+            case Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Skipped:
+            case Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.None:
+            case Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.NotFound:
                 outcome = TrxObjectModel.TestOutcome.NotExecuted;
                 break;
             default:
@@ -191,10 +190,10 @@ internal class Converter
         return collectorEntries;
     }
 
-    public IList<String> ToResultFiles(IEnumerable<AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory,
+    public IList<string> ToResultFiles(IEnumerable<AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory,
         List<string> errorMessages)
     {
-        List<String> resultFiles = new();
+        List<string> resultFiles = new();
         if (attachmentSets == null)
         {
             return resultFiles;
@@ -231,7 +230,7 @@ internal class Converter
     /// </summary>
     /// <param name="unitTestResult">TRX TestResult</param>
     /// <param name="testResult"> rock steady test result</param>
-    private void UpdateResultMessages(TrxObjectModel.TestResult unitTestResult, ObjectModel.TestResult testResult)
+    private void UpdateResultMessages(TrxObjectModel.TestResult unitTestResult, VisualStudio.TestPlatform.ObjectModel.TestResult testResult)
     {
         StringBuilder debugTrace = new();
         StringBuilder stdErr = new();
@@ -314,7 +313,7 @@ internal class Converter
     /// </summary>
     /// <param name="testResult"></param>
     /// <returns>Parent execution id.</returns>
-    public Guid GetParentExecutionId(ObjectModel.TestResult testResult)
+    public Guid GetParentExecutionId(VisualStudio.TestPlatform.ObjectModel.TestResult testResult)
     {
         TestProperty parentExecutionIdProperty = testResult.Properties.FirstOrDefault(
             property => property.Id.Equals(Constants.ParentExecutionIdPropertyIdentifier));
@@ -329,7 +328,7 @@ internal class Converter
     /// </summary>
     /// <param name="testResult"></param>
     /// <returns>Execution id.</returns>
-    public Guid GetExecutionId(ObjectModel.TestResult testResult)
+    public Guid GetExecutionId(VisualStudio.TestPlatform.ObjectModel.TestResult testResult)
     {
         TestProperty executionIdProperty = testResult.Properties.FirstOrDefault(
             property => property.Id.Equals(Constants.ExecutionIdPropertyIdentifier));
@@ -347,7 +346,7 @@ internal class Converter
     /// </summary>
     /// <param name="testResult"></param>
     /// <returns>Test type</returns>
-    public TestType GetTestType(ObjectModel.TestResult testResult)
+    public TestType GetTestType(VisualStudio.TestPlatform.ObjectModel.TestResult testResult)
     {
         var testTypeGuid = Constants.UnitTestTypeGuid;
 
@@ -369,7 +368,7 @@ internal class Converter
     /// <param name="testRun"></param>
     /// <param name="trxFileDirectory"></param>
     /// <param name="addAttachments"></param>
-    private void UpdateTestResultAttachments(ObjectModel.TestResult rockSteadyTestResult, TrxObjectModel.TestResult testResult, TestRun testRun, string trxFileDirectory, bool addAttachments)
+    private void UpdateTestResultAttachments(VisualStudio.TestPlatform.ObjectModel.TestResult rockSteadyTestResult, TrxObjectModel.TestResult testResult, TestRun testRun, string trxFileDirectory, bool addAttachments)
     {
         if (rockSteadyTestResult.Attachments == null || rockSteadyTestResult.Attachments.Count == 0)
         {
@@ -454,7 +453,7 @@ internal class Converter
         }
 
         List<IDataAttachment> uriDataAttachments = new();
-        foreach (ObjectModel.UriDataAttachment uriDataAttachment in attachmentSet.Attachments)
+        foreach (VisualStudio.TestPlatform.ObjectModel.UriDataAttachment uriDataAttachment in attachmentSet.Attachments)
         {
             EqtTrace.Verbose("TrxLogger.ToCollectorEntry: Got attachment " + uriDataAttachment.Uri + " with description " + uriDataAttachment.Description);
 
@@ -511,7 +510,7 @@ internal class Converter
         }
 
         List<string> resultFiles = new();
-        foreach (ObjectModel.UriDataAttachment uriDataAttachment in attachmentSet.Attachments)
+        foreach (VisualStudio.TestPlatform.ObjectModel.UriDataAttachment uriDataAttachment in attachmentSet.Attachments)
         {
             string sourceFile = uriDataAttachment.Uri.IsAbsoluteUri ? uriDataAttachment.Uri.LocalPath : uriDataAttachment.Uri.ToString();
 

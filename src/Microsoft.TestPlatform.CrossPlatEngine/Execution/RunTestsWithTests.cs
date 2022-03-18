@@ -1,25 +1,24 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-using Common.Interfaces;
-using CoreUtilities.Tracing;
-using Adapter;
-using Utilities;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-using ObjectModel.Engine;
-using ObjectModel.Engine.ClientProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
-using ObjectModel.Client;
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 internal class RunTestsWithTests : BaseRunTests
 {
@@ -128,7 +127,7 @@ internal class RunTestsWithTests : BaseRunTests
             // TODO: Fill this in with the right extension value.
             var executorUriExtensionTuple = new Tuple<Uri, string>(
                 test.ExecutorUri,
-                Constants.UnspecifiedAdapterPath);
+                ObjectModel.Constants.UnspecifiedAdapterPath);
 
             if (result.TryGetValue(executorUriExtensionTuple, out List<TestCase> testList))
             {

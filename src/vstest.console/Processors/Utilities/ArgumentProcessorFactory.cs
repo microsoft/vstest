@@ -1,18 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-using ObjectModel;
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// Used to create the appropriate instance of an argument processor.
@@ -59,11 +58,11 @@ internal class ArgumentProcessorFactory
     /// The feature flag support.
     /// </param>
     /// <returns>ArgumentProcessorFactory.</returns>
-    internal static ArgumentProcessorFactory Create(IFeatureFlag featureFlag = null)
+    internal static ArgumentProcessorFactory Create(IFeatureFlag disableFeatureFlag = null)
     {
         var defaultArgumentProcessor = DefaultArgumentProcessors;
 
-        if ((featureFlag ?? FeatureFlag.Instance).IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING))
+        if (!(disableFeatureFlag ?? FeatureFlag.Instance).IsDisabled(FeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING))
         {
             defaultArgumentProcessor.Add(new ArtifactProcessingCollectModeProcessor());
             defaultArgumentProcessor.Add(new ArtifactProcessingPostProcessModeProcessor());
@@ -121,7 +120,7 @@ internal class ArgumentProcessorFactory
     /// <returns>The argument processor or null if one was not found.</returns>
     public IArgumentProcessor CreateArgumentProcessor(string argument)
     {
-        if (String.IsNullOrWhiteSpace(argument))
+        if (string.IsNullOrWhiteSpace(argument))
         {
             throw new ArgumentException("Cannot be null or empty", nameof(argument));
         }

@@ -1405,6 +1405,33 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";TestAdapterLoadingStrategyHelp" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:<strategy>]D;]A;      This affects adapter loading behavior.]D;]A;]D;]A;      Currently supported behaviors:]D;]A;        - Explicit: Test Platform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). ]D;]A;                    If a specific adapter path is provided, adapter will be loaded; if a directory path is provided adapters directly in that folder will be loaded, unless Recursive option is also specified.]D;]A;                    If no adapter path is specified, test run will fail.]D;]A;                    This will imply /InIsolation switch and force the tests to be run in an isolated process.]D;]A;        ]D;]A;        - Default: Test Platform will load adapters is if this argument has not been specified. ]D;]A;                   It will pick up extensions from next to source, provided additional adapter paths and from the default directory.]D;]A;]D;]A;        - DefaultRuntimeProviders: Load default runtime providers shipped with Test Platform. ]D;]A;                                   If this is not specified when "Explicit" option is set, a test host provider need to be specified explicitly.]D;]A;]D;]A;        - ExtensionsDirectory: Load adapters inside Extensions folder.]D;]A;]D;]A;        - NextToSource: Load adapters next to source. ]D;]A;]D;]A;        - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:<strategy>]D;]A;      Influisce sul comportamento di caricamento dell'adattatore.]D;]A;]D;]A;      Comportamenti attualmente supportati:]D;]A;        - Explicit: la piattaforma di test caricherà solo gli adattatori specificati da /TestAdapterPath (o dal nodo RunConfiguration.TestAdaptersPaths). ]D;]A;                    Se viene specificato un percorso specifico dell'adattatore, verrà caricato l'adattatore; se viene specificato un percorso di directory, verranno caricati direttamente gli adattatori presenti in tale cartella, a meno che non sia specificata anche l'opzione Recursive.]D;]A;                    Se non viene specificato alcun percorso dell'adattatore, l'esecuzione dei test non riuscirà.]D;]A;                    Implica l'opzione /InIsolation e forza l'esecuzione dei test in un processo isolato.]D;]A;        ]D;]A;        - Default: la piattaforma di test caricherà gli adattatori se questo argomento non è stato specificato. ]D;]A;                   Verranno selezionate le estensioni accanto all'origine, specificati percorsi aggiuntivi dell'adattatore e dalla directory predefinita.]D;]A;]D;]A;        - DefaultRuntimeProviders: carica i provider di runtime predefiniti forniti con la piattaforma di test. ]D;]A;                                   Se questa opzione non viene specificata quando viene impostata l'opzione "Explicit", è necessario specificare in modo esplicito un provider host di test.]D;]A;]D;]A;        - ExtensionsDirectory: carica gli adattatori all'interno della cartella Extensions.]D;]A;]D;]A;        - NextToSource: caricare gli adattatori accanto all'origine. ]D;]A;]D;]A;        - Recursive: esegue una ricerca ricorsiva nelle cartelle durante il caricamento degli adattatori. È necessario specificare anche "Explicit" o "NextToSource".]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestAdapterLoadingStrategyValueInvalid" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Il valore specificato ({0}) per /TestAdapterLoadingStrategy non è valido.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestAdapterLoadingStrategyValueInvalidRecursive" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[La strategia di caricamento ricorsivo dell'adattatore non può essere usata da sola. Combinare con uno o più di: {0}]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";TestAdapterPathDoesNotExist" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[The custom test adapter search path provided was not found, provide a valid path and try again.]]></Val>
@@ -1428,6 +1455,15 @@
           <Val><![CDATA[The /TestAdapterPath parameter requires a value, which is path of a location containing custom test adapters. Example:  /TestAdapterPath:c:\MyCustomAdapters]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Con il parametro /TestAdapterPath è richiesto un valore, corrispondente al percorso di una posizione contenente adattatori di test personalizzati. Esempio: /TestAdapterPath:c:\MyCustomAdapters]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestAdapterPathValueRequiredWhenStrategyXIsUsed" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[È necessario specificare il parametro /TestAdapterPath quando si specifica la strategia di caricamento dell'adattatore di test "{0}".]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

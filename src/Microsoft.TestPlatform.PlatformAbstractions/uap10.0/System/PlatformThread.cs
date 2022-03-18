@@ -3,14 +3,14 @@
 
 #if WINDOWS_UWP
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
 using System;
 using System.Threading.Tasks;
 
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 public class PlatformThread : IThread
 {

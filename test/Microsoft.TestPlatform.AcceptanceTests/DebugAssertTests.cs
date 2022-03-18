@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 #nullable disable
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
-
-using Microsoft.TestPlatform.TestUtilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 public class DebugAssertTests : AcceptanceTestBase
@@ -20,9 +20,8 @@ public class DebugAssertTests : AcceptanceTestBase
         // is to not crash the process when we are running in debug, and debugger is attached
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        using var tempDir = new TempDirectory();
         var assemblyPath = BuildMultipleAssemblyPath("CrashingOnDebugAssertTestProject.dll").Trim('\"');
-        var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         InvokeVsTest(arguments);
 
         // this will have failed tests when our trace listener works and crash the testhost process when it does not

@@ -1,16 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests;
-
 using System.IO;
 using System.Xml;
 
-using EventLogCollector;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using VisualStudio.TestTools.UnitTesting;
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests;
 
 [TestClass]
 public class CollectorNameValueConfigurationManagerTests

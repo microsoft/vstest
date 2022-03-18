@@ -1,12 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
-
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -20,20 +17,23 @@ using System.Xml.Linq;
 using Microsoft.TestPlatform.TestHostProvider.Hosting;
 using Microsoft.TestPlatform.TestHostProvider.Resources;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
-using Helpers;
-using Helpers.Interfaces;
-using DesktopTestHostRuntimeProvider;
-using ObjectModel;
-using ObjectModel.Client.Interfaces;
-using ObjectModel.Host;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.DesktopTestHostRuntimeProvider;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using PlatformAbstractions;
-using PlatformAbstractions.Interfaces;
-using Utilities;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-using System.Collections.Immutable;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
 
 /// <summary>
 /// The default test host launcher for the engine.

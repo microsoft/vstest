@@ -1,15 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-using System.Diagnostics.CodeAnalysis;
-
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
-using System.IO;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 /// <summary>
 /// The class that enables us to get debug information from both managed and native binaries.
@@ -101,12 +101,21 @@ public class DiaSession : INavigationSession
         // For remote scenario, also look for pdb in current directory, (esp for UWP)
         // The alternate search path should be an input from Adapters, but since it is not so currently adding a HACK
         pdbFilePath = !File.Exists(pdbFilePath) ? Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(pdbFilePath)) : pdbFilePath;
-        using var stream = new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read);
-        if (PortablePdbReader.IsPortable(stream))
+
+        if (File.Exists(pdbFilePath))
         {
+            using var stream = new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read);
+            if (PortablePdbReader.IsPortable(stream))
+            {
+                return new PortableSymbolReader();
+            }
+
+            return new FullSymbolReader();
+        }
+        else
+        {
+            // If we cannot find the pdb file, it might be embedded in the dll.
             return new PortableSymbolReader();
         }
-
-        return new FullSymbolReader();
     }
 }

@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
-
 using System.IO;
 using System.Reflection;
 
@@ -21,6 +17,10 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+
+#nullable disable
+
+namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
 
 [TestClass]
 public class InProcDataCollectorTests

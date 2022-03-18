@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
-
 using System;
 using System.Runtime.Serialization;
 
-using Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
 /// <summary>
 /// Stores information about test execution context.

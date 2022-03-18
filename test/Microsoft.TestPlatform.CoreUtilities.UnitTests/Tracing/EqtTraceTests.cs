@@ -1,17 +1,29 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace TestPlatform.CoreUtilities.UnitTests;
 
 #if NETFRAMEWORK
 using System.Diagnostics;
 #endif
+using System;
 using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+/* Unmerged change from project 'Microsoft.TestPlatform.CoreUtilities.UnitTests (net451)'
+Before:
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using System;
+After:
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+using System;
+*/
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace TestPlatform.CoreUtilities.UnitTests;
 
 [TestClass]
 public class EqtTraceTests
@@ -20,7 +32,7 @@ public class EqtTraceTests
     private static string s_logFile;
 
     [ClassInitialize]
-    public static void Init(TestContext testContext)
+    public static void Init(TestContext _)
     {
         // Set DoNotInitailize to false.
         EqtTrace.DoNotInitailize = false;

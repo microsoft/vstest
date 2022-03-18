@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,22 +9,25 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 
-using CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using CoreUtilities.Extensions;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Host;
-using ObjectModel.Logging;
-using PlatformAbstractions;
-using PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-using CoreUtilities.Helpers;
+using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
-using CrossPlatEngineResources = Resources.Resources;
-using CommunicationUtilitiesResources = CommunicationUtilities.Resources.Resources;
-using CoreUtilitiesConstants = CoreUtilities.Constants;
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 /// <summary>
 /// Base class for any operations that the client needs to drive through the engine.
@@ -303,7 +302,9 @@ public class ProxyOperationManager
 
                 // We want to give test host a chance to safely close.
                 // The upper bound for wait should be 100ms.
-                var timeout = 100;
+                var timeout = int.TryParse(Environment.GetEnvironmentVariable("VSTEST_TESTHOST_SHUTDOWN_TIMEOUT"), out var time)
+                    ? time
+                    : 100;
                 EqtTrace.Verbose("ProxyOperationManager.Close: waiting for test host to exit for {0} ms", timeout);
                 if (!_testHostExited.Wait(timeout))
                 {
@@ -324,8 +325,16 @@ public class ProxyOperationManager
         {
             _initialized = false;
 
-            // Please clean up test host.
-            TestHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
+            // This is calling external code, make sure we don't fail when it throws
+            try
+            {
+                // Please clean up test host.
+                TestHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error($"ProxyOperationManager: Cleaning testhost failed: {ex}");
+            }
 
             TestHostManager.HostExited -= TestHostManagerHostExited;
             TestHostManager.HostLaunched -= TestHostManagerHostLaunched;
@@ -407,6 +416,9 @@ public class ProxyOperationManager
     {
         var properties = TestHostManager.GetType().GetRuntimeProperties();
 
+        // The field is actually defaulting to true, so this is just a complicated way to set or not set
+        // this to true (modern testhosts should have it set to true). Bad thing about this is that we are checking
+        // internal "undocumented" property. Good thing is that if you don't implement it you get the modern behavior.
         var versionCheckProperty = properties.FirstOrDefault(p => string.Equals(p.Name, _versionCheckPropertyName, StringComparison.OrdinalIgnoreCase));
         if (versionCheckProperty != null)
         {

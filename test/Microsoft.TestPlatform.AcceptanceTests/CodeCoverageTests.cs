@@ -1,17 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.AcceptanceTests;
-
 using System;
 using System.IO;
 using System.Xml;
 
-using TestUtilities;
+using Microsoft.TestPlatform.TestUtilities;
 
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 internal struct TestParameters
 {
@@ -208,10 +208,9 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
     private void CollectCodeCoverage(RunnerInfo runnerInfo, TestParameters testParameters)
     {
-        using var tempDir = new TempDirectory();
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = CreateArguments(tempDir, runnerInfo, testParameters, out var trxFilePath);
+        var arguments = CreateArguments(TempDirectory, runnerInfo, testParameters, out var trxFilePath);
 
         InvokeVsTest(arguments);
 
@@ -220,8 +219,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             testParameters.ExpectedSkippedTests,
             testParameters.ExpectedFailedTests);
 
-        var actualCoverageFile = GetCoverageFileNameFromTrx(trxFilePath, tempDir.Path);
-        Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {tempDir.Path} trxfile: {trxFilePath}");
+        var actualCoverageFile = GetCoverageFileNameFromTrx(trxFilePath, TempDirectory.Path);
+        Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {TempDirectory.Path} trxfile: {trxFilePath}");
         Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
 
         if (testParameters.RunSettingsType == TestParameters.SettingsType.XmlOutput)
@@ -237,7 +236,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             Assert.IsTrue(actualCoverageFile.EndsWith(".coverage", StringComparison.InvariantCultureIgnoreCase));
         }
 
-        var coverageDocument = GetXmlCoverage(actualCoverageFile, tempDir);
+        var coverageDocument = GetXmlCoverage(actualCoverageFile, TempDirectory);
         if (testParameters.CheckSkipped)
         {
             AssertSkippedMethod(coverageDocument);
@@ -247,7 +246,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     private string CreateArguments(
-        TempDirectory tempDir,
+        TempDirectory tempDirectory,
         RunnerInfo runnerInfo,
         TestParameters testParameters,
         out string trxFilePath)
@@ -257,14 +256,14 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
             "artifacts", IntegrationTestEnvironment.BuildConfiguration, "Microsoft.CodeCoverage");
 
-        string diagFileName = Path.Combine(tempDir.Path, "diaglog.txt");
+        string diagFileName = Path.Combine(tempDirectory.Path, "diaglog.txt");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty,
-            FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
+            FrameworkArgValue, runnerInfo.InIsolationValue, tempDirectory.Path);
         arguments = string.Concat(arguments, $" /Diag:{diagFileName}",
             $" /TestAdapterPath:{traceDataCollectorDir}");
         arguments = string.Concat(arguments, $" /Platform:{testParameters.TargetPlatform}");
 
-        trxFilePath = Path.Combine(tempDir.Path, Guid.NewGuid() + ".trx");
+        trxFilePath = Path.Combine(tempDirectory.Path, Guid.NewGuid() + ".trx");
         arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
 
         var defaultRunSettingsPath = Path.Combine(

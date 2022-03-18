@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.AttachVS;
-
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -13,6 +9,10 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AttachVS;
 
 internal class DebuggerUtility
 {
@@ -140,6 +140,14 @@ internal class DebuggerUtility
                         }
                         catch (COMException ex)
                         {
+                            Trace($"ComException: Retrying in 250ms.\n{ex}");
+                            Thread.Sleep(250);
+                        }
+                        catch (TargetInvocationException ex)
+                        {
+                            if (ex.InnerException is not COMException)
+                                throw;
+
                             Trace($"ComException: Retrying in 250ms.\n{ex}");
                             Thread.Sleep(250);
                         }

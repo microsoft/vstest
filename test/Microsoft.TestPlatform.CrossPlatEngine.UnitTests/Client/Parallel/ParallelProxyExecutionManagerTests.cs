@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,6 +23,10 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+
+#nullable disable
+
+namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ParallelProxyExecutionManagerTests

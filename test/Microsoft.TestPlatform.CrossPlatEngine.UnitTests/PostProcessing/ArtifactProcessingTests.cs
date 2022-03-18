@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CrossPlatEngine.UnitTests;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,6 +23,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
+namespace TestPlatform.CrossPlatEngine.UnitTests;
+
 [TestClass]
 public class ArtifactProcessingTests
 {
@@ -38,7 +38,7 @@ public class ArtifactProcessingTests
 
     public ArtifactProcessingTests()
     {
-        _featureFlagMock.Setup(x => x.IsEnabled(It.IsAny<string>())).Returns(true);
+        _featureFlagMock.Setup(x => x.IsDisabled(It.IsAny<string>())).Returns(false);
         _fileHelperMock.Setup(x => x.GetTempPath()).Returns("/tmp");
 
         _artifactProcessingManager =

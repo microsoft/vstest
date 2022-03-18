@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Linq;
+using System.Reflection;
+
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 #nullable disable
 
 namespace TestPlatform.Common.UnitTests.ExtensionFramework;
-
-using System.Linq;
-
-using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Reflection;
-using Microsoft.TestPlatform.TestUtilities;
 
 [TestClass]
 public class TestExecutorExtensionManagerTests

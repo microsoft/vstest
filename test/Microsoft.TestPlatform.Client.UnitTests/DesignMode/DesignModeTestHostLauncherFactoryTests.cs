@@ -1,15 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode;
-
-using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using TestTools.UnitTesting;
-
-using Moq;
 
 [TestClass]
 public class DesignModeTestHostLauncherFactoryTests

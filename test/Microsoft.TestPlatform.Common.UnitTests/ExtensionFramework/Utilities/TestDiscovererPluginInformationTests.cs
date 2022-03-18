@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities;
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,6 +10,10 @@ using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities;
 
 [TestClass]
 public class TestDiscovererPluginInformationTests

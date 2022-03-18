@@ -3,13 +3,13 @@
 
 #if WINDOWS_UWP
 
+using System.IO;
+
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
-using System.IO;
-
-using Interfaces;
 
 /// <inheritdoc/>
 public class PlatformStream : IStream

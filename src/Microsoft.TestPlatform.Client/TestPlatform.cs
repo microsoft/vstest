@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Client;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -31,12 +27,16 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
 
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Client;
+
 /// <summary>
 /// Implementation for TestPlatform.
 /// </summary>
 internal class TestPlatform : ITestPlatform
 {
-    private readonly TestRuntimeProviderManager _testHostProviderManager;
+    private readonly ITestRuntimeProviderManager _testHostProviderManager;
 
     private readonly IFileHelper _fileHelper;
 
@@ -66,10 +66,10 @@ internal class TestPlatform : ITestPlatform
     /// <param name="testEngine">The test engine.</param>
     /// <param name="filehelper">The file helper.</param>
     /// <param name="testHostProviderManager">The data.</param>
-    protected TestPlatform(
+    protected internal TestPlatform(
         ITestEngine testEngine,
         IFileHelper filehelper,
-        TestRuntimeProviderManager testHostProviderManager)
+        ITestRuntimeProviderManager testHostProviderManager)
     {
         TestEngine = testEngine;
         _fileHelper = filehelper;
@@ -117,6 +117,11 @@ internal class TestPlatform : ITestPlatform
         ITestLoggerManager loggerManager = TestEngine.GetLoggerManager(requestData);
         loggerManager.Initialize(testRunCriteria.TestRunSettings);
 
+        // TODO: PERF: this will create a testhost manager, and then it will pass that to GetExecutionManager, where it will
+        // be used only when we will run in-process. If we don't run in process, we will throw away the manager we just
+        // created and let the proxy parallel callbacks to create a new one. This seems to be very easy to move to the GetExecutionManager,
+        // and safe as well, so we create the manager only once.
+        // TODO: Of course TestEngine.GetExecutionManager is public api...
         ITestRuntimeProvider testHostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
         TestPlatform.ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
 

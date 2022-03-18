@@ -3,10 +3,6 @@
 
 #if WINDOWS_UWP
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,6 +10,10 @@ using System.Diagnostics.Tracing;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 internal sealed class FileEventListener : EventListener
 {

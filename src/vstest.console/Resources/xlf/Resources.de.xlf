@@ -1134,36 +1134,36 @@
         - NextToSource: Load adapters next to source. 
 
         - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</source>
-        <target state="new">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
-      This affects adapter loading behavior.
+        <target state="translated">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+      Dies wirkt sich auf das Ladeverhalten des Adapters aus.
 
-      Currently supported behaviors:
-        - Explicit: Test Platform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). 
-                    If a specific adapter path is provided, adapter will be loaded; if a directory path is provided adapters directly in that folder will be loaded, unless Recursive option is also specified.
-                    If no adapter path is specified, test run will fail.
-                    This will imply /InIsolation switch and force the tests to be run in an isolated process.
-        
-        - Default: Test Platform will load adapters is if this argument has not been specified. 
-                   It will pick up extensions from next to source, provided additional adapter paths and from the default directory.
+      Derzeit unterstützte Verhaltensweisen:
+      – Explicit: Test Platform lädt nur Adapter, die durch /TestAdapterPath (oder runConfiguration.TestAdaptersPaths-Knoten) angegeben sind. 
+      Wenn ein bestimmter Adapterpfad angegeben wird, wird der Adapter geladen. Wenn ein Verzeichnispfad bereitgestellt wird, werden Adapter direkt in diesen Ordner geladen, es sei denn, die Option „Rekursiv“ ist ebenfalls angegeben.
+      Wenn kein Adapterpfad angegeben ist, schlägt der Testlauf fehl.
+      Dies impliziert den Schalter „/InIsolation“, und es wird erzwungen, dass die Tests in einem isolierten Prozess ausgeführt werden.
 
-        - DefaultRuntimeProviders: Load default runtime providers shipped with Test Platform. 
-                                   If this is not specified when "Explicit" option is set, a test host provider need to be specified explicitly.
+      – Standard: Die Testplattform lädt Adapter, wenn dieses Argument nicht angegeben wurde. 
+      Werden Erweiterungen von der Quelle aus abgerufen, werden zusätzliche Adapterpfade und das Standardverzeichnis bereitgestellt.
 
-        - ExtensionsDirectory: Load adapters inside Extensions folder.
+      – DefaultRuntimeProviders: StandardruntimeProvider laden, die im Lieferumfang der Testplattform enthalten sind. 
+      Wenn dies nicht angegeben wird, wenn die Option "Explicit" festgelegt ist, muss ein Testhostanbieter explizit angegeben werden.
 
-        - NextToSource: Load adapters next to source. 
+      – ExtensionsDirectory: Laden Sie Adapter in den Ordner "Extensions".
 
-        - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</target>
+      – NextToSource: Laden Sie Adapter neben der Quelle. 
+
+      – Rekursiv: Suchen Sie beim Laden von Adaptern rekursiv nach Ordnern. Hierfür muss auch „Explicit“ oder „NextToSource“ angegeben werden.</target>
         <note>Do not translate "Default", "DefaultRuntimeProviders", "ExtensionsDirectory", "NextToSource" or "Recursive".</note>
       </trans-unit>
       <trans-unit id="TestAdapterLoadingStrategyValueInvalid">
         <source>Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!</source>
-        <target state="new">Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!</target>
+        <target state="translated">Der angegebene Wert ({0}) für /TestAdapterLoadingStrategy ist ungültig!</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestAdapterLoadingStrategyValueInvalidRecursive">
         <source>Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}</source>
-        <target state="new">Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}</target>
+        <target state="translated">Die Rekursive Adapterladestrategie kann nicht allein verwendet werden. Kombinieren Sie dies mit mindestens einem der folgenden Elemente: {0}</target>
         <note>
         - Do not translate "Recursive",
         - {0} is the strategy names, seperated by comma: for example "Explicit, NextToSource"
@@ -1171,7 +1171,7 @@
       </trans-unit>
       <trans-unit id="TestAdapterPathValueRequiredWhenStrategyXIsUsed">
         <source>The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!</source>
-        <target state="new">The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!</target>
+        <target state="translated">Der „/TestAdapterPath“ Parameter muss angegeben werden, wenn die Testadapterladestrategie „{0}“ angegeben wird.</target>
         <note>{0} is the strategy name, "Explicit" for example.</note>
       </trans-unit>
     </body>

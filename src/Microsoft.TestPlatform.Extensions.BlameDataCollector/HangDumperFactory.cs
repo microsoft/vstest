@@ -1,16 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
-
 using System;
 using System.Runtime.InteropServices;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using NuGet.Frameworks;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 internal class HangDumperFactory : IHangDumperFactory
 {

@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector;
-
-using System;
-
-using ObjectModel;
 
 /// <summary>
 /// The program.

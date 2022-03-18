@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Represents a loading strategy
@@ -37,7 +37,7 @@ internal enum TestAdapterLoadingStrategy
     /// <summary>
     /// Load adapters inside Extensions folder.
     /// </summary>
-    ExtensionsDirectory  = 8,
+    ExtensionsDirectory = 8,
 
     /// <summary>
     /// Directory wide searches will be recursive, this is required to be used with <see cref="NextToSource" /> or <see cref="Explicit" />.

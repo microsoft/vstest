@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
+
 #nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
-using System.Collections.Generic;
 
 /// <summary>
 /// Optional parameters to the persistence process. A class implementing IPersistable can 

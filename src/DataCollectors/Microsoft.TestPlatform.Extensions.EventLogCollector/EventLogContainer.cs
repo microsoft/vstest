@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +9,11 @@ using System.Globalization;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
-using Resource = Resources.Resources;
+using Resource = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
 
 /// <summary>
 /// The event log container.

@@ -1,18 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.IO;
+using System.Linq;
 
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 /// <summary>
 /// Converts paths in received and sent objects, to make testhost seem like it run a local test,
 /// while it was in fact running a test on a remote system, in a totally different path. This is for UWP which

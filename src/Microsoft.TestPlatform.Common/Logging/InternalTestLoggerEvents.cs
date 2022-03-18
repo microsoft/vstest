@@ -1,22 +1,22 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Common.Logging;
-
-using ObjectModel;
-using ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
-
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+
 #if NETFRAMEWORK
 using System.Configuration;
 #endif
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.Logging;
 
 /// <summary>
 /// Exposes events that Test Loggers can register for and allows for them

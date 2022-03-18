@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,6 +21,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
 
 internal class ArtifactProcessingManager : IArtifactProcessingManager
 {
@@ -71,7 +71,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
 
     public void CollectArtifacts(TestRunCompleteEventArgs testRunCompleteEventArgs!!, string runSettingsXml!!)
     {
-        if (!_featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING))
+        if (_featureFlag.IsDisabled(FeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING))
         {
             EqtTrace.Verbose("ArtifactProcessingManager.CollectArtifacts: Feature disabled");
             return;
@@ -107,7 +107,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
 
     public async Task PostProcessArtifactsAsync()
     {
-        if (!_featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING))
+        if (_featureFlag.IsDisabled(FeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING))
         {
             EqtTrace.Verbose("ArtifactProcessingManager.PostProcessArtifacts: Feature disabled");
             return;
@@ -201,7 +201,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
             new RequestData()
             {
                 IsTelemetryOptedIn = IsTelemetryOptedIn(),
-                ProtocolConfig = Constants.DefaultProtocolConfig
+                ProtocolConfig = ObjectModel.Constants.DefaultProtocolConfig
             },
             attachments,
             invokedDataCollectors,
@@ -213,7 +213,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
     private TestArtifacts[] LoadTestArtifacts() => _fileHelper.GetFiles(_processArtifactFolder, "*.*", SearchOption.AllDirectories)
         .Select(file => new { TestSessionId = Path.GetFileName(Path.GetDirectoryName(file)), Artifact = file })
         .GroupBy(grp => grp.TestSessionId)
-        .Select(testSessionArtifact => new TestArtifacts(testSessionArtifact.Key, testSessionArtifact.Select(x => ParseArtifact(x.Artifact)).Where(x => x is not null).ToArray()))
+        .Select(testSessionArtifact => new TestArtifacts(testSessionArtifact.Key, testSessionArtifact.Select(x => ParseArtifact(x.Artifact)).Where(x => x is not null).ToArray()!)) // Bang because null dataflow doesn't yet backport learning from the `Where` clause
         .ToArray();
 
     private static Artifact? ParseArtifact(string fileName!!) =>

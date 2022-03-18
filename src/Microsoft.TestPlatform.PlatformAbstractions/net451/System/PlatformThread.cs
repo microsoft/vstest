@@ -3,15 +3,15 @@
 
 #if NETFRAMEWORK || NETSTANDARD2_0
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
 using System;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 public class PlatformThread : IThread
 {

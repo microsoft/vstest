@@ -1,16 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsProcessing;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
@@ -19,8 +16,13 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using Moq;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsProcessing;
 
 [TestClass]
 public class TestRunAttachmentsProcessingManagerTests
@@ -453,16 +455,23 @@ public class TestRunAttachmentsProcessingManagerTests
         _mockEventsHandler.Setup(h => h.HandleTestRunAttachmentsProcessingComplete(It.IsAny<TestRunAttachmentsProcessingCompleteEventArgs>(), It.IsAny<IEnumerable<AttachmentSet>>()))
             .Callback((TestRunAttachmentsProcessingCompleteEventArgs _, IEnumerable<AttachmentSet> _) => attachmentProcessingComplete.Set());
 
+        ManualResetEventSlim handleLogMessage = new(false);
+        _mockEventsHandler.Setup(h => h.HandleLogMessage(TestMessageLevel.Informational, "Attachments processing was cancelled."))
+            .Callback((TestMessageLevel _, string _) => handleLogMessage.Set());
+
         // act
-        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, _cancellationTokenSource.Token);
+        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _mockEventsHandler.Object, _cancellationTokenSource.Token);
         Console.WriteLine("Attachments processing done");
         await innerTaskCompletionSource.Task;
 
         // Wait to drain all progress events
-        Assert.IsTrue(expectedProgress.Wait(TimeSpan.FromMinutes(1)));
+        Assert.IsTrue(expectedProgress.Wait(TimeSpan.FromMinutes(1)), "expectedProgress not signaled");
 
         // Wait for the HandleTestRunAttachmentsProcessingComplete
-        Assert.IsTrue(attachmentProcessingComplete.Wait(TimeSpan.FromMinutes(1)));
+        Assert.IsTrue(attachmentProcessingComplete.Wait(TimeSpan.FromMinutes(1)), "attachmentProcessingComplete not signaled");
+
+        // Wait for the HandleLogMessage
+        Assert.IsTrue(handleLogMessage.Wait(TimeSpan.FromMinutes(1)), "handleLogMessage not signaled");
 
         // assert
         VerifyCompleteEvent(true, false, inputAttachments[0]);

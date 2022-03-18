@@ -1,16 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Utilities.Tests;
-
 using System;
 using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using MSTest.TestFramework.AssertExtensions;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Utilities.Tests;
 
 [TestClass]
 public class MsTestSettingsUtilitiesTests

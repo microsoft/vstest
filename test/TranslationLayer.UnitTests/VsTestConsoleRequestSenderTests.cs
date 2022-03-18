@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +9,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Interfaces;
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -23,14 +19,18 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
 using Newtonsoft.Json.Linq;
 
-using TestResult = VisualStudio.TestPlatform.ObjectModel.TestResult;
-using Payloads = VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+using Payloads = Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
 
 [TestClass]
 public class VsTestConsoleRequestSenderTests
@@ -975,7 +975,7 @@ public class VsTestConsoleRequestSenderTests
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -998,7 +998,7 @@ public class VsTestConsoleRequestSenderTests
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -1240,7 +1240,7 @@ public class VsTestConsoleRequestSenderTests
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -1263,7 +1263,7 @@ public class VsTestConsoleRequestSenderTests
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -2735,7 +2735,7 @@ public class VsTestConsoleRequestSenderTests
         Assert.IsTrue(connectionSuccess, "Connection must succeed.");
     }
 
-    private void SetupMockCommunicationForRunRequest(Mock<ITestRunEventsHandler> mockHandler)
+    private void SetupMockCommunicationForRunRequest()
     {
         InitializeCommunication();
 

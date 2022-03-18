@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
-
 using System;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
 /// <summary>
 /// The portable pdb reader.
@@ -51,6 +51,17 @@ internal class PortablePdbReader : IDisposable
         }
 
         _provider = MetadataReaderProvider.FromPortablePdbStream(stream);
+        _reader = _provider.GetMetadataReader();
+    }
+
+    /// <summary>
+    /// Reads the pdb using a provided metadata reader, when the pdb is embedded in the dll, or found by
+    /// path that is in the dll metadata.
+    /// </summary>
+    /// <param name="metadataReaderProvider"></param>
+    public PortablePdbReader(MetadataReaderProvider metadataReaderProvider!!)
+    {
+        _provider = metadataReaderProvider;
         _reader = _provider.GetMetadataReader();
     }
 

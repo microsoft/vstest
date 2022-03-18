@@ -3,15 +3,15 @@
 
 #if WINDOWS_UWP
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <summary>
 /// Helper class to deal with process related functionality.

@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.IO;
+using System.Text.RegularExpressions;
+using System.Xml;
+
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-
-using System.IO;
-using System.Xml;
-
-using Microsoft.VisualStudio.TestPlatform.Utilities;
-using Interfaces;
-using ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using System.Text.RegularExpressions;
 
 /// <summary>
 /// Utilities to get the run settings from the provider and the command line options specified.
@@ -94,7 +94,7 @@ internal static class RunSettingsProviderExtensions
     /// <param name="runSettingsProvider"></param>
     /// <param name="node"></param>
     /// <returns></returns>
-    public static Match GetTestRunParameterNodeMatch(this IRunSettingsProvider runSettingsProvider, string node)
+    public static Match GetTestRunParameterNodeMatch(this IRunSettingsProvider _, string node)
     {
         var attrName = $"(?<{AttributeNameString}>[\\w.:-]+)";
         var attrValue = $"(?<{AttributeValueString}>.+)";

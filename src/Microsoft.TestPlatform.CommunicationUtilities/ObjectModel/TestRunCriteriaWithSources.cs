@@ -1,15 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
 using Newtonsoft.Json;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
 /// <summary>
 /// The test run criteria with sources.

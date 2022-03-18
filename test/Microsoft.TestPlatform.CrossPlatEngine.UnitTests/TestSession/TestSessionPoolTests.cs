@@ -1,18 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestSession;
-
 using System;
 
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestSession;
 
 [TestClass]
 public class TestSessionPoolTests

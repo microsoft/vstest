@@ -1,15 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Utilities;
-
 using System;
 using System.Diagnostics;
 using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
 /// Utility methods for MulticastDelegates.

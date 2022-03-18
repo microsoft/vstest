@@ -1,13 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-#if NETFRAMEWORK
-using Adapter;
-#endif
-
 using System;
 using System.Collections.Generic;
 #if NETFRAMEWORK
@@ -16,6 +9,14 @@ using System.IO;
 #endif
 using System.Linq;
 using System.Reflection;
+
+#if NETFRAMEWORK
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+#endif
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 /// <summary>
 /// Implementation of finding assembly references using "managed route", i.e. Assembly.Load.

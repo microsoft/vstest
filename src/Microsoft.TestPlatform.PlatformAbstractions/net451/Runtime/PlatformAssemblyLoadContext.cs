@@ -3,13 +3,13 @@
 
 #if NETFRAMEWORK || NETSTANDARD2_0
 
+using System.Reflection;
+
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
-using System.Reflection;
-
-using Interfaces;
 
 /// <inheritdoc/>
 public class PlatformAssemblyLoadContext : IAssemblyLoadContext

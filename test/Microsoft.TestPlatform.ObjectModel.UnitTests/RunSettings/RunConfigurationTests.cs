@@ -1,17 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
-
 using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-using VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using MSTest.TestFramework.AssertExtensions;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 
 [TestClass]
 public class RunConfigurationTests
@@ -114,7 +115,7 @@ public class RunConfigurationTests
     }
 
     [TestMethod]
-    [Obsolete]
+    [Obsolete("TargetFrameworkVersion is Obsolete but we want to test its behavior")]
     public void SetTargetFrameworkVersionShouldSetTargetFramework()
     {
         var runConfiguration = new RunConfiguration();
@@ -140,7 +141,7 @@ public class RunConfigurationTests
     }
 
     [TestMethod]
-    [Obsolete]
+    [Obsolete("TargetFrameworkVersion is Obsolete but we want to test its behavior")]
     public void SetTargetFrameworkShouldSetTargetFrameworkVersion()
     {
         var runConfiguration = new RunConfiguration();

@@ -1,15 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// Argument Processor for the "--testSessionCorrelationId|/TestSessionCorrelationId" command line argument.
@@ -21,45 +19,26 @@ internal class TestSessionCorrelationIdProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/TestSessionCorrelationId";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
 
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
     /// </summary>
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new TestSessionCorrelationIdProcessorCapabilities());
-            }
-
-            return _metadata;
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new TestSessionCorrelationIdProcessorCapabilities());
 
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor = new Lazy<IArgumentExecutor>(() => new TestSessionCorrelationIdProcessorModeProcessorExecutor(CommandLineOptions.Instance));
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new TestSessionCorrelationIdProcessorModeProcessorExecutor(CommandLineOptions.Instance));
 
-            return _executor;
-        }
-
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 }
 
@@ -76,7 +55,7 @@ internal class TestSessionCorrelationIdProcessorCapabilities : BaseArgumentProce
     public override HelpContentPriority HelpPriority => HelpContentPriority.None;
 
     // We want to be sure that this command won't show in user help
-    public override string HelpContentResourceName => null;
+    public override string? HelpContentResourceName => null;
 }
 
 /// <summary>
@@ -86,12 +65,12 @@ internal class TestSessionCorrelationIdProcessorModeProcessorExecutor : IArgumen
 {
     private readonly CommandLineOptions _commandLineOptions;
 
-    public TestSessionCorrelationIdProcessorModeProcessorExecutor(CommandLineOptions options)
+    public TestSessionCorrelationIdProcessorModeProcessorExecutor(CommandLineOptions options!!)
     {
-        _commandLineOptions = options ?? throw new ArgumentNullException(nameof(options));
+        _commandLineOptions = options;
     }
 
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
         if (string.IsNullOrEmpty(argument))
         {

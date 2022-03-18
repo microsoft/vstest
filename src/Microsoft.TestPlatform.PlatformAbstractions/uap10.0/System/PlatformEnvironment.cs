@@ -3,14 +3,14 @@
 
 #if WINDOWS_UWP
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
 using System;
 using System.Runtime.InteropServices;
 
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <inheritdoc />
 public class PlatformEnvironment : IEnvironment

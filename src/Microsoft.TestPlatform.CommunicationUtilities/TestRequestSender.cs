@@ -1,27 +1,26 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
 
-using CoreUtilities.Helpers;
-
-using Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-using CommonResources = Resources.Resources;
-using ObjectModelConstants = TestPlatform.ObjectModel.Constants;
+using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
 /// Test request sender implementation.
@@ -39,7 +38,7 @@ public class TestRequestSender : ITestRequestSender
 
     private readonly int _clientExitedWaitTime;
 
-    private ICommunicationEndPoint _communicationEndpoint;
+    private readonly ICommunicationEndPoint _communicationEndpoint;
 
     private ICommunicationChannel _channel;
 
@@ -80,7 +79,6 @@ public class TestRequestSender : ITestRequestSender
             protocolConfig,
             ClientProcessExitWaitTimeout)
     {
-        SetCommunicationEndPoint();
     }
 
     internal TestRequestSender(
@@ -101,7 +99,14 @@ public class TestRequestSender : ITestRequestSender
 
         // The connectionInfo here is that of RuntimeProvider, so reverse the role of runner.
         _runtimeProvider = runtimeProvider;
-        _communicationEndpoint = communicationEndPoint;
+
+        // TODO: In various places TestRequest sender is instantiated, and we can't easily inject the factory, so this is last
+        // resort of getting the dependency into the execution flow.
+        _communicationEndpoint = communicationEndPoint
+#if DEBUG
+            ?? TestServiceLocator.Get<ICommunicationEndPoint>(connectionInfo.Endpoint)
+#endif
+            ?? SetCommunicationEndPoint();
         _connectionInfo.Endpoint = connectionInfo.Endpoint;
         _connectionInfo.Role = connectionInfo.Role == ConnectionRole.Host
             ? ConnectionRole.Client
@@ -145,6 +150,12 @@ public class TestRequestSender : ITestRequestSender
         _communicationEndpoint.Connected += (sender, args) =>
         {
             _channel = args.Channel;
+            // TODO: I suspect that Channel can be null only because of some unit tests,
+            // and being connected and actually not setting any channel should be error
+            // rather than silently waiting for timeout
+            // TODO: also this event is called back on connected, why are the event args holding
+            // the Connected boolean and why do we check it here. If we did not connect we should
+            // have not fired this event.
             if (args.Connected && _channel != null)
             {
                 _connected.Set();
@@ -158,6 +169,7 @@ public class TestRequestSender : ITestRequestSender
         // Server start returns the listener port
         // return int.Parse(this.communicationServer.Start());
         var endpoint = _communicationEndpoint.Start(_connectionInfo.Endpoint);
+        // TODO: This is forcing us to use IP address and port for communication
         return endpoint.GetIpEndPoint().Port;
     }
 
@@ -183,7 +195,8 @@ public class TestRequestSender : ITestRequestSender
     {
         // Negotiation follows these steps:
         // Runner sends highest supported version to Test host
-        // Test host sends the version it can support (must be less than highest) to runner
+        // Test host compares the version with the highest version it can support.
+        // Test host sends back the lower number of the two. So the highest protocol version, that both sides support is used.
         // Error case: test host can send a protocol error if it cannot find a supported version
         var protocolNegotiated = new ManualResetEvent(false);
         _onMessageReceived = (sender, args) =>
@@ -312,7 +325,7 @@ public class TestRequestSender : ITestRequestSender
         _messageEventHandler = eventHandler;
         _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
 
-        _onMessageReceived = (sender, args) => OnExecutionMessageReceived(sender, args, eventHandler);
+        _onMessageReceived = (sender, args) => OnExecutionMessageReceived(args, eventHandler);
         _channel.MessageReceived += _onMessageReceived;
 
         // This code section is needed because we altered the old testhost launch process for
@@ -355,7 +368,7 @@ public class TestRequestSender : ITestRequestSender
         _messageEventHandler = eventHandler;
         _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
 
-        _onMessageReceived = (sender, args) => OnExecutionMessageReceived(sender, args, eventHandler);
+        _onMessageReceived = (sender, args) => OnExecutionMessageReceived(args, eventHandler);
         _channel.MessageReceived += _onMessageReceived;
 
         // This code section is needed because we altered the old testhost launch process for
@@ -466,7 +479,7 @@ public class TestRequestSender : ITestRequestSender
         GC.SuppressFinalize(this);
     }
 
-    private void OnExecutionMessageReceived(object sender, MessageReceivedEventArgs messageReceived, ITestRunEventsHandler testRunEventsHandler)
+    private void OnExecutionMessageReceived(MessageReceivedEventArgs messageReceived, ITestRunEventsHandler testRunEventsHandler)
     {
         try
         {
@@ -530,7 +543,9 @@ public class TestRequestSender : ITestRequestSender
         }
         catch (Exception exception)
         {
-            OnTestRunAbort(testRunEventsHandler, exception, false);
+            // If we failed to process the incoming message, initiate client (testhost) abort, because we can't recover, and don't wait
+            // for it to exit and write into error stream, because it did not do anything wrong, so no error is coming there
+            OnTestRunAbort(testRunEventsHandler, exception, getClientError: false);
         }
     }
 
@@ -640,20 +655,25 @@ public class TestRequestSender : ITestRequestSender
 
     private string GetAbortErrorMessage(Exception exception, bool getClientError)
     {
+
         EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Exception: " + exception);
 
         // It is also possible for an operation to abort even if client has not
-        // disconnected, e.g. if there's an error parsing the response from test host. We
-        // want the exception to be available in those scenarios.
+        // disconnected, because we initiate client abort when there is error in processing incoming messages.
+        // in this case, we will use the exception as the failure result, if it is present. Otherwise we will
+        // try to wait for the client process to exit, and capture it's error output (we are listening to it's standard and
+        // error output in the ClientExited callback).
         var reason = exception?.Message;
         if (getClientError)
         {
             EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Client has disconnected. Wait for standard error.");
 
             // Wait for test host to exit for a moment
+            // TODO: this timeout is 10 seconds, make it also configurable like the other famous timeout that is 100ms
             if (_clientExited.Wait(_clientExitedWaitTime))
             {
-                // Set a default message of test host process exited and additionally specify the error if present
+                // Set a default message of test host process exited and additionally specify the error if we were able to get it
+                // from error output of the process
                 EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Received test host error message.");
                 reason = CommonResources.TestHostProcessCrashed;
                 if (!string.IsNullOrWhiteSpace(_clientExitErrorMessage))
@@ -712,18 +732,18 @@ public class TestRequestSender : ITestRequestSender
         Interlocked.CompareExchange(ref _operationCompleted, 1, 0);
     }
 
-    private void SetCommunicationEndPoint()
+    private ICommunicationEndPoint SetCommunicationEndPoint()
     {
         // TODO: Use factory to get the communication endpoint. It will abstract out the type of communication endpoint like socket, shared memory or named pipe etc.,
         if (_connectionInfo.Role == ConnectionRole.Client)
         {
-            _communicationEndpoint = new SocketClient();
             EqtTrace.Verbose("TestRequestSender is acting as client.");
+            return new SocketClient();
         }
         else
         {
-            _communicationEndpoint = new SocketServer();
             EqtTrace.Verbose("TestRequestSender is acting as server.");
+            return new SocketServer();
         }
     }
 }

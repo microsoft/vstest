@@ -3,14 +3,16 @@
 
 #if NETFRAMEWORK || NETSTANDARD2_0
 
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
-using System;
-using System.Threading;
-
-using Interfaces;
 
 /// <inheritdoc />
 public class PlatformEnvironment : IEnvironment
@@ -20,12 +22,33 @@ public class PlatformEnvironment : IEnvironment
     {
         get
         {
-            // On Mono System.Runtime.InteropServices.RuntimeInformation breaks
-            // See https://github.com/dotnet/corefx/issues/15112
-            // Support just x86 and x64 for now, likely our solution for ARM is going to be
-            // netcore based.
-            return Environment.Is64BitOperatingSystem ? PlatformArchitecture.X64 : PlatformArchitecture.X86;
+            return Environment.Is64BitOperatingSystem
+                ? IsArm64()
+                    ? PlatformArchitecture.ARM64
+                    : PlatformArchitecture.X64
+                : PlatformArchitecture.X86;
         }
+    }
+
+    private static bool IsArm64()
+    {
+        try
+        {
+            var currentProcess = Process.GetCurrentProcess();
+            if (!NativeMethods.IsWow64Process2(currentProcess.Handle, out ushort _, out ushort nativeMachine))
+            {
+                throw new Win32Exception();
+            }
+
+            // If nativeMachine is IMAGE_FILE_MACHINE_ARM64 it means that we're running on ARM64 architecture device.
+            return nativeMachine == NativeMethods.IMAGE_FILE_MACHINE_ARM64;
+        }
+        catch (Exception ex)
+        {
+            PlatformEqtTrace.Verbose($"PlatformEnvironment.IsArm64: Exception during ARM64 machine evaluation, {ex}\n");
+        }
+
+        return false;
     }
 
     /// <inheritdoc />
@@ -60,9 +83,7 @@ public class PlatformEnvironment : IEnvironment
 
     /// <inheritdoc />
     public int GetCurrentManagedThreadId()
-    {
-        return Thread.CurrentThread.ManagedThreadId;
-    }
+        => Environment.CurrentManagedThreadId;
 }
 
 #endif

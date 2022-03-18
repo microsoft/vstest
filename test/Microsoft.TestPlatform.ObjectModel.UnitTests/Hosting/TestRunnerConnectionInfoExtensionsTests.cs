@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace TestPlatform.TestHostProvider.UnitTests.Hosting;
-
 using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace TestPlatform.TestHostProvider.UnitTests.Hosting;
 
 [TestClass]
 public class TestRunnerConnectionInfoExtensionsTests

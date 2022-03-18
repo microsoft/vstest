@@ -1,16 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-using Resources;
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 public static class FilterHelper
 {
@@ -65,7 +63,7 @@ public static class FilterHelper
                 if (++i == str.Length || !SpecialCharactersSet.Contains(currentChar = str[i]))
                 {
                     // "\" should be followed by a special character.
-                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.TestCaseFilterEscapeException, str));
+                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.TestCaseFilterEscapeException, str));
                 }
             }
 

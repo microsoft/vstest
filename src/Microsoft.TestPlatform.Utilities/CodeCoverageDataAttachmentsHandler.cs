@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Utilities;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,11 +11,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
-using ObjectModel;
-using ObjectModel.DataCollection;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-using PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProcessor
 {

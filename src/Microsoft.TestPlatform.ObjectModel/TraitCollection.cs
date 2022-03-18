@@ -1,9 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 #if NETFRAMEWORK
 using System;
@@ -11,6 +8,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Class that holds collection of traits

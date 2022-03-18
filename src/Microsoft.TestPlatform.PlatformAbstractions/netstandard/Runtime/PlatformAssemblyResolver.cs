@@ -3,13 +3,13 @@
 
 #if NETSTANDARD && !NETSTANDARD2_0
 
+using System;
+
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
-using System;
-
-using Interfaces;
 
 /// <inheritdoc/>
 public class PlatformAssemblyResolver : IAssemblyResolver

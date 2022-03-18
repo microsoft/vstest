@@ -3,11 +3,11 @@
 
 #if WINDOWS_UWP
 
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
-using Interfaces;
 
 /// <inheritdoc/>
 public class PlatformAssemblyResolver : IAssemblyResolver

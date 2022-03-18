@@ -1,17 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
-using EventHandlers;
-using Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -19,13 +16,16 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using Utilities;
-
-using CrossPlatResources = CrossPlatEngine.Resources.Resources;
-using ObjectModelConstants = TestPlatform.ObjectModel.Constants;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-using System.Diagnostics;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestRequestHandler
 {

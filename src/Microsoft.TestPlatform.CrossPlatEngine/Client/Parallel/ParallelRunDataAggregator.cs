@@ -1,19 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-using Common.Telemetry;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 /// <summary>
 /// ParallelRunDataAggregator aggregates test run data from execution managers running in parallel
@@ -72,6 +72,7 @@ internal class ParallelRunDataAggregator
         {
             foreach (var runStats in _testRunStatsList)
             {
+                // TODO: we get nullref here if the stats are empty.
                 foreach (var outcome in runStats.Stats.Keys)
                 {
                     if (!testOutcomeMap.ContainsKey(outcome))

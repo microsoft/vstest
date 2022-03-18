@@ -1405,6 +1405,33 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";TestAdapterLoadingStrategyHelp" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:<strategy>]D;]A;      This affects adapter loading behavior.]D;]A;]D;]A;      Currently supported behaviors:]D;]A;        - Explicit: Test Platform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). ]D;]A;                    If a specific adapter path is provided, adapter will be loaded; if a directory path is provided adapters directly in that folder will be loaded, unless Recursive option is also specified.]D;]A;                    If no adapter path is specified, test run will fail.]D;]A;                    This will imply /InIsolation switch and force the tests to be run in an isolated process.]D;]A;        ]D;]A;        - Default: Test Platform will load adapters is if this argument has not been specified. ]D;]A;                   It will pick up extensions from next to source, provided additional adapter paths and from the default directory.]D;]A;]D;]A;        - DefaultRuntimeProviders: Load default runtime providers shipped with Test Platform. ]D;]A;                                   If this is not specified when "Explicit" option is set, a test host provider need to be specified explicitly.]D;]A;]D;]A;        - ExtensionsDirectory: Load adapters inside Extensions folder.]D;]A;]D;]A;        - NextToSource: Load adapters next to source. ]D;]A;]D;]A;        - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:<strategy>]D;]A;      這會影響介面卡載入行為。]D;]A;]D;]A;      目前支援的行:]D;]A;        - 明確: 測試平台只會載入 /TestAdapterPath 指定的介面卡 (或 RunConfiguration.TestAdaptersPaths 節點)。]D;]A;                    如果提供特定介面卡路徑，將會載入介面卡; 如果目錄路徑是直接在該資料夾中提供介面卡，則會載入，除非同時指定 [Recursive]5D; 選項。]D;]A;                    如果沒有指定介面卡路徑，測試回合將會失敗。]D;]A;                    這會隱含 /InIsolation 切換參數，並強制在隔離的處理常式中執行測試。]D;]A;        ]D;]A;        - Default: 如果尚未指定此引數，則測試平台會載入介面卡。]D;]A;                   它會從來源旁邊、提供的額外介面卡路徑以及預設目錄中挑選擴充功能。]D;]A;]D;]A;        - DefaultRuntimeProviders: 載入測試平台隨附的預設執行階段提供者。]D;]A;                                   如果設定 [明確]5D; 選項時未指定此項目，則必須明確指定測試主機提供者。]D;]A;]D;]A;        - ExtensionsDirectory: 在 [擴充功能]5D; 資料夾內載入介面卡。]D;]A;]D;]A;        - NextToSource: 載入來源旁的介面卡。]D;]A;]D;]A;       - Recursive: 載入介面卡時，以遞迴方式搜尋資料夾。這需要也指定「明確」或「NextToSource」。]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestAdapterLoadingStrategyValueInvalid" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[為 /TestAdapterLoadingStrategy 指定的值 ({0}) 無效!]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestAdapterLoadingStrategyValueInvalidRecursive" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Recursive 介面卡載入策略無法自行使用。請結合一或多個: {0}]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";TestAdapterPathDoesNotExist" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[The custom test adapter search path provided was not found, provide a valid path and try again.]]></Val>
@@ -1428,6 +1455,15 @@
           <Val><![CDATA[The /TestAdapterPath parameter requires a value, which is path of a location containing custom test adapters. Example:  /TestAdapterPath:c:\MyCustomAdapters]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[/TestAdapterPath 參數需要一個值，這個值是包含自訂測試配接器之位置的路徑。範例:  /TestAdapterPath:c:\MyCustomAdapters]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestAdapterPathValueRequiredWhenStrategyXIsUsed" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[指定「{0}」測試介面卡載入策略時，必須提供 /TestAdapterPath 參數！]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

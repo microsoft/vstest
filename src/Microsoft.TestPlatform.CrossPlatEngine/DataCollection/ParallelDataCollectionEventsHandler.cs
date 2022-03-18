@@ -1,19 +1,19 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
-
 using System.Collections.Generic;
 using System.Threading;
 
-using CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-using Client.Parallel;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 internal class ParallelDataCollectionEventsHandler : ParallelRunEventsHandler
 {

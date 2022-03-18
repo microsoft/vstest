@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
-
-using System.Collections.Generic;
-
-using ObjectModel;
 
 /// <summary>
 /// An environment variable requested to be set in the test execution environment by a data collector, including the

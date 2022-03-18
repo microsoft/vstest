@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +9,10 @@ using System.Text;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 /// <summary>
 /// The blame logger.
@@ -81,8 +81,8 @@ public class BlameLogger : ITestLogger
     /// <param name="e">TestRunCompleteEventArgs</param>
     private void TestRunCompleteHandler(object sender!!, TestRunCompleteEventArgs e)
     {
-        ValidateArg.NotNull<object>(sender, nameof(sender));
-        ValidateArg.NotNull<TestRunCompleteEventArgs>(e, nameof(e));
+        ValidateArg.NotNull(sender, nameof(sender));
+        ValidateArg.NotNull(e, nameof(e));
 
         if (!e.IsAborted)
         {

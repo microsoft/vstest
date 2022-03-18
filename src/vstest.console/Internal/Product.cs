@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Reflection;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
-
-using System.Reflection;
 
 public class Product
 {

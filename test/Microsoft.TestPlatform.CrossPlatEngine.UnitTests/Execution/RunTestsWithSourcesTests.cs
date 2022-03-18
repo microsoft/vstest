@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace TestPlatform.CrossPlatEngine.UnitTests.Execution;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +23,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using TestableImplementations;
+using TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations;
+
+#nullable disable
+
+namespace TestPlatform.CrossPlatEngine.UnitTests.Execution;
 
 [TestClass]
 public class RunTestsWithSourcesTests
@@ -285,7 +285,7 @@ public class RunTestsWithSourcesTests
 
         _runTestsInstance.CallSendSessionStart();
 
-        mockTestCaseEventsHandler.Verify(x => x.SendSessionStart(It.Is<IDictionary<String, object>>(
+        mockTestCaseEventsHandler.Verify(x => x.SendSessionStart(It.Is<IDictionary<string, object>>(
             y => y.ContainsKey("TestSources")
                  && ((IEnumerable<string>)y["TestSources"]).Contains("1.dll")
                  && ((IEnumerable<string>)y["TestSources"]).Contains("2.dll")

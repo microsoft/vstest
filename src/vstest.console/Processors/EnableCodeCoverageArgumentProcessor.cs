@@ -1,23 +1,23 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Globalization;
 using System.IO;
 using System.Xml;
 using System.Xml.XPath;
 
-using Common;
-using Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// The argument processor for enabling data collectors.
@@ -37,37 +37,18 @@ internal class EnableCodeCoverageArgumentProcessor : IArgumentProcessor
     /// Gets the metadata.
     /// </summary>
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new EnableCodeCoverageArgumentProcessorCapabilities());
-            }
-
-            return _metadata;
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new EnableCodeCoverageArgumentProcessorCapabilities());
 
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor = new Lazy<IArgumentExecutor>(() => new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, new FileHelper()));
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, new FileHelper()));
 
-            return _executor;
-        }
-
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 }
 

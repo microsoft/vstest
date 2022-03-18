@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-
 using System;
 using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
 /// Represents required and optional information needed for requesting a file transfer.

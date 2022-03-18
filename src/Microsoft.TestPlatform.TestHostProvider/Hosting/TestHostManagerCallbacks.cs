@@ -1,19 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.TestHostProvider.Hosting;
-
 using System;
 using System.Diagnostics;
 using System.Text;
 
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-using VisualStudio.TestPlatform.CoreUtilities.Extensions;
+#nullable disable
+
+namespace Microsoft.TestPlatform.TestHostProvider.Hosting;
 
 internal class TestHostManagerCallbacks
 {

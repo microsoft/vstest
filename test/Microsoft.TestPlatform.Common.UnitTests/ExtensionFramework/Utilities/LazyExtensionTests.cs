@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities;
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,6 +15,10 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+
+#nullable disable
+
+namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities;
 
 [TestClass]
 public class LazyExtensionTests

@@ -1,17 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics;
+
+using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
+
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+
+using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+
 #nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
-using System.Diagnostics;
-
-using Utility;
-
-using XML;
-
-using TrxLoggerResources = VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
 /// <summary>
 /// The test list category.

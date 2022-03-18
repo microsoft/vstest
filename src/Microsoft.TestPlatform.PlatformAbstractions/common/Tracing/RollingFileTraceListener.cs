@@ -3,14 +3,14 @@
 
 #if NETFRAMEWORK || NETCOREAPP || NETSTANDARD2_0
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Performs logging to a file and rolls the output file when either time or size thresholds are

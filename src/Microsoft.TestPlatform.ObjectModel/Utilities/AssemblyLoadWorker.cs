@@ -1,15 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 #if NETFRAMEWORK
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 /// <summary>
 /// Does the real work of finding references using Assembly.ReflectionOnlyLoadFrom.
@@ -165,7 +166,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
     public void GetPlatformAndFrameworkSettings(string path, out string procArchType, out string frameworkVersion)
     {
         procArchType = nameof(Architecture.Default);
-        frameworkVersion = String.Empty;
+        frameworkVersion = string.Empty;
 
         try
         {

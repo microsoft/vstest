@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.AcceptanceTests;
-
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -12,6 +8,10 @@ using System.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
@@ -47,7 +47,7 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
     [TestInitialize]
     public void SetUp()
     {
-        _resultsDirectory = new TempDirectory();
+        _resultsDirectory = TempDirectory;
     }
 
     [TestCleanup]

@@ -1,9 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 #if NETFRAMEWORK
 using System.Threading;
@@ -14,12 +11,16 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using ObjectModel;
-using PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 /// <summary>
 /// The test plugin cache.

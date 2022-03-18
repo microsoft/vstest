@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.TestHost;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,27 +9,22 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Common;
-using Common.Telemetry;
-
-using CommunicationUtilities;
-using CommunicationUtilities.Interfaces;
-
-using CoreUtilities.Helpers;
-
-using CrossPlatEngine;
-
-using ObjectModel;
-using ObjectModel.Client;
-using ObjectModel.Engine.TesthostProtocol;
-
-using PlatformAbstractions;
-
-using PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 using CommunicationUtilitiesResources =
-    CommunicationUtilities.Resources.Resources;
-using CoreUtilitiesConstants = CoreUtilities.Constants;
+    Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+
+namespace Microsoft.VisualStudio.TestPlatform.TestHost;
 
 internal class DefaultEngineInvoker :
 #if NETFRAMEWORK
@@ -63,7 +54,7 @@ internal class DefaultEngineInvoker :
 
     // this path is where the sources were originally located on the source system
     // we are in a testhost that runs on the remote system, so this local path is
-    // actually remote for us and the remote path is local for us. 
+    // actually remote for us and the remote path is local for us.
     private const string LocalPath = "--local-path";
 
     private const string RemotePath = "--remote-path";
@@ -86,7 +77,7 @@ internal class DefaultEngineInvoker :
         _dataCollectionTestCaseEventSender = dataCollectionTestCaseEventSender;
     }
 
-    public void Invoke(IDictionary<string, string> argsDictionary)
+    public void Invoke(IDictionary<string, string?> argsDictionary)
     {
         InitializeEqtTrace(argsDictionary);
 
@@ -94,14 +85,14 @@ internal class DefaultEngineInvoker :
         // beacuse of it's public interface, we work around that by making it implement a second interface
         if (_requestHandler is IDeploymentAwareTestRequestHandler deployedHandler)
         {
-            if (argsDictionary.ContainsKey(RemotePath))
+            if (argsDictionary.TryGetValue(RemotePath, out var remotePath) && remotePath != null)
             {
-                deployedHandler.RemotePath = argsDictionary[RemotePath];
+                deployedHandler.RemotePath = remotePath;
             }
 
-            if (argsDictionary.ContainsKey(LocalPath))
+            if (argsDictionary.TryGetValue(LocalPath, out var localPath) && localPath != null)
             {
-                deployedHandler.LocalPath = argsDictionary[LocalPath];
+                deployedHandler.LocalPath = localPath;
             }
         }
 
@@ -131,8 +122,7 @@ internal class DefaultEngineInvoker :
 
         SetParentProcessExitCallback(argsDictionary);
 
-        _requestHandler.ConnectionInfo =
-            GetConnectionInfo(argsDictionary);
+        _requestHandler.ConnectionInfo = GetConnectionInfo(argsDictionary);
 
         // Initialize Communication with vstest.console
         _requestHandler.InitializeCommunication();
@@ -165,7 +155,7 @@ internal class DefaultEngineInvoker :
         }
     }
 
-    private static RequestData GetRequestData(IDictionary<string, string> argsDictionary)
+    private static RequestData GetRequestData(IDictionary<string, string?> argsDictionary)
     {
         // Checks for Telemetry Opted in or not from Command line Arguments.
         // By Default opting out in Test Host to handle scenario when user running old version of vstest.console
@@ -183,7 +173,7 @@ internal class DefaultEngineInvoker :
         {
             MetricsCollection =
                 telemetryOptedIn
-                    ? (IMetricsCollection)new MetricsCollection()
+                    ? new MetricsCollection()
                     : new NoOpMetricsCollection(),
             IsTelemetryOptedIn = telemetryOptedIn
         };
@@ -219,7 +209,7 @@ internal class DefaultEngineInvoker :
         }
     }
 
-    private void SetParentProcessExitCallback(IDictionary<string, string> argsDictionary)
+    private void SetParentProcessExitCallback(IDictionary<string, string?> argsDictionary)
     {
         // Attach to exit of parent process
         var hasParentProcessArgument = CommandLineArgumentsHelper.TryGetIntArgFromDict(argsDictionary, ParentProcessIdArgument, out var parentProcessId);
@@ -253,7 +243,7 @@ internal class DefaultEngineInvoker :
             });
     }
 
-    private static TestHostConnectionInfo GetConnectionInfo(IDictionary<string, string> argsDictionary)
+    private static TestHostConnectionInfo GetConnectionInfo(IDictionary<string, string?> argsDictionary)
     {
         // vstest.console < 15.5 won't send endpoint and role arguments.
         // So derive endpoint from port argument and Make connectionRole as Client.
@@ -284,7 +274,7 @@ internal class DefaultEngineInvoker :
         return connectionInfo;
     }
 
-    private static void InitializeEqtTrace(IDictionary<string, string> argsDictionary)
+    private static void InitializeEqtTrace(IDictionary<string, string?> argsDictionary)
     {
         // Setup logging if enabled
         if (argsDictionary.TryGetValue(LogFileArgument, out var logFile))
@@ -304,7 +294,7 @@ internal class DefaultEngineInvoker :
         }
     }
 
-    private Task StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
+    private static Task StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
     {
         var task = new Task(
             () =>

@@ -1,9 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace vstest.console.UnitTests.Processors;
+using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
@@ -14,7 +12,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using System.Collections.Generic;
+#nullable disable
+
+namespace vstest.console.UnitTests.Processors;
 
 [TestClass]
 public class UseVsixExtensionsArgumentProcessorTests

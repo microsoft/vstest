@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,28 +11,31 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-using CommunicationUtilities.Interfaces;
-
-using Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-using Common.Interfaces;
-using Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using CommunicationUtilities;
-using CoreUtilities.Tracing.Interfaces;
-using Adapter;
-using DataCollection.Interfaces;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using ObjectModel.Engine;
-using ObjectModel.Engine.ClientProtocol;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using PlatformAbstractions;
-using PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-using CrossPlatEngineResources = Resources.Resources;
+using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 /// <summary>
 /// The base run tests.
@@ -231,7 +230,7 @@ internal abstract class BaseRunTests
                 try
                 {
                     // Send the test run complete event.
-                    RaiseTestRunComplete(exception, _isCancellationRequested, isAborted, shutdownAfterRun, elapsedTime);
+                    RaiseTestRunComplete(exception, _isCancellationRequested, isAborted, elapsedTime);
                 }
                 catch (Exception ex2)
                 {
@@ -250,7 +249,7 @@ internal abstract class BaseRunTests
     internal void Abort()
     {
         EqtTrace.Verbose("BaseRunTests.Abort: Calling RaiseTestRunComplete");
-        RaiseTestRunComplete(exception: null, canceled: _isCancellationRequested, aborted: true, adapterHintToShutdownAfterRun: false, elapsedTime: TimeSpan.Zero);
+        RaiseTestRunComplete(exception: null, canceled: _isCancellationRequested, aborted: true, elapsedTime: TimeSpan.Zero);
     }
 
     /// <summary>
@@ -544,7 +543,7 @@ internal abstract class BaseRunTests
         try
         {
             if (string.IsNullOrEmpty(extensionAssembly)
-                || string.Equals(extensionAssembly, Constants.UnspecifiedAdapterPath))
+                || string.Equals(extensionAssembly, ObjectModel.Constants.UnspecifiedAdapterPath))
             {
                 // full execution. Since the extension manager is cached this can be created multiple times without harming performance.
                 return TestExecutorExtensionManager.Create();
@@ -581,7 +580,6 @@ internal abstract class BaseRunTests
         Exception exception,
         bool canceled,
         bool aborted,
-        bool adapterHintToShutdownAfterRun,
         TimeSpan elapsedTime)
     {
         var runStats = TestRunCache?.TestRunStatistics ?? new TestRunStatistics(new Dictionary<TestOutcome, long>());

@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Xml;
 
-using Utility;
+using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
-using XML;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
 /// Data entry from a collector along with information what this collector is and what agent it was collected on.

@@ -1,17 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-
-using XML;
-using ObjectModel;
 using System.Xml;
+
+using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
 /// <summary>
 /// Base class for Eqt Collections.

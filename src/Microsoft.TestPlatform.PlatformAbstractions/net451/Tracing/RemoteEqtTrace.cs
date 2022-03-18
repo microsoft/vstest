@@ -3,12 +3,12 @@
 
 #if NETFRAMEWORK
 
+using System;
+using System.Diagnostics;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-using System;
-using System.Diagnostics;
 
 /// <summary>
 /// A class used to expose EqtTrace functionality across AppDomains.

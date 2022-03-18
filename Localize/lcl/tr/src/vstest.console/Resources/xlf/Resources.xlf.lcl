@@ -1405,6 +1405,33 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";TestAdapterLoadingStrategyHelp" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:<strategy>]D;]A;      This affects adapter loading behavior.]D;]A;]D;]A;      Currently supported behaviors:]D;]A;        - Explicit: Test Platform will only load adapters specified by /TestAdapterPath (or RunConfiguration.TestAdaptersPaths node). ]D;]A;                    If a specific adapter path is provided, adapter will be loaded; if a directory path is provided adapters directly in that folder will be loaded, unless Recursive option is also specified.]D;]A;                    If no adapter path is specified, test run will fail.]D;]A;                    This will imply /InIsolation switch and force the tests to be run in an isolated process.]D;]A;        ]D;]A;        - Default: Test Platform will load adapters is if this argument has not been specified. ]D;]A;                   It will pick up extensions from next to source, provided additional adapter paths and from the default directory.]D;]A;]D;]A;        - DefaultRuntimeProviders: Load default runtime providers shipped with Test Platform. ]D;]A;                                   If this is not specified when "Explicit" option is set, a test host provider need to be specified explicitly.]D;]A;]D;]A;        - ExtensionsDirectory: Load adapters inside Extensions folder.]D;]A;]D;]A;        - NextToSource: Load adapters next to source. ]D;]A;]D;]A;        - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:<strategy>]D;]A;      Bu, bağdaştırıcı yükleme davranışını etkiliyor.]D;]A;]D;]A;      Şu anda desteklenen davranışlar:]D;]A;        - Açık: Test Platformu yalnızca /TestAdapterPath (veya RunConfiguration.TestAdaptersPaths düğümü) tarafından belirtilen bağdaştırıcıları yükler. ]D;]A;                    Belirli bir bağdaştırıcı yolu sağlanırsa, bağdaştırıcı yüklenir; bir dizin yolu sağlanırsa Özyinelemeli seçeneği de belirtilmediği sürece bağdaştırıcılar doğrudan bu klasörde yüklenir.]D;]A;                    Bağdaştırıcı yolu belirtilmezse test çalıştırması başarısız olur.]D;]A;                    Bu, /InIsolation geçiş işlemini belirtir ve testleri yalıtılmış bir işlemde çalıştırılmaya zorlar.]D;]A;        ]D;]A;        - Varsayılan: Bu bağımsız değişken belirtilmemişse, Test Platformu bağdaştırıcıları yükler. ]D;]A;                   Kaynağın yanında, sağlanan ek bağdaştırıcı yolları ve varsayılan dizinden uzantılar alır.]D;]A;]D;]A;        - DefaultRuntimeProviders: Test Platformu ile gönderilen varsayılan çalışma zamanı sağlayıcılarını yükleyin. ]D;]A;                                   "Explicit" seçeneği ayarlandığında bu belirtilmezse, bir test ana bilgisayar sağlayıcısının açıkça belirtilmesi gerekir.]D;]A;]D;]A;- ExtensionsDirectory: Bağdaştırıcıları Uzantılar klasörünün içine yükleyin.]D;]A;]D;]A;        - NextToSource: Bağdaştırıcıları kaynağın yanında yükle. ]D;]A;]D;]A;        - Özyinelemeli: Bağdaştırıcılar yüklenirken klasörleri özyinelemeli olarak arayın. Bu, "Explicit" veya "NextToSource" öğesinin de belirtilmesini gerektirir.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestAdapterLoadingStrategyValueInvalid" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Specified value ({0}) for /TestAdapterLoadingStrategy is invalid!]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[/TestAdapterLoadingStrategy için belirtilen değer ({0}) geçersiz!]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestAdapterLoadingStrategyValueInvalidRecursive" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Recursive adapter loading strategy is cannot be used by itself. Please combine with one or more of: {0}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Özyinelemeli bağdaştırıcı yükleme stratejisi kendisi tarafından kullanılamaz. Lütfen bir veya daha fazla öğeyle birleştirin: {0}]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";TestAdapterPathDoesNotExist" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[The custom test adapter search path provided was not found, provide a valid path and try again.]]></Val>
@@ -1428,6 +1455,15 @@
           <Val><![CDATA[The /TestAdapterPath parameter requires a value, which is path of a location containing custom test adapters. Example:  /TestAdapterPath:c:\MyCustomAdapters]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[/TestAdapterPath parametresi, özel test bağdaştırıcıları içeren bir konumun yolu olan değeri gerektirir. Örnek:  /TestAdapterPath:c:\MyCustomAdapters]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestAdapterPathValueRequiredWhenStrategyXIsUsed" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[The /TestAdapterPath parameter needs to be provided when "{0}" test adapter loading strategy is specified!]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Test bağdaştırıcısı yükleme stratejisi "{0}" belirtilirken /TestAdapterPath parametresi belirtilmelidir!]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

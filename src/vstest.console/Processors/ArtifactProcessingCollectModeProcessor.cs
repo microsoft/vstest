@@ -1,13 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// Argument Processor for the "--artifactsProcessingMode-collect|/ArtifactsProcessingMode-Collect" command line argument.
@@ -19,45 +17,26 @@ internal class ArtifactProcessingCollectModeProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/ArtifactsProcessingMode-Collect";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
 
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
     /// </summary>
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ArtifactProcessingCollectModeProcessorCapabilities());
-            }
-
-            return _metadata;
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new ArtifactProcessingCollectModeProcessorCapabilities());
 
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor = new Lazy<IArgumentExecutor>(() => new ArtifactProcessingCollectModeProcessorExecutor(CommandLineOptions.Instance));
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new ArtifactProcessingCollectModeProcessorExecutor(CommandLineOptions.Instance));
 
-            return _executor;
-        }
-
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 }
 
@@ -74,7 +53,7 @@ internal class ArtifactProcessingCollectModeProcessorCapabilities : BaseArgument
     public override HelpContentPriority HelpPriority => HelpContentPriority.None;
 
     // We want to be sure that this command won't show in user help
-    public override string HelpContentResourceName => null;
+    public override string? HelpContentResourceName => null;
 }
 
 internal enum ArtifactProcessingMode
@@ -91,12 +70,12 @@ internal class ArtifactProcessingCollectModeProcessorExecutor : IArgumentExecuto
 {
     private readonly CommandLineOptions _commandLineOptions;
 
-    public ArtifactProcessingCollectModeProcessorExecutor(CommandLineOptions options)
+    public ArtifactProcessingCollectModeProcessorExecutor(CommandLineOptions options!!)
     {
-        _commandLineOptions = options ?? throw new ArgumentNullException(nameof(options));
+        _commandLineOptions = options;
     }
 
-    public void Initialize(string argument)
+    public void Initialize(string? _)
     {
         _commandLineOptions.ArtifactProcessingMode = ArtifactProcessingMode.Collect;
         EqtTrace.Verbose($"ArtifactProcessingPostProcessModeProcessorExecutor.Initialize: ArtifactProcessingMode.Collect");

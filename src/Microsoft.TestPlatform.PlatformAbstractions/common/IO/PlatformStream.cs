@@ -3,13 +3,13 @@
 
 #if NETFRAMEWORK || NETCOREAPP || NETSTANDARD2_0
 
+using System.IO;
+
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
-using System.IO;
-
-using Interfaces;
 
 /// <inheritdoc/>
 public class PlatformStream : IStream

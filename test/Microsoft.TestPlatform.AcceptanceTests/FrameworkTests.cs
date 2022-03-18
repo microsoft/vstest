@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 #nullable disable
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
-
-using Microsoft.TestPlatform.TestUtilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 public class FrameworkTests : AcceptanceTestBase
@@ -18,9 +18,8 @@ public class FrameworkTests : AcceptanceTestBase
     public void FrameworkArgumentShouldWork(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
-        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " ", $"/Framework:{FrameworkArgValue}");
 
         InvokeVsTest(arguments);
@@ -33,9 +32,8 @@ public class FrameworkTests : AcceptanceTestBase
     public void FrameworkShortNameArgumentShouldWork(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
-        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " ", $"/Framework:{_testEnvironment.TargetFramework}");
 
         InvokeVsTest(arguments);
@@ -50,9 +48,8 @@ public class FrameworkTests : AcceptanceTestBase
     public void OnWrongFrameworkPassedTestRunShouldNotRun(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
-        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: TempDirectory.Path);
         if (runnerInfo.TargetFramework.Contains("netcore"))
         {
             arguments = string.Concat(arguments, " ", "/Framework:Framework45");
@@ -82,9 +79,8 @@ public class FrameworkTests : AcceptanceTestBase
     public void RunSpecificTestsShouldWorkWithFrameworkInCompatibleWarning(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
-        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " ", "/tests:PassingTest");
         arguments = string.Concat(arguments, " ", "/Framework:Framework40");
 

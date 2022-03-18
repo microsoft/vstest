@@ -1,20 +1,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 
-using System;
-
-using Logging;
-using ObjectModel.Host;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
 /// <summary>
 /// Responsible for managing TestRuntimeProviderManager extensions
 /// </summary>
-public class TestRuntimeProviderManager
+public class TestRuntimeProviderManager : ITestRuntimeProviderManager
 {
     private static TestRuntimeProviderManager s_testHostManager;
 

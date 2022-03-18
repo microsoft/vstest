@@ -1,15 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector;
-
-using CommunicationUtilities.DataCollection;
-
-using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
-
-using ObjectModel.Logging;
 
 /// <inheritdoc />
 internal class MessageSink : IMessageSink

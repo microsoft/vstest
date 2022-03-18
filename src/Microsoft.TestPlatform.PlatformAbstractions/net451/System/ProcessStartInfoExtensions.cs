@@ -3,11 +3,11 @@
 
 #if NETFRAMEWORK || NETSTANDARD2_0
 
+using System.Diagnostics;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
-using System.Diagnostics;
 
 public static class ProcessStartInfoExtensions
 {

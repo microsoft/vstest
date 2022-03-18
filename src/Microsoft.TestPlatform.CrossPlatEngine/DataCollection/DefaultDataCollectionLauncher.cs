@@ -1,19 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-using Common.Logging;
-using ObjectModel.Logging;
-using PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 /// <summary>
 /// The datacollection launcher.
@@ -22,6 +22,7 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 internal class DefaultDataCollectionLauncher : DataCollectionLauncher
 {
     private const string DataCollectorProcessName = "datacollector.exe";
+    private const string DataCollectorProcessNameArm64 = "datacollector.arm64.exe";
 
     /// <summary>
     /// The constructor.
@@ -58,11 +59,12 @@ internal class DefaultDataCollectionLauncher : DataCollectionLauncher
 
         var currentProcessPath = _processHelper.GetCurrentProcessFileName();
 
-        // If current process is dotnet/dotnet.exe and you are here, datacollector.exe is present in TestHost folder.
+        // If current process is dotnet/dotnet.exe and you are here, datacollector.exe/datacollector.arm64.exe is present in TestHost folder.
+        string dataCollectorProcessName = _processHelper.GetCurrentProcessArchitecture() == PlatformArchitecture.ARM64 ? DataCollectorProcessNameArm64 : DataCollectorProcessName;
         string dataCollectorProcessPath = currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                                           || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase)
-            ? Path.Combine(dataCollectorDirectory, "TestHost", DataCollectorProcessName)
-            : Path.Combine(dataCollectorDirectory, DataCollectorProcessName);
+            ? Path.Combine(dataCollectorDirectory, "TestHost", dataCollectorProcessName)
+            : Path.Combine(dataCollectorDirectory, dataCollectorProcessName);
 
         var argumentsString = string.Join(" ", commandLineArguments);
         var dataCollectorProcess = _processHelper.LaunchProcess(dataCollectorProcessPath, argumentsString, Directory.GetCurrentDirectory(), environmentVariables, ErrorReceivedCallback, ExitCallBack, null);

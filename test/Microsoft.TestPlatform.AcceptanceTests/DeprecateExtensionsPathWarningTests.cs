@@ -1,17 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.AcceptanceTests;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
+#nullable disable
+
+namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
@@ -19,18 +19,6 @@ public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
 {
     private IList<string> _adapterDependencies;
     private IList<string> _copiedFiles;
-
-    private string BuildConfiguration
-    {
-        get
-        {
-#if DEBUG
-            return "Debug";
-#else
-            return "Release";
-#endif
-        }
-    }
 
     [TestCleanup]
     public void Cleanup()
@@ -73,8 +61,7 @@ public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
     [TestMethod]
     public void VerifyDeprecatedWarningIsThrownWhenAdaptersPickedFromExtensionDirectory()
     {
-        using var tempDir = new TempDirectory();
-        var arguments = PrepareArguments(GetSampleTestAssembly(), null, null, FrameworkArgValue, resultsDirectory: tempDir.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), null, null, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         StdOutputContains("Adapter lookup is being changed, please follow");

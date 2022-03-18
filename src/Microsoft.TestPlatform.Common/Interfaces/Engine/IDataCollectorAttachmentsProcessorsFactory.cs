@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-
 using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 /// <summary>
 /// Creates and return a list of available attachments processor
@@ -27,7 +27,7 @@ internal interface IDataCollectorAttachmentsProcessorsFactory
 /// <summary>
 /// Registered data collector attachment processor
 /// </summary>
-internal class DataCollectorAttachmentProcessor
+internal class DataCollectorAttachmentProcessor : IDisposable
 {
     /// <summary>
     /// Data collector FriendlyName
@@ -43,5 +43,10 @@ internal class DataCollectorAttachmentProcessor
     {
         FriendlyName = string.IsNullOrEmpty(friendlyName) ? throw new ArgumentException("Invalid FriendlyName", nameof(friendlyName)) : friendlyName;
         DataCollectorAttachmentProcessorInstance = dataCollectorAttachmentProcessor;
+    }
+
+    public void Dispose()
+    {
+        (DataCollectorAttachmentProcessorInstance as IDisposable)?.Dispose();
     }
 }

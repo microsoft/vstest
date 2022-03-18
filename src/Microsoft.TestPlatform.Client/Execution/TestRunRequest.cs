@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Client.Execution;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,19 +8,23 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-using Common.Telemetry;
-using CommunicationUtilities;
-using CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-using ObjectModel.Engine;
-using ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-using ClientResources = Resources.Resources;
+using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Client.Execution;
 
 public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
 {

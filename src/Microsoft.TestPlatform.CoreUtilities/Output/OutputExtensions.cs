@@ -3,14 +3,14 @@
 
 #if !NETSTANDARD1_0 && !WINDOWS_UWP
 
+using System;
+using System.Globalization;
+
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
-
-using CoreUtilities.Resources;
-
-using System;
-using System.Globalization;
 
 /// <summary>
 /// Utility Methods for sending output to IOutput.

@@ -1,25 +1,25 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 
-using Interfaces;
-using ExtensionFramework;
-using Logging;
-using Utilities;
-using ObjectModel;
-using ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 /// <summary>
 /// Manages data collection.
@@ -454,7 +454,7 @@ internal class DataCollectionManager : IDataCollectionManager
     /// <returns>
     /// The <see cref="DataCollector"/>.
     /// </returns>
-    protected virtual DataCollector TryGetTestExtension(string extensionUri)
+    protected virtual ObjectModel.DataCollection.DataCollector TryGetTestExtension(string extensionUri)
     {
         return DataCollectorExtensionManager.TryGetTestExtension(extensionUri).Value;
     }
@@ -482,7 +482,7 @@ internal class DataCollectionManager : IDataCollectionManager
                 LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.UnableToFetchUriString, dataCollectorSettings.FriendlyName));
             }
 
-            DataCollector dataCollector = null;
+            ObjectModel.DataCollection.DataCollector dataCollector = null;
             if (!string.IsNullOrWhiteSpace(dataCollectorUri))
             {
                 dataCollector = TryGetTestExtension(dataCollectorUri);

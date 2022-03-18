@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-
 using System;
 using System.Collections.Generic;
 
-using Utilities;
-using Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using ObjectModel;
-using ObjectModel.Adapter;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 /// <summary>
 /// Responsible for managing the Test Discoverer extensions which are available.
@@ -63,7 +63,6 @@ internal class TestDiscoveryExtensionManager
     {
         if (s_testDiscoveryExtensionManager == null)
         {
-
             TestPluginManager.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                     TestPlatformConstants.TestAdapterEndsWithPattern,
                     out var unfilteredTestExtensions,

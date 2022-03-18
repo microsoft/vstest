@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -29,6 +25,10 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+
+#nullable disable
+
+namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ProxyOperationManagerTests : ProxyBaseManagerTests
@@ -104,7 +104,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
                     It.IsAny<Dictionary<string, string>>(),
                     It.Is<TestRunnerConnectionInfo>(
                         t => t.LogFile.Contains("log.host." + DateTime.Now.ToString("yy-MM-dd"))
-                             && t.LogFile.Contains("_" + Thread.CurrentThread.ManagedThreadId + ".txt"))));
+                             && t.LogFile.Contains("_" + Environment.CurrentManagedThreadId + ".txt"))));
 #if NETFRAMEWORK
         EqtTrace.TraceLevel = TraceLevel.Off;
 #else

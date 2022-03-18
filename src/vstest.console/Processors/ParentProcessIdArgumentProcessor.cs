@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using System;
 using System.Diagnostics.Contracts;
 
-using CommandLineResources = Resources.Resources;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+#nullable disable
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
 /// Argument Processor for the "--ParentProcessId|/ParentProcessId" command line argument.
@@ -28,38 +28,18 @@ internal class ParentProcessIdArgumentProcessor : IArgumentProcessor
     /// Gets the metadata.
     /// </summary>
     public Lazy<IArgumentProcessorCapabilities> Metadata
-    {
-        get
-        {
-            if (_metadata == null)
-            {
-                _metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ParentProcessIdArgumentProcessorCapabilities());
-            }
-
-            return _metadata;
-        }
-    }
+        => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
+            new ParentProcessIdArgumentProcessorCapabilities());
 
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
     public Lazy<IArgumentExecutor> Executor
     {
-        get
-        {
-            if (_executor == null)
-            {
-                _executor = new Lazy<IArgumentExecutor>(() =>
-                    new ParentProcessIdArgumentExecutor(CommandLineOptions.Instance));
-            }
+        get => _executor ??= new Lazy<IArgumentExecutor>(() =>
+            new ParentProcessIdArgumentExecutor(CommandLineOptions.Instance));
 
-            return _executor;
-        }
-
-        set
-        {
-            _executor = value;
-        }
+        set => _executor = value;
     }
 }
 

@@ -1,17 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
-namespace Microsoft.TestPlatform.Build.Tasks;
-
-using Utils;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-using Trace;
+using Microsoft.TestPlatform.Build.Trace;
+using Microsoft.TestPlatform.Build.Utils;
+
+#nullable disable
+
+namespace Microsoft.TestPlatform.Build.Tasks;
 
 public class VSTestForwardingApp
 {

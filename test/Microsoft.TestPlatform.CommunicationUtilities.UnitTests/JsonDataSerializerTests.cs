@@ -1,18 +1,21 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Linq;
+
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+
+using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
+
 #nullable disable
 
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests;
-
-using System;
-using System.Linq;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using VisualStudio.TestPlatform.ObjectModel;
-using TestResult = VisualStudio.TestPlatform.ObjectModel.TestResult;
 
 [TestClass]
 public class JsonDataSerializerTests
