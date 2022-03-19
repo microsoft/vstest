@@ -17,6 +17,8 @@ using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
@@ -50,21 +52,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 /// </summary>
 internal class Executor
 {
+    private const string NonARM64RunnerName = "vstest.console.exe";
     private readonly ITestPlatformEventSource _testPlatformEventSource;
+    private readonly IProcessHelper _processHelper;
+    private readonly IEnvironment _environment;
     private bool _showHelp;
 
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public Executor(IOutput output) : this(output, TestPlatformEventSource.Instance)
+    public Executor(IOutput output) : this(output, TestPlatformEventSource.Instance, new ProcessHelper(), new PlatformEnvironment())
     {
     }
 
-    internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource)
+    internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource, IProcessHelper processHelper, IEnvironment environment)
     {
         Output = output;
         _testPlatformEventSource = testPlatformEventSource;
         _showHelp = true;
+        _processHelper = processHelper;
+        _environment = environment;
     }
 
     /// <summary>
@@ -410,10 +417,26 @@ internal class Executor
             }
         }
 
-        string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersion);
+        string assemblyVersionAndArchitecture = $"{assemblyVersion} ({_processHelper.GetCurrentProcessArchitecture().ToString().ToLowerInvariant()})";
+        string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersionAndArchitecture);
         Output.WriteLine(commandLineBanner, OutputLevel.Information);
         Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
+        PrintWarningIfRunningEmulatedOnArm64();
         Output.WriteLine(string.Empty, OutputLevel.Information);
+    }
+
+    /// <summary>
+    /// Display a warning if we're running the runner on ARM64 but with a different current process architecture.
+    /// </summary>
+    private void PrintWarningIfRunningEmulatedOnArm64()
+    {
+        var currentProcessArchitecture = _processHelper.GetCurrentProcessArchitecture();
+        if (Path.GetFileName(_processHelper.GetCurrentProcessFileName()) == NonARM64RunnerName &&
+            _environment.Architecture == PlatformArchitecture.ARM64 &&
+            currentProcessArchitecture != PlatformArchitecture.ARM64)
+        {
+            Output.Warning(false, CommandLineResources.WarningEmulatedOnArm64, currentProcessArchitecture.ToString().ToLowerInvariant());
+        }
     }
 
     /// <summary>
