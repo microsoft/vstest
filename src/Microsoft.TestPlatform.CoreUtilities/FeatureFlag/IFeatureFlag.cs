@@ -5,5 +5,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 internal interface IFeatureFlag
 {
-    bool IsDisabled(string featureName);
+    bool IsSet(string featureName);
 }

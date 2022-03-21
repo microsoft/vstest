@@ -196,17 +196,15 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // flaky on the desktop runner, desktop framework combo
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetFullTargetFrameworkDataSource(inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
-    public void CancelTestDiscovery(RunnerInfo runnerInfo)
+    public async Task CancelTestDiscovery(RunnerInfo runnerInfo)
     {
         // Setup
         var testAssemblies = new List<string>
         {
             GetAssetFullPath("DiscoveryTestProject.dll"),
             GetAssetFullPath("SimpleTestProject.dll"),
-            GetAssetFullPath("SimpleTestProject2.dll")
         };
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -214,19 +212,30 @@ public class DiscoverTests : AcceptanceTestBase
 
         var discoveredTests = new List<TestCase>();
         var discoveryEvents = new Mock<ITestDiscoveryEventsHandler>();
-        discoveryEvents.Setup((events) => events.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback
-            ((IEnumerable<TestCase> testcases) => discoveredTests.AddRange(testcases));
+        discoveryEvents.Setup(events => events.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
+            .Callback((IEnumerable<TestCase> testcases) =>
+            {
+                discoveredTests.AddRange(testcases);
+                _vstestConsoleWrapper.CancelDiscovery();
+            });
+        var isTestCancelled = false;
+        discoveryEvents.Setup(events => events.HandleDiscoveryComplete(It.IsAny<long>(), It.IsAny<IEnumerable<TestCase>>(), It.IsAny<bool>()))
+            .Callback((long _, IEnumerable<TestCase> testcases, bool isAborted) =>
+            {
+                isTestCancelled = isAborted;
+                if (testcases != null)
+                {
+                    discoveredTests.AddRange(testcases);
+                }
+            });
 
         // Act
-        var discoveryTask = Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), discoveryEvents.Object));
-
-        Task.Delay(2000).Wait();
-        _vstestConsoleWrapper.CancelDiscovery();
-        discoveryTask.Wait();
+        await Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), discoveryEvents.Object));
 
         // Assert.
-        int discoveredSources = discoveredTests.Select((testcase) => testcase.Source).Distinct().Count();
-        Assert.AreNotEqual(testAssemblies.Count, discoveredSources, "All test assemblies discovered");
+        Assert.IsTrue(isTestCancelled);
+        int discoveredSourcesCount = discoveredTests.Select(testcase => testcase.Source).Distinct().Count();
+        Assert.AreNotEqual(testAssemblies.Count, discoveredSourcesCount, "All test assemblies discovered");
     }
 
     private IList<string> GetTestAssemblies()

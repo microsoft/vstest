@@ -141,7 +141,7 @@ function Verify-NugetPackages
 function Write-FailLog ([string] $message)
 {
     $script:ErrorCount = $script:ErrorCount + 1
-    Write-ToCI -message $message -type "error"
+    Write-ToCI -message $message -type "task.logissue type=error"
 }
 
 function Write-Debug ([string] $message)
@@ -172,5 +172,6 @@ Verify-Assemblies
 Verify-NugetPackages
 
 if ($script:ErrorCount -gt 0) {
-    Write-ToCI -message "Verification failed, $($script:ErrorCount) errors found!" -type "task.logissue" -vso
+    # Write-ToCI -message "Verification failed, $($script:ErrorCount) errors found!" -type "task.logissue type=error" -vso
+    Write-ToCI -message "Verification failed, $($script:ErrorCount) errors found!" -type "task.complete result=Failed;" -vso
 }

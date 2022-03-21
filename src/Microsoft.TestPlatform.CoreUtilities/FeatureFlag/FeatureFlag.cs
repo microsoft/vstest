@@ -4,7 +4,7 @@
 #if !NETSTANDARD1_0
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
@@ -22,36 +22,28 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 /// Use constants so the feature name will be compiled directly into the assembly that references this, to avoid backwards compatibility issues, when the flag is removed in newer version.
 /// </summary>
 
-// !!! FEATURES MUST BE KEPT IN SYNC WITH https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestFeatureFlag.cs !!!
+// !!! SDK USED FEATURE NAMES MUST BE KEPT IN SYNC IN https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestFeatureFlag.cs !!!
 internal partial class FeatureFlag : IFeatureFlag
 {
-    private static readonly Dictionary<string, bool> FeatureFlags = new();
-
-    private const string VSTEST_ = nameof(VSTEST_);
+    private readonly ConcurrentDictionary<string, bool> _cache = new();
 
     public static IFeatureFlag Instance { get; } = new FeatureFlag();
 
-    static FeatureFlag()
-    {
-        FeatureFlags.Add(DISABLE_ARTIFACTS_POSTPROCESSING, false);
-        FeatureFlags.Add(DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX, false);
-    }
+    private FeatureFlag() { }
+
+    // Only check the env variable once, when it is not set or is set to 0, consider it unset. When it is anything else, consider it set.
+    public bool IsSet(string featureFlag) => _cache.GetOrAdd(featureFlag, f => (Environment.GetEnvironmentVariable(f)?.Trim() ?? "0") != "0");
+
+    private const string VSTEST_ = nameof(VSTEST_);
 
     // Added for artifact post-processing, it enable/disable the post processing.
     // Added in 17.2-preview 7.0-preview
-    public const string DISABLE_ARTIFACTS_POSTPROCESSING = VSTEST_ + "_" + nameof(DISABLE_ARTIFACTS_POSTPROCESSING);
+    public const string DISABLE_ARTIFACTS_POSTPROCESSING = VSTEST_ + nameof(DISABLE_ARTIFACTS_POSTPROCESSING);
 
     // Added for artifact post-processing, it will show old output for dotnet sdk scenario.
     // It can be useful if we need to restore old UX in case users are parsing the console output.
     // Added in 17.2-preview 7.0-preview
-    public const string DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX = VSTEST_ + "_" + nameof(DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX);
-
-    // For now we're checking env var.
-    // We could add it also to some section inside the runsettings.
-    public bool IsDisabled(string featureName) =>
-        int.TryParse(Environment.GetEnvironmentVariable(featureName), out int disabled) ?
-        disabled == 1 :
-        FeatureFlags.TryGetValue(featureName, out bool isDisabled) && isDisabled;
+    public const string DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX = VSTEST_ + nameof(DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX);
 }
 
 #endif
