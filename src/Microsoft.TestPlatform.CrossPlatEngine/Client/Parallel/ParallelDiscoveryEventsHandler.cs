@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
-using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -14,8 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
@@ -57,7 +54,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     }
 
     /// <inheritdoc/>
-    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase>? lastChunk)
     {
         // Aggregate data for final discovery complete
         _discoveryDataAggregator.Aggregate(discoveryCompleteEventArgs, discoveryCompleteEventArgs.DiscoveredExtensions);
