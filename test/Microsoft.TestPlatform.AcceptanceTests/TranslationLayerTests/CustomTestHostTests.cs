@@ -33,7 +33,10 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [RunnerCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER_FLOW)]
-    [TestHostCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER_FLOW)]
+    // This does not work with testhosts that are earlier than when the feature was introduced,
+    // when latest runner is used, because the latest runner does not downgrade the messages when
+    // older testhost launcher is used.
+    // [TestHostCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER_FLOW)]
     public void RunTestsWithCustomTestHostLauncherLaunchesTheProcessUsingTheProvidedLauncher(RunnerInfo runnerInfo)
     {
         // Pins the existing functionality.

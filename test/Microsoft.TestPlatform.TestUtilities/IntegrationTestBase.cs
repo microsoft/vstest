@@ -605,7 +605,7 @@ public class IntegrationTestBase
 
         if (IsDesktopRunner())
         {
-            if (!string.IsNullOrWhiteSpace(_testEnvironment?.VSTestConsoleInfo.Path))
+            if (!string.IsNullOrWhiteSpace(_testEnvironment.VSTestConsoleInfo?.Path))
             {
                 consoleRunnerPath = _testEnvironment.VSTestConsoleInfo.Path;
             }
