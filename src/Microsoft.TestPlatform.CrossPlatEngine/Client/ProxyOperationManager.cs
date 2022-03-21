@@ -302,7 +302,9 @@ public class ProxyOperationManager
 
                 // We want to give test host a chance to safely close.
                 // The upper bound for wait should be 100ms.
-                var timeout = 100;
+                var timeout = int.TryParse(Environment.GetEnvironmentVariable("VSTEST_TESTHOST_SHUTDOWN_TIMEOUT"), out var time)
+                    ? time
+                    : 100;
                 EqtTrace.Verbose("ProxyOperationManager.Close: waiting for test host to exit for {0} ms", timeout);
                 if (!_testHostExited.Wait(timeout))
                 {

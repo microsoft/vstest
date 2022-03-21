@@ -25,7 +25,7 @@ internal static class DataCollectionLauncherFactory
     /// </returns>
     internal static IDataCollectionLauncher GetDataCollectorLauncher(IProcessHelper processHelper, string settingsXml)
     {
-        // Always launch datacollector.exe if code coverage is configured.
+        // Event log datacollector is built for .NET Framework and we need to load inside .NET Framework process.
         if (!string.IsNullOrWhiteSpace(settingsXml))
         {
             var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settingsXml);

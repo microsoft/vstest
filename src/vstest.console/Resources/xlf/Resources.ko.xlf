@@ -1174,6 +1174,11 @@
         <target state="translated">"{0}" 테스트 어댑터 로드 전략이 지정된 경우 /TestAdapterPath 매개 변수를 제공해야 합니다!</target>
         <note>{0} is the strategy name, "Explicit" for example.</note>
       </trans-unit>
+      <trans-unit id="WarningEmulatedOnArm64">
+        <source>vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.</source>
+        <target state="translated">vstest.console.exe가 에뮬레이트 모드에서 {0}(으)로 실행 중입니다. 더 나은 성능을 위해 네이티브 실행기 vstest.console.arm64.exe 사용을 고려하세요.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

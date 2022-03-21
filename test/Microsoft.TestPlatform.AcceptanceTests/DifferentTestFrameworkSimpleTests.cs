@@ -20,9 +20,11 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     public void ChutzpahRunAllTestExecution(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        var testJSFileAbsolutePath = Path.Combine(_testEnvironment.TestAssetsPath, "test.js");
-        var arguments = PrepareArguments(testJSFileAbsolutePath, GetTestAdapterPath(UnitTestFramework.Chutzpah), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
-
+        string fileName = "test.js";
+        var testJSFileAbsolutePath = Path.Combine(_testEnvironment.TestAssetsPath, fileName);
+        string tempPath = Path.Combine(TempDirectory.Path, fileName);
+        File.Copy(testJSFileAbsolutePath, tempPath);
+        var arguments = PrepareArguments(tempPath, GetTestAdapterPath(UnitTestFramework.Chutzpah), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 1, 0);
     }

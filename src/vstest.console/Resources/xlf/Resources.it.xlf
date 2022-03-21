@@ -1174,6 +1174,11 @@
         <target state="translated">È necessario specificare il parametro /TestAdapterPath quando si specifica la strategia di caricamento dell'adattatore di test "{0}".</target>
         <note>{0} is the strategy name, "Explicit" for example.</note>
       </trans-unit>
+      <trans-unit id="WarningEmulatedOnArm64">
+        <source>vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.</source>
+        <target state="new">vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
