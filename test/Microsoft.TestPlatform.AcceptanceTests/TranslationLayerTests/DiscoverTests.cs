@@ -208,8 +208,8 @@ public class DiscoverTests : AcceptanceTestBase
         // Setup
         var testAssemblies = new List<string>
         {
-            GetAssetFullPath("DiscoveryTestProject.dll"),
-            GetAssetFullPath("SimpleTestProject.dll"),
+            GetTestDll("DiscoveryTestProject.dll"),
+            GetTestDll("SimpleTestProject.dll"),
         };
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -235,7 +235,7 @@ public class DiscoverTests : AcceptanceTestBase
             });
 
         // Act
-        await Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), discoveryEvents.Object));
+        await Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, GetRunSettingsWithCurrentTargetFramework(), discoveryEvents.Object));
 
         // Assert.
         Assert.IsTrue(isTestCancelled);
