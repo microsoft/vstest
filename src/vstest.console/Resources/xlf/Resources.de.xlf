@@ -1176,7 +1176,7 @@
       </trans-unit>
       <trans-unit id="WarningEmulatedOnArm64">
         <source>vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.</source>
-        <target state="new">vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.</target>
+        <target state="translated">„vstest.console.exe“ wird im emulierten Modus als {0} ausgeführt. Um eine bessere Leistung zu erzielen, erwägen Sie die Verwendung der nativen Ausführung von „vstest.console.arm64.exe“.</target>
         <note></note>
       </trans-unit>
     </body>
