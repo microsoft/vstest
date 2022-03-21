@@ -1176,7 +1176,7 @@ Comportements actuellement pris en charge :
       </trans-unit>
       <trans-unit id="WarningEmulatedOnArm64">
         <source>vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.</source>
-        <target state="new">vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.</target>
+        <target state="translated">vstest.console.exe s’exécute en mode émulé en tant que {0}. Pour de meilleures performances, utilisez l’exécuteur natif vstest.console.arm64.exe.</target>
         <note></note>
       </trans-unit>
     </body>
