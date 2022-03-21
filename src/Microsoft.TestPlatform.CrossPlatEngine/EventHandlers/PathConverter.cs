@@ -31,8 +31,8 @@ internal class PathConverter : IPathConverter
 
     public PathConverter(string originalPath!!, string deploymentPath!!, IFileHelper fileHelper!!)
     {
-        _originalPath = fileHelper.GetFullPath(originalPath).TrimEnd('\\').TrimEnd('/') + Path.DirectorySeparatorChar;
-        _deploymentPath = fileHelper.GetFullPath(deploymentPath).TrimEnd('\\').TrimEnd('/') + Path.DirectorySeparatorChar;
+        _originalPath = fileHelper.GetFullPath(originalPath).Trim('\"').TrimEnd('\\').TrimEnd('/') + Path.DirectorySeparatorChar;
+        _deploymentPath = fileHelper.GetFullPath(deploymentPath).Trim('\"').TrimEnd('\\').TrimEnd('/') + Path.DirectorySeparatorChar;
     }
 
     public string? UpdatePath(string? path, PathConversionDirection updateDirection)
