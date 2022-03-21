@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "testhost": {
-      "commandName": "Project",
-      "commandLineArgs": " --port 0 --endpoint 192.168.0.220:8020 --role host --parentprocessid 10136 --local-path \"C:\\p\\WinUI-Samples\\x64\\Debug\\UITests\" --diag \"C:\\Users\\jajares\\AppData\\Local\\Temp\\TestPlatformLogs\\2022_03_18_15_11_53_14140\\logs.host.22-03-18_15-43-15_64470_49.txt\" --tracelevel 4 --telemetryoptedin true"
-    }
-  }
-}

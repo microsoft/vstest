@@ -11,7 +11,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>testhost</AssemblyName>
-    <TargetFrameworks>netcoreapp2.1;netcoreapp1.0;net451;net452;net46;net461;net462;net47;net471;net472;net48;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp1.0;net451;net452;net46;net461;net462;net47;net471;net472;net48</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <IsTestProject>false</IsTestProject>
