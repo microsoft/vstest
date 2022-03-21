@@ -49,7 +49,7 @@ public class TelemetryTests : AcceptanceTestBase
             return;
         }
 
-        var assemblyPaths = GetTestDll("SimpleTestProject2.dll");
+        var assemblyPaths = GetAssetFullPath("SimpleTestProject2.dll");
 
         var env = new Dictionary<string, string>
         {
@@ -70,7 +70,7 @@ public class TelemetryTests : AcceptanceTestBase
             return;
         }
 
-        var assemblyPaths = GetTestDll("SimpleTestProject2.dll");
+        var assemblyPaths = GetAssetFullPath("SimpleTestProject2.dll");
 
         var env = new Dictionary<string, string>
         {

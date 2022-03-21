@@ -47,7 +47,7 @@ public class RunTests : AcceptanceTestBase
         
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetRunSettingsWithCurrentTargetFramework(), runEventHandler);
+        vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetDefaultRunSettings(), runEventHandler);
 
         // Assert
         Assert.AreEqual(6, runEventHandler.TestResults.Count);
@@ -67,7 +67,7 @@ public class RunTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
-        _vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetRunSettingsWithCurrentTargetFramework(), _runEventHandler);
+        _vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetDefaultRunSettings(), _runEventHandler);
         _vstestConsoleWrapper?.EndSession();
 
         // Assert
@@ -89,7 +89,7 @@ public class RunTests : AcceptanceTestBase
 
         _vstestConsoleWrapper.RunTests(
             GetTestAssemblies(),
-            GetRunSettingsWithCurrentTargetFramework(),
+            GetDefaultRunSettings(),
             new TestPlatformOptions() { CollectMetrics = true },
             _runEventHandler);
 
@@ -113,7 +113,7 @@ public class RunTests : AcceptanceTestBase
 
         _vstestConsoleWrapper.RunTests(
             GetTestAssemblies(),
-            GetRunSettingsWithCurrentTargetFramework(),
+            GetDefaultRunSettings(),
             new TestPlatformOptions() { CollectMetrics = false },
             _runEventHandler);
 
@@ -137,11 +137,11 @@ public class RunTests : AcceptanceTestBase
             return;
         }
 
-        var source = new[] { GetTestDll("SimpleTestProject3.dll") };
+        var source = new[] { GetAssetFullPath("SimpleTestProject3.dll") };
 
         _vstestConsoleWrapper.RunTests(
             source,
-            GetRunSettingsWithCurrentTargetFramework(),
+            GetDefaultRunSettings(),
             new TestPlatformOptions() { TestCaseFilter = "ExitWithStackoverFlow" },
             _runEventHandler);
 
@@ -162,7 +162,7 @@ public class RunTests : AcceptanceTestBase
         Setup();
 
         var testAssemblyName = "SimpleTestProject2.dll";
-        var source = new List<string>() { GetTestDll(testAssemblyName) };
+        var source = new List<string>() { GetAssetFullPath(testAssemblyName) };
 
         var veryLongTestCaseFilter =
             "FullyQualifiedName=VeryLongTestCaseNameeeeeeeeeeeeee" +
@@ -173,7 +173,7 @@ public class RunTests : AcceptanceTestBase
 
         _vstestConsoleWrapper.RunTests(
             source,
-            GetRunSettingsWithCurrentTargetFramework(),
+            GetDefaultRunSettings(),
             new TestPlatformOptions() { TestCaseFilter = veryLongTestCaseFilter },
             _runEventHandler);
 
@@ -190,8 +190,8 @@ public class RunTests : AcceptanceTestBase
     {
         return new List<string>
         {
-            GetTestDll("SimpleTestProject.dll"),
-            GetTestDll("SimpleTestProject2.dll")
+            GetAssetFullPath("SimpleTestProject.dll"),
+            GetAssetFullPath("SimpleTestProject2.dll")
         };
     }
 }

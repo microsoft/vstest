@@ -21,7 +21,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
-            GetSampleTestDll(),
+            GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
             runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -38,7 +38,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
-            GetSampleTestDll(),
+            GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
             runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -55,7 +55,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
-            GetSampleTestDll(),
+            GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
             runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -72,7 +72,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
-            GetSampleTestDll(),
+            GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
             runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -91,7 +91,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
-            GetSampleTestDll(),
+            GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
             runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -108,7 +108,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
-            GetSampleTestDll(),
+            GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
             runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -125,7 +125,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
-            GetSampleTestDll(),
+            GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
             runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);

@@ -246,7 +246,7 @@ public class RunsettingsTests : AcceptanceTestBase
         };
         var runsettingsFilePath = GetRunsettingsFilePath(runConfigurationDictionary, TempDirectory);
         var arguments = PrepareArguments(
-            GetSampleTestDll(),
+            GetSampleTestAssembly(),
             string.Empty,
             runsettingsFilePath, FrameworkArgValue,
             runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -267,7 +267,7 @@ public class RunsettingsTests : AcceptanceTestBase
         };
         var runsettingsFilePath = GetRunsettingsFilePath(runConfigurationDictionary, TempDirectory);
         var arguments = PrepareArguments(
-            GetSampleTestDll(),
+            GetSampleTestAssembly(),
             string.Empty,
             runsettingsFilePath, FrameworkArgValue,
             runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -284,7 +284,7 @@ public class RunsettingsTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var testAssemblyPath = GetTestDll("LegacySettingsUnitTestProject.dll");
+        var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
         _ = Path.GetDirectoryName(testAssemblyPath);
 
         var runsettingsXml = @"<RunSettings>
@@ -315,7 +315,7 @@ public class RunsettingsTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var testAssemblyPath = GetTestDll("LegacySettingsUnitTestProject.dll");
+        var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
 
         // Create the script files
         var guid = Guid.NewGuid();
@@ -361,7 +361,7 @@ public class RunsettingsTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var testAssemblyPath = GetTestDll("LegacySettingsUnitTestProject.dll");
+        var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
         var testAssemblyDirectory = Path.GetDirectoryName(testAssemblyPath);
 
         var deploymentItem = Path.Combine(testAssemblyDirectory, "Deployment", "DeploymentFile.xml");
@@ -397,7 +397,7 @@ public class RunsettingsTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var testAssemblyPath = GetTestDll("LegacySettingsUnitTestProject.dll");
+        var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
         var runsettingsXml = @"<RunSettings>
                                     <MSTest>
                                     <ForcedLegacyMode>true</ForcedLegacyMode>
@@ -424,7 +424,7 @@ public class RunsettingsTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var testAssemblyPath = GetTestDll("LegacySettingsUnitTestProject.dll");
+        var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
         var runsettingsFormat = @"<RunSettings>
                                     <MSTest><ForcedLegacyMode>true</ForcedLegacyMode></MSTest>
                                     <LegacySettings>
@@ -466,7 +466,7 @@ public class RunsettingsTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var testAssemblyPath = GetTestDll("EnvironmentVariablesTestProject.dll");
+        var testAssemblyPath = GetAssetFullPath("EnvironmentVariablesTestProject.dll");
 
         var runsettingsXml = @"<RunSettings>
                                     <RunConfiguration>

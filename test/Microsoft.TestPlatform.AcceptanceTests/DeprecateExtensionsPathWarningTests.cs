@@ -61,7 +61,7 @@ public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
     [TestMethod]
     public void VerifyDeprecatedWarningIsThrownWhenAdaptersPickedFromExtensionDirectory()
     {
-        var arguments = PrepareArguments(GetSampleTestDll(), null, null, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), null, null, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         StdOutputContains("Adapter lookup is being changed, please follow");

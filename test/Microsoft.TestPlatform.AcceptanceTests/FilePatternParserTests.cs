@@ -20,7 +20,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var testAssembly = GetSampleTestDll();
+        var testAssembly = GetSampleTestAssembly();
         testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
 
         var arguments = PrepareArguments(
@@ -40,7 +40,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var testAssembly = GetSampleTestDll();
+        var testAssembly = GetSampleTestAssembly();
 
         // Add one more directory to the temp path, so we can substitute it with **
         // and copy then whole directory there.
@@ -66,7 +66,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var testAssembly = GetSampleTestDll();
+        var testAssembly = GetSampleTestAssembly();
         testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
 
         var wildCardIndex = testAssembly.IndexOfAny(new char[] { '*' });

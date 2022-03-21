@@ -437,7 +437,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
     private IList<string> GetTestAssemblies()
     {
-        return GetProjects().Select(p => GetTestDll(p)).ToList();
+        return GetProjects().Select(p => GetAssetFullPath(p)).ToList();
     }
 
     private IList<string> GetProjects()

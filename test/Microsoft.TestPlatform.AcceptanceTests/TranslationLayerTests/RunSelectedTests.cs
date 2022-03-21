@@ -42,10 +42,10 @@ public class RunSelectedTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
-        _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetRunSettingsWithCurrentTargetFramework(), _discoveryEventHandler);
+        _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), _discoveryEventHandler);
         var testCases = _discoveryEventHandler.DiscoveredTestCases;
 
-        _vstestConsoleWrapper.RunTests(testCases, GetRunSettingsWithCurrentTargetFramework(), _runEventHandler);
+        _vstestConsoleWrapper.RunTests(testCases, GetDefaultRunSettings(), _runEventHandler);
 
         // Assert
         Assert.AreEqual(6, _runEventHandler.TestResults.Count);
@@ -62,12 +62,12 @@ public class RunSelectedTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
-        _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetRunSettingsWithCurrentTargetFramework(), _discoveryEventHandler);
+        _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), _discoveryEventHandler);
         var testCases = _discoveryEventHandler.DiscoveredTestCases;
 
         _vstestConsoleWrapper.RunTests(
             testCases,
-            GetRunSettingsWithCurrentTargetFramework(),
+            GetDefaultRunSettings(),
             new TestPlatformOptions() { CollectMetrics = true },
             _runEventHandler);
 
@@ -85,8 +85,8 @@ public class RunSelectedTests : AcceptanceTestBase
     {
         var testAssemblies = new List<string>
         {
-            GetTestDll("SimpleTestProject.dll"),
-            GetTestDll("SimpleTestProject2.dll")
+            GetAssetFullPath("SimpleTestProject.dll"),
+            GetAssetFullPath("SimpleTestProject2.dll")
         };
 
         return testAssemblies;

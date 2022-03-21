@@ -44,11 +44,11 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
         _runEventHandler = new RunEventHandler();
 
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
-        var sources = new List<string> { GetTestDll("SimpleTestProject.dll") };
+        var sources = new List<string> { GetAssetFullPath("SimpleTestProject.dll") };
 
         vstestConsoleWrapper.RunTests(
             sources,
-            GetRunSettingsWithCurrentTargetFramework(),
+            GetDefaultRunSettings(),
             new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName=SampleUnitTestProject.UnitTest1.PassingTest" },
             _runEventHandler);
 
@@ -65,11 +65,11 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
-        var sources = new List<string> { GetTestDll("SimpleTestProject.dll") };
+        var sources = new List<string> { GetAssetFullPath("SimpleTestProject.dll") };
 
         _vstestConsoleWrapper.RunTests(
             sources,
-            GetRunSettingsWithCurrentTargetFramework(),
+            GetDefaultRunSettings(),
             new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName=SampleUnitTestProject.UnitTest1.PassingTest | FullyQualifiedName=SampleUnitTestProject.UnitTest1.FailingTest" },
             _runEventHandler);
 

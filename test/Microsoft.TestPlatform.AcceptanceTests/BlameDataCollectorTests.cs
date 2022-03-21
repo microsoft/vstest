@@ -46,7 +46,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     public void BlameDataCollectorShouldGiveCorrectTestCaseName(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = GetTestDll("BlameUnitTestProject.dll");
+        var assemblyPaths = GetAssetFullPath("BlameUnitTestProject.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /Blame");
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
@@ -137,7 +137,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     public void HangDumpOnTimeout(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = GetTestDll("timeout.dll");
+        var assemblyPaths = GetAssetFullPath("timeout.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=full;TestTimeout=3s""");
 
@@ -160,7 +160,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     public void CrashDumpWhenThereIsNoTimeout(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = GetTestDll("timeout.dll");
+        var assemblyPaths = GetAssetFullPath("timeout.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full;CollectAlways=true;CollectHangDump""");
 
@@ -183,7 +183,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     public void CrashDumpOnExit(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = GetTestDll("timeout.dll");
+        var assemblyPaths = GetAssetFullPath("timeout.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full;CollectAlways=true""");
 
@@ -204,7 +204,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     public void CrashDumpOnStackOverflow(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = GetTestDll("crash.dll");
+        var assemblyPaths = GetAssetFullPath("crash.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full""");
 
@@ -225,7 +225,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     public void CrashDumpChildProcesses(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = GetTestDll("child-crash.dll");
+        var assemblyPaths = GetAssetFullPath("child-crash.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full""");
         InvokeVsTest(arguments);
@@ -240,7 +240,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     public void HangDumpChildProcesses(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = GetTestDll("child-hang.dll");
+        var assemblyPaths = GetAssetFullPath("child-hang.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=full;TestTimeout=15s""");
         InvokeVsTest(arguments);

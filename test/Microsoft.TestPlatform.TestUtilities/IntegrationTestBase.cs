@@ -522,12 +522,12 @@ public class IntegrationTestBase
         }
     }
 
-    protected string GetSampleTestDll()
+    protected string GetSampleTestAssembly()
     {
-        return GetTestDll("SimpleTestProject.dll");
+        return GetAssetFullPath("SimpleTestProject.dll");
     }
 
-    protected string GetTestDll(string assetName)
+    protected string GetAssetFullPath(string assetName)
     {
         return _testEnvironment.GetTestAsset(assetName);
     }
@@ -542,7 +542,7 @@ public class IntegrationTestBase
         var assets = new List<string>();
         foreach (var assetName in assetNames)
         {
-            assets.Add(GetTestDll(assetName));
+            assets.Add(GetAssetFullPath(assetName));
         }
 
         return assets;

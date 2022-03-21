@@ -45,7 +45,7 @@ public class PlatformTests : AcceptanceTestBase
     {
 
         var arguments = PrepareArguments(
-            GetSampleTestDll(),
+            GetSampleTestAssembly(),
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
             _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);

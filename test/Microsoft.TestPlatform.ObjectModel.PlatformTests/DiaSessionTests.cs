@@ -34,7 +34,7 @@ public class DiaSessionTests : IntegrationTestBase
     public void GetNavigationDataShouldReturnCorrectFileNameAndLineNumber()
     {
         var currentTargetFrameWork = GetAndSetTargetFrameWork(_testEnvironment);
-        var assemblyPath = GetTestDll("SimpleClassLibrary.dll");
+        var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         var diaSession = new DiaSession(assemblyPath);
         DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "PassingTest");
@@ -52,7 +52,7 @@ public class DiaSessionTests : IntegrationTestBase
     public void GetNavigationDataShouldReturnCorrectDataForAsyncMethod()
     {
         var currentTargetFrameWork = GetAndSetTargetFrameWork(_testEnvironment);
-        var assemblyPath = GetTestDll("SimpleClassLibrary.dll");
+        var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         var diaSession = new DiaSession(assemblyPath);
         DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1+<AsyncTestMethod>d__1", "MoveNext");
@@ -70,7 +70,7 @@ public class DiaSessionTests : IntegrationTestBase
     public void GetNavigationDataShouldReturnCorrectDataForOverLoadedMethod()
     {
         var currentTargetFrameWork = GetAndSetTargetFrameWork(_testEnvironment);
-        var assemblyPath = GetTestDll("SimpleClassLibrary.dll");
+        var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         var diaSession = new DiaSession(assemblyPath);
         DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "OverLoadedMethod");
@@ -89,7 +89,7 @@ public class DiaSessionTests : IntegrationTestBase
     public void GetNavigationDataShouldReturnNullForNotExistMethodNameOrNotExistTypeName()
     {
         var currentTargetFrameWork = GetAndSetTargetFrameWork(_testEnvironment);
-        var assemblyPath = GetTestDll("SimpleClassLibrary.dll");
+        var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         var diaSession = new DiaSession(assemblyPath);
 
@@ -108,7 +108,7 @@ public class DiaSessionTests : IntegrationTestBase
     public void DiaSessionPerfTest()
     {
         var currentTargetFrameWork = GetAndSetTargetFrameWork(_testEnvironment);
-        var assemblyPath = GetTestDll("SimpleClassLibrary.dll");
+        var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         var watch = Stopwatch.StartNew();
         var diaSession = new DiaSession(assemblyPath);

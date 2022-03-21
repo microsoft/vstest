@@ -47,12 +47,12 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 
         var sources = new List<string>
         {
-            GetTestDll("NUTestProject.dll")
+            GetAssetFullPath("NUTestProject.dll")
         };
 
         _vstestConsoleWrapper.RunTests(
             sources,
-            GetRunSettingsWithCurrentTargetFramework(),
+            GetDefaultRunSettings(),
             _runEventHandler);
 
         var testCase =
@@ -94,7 +94,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 
         _vstestConsoleWrapper.RunTests(
             sources,
-            GetRunSettingsWithCurrentTargetFramework(),
+            GetDefaultRunSettings(),
             _runEventHandler);
 
         var testCase =
@@ -134,7 +134,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 
         _vstestConsoleWrapper.RunTests(
             sources,
-            GetRunSettingsWithCurrentTargetFramework(),
+            GetDefaultRunSettings(),
             _runEventHandler);
 
         var testCase =

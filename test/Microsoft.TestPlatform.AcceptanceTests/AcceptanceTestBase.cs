@@ -124,7 +124,7 @@ public class AcceptanceTestBase : IntegrationTestBase
     /// <summary>
     /// Almost empty runsettings, just specifying the target framework from the currently set test environment.
     /// </summary>
-    public string GetRunSettingsWithCurrentTargetFramework()
+    public string GetDefaultRunSettings()
     {
         return GetRunSettingsWithTargetFramework(FrameworkArgValue);
     }

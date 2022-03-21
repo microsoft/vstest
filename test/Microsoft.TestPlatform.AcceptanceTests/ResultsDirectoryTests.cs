@@ -20,7 +20,7 @@ public class ResultsDirectoryTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
         var trxFileName = "TestResults.trx";
         var trxFilePath = Path.Combine(TempDirectory.Path, trxFileName);
         arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
@@ -41,7 +41,7 @@ public class ResultsDirectoryTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
         var trxFileName = "TestResults.trx";
         var relativeDirectory = @"relative\directory";
         var resultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), relativeDirectory);

@@ -45,7 +45,7 @@ public class CustomTestHostTests : AcceptanceTestBase
 
         // Act
         var customTestHostLauncher = new TestHostLauncherV1();
-        _vstestConsoleWrapper.RunTestsWithCustomTestHost(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetRunSettingsWithCurrentTargetFramework(), runEventHandler, customTestHostLauncher);
+        _vstestConsoleWrapper.RunTestsWithCustomTestHost(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), runEventHandler, customTestHostLauncher);
 
         // Assert
         EnsureTestsRunWithoutErrors(runEventHandler, passed: 2, failed: 2, skipped: 2);
@@ -74,7 +74,7 @@ public class CustomTestHostTests : AcceptanceTestBase
 
         // Act
         var customTestHostLauncher = new TestHostLauncherV2();
-        _vstestConsoleWrapper.RunTestsWithCustomTestHost(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetRunSettingsWithCurrentTargetFramework(), runEventHandler, customTestHostLauncher);
+        _vstestConsoleWrapper.RunTestsWithCustomTestHost(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), runEventHandler, customTestHostLauncher);
 
         // Assert
         EnsureTestsRunWithoutErrors(runEventHandler, passed: 2, failed: 2, skipped: 2);
@@ -98,7 +98,7 @@ public class CustomTestHostTests : AcceptanceTestBase
 
         // Act
         var customTestHostLauncher = new TestHostLauncherV2();
-        _vstestConsoleWrapper.RunTestsWithCustomTestHost(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetRunSettingsWithCurrentTargetFramework(), runEventHandler, customTestHostLauncher);
+        _vstestConsoleWrapper.RunTestsWithCustomTestHost(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), runEventHandler, customTestHostLauncher);
 
         // Assert
         EnsureTestsRunWithoutErrors(runEventHandler, passed: 2, failed: 2, skipped: 2);
@@ -123,7 +123,7 @@ public class CustomTestHostTests : AcceptanceTestBase
 
         // Act
         var customTestHostLauncher = new TestHostLauncherV1();
-        _vstestConsoleWrapper.RunTestsWithCustomTestHost(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetRunSettingsWithCurrentTargetFramework(), runEventHandler, customTestHostLauncher);
+        _vstestConsoleWrapper.RunTestsWithCustomTestHost(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), runEventHandler, customTestHostLauncher);
 
         // Assert
         EnsureTestsRunWithoutErrors(runEventHandler, passed: 2, failed: 2, skipped: 2);

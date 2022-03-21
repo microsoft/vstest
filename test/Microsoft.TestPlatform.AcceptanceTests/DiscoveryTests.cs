@@ -25,7 +25,7 @@ public class DiscoveryTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        InvokeVsTestForDiscovery(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue);
+        InvokeVsTestForDiscovery(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue);
 
         var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
         ValidateDiscoveredTests(listOfTests);
@@ -65,7 +65,7 @@ public class DiscoveryTests : AcceptanceTestBase
 
         var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
 
-        var arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /ListFullyQualifiedTests", " /ListTestsTargetPath:\"" + dummyFilePath + "\"");
         InvokeVsTest(arguments);
 
@@ -80,7 +80,7 @@ public class DiscoveryTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assetFullPath = GetTestDll("SimpleTestProject2.dll");
+        var assetFullPath = GetAssetFullPath("SimpleTestProject2.dll");
         var arguments = PrepareArguments(assetFullPath, GetTestAdapterPath(), string.Empty, FrameworkArgValue, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /listtests");
         arguments = string.Concat(arguments, " /testcasefilter:NonExistTestCaseName");

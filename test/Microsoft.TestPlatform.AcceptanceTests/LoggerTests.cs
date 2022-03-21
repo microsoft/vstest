@@ -23,12 +23,12 @@ public class LoggerTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         var trxFileName = "TestResults.trx";
         arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
         InvokeVsTest(arguments);
 
-        arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+        arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
         arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
         InvokeVsTest(arguments);
@@ -44,12 +44,12 @@ public class LoggerTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         var htmlFileName = "TestResults.html";
         arguments = string.Concat(arguments, $" /logger:\"html;LogFileName={htmlFileName}\"");
         InvokeVsTest(arguments);
 
-        arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+        arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:\"html;LogFileName={htmlFileName}\"");
         arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
         InvokeVsTest(arguments);
@@ -64,12 +64,12 @@ public class LoggerTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         var trxFileName = "TestResults.trx";
         arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/TrxLogger/v1;LogFileName={trxFileName}\"");
         InvokeVsTest(arguments);
 
-        arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+        arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/TrxLogger/v1;LogFileName={trxFileName}\"");
         arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
         InvokeVsTest(arguments);
@@ -86,11 +86,11 @@ public class LoggerTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var trxFileNamePattern = "TestResults";
 
-        var arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/TrxLogger/v1;LogFilePrefix={trxFileNamePattern}\"");
         InvokeVsTest(arguments);
 
-        arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+        arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/TrxLogger/v1;LogFilePrefix={trxFileNamePattern}\"");
         arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
         InvokeVsTest(arguments);
@@ -105,12 +105,12 @@ public class LoggerTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         var htmlFileName = "TestResults.html";
         arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/htmlLogger/v1;LogFileName{htmlFileName}\"");
         InvokeVsTest(arguments);
 
-        arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+        arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/htmlLogger/v1;LogFileName={htmlFileName}\"");
         arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
         InvokeVsTest(arguments);
@@ -126,7 +126,7 @@ public class LoggerTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
         var trxFilePath = Path.Combine(TempDirectory.Path, "TrxLogger.trx");
 
         arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFilePath}\"");
@@ -149,7 +149,7 @@ public class LoggerTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
         var trxFilePath = Path.Combine(TempDirectory.Path, "TrxLogger.trx");
 
         arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFilePath}\"");

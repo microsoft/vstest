@@ -40,7 +40,7 @@ public class ArgumentProcessorTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetSampleTestDll(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /badArgument");
 
         InvokeVsTest(arguments);
