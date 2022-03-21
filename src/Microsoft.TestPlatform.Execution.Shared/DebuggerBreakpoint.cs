@@ -103,7 +103,7 @@ internal static class DebuggerBreakpoint
             return fromPath;
         }
 
-        var parent = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        var parent = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
         while (parent != null)
         {
             var path = Path.Combine(parent, @"src\AttachVS\bin\Debug\net472\AttachVS.exe");
@@ -156,7 +156,7 @@ internal static class DebuggerBreakpoint
 
             while (!Debugger.IsAttached)
             {
-                Thread.Sleep(1000);
+                Task.Delay(1000).GetAwaiter().GetResult();
             }
 
             Break();
