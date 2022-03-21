@@ -3,9 +3,7 @@
 
 using System.Reflection;
 
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
-
 
 public class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo>
 {

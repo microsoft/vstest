@@ -31,6 +31,7 @@ public class CustomTestHostTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    [TestCategory("Windows-Review")]
     [RunnerCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER_FLOW)]
     [TestHostCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER_FLOW)]
     public void RunTestsWithCustomTestHostLauncherLaunchesTheProcessUsingTheProvidedLauncher(RunnerInfo runnerInfo)
@@ -56,6 +57,7 @@ public class CustomTestHostTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    [TestCategory("Windows-Review")]
     // [RunnerCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER_FLOW)]
     [TestHostCompatibilityDataSource("net451", "netcoreapp2.1", "LegacyStable", BeforeFeature = Features.ATTACH_DEBUGGER_FLOW, DebugVSTestConsole = true)]
     [Ignore("This is not working for any testhost prior 16.7.0 where the change was introduced. The launch testhost flow was replaced with AttachDebugger in runner, and the new callback to AttachDebugger happens in testhost."
@@ -85,9 +87,9 @@ public class CustomTestHostTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    [TestCategory("Windows-Review")]
     [RunnerCompatibilityDataSource(AfterFeature = Features.ATTACH_DEBUGGER_FLOW)]
     // [TestHostCompatibilityDataSource(AfterFeature = Features.ATTACH_DEBUGGER_FLOW)]
-    [TestHostCompatibilityDataSource()]
     public void RunTestsWithCustomTestHostLauncherAttachesToDebuggerUsingTheProvidedLauncher(RunnerInfo runnerInfo)
     {
 
@@ -109,6 +111,7 @@ public class CustomTestHostTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    [TestCategory("Windows-Review")]
     [Ignore("This is not working. The compatibility code only checks the protocol version (in handler), which is dictated by testhost. "
         + "It sees 6 but does not realize that the provided CustomTesthostLauncher is not supporting the new feature, it ends up calling back to EditoAttachDebugger" +
         "in translation layer, and that just silently skips the call.")]
