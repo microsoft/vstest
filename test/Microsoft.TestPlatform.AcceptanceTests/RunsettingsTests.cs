@@ -500,8 +500,8 @@ public class RunsettingsTests : AcceptanceTestBase
     [TestMethod]
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunSettingsAreLoadedFromProject(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

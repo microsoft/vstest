@@ -104,7 +104,7 @@ public class TempDirectory : IDisposable
         // just the normal TEMP, because that is not cleaned up for every run.
         //
         // System.IO.Path.GetTempPath is banned from the rest of the code. This is the only
-        // place we we are allowed to use it. All other methods should use our GetTempPath (this method).
+        // place where we are allowed to use it. All other methods should use our GetTempPath (this method).
 #pragma warning disable RS0030 // Do not used banned APIs
         return Environment.GetEnvironmentVariable("AGENT_TEMPDIRECTORY")
             ?? IO.Path.GetTempPath();

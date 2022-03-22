@@ -190,6 +190,7 @@ internal class TestPluginDiscoverer
 
             if (e.Types?.Length > 0)
             {
+                // Unloaded types on e.Types are null, make sure we skip them.
                 types.AddRange(e.Types.Where(type => type != null && type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract));
             }
 

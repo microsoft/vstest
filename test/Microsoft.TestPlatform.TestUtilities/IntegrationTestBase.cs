@@ -178,7 +178,8 @@ public class IntegrationTestBase
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
     public void InvokeVsTest(string arguments, Dictionary<string, string> environmentVariables = null)
     {
-        ExecuteVsTestConsole(arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, environmentVariables);
+        var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
+        ExecuteVsTestConsole(arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables);
         FormatStandardOutCome();
     }
 
@@ -188,14 +189,20 @@ public class IntegrationTestBase
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
     public void InvokeDotnetTest(string arguments, Dictionary<string, string> environmentVariables = null)
     {
+        var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
+
         var vstestConsolePath = GetDotnetRunnerPath();
-        
+
         if (arguments.Contains(".csproj"))
         {
             arguments = $@"-p:VsTestConsolePath=""{vstestConsolePath}"" " + arguments;
         }
 
-        ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, environmentVariables);
+        // This is used in dotnet/sdk to determine path to vstest.console:
+        // https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestForwardingApp.cs#L30-L39
+        debugEnvironmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
+
+        ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables);
         FormatStandardOutCome();
     }
 
@@ -213,44 +220,37 @@ public class IntegrationTestBase
         Dictionary<string, string> environmentVariables = null)
     {
         var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
-        InvokeVsTest(arguments, AddDebugEnvVariables(environmentVariables));
+        InvokeVsTest(arguments, environmentVariables);
     }
 
-    private Dictionary<string, string> AddDebugEnvVariables(Dictionary<string, string> environmentVariables)
+    private Dictionary<string, string> AddDebugEnvironmentVariables(Dictionary<string, string> environmentVariables)
     {
-        var debugVariables = new Dictionary<string, string>();
-        if (environmentVariables != null)
-        {
-            foreach (var pair in environmentVariables)
-            {
-                debugVariables.Add(pair.Key, pair.Value);
-            }
-        }
+        environmentVariables ??= new Dictionary<string, string>();
 
         if (_testEnvironment.DebugInfo != null)
         {
             if (_testEnvironment.DebugInfo.DebugVSTestConsole)
             {
-                debugVariables.Add("VSTEST_RUNNER_DEBUG_ATTACHVS", "1");
+                environmentVariables["VSTEST_RUNNER_DEBUG_ATTACHVS"] = "1";
             }
 
             if (_testEnvironment.DebugInfo.DebugTestHost)
             {
-                debugVariables.Add("VSTEST_HOST_DEBUG_ATTACHVS", "1");
+                environmentVariables["VSTEST_HOST_DEBUG_ATTACHVS"] = "1";
             }
 
             if (_testEnvironment.DebugInfo.DebugDataCollector)
             {
-                debugVariables.Add("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS", "1");
+                environmentVariables["VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS"] = "1";
             }
 
             if (_testEnvironment.DebugInfo.NoDefaultBreakpoints)
             {
-                debugVariables.Add("VSTEST_DEBUG_NOBP", "1");
+                environmentVariables["VSTEST_DEBUG_NOBP"] = "1";
             }
         }
 
-        return debugVariables;
+        return environmentVariables;
     }
 
     /// <summary>
@@ -675,36 +675,28 @@ public class IntegrationTestBase
         Console.WriteLine($"Console runner path: {consoleRunnerPath}");
 
         VsTestConsoleWrapper vstestConsoleWrapper;
-        if (_testEnvironment.DebugInfo != null
-            && (_testEnvironment.DebugInfo.DebugVSTestConsole
-                || _testEnvironment.DebugInfo.DebugTestHost
-                || _testEnvironment.DebugInfo.DebugDataCollector))
+
+        // Providing any environment variable to vstest.console will clear all existing environment variables,
+        // this works around it by copying all existing variables, and adding debug. But we only want to do that
+        // when we are setting any debug variables.
+        // TODO: This is scheduled to be fixed in 17.3, where it will start working normally. We will just add those
+        // variables, unless we explicitly say to clean them. https://github.com/microsoft/vstest/pull/3433
+        // Remove this code later, and just pass the variables you want to add.
+        var debugEnvironmentVariables = AddDebugEnvironmentVariables(new Dictionary<string, string>());
+        Dictionary<string, string> environmentVariables = new();
+        if (debugEnvironmentVariables.Count > 0)
         {
-            var environmentVariables = new Dictionary<string, string>();
             Environment.GetEnvironmentVariables().OfType<DictionaryEntry>().ToList().ForEach(e => environmentVariables.Add(e.Key.ToString(), e.Value.ToString()));
-
-            if (_testEnvironment.DebugInfo.DebugVSTestConsole)
+            foreach (var pair in debugEnvironmentVariables)
             {
-                environmentVariables.Add("VSTEST_RUNNER_DEBUG_ATTACHVS", "1");
+                environmentVariables.Add(pair.Key, pair.Value);
             }
+        }
 
-            if (_testEnvironment.DebugInfo.DebugTestHost)
-            {
-                environmentVariables.Add("VSTEST_HOST_DEBUG_ATTACHVS", "1");
-            }
-
-            if (_testEnvironment.DebugInfo.DebugDataCollector)
-            {
-                environmentVariables.Add("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS", "1");
-            }
-
-            if (_testEnvironment.DebugInfo.NoDefaultBreakpoints)
-            {
-                environmentVariables.Add("VSTEST_DEBUG_NOBP", "1");
-            }
-
-            // This clears all variables
-            vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath, EnvironmentVariables = environmentVariables });
+        if (environmentVariables.Count > 0)
+        {
+            // This clears all variables, so we copy all environment variables, and add the debug ones to them.   
+            vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath, EnvironmentVariables = debugEnvironmentVariables });
         }
         else
         {
@@ -912,7 +904,7 @@ public class IntegrationTestBase
 
     protected string BuildMultipleAssemblyPath(params string[] assetNames)
     {
-        return @$"""{string.Join(@""" """, GetTestDlls(assetNames))}""";
+        return string.Join(" ", GetTestDlls(assetNames));
     }
 
     protected static string GetDiagArg(string rootDir)
