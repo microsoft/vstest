@@ -1678,6 +1678,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";WarningEmulatedOnArm64" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[vstest.console.exe выполняется в режиме эмуляции как {0}. Для повышения производительности рекомендуется использовать собственное средство выполнения тестов vstest.console.arm64.exe.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
     </Item>
   </Item>
 </LCX>
