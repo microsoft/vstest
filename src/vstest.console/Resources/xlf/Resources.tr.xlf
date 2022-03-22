@@ -1176,7 +1176,7 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
       </trans-unit>
       <trans-unit id="WarningEmulatedOnArm64">
         <source>vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.</source>
-        <target state="new">vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.</target>
+        <target state="translated">vstest.console.exe, öykünülen modda {0} olarak çalışıyor. Daha iyi performans için vstest.console.arm64.exe yerel çalıştırıcısını kullanmayı deneyin.</target>
         <note></note>
       </trans-unit>
     </body>
