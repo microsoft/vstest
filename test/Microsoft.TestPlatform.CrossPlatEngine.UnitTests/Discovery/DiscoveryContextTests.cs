@@ -7,17 +7,14 @@ using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery;
 
 [TestClass]
 public class DiscoveryContextTests
 {
-    private DiscoveryContext _discoveryContext;
+    private readonly DiscoveryContext _discoveryContext;
 
-    [TestInitialize]
-    public void TestInit()
+    public DiscoveryContextTests()
     {
         _discoveryContext = new DiscoveryContext();
     }

@@ -17,27 +17,19 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ParallelRunEventsHandlerTests
 {
-    private ParallelRunEventsHandler _parallelRunEventsHandler;
+    private readonly ParallelRunEventsHandler _parallelRunEventsHandler;
+    private readonly Mock<IProxyExecutionManager> _mockProxyExecutionManager;
+    private readonly Mock<ITestRunEventsHandler> _mockTestRunEventsHandler;
+    private readonly Mock<IParallelProxyExecutionManager> _mockParallelProxyExecutionManager;
+    private readonly Mock<IDataSerializer> _mockDataSerializer;
+    private readonly Mock<IRequestData> _mockRequestData;
 
-    private Mock<IProxyExecutionManager> _mockProxyExecutionManager;
-
-    private Mock<ITestRunEventsHandler> _mockTestRunEventsHandler;
-
-    private Mock<IParallelProxyExecutionManager> _mockParallelProxyExecutionManager;
-
-    private Mock<IDataSerializer> _mockDataSerializer;
-
-    private Mock<IRequestData> _mockRequestData;
-
-    [TestInitialize]
-    public void TestInit()
+    public ParallelRunEventsHandlerTests()
     {
         _mockProxyExecutionManager = new Mock<IProxyExecutionManager>();
         _mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();

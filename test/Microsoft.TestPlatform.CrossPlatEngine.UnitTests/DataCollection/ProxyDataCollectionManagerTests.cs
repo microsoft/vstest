@@ -23,24 +23,21 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
 
 [TestClass]
 public class ProxyDataCollectionManagerTests
 {
-    private Mock<IDataCollectionRequestSender> _mockDataCollectionRequestSender;
+    private readonly Mock<IDataCollectionRequestSender> _mockDataCollectionRequestSender;
     private ProxyDataCollectionManager _proxyDataCollectionManager;
-    private Mock<IDataCollectionLauncher> _mockDataCollectionLauncher;
-    private Mock<IProcessHelper> _mockProcessHelper;
-    private Mock<IRequestData> _mockRequestData;
-    private Mock<IMetricsCollection> _mockMetricsCollection;
+    private readonly Mock<IDataCollectionLauncher> _mockDataCollectionLauncher;
+    private readonly Mock<IProcessHelper> _mockProcessHelper;
+    private readonly Mock<IRequestData> _mockRequestData;
+    private readonly Mock<IMetricsCollection> _mockMetricsCollection;
     private static readonly string TimoutErrorMessage =
         "vstest.console process failed to connect to datacollector process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
 
-    [TestInitialize]
-    public void Initialize()
+    public ProxyDataCollectionManagerTests()
     {
         _mockDataCollectionRequestSender = new Mock<IDataCollectionRequestSender>();
         _mockDataCollectionLauncher = new Mock<IDataCollectionLauncher>();
@@ -162,7 +159,7 @@ public class ProxyDataCollectionManagerTests
 
         var result = _proxyDataCollectionManager.BeforeTestRunStart(true, true, null);
 
-        var extensionsFolderPath = Path.Combine(Path.GetDirectoryName(typeof(ITestPlatform).GetTypeInfo().Assembly.Location), "Extensions");
+        var extensionsFolderPath = Path.Combine(Path.GetDirectoryName(typeof(ITestPlatform).GetTypeInfo().Assembly.Location)!, "Extensions");
         var expectedSettingsXml = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><RunConfiguration><TestAdaptersPaths>{extensionsFolderPath}</TestAdaptersPaths></RunConfiguration></RunSettings>";
         _mockDataCollectionRequestSender.Verify(
             x => x.SendBeforeTestRunStartAndGetResult(expectedSettingsXml, sourceList, true, It.IsAny<ITestMessageEventHandler>()), Times.Once);
