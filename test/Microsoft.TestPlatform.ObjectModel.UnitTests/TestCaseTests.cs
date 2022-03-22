@@ -7,17 +7,14 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 
 [TestClass]
 public class TestCaseTests
 {
-    private TestCase _testCase;
+    private readonly TestCase _testCase;
 
-    [TestInitialize]
-    public void TestInit()
+    public TestCaseTests()
     {
         _testCase = new TestCase("sampleTestClass.sampleTestCase", new Uri("executor://sampleTestExecutor"), "sampleTest.dll");
     }

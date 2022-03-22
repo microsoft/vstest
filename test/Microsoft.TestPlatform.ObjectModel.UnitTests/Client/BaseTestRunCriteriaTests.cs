@@ -6,8 +6,6 @@ using System;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Client;
 
 [TestClass]

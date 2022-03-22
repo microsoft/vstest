@@ -9,8 +9,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Newtonsoft.Json;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Client;
 
 [TestClass]

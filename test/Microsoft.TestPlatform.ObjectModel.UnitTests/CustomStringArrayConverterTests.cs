@@ -7,8 +7,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 
 [TestClass]
@@ -51,6 +49,7 @@ public class CustomStringArrayConverterTests
 
         var data = _customStringArrayConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as string[];
 
+        Assert.IsNotNull(data);
         Assert.AreEqual(2, data.Length);
         Assert.IsNull(data[0]);
         Assert.AreEqual("val", data[1]);
@@ -63,6 +62,7 @@ public class CustomStringArrayConverterTests
 
         var data = _customStringArrayConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as string[];
 
+        Assert.IsNotNull(data);
         Assert.AreEqual(2, data.Length);
         Assert.AreEqual(string.Empty, data[0]);
         Assert.AreEqual(string.Empty, data[1]);
