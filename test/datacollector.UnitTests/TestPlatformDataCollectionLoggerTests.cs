@@ -11,8 +11,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
 
 [TestClass]
@@ -47,7 +45,7 @@ public class TestPlatformDataCollectionLoggerTests
     [TestMethod]
     public void LogErrorShouldThrowExceptionIfTextIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(_context, (string)null));
+        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(_context, (string?)null));
 
         Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(_context, null, new Exception()));
     }
@@ -55,9 +53,9 @@ public class TestPlatformDataCollectionLoggerTests
     [TestMethod]
     public void LogErrorShouldThrowExceptionIfExceptionIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(_context, (Exception)null));
+        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(_context, (Exception?)null));
 
-        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(_context, string.Empty, (Exception)null));
+        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(_context, string.Empty, null));
     }
 
     [TestMethod]

@@ -16,8 +16,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
 
 [TestClass]
@@ -97,7 +95,7 @@ public class DataCollectionAttachmentManagerTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfSessionIdIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _attachmentManager.Initialize((SessionId)null, string.Empty, _messageSink.Object));
+        Assert.ThrowsException<ArgumentNullException>(() => _attachmentManager.Initialize(null, string.Empty, _messageSink.Object));
     }
 
     [TestMethod]
