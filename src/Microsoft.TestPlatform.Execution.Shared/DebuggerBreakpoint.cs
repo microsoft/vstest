@@ -22,7 +22,7 @@ internal static class DebuggerBreakpoint
 {
     internal static void AttachVisualStudioDebugger(string environmentVariable)
     {
-#if NETCOREAPP1_0 || !DEBUG
+#if NETCOREAPP1_0
         return;
 #else
         if (string.IsNullOrWhiteSpace(environmentVariable))
@@ -62,7 +62,7 @@ internal static class DebuggerBreakpoint
 
     private static bool AttachVs(Process process, int? vsPid)
     {
-#if NETCOREAPP1_0 || !DEBUG
+#if NETCOREAPP1_0
         return false;
 #else
         // The way we attach VS is not compatible with .NET Core 2.1 and .NET Core 3.1, but works in .NET Framework and .NET.
@@ -93,7 +93,7 @@ internal static class DebuggerBreakpoint
 
     private static string FindAttachVs()
     {
-#if NETCOREAPP1_0 || !DEBUG
+#if NETCOREAPP1_0
         return null;
 #else
 
