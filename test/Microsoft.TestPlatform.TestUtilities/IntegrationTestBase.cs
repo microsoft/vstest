@@ -170,6 +170,7 @@ public class IntegrationTestBase
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
     public void InvokeDotnetTest(string arguments, Dictionary<string, string> environmentVariables = null)
     {
+<<<<<<< Updated upstream
         var vstestConsolePath = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
         var env = "VSTEST_CONSOLE_PATH";
         var originalVstestConsolePath = Environment.GetEnvironmentVariable(env);
@@ -186,9 +187,17 @@ public class IntegrationTestBase
             FormatStandardOutCome();
         }
         finally
+=======
+        var vstestConsolePath = GetDotnetRunnerPath();
+        
+        if (arguments.Contains(".csproj"))
+>>>>>>> Stashed changes
         {
-            Environment.SetEnvironmentVariable(env, originalVstestConsolePath);
+            arguments = $@"-p:VsTestConsolePath=""{vstestConsolePath}"" " + arguments;
         }
+
+        ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, environmentVariables);
+        FormatStandardOutCome();
     }
 
     /// <summary>
@@ -205,7 +214,48 @@ public class IntegrationTestBase
         Dictionary<string, string> environmentVariables = null)
     {
         var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
+<<<<<<< Updated upstream
         InvokeVsTest(arguments, environmentVariables);
+=======
+        InvokeVsTest(arguments, AddDebugEnvVariables(environmentVariables));
+    }
+
+    private Dictionary<string, string> AddDebugEnvVariables(Dictionary<string, string> environmentVariables)
+    {
+        var debugVariables = new Dictionary<string, string>();
+        if (environmentVariables != null)
+        {
+            foreach (var pair in environmentVariables)
+            {
+                debugVariables.Add(pair.Key, pair.Value);
+            }
+        }
+
+        if (_testEnvironment.DebugInfo != null)
+        {
+            if (_testEnvironment.DebugInfo.DebugVSTestConsole)
+            {
+                debugVariables.Add("VSTEST_RUNNER_DEBUG_ATTACHVS", "1");
+            }
+
+            if (_testEnvironment.DebugInfo.DebugTestHost)
+            {
+                debugVariables.Add("VSTEST_HOST_DEBUG_ATTACHVS", "1");
+            }
+
+            if (_testEnvironment.DebugInfo.DebugDataCollector)
+            {
+                debugVariables.Add("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS", "1");
+            }
+
+            if (_testEnvironment.DebugInfo.NoDefaultBreakpoints)
+            {
+                debugVariables.Add("VSTEST_DEBUG_NOBP", "1");
+            }
+        }
+
+        return debugVariables;
+>>>>>>> Stashed changes
     }
 
     /// <summary>
@@ -567,7 +617,53 @@ public class IntegrationTestBase
             throw new FileNotFoundException($"File '{dotnetPath}' was not found.");
         }
 
+<<<<<<< Updated upstream
         var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath });
+=======
+        if (!File.Exists(consoleRunnerPath))
+        {
+            throw new FileNotFoundException($"File '{consoleRunnerPath}' was not found.");
+        }
+
+        Console.WriteLine($"Console runner path: {consoleRunnerPath}");
+
+        VsTestConsoleWrapper vstestConsoleWrapper;
+        if (_testEnvironment.DebugInfo != null
+            && (_testEnvironment.DebugInfo.DebugVSTestConsole
+                || _testEnvironment.DebugInfo.DebugTestHost
+                || _testEnvironment.DebugInfo.DebugDataCollector))
+        {
+            var environmentVariables = new Dictionary<string, string>();
+            Environment.GetEnvironmentVariables().OfType<DictionaryEntry>().ToList().ForEach(e => environmentVariables.Add(e.Key.ToString(), e.Value.ToString()));
+
+            if (_testEnvironment.DebugInfo.DebugVSTestConsole)
+            {
+                environmentVariables.Add("VSTEST_RUNNER_DEBUG_ATTACHVS", "1");
+            }
+
+            if (_testEnvironment.DebugInfo.DebugTestHost)
+            {
+                environmentVariables.Add("VSTEST_HOST_DEBUG_ATTACHVS", "1");
+            }
+
+            if (_testEnvironment.DebugInfo.DebugDataCollector)
+            {
+                environmentVariables.Add("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS", "1");
+            }
+
+            if (_testEnvironment.DebugInfo.NoDefaultBreakpoints)
+            {
+                environmentVariables.Add("VSTEST_DEBUG_NOBP", "1");
+            }
+
+            // This clears all variables
+            vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath, EnvironmentVariables = environmentVariables });
+        }
+        else
+        {
+            vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath });
+        }
+>>>>>>> Stashed changes
         vstestConsoleWrapper.StartSession();
 
         return vstestConsoleWrapper;
@@ -770,6 +866,7 @@ public class IntegrationTestBase
 
     protected string BuildMultipleAssemblyPath(params string[] assetNames)
     {
+<<<<<<< Updated upstream
         var assertFullPaths = new string[assetNames.Length];
         for (var i = 0; i < assetNames.Length; i++)
         {
@@ -777,6 +874,9 @@ public class IntegrationTestBase
         }
 
         return string.Join(" ", assertFullPaths);
+=======
+        return @$"""{string.Join(@""" """, GetTestDlls(assetNames))}""";
+>>>>>>> Stashed changes
     }
 
     protected static string GetDiagArg(string rootDir)
