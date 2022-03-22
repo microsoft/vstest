@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 using IO = System.IO;
@@ -52,6 +53,36 @@ public class TempDirectory : IDisposable
     }
 
     /// <summary>
+    /// Copy given files into the TempDirectory and return the updated paths that are pointing to TempDirectory.
+    /// </summary>
+    /// <param name="filePaths"></param>
+    /// <returns></returns>
+    public string[] CopyFile(params string[] filePaths)
+    {
+        var paths = new List<string>(filePaths.Length);
+        foreach (var filePath in filePaths)
+        {
+            var destination = IO.Path.Combine(Path, IO.Path.GetFileName(filePath));
+            File.Copy(filePath, destination);
+            paths.Add(destination);
+        }
+
+        return paths.ToArray();
+    }
+
+    /// <summary>
+    /// Copy given file into TempDirectory and return the updated path.
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <returns></returns>
+    public string CopyFile(string filePath)
+    {
+        var destination = IO.Path.Combine(Path, IO.Path.GetFileName(filePath));
+        File.Copy(filePath, destination);
+        return destination; 
+    }
+
+    /// <summary>
     /// Creates an unique temporary directory.
     /// </summary>
     /// <returns>
@@ -71,7 +102,13 @@ public class TempDirectory : IDisposable
         // AGENT_TEMPDIRECTORY is AzureDevops variable, which is set to path
         // that is cleaned up after every job. This is preferable to use over
         // just the normal TEMP, because that is not cleaned up for every run.
-        return Environment.GetEnvironmentVariable("AGENT_TEMPDIRECTORY") ?? IO.Path.GetTempPath();
+        //
+        // System.IO.Path.GetTempPath is banned from the rest of the code. This is the only
+        // place we we are allowed to use it. All other methods should use our GetTempPath (this method).
+#pragma warning disable RS0030 // Do not used banned APIs
+        return Environment.GetEnvironmentVariable("AGENT_TEMPDIRECTORY")
+            ?? IO.Path.GetTempPath();
+#pragma warning restore RS0030 // Do not used banned APIs
     }
 
     public static void TryRemoveDirectory(string directory)

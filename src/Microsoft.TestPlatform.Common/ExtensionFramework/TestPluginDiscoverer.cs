@@ -190,7 +190,7 @@ internal class TestPluginDiscoverer
 
             if (e.Types?.Length > 0)
             {
-                types.AddRange(e.Types.Where(type => type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract));
+                types.AddRange(e.Types.Where(type => type != null && type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract));
             }
 
             if (e.LoaderExceptions != null)
