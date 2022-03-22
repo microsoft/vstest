@@ -5,8 +5,6 @@ using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 [TestClass]

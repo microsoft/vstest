@@ -5,23 +5,21 @@
 #define DEBUG
 
 #if NETCOREAPP
+
 using System.Collections.Generic;
 using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace testhost.UnitTests;
 
 [TestClass]
 public class TestHostTraceListenerTests
 {
-    TraceListener[] _listeners;
+    private readonly TraceListener[] _listeners;
 
-    [TestInitialize()]
-    public void Initialize()
+    public TestHostTraceListenerTests()
     {
         _listeners = new TraceListener[Trace.Listeners.Count];
         Trace.Listeners.CopyTo(_listeners, 0);
@@ -99,10 +97,9 @@ public class TestHostTraceListenerTests
 [TestClass]
 public class TestHostTraceListenerRegistrationTests
 {
-    TraceListener[] _listeners;
+    private readonly TraceListener[] _listeners;
 
-    [TestInitialize()]
-    public void Initialize()
+    public TestHostTraceListenerRegistrationTests()
     {
         _listeners = new TraceListener[Trace.Listeners.Count];
         Trace.Listeners.CopyTo(_listeners, 0);
@@ -147,13 +144,14 @@ public class TestHostTraceListenerRegistrationTests
 
     private class DummyTraceListener : TraceListener
     {
-        public List<string> Lines { get; } = new List<string>();
-        public override void Write(string message)
+        public List<string?> Lines { get; } = new();
+
+        public override void Write(string? message)
         {
             Lines.Add(message);
         }
 
-        public override void WriteLine(string message)
+        public override void WriteLine(string? message)
         {
             Lines.Add(message);
         }

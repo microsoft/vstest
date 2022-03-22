@@ -12,18 +12,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine;
 
 [TestClass]
 public class TestRunResultAggregatorTests
 {
-    readonly TestRunResultAggregator _resultAggregator = TestRunResultAggregator.Instance;
-    Mock<ITestRunRequest> _mockTestRunRequest;
+    private readonly TestRunResultAggregator _resultAggregator = TestRunResultAggregator.Instance;
+    private readonly Mock<ITestRunRequest> _mockTestRunRequest;
 
-    [TestInitialize]
-    public void TestInit()
+    public TestRunResultAggregatorTests()
     {
         _resultAggregator.Reset();
         _mockTestRunRequest = new Mock<ITestRunRequest>();

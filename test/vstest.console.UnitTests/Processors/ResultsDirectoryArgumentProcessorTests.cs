@@ -11,18 +11,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using vstest.console.UnitTests.Processors;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 [TestClass]
 public class ResultsDirectoryArgumentProcessorTests
 {
-    private ResultsDirectoryArgumentExecutor _executor;
-    private TestableRunSettingsProvider _runSettingsProvider;
+    private readonly ResultsDirectoryArgumentExecutor _executor;
+    private readonly TestableRunSettingsProvider _runSettingsProvider;
 
-    [TestInitialize]
-    public void Init()
+    public ResultsDirectoryArgumentProcessorTests()
     {
         _runSettingsProvider = new TestableRunSettingsProvider();
         _executor = new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, _runSettingsProvider);
@@ -74,7 +71,7 @@ public class ResultsDirectoryArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldThrowIfArgumentIsNull()
     {
-        string folder = null;
+        string? folder = null;
         var message =
             @"The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory";
         InitializeExceptionTestTemplate(folder, message);
@@ -97,7 +94,7 @@ public class ResultsDirectoryArgumentProcessorTests
         var invalidChar = Path.GetInvalidPathChars()[0];
 
         var folder = TranslatePath($@"c:\som{invalidChar}\illegal\path\");
-        // The error varies based on the runtime and OS, just checking that we detect 
+        // The error varies based on the runtime and OS, just checking that we detect
         // incorrect path should be enough and not so flaky
         // you might get
         // - The filename, directory name, or volume label syntax is incorrect
@@ -109,7 +106,7 @@ public class ResultsDirectoryArgumentProcessorTests
         InitializeExceptionTestTemplate(folder, message);
     }
 
-    private void InitializeExceptionTestTemplate(string folder, string message)
+    private void InitializeExceptionTestTemplate(string? folder, string message)
     {
         var isExceptionThrown = false;
 

@@ -16,8 +16,6 @@ using Moq;
 
 using static Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.CollectArgumentExecutor;
 
-#nullable disable
-
 namespace vstest.console.UnitTests.Processors;
 
 [TestClass]
@@ -154,7 +152,7 @@ public class CollectArgumentProcessorTests
             "      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />",
             "    </DataCollectors>",
             "  </DataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -179,7 +177,7 @@ public class CollectArgumentProcessorTests
             "      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />",
             "    </DataCollectors>",
             "  </DataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -207,7 +205,7 @@ public class CollectArgumentProcessorTests
             "      <DataCollector friendlyName=\"MyDataCollector2\" enabled=\"True\" />",
             "    </DataCollectors>",
             "  </DataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -235,7 +233,7 @@ public class CollectArgumentProcessorTests
             "      <DataCollector friendlyName=\"MyDataCollector2\" enabled=\"True\" />",
             "    </DataCollectors>",
             "  </DataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -260,7 +258,7 @@ public class CollectArgumentProcessorTests
             "      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />",
             "    </DataCollectors>",
             "  </DataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -288,7 +286,7 @@ public class CollectArgumentProcessorTests
             "      <InProcDataCollector assemblyQualifiedName=\"Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\" friendlyName=\"XPlat Code Coverage\" enabled=\"True\" codebase=\"coverlet.collector.dll\" />",
             "    </InProcDataCollectors>",
             "  </InProcDataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -320,7 +318,7 @@ public class CollectArgumentProcessorTests
             $"      <InProcDataCollector assemblyQualifiedName=\"Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\" friendlyName=\"XPlat Code Coverage\" enabled=\"True\" codebase=\"c:\\AdapterFolderPath{Path.DirectorySeparatorChar}coverlet.collector.dll\" />",
             "    </InProcDataCollectors>",
             "  </InProcDataCollectionRunSettings>",
-            "</RunSettings>").ShowWhiteSpace(), _settingsProvider.ActiveRunSettings.SettingsXml.ShowWhiteSpace());
+            "</RunSettings>").ShowWhiteSpace(), _settingsProvider.ActiveRunSettings!.SettingsXml.ShowWhiteSpace());
     }
 
     [TestMethod]
@@ -352,7 +350,7 @@ public class CollectArgumentProcessorTests
             "      <InProcDataCollector assemblyQualifiedName=\"Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\" friendlyName=\"XPlat Code Coverage\" enabled=\"True\" codebase=\"coverlet.collector.dll\" />",
             "    </InProcDataCollectors>",
             "  </InProcDataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -391,7 +389,7 @@ public class CollectArgumentProcessorTests
             $"      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"{CoverletConstants.CoverletDataCollectorFriendlyName}\" enabled=\"True\" codebase=\"{CoverletConstants.CoverletDataCollectorCodebase}\" />",
             "    </InProcDataCollectors>",
             "  </InProcDataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -431,7 +429,7 @@ public class CollectArgumentProcessorTests
             $"      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"XPlat Code Coverage\" enabled=\"True\" codebase=\"{CoverletConstants.CoverletDataCollectorCodebase}\" />",
             "    </InProcDataCollectors>",
             "  </InProcDataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -476,7 +474,7 @@ public class CollectArgumentProcessorTests
             "      <InProcDataCollector assemblyQualifiedName=\"Microsoft.TestPlatform.Extensions.CoverletCoverageDataCollector.CoverletCoverageDataCollector, Microsoft.TestPlatform.Extensions.CoverletCoverageDataCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" friendlyName=\"XPlat Code Coverage\" enabled=\"True\" codebase=\"inprocdatacollector.dll\" />",
             "    </InProcDataCollectors>",
             "  </InProcDataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -520,7 +518,7 @@ public class CollectArgumentProcessorTests
             $"      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"{CoverletConstants.CoverletDataCollectorFriendlyName}\" enabled=\"True\" codebase=\"inprocdatacollector.dll\" />",
             "    </InProcDataCollectors>",
             "  </InProcDataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -552,7 +550,7 @@ public class CollectArgumentProcessorTests
             $"      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"{CoverletConstants.CoverletDataCollectorFriendlyName}\" enabled=\"True\" codebase=\"{CoverletConstants.CoverletDataCollectorCodebase}\" />",
             "    </InProcDataCollectors>",
             "  </InProcDataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -587,7 +585,7 @@ public class CollectArgumentProcessorTests
             $"      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"{CoverletConstants.CoverletDataCollectorFriendlyName}\" enabled=\"True\" codebase=\"{CoverletConstants.CoverletDataCollectorCodebase}\" />",
             "    </InProcDataCollectors>",
             "  </InProcDataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -639,7 +637,7 @@ public class CollectArgumentProcessorTests
             "      </DataCollector>",
             "    </DataCollectors>",
             "  </DataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -673,7 +671,7 @@ public class CollectArgumentProcessorTests
             "      </DataCollector>",
             "    </DataCollectors>",
             "  </DataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -706,7 +704,7 @@ public class CollectArgumentProcessorTests
             "      </DataCollector>",
             "    </DataCollectors>",
             "  </DataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
     #endregion
 }

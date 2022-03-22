@@ -21,17 +21,14 @@ using Moq;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
 
 [TestClass]
 public class ExecutorUnitTests
 {
-    private Mock<ITestPlatformEventSource> _mockTestPlatformEventSource;
+    private readonly Mock<ITestPlatformEventSource> _mockTestPlatformEventSource;
 
-    [TestInitialize]
-    public void TestInit()
+    public ExecutorUnitTests()
     {
         _mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
     }
@@ -358,7 +355,7 @@ public class ExecutorUnitTests
 
     private class OutputMessage
     {
-        public string Message { get; set; }
+        public string Message { get; set; } = "";
         public OutputLevel Level { get; set; }
     }
 }
