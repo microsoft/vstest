@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 
 /// <summary>

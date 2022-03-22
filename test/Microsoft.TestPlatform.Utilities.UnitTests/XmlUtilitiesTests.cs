@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Utilities.UnitTests;
 
 [TestClass]
@@ -195,7 +193,7 @@ public class XmlUtilitiesTests
         var settingsXml = @"<RunSettings><RC>abc</RC></RunSettings>";
         var xmlDocument = GetXmlDocument(settingsXml);
         var navigator = xmlDocument.CreateNavigator();
-        navigator.MoveToChild("RunSettings", string.Empty);
+        navigator!.MoveToChild("RunSettings", string.Empty);
         XmlUtilities.RemoveChildNode(navigator, @"/RunSettings/RC", "RC");
 
         Assert.AreEqual(@"<RunSettings></RunSettings>", xmlDocument.OuterXml);
