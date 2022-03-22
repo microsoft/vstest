@@ -82,8 +82,11 @@ public class IntegrationTestBase
     [TestCleanup]
     public void TempDirectoryCleanup()
     {
-        // Delete the directory only when the test succeeded, so we can look at results and logs of failed tests.
-        if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+        // In CI always delete the results, because we have limited disk space there.
+        //
+        // Locally delete the directory only when the test succeeded, so we can look 
+        // at results and logs of failed tests.
+        if (IsCI || TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
         {
             TempDirectory.Dispose();
         }
