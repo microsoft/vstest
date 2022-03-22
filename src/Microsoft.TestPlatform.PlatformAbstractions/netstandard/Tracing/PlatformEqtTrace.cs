@@ -39,19 +39,32 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
         }
 
         var level = Enum.GetName(typeof(PlatformTraceLevel), traceLevel);
+
         Debug.WriteLine($"[{level}] {message}");
     }
 
     public bool InitializeVerboseTrace(string customLogFile)
     {
+#if DEBUG
+        // We don't have access to System.Diagnostics.Trace on netstandard1.3
+        // so we write to Debug. No need to initialize for non-debug builds.
+        return true;
+#else
         return false;
+#endif
     }
 
     public bool InitializeTrace(string customLogFile, PlatformTraceLevel traceLevel)
     {
         _traceLevel = traceLevel;
 
+#if DEBUG
+        // We don't have access to System.Diagnostics.Trace on netstandard1.3
+        // so we write to Debug. No need to initialize for non-debug builds.
+        return true;
+#else
         return false;
+#endif
     }
 
     public bool ShouldTrace(PlatformTraceLevel traceLevel)
