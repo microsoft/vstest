@@ -7,17 +7,14 @@ using System.IO;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests;
 
 [TestClass]
 public class PathResolverTests
 {
-    private PathResolver _pathResolver;
+    private readonly PathResolver _pathResolver;
 
-    [TestInitialize]
-    public void TestInit()
+    public PathResolverTests()
     {
         _pathResolver = new PathResolver();
     }

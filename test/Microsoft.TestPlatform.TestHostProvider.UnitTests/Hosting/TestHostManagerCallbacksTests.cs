@@ -7,8 +7,6 @@ using System.Text;
 using Microsoft.TestPlatform.TestHostProvider.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.TestHostProvider.Hosting.UnitTests;
 
 [TestClass]

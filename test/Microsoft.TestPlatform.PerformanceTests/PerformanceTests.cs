@@ -9,8 +9,6 @@ using FluentAssertions.Extensions;
 using Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.PerformanceTests;
 
 /// <summary>

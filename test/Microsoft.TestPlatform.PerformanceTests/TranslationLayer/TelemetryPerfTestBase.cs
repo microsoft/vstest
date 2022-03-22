@@ -12,8 +12,6 @@ using Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 
 [TestClass]
@@ -48,16 +46,19 @@ public class TelemetryPerfTestBase : PerformanceTestBase
 
         var metrics = new Dictionary<string, double>();
 
-        foreach (var entry in handlerMetrics)
+        if (handlerMetrics is not null)
         {
-            var stringValue = entry.Value.ToString();
-            if (double.TryParse(stringValue, out var doubleValue))
+            foreach (var entry in handlerMetrics)
             {
-                metrics.Add(entry.Key, doubleValue);
-            }
-            else
-            {
-                properties.Add(entry.Key, stringValue);
+                var stringValue = entry.Value.ToString();
+                if (double.TryParse(stringValue, out var doubleValue))
+                {
+                    metrics.Add(entry.Key, doubleValue);
+                }
+                else
+                {
+                    properties.Add(entry.Key, stringValue);
+                }
             }
         }
 
