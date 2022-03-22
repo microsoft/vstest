@@ -11,8 +11,6 @@ using Newtonsoft.Json.Linq;
 
 using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization;
 
 [TestClass]
@@ -23,7 +21,7 @@ public class TestResultSerializationTests
         new Uri("executor://sampleTestExecutor"),
         "sampleTest.dll");
 
-    private static DateTimeOffset s_startTime = new(new DateTime(2007, 3, 10, 0, 0, 0, DateTimeKind.Utc));
+    private static readonly DateTimeOffset StartTime = new(new DateTime(2007, 3, 10, 0, 0, 0, DateTimeKind.Utc));
     private static readonly TestResult TestResult = new(TestCase)
     {
         // Attachments = ?
@@ -34,7 +32,7 @@ public class TestResultSerializationTests
         DisplayName = "sampleTestResult",
         ComputerName = "sampleComputerName",
         Duration = TimeSpan.MaxValue,
-        StartTime = s_startTime,
+        StartTime = StartTime,
         EndTime = DateTimeOffset.MaxValue
     };
 
@@ -65,7 +63,7 @@ public class TestResultSerializationTests
 
         // By default json.net converts DateTimes to current time zone
         Assert.AreEqual("TestResult.StartTime", properties[6]["Key"]["Id"].Value);
-        Assert.AreEqual(s_startTime.Year, ((DateTimeOffset)properties[6]["Value"].Value).Year);
+        Assert.AreEqual(StartTime.Year, ((DateTimeOffset)properties[6]["Value"].Value).Year);
         Assert.AreEqual("TestResult.EndTime", properties[7]["Key"]["Id"].Value);
         Assert.AreEqual(DateTimeOffset.MaxValue.Year, ((DateTimeOffset)properties[7]["Value"].Value).Year);
     }
@@ -204,7 +202,7 @@ public class TestResultSerializationTests
         Assert.AreEqual("10675199.02:48:05.4775807", data["Duration"].Value);
 
         // By default json.net converts DateTimes to current time zone
-        Assert.AreEqual(s_startTime.Year, ((DateTimeOffset)data["StartTime"].Value).Year);
+        Assert.AreEqual(StartTime.Year, ((DateTimeOffset)data["StartTime"].Value).Year);
         Assert.AreEqual(DateTimeOffset.MaxValue.Year, ((DateTimeOffset)data["EndTime"].Value).Year);
     }
 
@@ -301,7 +299,7 @@ public class TestResultSerializationTests
         return JsonDataSerializer.Instance.Deserialize<T>(json, version);
     }
 
-    private void VerifyDummyPropertyIsRegistered()
+    private static void VerifyDummyPropertyIsRegistered()
     {
         var dummyProperty = TestProperty.Find("DummyProperty");
         Assert.IsNotNull(dummyProperty);
