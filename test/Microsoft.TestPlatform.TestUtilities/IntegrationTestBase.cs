@@ -170,25 +170,21 @@ public class IntegrationTestBase
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
     public void InvokeDotnetTest(string arguments, Dictionary<string, string> environmentVariables = null)
     {
-        var vstestConsolePath = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
-        var env = "VSTEST_CONSOLE_PATH";
-        var originalVstestConsolePath = Environment.GetEnvironmentVariable(env);
+        environmentVariables ??= new Dictionary<string, string>();
 
-        try
-        {
-            Environment.SetEnvironmentVariable(env, vstestConsolePath);
-            if (arguments.Contains(".csproj"))
-            {
-                arguments = $@"-p:VsTestConsolePath=""{vstestConsolePath}"" " + arguments;
-            }
+        var vstestConsolePath = GetDotnetRunnerPath();
 
-            ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, environmentVariables);
-            FormatStandardOutCome();
-        }
-        finally
+        if (arguments.Contains(".csproj"))
         {
-            Environment.SetEnvironmentVariable(env, originalVstestConsolePath);
+            arguments = $@"-p:VsTestConsolePath=""{vstestConsolePath}"" " + arguments;
         }
+
+        // This is used in dotnet/sdk to determine path to vstest.console:
+        // https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestForwardingApp.cs#L30-L39
+        environmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
+
+        ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, environmentVariables);
+        FormatStandardOutCome();
     }
 
     /// <summary>
@@ -205,6 +201,7 @@ public class IntegrationTestBase
         Dictionary<string, string> environmentVariables = null)
     {
         var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
+
         InvokeVsTest(arguments, environmentVariables);
     }
 
@@ -385,7 +382,7 @@ public class IntegrationTestBase
                        || _standardTestOutput.Contains(GetTestMethodName(test));
             Assert.IsTrue(flag, $"Test {test} does not appear in discovered tests list." +
                                 $"{Environment.NewLine}Std Output: {_standardTestOutput}" +
-                                $"{Environment.NewLine}Std Error: { _standardTestError}");
+                                $"{Environment.NewLine}Std Error: {_standardTestError}");
         }
     }
 
@@ -401,7 +398,7 @@ public class IntegrationTestBase
                        || _standardTestOutput.Contains(GetTestMethodName(test));
             Assert.IsFalse(flag, $"Test {test} should not appear in discovered tests list." +
                                 $"{Environment.NewLine}Std Output: {_standardTestOutput}" +
-                                $"{Environment.NewLine}Std Error: { _standardTestError}");
+                                $"{Environment.NewLine}Std Error: {_standardTestError}");
         }
     }
 
@@ -416,7 +413,7 @@ public class IntegrationTestBase
                        || fileOutput.Contains(GetTestMethodName(test));
             Assert.IsTrue(flag, $"Test {test} does not appear in discovered tests list." +
                                 $"{Environment.NewLine}Std Output: {_standardTestOutput}" +
-                                $"{Environment.NewLine}Std Error: { _standardTestError}");
+                                $"{Environment.NewLine}Std Error: {_standardTestError}");
         }
     }
 
