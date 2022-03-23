@@ -29,6 +29,8 @@
     <!-- net451 -->
     <file src="net451\$Runtime$\datacollector.exe"	target="tools\net451\datacollector.exe" />
     <file src="net451\$Runtime$\datacollector.exe.config"	target="tools\net451\datacollector.exe.config" />
+    <file src="net451\$Runtime$\datacollector.arm64.exe"	target="tools\net451\datacollector.arm64.exe" />
+    <file src="net451\$Runtime$\datacollector.arm64.exe.config"	target="tools\net451\datacollector.arm64.exe.config" />
     <file src="net451\$Runtime$\Microsoft.Extensions.DependencyModel.dll"	target="tools\net451\Microsoft.Extensions.DependencyModel.dll" />
     <file src="net451\$Runtime$\Microsoft.Extensions.FileSystemGlobbing.dll"	target="tools\net451\Microsoft.Extensions.FileSystemGlobbing.dll" />
     <file src="net451\$Runtime$\Microsoft.TestPlatform.CommunicationUtilities.dll"	target="tools\net451\Microsoft.TestPlatform.CommunicationUtilities.dll" />
@@ -119,6 +121,8 @@
 
     <file src="net451\$Runtime$\vstest.console.exe"	target="tools\net451\vstest.console.exe" />
     <file src="net451\$Runtime$\vstest.console.exe.config"	target="tools\net451\vstest.console.exe.config" />
+    <file src="net451\$Runtime$\vstest.console.arm64.exe"	target="tools\net451\vstest.console.arm64.exe" />
+    <file src="net451\$Runtime$\vstest.console.arm64.exe.config"	target="tools\net451\vstest.console.arm64.exe.config" />
     <file src="net451\$Runtime$\NuGet.Frameworks.dll"	target="tools\net451\NuGet.Frameworks.dll" />
 
     <file src="net451\$Runtime$\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll"	target="tools\net451\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
