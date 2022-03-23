@@ -63,6 +63,7 @@ internal class TestRequestManager : ITestRequestManager
     private readonly InferHelper _inferHelper;
     private readonly IProcessHelper _processHelper;
     private readonly ITestRunAttachmentsProcessingManager _attachmentsProcessingManager;
+    private readonly IEnvironment _environment;
 
     /// <summary>
     /// Maintains the current active execution request.
@@ -96,7 +97,8 @@ internal class TestRequestManager : ITestRequestManager
                 IsTelemetryOptedIn(),
                 CommandLineOptions.Instance.IsDesignMode),
             new ProcessHelper(),
-            new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new DataCollectorAttachmentsProcessorsFactory()))
+            new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new DataCollectorAttachmentsProcessorsFactory()),
+            new PlatformEnvironment())
     {
     }
 
@@ -108,7 +110,8 @@ internal class TestRequestManager : ITestRequestManager
         InferHelper inferHelper,
         Task<IMetricsPublisher> metricsPublisher,
         IProcessHelper processHelper,
-        ITestRunAttachmentsProcessingManager attachmentsProcessingManager)
+        ITestRunAttachmentsProcessingManager attachmentsProcessingManager,
+        IEnvironment environment)
     {
         _testPlatform = testPlatform;
         _commandLineOptions = commandLineOptions;
@@ -118,6 +121,7 @@ internal class TestRequestManager : ITestRequestManager
         _metricsPublisher = metricsPublisher;
         _processHelper = processHelper;
         _attachmentsProcessingManager = attachmentsProcessingManager;
+        _environment = environment;
     }
 
     /// <summary>
@@ -676,33 +680,45 @@ internal class TestRequestManager : ITestRequestManager
             out Framework chosenFramework,
             out sourceToFrameworkMap);
 
-            // Choose default architecture based on the framework.
-            // For .NET core, the default platform architecture should be based on the process.
-            Architecture defaultArchitecture = Architecture.X86;
-            if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
-                // This is a special case for 1 version of Nuget.Frameworks that was shipped with using identifier NET5 instead of NETCoreApp5 for .NET 5.
-                || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
+        // Choose default architecture based on the framework.
+        // For .NET core, the default platform architecture should be based on the process.
+        Architecture defaultArchitecture = Architecture.X86;
+        if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+            || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
+            // This is a special case for 1 version of Nuget.Frameworks that was shipped with using identifier NET5 instead of NETCoreApp5 for .NET 5.
+            || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            // We are running in vstest.console that is either started via dotnet
+            // or via vstest.console.exe. The architecture of the current process
+            // determines the default architecture to use for AnyCPU dlls
+            // and other sources that don't dictate architecture (e.g. js files).
+            // This way starting 32-bit dotnet will try to run as 32-bit testhost
+            // using the runtime that was installed with that 32-bit dotnet SDK. 
+            // Similarly ARM64 vstest.console will start ARM64 testhost, making sure 
+            // that we choose the architecture that we already know we can run as.
+            // 64-bit SDK when running from 64-bit dotnet process.
+            // As default architecture we specify the expected test host architecture,
+            // it can be specified by user on the command line with --arch or through runsettings.
+            // If it's not specified by user will be filled by current processor architecture;
+            // should be the same as SDK.
+            defaultArchitecture = GetDefaultArchitecture(runConfiguration);
+        }
+        else
+        {
+            if (_environment.Architecture == PlatformArchitecture.ARM64 && _environment.OperatingSystem == PlatformOperatingSystem.Windows)
             {
-                // We are running in vstest.console that is either started via dotnet
-                // or via vstest.console.exe. The architecture of the current process
-                // determines the default architecture to use for AnyCPU dlls
-                // and other sources that don't dictate architecture (e.g. js files).
-                // This way starting 32-bit dotnet will try to run as 32-bit testhost
-                // using the runtime that was installed with that 32-bit dotnet SDK. 
-                // Similarly ARM64 vstest.console will start ARM64 testhost, making sure 
-                // that we choose the architecture that we already know we can run as.
-                // 64-bit SDK when running from 64-bit dotnet process.
+                // For non .NET Core containers only on win ARM64 we want to run AnyCPU using current process architecture as a default
+                // for both vstest.console.exe and design mode scenario.
                 // As default architecture we specify the expected test host architecture,
-                // it can be specified by user on the command line with --arch or through runsettings.
-                // If it's not specified by user will be filled by current processor architecture;
-                // should be the same as SDK.
-                defaultArchitecture = RunSettingsHelper.Instance.IsDefaultTargetArchitecture ?
-                    TranslateToArchitecture(_processHelper.GetCurrentProcessArchitecture()) :
-                    runConfiguration.TargetPlatform;
-
-                EqtTrace.Verbose($"TestRequestManager.UpdateRunSettingsIfRequired: Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}, Current process architecture: {_processHelper.GetCurrentProcessArchitecture()}.");
+                // it can be specified by user on the command line with /Platform or through runsettings.
+                // If it's not specified by user will be filled by current processor architecture.
+                defaultArchitecture = GetDefaultArchitecture(runConfiguration);
             }
+
+            // For all other scenario we keep the old default Architecture.X86.
+        }
+
+        EqtTrace.Verbose($"TestRequestManager.UpdateRunSettingsIfRequired: Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}, Current process architecture: {_processHelper.GetCurrentProcessArchitecture()} OperatingSystem: {_environment.OperatingSystem}.");
 
         settingsUpdated |= UpdatePlatform(
             document,
@@ -711,19 +727,16 @@ internal class TestRequestManager : ITestRequestManager
             defaultArchitecture,
             out Architecture chosenPlatform,
             out sourceToArchitectureMap);
+        CheckSourcesForCompatibility(
+            chosenFramework,
+            chosenPlatform,
+            defaultArchitecture,
+            sourceToArchitectureMap,
+            sourceToFrameworkMap,
+            registrar);
 
-        if (!FeatureFlag.Instance.IsEnabled(FeatureFlag.MULTI_TFM_RUN))
-        {
-            CheckSourcesForCompatibility(
-                chosenFramework,
-                chosenPlatform,
-                defaultArchitecture,
-                sourceToArchitectureMap,
-                sourceToFrameworkMap,
-                registrar);
+        // TODO: NOMERGE: revert all architectures and frameworks on our map to the one common framework and architecture.
 
-            // TODO: NOMERGE: revert all architectures and frameworks on our map to the one common framework and architecture.
-        }
         settingsUpdated |= UpdateDesignMode(document, runConfiguration);
         settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
         settingsUpdated |= UpdateTargetDevice(navigator, document);
@@ -732,6 +745,11 @@ internal class TestRequestManager : ITestRequestManager
         updatedRunSettingsXml = navigator.OuterXml;
 
         return settingsUpdated;
+
+        Architecture GetDefaultArchitecture(RunConfiguration runConfiguration)
+            => RunSettingsHelper.Instance.IsDefaultTargetArchitecture
+                ? TranslateToArchitecture(_processHelper.GetCurrentProcessArchitecture())
+                : runConfiguration.TargetPlatform;
 
         static Architecture TranslateToArchitecture(PlatformArchitecture targetArchitecture)
         {

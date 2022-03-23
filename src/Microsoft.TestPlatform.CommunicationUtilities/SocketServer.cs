@@ -65,17 +65,25 @@ public class SocketServer : ICommunicationEndPoint
 
     public string Start(string endPoint)
     {
-        _tcpListener = new TcpListener(endPoint.GetIpEndPoint());
+        try
+        {
+            _tcpListener = new TcpListener(endPoint.GetIpEndPoint());
 
-        _tcpListener.Start();
+            _tcpListener.Start();
 
-        _endPoint = _tcpListener.LocalEndpoint.ToString();
-        EqtTrace.Info("SocketServer.Start: Listening on endpoint : {0}", _endPoint);
+            _endPoint = _tcpListener.LocalEndpoint.ToString();
+            EqtTrace.Info("SocketServer.Start: Listening on endpoint : {0}", _endPoint);
 
-        // Serves a single client at the moment. An error in connection, or message loop just
-        // terminates the entire server.
-        _tcpListener.AcceptTcpClientAsync().ContinueWith(t => OnClientConnected(t.Result));
-        return _endPoint;
+            // Serves a single client at the moment. An error in connection, or message loop just
+            // terminates the entire server.
+            _tcpListener.AcceptTcpClientAsync().ContinueWith(t => OnClientConnected(t.Result));
+            return _endPoint;
+        }
+        catch (SocketException ex)
+        {
+            EqtTrace.Error("Failed for address {0}, with: {1}", endPoint, ex);
+            throw;
+        }
     }
 
     /// <inheritdoc />

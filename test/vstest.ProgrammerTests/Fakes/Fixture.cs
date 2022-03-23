@@ -27,6 +27,7 @@ internal class Fixture : IDisposable
     public FakeFileHelper FileHelper { get; }
     public FakeTestRuntimeProviderManager TestRuntimeProviderManager { get; }
     public FakeTestRunEventsRegistrar TestRunEventsRegistrar { get; }
+    public FakeEnvironment Environment { get; }
     public FakeTestDiscoveryEventsRegistrar TestDiscoveryEventsRegistrar { get;  }
     public TestEngine? TestEngine { get; private set; }
     public TestPlatform? TestPlatform { get; private set; }
@@ -61,7 +62,7 @@ internal class Fixture : IDisposable
 
 #pragma warning disable CS0618 // Type or member is obsolete (to prevent use outside of test context)
         FeatureFlag.Reset();
-        fixtureOptions?.FeatureFlags?.ToList().ForEach(flag => FeatureFlag.SetFlag(flag.Key, flag.Value));
+        fixtureOptions?.FeatureFlags?.ToList().ForEach(flag => ((FeatureFlag)FeatureFlag.Instance).SetFlag(flag.Key, flag.Value));
 #pragma warning restore CS0618 // Type or member is obsolete
 
         // This makes the run a bit slower, but at least we get info in the output window. We probably should add a mode where we don't
@@ -74,6 +75,7 @@ internal class Fixture : IDisposable
         FileHelper = new FakeFileHelper(ErrorAggregator);
         TestRuntimeProviderManager = new FakeTestRuntimeProviderManager(ErrorAggregator);
         TestRunEventsRegistrar = new FakeTestRunEventsRegistrar(ErrorAggregator);
+        Environment = new FakeEnvironment();
         TestDiscoveryEventsRegistrar = new FakeTestDiscoveryEventsRegistrar(ErrorAggregator);
         TestSessionEventsHandler = new FakeTestSessionEventsHandler(ErrorAggregator);
         ProtocolConfig = new ProtocolConfig();
@@ -135,8 +137,8 @@ internal class Fixture : IDisposable
             InferHelper,
             fakeMetricsPublisherTask,
             ProcessHelper,
-            TestRunAttachmentsProcessingManager
-            );
+            TestRunAttachmentsProcessingManager,
+            Environment);
 
         TestRequestManager = testRequestManager;
 

@@ -29,6 +29,6 @@
     <!-- Add a third party notice file -->
     <file src="ThirdPartyNotices.txt" target="" />
     
-    <file src="netcoreapp2.1\**\*.*" exclude="**\*.pdb" target="contentFiles\any\netcoreapp2.1" />
+    <file src="$TargetFramework$\**\*.*" exclude="**\*.pdb" target="contentFiles\any\$TargetFramework$" />
   </files>
 </package>

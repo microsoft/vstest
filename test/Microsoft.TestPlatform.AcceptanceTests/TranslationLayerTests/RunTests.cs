@@ -71,6 +71,9 @@ public class RunTests : AcceptanceTestBase
         _vstestConsoleWrapper?.EndSession();
 
         // Assert
+        // TODO: This still works reliably, but it is accidental. Correctly we should look at our "tree" of processes
+        // but there is no such thing on Windows. We can still replicate it quite well. There is code for it in blame
+        // hang collector.
         Assert.AreEqual(numOfProcesses, Process.GetProcessesByName("vstest.console").Length);
 
         _vstestConsoleWrapper = null;

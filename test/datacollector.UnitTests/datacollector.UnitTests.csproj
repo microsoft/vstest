@@ -10,8 +10,8 @@
     <RootNamespace>Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
-    <OutputType Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.1;net472</TargetFrameworks>
+    <OutputType Condition=" $(TargetFramework.StartsWith('net6')) ">Exe</OutputType>
+    <TargetFrameworks>net6.0;net48</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <AssemblyName>datacollector.UnitTests</AssemblyName>
   </PropertyGroup>

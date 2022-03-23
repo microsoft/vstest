@@ -13,8 +13,8 @@
     from a build parameter would not be available, so I am writing this version from the build.ps1 script to keep it in sync -->
     <NETTestSdkVersion>17.2.0-dev</NETTestSdkVersion>
 
-    <MSTestFrameworkVersion>2.1.0</MSTestFrameworkVersion>
-    <MSTestAdapterVersion>2.1.0</MSTestAdapterVersion>
+    <MSTestFrameworkVersion>2.2.8</MSTestFrameworkVersion>
+    <MSTestAdapterVersion>2.2.8</MSTestAdapterVersion>
     <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
 
     <XUnitFrameworkVersion>2.3.1</XUnitFrameworkVersion>

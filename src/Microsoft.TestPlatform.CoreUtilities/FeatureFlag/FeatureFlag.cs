@@ -4,66 +4,61 @@
 #if !NETSTANDARD1_0
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
-// !!! FEATURES MUST BE KEPT IN SYNC WITH https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestFeatureFlag.cs !!!
-internal sealed class FeatureFlag : IFeatureFlag
+/// <summary>
+/// !!!NEVER USE A FLAG TO ENABLE FUNCTIONALITY!!!
+/// 
+/// The reasoning is:
+/// 
+/// * New version will automatically ship with the feature enabled. There is no action needed to be done just before release.
+/// * Anyone interested in the new feature will get it automatically by grabbing our preview.
+/// * Anyone who needs more time before using the new feature can disable it in the released package.
+/// * If we remove the flag from our code, we will do it after the feature is the new default, or after the functionality was completely removed from our codebase.
+/// * If there is a very outdated version of an assembly that for some reason loaded with the newest version of TP and it cannot find a feature flag, because we removed that feature flag in the meantime, it will just run with all it's newest features enabled.
+///
+/// Use constants so the feature name will be compiled directly into the assembly that references this, to avoid backwards compatibility issues, when the flag is removed in newer version.
+/// </summary>
+
+// !!! SDK USED FEATURE NAMES MUST BE KEPT IN SYNC IN https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestFeatureFlag.cs !!!
+internal partial class FeatureFlag : IFeatureFlag
 {
-    private static readonly Dictionary<string, bool> FeatureFlags = new();
+    private readonly ConcurrentDictionary<string, bool> _cache = new();
 
-    private const string VSTEST_FEATURE = nameof(VSTEST_FEATURE);
+    public static IFeatureFlag Instance { get; private set; } = new FeatureFlag();
 
-    public static IFeatureFlag Instance { get; } = new FeatureFlag();
+    private FeatureFlag() { }
 
-    static FeatureFlag()
-    {
-#pragma warning disable CS0618 // Type or member is obsolete
-        Reset();
-#pragma warning restore CS0618 // Type or member is obsolete
-    }
+    // Only check the env variable once, when it is not set or is set to 0, consider it unset. When it is anything else, consider it set.
+    public bool IsSet(string featureFlag) => _cache.GetOrAdd(featureFlag, f => (Environment.GetEnvironmentVariable(f)?.Trim() ?? "0") != "0");
 
-    [Obsolete("Use this only from tests, and ctor.")]
-    internal static void Reset()
-    {
-        FeatureFlags.Clear();
-        FeatureFlags.Add(ARTIFACTS_POSTPROCESSING, true);
-        FeatureFlags.Add(ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX, false);
-        FeatureFlags.Add(FORCE_DATACOLLECTORS_ATTACHMENTPROCESSORS, false);
-        FeatureFlags.Add(MULTI_TFM_RUN, true);
-    }
-
-    [Obsolete("Use this only from tests.")]
-    internal static void SetFlag(string name, bool value)
-    {
-        if (!FeatureFlags.ContainsKey(name))
-            throw new ArgumentException($"Feature flag {name} is not a known feature flag.");
-        
-        FeatureFlags[name] = value;
-    }
+    private const string VSTEST_ = nameof(VSTEST_);
 
     // Added for artifact post-processing, it enable/disable the post processing.
     // Added in 17.2-preview 7.0-preview
-    public const string ARTIFACTS_POSTPROCESSING = VSTEST_FEATURE + "_" + nameof(ARTIFACTS_POSTPROCESSING);
+    public const string DISABLE_ARTIFACTS_POSTPROCESSING = VSTEST_ + nameof(DISABLE_ARTIFACTS_POSTPROCESSING);
 
     // Added for artifact post-processing, it will show old output for dotnet sdk scenario.
     // It can be useful if we need to restore old UX in case users are parsing the console output.
     // Added in 17.2-preview 7.0-preview
-    public const string ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX = VSTEST_FEATURE + "_" + nameof(ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX);
+    public const string DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX = VSTEST_ + nameof(DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX);
 
-    // Allow vstest.console to sources from multiple TFMs
-    public const string MULTI_TFM_RUN = VSTEST_FEATURE + "_" + nameof(MULTI_TFM_RUN);
+    // TODO: Invert this to disable.
+    public const string MULTI_TFM_RUN = VSTEST_ + nameof(MULTI_TFM_RUN);
 
-    // Temporary used to allow tests to work
-    public const string FORCE_DATACOLLECTORS_ATTACHMENTPROCESSORS = VSTEST_FEATURE + "_" + "FORCE_DATACOLLECTORS_ATTACHMENTPROCESSORS";
+    [Obsolete("Only use this in tests.")]
+    internal static void Reset()
+    {
+        Instance = new FeatureFlag();
+    }
 
-    // For now we're checking env var.
-    // We could add it also to some section inside the runsettings.
-    public bool IsEnabled(string featureName) =>
-        int.TryParse(Environment.GetEnvironmentVariable(featureName), out int enabled) ?
-        enabled == 1 :
-        FeatureFlags.TryGetValue(featureName, out bool isEnabled) && isEnabled;
+    [Obsolete("Only use this in tests.")]
+    internal void SetFlag(string key, bool value)
+    {
+        _cache[key] = value;
+    }
 }
 
 #endif

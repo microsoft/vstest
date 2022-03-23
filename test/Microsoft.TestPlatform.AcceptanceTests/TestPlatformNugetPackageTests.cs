@@ -47,7 +47,7 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
     [TestInitialize]
     public void SetUp()
     {
-        _resultsDirectory = new TempDirectory();
+        _resultsDirectory = TempDirectory;
     }
 
     [TestCleanup]

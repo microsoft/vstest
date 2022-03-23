@@ -4,11 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-#if !NETCOREAPP1_0 && DEBUG
-using System.Reflection;
-#endif
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -22,7 +18,7 @@ internal static class DebuggerBreakpoint
 {
     internal static void AttachVisualStudioDebugger(string environmentVariable)
     {
-#if NETCOREAPP1_0 || !DEBUG
+#if NETCOREAPP1_0
         return;
 #else
         if (string.IsNullOrWhiteSpace(environmentVariable))
@@ -62,7 +58,7 @@ internal static class DebuggerBreakpoint
 
     private static bool AttachVs(Process process, int? vsPid)
     {
-#if NETCOREAPP1_0 || !DEBUG
+#if NETCOREAPP1_0
         return false;
 #else
         // The way we attach VS is not compatible with .NET Core 2.1 and .NET Core 3.1, but works in .NET Framework and .NET.
@@ -93,7 +89,7 @@ internal static class DebuggerBreakpoint
 
     private static string FindAttachVs()
     {
-#if NETCOREAPP1_0 || !DEBUG
+#if NETCOREAPP1_0
         return null;
 #else
 
@@ -103,7 +99,7 @@ internal static class DebuggerBreakpoint
             return fromPath;
         }
 
-        var parent = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        var parent = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
         while (parent != null)
         {
             var path = Path.Combine(parent, @"src\AttachVS\bin\Debug\net472\AttachVS.exe");
@@ -156,7 +152,7 @@ internal static class DebuggerBreakpoint
 
             while (!Debugger.IsAttached)
             {
-                Thread.Sleep(1000);
+                Task.Delay(1000).GetAwaiter().GetResult();
             }
 
             Break();

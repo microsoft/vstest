@@ -29,10 +29,6 @@ public class IntegrationTestEnvironment
 
     public IntegrationTestEnvironment()
     {
-        // These environment variables are set in scripts/test.ps1 or scripts/test.sh.
-        TargetFramework = Environment.GetEnvironmentVariable("TPT_TargetFramework");
-        TargetRuntime = Environment.GetEnvironmentVariable("TPT_TargetRuntime");
-
         // If the variables are not set, valid defaults are assumed.
         if (string.IsNullOrEmpty(TargetFramework))
         {
@@ -194,6 +190,9 @@ public class IntegrationTestEnvironment
         get;
         set;
     }
+
+    // A known AzureDevOps env variable meaning we are running in CI.
+    public static bool IsCI { get; } = Environment.GetEnvironmentVariable("TF_BUILD") == "True";
 
     /// <summary>
     /// Gets the full path to a test asset.

@@ -6,14 +6,12 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-
 /// <summary>
 /// Converts paths in received and sent objects, to make testhost seem like it run a local test,
 /// while it was in fact running a test on a remote system, in a totally different path. This is for UWP which
@@ -32,8 +30,13 @@ internal class PathConverter : IPathConverter
 
     public PathConverter(string originalPath!!, string deploymentPath!!, IFileHelper fileHelper!!)
     {
-        _originalPath = fileHelper.GetFullPath(originalPath).TrimEnd('\\').TrimEnd('/') + Path.DirectorySeparatorChar;
-        _deploymentPath = fileHelper.GetFullPath(deploymentPath).TrimEnd('\\').TrimEnd('/') + Path.DirectorySeparatorChar;
+        string unquotedOriginalPath = originalPath.Trim('\"');
+        string normalizedLocalPath = fileHelper.GetFullPath(unquotedOriginalPath).TrimEnd('\\').TrimEnd('/') + Path.DirectorySeparatorChar;
+        _originalPath = normalizedLocalPath;
+
+        string unquotedDeploymentPath = deploymentPath.Trim('\"');
+        string normalizedDeploymentPath = fileHelper.GetFullPath(unquotedDeploymentPath).TrimEnd('\\').TrimEnd('/') + Path.DirectorySeparatorChar;
+        _deploymentPath = normalizedDeploymentPath;
     }
 
     public string? UpdatePath(string? path, PathConversionDirection updateDirection)

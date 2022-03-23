@@ -2,14 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #pragma warning disable IDE1006 // Naming Styles
-#nullable disable
-
 namespace testhost.UnitTests;
 #pragma warning restore IDE1006 // Naming Styles
 
 public static class Program
 {
-    public static void Main(string[] args)
+    public static void Main()
     {
     }
 }
