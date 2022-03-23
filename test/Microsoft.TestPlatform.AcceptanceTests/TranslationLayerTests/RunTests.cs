@@ -40,6 +40,7 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    [TestCategory("Windows-Review")]
     [RunnerCompatibilityDataSource]
     public void RunAllTests(RunnerInfo runnerInfo)
     {

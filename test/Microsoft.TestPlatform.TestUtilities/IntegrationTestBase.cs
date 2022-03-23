@@ -911,7 +911,7 @@ public class IntegrationTestBase
 
     protected string BuildMultipleAssemblyPath(params string[] assetNames)
     {
-        return string.Join(" ", GetTestDlls(assetNames));
+        return $"\"{string.Join("\" \"", GetTestDlls(assetNames))}\"";
     }
 
     protected static string GetDiagArg(string rootDir)
