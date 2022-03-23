@@ -696,14 +696,14 @@ public class IntegrationTestBase
             Environment.GetEnvironmentVariables().OfType<DictionaryEntry>().ToList().ForEach(e => environmentVariables.Add(e.Key.ToString(), e.Value.ToString()));
             foreach (var pair in debugEnvironmentVariables)
             {
-                environmentVariables.Add(pair.Key, pair.Value);
+                environmentVariables[pair.Key] = pair.Value;
             }
         }
 
         if (environmentVariables.Count > 0)
         {
             // This clears all variables, so we copy all environment variables, and add the debug ones to them.   
-            vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath, EnvironmentVariables = debugEnvironmentVariables });
+            vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath, EnvironmentVariables = environmentVariables });
         }
         else
         {

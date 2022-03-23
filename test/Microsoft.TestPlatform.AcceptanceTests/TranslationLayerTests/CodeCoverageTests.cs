@@ -183,6 +183,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingNoMetrics(RunnerInfo runnerInfo)
     {
+        // System.Environment.SetEnvironmentVariable("VSTEST_RUNNER_DEBUG_ATTACHVS", "1");
         // arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
