@@ -62,6 +62,10 @@ public class IntegrationTestBase
         _testEnvironment = new IntegrationTestEnvironment();
         BuildConfiguration = IntegrationTestEnvironment.BuildConfiguration;
         TempDirectory = new TempDirectory();
+
+        var drive = new DriveInfo(Directory.GetDirectoryRoot(TempDirectory.Path));
+        Console.WriteLine($"Available space for TEMP: {drive.Name} {drive.AvailableFreeSpace / (1024 * 1024)} MB");
+
         IsCI = IntegrationTestEnvironment.IsCI;
     }
 
