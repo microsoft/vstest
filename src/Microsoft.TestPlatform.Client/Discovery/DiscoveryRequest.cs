@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -248,6 +250,22 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                     OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.DiscoveryComplete");
                 }
 
+                // Add extensions discovered by vstest.console.
+                //
+                // TODO(copoiena): Writing telemetry twice is less than ideal.
+                // We first write telemetry data in the _requestData variable in the ParallelRunEventsHandler
+                // and then we write again here. We should refactor this code and write only once.
+                discoveryCompleteEventArgs.DiscoveredExtensions = TestExtensions.MergeExtensionMaps(
+                    discoveryCompleteEventArgs.DiscoveredExtensions,
+                    TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
+
+                if (RequestData.IsTelemetryOptedIn)
+                {
+                    TestExtensions.WriteExtensionMapToTelemetryData(
+                        discoveryCompleteEventArgs.Metrics,
+                        discoveryCompleteEventArgs.DiscoveredExtensions);
+                }
+
                 LoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs);
                 OnDiscoveryComplete.SafeInvoke(this, discoveryCompleteEventArgs, "DiscoveryRequest.DiscoveryComplete");
             }
@@ -406,6 +424,25 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
                 // Collecting Total Time Taken
                 discoveryCompletePayload.Metrics[TelemetryDataConstants.TimeTakenInSecForDiscovery] = discoveryFinalTimeTakenForDesignMode.TotalSeconds;
+
+                // Add extensions discovered by vstest.console.
+                //
+                // TODO(copoiena):
+                // Handling of this merging operation (i.e. extensions discovered by testhost with
+                // extensions discovered by vstest.console) is incorrect because in the current
+                // implementation it's tied to telemetry being opted in. We should handle this a
+                // level above where this method is called, but the raw message is only deserialized
+                // when telemetry is opted in which makes better handling impossible for now. We
+                // could deserialize the raw message no matter if telemetry is opted in or not but
+                // that would probably mean a performance hit.
+                discoveryCompletePayload.DiscoveredExtensions = TestExtensions.MergeExtensionMaps(
+                    discoveryCompletePayload.DiscoveredExtensions,
+                    TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
+
+                // Write extensions to telemetry data.
+                TestExtensions.WriteExtensionMapToTelemetryData(
+                    discoveryCompletePayload.Metrics,
+                    discoveryCompletePayload.DiscoveredExtensions);
             }
 
             if (message is VersionedMessage message1)

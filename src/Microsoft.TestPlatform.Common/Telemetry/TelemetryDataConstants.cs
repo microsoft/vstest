@@ -10,6 +10,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 /// </summary>
 internal static class TelemetryDataConstants
 {
+    // ******************** General ***********************
+    public static readonly string DiscoveredExtensions = "VS.TestPlatform.DiscoveredExtensions";
+
     // ******************** Execution ***********************
     public static readonly string ParallelEnabledDuringExecution = "VS.TestRun.ParallelEnabled";
 

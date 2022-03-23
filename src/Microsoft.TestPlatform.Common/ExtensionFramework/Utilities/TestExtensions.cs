@@ -5,11 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
-
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 #nullable disable
@@ -90,6 +90,74 @@ public class TestExtensions
     /// Gets or sets a value indicating whether are test hosts cached.
     /// </summary>
     internal bool AreDataCollectorsCached { get; set; }
+
+    /// <summary>
+    /// Merge two extension maps.
+    /// </summary>
+    /// 
+    /// <param name="extensionMap1">First extension map.</param>
+    /// <param name="extensionMap2">Second extension map.</param>
+    /// 
+    /// <returns>
+    /// A map representing the merger between the two input maps.
+    /// </returns>
+    internal static IDictionary<string, ISet<string>> MergeExtensionMaps(
+        IDictionary<string, ISet<string>> extensionMap1,
+        IDictionary<string, ISet<string>> extensionMap2)
+    {
+        var isExtensionMap1Valid = (extensionMap1 != null && extensionMap1.Count > 0);
+        var isExtensionMap2Valid = (extensionMap2 != null && extensionMap2.Count > 0);
+
+        // Sanity checks.
+        if (!isExtensionMap1Valid && !isExtensionMap2Valid) return new Dictionary<string, ISet<string>>();
+        if (!isExtensionMap1Valid) return extensionMap2;
+        if (!isExtensionMap2Valid) return extensionMap1;
+
+        // We don't use an additional map for merging, instead we use the first map as a
+        // destination for the merging operation.
+        foreach (var kvp in extensionMap2)
+        {
+            // If the "source" set is empty there's no reason to continue.
+            if (kvp.Value == null || kvp.Value.Count == 0)
+            {
+                continue;
+            }
+
+            // If there's no key-value pair entry in the "destination" map for the current key in
+            // the "source" map, we copy the "source" set wholesale.
+            if (!extensionMap1.ContainsKey(kvp.Key))
+            {
+                extensionMap1.Add(kvp);
+                continue;
+            }
+
+            // Getting here means there's already an entry for the "source" key in the "destination"
+            // map which means we need to copy individual set elements from the "source" set to the
+            // "destination" set.
+            // No need to worry about duplicates as the set implementation handles this already.
+            foreach (var extension in kvp.Value)
+            {
+                extensionMap1[kvp.Key].Add(extension);
+            }
+        }
+
+        return extensionMap1;
+    }
+
+    /// <summary>
+    /// Write the extension map to the telemetry data.
+    /// </summary>
+    /// 
+    /// <param name="metrics">A collection representing the telemetry data.</param>
+    /// <param name="extensionMap">The input extension map.</param>
+    internal static void WriteExtensionMapToTelemetryData(
+        IDictionary<string, object> metrics,
+        IDictionary<string, ISet<string>> extensionMap)
+    {
+        metrics.Add(
+            TelemetryDataConstants.DiscoveredExtensions,
+            SerializeExtensionMap(extensionMap));
+    }
 
     /// <summary>
     /// Adds the extensions specified to the current set of extensions.
@@ -308,6 +376,27 @@ public class TestExtensions
     }
 
     /// <summary>
+    /// Gets the cached extensions for the current process.
+    /// </summary>
+    /// 
+    /// <returns>A map representing the cached extensions for the current process.</returns>
+    internal IDictionary<string, ISet<string>> GetCachedExtensions()
+    {
+        var extensionMap = new Dictionary<string, ISet<string>>();
+
+        // Write all "known" cached extension.
+        AddCachedExtensionToExtensionMap(extensionMap, "TestDiscoverers", TestDiscoverers?.Values.ToList());
+        AddCachedExtensionToExtensionMap(extensionMap, "TestExecutors", TestExecutors?.Values.ToList());
+        AddCachedExtensionToExtensionMap(extensionMap, "TestExecutors2", TestExecutors2?.Values.ToList());
+        AddCachedExtensionToExtensionMap(extensionMap, "TestSettingsProviders", TestSettingsProviders?.Values.ToList());
+        AddCachedExtensionToExtensionMap(extensionMap, "TestLoggers", TestLoggers?.Values.ToList());
+        AddCachedExtensionToExtensionMap(extensionMap, "TestHosts", TestHosts?.Values.ToList());
+        AddCachedExtensionToExtensionMap(extensionMap, "DataCollectors", DataCollectors?.Values.ToList());
+
+        return extensionMap;
+    }
+
+    /// <summary>
     /// The invalidate cache of plugin infos.
     /// </summary>
     internal void InvalidateCache()
@@ -390,4 +479,35 @@ public class TestExtensions
         }
     }
 
+    private void AddCachedExtensionToExtensionMap<T>(
+        IDictionary<string, ISet<string>> extensionMap,
+        string extensionType,
+        IList<T> extensions) where T : TestPluginInformation
+    {
+        if (extensions == null) return;
+
+        extensionMap.Add(extensionType, new HashSet<string>());
+        foreach (var extension in extensions)
+        {
+            extensionMap[extensionType].Add(extension.IdentifierData);
+        }
+    }
+
+    private static string SerializeExtensionMap(IDictionary<string, ISet<string>> extensionMap)
+    {
+        StringBuilder sb = new();
+
+        foreach (var kvp in extensionMap)
+        {
+            sb.Append(
+                kvp.Value?.Count == 0
+                ? string.Empty
+                : string.Format(
+                    "{0}=[{1}];",
+                    kvp.Key,
+                    string.Join(",", kvp.Value.ToArray())));
+        }
+
+        return sb.ToString();
+    }
 }

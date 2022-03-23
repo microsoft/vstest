@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -37,6 +38,7 @@ internal class ParallelRunDataAggregator
         RunCompleteArgsAttachments = new List<AttachmentSet>();
         InvokedDataCollectors = new Collection<InvokedDataCollector>();
         Exceptions = new List<Exception>();
+        DiscoveredExtensions = new Dictionary<string, ISet<string>>();
         _executorUris = new List<string>();
         _testRunStatsList = new List<ITestRunStatistics>();
 
@@ -57,6 +59,11 @@ internal class ParallelRunDataAggregator
     public List<Exception> Exceptions { get; }
 
     public HashSet<string> ExecutorUris => new(_executorUris);
+
+    /// <summary>
+    /// A collection of aggregated discovered extensions.
+    /// </summary>
+    public IDictionary<string, ISet<string>> DiscoveredExtensions { get; set; }
 
     public bool IsAborted { get; private set; }
 
@@ -136,7 +143,8 @@ internal class ParallelRunDataAggregator
         bool isCanceled,
         ICollection<AttachmentSet> runContextAttachments,
         Collection<AttachmentSet> runCompleteArgsAttachments,
-        Collection<InvokedDataCollector> invokedDataCollectors)
+        Collection<InvokedDataCollector> invokedDataCollectors,
+        IDictionary<string, ISet<string>> discoveredExtensions)
     {
         lock (_dataUpdateSyncObject)
         {
@@ -167,6 +175,9 @@ internal class ParallelRunDataAggregator
                     }
                 }
             }
+
+            // Aggregate the discovered extensions.
+            AggregateDiscoveredExtensions(discoveredExtensions);
         }
     }
 
@@ -200,4 +211,8 @@ internal class ParallelRunDataAggregator
         }
     }
 
+    private void AggregateDiscoveredExtensions(IDictionary<string, ISet<string>> discoveredExtensions)
+    {
+        DiscoveredExtensions = TestExtensions.MergeExtensionMaps(DiscoveredExtensions, discoveredExtensions);
+    }
 }

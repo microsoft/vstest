@@ -977,7 +977,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         discoveryCompletePayload.IsAborted,
                         discoveryCompletePayload.FullyDiscoveredSources,
                         discoveryCompletePayload.PartiallyDiscoveredSources,
-                        discoveryCompletePayload.NotDiscoveredSources);
+                        discoveryCompletePayload.NotDiscoveredSources,
+                        discoveryCompletePayload.DiscoveredExtensions);
 
                     // Adding metrics from vstest.console.
                     discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
@@ -1067,7 +1068,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         discoveryCompletePayload.IsAborted,
                         discoveryCompletePayload.FullyDiscoveredSources,
                         discoveryCompletePayload.PartiallyDiscoveredSources,
-                        discoveryCompletePayload.NotDiscoveredSources);
+                        discoveryCompletePayload.NotDiscoveredSources,
+                        discoveryCompletePayload.DiscoveredExtensions);
 
                     // Adding Metrics from VsTestConsole
                     discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;

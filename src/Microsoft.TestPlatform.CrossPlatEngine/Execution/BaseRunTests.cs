@@ -615,6 +615,8 @@ internal abstract class BaseRunTests
                 // Today we don't offer an extension to run collectors for test adapters.
                 new Collection<InvokedDataCollector>(),
                 elapsedTime);
+
+            testRunCompleteEventArgs.DiscoveredExtensions = TestPluginCache.Instance.TestExtensions.GetCachedExtensions();
             testRunCompleteEventArgs.Metrics = _requestData.MetricsCollection.Metrics;
 
             TestRunEventsHandler.HandleTestRunComplete(

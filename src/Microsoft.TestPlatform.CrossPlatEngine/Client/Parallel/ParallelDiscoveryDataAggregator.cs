@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -27,6 +28,7 @@ internal class ParallelDiscoveryDataAggregator
         IsAborted = false;
         TotalTests = 0;
         _metricsAggregator = new ConcurrentDictionary<string, object>();
+        DiscoveredExtensions = new Dictionary<string, ISet<string>>();
     }
 
     /// <summary>
@@ -39,6 +41,10 @@ internal class ParallelDiscoveryDataAggregator
     /// </summary>
     public long TotalTests { get; private set; }
 
+    /// <summary>
+    /// A collection of aggregated discovered extensions.
+    /// </summary>
+    public IDictionary<string, ISet<string>> DiscoveredExtensions { get; set; }
 
     /// <summary>
     /// Dictionary which stores source with corresponding discoveryStatus
@@ -84,7 +90,10 @@ internal class ParallelDiscoveryDataAggregator
     /// Aggregate discovery data
     /// Must be thread-safe as this is expected to be called by parallel managers
     /// </summary>
-    public void Aggregate(long totalTests, bool isAborted)
+    public void Aggregate(
+        long totalTests,
+        bool isAborted,
+        IDictionary<string, ISet<string>> discoveredExtensions)
     {
         lock (_dataUpdateSyncObject)
         {
@@ -100,6 +109,9 @@ internal class ParallelDiscoveryDataAggregator
             }
 
             TotalTests += totalTests;
+
+            // Aggregate the discovered extensions.
+            AggregateDiscoveredExtensions(discoveredExtensions);
         }
     }
 
@@ -156,4 +168,9 @@ internal class ParallelDiscoveryDataAggregator
     /// <returns></returns>
     public List<string> GetSourcesWithStatus(DiscoveryStatus status)
         => DiscoveryManager.GetSourcesWithStatus(status, _sourcesWithDiscoveryStatus);
+
+    private void AggregateDiscoveredExtensions(IDictionary<string, ISet<string>> discoveredExtensions)
+    {
+        DiscoveredExtensions = TestExtensions.MergeExtensionMaps(DiscoveredExtensions, discoveredExtensions);
+    }
 }

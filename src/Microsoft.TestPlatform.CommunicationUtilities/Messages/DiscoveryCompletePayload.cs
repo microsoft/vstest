@@ -48,4 +48,9 @@ public class DiscoveryCompletePayload
     /// Gets or sets list of sources which were not discovered at all.
     /// </summary>
     public IList<string> NotDiscoveredSources { get; set; } = new List<string>();
+
+    /// <summary>
+    /// Gets or sets the collection of discovered extensions.
+    /// </summary>
+    public IDictionary<string, ISet<string>> DiscoveredExtensions { get; set; }
 }

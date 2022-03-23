@@ -4,6 +4,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -80,12 +82,21 @@ internal class ParallelRunEventsHandler : ITestRunEventsHandler2
                 _runDataAggregator.ElapsedTime);
 
             // Collect Final RunState
-            _requestData.MetricsCollection.Add(TelemetryDataConstants.RunState, _runDataAggregator.IsAborted ? "Aborted" : _runDataAggregator.IsCanceled ? "Canceled" : "Completed");
+            _requestData.MetricsCollection.Add(
+                TelemetryDataConstants.RunState,
+                _runDataAggregator.IsAborted
+                    ? "Aborted"
+                    : _runDataAggregator.IsCanceled ? "Canceled" : "Completed");
+
+            // Add the map containing discovered extensions to the event args. This map contains
+            // only extensions discovered by the testhost processes. Current process extensions
+            // (i.e. vstest.console) are to be added later on.
+            completedArgs.DiscoveredExtensions = _runDataAggregator.DiscoveredExtensions;
 
             // Collect Aggregated Metrics Data
             var aggregatedRunDataMetrics = _runDataAggregator.GetAggregatedRunDataMetrics();
-
             completedArgs.Metrics = aggregatedRunDataMetrics;
+
             HandleParallelTestRunComplete(completedArgs);
         }
     }
@@ -115,7 +126,8 @@ internal class ParallelRunEventsHandler : ITestRunEventsHandler2
             testRunCompleteArgs.IsCanceled,
             runContextAttachments,
             testRunCompleteArgs.AttachmentSets,
-            testRunCompleteArgs.InvokedDataCollectors);
+            testRunCompleteArgs.InvokedDataCollectors,
+            testRunCompleteArgs.DiscoveredExtensions);
 
         // Aggregate Run Data Metrics
         _runDataAggregator.AggregateRunDataMetrics(testRunCompleteArgs.Metrics);

@@ -232,6 +232,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
                 FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources,
                 PartiallyDiscoveredSources = discoveryCompleteEventArgs.PartiallyDiscoveredSources,
                 NotDiscoveredSources = discoveryCompleteEventArgs.NotDiscoveredSources,
+                DiscoveredExtensions = discoveryCompleteEventArgs.DiscoveredExtensions,
             },
             _protocolVersion);
         SendData(data);

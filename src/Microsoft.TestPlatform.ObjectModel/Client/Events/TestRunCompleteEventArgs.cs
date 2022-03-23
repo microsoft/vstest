@@ -106,4 +106,10 @@ public class TestRunCompleteEventArgs : EventArgs
     /// </summary>
     [DataMember]
     public IDictionary<string, object> Metrics { get; set; }
+
+    /// <summary>
+    /// Gets or sets the collection of discovered extensions.
+    /// </summary>
+    [DataMember]
+    public IDictionary<string, ISet<string>> DiscoveredExtensions { get; set; }
 }
