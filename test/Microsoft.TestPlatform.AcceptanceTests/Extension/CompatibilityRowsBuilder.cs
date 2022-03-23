@@ -24,11 +24,11 @@ public class CompatibilityRowsBuilder
     private readonly string[] _hostVersions;
 
     public CompatibilityRowsBuilder(string runnerFrameworks = AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET,
-    string runnerVersions = AcceptanceTestBase.LATEST_TO_LEGACY,
-    string hostFrameworks = AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET,
-    string hostVersions = AcceptanceTestBase.LATEST_TO_LEGACY,
-    string adapterVersions = AcceptanceTestBase.LATESTPREVIEW_TO_LEGACY,
-    string adapters = AcceptanceTestBase.MSTEST)
+        string runnerVersions = AcceptanceTestBase.LATEST_TO_LEGACY,
+        string hostFrameworks = AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET,
+        string hostVersions = AcceptanceTestBase.LATEST_TO_LEGACY,
+        string adapterVersions = AcceptanceTestBase.LATESTPREVIEW_TO_LEGACY,
+        string adapters = AcceptanceTestBase.MSTEST)
     {
         _runnerFrameworks = runnerFrameworks.Split(';');
         _runnerVersions = runnerVersions.Split(';');
@@ -197,7 +197,6 @@ public class CompatibilityRowsBuilder
         }
     }
 
-
     private void AddEveryVersionOfAdapter(List<RunnerInfo> dataRows)
     {
         var runnerVersion = _runnerVersions[0];
@@ -270,7 +269,7 @@ public class CompatibilityRowsBuilder
     }
 
     private void AddRow(List<RunnerInfo> dataRows, string batch,
-string runnerVersion, string runnerFramework, string hostVersion, string hostFramework, string adapter, string adapterVersion, bool inIsolation)
+        string runnerVersion, string runnerFramework, string hostVersion, string hostFramework, string adapter, string adapterVersion, bool inIsolation)
     {
         RunnerInfo runnerInfo = GetRunnerInfo(batch, runnerFramework, hostFramework, inIsolation);
         runnerInfo.DebugInfo = GetDebugInfo();
@@ -297,7 +296,6 @@ string runnerVersion, string runnerFramework, string hostVersion, string hostFra
             NoDefaultBreakpoints = NoDefaultBreakpoints
         };
     }
-
 
     private RunnerInfo GetRunnerInfo(string batch, string runnerFramework, string hostFramework, bool inIsolation)
     {
@@ -339,7 +337,7 @@ string runnerVersion, string runnerFramework, string hostVersion, string hostFra
         // same as other versions, we just need to grab the version from a different property. 
 
         var propertyName = vstestConsoleVersion == AcceptanceTestBase.LATEST
-            ? $"NETTestSdkVersion"
+            ? "NETTestSdkVersion"
             : $"VSTestConsole{vstestConsoleVersion}Version";
 
         var packageName = runnerInfo.IsNetFrameworkRunner
@@ -378,7 +376,7 @@ string runnerVersion, string runnerFramework, string hostVersion, string hostFra
         // same as other versions, we just need to grab the version from a different property. 
 
         var propertyName = testhostVersionType == AcceptanceTestBase.LATEST
-            ? $"NETTestSdkVersion"
+            ? "NETTestSdkVersion"
             : $"VSTestConsole{testhostVersionType}Version";
 
         // It is okay when node is null, we check that Version has value when we update paths by using TesthostInfo, and throw.
@@ -397,7 +395,6 @@ string runnerVersion, string runnerFramework, string hostVersion, string hostFra
             Path = versionSpecificBinPath
         };
     }
-
 
     private static XmlDocument GetDependenciesXml()
     {

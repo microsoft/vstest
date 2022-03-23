@@ -5,7 +5,7 @@ using System;
 
 namespace Microsoft.TestPlatform.TestUtilities;
 
-[Serializable]
+[Serializable] // Type should be serializable to allow the tree-view behavior of test discovery in Test Explorer
 public class NetTestSdkInfo : DllInfo
 {
     public NetTestSdkInfo()

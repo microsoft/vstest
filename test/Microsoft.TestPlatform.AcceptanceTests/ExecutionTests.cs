@@ -38,7 +38,6 @@ public class ExecutionTests : AcceptanceTestBase
     [TestCategory("Windows-Review")]
     [TestPlatformCompatibilityDataSource()]
     //[TestPlatformCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER, AfterAdapterFeature = Features.MSTEST_IFRAMEWORK_HANDLE_99)]
-
     public void RunTestsFromMultipleMSTestAssemblies(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -68,7 +67,6 @@ public class ExecutionTests : AcceptanceTestBase
         ExitCodeEquals(1); // failing tests
     }
 
-
     [TestMethod]
     [TestCategory("Windows-Review")]
     [RunnerCompatibilityDataSource]
@@ -83,7 +81,6 @@ public class ExecutionTests : AcceptanceTestBase
         ValidateSummaryStatus(2, 2, 2);
         ExitCodeEquals(1); // failing tests
     }
-
 
     // TODO: This one mixes different frameworks, I can make it work, but it is worth it? We are going to test
     // the two respective versions together (e.g. latest xunit and latest mstest), but does using two different test
@@ -115,13 +112,12 @@ public class ExecutionTests : AcceptanceTestBase
     public void RunMultipleTestAssembliesInParallel(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll");
         var arguments = PrepareArguments(assemblyPaths, testAdapterPath: null, runSettings: null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
         arguments = string.Concat(arguments, " /Parallel");
         arguments = string.Concat(arguments, " /Platform:x86");
-        arguments += GetDiagArg(tempDir.Path);
+        arguments += GetDiagArg(TempDirectory.Path);
 
         // for the desktop we will run testhost.x86 in two copies, but for core
         // we will run a combination of testhost.x86 and dotnet, where the dotnet will be
@@ -134,7 +130,7 @@ public class ExecutionTests : AcceptanceTestBase
 
         InvokeVsTest(arguments);
 
-        AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, tempDir.Path, testHostProcessNames);
+        AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, TempDirectory.Path, testHostProcessNames);
         ValidateSummaryStatus(2, 2, 2);
         ExitCodeEquals(1); // failing tests
     }

@@ -2,22 +2,22 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 public static class Features
 {
     public const string ATTACH_DEBUGGER_FLOW = nameof(ATTACH_DEBUGGER_FLOW);
-    public const string MSTEST_IFRAMEWORK_HANDLE_99 = nameof(MSTEST_IFRAMEWORK_HANDLE_99);
+    public const string MSTEST_EXAMPLE_FEATURE = nameof(MSTEST_EXAMPLE_FEATURE);
 
-
-    public static Dictionary<string, Feature> TestPlatformFeatures { get; } = new Dictionary<string, Feature>
+    public static IImmutableDictionary<string, Feature> TestPlatformFeatures { get; } = new Dictionary<string, Feature>
     {
         [ATTACH_DEBUGGER_FLOW] = new(version: "v16.7.0-preview-20200519-01", issue: "https://github.com/microsoft/vstest/pull/2325"),
-    };
+    }.ToImmutableDictionary();
 
-    public static Dictionary<string, Feature> AdapterFeatures { get; internal set; } = new Dictionary<string, Feature>
+    public static IImmutableDictionary<string, Feature> AdapterFeatures { get; internal set; } = new Dictionary<string, Feature>
     {
-        [MSTEST_IFRAMEWORK_HANDLE_99] = new("2.2.8", issue: "idk"),
-    };
+        [MSTEST_EXAMPLE_FEATURE] = new("2.2.8", issue: "This feature does not actually exist."),
+    }.ToImmutableDictionary();
 }

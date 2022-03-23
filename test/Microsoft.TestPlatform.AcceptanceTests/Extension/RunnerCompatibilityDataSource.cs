@@ -5,7 +5,6 @@ using System.Reflection;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-
 /// <summary>
 /// A data source that provides every version of runner.
 /// 

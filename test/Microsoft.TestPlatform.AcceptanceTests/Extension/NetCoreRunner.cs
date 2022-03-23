@@ -51,7 +51,7 @@ public class NetCoreRunner : Attribute, ITestDataSource
             {
                 RunnerFramework = IntegrationTestBase.CoreRunnerFramework,
                 TargetFramework = fmw,
-                InIsolationValue = null
+                InIsolationValue = null,
             };
             runnerInfo.DebugInfo = new DebugInfo
             {

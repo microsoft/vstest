@@ -16,5 +16,3 @@ public sealed class DebugInfo
     public bool DebugDataCollector { get; set; }
     public bool NoDefaultBreakpoints { get; set; } = true;
 }
-
-
