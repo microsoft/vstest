@@ -11,7 +11,7 @@ Param(
     [System.String] $TargetRuntime = "win7-x64",
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("netcoreapp2.1", "net451", "net452")]
+    [ValidateSet("netcoreapp2.1", "net472")]
     [Alias("f")]
     [System.String] $TargetFramework,
 
@@ -39,7 +39,7 @@ $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 #
 # Test configuration
 #
-$TPT_TargetFrameworkFullCLR = "net451"
+$TPT_TargetFrameworkFullCLR = "net472"
 $TPT_TargetFramework20Core = "netcoreapp2.1"
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
