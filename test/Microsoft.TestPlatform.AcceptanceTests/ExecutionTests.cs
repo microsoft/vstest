@@ -6,6 +6,7 @@ using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 
 using TestPlatform.TestUtilities;
 
@@ -96,7 +97,7 @@ public class ExecutionTests : AcceptanceTestBase
             _testEnvironment.GetTestAsset("XUTestProject.dll", "net46") :
             _testEnvironment.GetTestAsset("XUTestProject.dll");
 
-        assemblyPaths = string.Concat(assemblyPaths, "\" \"", xunitAssemblyPath);
+        assemblyPaths = string.Join(" ", assemblyPaths, xunitAssemblyPath.AddDoubleQuote());
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: string.Empty, FrameworkArgValue, string.Empty);
 
         ValidateSummaryStatus(2, 2, 1);

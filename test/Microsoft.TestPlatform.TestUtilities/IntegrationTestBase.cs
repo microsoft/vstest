@@ -911,7 +911,8 @@ public class IntegrationTestBase
 
     protected string BuildMultipleAssemblyPath(params string[] assetNames)
     {
-        return $"\"{string.Join("\" \"", GetTestDlls(assetNames))}\"";
+        // Double quoted sources sepearated by space.
+        return string.Join(" ", GetTestDlls(assetNames).Select(a => a.AddDoubleQuote()));
     }
 
     protected static string GetDiagArg(string rootDir)
