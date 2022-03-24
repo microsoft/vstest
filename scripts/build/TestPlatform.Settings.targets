@@ -77,8 +77,7 @@
       <PropertyGroup>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
         <!-- Suppress warnings about testhost being x64 (AMD64)/x86 when imported into AnyCPU (MSIL) test projects. -->
-        <!-- Suppress warnings about no strong-named nuget packages. -->
-        <NoWarn>$(NoWarn);MSB3270;CS8002</NoWarn>
+        <NoWarn>$(NoWarn);MSB3270</NoWarn>
       </PropertyGroup>
 
       <!-- Test projects are not discovered in test window without test container capability -->

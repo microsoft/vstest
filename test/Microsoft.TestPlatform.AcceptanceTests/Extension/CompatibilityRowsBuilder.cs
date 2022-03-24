@@ -6,10 +6,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
+using NuGet.Versioning;
 
 using Microsoft.TestPlatform.TestUtilities;
-
-using Semver;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
@@ -79,49 +78,49 @@ public class CompatibilityRowsBuilder
         if (WithInProcess)
             AddInProcess(dataRows);
 
-        var minVersion = SemVersion.Parse("0.0.0-alpha.1");
-        var maxVersion = SemVersion.Parse("9999.0.0");
-        SemVersion? beforeRunnerVersion = maxVersion;
-        SemVersion? afterRunnerVersion = minVersion;
-        SemVersion? beforeTestHostVersion = maxVersion;
-        SemVersion? afterTestHostVersion = minVersion;
-        SemVersion? beforeAdapterVersion = maxVersion;
-        SemVersion? afterAdapterVersion = minVersion;
+        var minVersion = SemanticVersion.Parse("0.0.0-alpha.1");
+        var maxVersion = SemanticVersion.Parse("9999.0.0");
+        SemanticVersion? beforeRunnerVersion = maxVersion;
+        SemanticVersion? afterRunnerVersion = minVersion;
+        SemanticVersion? beforeTestHostVersion = maxVersion;
+        SemanticVersion? afterTestHostVersion = minVersion;
+        SemanticVersion? beforeAdapterVersion = maxVersion;
+        SemanticVersion? afterAdapterVersion = minVersion;
 
         if (BeforeRunnerFeature != null)
         {
             var feature = Features.TestPlatformFeatures[BeforeRunnerFeature];
-            beforeRunnerVersion = SemVersion.Parse(feature.Version.TrimStart('v'));
+            beforeRunnerVersion = SemanticVersion.Parse(feature.Version.TrimStart('v'));
         }
 
         if (AfterRunnerFeature != null)
         {
             var feature = Features.TestPlatformFeatures[AfterRunnerFeature];
-            afterRunnerVersion = SemVersion.Parse(feature.Version.TrimStart('v'));
+            afterRunnerVersion = SemanticVersion.Parse(feature.Version.TrimStart('v'));
         }
 
         if (BeforeTestHostFeature != null)
         {
             var feature = Features.TestPlatformFeatures[BeforeTestHostFeature];
-            beforeTestHostVersion = SemVersion.Parse(feature.Version.TrimStart('v'));
+            beforeTestHostVersion = SemanticVersion.Parse(feature.Version.TrimStart('v'));
         }
 
         if (AfterTestHostFeature != null)
         {
             var feature = Features.TestPlatformFeatures[AfterTestHostFeature];
-            afterTestHostVersion = SemVersion.Parse(feature.Version.TrimStart('v'));
+            afterTestHostVersion = SemanticVersion.Parse(feature.Version.TrimStart('v'));
         }
 
         if (BeforeAdapterFeature != null)
         {
             var feature = Features.TestPlatformFeatures[BeforeAdapterFeature];
-            beforeAdapterVersion = SemVersion.Parse(feature.Version.TrimStart('v'));
+            beforeAdapterVersion = SemanticVersion.Parse(feature.Version.TrimStart('v'));
         }
 
         if (AfterAdapterFeature != null)
         {
             var feature = Features.AdapterFeatures[AfterAdapterFeature];
-            afterAdapterVersion = SemVersion.Parse(feature.Version.TrimStart('v'));
+            afterAdapterVersion = SemanticVersion.Parse(feature.Version.TrimStart('v'));
         }
 
         var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
@@ -133,12 +132,12 @@ public class CompatibilityRowsBuilder
         // We probably don't have that need right now, because legacy version is 15.x.x, which is very old, and we are still keeping
         // compatibility.
 
-        Func<SemVersion, SemVersion, SemVersion, bool> isInRange = (version, before, after) => version < before && after < version;
+        Func<SemanticVersion, SemanticVersion, SemanticVersion, bool> isInRange = (version, before, after) => version < before && after < version;
 
         var rows = dataRows.Where(r => r.VSTestConsoleInfo != null
-            && isInRange(r.VSTestConsoleInfo.Version, beforeRunnerVersion, afterRunnerVersion)
-            && r.TestHostInfo != null && isInRange(r.TestHostInfo.Version, beforeTestHostVersion, afterTestHostVersion)
-            && r.AdapterInfo != null && isInRange(r.AdapterInfo.Version, beforeAdapterVersion, afterAdapterVersion)).ToList();
+            && isInRange(SemanticVersion.Parse(r.VSTestConsoleInfo.Version), beforeRunnerVersion, afterRunnerVersion)
+            && r.TestHostInfo != null && isInRange(SemanticVersion.Parse(r.TestHostInfo.Version), beforeTestHostVersion, afterTestHostVersion)
+            && r.AdapterInfo != null && isInRange(SemanticVersion.Parse(r.AdapterInfo.Version), beforeAdapterVersion, afterAdapterVersion)).ToList();
 
         // We use ToString to determine which values are unique. Not great solution, but works better than using records.
         var distinctRows = new Dictionary<string, RunnerInfo>();
