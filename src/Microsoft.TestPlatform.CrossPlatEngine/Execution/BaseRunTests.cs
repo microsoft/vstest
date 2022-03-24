@@ -616,7 +616,7 @@ internal abstract class BaseRunTests
                 new Collection<InvokedDataCollector>(),
                 elapsedTime);
 
-            testRunCompleteEventArgs.DiscoveredExtensions = TestPluginCache.Instance.TestExtensions.GetCachedExtensions();
+            testRunCompleteEventArgs.DiscoveredExtensions = TestPluginCache.Instance.TestExtensions?.GetCachedExtensions();
             testRunCompleteEventArgs.Metrics = _requestData.MetricsCollection.Metrics;
 
             TestRunEventsHandler.HandleTestRunComplete(
