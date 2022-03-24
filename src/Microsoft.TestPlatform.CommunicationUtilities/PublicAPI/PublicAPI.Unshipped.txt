@@ -6,3 +6,5 @@ Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.Discovery
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.DiscoveryCompletePayload.PartiallyDiscoveredSources.get -> System.Collections.Generic.IList<string>
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.DiscoveryCompletePayload.PartiallyDiscoveredSources.set -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestSender.SendDiscoveryAbort() -> void
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.DiscoveryCompletePayload.DiscoveredExtensions.get -> System.Collections.Generic.IDictionary<string, System.Collections.Generic.ISet<string>>
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.DiscoveryCompletePayload.DiscoveredExtensions.set -> void
