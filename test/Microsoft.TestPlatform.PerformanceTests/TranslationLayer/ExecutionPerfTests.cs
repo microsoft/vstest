@@ -15,8 +15,8 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 [TestClass]
 public class ExecutionPerfTests : TelemetryPerfTestbase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private RunEventHandler _runEventHandler;
+    private readonly IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private readonly RunEventHandler _runEventHandler;
 
     public ExecutionPerfTests()
     {
@@ -35,10 +35,8 @@ public class ExecutionPerfTests : TelemetryPerfTestbase
 
         _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _runEventHandler);
 
-        PostTelemetry("RunMsTest10K", _runEventHandler.Metrics);
-
-        // TODO: Assert on the basics for every test. And also add some check for the actual timing to see if we are fast or slow?
         Assert.AreEqual(10_000L, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
+        PostTelemetry("RunMsTest10K", _runEventHandler.Metrics);
     }
 
     [TestMethod]
@@ -47,11 +45,12 @@ public class ExecutionPerfTests : TelemetryPerfTestbase
     {
         var testAssemblies = new List<string>
         {
-            GetPerfAssetFullPath("XunitAdapterPerfTestProject", "XunitAdapterPerfTestProject.dll"),
+            GetPerfAssetFullPath("XunitAdapterPerfTestProject", "XunitAdapterPerfTestProject.dll", "net452"),
         };
 
         _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _runEventHandler);
 
+        Assert.AreEqual(10_000L, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
         PostTelemetry("RunXunit10K", _runEventHandler.Metrics);
     }
 
@@ -66,6 +65,7 @@ public class ExecutionPerfTests : TelemetryPerfTestbase
 
         _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _runEventHandler);
 
+        Assert.AreEqual(10_000L, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
         PostTelemetry("RunNunit10K", _runEventHandler.Metrics);
     }
 
@@ -80,6 +80,7 @@ public class ExecutionPerfTests : TelemetryPerfTestbase
 
         _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, _runEventHandler);
 
+        Assert.AreEqual(10_000L, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
         PostTelemetry("RunMsTest10KWithDefaultAdaptersSkipped", _runEventHandler.Metrics);
     }
 
@@ -89,11 +90,12 @@ public class ExecutionPerfTests : TelemetryPerfTestbase
     {
         var testAssemblies = new List<string>
         {
-            GetPerfAssetFullPath("XunitAdapterPerfTestProject", "XunitAdapterPerfTestProject.dll"),
+            GetPerfAssetFullPath("XunitAdapterPerfTestProject", "XunitAdapterPerfTestProject.dll", "net452"),
         };
 
         _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, _runEventHandler);
 
+        Assert.AreEqual(10_000L, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
         PostTelemetry("RunXunit10KWithDefaultAdaptersSkipped", _runEventHandler.Metrics);
     }
 
@@ -108,6 +110,7 @@ public class ExecutionPerfTests : TelemetryPerfTestbase
 
         _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, _runEventHandler);
 
+        Assert.AreEqual(10_000L, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
         PostTelemetry("RunNunit10KWithDefaultAdaptersSkipped", _runEventHandler.Metrics);
     }
 }

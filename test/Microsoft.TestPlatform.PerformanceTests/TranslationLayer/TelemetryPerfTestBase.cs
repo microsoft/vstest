@@ -25,8 +25,10 @@ public class TelemetryPerfTestbase
 
     public TelemetryPerfTestbase()
     {
-        _client = new TelemetryClient();
-        TelemetryConfiguration.Active.InstrumentationKey = TelemetryInstrumentationKey;
+        var telemetryConfiguration = TelemetryConfiguration.CreateDefault();
+        telemetryConfiguration.InstrumentationKey = TelemetryInstrumentationKey;
+
+        _client = new TelemetryClient(telemetryConfiguration);
     }
 
     /// <summary>
@@ -61,9 +63,9 @@ public class TelemetryPerfTestbase
     /// <param name="dllDirectory">Name of the directory of the test dll</param>
     /// <param name="dllName">Name of the test dll</param>
     /// <returns></returns>
-    public string GetPerfAssetFullPath(string dllDirectory, string dllName)
+    public string GetPerfAssetFullPath(string dllDirectory, string dllName, string framework = "net451")
     {
-        var dllPath = Path.Combine(_rootDirectory, "test", "TestAssets", "PerfAssets", dllDirectory, "bin", BuildConfiguration, "net451", dllName);
+        var dllPath = Path.Combine(_rootDirectory, "test", "TestAssets", "PerfAssets", dllDirectory, "bin", BuildConfiguration, framework, dllName);
         if (!File.Exists(dllPath))
         {
             throw new FileNotFoundException(null, dllPath);
@@ -78,7 +80,7 @@ public class TelemetryPerfTestbase
     /// <returns></returns>
     public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
     {
-        var vstestConsoleWrapper = new VsTestConsoleWrapper(GetConsoleRunnerPath());
+        var vstestConsoleWrapper = new VsTestConsoleWrapper(GetConsoleRunnerPath(), new ConsoleParameters { LogFilePath = @"C:\temp\log3333.txt", TraceLevel = System.Diagnostics.TraceLevel.Verbose});
         vstestConsoleWrapper.StartSession();
 
         return vstestConsoleWrapper;
@@ -106,14 +108,5 @@ public class TelemetryPerfTestbase
     /// Returns the default runsettings xml
     /// </summary>
     /// <returns></returns>
-    public string GetDefaultRunSettings()
-    {
-        string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
-                                    <RunSettings>
-                                        <RunConfiguration>
-                                        <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
-                                        </RunConfiguration>
-                                    </RunSettings>";
-        return runSettingsXml;
-    }
+    public string GetDefaultRunSettings() => @"<RunSettings></RunSettings>";
 }
