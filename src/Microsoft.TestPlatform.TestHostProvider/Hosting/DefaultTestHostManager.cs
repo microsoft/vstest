@@ -47,9 +47,9 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     private const string DefaultTestHostFriendlyName = "DefaultTestHost";
     private const string TestAdapterEndsWithPattern = @"TestAdapter.dll";
 
-    // Any version (older or newer) that is not in this list will use the default testhost.exe that is built using net451.
+    // Any version (older or newer) that is not in this list will use the default testhost.exe that is built using net472.
     // TODO: Add net481 when it is published, if it uses a new moniker.
-    private static readonly ImmutableArray<string> SupportedTargetFrameworks = ImmutableArray.Create("net452", "net46", "net461", "net462", "net47", "net471", "net472", "net48");
+    private static readonly ImmutableArray<string> SupportedTargetFrameworks = ImmutableArray.Create("net48");
 
     private Architecture _architecture;
     private Framework _targetFramework;
@@ -186,14 +186,14 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     {
         // We ship multiple executables for testhost that follow this naming schema:
         // testhost<.tfm><.architecture>.exe
-        // e.g.: testhost.net472.x86.exe -> 32-bit testhost for .NET Framework 4.7.2
+        // e.g.: testhost.net48.x86.exe -> 32-bit testhost for .NET Framework 4.8
         //
-        // The tfm is omitted for .NET Framework 4.5.1 testhost.
-        // testhost.x86.exe -> 32-bit testhost for .NET Framework 4.5.1
+        // The tfm is omitted for .NET Framework 4.7.2 testhost.
+        // testhost.x86.exe -> 32-bit testhost for .NET Framework 4.7.2
         //
         // The architecture is omitted for 64-bit (x64) testhost.
-        // testhost.net472.exe -> 64-bit testhost for .NET Framework 4.7.2
-        // testhost.exe -> 64-bit testhost for .NET Framework 4.5.1
+        // testhost.net48.exe -> 64-bit testhost for .NET Framework 4.8
+        // testhost.exe -> 64-bit testhost for .NET Framework 4.7.2
         //
         // These omissions are done for backwards compatibility because originally there were
         // only testhost.exe and testhost.x86.exe, both built against .NET Framework 4.5.1.
@@ -206,14 +206,13 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             // e.g. ".NETFramework,Version=v4.7.2" -> "net472".
             var targetFrameworkMoniker = "net" + targetFramework.Name.Replace(".NETFramework,Version=v", string.Empty).Replace(".", string.Empty);
 
-            var isSupportedTargetFramework = SupportedTargetFrameworks.Contains(targetFrameworkMoniker);
-            if (isSupportedTargetFramework)
+            if (SupportedTargetFrameworks.Contains(targetFrameworkMoniker))
             {
                 testHostProcessName.Append('.').Append(targetFrameworkMoniker);
             }
             else
             {
-                // The .NET Framework 4.5.1 testhost that does not have moniker in the name is used as fallback.
+                // The .NET Framework 4.7.2 testhost that does not have moniker in the name is used as fallback.
             }
         }
 

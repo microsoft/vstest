@@ -5,9 +5,7 @@ using Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
 using System;
 using System.Globalization;
-#if !NET20
 using System.Linq;
-#endif
 using System.Reflection;
 using System.Text;
 
@@ -202,11 +200,7 @@ public static partial class ManagedNameHelper
         MethodInfo method = null;
         ManagedNameParser.ParseManagedMethodName(managedMethodName, out var methodName, out var methodArity, out var parameterTypes);
 
-#if NET20 || NET35
-        if (!IsNullOrWhiteSpace(methodName))
-#else
         if (!string.IsNullOrWhiteSpace(methodName))
-#endif
         {
             method = FindMethod(type, methodName, methodArity, parameterTypes);
         }
@@ -260,11 +254,7 @@ public static partial class ManagedNameHelper
         methods = type.GetRuntimeMethods().Where(m => Filter(m, null)).ToArray();
 #endif
 
-#if NET20
-        return (MethodInfo)SingleOrDefault(methods);
-#else
         return (MethodInfo)methods.SingleOrDefault();
-#endif
     }
 
     private static int[] AppendTypeString(StringBuilder b, Type type, bool closedType)
@@ -502,62 +492,4 @@ public static partial class ManagedNameHelper
         AppendTypeString(builder, type, closedType);
         return builder.ToString();
     }
-
-#if NET20
-    // the method is mostly copied from
-    // https://github.com/dotnet/runtime/blob/c0840723b382bcfa67b35839af8572fcd38f1d13/src/libraries/System.Linq/src/System/Linq/Single.cs#L86
-    public static TSource SingleOrDefault<TSource>(System.Collections.Generic.IEnumerable<TSource> source)
-    {
-        if (source == null)
-        {
-            throw new ArgumentNullException(nameof(source));
-        }
-
-        if (source is System.Collections.Generic.IList<TSource> list)
-        {
-            switch (list.Count)
-            {
-                case 0:
-                    return default;
-                case 1:
-                    return list[0];
-            }
-        }
-        else
-        {
-            using (System.Collections.Generic.IEnumerator<TSource> e = source.GetEnumerator())
-            {
-                if (!e.MoveNext())
-                {
-                    return default;
-                }
-
-                TSource result = e.Current;
-                if (!e.MoveNext())
-                {
-                    return result;
-                }
-            }
-        }
-
-        throw new InvalidOperationException("MoreThanOneElement");
-    }
-#endif
-
-#if NET20 || NET35
-    public static bool IsNullOrWhiteSpace(string value)
-    {
-        if (value is null) return true;
-
-        for (int i = 0; i < value.Length; i++)
-        {
-            if (!char.IsWhiteSpace(value[i]))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-#endif
 }

@@ -24,7 +24,7 @@ public class TraitCollection : IEnumerable<Trait>
     internal const string TraitPropertyId = "TestObject.Traits";
     private static readonly TestProperty TraitsProperty = TestProperty.Register(
         TraitPropertyId,
-#if !NET451
+#if !NETFRAMEWORK // REVIEW: This looks wrong, if the issue is for UWP and Win Apps then this should not be only non NET Framework
         // TODO: Fix this with proper resourcing for UWP and Win 8.1 Apps
         // Trying to access resources will throw "MissingManifestResourceException" percolated as "TypeInitialization" exception
         "Traits",

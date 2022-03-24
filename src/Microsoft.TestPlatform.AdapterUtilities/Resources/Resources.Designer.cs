@@ -27,11 +27,7 @@
             {
                 if (object.ReferenceEquals(resourceMan, null))
                 {
-#if NET20 || NET35 || NET40
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TestPlatform.AdapterUtilities.Resources.Resources", typeof(Resources).Assembly);
-#else
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TestPlatform.AdapterUtilities.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
-#endif
                     resourceMan = temp;
                 }
                 return resourceMan;
