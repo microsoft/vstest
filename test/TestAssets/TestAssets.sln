@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32024.52
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUnitAdapterPerfTestProject", "PerfAssets\NUnitAdapterPerfTestProject\NUnitAdapterPerfTestProject.csproj", "{F22A8D65-0581-4CC7-9C1C-9BC9F9E80DA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUnit10kPassing", "performance\NUnit10kPassing\NUnit10kPassing.csproj", "{F22A8D65-0581-4CC7-9C1C-9BC9F9E80DA4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnitAdapterPerfTestProject", "PerfAssets\XUnitAdapterPerfTestProject\XUnitAdapterPerfTestProject.csproj", "{C1A621CF-8FA8-437C-98E8-C6C6418FEBEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnit10kPassing", "performance\XUnit10kPassing\XUnit10kPassing.csproj", "{C1A621CF-8FA8-437C-98E8-C6C6418FEBEF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSTestAdapterPerfTestProject", "PerfAssets\MSTestAdapterPerfTestProject\MSTestAdapterPerfTestProject.csproj", "{52CAF89F-2309-4597-B531-79D6A96902BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSTest10kPassing", "performance\MSTest10kPassing\MSTest10kPassing.csproj", "{52CAF89F-2309-4597-B531-79D6A96902BE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUTestProject", "NUTestProject\NUTestProject.csproj", "{1ADE5795-2365-4790-8ACB-2EF0C2613D61}"
 EndProject
@@ -22,8 +22,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleTestProject2", "SimpleTestProject2\SimpleTestProject2.csproj", "{2B0F911C-5864-4EF7-A1F4-6923F7963D74}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OutOfProcDataCollector", "OutOfProcDataCollector\OutOfProcDataCollector.csproj", "{1266AB9D-94D9-496D-8AE5-73612D097A09}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerfTestProject", "PerfTestProject\PerfTestProject.csproj", "{1D1FDCD9-10B5-4C54-8A95-AD0C941F41C6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleRunners", "ConsoleRunners\ConsoleRunners.csproj", "{FBDB7A61-C1DB-4B24-B568-DA96AAD0DB8A}"
 EndProject
@@ -94,7 +92,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AttachmentProcessorDataColl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureSwitch", "ArchitectureSwitch\ArchitectureSwitch.csproj", "{452352E1-71CA-436E-8165-F284EE36C924}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleTestProjectMessedUpTargetFramework", "SimpleTestProjectMessedUpTargetFramework\SimpleTestProjectMessedUpTargetFramework.csproj", "{08C44607-EB80-4EE5-927D-08C34AA277AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleTestProjectMessedUpTargetFramework", "SimpleTestProjectMessedUpTargetFramework\SimpleTestProjectMessedUpTargetFramework.csproj", "{08C44607-EB80-4EE5-927D-08C34AA277AF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "performance", "performance", "{0C9CA869-32FD-4A9E-8885-E2E19786C746}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -226,18 +226,6 @@ Global
 		{1266AB9D-94D9-496D-8AE5-73612D097A09}.Release|x64.Build.0 = Release|Any CPU
 		{1266AB9D-94D9-496D-8AE5-73612D097A09}.Release|x86.ActiveCfg = Release|Any CPU
 		{1266AB9D-94D9-496D-8AE5-73612D097A09}.Release|x86.Build.0 = Release|Any CPU
-		{1D1FDCD9-10B5-4C54-8A95-AD0C941F41C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1D1FDCD9-10B5-4C54-8A95-AD0C941F41C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1D1FDCD9-10B5-4C54-8A95-AD0C941F41C6}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{1D1FDCD9-10B5-4C54-8A95-AD0C941F41C6}.Debug|x64.Build.0 = Debug|Any CPU
-		{1D1FDCD9-10B5-4C54-8A95-AD0C941F41C6}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{1D1FDCD9-10B5-4C54-8A95-AD0C941F41C6}.Debug|x86.Build.0 = Debug|Any CPU
-		{1D1FDCD9-10B5-4C54-8A95-AD0C941F41C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1D1FDCD9-10B5-4C54-8A95-AD0C941F41C6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1D1FDCD9-10B5-4C54-8A95-AD0C941F41C6}.Release|x64.ActiveCfg = Release|Any CPU
-		{1D1FDCD9-10B5-4C54-8A95-AD0C941F41C6}.Release|x64.Build.0 = Release|Any CPU
-		{1D1FDCD9-10B5-4C54-8A95-AD0C941F41C6}.Release|x86.ActiveCfg = Release|Any CPU
-		{1D1FDCD9-10B5-4C54-8A95-AD0C941F41C6}.Release|x86.Build.0 = Release|Any CPU
 		{FBDB7A61-C1DB-4B24-B568-DA96AAD0DB8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FBDB7A61-C1DB-4B24-B568-DA96AAD0DB8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBDB7A61-C1DB-4B24-B568-DA96AAD0DB8A}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -637,6 +625,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F22A8D65-0581-4CC7-9C1C-9BC9F9E80DA4} = {0C9CA869-32FD-4A9E-8885-E2E19786C746}
+		{C1A621CF-8FA8-437C-98E8-C6C6418FEBEF} = {0C9CA869-32FD-4A9E-8885-E2E19786C746}
+		{52CAF89F-2309-4597-B531-79D6A96902BE} = {0C9CA869-32FD-4A9E-8885-E2E19786C746}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D2334DAA-F7B2-450E-ABA4-FBC185152500}

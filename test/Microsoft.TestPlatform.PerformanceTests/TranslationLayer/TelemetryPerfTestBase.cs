@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -34,9 +35,9 @@ public class TelemetryPerfTestbase
     /// <summary>
     /// Used for posting the telemetry to AppInsights
     /// </summary>
-    /// <param name="perfScenario"></param>
     /// <param name="handlerMetrics"></param>
-    public void PostTelemetry(string perfScenario, IDictionary<string, object> handlerMetrics)
+    /// <param name="scenario"></param>
+    public void PostTelemetry(IDictionary<string, object> handlerMetrics, [CallerMemberName] string scenario = null)
     {
         var properties = new Dictionary<string, string>();
         var metrics = new Dictionary<string, double>();
@@ -53,7 +54,7 @@ public class TelemetryPerfTestbase
                 properties.Add(entry.Key, stringValue);
             }
         }
-        _client.TrackEvent(perfScenario, properties, metrics);
+        _client.TrackEvent(scenario, properties, metrics);
         _client.Flush();
     }
 
@@ -65,7 +66,7 @@ public class TelemetryPerfTestbase
     /// <returns></returns>
     public string GetPerfAssetFullPath(string dllDirectory, string dllName, string framework = "net451")
     {
-        var dllPath = Path.Combine(_rootDirectory, "test", "TestAssets", "PerfAssets", dllDirectory, "bin", BuildConfiguration, framework, dllName);
+        var dllPath = Path.Combine(_rootDirectory, "test", "TestAssets", "performance", dllDirectory, "bin", BuildConfiguration, framework, dllName);
         if (!File.Exists(dllPath))
         {
             throw new FileNotFoundException(null, dllPath);
