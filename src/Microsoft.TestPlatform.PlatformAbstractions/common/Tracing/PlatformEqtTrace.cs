@@ -445,19 +445,6 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
         TraceLevel = TraceLevel.Off;
         Source.Switch.Level = SourceLevels.Off;
     }
-
-    /// <summary>
-    /// Trace a verbose message.
-    /// </summary>
-    /// <param name="message">Trace message.</param>
-    [Conditional("TRACE")]
-    internal static void Verbose(string message)
-    {
-        if (Instance.ShouldTrace(PlatformTraceLevel.Verbose))
-        {
-            Instance.WriteLine(PlatformTraceLevel.Verbose, message);
-        }
-    }
 }
 
 #endif
