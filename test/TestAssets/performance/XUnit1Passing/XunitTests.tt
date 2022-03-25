@@ -1,16 +1,13 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 
-namespace MSTestAdapterPerfTests
+namespace XUnitAdapterPerfTests
 {
-    [TestClass]
-	public class MSTests
+	public class XuniTests
     {
 <#
-	int passedTests = 10000;
+	int passedTests = 1;
 	int failedTests = 0;
 	String padding = "00";
-
 	int count = 1;
 	String testmethodprefix = "Test_";
 #>
@@ -21,7 +18,7 @@ namespace MSTestAdapterPerfTests
 	{
 	String methodName= testmethodprefix + count.ToString(padding);
 #>
-		[TestMethod]
+		[Fact]
 		public void <#=methodName#>()
 		{
 		}
@@ -37,7 +34,7 @@ namespace MSTestAdapterPerfTests
 	{
 	String methodName= testmethodprefix + count.ToString(padding);
 #>
-		[TestMethod]
+		[Fact]
 		public void <#=methodName#>()
 		{
 			Assert.Fail();

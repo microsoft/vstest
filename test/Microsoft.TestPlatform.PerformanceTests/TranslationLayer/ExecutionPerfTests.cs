@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Collections.Generic;
-
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -26,91 +24,52 @@ public class ExecutionPerfTests : TelemetryPerfTestbase
 
     [TestMethod]
     [TestCategory("TelemetryPerf")]
-    public void RunMsTest10K()
+    [DataRow("MSTest1Passing", 1)]
+    [DataRow("MSTest100Passing", 100)]
+    [DataRow("MSTest1000Passing", 1000)]
+    [DataRow("MSTest10kPassing", 10_000)]
+    [DataRow("NUnit1Passing", 1)]
+    [DataRow("NUnit100Passing", 100)]
+    [DataRow("NUnit1000Passing", 1000)]
+    [DataRow("NUnit10kPassing", 10_000)]
+    [DataRow("XUnit1Passing", 1)]
+    [DataRow("XUnit100Passing", 100)]
+    [DataRow("XUnit1000Passing", 1000)]
+    [DataRow("XUnit10kPassing", 10_000)]
+    public void RunTests(string projectName, long expectedNumberOfTests)
     {
-        var testAssemblies = new List<string>
-        {
-            GetPerfAssetFullPath("MSTest10kPassing", "MSTest10kPassing.dll"),
-        };
+        var framework = projectName.StartsWith("XUnit") ? "net452" : "net451";
+        TestPlatformOptions options = new() { CollectMetrics = true };
+        _vstestConsoleWrapper.RunTests(GetPerfAssetFullPath(projectName, framework), GetDefaultRunSettings(), options, _runEventHandler);
 
-        _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _runEventHandler);
-
-        Assert.AreEqual(10_000L, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
+        Assert.AreEqual(expectedNumberOfTests, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
         PostTelemetry(_runEventHandler.Metrics);
     }
 
     [TestMethod]
     [TestCategory("TelemetryPerf")]
-    public void RunXunit10K()
+    [DataRow("MSTest1Passing", 1)]
+    [DataRow("MSTest100Passing", 100)]
+    [DataRow("MSTest1000Passing", 1000)]
+    [DataRow("MSTest10kPassing", 10_000)]
+    [DataRow("NUnit1Passing", 1)]
+    [DataRow("NUnit100Passing", 100)]
+    [DataRow("NUnit1000Passing", 1000)]
+    [DataRow("NUnit10kPassing", 10_000)]
+    [DataRow("XUnit1Passing", 1)]
+    [DataRow("XUnit100Passing", 100)]
+    [DataRow("XUnit1000Passing", 1000)]
+    [DataRow("XUnit10kPassing", 10_000)]
+    public void RunTestsWithDefaultAdaptersSkipped(string projectName, long expectedNumberOfTests)
     {
-        var testAssemblies = new List<string>
-        {
-            GetPerfAssetFullPath("XUnit10kPassing", "XUnit10kPassing.dll", "net452"),
+        var framework = projectName.StartsWith("XUnit") ? "net452" : "net451";
+        TestPlatformOptions options = new() {
+            CollectMetrics = true,
+            SkipDefaultAdapters = true, // <-- skipping adapters
         };
+        _vstestConsoleWrapper.RunTests(GetPerfAssetFullPath(projectName, framework), GetDefaultRunSettings(), options, _runEventHandler);
 
-        _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _runEventHandler);
-
-        Assert.AreEqual(10_000L, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
-        PostTelemetry(_runEventHandler.Metrics);
-    }
-
-    [TestMethod]
-    [TestCategory("TelemetryPerf")]
-    public void RunNunit10K()
-    {
-        var testAssemblies = new List<string>
-        {
-            GetPerfAssetFullPath("NUnit10kPassing", "NUnit10kPassing.dll"),
-        };
-
-        _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _runEventHandler);
-
-        Assert.AreEqual(10_000L, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
-        PostTelemetry(_runEventHandler.Metrics);
-    }
-
-    [TestMethod]
-    [TestCategory("TelemetryPerf")]
-    public void RunMsTest10KWithDefaultAdaptersSkipped()
-    {
-        var testAssemblies = new List<string>
-        {
-            GetPerfAssetFullPath("MSTest10kPassing", "MSTest10kPassing.dll"),
-        };
-
-        _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, _runEventHandler);
-
-        Assert.AreEqual(10_000L, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
-        PostTelemetry(_runEventHandler.Metrics);
-    }
-
-    [TestMethod]
-    [TestCategory("TelemetryPerf")]
-    public void RunXunit10KWithDefaultAdaptersSkipped()
-    {
-        var testAssemblies = new List<string>
-        {
-            GetPerfAssetFullPath("XUnit10kPassing", "XUnit10kPassing.dll", "net452"),
-        };
-
-        _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, _runEventHandler);
-
-        Assert.AreEqual(10_000L, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
-        PostTelemetry(_runEventHandler.Metrics);
-    }
-
-    [TestMethod]
-    [TestCategory("TelemetryPerf")]
-    public void RunNunit10KWithDefaultAdaptersSkipped()
-    {
-        var testAssemblies = new List<string>
-        {
-            GetPerfAssetFullPath("NUnit10kPassing", "NUnit10kPassing.dll"),
-        };
-
-        _vstestConsoleWrapper.RunTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, _runEventHandler);
-
-        Assert.AreEqual(10_000L, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
+        Assert.AreEqual(expectedNumberOfTests, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
         PostTelemetry(_runEventHandler.Metrics);
     }
 }

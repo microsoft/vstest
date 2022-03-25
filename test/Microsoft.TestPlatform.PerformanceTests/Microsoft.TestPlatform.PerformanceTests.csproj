@@ -8,7 +8,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <OutputType Condition=" '$(TargetFramework)' == 'net6.0' ">Exe</OutputType>
-    <TargetFrameworks>net6.0;net48</TargetFrameworks>
+    <TargetFrameworks>net48</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.PerformanceTests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>

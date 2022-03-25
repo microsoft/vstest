@@ -37,9 +37,15 @@ public class TelemetryPerfTestbase
     /// </summary>
     /// <param name="handlerMetrics"></param>
     /// <param name="scenario"></param>
-    public void PostTelemetry(IDictionary<string, object> handlerMetrics, [CallerMemberName] string scenario = null)
+    public void PostTelemetry(IDictionary<string, object> handlerMetrics, string projectName = null, [CallerMemberName] string scenario = null)
     {
-        var properties = new Dictionary<string, string>();
+        var properties = new Dictionary<string, string>
+        {
+            ["Project"] = projectName,
+            ["Scenario"] = scenario,
+            ["Configuration"] = BuildConfiguration,
+        };
+
         var metrics = new Dictionary<string, double>();
 
         foreach (var entry in handlerMetrics)
@@ -54,7 +60,7 @@ public class TelemetryPerfTestbase
                 properties.Add(entry.Key, stringValue);
             }
         }
-        _client.TrackEvent(scenario, properties, metrics);
+        _client.TrackEvent($"{scenario}{projectName}", properties, metrics);
         _client.Flush();
     }
 
@@ -62,17 +68,17 @@ public class TelemetryPerfTestbase
     /// Returns the full path to the test asset dll
     /// </summary>
     /// <param name="dllDirectory">Name of the directory of the test dll</param>
-    /// <param name="dllName">Name of the test dll</param>
+    /// <param name="name">Name of the test project without extension</param>
     /// <returns></returns>
-    public string GetPerfAssetFullPath(string dllDirectory, string dllName, string framework = "net451")
+    public string[] GetPerfAssetFullPath(string name, string framework = "net451")
     {
-        var dllPath = Path.Combine(_rootDirectory, "test", "TestAssets", "performance", dllDirectory, "bin", BuildConfiguration, framework, dllName);
+        var dllPath = Path.Combine(_rootDirectory, "test", "TestAssets", "performance", name, "bin", BuildConfiguration, framework, $"{name}.dll");
         if (!File.Exists(dllPath))
         {
             throw new FileNotFoundException(null, dllPath);
         }
 
-        return dllPath;
+        return new[] { dllPath };
     }
 
     /// <summary>
@@ -81,7 +87,13 @@ public class TelemetryPerfTestbase
     /// <returns></returns>
     public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
     {
-        var vstestConsoleWrapper = new VsTestConsoleWrapper(GetConsoleRunnerPath(), new ConsoleParameters { LogFilePath = @"C:\temp\log3333.txt", TraceLevel = System.Diagnostics.TraceLevel.Verbose});
+        var vstestConsoleWrapper = new VsTestConsoleWrapper(GetConsoleRunnerPath(),
+            new ConsoleParameters
+            {
+                // Log into TEMP and use info level, becuase that is what is used by default under VS.
+                LogFilePath = Path.Combine(Path.GetTempPath(), "logs", "log.txt"),
+                TraceLevel = System.Diagnostics.TraceLevel.Info
+            });
         vstestConsoleWrapper.StartSession();
 
         return vstestConsoleWrapper;
@@ -109,5 +121,7 @@ public class TelemetryPerfTestbase
     /// Returns the default runsettings xml
     /// </summary>
     /// <returns></returns>
-    public string GetDefaultRunSettings() => @"<RunSettings></RunSettings>";
+
+    // DONT make this just <RunSettings></RunSettings> it makes Translation layer hang... https://github.com/microsoft/vstest/issues/3519
+    public string GetDefaultRunSettings() => "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
 }
