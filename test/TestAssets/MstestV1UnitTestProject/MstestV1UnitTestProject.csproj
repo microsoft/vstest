@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <OutputType>library</OutputType>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <AssemblyName>MstestV1UnitTestProject</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
@@ -17,7 +17,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
-      <HintPath>..\..\..\packages\microsoft.visualstudio.qualitytools\$(TestPlatformExternalsVersion)\tools\net451\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll</HintPath>
+      <HintPath>..\..\..\packages\microsoft.visualstudio.qualitytools\$(TestPlatformExternalsVersion)\tools\net472\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
