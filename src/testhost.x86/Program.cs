@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost;
 /// </summary>
 public class Program
 {
-#if NETFRAMEWORK
+#if NETFRAMEWORK || NETCOREAPP3_0_OR_GREATER
     private const string TestSourceArgumentString = "--testsourcepath";
 #endif
 
@@ -63,7 +63,7 @@ public class Program
     private static IEngineInvoker GetEngineInvoker(IDictionary<string, string> argsDictionary)
     {
         IEngineInvoker? invoker = null;
-#if NETFRAMEWORK
+#if NETFRAMEWORK || NETCOREAPP3_0_OR_GREATER
         // If Args contains test source argument, invoker Engine in new appdomain
         if (argsDictionary.TryGetValue(TestSourceArgumentString, out var testSourcePath) && !string.IsNullOrWhiteSpace(testSourcePath))
         {
@@ -75,10 +75,15 @@ public class Program
                 (testSourcePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
                  || testSourcePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)))
             {
+#if NETFRAMEWORK
                 invoker = new AppDomainEngineInvoker<DefaultEngineInvoker>(testSourcePath);
+#else
+                invoker = new AssemblyLoadContextEngineInvoker<DefaultEngineInvoker>(testSourcePath);
+#endif
             }
         }
 #endif
+
         return invoker ?? new DefaultEngineInvoker();
     }
 }

@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -14,10 +14,10 @@ using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
@@ -27,30 +27,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 internal class TestPluginDiscoverer
 {
     private static readonly HashSet<string> UnloadableFiles = new();
+
     private readonly MetadataReaderExtensionsHelper _extensionHelper = new();
+    private readonly IAssemblyLoadContext _assemblyLoadContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class.
     /// </summary>
-    public TestPluginDiscoverer()
+    public TestPluginDiscoverer(IAssemblyLoadContext? assemblyLoadContext = null)
     {
+        // If no context is given, use the default context of the current TFM
+        // (e.g. no-op, AppDomain or AssemblyLoadContext.Default).
+        _assemblyLoadContext = assemblyLoadContext ?? new PlatformAssemblyLoadContext();
     }
-
-#if WINDOWS_UAP
-        private static HashSet<string> platformAssemblies = new HashSet<string>(new string[] {
-            "MICROSOFT.VISUALSTUDIO.TESTPLATFORM.UNITTESTFRAMEWORK.DLL",
-            "MICROSOFT.VISUALSTUDIO.TESTPLATFORM.TESTEXECUTOR.CORE.DLL",
-            "MICROSOFT.VISUALSTUDIO.TESTPLATFORM.OBJECTMODEL.DLL",
-            "VSTEST_EXECUTIONENGINE_PLATFORMBRIDGE.DLL",
-            "VSTEST_EXECUTIONENGINE_PLATFORMBRIDGE.WINMD",
-            "VSTEST.EXECUTIONENGINE.WINDOWSPHONE.DLL",
-            "MICROSOFT.CSHARP.DLL",
-            "MICROSOFT.VISUALBASIC.DLL",
-            "CLRCOMPRESSION.DLL",
-        });
-
-        private const string SYSTEM_ASSEMBLY_PREFIX = "system.";
-#endif
 
     /// <summary>
     /// Gets information about each of the test extensions available.
@@ -61,30 +50,31 @@ internal class TestPluginDiscoverer
     /// <returns>
     /// A dictionary of assembly qualified name and test plugin information.
     /// </returns>
-    public Dictionary<string, TPluginInfo> GetTestExtensionsInformation<TPluginInfo, TExtension>(IEnumerable<string> extensionPaths) where TPluginInfo : TestPluginInformation
+    public Dictionary<string, TPluginInfo> GetTestExtensionsInformation<TPluginInfo, TExtension>(IEnumerable<string> extensionPaths)
+        where TPluginInfo : TestPluginInformation
     {
-        Debug.Assert(extensionPaths != null);
-
         var pluginInfos = new Dictionary<string, TPluginInfo>();
 
         // C++ UWP adapters do not follow TestAdapater naming convention, so making this exception
         if (!extensionPaths.Any())
         {
-            AddKnownExtensions(ref extensionPaths);
+            extensionPaths = AddKnownExtensions(extensionPaths);
         }
 
-        GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), pluginInfos);
+        GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToImmutableArray(), pluginInfos);
 
         return pluginInfos;
     }
 
-    private void AddKnownExtensions(ref IEnumerable<string> extensionPaths)
-    {
+    private static IEnumerable<string> AddKnownExtensions(IEnumerable<string> extensionPaths)
         // For C++ UWP adapter, & OLD C# UWP(MSTest V1) adapter
         // In UWP .Net Native Compilation mode managed dll's are packaged differently, & File.Exists() fails.
         // Include these two dll's if so far no adapters(extensions) were found, & let Assembly.Load() fail if they are not present.
-        extensionPaths = extensionPaths.Concat(new[] { "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll" });
-    }
+        => extensionPaths.Concat(new[]
+        {
+            "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll",
+            "Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll",
+        });
 
     /// <summary>
     /// Gets test extension information from the given collection of files.
@@ -101,13 +91,9 @@ internal class TestPluginDiscoverer
     /// <param name="pluginInfos">
     /// Test plugins collection to add to.
     /// </param>
-    private void GetTestExtensionsFromFiles<TPluginInfo, TExtension>(
-        string[] files,
-        Dictionary<string, TPluginInfo> pluginInfos) where TPluginInfo : TestPluginInformation
+    private void GetTestExtensionsFromFiles<TPluginInfo, TExtension>(ImmutableArray<string> files, Dictionary<string, TPluginInfo> pluginInfos)
+        where TPluginInfo : TestPluginInformation
     {
-        Debug.Assert(files != null, "null files");
-        Debug.Assert(pluginInfos != null, "null pluginInfos");
-
         // Scan each of the files for data extensions.
         foreach (var file in files)
         {
@@ -117,10 +103,7 @@ internal class TestPluginDiscoverer
             }
             try
             {
-                Assembly assembly = null;
-                var assemblyName = Path.GetFileNameWithoutExtension(file);
-                assembly = Assembly.Load(new AssemblyName(assemblyName));
-                if (assembly != null)
+                if (_assemblyLoadContext.LoadAssemblyFromPath(file) is { } assembly)
                 {
                     GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos, file);
                 }
@@ -150,11 +133,9 @@ internal class TestPluginDiscoverer
     /// <typeparam name="TExtension">
     /// Type of Extensions.
     /// </typeparam>
-    private void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos, string filePath) where TPluginInfo : TestPluginInformation
+    private void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos, string filePath)
+        where TPluginInfo : TestPluginInformation
     {
-        Debug.Assert(assembly != null, "null assembly");
-        Debug.Assert(pluginInfos != null, "null pluginInfos");
-
         List<Type> types = new();
         Type extension = typeof(TExtension);
 
@@ -191,7 +172,7 @@ internal class TestPluginDiscoverer
             if (e.Types?.Length > 0)
             {
                 // Unloaded types on e.Types are null, make sure we skip them.
-                types.AddRange(e.Types.Where(type => type != null && type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract));
+                types.AddRange(e.Types.Where(type => type?.GetTypeInfo() is { } typeInfo && typeInfo.IsClass && !typeInfo.IsAbstract));
             }
 
             if (e.LoaderExceptions != null)
@@ -203,7 +184,7 @@ internal class TestPluginDiscoverer
             }
         }
 
-        if (types != null && types.Any())
+        if (types != null)
         {
             foreach (var type in types)
             {
@@ -227,38 +208,40 @@ internal class TestPluginDiscoverer
     /// <param name="extensionCollection">
     /// Test extensions collection to add to.
     /// </param>
-    private void GetTestExtensionFromType<TPluginInfo>(
+    private static void GetTestExtensionFromType<TPluginInfo>(
         Type type,
         Type extensionType,
         Dictionary<string, TPluginInfo> extensionCollection,
         string filePath)
         where TPluginInfo : TestPluginInformation
     {
-        if (extensionType.GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
+        if (!extensionType.GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
         {
-            var rawPluginInfo = Activator.CreateInstance(typeof(TPluginInfo), type);
-            var pluginInfo = (TPluginInfo)rawPluginInfo;
-            pluginInfo.FilePath = filePath;
+            return;
+        }
 
-            if (pluginInfo == null || pluginInfo.IdentifierData == null)
-            {
-                EqtTrace.Error(
-                    "GetTestExtensionFromType: Either PluginInformation is null or PluginInformation doesn't contain IdentifierData for type {0}.", type.FullName);
-                return;
-            }
+        var rawPluginInfo = Activator.CreateInstance(typeof(TPluginInfo), type);
+        var pluginInfo = (TPluginInfo)rawPluginInfo;
+        pluginInfo.FilePath = filePath;
 
-            if (extensionCollection.ContainsKey(pluginInfo.IdentifierData))
-            {
-                EqtTrace.Warning(
-                    "GetTestExtensionFromType: Discovered multiple test extensions with identifier data '{0}' and type '{1}' inside file '{2}'; keeping the first one '{3}'.",
-                    pluginInfo.IdentifierData, pluginInfo.AssemblyQualifiedName, filePath, extensionCollection[pluginInfo.IdentifierData].AssemblyQualifiedName);
-            }
-            else
-            {
-                extensionCollection.Add(pluginInfo.IdentifierData, pluginInfo);
-                EqtTrace.Info("GetTestExtensionFromType: Register extension with identifier data '{0}' and type '{1}' inside file '{2}'",
-                    pluginInfo.IdentifierData, pluginInfo.AssemblyQualifiedName, filePath);
-            }
+        if (pluginInfo == null || pluginInfo.IdentifierData == null)
+        {
+            EqtTrace.Error(
+                "GetTestExtensionFromType: Either PluginInformation is null or PluginInformation doesn't contain IdentifierData for type {0}.", type.FullName);
+            return;
+        }
+
+        if (extensionCollection.ContainsKey(pluginInfo.IdentifierData))
+        {
+            EqtTrace.Warning(
+                "GetTestExtensionFromType: Discovered multiple test extensions with identifier data '{0}' and type '{1}' inside file '{2}'; keeping the first one '{3}'.",
+                pluginInfo.IdentifierData, pluginInfo.AssemblyQualifiedName, filePath, extensionCollection[pluginInfo.IdentifierData].AssemblyQualifiedName);
+        }
+        else
+        {
+            extensionCollection.Add(pluginInfo.IdentifierData, pluginInfo);
+            EqtTrace.Info("GetTestExtensionFromType: Register extension with identifier data '{0}' and type '{1}' inside file '{2}'",
+                pluginInfo.IdentifierData, pluginInfo.AssemblyQualifiedName, filePath);
         }
     }
 

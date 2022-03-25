@@ -14,7 +14,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-#if NETFRAMEWORK
+#if NETFRAMEWORK || NETCOREAPP3_0_OR_GREATER
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 #endif
 
@@ -48,13 +48,18 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
 
                 EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Analyzing data collector attachment processor Uri: {invokedDataCollector.Uri} AssemblyQualifiedName: {invokedDataCollector.AssemblyQualifiedName} FilePath: {invokedDataCollector.FilePath} HasAttachmentProcessor: {invokedDataCollector.HasAttachmentProcessor}");
 
-#if NETFRAMEWORK
+#if NETFRAMEWORK || NETCOREAPP3_0_OR_GREATER
                 // If we're in design mode we need to load the extension inside a different AppDomain to avoid to lock extension file containers.
                 if (RunSettingsHelper.Instance.IsDesignMode)
                 {
                     try
                     {
-                        var wrapper = new DataCollectorAttachmentProcessorAppDomain(invokedDataCollector, logger);
+                        var wrapper =
+#if NETFRAMEWORK
+                            new DataCollectorAttachmentProcessorAppDomain(invokedDataCollector, logger);
+#else
+                            new DataCollectorAttachmentProcessAssemblyLoadContext(invokedDataCollector, logger);
+#endif
                         if (wrapper.LoadSucceded && wrapper.HasAttachmentProcessor)
                         {
                             if (!datacollectorsAttachmentsProcessors.ContainsKey(wrapper.AssemblyQualifiedName))
@@ -111,7 +116,7 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
                     {
                         EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: DataCollectorExtension not found for uri '{invokedDataCollector.Uri}'");
                     }
-#if NETFRAMEWORK
+#if NETFRAMEWORK || NETCOREAPP3_0_OR_GREATER
                 }
 #endif
             }

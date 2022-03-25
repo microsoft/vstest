@@ -32,7 +32,7 @@ public class TestCaseFilterExpression : ITestCaseFilterExpression
     {
         ValidateArg.NotNull(filterWrapper, nameof(filterWrapper));
         _filterWrapper = filterWrapper;
-        _validForMatch = string.IsNullOrEmpty(filterWrapper.ParseError);
+        _validForMatch = filterWrapper.ParseError.IsNullOrEmpty();
     }
 
     /// <summary>

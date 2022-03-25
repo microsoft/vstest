@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -137,7 +136,7 @@ internal class Condition
                 {
                     foreach (string propertyValue in multiValue)
                     {
-                        Debug.Assert(null != propertyValue, "PropertyValue can not be null.");
+                        TPDebug.Assert(null != propertyValue, "PropertyValue can not be null.");
                         result = result || propertyValue.IndexOf(Value, StringComparison.OrdinalIgnoreCase) != -1;
                         if (result)
                         {
@@ -155,7 +154,7 @@ internal class Condition
                 {
                     foreach (string propertyValue in multiValue)
                     {
-                        Debug.Assert(null != propertyValue, "PropertyValue can not be null.");
+                        TPDebug.Assert(null != propertyValue, "PropertyValue can not be null.");
                         result = result && propertyValue.IndexOf(Value, StringComparison.OrdinalIgnoreCase) == -1;
                         if (!result)
                         {
@@ -256,23 +255,14 @@ internal class Condition
     /// Return Operation corresponding to the operationString
     /// </summary>
     private static Operation GetOperator(string operationString)
-    {
-        switch (operationString)
+        => operationString switch
         {
-            case "=":
-                return Operation.Equal;
-
-            case "!=":
-                return Operation.NotEqual;
-
-            case "~":
-                return Operation.Contains;
-
-            case "!~":
-                return Operation.NotContains;
-        }
-        throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidOperator, operationString)));
-    }
+            "=" => Operation.Equal,
+            "!=" => Operation.NotEqual,
+            "~" => Operation.Contains,
+            "!~" => Operation.NotContains,
+            _ => throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidOperator, operationString))),
+        };
 
     /// <summary>
     /// Returns property value for Property using propertValueProvider.

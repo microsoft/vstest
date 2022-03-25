@@ -12,8 +12,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
 internal class AssemblyResolver : IDisposable
@@ -27,7 +25,7 @@ internal class AssemblyResolver : IDisposable
     /// Dictionary of Assemblies discovered to date. Must be locked as it may
     /// be accessed in a multi-threaded context.
     /// </summary>
-    private readonly Dictionary<string, Assembly> _resolvedAssemblies;
+    private readonly Dictionary<string, Assembly?> _resolvedAssemblies;
 
     /// <summary>
     /// Specifies whether the resolver is disposed or not
@@ -52,9 +50,11 @@ internal class AssemblyResolver : IDisposable
     {
         EqtTrace.Info($"AssemblyResolver.ctor: Creating AssemblyResolver with searchDirectories {string.Join(",", directories)}");
 
-        _resolvedAssemblies = new Dictionary<string, Assembly>();
+        _resolvedAssemblies = new Dictionary<string, Assembly?>();
 
-        _searchDirectories = directories == null || !directories.Any() ? new HashSet<string>() : new HashSet<string>(directories);
+        _searchDirectories = directories == null || !directories.Any()
+            ? new HashSet<string>()
+            : new HashSet<string>(directories);
 
         _platformAssemblyResolver = new PlatformAssemblyResolver();
         _platformAssemblyLoadContext = new PlatformAssemblyLoadContext();
@@ -83,9 +83,9 @@ internal class AssemblyResolver : IDisposable
     /// <returns>
     /// The <see cref="Assembly"/>.
     /// </returns>
-    private Assembly OnResolve(object sender, AssemblyResolveEventArgs args)
+    private Assembly? OnResolve(object sender, AssemblyResolveEventArgs args)
     {
-        if (string.IsNullOrEmpty(args?.Name))
+        if (StringUtils.IsNullOrEmpty(args?.Name))
         {
             Debug.Fail("AssemblyResolver.OnResolve: args.Name is null or empty.");
             return null;
@@ -108,7 +108,7 @@ internal class AssemblyResolver : IDisposable
                 return assembly;
             }
 
-            AssemblyName requestedName = null;
+            AssemblyName? requestedName = null;
             try
             {
                 // Can throw ArgumentException, FileLoadException if arg is empty/wrong format, etc. Should not return null.
@@ -122,11 +122,11 @@ internal class AssemblyResolver : IDisposable
                 return null;
             }
 
-            Debug.Assert(requestedName != null && !string.IsNullOrEmpty(requestedName.Name), "AssemblyResolver.OnResolve: requested is null or name is empty!");
+            TPDebug.Assert(!StringUtils.IsNullOrEmpty(requestedName?.Name), "AssemblyResolver.OnResolve: requested is null or name is empty!");
 
             foreach (var dir in _searchDirectories)
             {
-                if (string.IsNullOrEmpty(dir))
+                if (dir.IsNullOrEmpty())
                 {
                     continue;
                 }
@@ -194,10 +194,10 @@ internal class AssemblyResolver : IDisposable
     /// <returns>
     /// The <see cref="bool"/>.
     /// </returns>
-    private bool RequestedAssemblyNameMatchesFound(AssemblyName requestedName, AssemblyName foundName)
+    private static bool RequestedAssemblyNameMatchesFound(AssemblyName requestedName, AssemblyName foundName)
     {
-        Debug.Assert(requestedName != null);
-        Debug.Assert(foundName != null);
+        TPDebug.Assert(requestedName != null);
+        TPDebug.Assert(foundName != null);
 
         var requestedPublicKey = requestedName.GetPublicKeyToken();
         if (requestedPublicKey != null)

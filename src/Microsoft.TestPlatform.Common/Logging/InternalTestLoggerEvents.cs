@@ -3,16 +3,14 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
+#if NETFRAMEWORK
+using System.Configuration;
+#endif
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-
-#if NETFRAMEWORK
-using System.Configuration;
-#endif
 
 #nullable disable
 
@@ -386,7 +384,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
 #else
             null;
 #endif
-        if (string.IsNullOrEmpty(enableBoundsOnEventQueueIsDefined))
+        if (enableBoundsOnEventQueueIsDefined.IsNullOrEmpty())
         {
             enableBounds = TestPlatformDefaults.DefaultEnableBoundsOnLoggerEventQueue;
         }
@@ -405,7 +403,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// </summary>
     private static int FindTestResultSize(TestResultEventArgs args)
     {
-        Debug.Assert(args != null && args.Result != null);
+        TPDebug.Assert(args != null && args.Result != null);
 
         int size = 0;
 
@@ -413,7 +411,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
         {
             foreach (TestResultMessage msg in args.Result.Messages)
             {
-                if (!string.IsNullOrEmpty(msg.Text))
+                if (!msg.Text.IsNullOrEmpty())
                     size += msg.Text.Length;
             }
         }
@@ -433,7 +431,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
 #else
             null;
 #endif
-        if (string.IsNullOrEmpty(appSettingValue))
+        if (appSettingValue.IsNullOrEmpty())
         {
             value = defaultValue;
         }

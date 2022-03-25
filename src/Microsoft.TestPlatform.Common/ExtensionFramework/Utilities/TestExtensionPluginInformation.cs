@@ -75,13 +75,13 @@ internal abstract class TestExtensionPluginInformation : TestPluginInformation
         {
             ExtensionUriAttribute extensionUriAttribute = (ExtensionUriAttribute)attributes[0];
 
-            if (!string.IsNullOrEmpty(extensionUriAttribute.ExtensionUri))
+            if (!extensionUriAttribute.ExtensionUri.IsNullOrEmpty())
             {
                 extensionUri = extensionUriAttribute.ExtensionUri;
             }
         }
 
-        if (string.IsNullOrEmpty(extensionUri))
+        if (extensionUri.IsNullOrEmpty())
         {
             EqtTrace.Error("The type \"{0}\" defined in \"{1}\" does not have ExtensionUri attribute.", testLoggerType.ToString(), testLoggerType.GetTypeInfo().Module.Name);
         }

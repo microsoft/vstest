@@ -61,7 +61,7 @@ internal class TestRuntimePluginInformation : TestExtensionPluginInformation
         {
             FriendlyNameAttribute friendlyNameAttribute = (FriendlyNameAttribute)attributes[0];
 
-            if (!string.IsNullOrEmpty(friendlyNameAttribute.FriendlyName))
+            if (!friendlyNameAttribute.FriendlyName.IsNullOrEmpty())
             {
                 friendlyName = friendlyNameAttribute.FriendlyName;
             }

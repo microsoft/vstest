@@ -149,7 +149,7 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
 
     public bool SupportsIncrementalProcessing => _wrapper.SupportsIncrementalProcessing;
 
-    public IEnumerable<Uri>? GetExtensionUris() => _wrapper?.GetExtensionUris();
+    public IEnumerable<Uri>? GetExtensionUris() => _wrapper.GetExtensionUris();
 
     public async Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
     {

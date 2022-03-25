@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -137,7 +136,7 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
         if (friendlyNameAttributes != null && friendlyNameAttributes.Length > 0)
         {
             var friendlyNameAttribute = (DataCollectorFriendlyNameAttribute)friendlyNameAttributes[0];
-            if (!string.IsNullOrEmpty(friendlyNameAttribute.FriendlyName))
+            if (!StringUtils.IsNullOrEmpty(friendlyNameAttribute.FriendlyName))
             {
                 friendlyName = friendlyNameAttribute.FriendlyName;
             }
@@ -160,8 +159,8 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
     /// </returns>
     private static object[] GetAttributes(Type dataCollectorType, Type attributeType)
     {
-        Debug.Assert(dataCollectorType != null, "null dataCollectorType");
-        Debug.Assert(attributeType != null, "null attributeType");
+        TPDebug.Assert(dataCollectorType != null, "null dataCollectorType");
+        TPDebug.Assert(attributeType != null, "null attributeType");
 
         // If any attribute constructor on the type throws, the exception will bubble up through
         // the "GetCustomAttributes" method.

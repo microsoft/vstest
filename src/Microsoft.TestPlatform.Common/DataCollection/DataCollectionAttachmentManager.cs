@@ -5,7 +5,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -25,14 +24,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 /// <summary>
 /// Manages file transfer from data collector to test runner service.
-/// 
+///
 /// Events are handled sequentially so it's not possible have parallel AddAttachment/GetAttachments for the same DataCollectionContext.
 /// DataCollectionContext can be a session context(session start/end) or a test case context(test case start/end).
-/// 
+///
 /// We have two type of events that will fire a collection of files "session end" and "test case end".
 /// File are sent and copied/moved in parallel using async tasks, for these reason we need to use an async structure ConcurrentDictionary
 /// to be able to handle parallel test case start/end events(if host run tests in parallel).
-/// 
+///
 /// We could avoid to use ConcurrentDictionary for the list of the attachment sets of a specific DataCollectionContext, but
 /// we don't know how the user will implement the datacollector and they could send file out of events(wrong usage, no more expected sequential access AddAttachment->GetAttachments),
 /// so we prefer protect every collection. This not means that outcome will be "always correct"(file attached in a correct way) but at least we avoid exceptions.
@@ -106,7 +105,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
 
         _messageSink = messageSink;
 
-        if (string.IsNullOrEmpty(outputDirectory))
+        if (StringUtils.IsNullOrEmpty(outputDirectory))
         {
             SessionOutputDirectory = Path.Combine(Path.GetTempPath(), DefaultOutputDirectoryName, id.Id.ToString());
         }
@@ -167,7 +166,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     {
         ValidateArg.NotNull(fileTransferInfo, nameof(fileTransferInfo));
 
-        if (string.IsNullOrEmpty(SessionOutputDirectory))
+        if (StringUtils.IsNullOrEmpty(SessionOutputDirectory))
         {
             EqtTrace.Error("DataCollectionAttachmentManager.AddAttachment: Initialize not invoked.");
             return;
@@ -195,7 +194,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     }
 
     /// <summary>
-    /// Sanity checks on CopyRequestData 
+    /// Sanity checks on CopyRequestData
     /// </summary>
     /// <param name="fileTransferInfo">
     /// The file Transfer Info.
@@ -244,7 +243,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     private void AddNewFileTransfer(FileTransferInformation fileTransferInfo, AsyncCompletedEventHandler sendFileCompletedCallback, Uri uri, string friendlyName)
     {
         var context = fileTransferInfo.Context;
-        Debug.Assert(
+        TPDebug.Assert(
             context != null,
             "DataCollectionManager.AddNewFileTransfer: FileDataHeaderMessage with null context.");
 

@@ -183,7 +183,7 @@ internal class FilterExpression
         foreach (var inputToken in tokens)
         {
             var token = inputToken.Trim();
-            if (string.IsNullOrEmpty(token))
+            if (token.IsNullOrEmpty())
             {
                 // ignore empty tokens
                 continue;
