@@ -1,6 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Threading;
+
+using Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -13,15 +16,6 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 [TestClass]
 public class ExecutionPerfTests : TelemetryPerfTestbase
 {
-    private readonly IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private readonly RunEventHandler _runEventHandler;
-
-    public ExecutionPerfTests()
-    {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
-        _runEventHandler = new RunEventHandler();
-    }
-
     [TestMethod]
     [TestCategory("TelemetryPerf")]
     [DataRow("MSTest1Passing", 1)]
@@ -39,11 +33,30 @@ public class ExecutionPerfTests : TelemetryPerfTestbase
     public void RunTests(string projectName, long expectedNumberOfTests)
     {
         var framework = projectName.StartsWith("XUnit") ? "net452" : "net451";
+        var runEventHandler = new RunEventHandler();
         TestPlatformOptions options = new() { CollectMetrics = true };
-        _vstestConsoleWrapper.RunTests(GetPerfAssetFullPath(projectName, framework), GetDefaultRunSettings(), options, _runEventHandler);
 
-        Assert.AreEqual(expectedNumberOfTests, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
-        PostTelemetry(_runEventHandler.Metrics);
+        var perfAnalyzer = new PerfAnalyzer();
+        try
+        {
+            perfAnalyzer.EnableProvider();
+            var vstestConsoleWrapper = GetVsTestConsoleWrapper(logFileDir: null, traceLevel: System.Diagnostics.TraceLevel.Off);
+
+            vstestConsoleWrapper.RunTests(GetPerfAssetFullPath(projectName, framework), GetDefaultRunSettings(), options, runEventHandler);
+            vstestConsoleWrapper.EndSession();
+        }
+        finally
+        {
+            perfAnalyzer.DisableProvider(wait: expectedNumberOfTests > 100);
+        }
+
+        Assert.AreEqual(expectedNumberOfTests, runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
+
+        perfAnalyzer.AnalyzeEventsData();
+        var summary = perfAnalyzer.SummarizeExecution();
+
+        summary.ForEach(measurement => runEventHandler.Metrics[measurement.Key] = measurement.Value);
+        PostTelemetry(runEventHandler.Metrics);
     }
 
     [TestMethod]
@@ -63,13 +76,32 @@ public class ExecutionPerfTests : TelemetryPerfTestbase
     public void RunTestsWithDefaultAdaptersSkipped(string projectName, long expectedNumberOfTests)
     {
         var framework = projectName.StartsWith("XUnit") ? "net452" : "net451";
-        TestPlatformOptions options = new() {
+        var runEventHandler = new RunEventHandler();
+        TestPlatformOptions options = new()
+        {
             CollectMetrics = true,
             SkipDefaultAdapters = true, // <-- skipping adapters
         };
-        _vstestConsoleWrapper.RunTests(GetPerfAssetFullPath(projectName, framework), GetDefaultRunSettings(), options, _runEventHandler);
 
-        Assert.AreEqual(expectedNumberOfTests, _runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
-        PostTelemetry(_runEventHandler.Metrics);
+        var perfAnalyzer = new PerfAnalyzer();
+        try
+        {
+            perfAnalyzer.EnableProvider();
+            var vstestConsoleWrapper = GetVsTestConsoleWrapper(logFileDir: null, traceLevel: System.Diagnostics.TraceLevel.Off);
+            vstestConsoleWrapper.RunTests(GetPerfAssetFullPath(projectName, framework), GetDefaultRunSettings(), options, runEventHandler);
+            vstestConsoleWrapper.EndSession();
+        }
+        finally
+        {
+            perfAnalyzer.DisableProvider(wait: expectedNumberOfTests > 100);
+        }
+
+        Assert.AreEqual(expectedNumberOfTests, runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
+
+        perfAnalyzer.AnalyzeEventsData();
+        var summary = perfAnalyzer.SummarizeExecution();
+
+        summary.ForEach(measurement => runEventHandler.Metrics[measurement.Key] = measurement.Value);
+        PostTelemetry(runEventHandler.Metrics);
     }
 }

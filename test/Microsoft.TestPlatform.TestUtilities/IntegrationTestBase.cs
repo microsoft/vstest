@@ -537,21 +537,25 @@ public class IntegrationTestBase
     /// Returns the VsTestConsole Wrapper.
     /// </summary>
     /// <returns></returns>
-    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(TempDirectory logFileDir)
+    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(TempDirectory logFileDir, TraceLevel traceLevel = TraceLevel.Verbose)
     {
-        if (!Directory.Exists(logFileDir.Path))
+        string logFilePath = null;
+        if (traceLevel != TraceLevel.Off)
         {
-            Directory.CreateDirectory(logFileDir.Path);
-        }
+            if (!Directory.Exists(logFileDir.Path))
+            {
+                Directory.CreateDirectory(logFileDir.Path);
+            }
 
-        // Directory is already unique so there is no need to have a unique file name.
-        var logFilePath = Path.Combine(logFileDir.Path, "log.txt");
-        if (!File.Exists(logFilePath))
-        {
-            File.Create(logFilePath).Close();
-        }
+            // Directory is already unique so there is no need to have a unique file name.
+            logFilePath = Path.Combine(logFileDir.Path, "log.txt");
+            if (!File.Exists(logFilePath))
+            {
+                File.Create(logFilePath).Close();
+            }
 
-        Console.WriteLine($"Logging diagnostics in {logFilePath}");
+            Console.WriteLine($"Logging diagnostics in {logFilePath}");
+        }
 
         var consoleRunnerPath = IsNetCoreRunner()
             ? Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll")
@@ -564,7 +568,8 @@ public class IntegrationTestBase
             throw new FileNotFoundException($"File '{dotnetPath}' was not found.");
         }
 
-        var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath });
+        ConsoleParameters consoleParameters = traceLevel == TraceLevel.Off ? new() : new() { LogFilePath = logFilePath };
+        var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, consoleParameters);
         vstestConsoleWrapper.StartSession();
 
         return vstestConsoleWrapper;

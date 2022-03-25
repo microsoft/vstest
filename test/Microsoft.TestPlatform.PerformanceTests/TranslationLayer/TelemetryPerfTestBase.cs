@@ -8,8 +8,7 @@ using System.Runtime.CompilerServices;
 
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
-using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -18,7 +17,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 
 [TestClass]
-public class TelemetryPerfTestbase
+public class TelemetryPerfTestbase : PerformanceTestBase
 {
     private const string TelemetryInstrumentationKey = "08de1ac5-2db8-4c30-97c6-2e12695fa610";
     private readonly TelemetryClient _client;
@@ -79,42 +78,6 @@ public class TelemetryPerfTestbase
         }
 
         return new[] { dllPath };
-    }
-
-    /// <summary>
-    /// Returns the VsTestConsole Wrapper.
-    /// </summary>
-    /// <returns></returns>
-    public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
-    {
-        var vstestConsoleWrapper = new VsTestConsoleWrapper(GetConsoleRunnerPath(),
-            new ConsoleParameters
-            {
-                // Log into TEMP and use info level, becuase that is what is used by default under VS.
-                LogFilePath = Path.Combine(Path.GetTempPath(), "logs", "log.txt"),
-                TraceLevel = System.Diagnostics.TraceLevel.Info
-            });
-        vstestConsoleWrapper.StartSession();
-
-        return vstestConsoleWrapper;
-    }
-
-    private string BuildConfiguration
-    {
-        get
-        {
-#if DEBUG
-            return "Debug";
-#else
-            return "Release";
-#endif
-        }
-    }
-
-    private string GetConsoleRunnerPath()
-    {
-        // Path to artifacts vstest.console
-        return Path.Combine(_rootDirectory, "artifacts", BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
     }
 
     /// <summary>

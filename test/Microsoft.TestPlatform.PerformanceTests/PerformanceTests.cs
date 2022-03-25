@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Linq;
+
 using FluentAssertions;
 using FluentAssertions.Extensions;
 
-using Microsoft.TestPlatform.TestUtilities.PerfInstrumentation;
-
+using Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
+using Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable disable
@@ -16,22 +18,20 @@ namespace Microsoft.TestPlatform.PerformanceTests;
 /// The performance tests.
 /// </summary>
 [TestClass]
-public class PerformanceTests : PerformanceTestBase
+public class PerformanceTests : TelemetryPerfTestbase
 {
     [TestMethod]
-    public void ExecutionPerformanceTest()
+    [DataRow("MSTest1Passing", 1, 500)]
+    public void ExecutionPerformanceTest(string projectName, int expectedTestCount, int thresholdInMs)
     {
-        RunExecutionPerformanceTests(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty);
+        RunExecutionPerformanceTests(GetPerfAssetFullPath(projectName).Single(), GetTestAdapterPath(), string.Empty);
 
-        ValidateSummaryStatus(1, 1, 1);
-        ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
-        ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
-        ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
+        ValidateSummaryStatus(expectedTestCount, 0, 0);
 
         AnalyzePerfData();
         var actualExecutionTime = GetExecutionTime();
 
-        actualExecutionTime.Should().BeLessOrEqualTo(500.Milliseconds());
+        actualExecutionTime.Should().BeLessOrEqualTo(thresholdInMs.Milliseconds());
     }
 
     [TestMethod]

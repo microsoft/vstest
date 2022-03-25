@@ -4,9 +4,11 @@
 using System;
 using System.Collections.Generic;
 
+using Microsoft.TestPlatform.TestUtilities;
+
 #nullable disable
 
-namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation;
+namespace Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 
 /// <summary>
 /// The performance test base.
