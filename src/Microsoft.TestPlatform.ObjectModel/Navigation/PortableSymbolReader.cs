@@ -163,11 +163,10 @@ internal class PortableSymbolReader : ISymbolReader
     /// <exception cref="InvalidOperationException"></exception>
     private static PortablePdbReader CreatePortablePdbReaderFromPEData(string binaryPath)
     {
-        var peReader = new PEReader(new FileStream(binaryPath, FileMode.Open, FileAccess.Read));
+        using var dllStream = new FileStream(binaryPath, FileMode.Open, FileAccess.Read);
+        using var peReader = new PEReader(dllStream);
 
-        // (_) => null is stream reader factory for the pdb. We don't need that stream.
-        // out _ is the path to the found pdb, we also don't need that.
-        var hasPdb = peReader.TryOpenAssociatedPortablePdb(binaryPath, (_) => null, out MetadataReaderProvider mp, out _);
+        var hasPdb = peReader.TryOpenAssociatedPortablePdb(binaryPath, pdbPath => new FileStream(pdbPath, FileMode.Open, FileAccess.Read), out MetadataReaderProvider mp, pdbPath: out _);
 
         // The out parameters don't give additional info about the pdbFile in case it is not found. So we have few reasons to fail:
         if (!hasPdb)

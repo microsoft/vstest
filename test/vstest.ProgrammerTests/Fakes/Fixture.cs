@@ -23,6 +23,7 @@ internal class Fixture : IDisposable
     public FakeFileHelper FileHelper { get; }
     public FakeTestRuntimeProviderManager TestRuntimeProviderManager { get; }
     public FakeTestRunEventsRegistrar TestRunEventsRegistrar { get; }
+    public FakeEnvironment Environment { get; }
     public TestEngine? TestEngine { get; private set; }
     public TestPlatform? TestPlatform { get; private set; }
     public TestRunResultAggregator? TestRunResultAggregator { get; private set; }
@@ -33,7 +34,6 @@ internal class Fixture : IDisposable
     public TestRunAttachmentsProcessingManager? TestRunAttachmentsProcessingManager { get; private set; }
     public TestRequestManager? TestRequestManager { get; private set; }
     public List<TestResult> ExecutedTests => TestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults).ToList();
-
     public ProtocolConfig ProtocolConfig { get; internal set; }
 
     public Fixture()
@@ -56,6 +56,7 @@ internal class Fixture : IDisposable
         FileHelper = new FakeFileHelper(ErrorAggregator);
         TestRuntimeProviderManager = new FakeTestRuntimeProviderManager(ErrorAggregator);
         TestRunEventsRegistrar = new FakeTestRunEventsRegistrar(ErrorAggregator);
+        Environment = new FakeEnvironment();
         ProtocolConfig = new ProtocolConfig();
     }
     public void Dispose()
@@ -103,8 +104,8 @@ internal class Fixture : IDisposable
             InferHelper,
             fakeMetricsPublisherTask,
             ProcessHelper,
-            TestRunAttachmentsProcessingManager
-            );
+            TestRunAttachmentsProcessingManager,
+            Environment);
 
         TestRequestManager = testRequestManager;
 

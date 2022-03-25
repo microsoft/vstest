@@ -65,12 +65,12 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var taskCompletionSource = new TaskCompletionSource<Collection<AttachmentSet>>();
-            using (cancellationToken.Register(() => taskCompletionSource.TrySetCanceled()))
+            var cancelAttachmentProcessingCompletionSource = new TaskCompletionSource<Collection<AttachmentSet>>();
+            using (cancellationToken.Register(() => cancelAttachmentProcessingCompletionSource.TrySetCanceled()))
             {
                 Task<Collection<AttachmentSet>> task = Task.Run(async () => await ProcessAttachmentsAsync(runSettingsXml, new Collection<AttachmentSet>(attachments.ToList()), invokedDataCollector, eventHandler, cancellationToken));
 
-                var completedTask = await Task.WhenAny(task, taskCompletionSource.Task).ConfigureAwait(false);
+                var completedTask = await Task.WhenAny(task, cancelAttachmentProcessingCompletionSource.Task).ConfigureAwait(false);
 
                 if (completedTask == task)
                 {
@@ -83,8 +83,15 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
                 }
             }
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
+            // If it's OperationCanceledException of our cancellationToken we log like in case of cancelAttachmentProcessingCompletionSource
+            // there's a possible exception race task vs cancelAttachmentProcessingCompletionSource.Task
+            if (ex.CancellationToken == cancellationToken)
+            {
+                eventHandler?.HandleLogMessage(TestMessageLevel.Informational, "Attachments processing was cancelled.");
+            }
+
             EqtTrace.Warning("TestRunAttachmentsProcessingManager: Operation was cancelled.");
             return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(true, null), attachments, stopwatch, eventHandler);
         }
@@ -106,7 +113,9 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
         var dataCollectorAttachmentsProcessors = _dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollector?.ToArray(), logger);
         for (int i = 0; i < dataCollectorAttachmentsProcessors.Length; i++)
         {
-            var dataCollectorAttachmentsProcessor = dataCollectorAttachmentsProcessors[i];
+            // We need to dispose the DataCollectorAttachmentProcessor to unload the AppDomain for net451
+            using DataCollectorAttachmentProcessor dataCollectorAttachmentsProcessor = dataCollectorAttachmentsProcessors[i];
+
             int attachmentsHandlerIndex = i + 1;
 
             if (!dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.SupportsIncrementalProcessing)
@@ -147,7 +156,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
                             configuration = collectorConfiguration.Configuration;
                         }
 
-                        EqtTrace.Info($"TestRunAttachmentsProcessingManager: Invocation of data collector attachment processor '{dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName}' with configuration '{(configuration == null ? "null" : configuration.OuterXml)}'");
+                        EqtTrace.Info($"TestRunAttachmentsProcessingManager: Invocation of data collector attachment processor AssemblyQualifiedName: '{dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName}' FriendlyName: '{dataCollectorAttachmentsProcessor.FriendlyName}' with configuration '{(configuration == null ? "null" : configuration.OuterXml)}'");
                         ICollection<AttachmentSet> processedAttachments = await dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.ProcessAttachmentSetsAsync(
                             configuration,
                             new Collection<AttachmentSet>(attachmentsToBeProcessed),

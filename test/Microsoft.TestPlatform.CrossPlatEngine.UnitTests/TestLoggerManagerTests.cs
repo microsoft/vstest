@@ -1631,7 +1631,7 @@ public class TestLoggerManagerTests
     {
         public static int Counter;
 
-        public void Initialize(TestLoggerEvents events, string testRunDirectory)
+        public void Initialize(TestLoggerEvents _, string _2)
         {
             Counter++;
         }

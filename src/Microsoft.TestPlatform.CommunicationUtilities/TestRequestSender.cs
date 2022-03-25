@@ -84,7 +84,7 @@ public class TestRequestSender : ITestRequestSender
     internal TestRequestSender(
         ITestRuntimeProvider runtimeProvider,
         ICommunicationEndPoint communicationEndPoint,
-        TestHostConnectionInfo connectionInfo,
+        TestHostConnectionInfo testhostConnectionInfo,
         IDataSerializer serializer,
         ProtocolConfig protocolConfig,
         int clientExitedWaitTime)
@@ -97,18 +97,21 @@ public class TestRequestSender : ITestRequestSender
 
         _highestSupportedVersion = protocolConfig.Version;
 
-        // The connectionInfo here is that of RuntimeProvider, so reverse the role of runner.
+
         _runtimeProvider = runtimeProvider;
 
         // TODO: In various places TestRequest sender is instantiated, and we can't easily inject the factory, so this is last
         // resort of getting the dependency into the execution flow.
         _communicationEndpoint = communicationEndPoint
 #if DEBUG
-            ?? TestServiceLocator.Get<ICommunicationEndPoint>(connectionInfo.Endpoint)
+            ?? TestServiceLocator.Get<ICommunicationEndPoint>(testhostConnectionInfo.Endpoint)
 #endif
-            ?? SetCommunicationEndPoint();
-        _connectionInfo.Endpoint = connectionInfo.Endpoint;
-        _connectionInfo.Role = connectionInfo.Role == ConnectionRole.Host
+            ?? SetCommunicationEndPoint(testhostConnectionInfo);
+
+        // The connectionInfo here is what is provided to testhost, but we are in runner, and so the role needs
+        // to be reversed. If testhost starts as client, then runner must be host, and in reverse.
+        _connectionInfo.Endpoint = testhostConnectionInfo.Endpoint;
+        _connectionInfo.Role = testhostConnectionInfo.Role == ConnectionRole.Host
             ? ConnectionRole.Client
             : ConnectionRole.Host;
     }
@@ -325,7 +328,7 @@ public class TestRequestSender : ITestRequestSender
         _messageEventHandler = eventHandler;
         _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
 
-        _onMessageReceived = (sender, args) => OnExecutionMessageReceived(sender, args, eventHandler);
+        _onMessageReceived = (sender, args) => OnExecutionMessageReceived(args, eventHandler);
         _channel.MessageReceived += _onMessageReceived;
 
         // This code section is needed because we altered the old testhost launch process for
@@ -368,7 +371,7 @@ public class TestRequestSender : ITestRequestSender
         _messageEventHandler = eventHandler;
         _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
 
-        _onMessageReceived = (sender, args) => OnExecutionMessageReceived(sender, args, eventHandler);
+        _onMessageReceived = (sender, args) => OnExecutionMessageReceived(args, eventHandler);
         _channel.MessageReceived += _onMessageReceived;
 
         // This code section is needed because we altered the old testhost launch process for
@@ -479,7 +482,7 @@ public class TestRequestSender : ITestRequestSender
         GC.SuppressFinalize(this);
     }
 
-    private void OnExecutionMessageReceived(object sender, MessageReceivedEventArgs messageReceived, ITestRunEventsHandler testRunEventsHandler)
+    private void OnExecutionMessageReceived(MessageReceivedEventArgs messageReceived, ITestRunEventsHandler testRunEventsHandler)
     {
         try
         {
@@ -732,10 +735,12 @@ public class TestRequestSender : ITestRequestSender
         Interlocked.CompareExchange(ref _operationCompleted, 1, 0);
     }
 
-    private ICommunicationEndPoint SetCommunicationEndPoint()
+    private ICommunicationEndPoint SetCommunicationEndPoint(TestHostConnectionInfo testhostConnectionInfo)
     {
         // TODO: Use factory to get the communication endpoint. It will abstract out the type of communication endpoint like socket, shared memory or named pipe etc.,
-        if (_connectionInfo.Role == ConnectionRole.Client)
+        // The connectionInfo here is what is provided to testhost, but we are in runner, and so the role needs
+        // to be reversed. If testhost starts as client, then runner must be host, and in reverse.
+        if (testhostConnectionInfo.Role != ConnectionRole.Client)
         {
             EqtTrace.Verbose("TestRequestSender is acting as client.");
             return new SocketClient();

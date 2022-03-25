@@ -124,21 +124,23 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
-        var sources = new List<string>
-        {
-            Path.Combine(_testEnvironment.TestAssetsPath, "test.js")
-        };
+        var jsSource = Path.Combine(_testEnvironment.TestAssetsPath, "test.js");
+
+        // Chuzpah adapter creates _Chutzpah temp files, to give data back from the runner.
+        // But when cleaning up it deletes all the _Chutzpah files, not just the one it owns,
+        // so when we run in parallel, the slower process will never find it's own file, because it was already deleted:
+        // https://github.com/mmanela/chutzpah/issues/812
+        var jsInTemp = TempDirectory.CopyFile(jsSource);
 
         var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(UnitTestFramework.Chutzpah), "*.TestAdapter.dll").ToList();
         _vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
 
         _vstestConsoleWrapper.RunTests(
-            sources,
+            new[] { jsInTemp },
             GetDefaultRunSettings(),
             _runEventHandler);
 
-        var testCase =
-            _runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("TestMethod1"));
+        var testCase = _runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("TestMethod1"));
 
         // Assert
         Assert.AreEqual(2, _runEventHandler.TestResults.Count);

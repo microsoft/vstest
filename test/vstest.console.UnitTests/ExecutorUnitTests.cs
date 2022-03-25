@@ -6,11 +6,14 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -40,7 +43,7 @@ public class ExecutorUnitTests
     public void ExecutorPrintsSplashScreenTest()
     {
         var mockOutput = new MockOutput();
-        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object).Execute("/badArgument");
+        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute("/badArgument");
         var assemblyVersion = typeof(Executor).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
         Assert.AreEqual(1, exitCode, "Exit code must be One for bad arguments");
@@ -64,7 +67,7 @@ public class ExecutorUnitTests
     public void ExecutorShouldNotPrintsSplashScreenIfNoLogoPassed()
     {
         var mockOutput = new MockOutput();
-        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object).Execute("--nologo");
+        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute("--nologo");
 
         Assert.AreEqual(1, exitCode, "Exit code must be One for bad arguments");
 
@@ -82,7 +85,7 @@ public class ExecutorUnitTests
     public void ExecutorShouldSanitizeNoLogoInput()
     {
         var mockOutput = new MockOutput();
-        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object).Execute("--nologo");
+        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute("--nologo");
 
         Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
 
@@ -96,7 +99,7 @@ public class ExecutorUnitTests
     public void ExecutorEmptyArgsPrintsErrorAndHelpMessage()
     {
         var mockOutput = new MockOutput();
-        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object).Execute(null);
+        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute(null);
 
         Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
 
@@ -108,7 +111,7 @@ public class ExecutorUnitTests
     {
         var mockOutput = new MockOutput();
         string badArg = "/badArgument";
-        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object).Execute(badArg);
+        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute(badArg);
 
         Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
 
@@ -120,7 +123,7 @@ public class ExecutorUnitTests
     {
         var mockOutput = new MockOutput();
         string badArg = "--invalidArg";
-        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object).Execute(badArg);
+        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute(badArg);
 
         Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
 
@@ -132,7 +135,7 @@ public class ExecutorUnitTests
     {
         var mockOutput = new MockOutput();
         string badArg = "--invalidArg:xyz";
-        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object).Execute(badArg);
+        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute(badArg);
 
         Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
 
@@ -146,7 +149,7 @@ public class ExecutorUnitTests
     public void ExecuteShouldInitializeDefaultRunsettings()
     {
         var mockOutput = new MockOutput();
-        _ = new Executor(mockOutput, _mockTestPlatformEventSource.Object).Execute(null);
+        _ = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute(null);
         RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
         Assert.AreEqual(Constants.DefaultResultsDirectory, runConfiguration.ResultsDirectory);
         Assert.AreEqual(Framework.DefaultFramework.ToString(), runConfiguration.TargetFramework.ToString());
@@ -157,7 +160,7 @@ public class ExecutorUnitTests
     public void ExecuteShouldInstrumentVsTestConsoleStart()
     {
         var mockOutput = new MockOutput();
-        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object).Execute(It.IsAny<string[]>());
+        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute(It.IsAny<string[]>());
 
         _mockTestPlatformEventSource.Verify(x => x.VsTestConsoleStart(), Times.Once);
     }
@@ -166,7 +169,7 @@ public class ExecutorUnitTests
     public void ExecuteShouldInstrumentVsTestConsoleStop()
     {
         var mockOutput = new MockOutput();
-        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object).Execute(It.IsAny<string[]>());
+        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute(It.IsAny<string[]>());
 
         _mockTestPlatformEventSource.Verify(x => x.VsTestConsoleStop(), Times.Once);
     }
@@ -177,7 +180,7 @@ public class ExecutorUnitTests
         string[] args = { "@FileDoesNotExist.rsp" };
         var mockOutput = new MockOutput();
 
-        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object).Execute(args);
+        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute(args);
 
         var errorMessageCount = mockOutput.Messages.Count(msg => msg.Level == OutputLevel.Error && msg.Message.Contains(
             string.Format(CultureInfo.CurrentCulture, CommandLineResources.OpenResponseFileError, args[0].Substring(1))));
@@ -212,7 +215,7 @@ public class ExecutorUnitTests
             string[] args = { testSourceDllPath, "/settings:" + runSettingsFile };
             var mockOutput = new MockOutput();
 
-            var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object).Execute(args);
+            var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute(args);
 
             var result = mockOutput.Messages.Any(o => o.Level == OutputLevel.Error && o.Message.Contains("Invalid settings 'Logger'. Unexpected XmlAttribute: 'invalidName'."));
             Assert.IsTrue(result, "expecting error message : Invalid settings 'Logger'.Unexpected XmlAttribute: 'invalidName'.");
@@ -250,7 +253,7 @@ public class ExecutorUnitTests
             string[] args = { "/settings:" + runSettingsFile };
             var mockOutput = new MockOutput();
 
-            var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object).Execute(args);
+            var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute(args);
 
             Assert.AreEqual(1, exitCode, "Exit code should be one because it throws exception");
         }
@@ -285,7 +288,7 @@ public class ExecutorUnitTests
             string[] args = { "/settings:" + runSettingsFile };
             var mockOutput = new MockOutput();
 
-            var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object).Execute(args);
+            var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute(args);
 
             var result = mockOutput.Messages.Any(o => o.Level == OutputLevel.Error && o.Message.Contains("Invalid setting 'RunConfiguration'. Invalid value 'Invalid' specified for 'TargetPlatform'."));
             Assert.AreEqual(1, exitCode, "Exit code should be one because it throws exception");
@@ -296,6 +299,46 @@ public class ExecutorUnitTests
             File.Delete(runSettingsFile);
             RunSettingsManager.Instance.SetActiveRunSettings(activeRunSetting);
         }
+    }
+
+    [TestMethod]
+    [TestCategory("Windows")]
+    public void ExecutorShouldPrintWarningIfRunningEmulatedOnARM64()
+    {
+        var mockOutput = new MockOutput();
+        Mock<IProcessHelper> processHelper = new();
+        processHelper.Setup(x => x.GetCurrentProcessArchitecture()).Returns(PlatformArchitecture.X64);
+        processHelper.Setup(x => x.GetCurrentProcessId()).Returns(0);
+        processHelper.Setup(x => x.GetCurrentProcessFileName()).Returns(@"X:\vstest.console.exe");
+        Mock<IEnvironment> environment = new();
+        environment.Setup(x => x.Architecture).Returns(PlatformArchitecture.ARM64);
+
+        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, processHelper.Object, environment.Object).Execute();
+        var assemblyVersion = typeof(Executor).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+
+        Assert.AreEqual(5, mockOutput.Messages.Count);
+        Assert.AreEqual("vstest.console.exe is running in emulated mode as x64. For better performance, please consider using the native runner vstest.console.arm64.exe.",
+            mockOutput.Messages[2].Message);
+        Assert.AreEqual(OutputLevel.Warning,
+            mockOutput.Messages[2].Level);
+    }
+
+    [TestMethod]
+    public void ExecutorShouldPrintRunnerArchitecture()
+    {
+        var mockOutput = new MockOutput();
+        Mock<IProcessHelper> processHelper = new();
+        processHelper.Setup(x => x.GetCurrentProcessArchitecture()).Returns(PlatformArchitecture.X64);
+        processHelper.Setup(x => x.GetCurrentProcessId()).Returns(0);
+        Mock<IEnvironment> environment = new();
+        environment.Setup(x => x.Architecture).Returns(PlatformArchitecture.X64);
+
+        var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, processHelper.Object, environment.Object).Execute();
+        var assemblyVersion = typeof(Executor).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+
+        Assert.AreEqual(4, mockOutput.Messages.Count);
+        Assert.IsTrue(Regex.IsMatch(mockOutput.Messages[0].Message, @"Microsoft \(R\) Test Execution Command Line Tool Version .* \(x64\)"));
+        Assert.IsFalse(mockOutput.Messages.Any(message => message.Message.Contains("vstest.console.exe is running in emulated mode")));
     }
 
     private class MockOutput : IOutput

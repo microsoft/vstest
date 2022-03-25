@@ -56,6 +56,7 @@ public class TestRequestManagerTests
     private readonly Mock<IMetricsPublisher> _mockMetricsPublisher;
     private readonly Mock<IProcessHelper> _mockProcessHelper;
     private readonly Mock<ITestRunAttachmentsProcessingManager> _mockAttachmentsProcessingManager;
+    private readonly Mock<IEnvironment> _mockEnvironment;
 
     private const string DefaultRunsettings = @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
@@ -76,6 +77,7 @@ public class TestRequestManagerTests
         _inferHelper = new InferHelper(_mockAssemblyMetadataProvider.Object);
         var testRunResultAggregator = new DummyTestRunResultAggregator();
         _mockProcessHelper = new Mock<IProcessHelper>();
+        _mockEnvironment = new Mock<IEnvironment>();
 
         _mockMetricsPublisher = new Mock<IMetricsPublisher>();
         _mockMetricsPublisherTask = Task.FromResult(_mockMetricsPublisher.Object);
@@ -88,7 +90,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
         _mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>()))
             .Returns(_mockDiscoveryRequest.Object);
         _mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>()))
@@ -122,7 +125,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
         Assert.IsFalse(_mockLoggerEvents.EventsSubscribed());
     }
@@ -202,7 +206,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
         _testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, _protocolConfig);
 
@@ -252,7 +257,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
         // Act
         _testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
@@ -300,7 +306,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
 
         // Act
@@ -349,7 +356,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
 
         // Act
@@ -392,7 +400,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
 
         // Act
@@ -435,7 +444,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
 
         // Act
@@ -478,7 +488,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
         CommandLineOptions.Instance.Parallel = true;
         CommandLineOptions.Instance.EnableCodeCoverage = true;
@@ -533,7 +544,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
         CommandLineOptions.Instance.SettingsFile = @"c://temp/.testsettings";
 
@@ -580,7 +592,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
         CommandLineOptions.Instance.SettingsFile = @"c://temp/.vsmdi";
 
@@ -627,7 +640,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
         CommandLineOptions.Instance.SettingsFile = @"c://temp/.testrunConfig";
 
@@ -925,7 +939,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
         CommandLineOptions.Instance.Parallel = true;
         CommandLineOptions.Instance.EnableCodeCoverage = true;
@@ -989,7 +1004,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
         // Act.
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
@@ -1036,7 +1052,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
         // Act.
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
@@ -1081,7 +1098,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
         // Act.
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
@@ -1128,7 +1146,8 @@ public class TestRequestManagerTests
             _inferHelper,
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
-            _mockAttachmentsProcessingManager.Object);
+            _mockAttachmentsProcessingManager.Object,
+            _mockEnvironment.Object);
 
         _testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, _protocolConfig);
 
