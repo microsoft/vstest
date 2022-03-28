@@ -19,7 +19,7 @@
     <IsTestProject>false</IsTestProject>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) OR '$(TargetFramework)' != 'net6.0' ">
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) != 'true' AND '$(TargetFramework)' != 'net6.0' ">
     <RuntimeIdentifier Condition="'$(DotNetBuildFromSource)' != 'true'">win7-x86</RuntimeIdentifier>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <TargetName Condition="'$(TargetFramework)' != 'net451'">$(AssemblyName.Replace('.x86', '')).$(TargetFramework).x86</TargetName>
