@@ -18,6 +18,7 @@ using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 namespace Microsoft.TestPlatform.PerformanceTests;
 
 [TestClass]
+[Ignore("The timing can vary significantly based on the system running the test. Convert them to report the results and not fail.")]
 public class ProtocolV1Tests
 {
     private static readonly TestCase TestCase = new(

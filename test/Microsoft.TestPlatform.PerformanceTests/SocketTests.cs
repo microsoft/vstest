@@ -18,6 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.PerformanceTests;
 
 [TestClass]
+[Ignore("The timing can vary significantly based on the system running the test. Convert them to report the results and not fail.")]
 public class SocketTests
 {
     [TestMethod]
