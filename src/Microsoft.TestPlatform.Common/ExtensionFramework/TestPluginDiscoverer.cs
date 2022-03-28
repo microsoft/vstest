@@ -221,7 +221,7 @@ internal class TestPluginDiscoverer
         }
 
         var rawPluginInfo = Activator.CreateInstance(typeof(TPluginInfo), type);
-        var pluginInfo = (TPluginInfo)rawPluginInfo;
+        var pluginInfo = (TPluginInfo)rawPluginInfo!;
         pluginInfo.FilePath = filePath;
 
         if (pluginInfo == null || pluginInfo.IdentifierData == null)

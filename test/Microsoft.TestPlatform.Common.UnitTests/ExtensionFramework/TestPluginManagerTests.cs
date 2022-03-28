@@ -17,8 +17,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.ExtensionFramework;
 
 [TestClass]
@@ -27,7 +25,7 @@ public class TestPluginManagerTests
     [TestMethod]
     public void GetTestExtensionTypeShouldReturnExtensionType()
     {
-        var type = TestPluginManager.GetTestExtensionType(typeof(TestPluginManagerTests).AssemblyQualifiedName);
+        var type = TestPluginManager.GetTestExtensionType(typeof(TestPluginManagerTests).AssemblyQualifiedName!);
 
         Assert.AreEqual(typeof(TestPluginManagerTests), type);
     }
@@ -50,23 +48,6 @@ public class TestPluginManagerTests
     public void CreateTestExtensionShouldThrowIfInstanceCannotBeCreated()
     {
         Assert.ThrowsException<MissingMethodException>(() => TestPluginManager.CreateTestExtension<ITestLogger>(typeof(AbstractDummyLogger)));
-    }
-
-    [TestMethod]
-    public void InstanceShouldReturnTestPluginManagerInstance()
-    {
-        var instance = TestPluginManager.Instance;
-
-        Assert.IsNotNull(instance);
-        Assert.IsTrue(instance is TestPluginManager);
-    }
-
-    [TestMethod]
-    public void InstanceShouldReturnCachedTestPluginManagerInstance()
-    {
-        var instance = TestPluginManager.Instance;
-
-        Assert.AreEqual(instance, TestPluginManager.Instance);
     }
 
     [TestMethod]

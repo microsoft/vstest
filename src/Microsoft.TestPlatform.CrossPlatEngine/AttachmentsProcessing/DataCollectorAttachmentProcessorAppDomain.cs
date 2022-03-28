@@ -39,21 +39,16 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
 {
     private readonly string _pipeShutdownMessagePrefix = Guid.NewGuid().ToString();
     private readonly DataCollectorAttachmentProcessorRemoteWrapper _wrapper;
-    private readonly InvokedDataCollector _invokedDataCollector;
     private readonly AppDomain _appDomain;
     private readonly IMessageLogger? _dataCollectorAttachmentsProcessorsLogger;
     private readonly Task _pipeServerReadTask;
     private readonly AnonymousPipeClientStream _pipeClientStream;
 
-    public bool LoadSucceded { get; private set; }
-    public string? AssemblyQualifiedName => _wrapper.AssemblyQualifiedName;
-    public string? FriendlyName => _wrapper.FriendlyName;
     private IMessageLogger? _processAttachmentSetsLogger;
     private IProgress<int>? _progressReporter;
 
-    public DataCollectorAttachmentProcessorAppDomain(InvokedDataCollector invokedDataCollector!!, IMessageLogger dataCollectorAttachmentsProcessorsLogger)
+    public DataCollectorAttachmentProcessorAppDomain(InvokedDataCollector invokedDataCollector!!, IMessageLogger? dataCollectorAttachmentsProcessorsLogger)
     {
-        _invokedDataCollector = invokedDataCollector;
         _appDomain = AppDomain.CreateDomain(invokedDataCollector.Uri.ToString());
         _dataCollectorAttachmentsProcessorsLogger = dataCollectorAttachmentsProcessorsLogger;
         _wrapper = (DataCollectorAttachmentProcessorRemoteWrapper)_appDomain.CreateInstanceFromAndUnwrap(
@@ -67,19 +62,14 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
             null);
 
         _pipeClientStream = new AnonymousPipeClientStream(PipeDirection.In, _wrapper.GetClientHandleAsString());
-        _pipeServerReadTask = Task.Run(() => PipeReaderTask());
+        _pipeServerReadTask = Task.Run(PipeReaderTask);
 
         EqtTrace.Verbose($"DataCollectorAttachmentProcessorAppDomain.ctor: AppDomain '{_appDomain.FriendlyName}' created to host assembly '{invokedDataCollector.FilePath}'");
 
-        InitExtension();
-    }
-
-    private void InitExtension()
-    {
         try
         {
-            LoadSucceded = _wrapper.LoadExtension(_invokedDataCollector.FilePath, _invokedDataCollector.Uri);
-            EqtTrace.Verbose($"DataCollectorAttachmentProcessorAppDomain.ctor: Extension '{_invokedDataCollector.Uri}' loaded. LoadSucceded: {LoadSucceded} AssemblyQualifiedName: '{AssemblyQualifiedName}' HasAttachmentProcessor: '{HasAttachmentProcessor}' FriendlyName: '{FriendlyName}'");
+            _wrapper.LoadExtension(invokedDataCollector);
+            EqtTrace.Verbose($"DataCollectorAttachmentProcessorAppDomain.ctor: Extension '{invokedDataCollector.Uri}' loaded. AssemblyQualifiedName: '{AssemblyQualifiedName}' AttachmentProcessorLoaded: '{AttachmentProcessorLoaded}' FriendlyName: '{FriendlyName}'");
         }
         catch (Exception ex)
         {
@@ -145,7 +135,9 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
         }
     }
 
-    public bool HasAttachmentProcessor => _wrapper.HasAttachmentProcessor;
+    public string? AssemblyQualifiedName => _wrapper.AssemblyQualifiedName;
+    public string? FriendlyName => _wrapper.FriendlyName;
+    public bool AttachmentProcessorLoaded => _wrapper.AttachmentProcessorLoaded;
 
     public bool SupportsIncrementalProcessing => _wrapper.SupportsIncrementalProcessing;
 
@@ -154,7 +146,7 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
     public async Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
     {
         // We register the cancellation and we call cancel inside the AppDomain
-        cancellationToken.Register(() => _wrapper.CancelProcessAttachment());
+        cancellationToken.Register(_wrapper.CancelProcessAttachment);
         _processAttachmentSetsLogger = logger;
         _progressReporter = progressReporter;
         return JsonDataSerializer.Instance.Deserialize<AttachmentSet[]>(await Task.Run(() => _wrapper.ProcessAttachment(configurationElement.OuterXml, JsonDataSerializer.Instance.Serialize(attachments.ToArray()))).ConfigureAwait(false));

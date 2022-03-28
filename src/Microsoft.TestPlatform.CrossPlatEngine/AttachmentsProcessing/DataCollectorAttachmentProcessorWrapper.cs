@@ -13,7 +13,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
-using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -41,9 +40,7 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
 
     public string? FriendlyName { get; private set; }
 
-    public bool LoadSucceded { get; private set; }
-
-    public bool HasAttachmentProcessor { get; private set; }
+    public bool AttachmentProcessorLoaded => _dataCollectorAttachmentProcessorInstance != null;
 
     public DataCollectorAttachmentProcessorRemoteWrapper(string pipeShutdownMessagePrefix!!)
     {
@@ -81,34 +78,23 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
 
     public void CancelProcessAttachment() => _processAttachmentCts?.Cancel();
 
-    public bool LoadExtension(string filePath, Uri dataCollectorUri)
+    public void LoadExtension(InvokedDataCollector dataCollector)
     {
-        var dataCollectorExtensionManager = DataCollectorExtensionManager.Create(filePath, true, new MessageLogger(this, nameof(LoadExtension)));
-        var dataCollectorExtension = dataCollectorExtensionManager.TryGetTestExtension(dataCollectorUri);
-        if (dataCollectorExtension is null || dataCollectorExtension?.Metadata.HasAttachmentProcessor == false)
-        {
-            TraceInfo($"DataCollectorAttachmentsProcessorsFactory: DataCollectorExtension not found for uri '{dataCollectorUri}'");
-            return false;
-        }
+        DataCollectorAttachmentsProcessorsFactory.TryLoadExtension(
+            dataCollector,
+            filePath => DataCollectorExtensionManager.Create(filePath, true, new MessageLogger(this, nameof(LoadExtension))),
+            TraceInfo,
+            errorMsg =>
+            {
+                TraceError(errorMsg);
+                SendMessage(nameof(LoadExtension), TestMessageLevel.Error, errorMsg);
+            },
+            out var friendlyName,
+            out var assemblyQualifiedName,
+            out _dataCollectorAttachmentProcessorInstance);
 
-        Type attachmentProcessorType = ((DataCollectorConfig)dataCollectorExtension!.TestPluginInfo).AttachmentsProcessorType;
-        try
-        {
-            _dataCollectorAttachmentProcessorInstance = TestPluginManager.CreateTestExtension<IDataCollectorAttachmentProcessor>(attachmentProcessorType);
-            AssemblyQualifiedName = attachmentProcessorType.AssemblyQualifiedName;
-            FriendlyName = dataCollectorExtension.Metadata.FriendlyName;
-            LoadSucceded = true;
-            HasAttachmentProcessor = true;
-            TraceInfo($"DataCollectorAttachmentProcessorWrapper.LoadExtension: Creation of collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}' from file '{filePath}' succeded");
-            return true;
-        }
-        catch (Exception ex)
-        {
-            TraceError($"DataCollectorAttachmentProcessorWrapper.LoadExtension: Failed during the creation of data collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}'\n{ex}");
-            SendMessage(nameof(LoadExtension), TestMessageLevel.Error, $"DataCollectorAttachmentProcessorWrapper.LoadExtension: Failed during the creation of data collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}'\n{ex}");
-        }
-
-        return false;
+        AssemblyQualifiedName = assemblyQualifiedName;
+        FriendlyName = friendlyName;
     }
 
     private void TraceError(string message) => Trace(AppDomainPipeMessagePrefix.EqtTraceError, message);
@@ -151,7 +137,7 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
         _pipeServerStream.WaitForPipeDrain();
     }
 
-    class MessageLogger : IMessageLogger
+    private class MessageLogger : IMessageLogger
     {
         private readonly string _name;
         private readonly DataCollectorAttachmentProcessorRemoteWrapper _wrapper;
@@ -166,7 +152,7 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
             => _wrapper.SendMessage(_name, testMessageLevel, message);
     }
 
-    class SynchronousProgress : IProgress<int>
+    private class SynchronousProgress : IProgress<int>
     {
         private readonly Action<int> _report;
 

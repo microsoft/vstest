@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 /// <summary>
 /// Represents a scope context for resolving assemblies and their dependencies.
 /// </summary>
-internal class PluginLoadContext : AssemblyLoadContext, IAssemblyLoadContext
+internal sealed class PluginLoadContext : AssemblyLoadContext, IAssemblyLoadContext, IDisposable
 {
     private readonly AssemblyDependencyResolver _resolver;
     private readonly IPlatformEqtTrace _platformEqtTrace;
@@ -33,6 +33,12 @@ internal class PluginLoadContext : AssemblyLoadContext, IAssemblyLoadContext
     {
         _resolver = new AssemblyDependencyResolver(pluginPath);
         _platformEqtTrace = platformEqtTrace;
+    }
+
+    public void Dispose()
+    {
+        // We implement IDisposable to give a clearer insight to callers that we need to unload.
+        Unload();
     }
 
     public AssemblyName GetAssemblyNameFromPath(string assemblyPath)

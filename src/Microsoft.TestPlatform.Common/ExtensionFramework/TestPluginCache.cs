@@ -27,7 +27,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 /// <remarks>Making this a singleton to offer better unit testing.</remarks>
 public class TestPluginCache
 {
+    private static TestPluginCache s_instance;
+
+    private readonly List<string> _defaultExtensionPaths = new();
+    private readonly IAssemblyLoadContext _assemblyLoadContext;
     private readonly Dictionary<string, Assembly> _resolvedAssemblies;
+
+    /// <summary>
+    /// Lock for extensions update
+    /// </summary>
+    private readonly object _lockForExtensionsUpdate;
 
     private List<string> _filterableExtensionPaths;
     private List<string> _unfilterableExtensionPaths;
@@ -38,37 +47,34 @@ public class TestPluginCache
     private AssemblyResolver _assemblyResolver;
 
     /// <summary>
-    /// Lock for extensions update
+    /// Initializes a new instance of the <see cref="TestPluginCache"/> class.
     /// </summary>
-    private readonly object _lockForExtensionsUpdate;
-
-    private static TestPluginCache s_instance;
-
-    private readonly List<string> _defaultExtensionPaths = new();
+    protected TestPluginCache()
+        : this(null)
+    {
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestPluginCache"/> class.
     /// </summary>
-    protected TestPluginCache()
+    /// <param name="assemblyLoadContext">The assembly load context instance to use or null to use the default context.</param>
+    internal TestPluginCache(IAssemblyLoadContext assemblyLoadContext = null)
     {
         _resolvedAssemblies = new Dictionary<string, Assembly>();
         _filterableExtensionPaths = new List<string>();
         _unfilterableExtensionPaths = new List<string>();
         _lockForExtensionsUpdate = new object();
         TestExtensions = null;
+        // We allow null value because when passing null to the TestPluginDiscoverer it new up the
+        // correct instance. But we could also prevent null on TestPluginDiscoverer and instanciate
+        // the PlatformAssemblyLoadContext here.
+        _assemblyLoadContext = assemblyLoadContext;
     }
 
     public static TestPluginCache Instance
     {
-        get
-        {
-            return s_instance ??= new TestPluginCache();
-        }
-
-        internal set
-        {
-            s_instance = value;
-        }
+        get => s_instance ??= new TestPluginCache();
+        internal set => s_instance = value;
     }
 
     /// <summary>
@@ -460,7 +466,7 @@ public class TestPluginCache
             SetupAssemblyResolver(extensionPath);
         }
 
-        return new TestPluginDiscoverer().GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths);
+        return new TestPluginDiscoverer(_assemblyLoadContext).GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths);
     }
 
     protected void SetupAssemblyResolver(string extensionAssembly)

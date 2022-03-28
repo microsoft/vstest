@@ -25,13 +25,14 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
 public class DataCollectorAttachmentProcessorAppDomainTests
 {
     private readonly Mock<IMessageLogger> _loggerMock = new();
-    internal static string SomeState = "deafultState";
+    internal static string SomeState = "defaultState";
 
     [TestMethod]
     public async Task DataCollectorAttachmentProcessorAppDomain_ShouldBeIsolated()
     {
         // arrange
-        var invokedDataCollector = new InvokedDataCollector(new Uri("datacollector://AppDomainSample"), "AppDomainSample", typeof(AppDomainSampleDataCollector).AssemblyQualifiedName, typeof(AppDomainSampleDataCollector).Assembly.Location, true);
+        var invokedDataCollector = new InvokedDataCollector(new Uri("datacollector://AppDomainSample"), "AppDomainSample",
+            typeof(AppDomainSampleDataCollector).AssemblyQualifiedName, typeof(AppDomainSampleDataCollector).Assembly.Location, true);
         var attachmentSet = new AttachmentSet(new Uri("datacollector://AppDomainSample"), string.Empty);
         attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\sample"), "sample"));
         Collection<AttachmentSet> attachments = new() { attachmentSet };
@@ -40,19 +41,21 @@ public class DataCollectorAttachmentProcessorAppDomainTests
 
         // act
         using DataCollectorAttachmentProcessorAppDomain dcap = new(invokedDataCollector, _loggerMock.Object);
-        Assert.IsTrue(dcap.LoadSucceded);
-        await dcap.ProcessAttachmentSetsAsync(doc.DocumentElement, attachments, new Progress<int>((int report) => { }), _loggerMock.Object, CancellationToken.None);
+        Assert.IsTrue(dcap.AttachmentProcessorLoaded);
+        await dcap.ProcessAttachmentSetsAsync(doc.DocumentElement, attachments, new Progress<int>((int report) => { }),
+            _loggerMock.Object, CancellationToken.None);
 
         //Assert
         // If the processor runs in another AppDomain the static state is not shared and should not change.
-        Assert.AreEqual("deafultState", SomeState);
+        Assert.AreEqual("defaultState", SomeState);
     }
 
     [TestMethod]
     public async Task DataCollectorAttachmentProcessorAppDomain_ShouldCancel()
     {
         // arrange
-        var invokedDataCollector = new InvokedDataCollector(new Uri("datacollector://AppDomainSample"), "AppDomainSample", typeof(AppDomainSampleDataCollector).AssemblyQualifiedName, typeof(AppDomainSampleDataCollector).Assembly.Location, true);
+        var invokedDataCollector = new InvokedDataCollector(new Uri("datacollector://AppDomainSample"), "AppDomainSample",
+            typeof(AppDomainSampleDataCollector).AssemblyQualifiedName, typeof(AppDomainSampleDataCollector).Assembly.Location, true);
         var attachmentSet = new AttachmentSet(new Uri("datacollector://AppDomainSample"), string.Empty);
         attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\sample"), "sample"));
         Collection<AttachmentSet> attachments = new() { attachmentSet };
@@ -62,9 +65,10 @@ public class DataCollectorAttachmentProcessorAppDomainTests
 
         // act
         using DataCollectorAttachmentProcessorAppDomain dcap = new(invokedDataCollector, _loggerMock.Object);
-        Assert.IsTrue(dcap.LoadSucceded);
+        Assert.IsTrue(dcap.AttachmentProcessorLoaded);
 
-        Task runProcessing = dcap.ProcessAttachmentSetsAsync(doc.DocumentElement, attachments, new Progress<int>((int report) => cts.Cancel()), _loggerMock.Object, cts.Token);
+        Task runProcessing = dcap.ProcessAttachmentSetsAsync(doc.DocumentElement, attachments, new Progress<int>((int report) => cts.Cancel()),
+            _loggerMock.Object, cts.Token);
 
         //assert
         await Assert.ThrowsExceptionAsync<OperationCanceledException>(async () => await runProcessing);
@@ -74,7 +78,8 @@ public class DataCollectorAttachmentProcessorAppDomainTests
     public async Task DataCollectorAttachmentProcessorAppDomain_ShouldReturnCorrectAttachments()
     {
         // arrange
-        var invokedDataCollector = new InvokedDataCollector(new Uri("datacollector://AppDomainSample"), "AppDomainSample", typeof(AppDomainSampleDataCollector).AssemblyQualifiedName, typeof(AppDomainSampleDataCollector).Assembly.Location, true);
+        var invokedDataCollector = new InvokedDataCollector(new Uri("datacollector://AppDomainSample"), "AppDomainSample",
+            typeof(AppDomainSampleDataCollector).AssemblyQualifiedName, typeof(AppDomainSampleDataCollector).Assembly.Location, true);
         var attachmentSet = new AttachmentSet(new Uri("datacollector://AppDomainSample"), "AppDomainSample");
         attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\sample"), "sample"));
         Collection<AttachmentSet> attachments = new() { attachmentSet };
@@ -83,9 +88,10 @@ public class DataCollectorAttachmentProcessorAppDomainTests
 
         // act
         using DataCollectorAttachmentProcessorAppDomain dcap = new(invokedDataCollector, _loggerMock.Object);
-        Assert.IsTrue(dcap.LoadSucceded);
+        Assert.IsTrue(dcap.AttachmentProcessorLoaded);
 
-        var attachmentsResult = await dcap.ProcessAttachmentSetsAsync(doc.DocumentElement, attachments, new Progress<int>(), _loggerMock.Object, CancellationToken.None);
+        var attachmentsResult = await dcap.ProcessAttachmentSetsAsync(doc.DocumentElement, attachments, new Progress<int>(),
+            _loggerMock.Object, CancellationToken.None);
 
         // assert
         // We return same instance but we're marshaling so we expected different pointers
@@ -103,7 +109,8 @@ public class DataCollectorAttachmentProcessorAppDomainTests
     public async Task DataCollectorAttachmentProcessorAppDomain_ShouldReportProgressCorrectly()
     {
         // arrange
-        var invokedDataCollector = new InvokedDataCollector(new Uri("datacollector://AppDomainSample"), "AppDomainSample", typeof(AppDomainSampleDataCollector).AssemblyQualifiedName, typeof(AppDomainSampleDataCollector).Assembly.Location, true);
+        var invokedDataCollector = new InvokedDataCollector(new Uri("datacollector://AppDomainSample"), "AppDomainSample",
+            typeof(AppDomainSampleDataCollector).AssemblyQualifiedName, typeof(AppDomainSampleDataCollector).Assembly.Location, true);
         var attachmentSet = new AttachmentSet(new Uri("datacollector://AppDomainSample"), "AppDomainSample");
         attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\sample"), "sample"));
         Collection<AttachmentSet> attachments = new() { attachmentSet };
@@ -113,7 +120,7 @@ public class DataCollectorAttachmentProcessorAppDomainTests
         // act
         var progress = new CustomProgress();
         using DataCollectorAttachmentProcessorAppDomain dcap = new(invokedDataCollector, _loggerMock.Object);
-        Assert.IsTrue(dcap.LoadSucceded);
+        Assert.IsTrue(dcap.AttachmentProcessorLoaded);
 
         var attachmentsResult = await dcap.ProcessAttachmentSetsAsync(
             doc.DocumentElement,
@@ -133,7 +140,8 @@ public class DataCollectorAttachmentProcessorAppDomainTests
     public async Task DataCollectorAttachmentProcessorAppDomain_ShouldLogCorrectly()
     {
         // arrange
-        var invokedDataCollector = new InvokedDataCollector(new Uri("datacollector://AppDomainSample"), "AppDomainSample", typeof(AppDomainSampleDataCollector).AssemblyQualifiedName, typeof(AppDomainSampleDataCollector).Assembly.Location, true);
+        var invokedDataCollector = new InvokedDataCollector(new Uri("datacollector://AppDomainSample"), "AppDomainSample",
+            typeof(AppDomainSampleDataCollector).AssemblyQualifiedName, typeof(AppDomainSampleDataCollector).Assembly.Location, true);
         var attachmentSet = new AttachmentSet(new Uri("datacollector://AppDomainSample"), "AppDomainSample");
         attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\sample"), "sample"));
         Collection<AttachmentSet> attachments = new() { attachmentSet };
@@ -150,9 +158,10 @@ public class DataCollectorAttachmentProcessorAppDomainTests
 
         // act
         using DataCollectorAttachmentProcessorAppDomain dcap = new(invokedDataCollector, _loggerMock.Object);
-        Assert.IsTrue(dcap.LoadSucceded);
+        Assert.IsTrue(dcap.AttachmentProcessorLoaded);
 
-        var attachmentsResult = await dcap.ProcessAttachmentSetsAsync(doc.DocumentElement, attachments, new Progress<int>(), _loggerMock.Object, CancellationToken.None);
+        var attachmentsResult = await dcap.ProcessAttachmentSetsAsync(doc.DocumentElement, attachments, new Progress<int>(),
+            _loggerMock.Object, CancellationToken.None);
 
         // assert
         countdownEvent.Wait(new CancellationTokenSource(10000).Token);
@@ -169,7 +178,8 @@ public class DataCollectorAttachmentProcessorAppDomainTests
     public void DataCollectorAttachmentProcessorAppDomain_ShouldReportFailureDuringExtensionCreation()
     {
         // arrange
-        var invokedDataCollector = new InvokedDataCollector(new Uri("datacollector://AppDomainSampleFailure"), "AppDomainSampleFailure", typeof(AppDomainSampleDataCollectorFailure).AssemblyQualifiedName, typeof(AppDomainSampleDataCollectorFailure).Assembly.Location, true);
+        var invokedDataCollector = new InvokedDataCollector(new Uri("datacollector://AppDomainSampleFailure"), "AppDomainSampleFailure",
+            typeof(AppDomainSampleDataCollectorFailure).AssemblyQualifiedName, typeof(AppDomainSampleDataCollectorFailure).Assembly.Location, true);
         var attachmentSet = new AttachmentSet(new Uri("datacollector://AppDomainSampleFailure"), "AppDomainSampleFailure");
         attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\sample"), "sample"));
         Collection<AttachmentSet> attachments = new() { attachmentSet };
@@ -191,7 +201,7 @@ public class DataCollectorAttachmentProcessorAppDomainTests
 
         //assert
         errorReportEvent.Wait(new CancellationTokenSource(10000).Token);
-        Assert.IsFalse(dcap.LoadSucceded);
+        Assert.IsFalse(dcap.AttachmentProcessorLoaded);
     }
 
     [DataCollectorFriendlyName("AppDomainSample")]
@@ -216,7 +226,8 @@ public class DataCollectorAttachmentProcessorAppDomainTests
 
         public IEnumerable<Uri> GetExtensionUris() => new[] { new Uri("datacollector://AppDomainSample") };
 
-        public async Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+        public async Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments,
+            IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
         {
             SomeState = "Updated shared state";
 
@@ -278,7 +289,8 @@ public class DataCollectorAttachmentProcessorAppDomainTests
 
         public IEnumerable<Uri> GetExtensionUris() => throw new NotImplementedException();
 
-        public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+        public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments,
+            IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
             => throw new NotImplementedException();
     }
 

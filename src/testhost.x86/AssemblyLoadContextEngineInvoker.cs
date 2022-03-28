@@ -51,7 +51,7 @@ internal class AssemblyLoadContextEngineInvoker<T> : IEngineInvoker, IDisposable
     // REVIEW: AppDomain equivalent is not disposable
     public void Dispose()
     {
-        _context.Unload();
+        _context.Dispose();
     }
 
     // REVIEW: Shall we warn if there are multiple invoker available?

@@ -13,24 +13,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 /// <summary>
 /// Manages test plugins information.
 /// </summary>
-internal class TestPluginManager
+internal static class TestPluginManager
 {
-    private static TestPluginManager? s_instance;
-
-    /// <summary>
-    /// Gets the singleton instance of TestPluginManager.
-    /// </summary>
-    public static TestPluginManager Instance
-        => s_instance ??= new TestPluginManager();
-
     /// <summary>
     /// Gets data type of test extension with given assembly qualified name.
     /// </summary>
     /// <param name="extensionTypeName">Assembly qualified name of the test extension</param>
     /// <returns>Data type of the test extension</returns>
-    public static Type GetTestExtensionType(string extensionTypeName)
+    public static Type? GetTestExtensionType(string extensionTypeName)
     {
-        Type extensionType;
+        Type? extensionType;
         try
         {
             extensionType = Type.GetType(extensionTypeName, true);
@@ -59,16 +51,16 @@ internal class TestPluginManager
 
         try
         {
-            object rawPlugin = Activator.CreateInstance(extensionType);
+            object? rawPlugin = Activator.CreateInstance(extensionType);
 
-            T testExtension = (T)rawPlugin;
+            T testExtension = (T)rawPlugin!;
             return testExtension;
         }
         catch (Exception ex)
         {
             if (ex is TargetInvocationException)
             {
-                EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
+                EqtTrace.Error($"TestPluginManager.CreateTestExtension: Could not create instance of type: {extensionType}  Exception: {ex}");
                 throw;
             }
 #if NETFRAMEWORK
@@ -78,7 +70,7 @@ internal class TestPluginManager
                 throw;
             }
 #endif
-            EqtTrace.Error("TestPluginManager.CreateTestExtension: Could not create instance of type: " + extensionType.ToString() + "  Exception: " + ex);
+            EqtTrace.Error($"TestPluginManager.CreateTestExtension: Could not create instance of type: {extensionType}  Exception: {ex}");
 
             throw;
         }
@@ -108,11 +100,13 @@ internal class TestPluginManager
     public static void GetSpecificTestExtensions<TPluginInfo, TExtension, IMetadata, TMetadata>(
         string endsWithPattern,
         out IEnumerable<LazyExtension<TExtension, Dictionary<string, object>>> unfiltered,
-        out IEnumerable<LazyExtension<TExtension, IMetadata>> filtered)
+        out IEnumerable<LazyExtension<TExtension, IMetadata>> filtered,
+        TestPluginCache? testPluginCache = null)
         where TMetadata : IMetadata
         where TPluginInfo : TestPluginInformation
     {
-        var extensions = TestPluginCache.Instance.DiscoverTestExtensions<TPluginInfo, TExtension>(endsWithPattern);
+        testPluginCache ??= TestPluginCache.Instance;
+        var extensions = testPluginCache.DiscoverTestExtensions<TPluginInfo, TExtension>(endsWithPattern);
         GetExtensions<TPluginInfo, TExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
     }
 
@@ -146,11 +140,13 @@ internal class TestPluginManager
         string extensionAssembly,
         out IEnumerable<LazyExtension<TExtension, Dictionary<string, object>>> unfiltered,
         out IEnumerable<LazyExtension<TExtension, IMetadata>> filtered,
-        bool skipCache = false)
+        bool skipCache = false,
+        TestPluginCache? testPluginCache = null)
         where TMetadata : IMetadata
         where TPluginInfo : TestPluginInformation
     {
-        var extensions = TestPluginCache.Instance.GetTestExtensions<TPluginInfo, TExtension>(extensionAssembly, skipCache);
+        testPluginCache ??= TestPluginCache.Instance;
+        var extensions = testPluginCache.GetTestExtensions<TPluginInfo, TExtension>(extensionAssembly, skipCache);
         GetExtensions<TPluginInfo, TExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
     }
 

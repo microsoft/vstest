@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -14,63 +13,62 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 
 internal sealed class DataCollectorAttachmentProcessAssemblyLoadContext : IDataCollectorAttachmentProcessor, IDisposable
 {
     private readonly PluginLoadContext _context;
-    private readonly InvokedDataCollector _invokedDataCollector;
-    private readonly IDataCollectorAttachmentProcessor _actualCollectorAttachmentProcessor;
+    private readonly IDataCollectorAttachmentProcessor? _actualCollectorAttachmentProcessor;
 
-    public DataCollectorAttachmentProcessAssemblyLoadContext(InvokedDataCollector invokedDataCollector!!, IMessageLogger dataCollectorAttachmentsProcessorsLogger!!)
+    public DataCollectorAttachmentProcessAssemblyLoadContext(InvokedDataCollector invokedDataCollector!!, IMessageLogger? logger)
     {
-        _invokedDataCollector = invokedDataCollector;
         var collectorPath = invokedDataCollector.Uri.AbsolutePath;
         _context = new PluginLoadContext(collectorPath);
 
+        DataCollectorAttachmentsProcessorsFactory.TryLoadExtension(
+            invokedDataCollector,
+            filePath => DataCollectorExtensionManager.Create(filePath, true, TestSessionMessageLogger.Instance, new TestPluginCache(_context)),
+            msg => EqtTrace.Info(msg),
+            errorMsg =>
+            {
+                EqtTrace.Error(errorMsg);
+                logger?.SendMessage(TestMessageLevel.Error, errorMsg);
+            },
+            out var friendlyName,
+            out var assemblyQualifiedName,
+            out _actualCollectorAttachmentProcessor);
 
-        var assembly = _context.LoadFromAssemblyPath(collectorPath);
-        (_actualCollectorAttachmentProcessor, var type) = CreateFirstAssignableType(assembly);
-        AssemblyQualifiedName = type.AssemblyQualifiedName;
-        FriendlyName = type.Assembly.FullName;
+
+        AssemblyQualifiedName = assemblyQualifiedName;
+        FriendlyName = friendlyName;
     }
 
     public string? AssemblyQualifiedName { get; }
     public string? FriendlyName { get; }
 
     public bool SupportsIncrementalProcessing
-        => _actualCollectorAttachmentProcessor.SupportsIncrementalProcessing;
+        => _actualCollectorAttachmentProcessor == null
+            ? throw new InvalidOperationException($"There is no loaded collector attachment processor, '{nameof(SupportsIncrementalProcessing)}' should not have been called.")
+            : _actualCollectorAttachmentProcessor.SupportsIncrementalProcessing;
 
-    public bool LoadSucceded { get; internal set; }
-    public bool HasAttachmentProcessor { get; internal set; }
+    public bool AttachmentProcessorLoaded => _actualCollectorAttachmentProcessor != null;
 
     public IEnumerable<Uri> GetExtensionUris()
-        => _actualCollectorAttachmentProcessor.GetExtensionUris();
+        => _actualCollectorAttachmentProcessor == null
+            ? throw new InvalidOperationException($"There is no loaded collector attachment processor, '{nameof(GetExtensionUris)}' should not have been called.")
+            : _actualCollectorAttachmentProcessor.GetExtensionUris();
 
-    public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
-        => _actualCollectorAttachmentProcessor.ProcessAttachmentSetsAsync(configurationElement, attachments, progressReporter, logger, cancellationToken);
+    public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments,
+        IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+        => _actualCollectorAttachmentProcessor == null
+            ? throw new InvalidOperationException($"There is no loaded collector attachment processor, '{nameof(ProcessAttachmentSetsAsync)}' should not have been called.")
+            : _actualCollectorAttachmentProcessor.ProcessAttachmentSetsAsync(configurationElement, attachments, progressReporter, logger, cancellationToken);
 
     public void Dispose()
-        => _context.Unload();
-
-    // REVIEW: Shall we warn if there are multiple available?
-    private static (IDataCollectorAttachmentProcessor, Type) CreateFirstAssignableType(Assembly assembly)
-    {
-        foreach (Type type in assembly.GetTypes())
-        {
-            if (typeof(IDataCollectorAttachmentProcessor).IsAssignableFrom(type))
-            {
-                // REVIEW: Ok to throw?
-                return Activator.CreateInstance(type) is not IDataCollectorAttachmentProcessor instance
-                    ? throw new InvalidOperationException($"Cannot create instance of '{nameof(IDataCollectorAttachmentProcessor)}' for type '{type}'.")
-                    : (instance, type);
-            }
-        }
-
-        // REVIEW: Ok to throw?
-        throw new InvalidOperationException($"Could not find any type compatible with '{nameof(IDataCollectorAttachmentProcessor)}' in '{assembly.FullName}'.");
-    }
+        => _context.Dispose();
 }
 
 #endif

@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 /// <summary>
@@ -75,17 +73,21 @@ internal class DataCollectorExtensionManager : TestExtensionManager<ObjectModel.
     /// <returns>
     /// The DataCollectorExtensionManager.
     /// </returns>
-    public static DataCollectorExtensionManager Create(string extensionAssemblyFilePath, bool skipCache, IMessageLogger messageLogger)
+    public static DataCollectorExtensionManager Create(string extensionAssemblyFilePath, bool skipCache, IMessageLogger messageLogger,
+        TestPluginCache? testPluginCache = null)
     {
         TestPluginManager.GetTestExtensions<DataCollectorConfig, ObjectModel.DataCollection.DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
             extensionAssemblyFilePath,
             out var unfilteredTestExtensions,
             out var filteredTestExtensions,
-            skipCache);
+            skipCache,
+            testPluginCache);
 
         return new DataCollectorExtensionManager(unfilteredTestExtensions, filteredTestExtensions, messageLogger);
     }
 }
+
+#nullable disable
 
 /// <summary>
 /// Hold data about the Data Collector.
