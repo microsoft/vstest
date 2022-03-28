@@ -77,7 +77,7 @@ public class Program
             {
 #if NETFRAMEWORK
                 invoker = new AppDomainEngineInvoker<DefaultEngineInvoker>(testSourcePath);
-#else
+#elif NETCOREAPP3_0_OR_GREATER
                 invoker = new AssemblyLoadContextEngineInvoker<DefaultEngineInvoker>(testSourcePath);
 #endif
             }

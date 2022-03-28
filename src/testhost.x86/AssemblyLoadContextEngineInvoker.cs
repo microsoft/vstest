@@ -44,6 +44,7 @@ internal class AssemblyLoadContextEngineInvoker<T> : IEngineInvoker, IDisposable
         }
         catch
         {
+            // REVIEW: Shall we at least log?
             // ignore
         }
     }

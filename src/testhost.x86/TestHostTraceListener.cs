@@ -25,7 +25,7 @@ internal class TestHostTraceListener : DefaultTraceListener
             var listener = Trace.Listeners[i];
             if (listener is DefaultTraceListener)
             {
-                EqtTrace.Verbose($"TestPlatformTraceListener.Setup: Replacing listener {0} with { nameof(TestHostTraceListener) }.", Trace.Listeners[i]);
+                EqtTrace.Verbose($"TestPlatformTraceListener.Setup: Replacing listener {0} with {nameof(TestHostTraceListener)}.", Trace.Listeners[i]);
                 Trace.Listeners[i] = new TestHostTraceListener();
             }
         }
@@ -101,7 +101,7 @@ internal class TestHostTraceListener : DefaultTraceListener
         MethodBase? method = null;
         foreach (var f in stack.GetFrames())
         {
-            var m = f.GetMethod();
+            var m = f?.GetMethod();
             var declaringType = m?.DeclaringType;
             if (!debugMethodFound && (declaringType == typeof(Debug) || declaringType == typeof(Trace)))
             {
@@ -120,8 +120,8 @@ internal class TestHostTraceListener : DefaultTraceListener
 #else
         var stackTrace = string.Join(Environment.NewLine, stack.ToString().Split(Environment.NewLine).TakeLast(frameCount));
 #endif
-        var methodName = method != null ? $"{method.DeclaringType.Name}.{method.Name}" : "<method>";
-        var wholeMessage = $"Method {methodName} failed with '{message}', and was translated to { typeof(DebugAssertException).FullName } to avoid terminating the process hosting the test.";
+        var methodName = method != null ? $"{method.DeclaringType!.Name}.{method.Name}" : "<method>";
+        var wholeMessage = $"Method {methodName} failed with '{message}', and was translated to {typeof(DebugAssertException).FullName} to avoid terminating the process hosting the test.";
 
         return new DebugAssertException(wholeMessage, stackTrace);
     }
