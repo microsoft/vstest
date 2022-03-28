@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq.Expressions;
 using System.Xml;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -193,6 +194,9 @@ public class IntegrationTestEnvironment
 
     // A known AzureDevOps env variable meaning we are running in CI.
     public static bool IsCI { get; } = Environment.GetEnvironmentVariable("TF_BUILD") == "True";
+    public DebugInfo DebugInfo { get; set; }
+    public VSTestConsoleInfo VSTestConsoleInfo { get; set; }
+    public List<DllInfo> DllInfos { get; set; }
 
     /// <summary>
     /// Gets the full path to a test asset.
@@ -235,8 +239,10 @@ public class IntegrationTestEnvironment
             targetFramework,
             assetName);
 
-        Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: {0}.", assetPath);
+        Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: \"{0}\". Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", assetPath);
 
+        // If you are thinking about wrapping the path in double quotes here,
+        // then don't. File.Exist cannot handle quoted paths, and we use it in a lot of places.
         return assetPath;
     }
 
@@ -310,7 +316,7 @@ public class IntegrationTestEnvironment
             simpleAssetName,
             assetName);
 
-        Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: {0}.", assetPath);
+        Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: \"{0}\".", assetPath);
 
         return assetPath;
     }

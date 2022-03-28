@@ -23,27 +23,47 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// </summary>
 public class NetCoreRunner : Attribute, ITestDataSource
 {
+    private readonly string _targetFrameworks;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="NetCoreTargetFrameworkDataSource"/> class.
     /// </summary>
     /// <param name="targetFrameworks">To run tests with desktop runner(vstest.console.exe), use AcceptanceTestBase.Net452TargetFramework or alike values.</param>
     public NetCoreRunner(string targetFrameworks = AcceptanceTestBase.NETFX452_NET50)
     {
-        var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
-        // on non-windows we want to filter down only to netcoreapp runner, and net5.0 and newer.
-        Func<string, bool> filter = tfm => isWindows || !tfm.StartsWith("net4");
-        foreach (var fmw in targetFrameworks.Split(';').Where(filter))
-        {
-            _dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, fmw) });
-        }
-
+        _targetFrameworks = targetFrameworks;
     }
 
-    private readonly List<object[]> _dataRows = new();
+    public bool DebugVSTestConsole { get; set; }
+    public bool DebugTesthost { get; set; }
+    public bool DebugDataCollector { get; set; }
+    public bool NoDefaultBreakpoints { get; set; } = true;
 
     public IEnumerable<object[]> GetData(MethodInfo methodInfo)
     {
-        return _dataRows;
+        var dataRows = new List<object[]>();
+        var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
+        // on non-windows we want to filter down only to netcoreapp runner, and net5.0 and newer.
+        Func<string, bool> filter = tfm => isWindows || !tfm.StartsWith("net4");
+        foreach (var fmw in _targetFrameworks.Split(';').Where(filter))
+        {
+            var runnerInfo = new RunnerInfo
+            {
+                RunnerFramework = IntegrationTestBase.CoreRunnerFramework,
+                TargetFramework = fmw,
+                InIsolationValue = null
+            };
+            runnerInfo.DebugInfo = new DebugInfo
+            {
+                DebugVSTestConsole = DebugVSTestConsole,
+                DebugTesthost = DebugTesthost,
+                DebugDataCollector = DebugDataCollector,
+                NoDefaultBreakpoints = NoDefaultBreakpoints,
+            };
+            dataRows.Add(new object[] { runnerInfo });
+        }
+
+        return dataRows;
     }
 
     public string GetDisplayName(MethodInfo methodInfo, object[] data)

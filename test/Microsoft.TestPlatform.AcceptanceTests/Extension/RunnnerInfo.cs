@@ -2,6 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
+
+using Microsoft.TestPlatform.TestUtilities;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
@@ -11,9 +14,21 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// <param name="RunnerFramework"></param>
 /// <param name="TargetFramework"></param>
 /// <param name="InIsolationValue">Supported value = <c>/InIsolation</c>.</param>
-[Serializable] // Type should be serializable to allow the tree-view behavior of test discovery in Test Explorer
-public record RunnerInfo(string RunnerFramework, string TargetFramework, string InIsolationValue = "")
+[Serializable]
+public class RunnerInfo
 {
+    public string? RunnerFramework { get; set; }
+
+    public VSTestConsoleInfo? VSTestConsoleInfo { get; set; }
+
+
+    public string? TargetFramework { get; set; }
+    public string? InIsolationValue { get; set; }
+
+    public DebugInfo? DebugInfo { get; set; }
+
+    public List<DllInfo> DllInfos { get; set; } = new();
+
     /// <summary>
     /// Is running via .NET "Core" vstest.console?
     /// </summary>
@@ -22,7 +37,7 @@ public record RunnerInfo(string RunnerFramework, string TargetFramework, string 
     /// <summary>
     /// Is running via .NET Framework vstest.console?
     /// </summary>
-    public bool IsNetFrameworkRunner => RunnerFramework.StartsWith("net4", StringComparison.InvariantCultureIgnoreCase);
+    public bool IsNetFrameworkRunner => RunnerFramework!.StartsWith("net4", StringComparison.InvariantCultureIgnoreCase);
 
     /// <summary>
     /// Is running via .NET "Core" testhost?
@@ -32,15 +47,7 @@ public record RunnerInfo(string RunnerFramework, string TargetFramework, string 
     /// <summary>
     /// Is running via .NET Framework testhost?
     /// </summary>
-    public bool IsNetFrameworkTarget => TargetFramework.StartsWith("net4", StringComparison.InvariantCultureIgnoreCase);
+    public bool IsNetFrameworkTarget => TargetFramework!.StartsWith("net4", StringComparison.InvariantCultureIgnoreCase);
 
-    public override string ToString()
-        => string.Join(
-            ",",
-            new[]
-            {
-                "RunnerFramework = " + RunnerFramework,
-                " TargetFramework = " + TargetFramework,
-                string.IsNullOrEmpty(InIsolationValue) ? " InProcess" : " InIsolation",
-            });
+    public override string ToString() => $"Runner = {RunnerFramework}, TargetFramework = {TargetFramework}, {(string.IsNullOrEmpty(InIsolationValue) ? "InProcess" : "InIsolation")}, {VSTestConsoleInfo}, {string.Join(",", DllInfos)}";
 }

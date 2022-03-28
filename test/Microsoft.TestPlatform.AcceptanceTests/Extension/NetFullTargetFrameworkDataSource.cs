@@ -22,6 +22,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// </summary>
 public class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
 {
+    private readonly bool _inIsolation;
+    private readonly bool _inProcess;
+    private readonly bool _useDesktopRunner;
+    private readonly bool _useCoreRunner;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="NetFullTargetFrameworkDataSource"/> class.
     /// </summary>
@@ -31,60 +36,79 @@ public class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
     /// <param name="useCoreRunner">To run tests with core runner(dotnet vstest.console.dll)</param>
     public NetFullTargetFrameworkDataSource(bool inIsolation = true, bool inProcess = false, bool useDesktopRunner = true, bool useCoreRunner = true)
     {
-        _dataRows = new List<object[]>();
-
-        var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
-        if (useCoreRunner && isWindows)
-        {
-            _dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework) });
-        }
-
-        if (useDesktopRunner && isWindows)
-        {
-            if (inIsolation)
-            {
-                _dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.InIsolation) });
-            }
-
-            if (inProcess)
-            {
-                _dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework) });
-            }
-        }
+        _inIsolation = inIsolation;
+        _inProcess = inProcess;
+        _useDesktopRunner = useDesktopRunner;
+        _useCoreRunner = useCoreRunner;
     }
 
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NetCoreTargetFrameworkDataSource"/> class.
-    /// </summary>
-    /// <param name="targetFrameworks">To run tests with desktop runner(vstest.console.exe), use AcceptanceTestBase.Net452TargetFramework or alike values.</param>
-    public NetFullTargetFrameworkDataSource(string[] targetFrameworks, bool inIsolation = true, bool inProcess = false)
-    {
-        if (inIsolation)
-        {
-            foreach (var fmw in targetFrameworks)
-            {
-                _dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw, AcceptanceTestBase.InIsolation) });
-            }
-        }
-
-        if (inProcess)
-        {
-            foreach (var fmw in targetFrameworks)
-            {
-                _dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw) });
-            }
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets the data rows.
-    /// </summary>
-    private readonly List<object[]> _dataRows = new();
+    public bool DebugVSTestConsole { get; set; }
+    public bool DebugTesthost { get; set; }
+    public bool DebugDataCollector { get; set; }
+    public bool NoDefaultBreakpoints { get; set; } = true;
 
     public IEnumerable<object[]> GetData(MethodInfo methodInfo)
     {
-        return _dataRows;
+        var dataRows = new List<object[]>();
+        var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
+        if (_useCoreRunner && isWindows)
+        {
+            var runnerInfo = new RunnerInfo
+            {
+                RunnerFramework = IntegrationTestBase.CoreRunnerFramework,
+                TargetFramework = AcceptanceTestBase.DesktopTargetFramework,
+                InIsolationValue = null
+            };
+            runnerInfo.DebugInfo = new DebugInfo
+            {
+                DebugVSTestConsole = DebugVSTestConsole,
+                DebugTesthost = DebugTesthost,
+                DebugDataCollector = DebugDataCollector,
+                NoDefaultBreakpoints = NoDefaultBreakpoints,
+            };
+            dataRows.Add(new object[] { runnerInfo });
+        }
+
+        if (_useDesktopRunner && isWindows)
+        {
+            if (_inIsolation)
+            {
+                var runnerInfo = new RunnerInfo
+                {
+                    RunnerFramework = IntegrationTestBase.DesktopRunnerFramework,
+                    TargetFramework = AcceptanceTestBase.DesktopTargetFramework,
+                    InIsolationValue = AcceptanceTestBase.InIsolation
+                };
+                runnerInfo.DebugInfo = new DebugInfo
+                {
+                    DebugVSTestConsole = DebugVSTestConsole,
+                    DebugTesthost = DebugTesthost,
+                    DebugDataCollector = DebugDataCollector,
+                    NoDefaultBreakpoints = NoDefaultBreakpoints,
+                };
+                dataRows.Add(new object[] { runnerInfo });
+            }
+
+            if (_inProcess)
+            {
+                var runnerInfo = new RunnerInfo
+                {
+                    RunnerFramework = IntegrationTestBase.DesktopRunnerFramework,
+                    TargetFramework = AcceptanceTestBase.DesktopTargetFramework,
+                    InIsolationValue = null
+                };
+                runnerInfo.DebugInfo = new DebugInfo
+                {
+                    DebugVSTestConsole = DebugVSTestConsole,
+                    DebugTesthost = DebugTesthost,
+                    DebugDataCollector = DebugDataCollector,
+                    NoDefaultBreakpoints = NoDefaultBreakpoints,
+                };
+                dataRows.Add(new object[] { runnerInfo });
+            }
+        }
+
+        return dataRows;
     }
 
     public string GetDisplayName(MethodInfo methodInfo, object[] data)

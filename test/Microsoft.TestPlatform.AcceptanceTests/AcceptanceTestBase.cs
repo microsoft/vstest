@@ -51,6 +51,17 @@ public class AcceptanceTestBase : IntegrationTestBase
     public const string NETCORE21_50 = "netcoreapp2.1;netcoreapp3.1;net5.0";
     public const string NETFX452_NET50 = "net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0";
     public const string NETFX452_NET31 = "net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1";
+    public const string DEFAULT_RUNNER_NETFX = "net451";
+    /// <summary>
+    /// Our current defaults for .NET and .NET Framework.
+    /// </summary>
+    public const string DEFAULT_RUNNER_NETFX_AND_NET = $"{DEFAULT_RUNNER_NETFX};netcoreapp2.1";
+    public const string DEFAULT_HOST_NETFX_AND_NET = "net451;netcoreapp2.1";
+    public const string LATEST_TO_LEGACY = "Latest;LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
+    public const string LATESTPREVIEW_TO_LEGACY = "LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
+    public const string LATEST = "Latest";
+    public const string LATESTSTABLE= "LatestStable";
+    internal const string MSTEST = "MSTest";
 
     public static string And(string left, string right)
     {
@@ -61,6 +72,10 @@ public class AcceptanceTestBase : IntegrationTestBase
 
     protected static void SetTestEnvironment(IntegrationTestEnvironment testEnvironment, RunnerInfo runnerInfo)
     {
+        testEnvironment.VSTestConsoleInfo = runnerInfo.VSTestConsoleInfo;
+        testEnvironment.DllInfos = runnerInfo.DllInfos;
+        testEnvironment.DebugInfo = runnerInfo.DebugInfo;
+
         testEnvironment.RunnerFramework = runnerInfo.RunnerFramework;
         testEnvironment.TargetFramework = runnerInfo.TargetFramework;
         testEnvironment.InIsolationValue = runnerInfo.InIsolationValue;
