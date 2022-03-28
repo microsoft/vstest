@@ -24,7 +24,6 @@ public class PerformanceTestBase : IntegrationTestBase
         : base()
     {
 #if NET
-        
         throw new InvalidOperationException("Perf tests are not supported on .NET");
 #else
         _perfAnalyzer = new PerfAnalyzer();
