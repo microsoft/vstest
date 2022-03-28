@@ -11,7 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 
 [TestClass]
-public class ExecutionPerfTests : TelemetryPerfTestbase
+public class ExecutionPerfTests : TelemetryPerfTestBase
 {
     [TestMethod]
     [TestCategory("TelemetryPerf")]

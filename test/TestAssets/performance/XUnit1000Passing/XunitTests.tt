@@ -2,48 +2,48 @@
 
 namespace XUnitAdapterPerfTests
 {
-	public class XuniTests
+    public class XuniTests
     {
 <#
-	int passedTests = 1000;
-	int failedTests = 0;
-	String padding = "00";
-	int count = 1;
-	String testmethodprefix = "Test_";
+    int passedTests = 1000;
+    int failedTests = 0;
+    String padding = "00";
+    int count = 1;
+    String testmethodprefix = "Test_";
 #>
 
-		#region PassingTests
+        #region PassingTests
 <#
-	for(int i=0;i<passedTests;i++)
-	{
-	String methodName= testmethodprefix + count.ToString(padding);
+    for(int i=0;i<passedTests;i++)
+    {
+    String methodName= testmethodprefix + count.ToString(padding);
 #>
-		[Fact]
-		public void <#=methodName#>()
-		{
-		}
-<#		
-		count++;
-	}
+        [Fact]
+        public void <#=methodName#>()
+        {
+        }
+<#        
+        count++;
+    }
 #>
-		#endregion
+        #endregion
 
-		#region FailingTests
+        #region FailingTests
 <#
-	for(int i=0;i<failedTests;i++)
-	{
-	String methodName= testmethodprefix + count.ToString(padding);
+    for(int i=0;i<failedTests;i++)
+    {
+    String methodName= testmethodprefix + count.ToString(padding);
 #>
-		[Fact]
-		public void <#=methodName#>()
-		{
-			Assert.Fail();
-		}
-<#		
-		count++;
-	}
+        [Fact]
+        public void <#=methodName#>()
+        {
+            Assert.Fail();
+        }
+<#        
+        count++;
+    }
 #>
-		#endregion
-   	
+        #endregion
+       
     }
 }

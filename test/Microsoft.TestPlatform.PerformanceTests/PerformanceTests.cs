@@ -17,7 +17,7 @@ namespace Microsoft.TestPlatform.PerformanceTests;
 /// The performance tests.
 /// </summary>
 [TestClass]
-public class PerformanceTests : TelemetryPerfTestbase
+public class PerformanceTests : TelemetryPerfTestBase
 {
     [TestMethod]
     [DataRow("MSTest1Passing", 1, 500)]

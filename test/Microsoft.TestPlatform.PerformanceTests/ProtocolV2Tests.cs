@@ -65,7 +65,7 @@ public class ProtocolV2Tests
     }
 
     [TestMethod]
-    public void TestCaseDeserializeV22()
+    public void TestCaseDeserialize2()
     {
         var json = SerializeV2(TestCase);
         DeserializeV2<TestCase>(json);
@@ -97,7 +97,7 @@ public class ProtocolV2Tests
     }
 
     [TestMethod]
-    public void TestResultDeserializeV22()
+    public void TestResultDeserialize2()
     {
         var json = SerializeV2(TestResult);
         DeserializeV2<TestResult>(json);
@@ -121,10 +121,5 @@ public class ProtocolV2Tests
     private static T DeserializeV2<T>(string json)
     {
         return JsonDataSerializer.Instance.Deserialize<T>(json, version: 2);
-    }
-
-    private static void VerifyPerformanceResult(string scenario, long expectedElapsedTime, long elapsedTime)
-    {
-        Assert.IsTrue(elapsedTime < expectedElapsedTime, $"Scenario '{scenario}' doesn't match with expected elapsed time.");
     }
 }

@@ -4,18 +4,18 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace MSTestAdapterPerfTests
 {
     [TestClass]
-	public class MSTests
+    public class MSTests
     {
 
-		#region PassingTests
-		[TestMethod]
-		public void Test_01()
-		{
-		}
-		#endregion
+        #region PassingTests
+        [TestMethod]
+        public void Test_01()
+        {
+        }
+        #endregion
 
-		#region FailingTests
-		#endregion
-   	
+        #region FailingTests
+        #endregion
+       
     }
 }

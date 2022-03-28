@@ -2,18 +2,18 @@
 
 namespace XUnitAdapterPerfTests
 {
-	public class XuniTests
+    public class XuniTests
     {
 
-		#region PassingTests
-		[Fact]
-		public void Test_01()
-		{
-		}
-		#endregion
+        #region PassingTests
+        [Fact]
+        public void Test_01()
+        {
+        }
+        #endregion
 
-		#region FailingTests
-		#endregion
-   	
+        #region FailingTests
+        #endregion
+       
     }
 }

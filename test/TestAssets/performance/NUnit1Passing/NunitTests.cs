@@ -4,18 +4,18 @@ using NUnit.Framework;
 namespace NUnitAdapterPerfTests
 {
 
-	public class NunitTests
+    public class NunitTests
     {
 
-		#region PassingTests
-		[Test]
-		public void Test_01()
-		{
-		}
-		#endregion
+        #region PassingTests
+        [Test]
+        public void Test_01()
+        {
+        }
+        #endregion
 
-		#region FailingTests
-		#endregion
-   	
+        #region FailingTests
+        #endregion
+       
     }
 }

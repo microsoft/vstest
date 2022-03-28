@@ -51,7 +51,10 @@ public class RunEventHandler : ITestRunEventsHandler2
         }
 
         Metrics = testRunCompleteArgs.Metrics;
-        LogMessages.Add($"[ERROR] {testRunCompleteArgs.Error}");
+        if (testRunCompleteArgs.Error != null)
+        {
+            LogMessages.Add($"[ERROR] {testRunCompleteArgs.Error}");
+        }
     }
 
     public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
