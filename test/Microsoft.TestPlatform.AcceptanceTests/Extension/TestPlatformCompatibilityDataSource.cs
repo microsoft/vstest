@@ -42,7 +42,7 @@ public class TestPlatformCompatibilityDataSource : TestDataSource<RunnerInfo>
     }
 
     public bool DebugVSTestConsole { get; set; }
-    public bool DebugTesthost { get; set; }
+    public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
     public bool NoDefaultBreakpoints { get; set; } = true;
 
@@ -59,9 +59,12 @@ public class TestPlatformCompatibilityDataSource : TestDataSource<RunnerInfo>
 
     public bool WithOlderConfigurations { get; set; } = true;
 
+    public string? BeforeRunnerFeature { get; set; }
+    public string? AfterRunnerFeature { get; set; }
 
-    public string? BeforeFeature { get; set; }
-    public string? AfterFeature { get; set; }
+    public string? BeforeTestHostFeature { get; set; }
+    public string? AfterTestHostFeature { get; set; }
+
     public string? BeforeAdapterFeature { get; set; }
     public string? AfterAdapterFeature { get; set; }
 
@@ -73,14 +76,18 @@ public class TestPlatformCompatibilityDataSource : TestDataSource<RunnerInfo>
         _builder.WithOlderConfigurations = WithOlderConfigurations;
         _builder.WithInProcess = WithInProcess;
 
-        _builder.BeforeFeature = BeforeFeature;
-        _builder.AfterFeature = AfterFeature;
+        _builder.BeforeRunnerFeature = BeforeRunnerFeature;
+        _builder.AfterRunnerFeature = AfterRunnerFeature;
+
+        _builder.BeforeTestHostFeature = BeforeTestHostFeature;
+        _builder.AfterTestHostFeature = AfterTestHostFeature;
+
         _builder.BeforeAdapterFeature = BeforeAdapterFeature;
         _builder.AfterAdapterFeature = AfterAdapterFeature;
 
         _builder.DebugDataCollector = DebugDataCollector;
         _builder.DebugVSTestConsole = DebugVSTestConsole;
-        _builder.DebugTesthost = DebugTesthost;
+        _builder.DebugTestHost = DebugTestHost;
         _builder.NoDefaultBreakpoints = NoDefaultBreakpoints;
 
         var data = _builder.CreateData();

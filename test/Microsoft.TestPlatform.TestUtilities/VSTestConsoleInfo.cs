@@ -5,21 +5,12 @@ using System;
 
 namespace Microsoft.TestPlatform.TestUtilities;
 
-[Serializable]
+[Serializable] // Type should be serializable to allow the tree-view behavior of test discovery in Test Explorer
 public class VSTestConsoleInfo
 {
-    public VSTestConsoleInfo(string versionType, string? version, string path)
-    {
-        VersionType = versionType;
-        // Version can be null when we fail to find the respective propertin in TestPlatform.Dependencies.props
-        // when that happens we throw when we try to update the path.
-        Version = version;
-        Path = path;
-    }
-
-    public string VersionType { get; }
-    public string? Version { get; }
-    public string Path { get; }
+    public string? VersionType { get; set; }
+    public string? Version { get; set; }
+    public string? Path { get; set; }
 
     public override string ToString() => $" vstest.console = {Version} [{VersionType}]";
 }

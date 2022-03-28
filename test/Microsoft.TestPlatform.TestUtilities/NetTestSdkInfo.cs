@@ -5,11 +5,12 @@ using System;
 
 namespace Microsoft.TestPlatform.TestUtilities;
 
-[Serializable]
-public class MSTestInfo : DllInfo
+[Serializable] // Type should be serializable to allow the tree-view behavior of test discovery in Test Explorer
+public class NetTestSdkInfo : DllInfo
 {
-    public MSTestInfo(string versionType, string? version, string path)
-        : base(name: "MSTest", propertyName: "MSTest", versionType, version, path)
+    public NetTestSdkInfo()
     {
+        Name = "Testhost";
+        PropertyName = "VSTestConsole";
     }
 }

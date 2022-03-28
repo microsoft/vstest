@@ -186,6 +186,7 @@ function Invoke-TestAssetsBuild {
             if ("VSTestConsoleLatestVersion" -eq $propertyName) { 
                 # NETTestSdkVersion has the version of the locally built package.
                 $vsTestConsoleVersion = $dependenciesXml.Project.PropertyGroup."NETTestSdkVersion"
+                continue
             }
             else { 
                 $vsTestConsoleVersion = $dependenciesXml.Project.PropertyGroup.$propertyName
@@ -213,7 +214,7 @@ function Invoke-TestAssetsBuild {
                     continue
                 }
 
-                Invoke-Exe $nugetExe -Arguments "install $package -Version $vsTestConsoleVersion -OutputDirectory $packagePath -ConfigFile ""$nugetConfig"""
+                Invoke-Exe $nugetExe -Arguments "install $package -Version $vsTestConsoleVersion -OutputDirectory $packagePath -ConfigFile $nugetConfig"
 
                 # Install puts it in packages/microsoft.testplatform/Microsoft.TestPlatform.17.1.0, 
                 # because we use that as our output folder. And it also caches it in packages/microsoft.testplatform/17.1.0

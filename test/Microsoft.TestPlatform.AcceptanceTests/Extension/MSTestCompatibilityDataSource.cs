@@ -3,9 +3,7 @@
 
 using System.Reflection;
 
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
-
 
 public class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo>
 {
@@ -34,7 +32,7 @@ public class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo>
     }
 
     public bool DebugVSTestConsole { get; set; }
-    public bool DebugTesthost { get; set; }
+    public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
     public bool NoDefaultBreakpoints { get; set; } = true;
 
@@ -43,8 +41,11 @@ public class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo>
     /// </summary>
     public bool InProcess { get; set; }
 
-    public string? BeforeFeature { get; set; }
-    public string? AfterFeature { get; set; }
+    public string? BeforeRunnerFeature { get; set; }
+    public string? AfterRunnerFeature { get; set; }
+
+    public string? BeforeTestHostFeature { get; set; }
+    public string? AfterTestHostFeature { get; set; }
 
     public string? BeforeAdapterFeature { get; set; }
     public string? AfterAdapterFeature { get; set; }
@@ -57,14 +58,18 @@ public class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo>
         _builder.WithOlderConfigurations = false;
         _builder.WithInProcess = InProcess;
 
-        _builder.BeforeFeature = BeforeFeature;
-        _builder.AfterFeature = AfterFeature;
+        _builder.BeforeRunnerFeature = BeforeRunnerFeature;
+        _builder.AfterRunnerFeature = AfterRunnerFeature;
+
+        _builder.BeforeTestHostFeature = BeforeTestHostFeature;
+        _builder.AfterTestHostFeature = AfterTestHostFeature;
+
         _builder.BeforeAdapterFeature = BeforeAdapterFeature;
         _builder.AfterAdapterFeature = AfterAdapterFeature;
 
         _builder.DebugDataCollector = DebugDataCollector;
         _builder.DebugVSTestConsole = DebugVSTestConsole;
-        _builder.DebugTesthost = DebugTesthost;
+        _builder.DebugTestHost = DebugTestHost;
         _builder.NoDefaultBreakpoints = NoDefaultBreakpoints;
 
         var data = _builder.CreateData();

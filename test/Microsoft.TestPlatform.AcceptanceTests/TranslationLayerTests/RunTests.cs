@@ -40,6 +40,7 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    [TestCategory("Windows-Review")]
     [RunnerCompatibilityDataSource]
     public void RunAllTests(RunnerInfo runnerInfo)
     {
@@ -47,7 +48,7 @@ public class RunTests : AcceptanceTestBase
         
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetDefaultRunSettings(), runEventHandler);
+        vstestConsoleWrapper.RunTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), runEventHandler);
 
         // Assert
         Assert.AreEqual(6, runEventHandler.TestResults.Count);

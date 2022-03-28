@@ -62,6 +62,10 @@ public class IntegrationTestBase
         _testEnvironment = new IntegrationTestEnvironment();
         BuildConfiguration = IntegrationTestEnvironment.BuildConfiguration;
         TempDirectory = new TempDirectory();
+
+        var drive = new DriveInfo(Directory.GetDirectoryRoot(TempDirectory.Path));
+        Console.WriteLine($"Available space for TEMP: {drive.Name} {drive.AvailableFreeSpace / (1024 * 1024)} MB");
+
         IsCI = IntegrationTestEnvironment.IsCI;
     }
 
@@ -82,8 +86,11 @@ public class IntegrationTestBase
     [TestCleanup]
     public void TempDirectoryCleanup()
     {
-        // Delete the directory only when the test succeeded, so we can look at results and logs of failed tests.
-        if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+        // In CI always delete the results, because we have limited disk space there.
+        //
+        // Locally delete the directory only when the test succeeded, so we can look 
+        // at results and logs of failed tests.
+        if (IsCI || TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
         {
             TempDirectory.Dispose();
         }
@@ -178,7 +185,8 @@ public class IntegrationTestBase
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
     public void InvokeVsTest(string arguments, Dictionary<string, string> environmentVariables = null)
     {
-        ExecuteVsTestConsole(arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, environmentVariables);
+        var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
+        ExecuteVsTestConsole(arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables);
         FormatStandardOutCome();
     }
 
@@ -188,7 +196,7 @@ public class IntegrationTestBase
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
     public void InvokeDotnetTest(string arguments, Dictionary<string, string> environmentVariables = null)
     {
-        environmentVariables ??= new Dictionary<string, string>();
+        var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
 
         var vstestConsolePath = GetDotnetRunnerPath();
 
@@ -199,9 +207,9 @@ public class IntegrationTestBase
 
         // This is used in dotnet/sdk to determine path to vstest.console:
         // https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestForwardingApp.cs#L30-L39
-        environmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
+        debugEnvironmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
 
-        ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, environmentVariables);
+        ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables);
         FormatStandardOutCome();
     }
 
@@ -219,33 +227,37 @@ public class IntegrationTestBase
         Dictionary<string, string> environmentVariables = null)
     {
         var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
+        InvokeVsTest(arguments, environmentVariables);
+    }
 
-        if (_testEnvironment.DebugInfo.DebugVSTestConsole || _testEnvironment.DebugInfo.DebugTesthost || _testEnvironment.DebugInfo.DebugDataCollector)
+    private Dictionary<string, string> AddDebugEnvironmentVariables(Dictionary<string, string> environmentVariables)
+    {
+        environmentVariables ??= new Dictionary<string, string>();
+
+        if (_testEnvironment.DebugInfo != null)
         {
-            environmentVariables ??= new Dictionary<string, string>();
-
             if (_testEnvironment.DebugInfo.DebugVSTestConsole)
             {
-                environmentVariables.Add("VSTEST_RUNNER_DEBUG_ATTACHVS", "1");
+                environmentVariables["VSTEST_RUNNER_DEBUG_ATTACHVS"] = "1";
             }
 
-            if (_testEnvironment.DebugInfo.DebugTesthost)
+            if (_testEnvironment.DebugInfo.DebugTestHost)
             {
-                environmentVariables.Add("VSTEST_HOST_DEBUG_ATTACHVS", "1");
+                environmentVariables["VSTEST_HOST_DEBUG_ATTACHVS"] = "1";
             }
 
             if (_testEnvironment.DebugInfo.DebugDataCollector)
             {
-                environmentVariables.Add("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS", "1");
+                environmentVariables["VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS"] = "1";
             }
 
             if (_testEnvironment.DebugInfo.NoDefaultBreakpoints)
             {
-                environmentVariables.Add("VSTEST_DEBUG_NOBP", "1");
+                environmentVariables["VSTEST_DEBUG_NOBP"] = "1";
             }
         }
 
-        InvokeVsTest(arguments, environmentVariables);
+        return environmentVariables;
     }
 
     /// <summary>
@@ -528,17 +540,17 @@ public class IntegrationTestBase
         return _testEnvironment.GetTestAsset(assetName);
     }
 
-    protected string GetAssetFullPath(string assetName, string targetFramework)
+    protected string GetTestDllForFramework(string assetName, string targetFramework)
     {
         return _testEnvironment.GetTestAsset(assetName, targetFramework);
     }
 
-    protected List<string> GetAssetFullPath(DllInfo dllInfo, params string[] assetNames)
+    protected List<string> GetTestDlls(params string[] assetNames)
     {
         var assets = new List<string>();
         foreach (var assetName in assetNames)
         {
-            assets.Add(dllInfo.UpdatePath(GetAssetFullPath(assetName)));
+            assets.Add(GetAssetFullPath(assetName));
         }
 
         return assets;
@@ -601,7 +613,7 @@ public class IntegrationTestBase
 
         if (IsDesktopRunner())
         {
-            if (!string.IsNullOrWhiteSpace(_testEnvironment?.VSTestConsoleInfo.Path))
+            if (!string.IsNullOrWhiteSpace(_testEnvironment.VSTestConsoleInfo?.Path))
             {
                 consoleRunnerPath = _testEnvironment.VSTestConsoleInfo.Path;
             }
@@ -670,32 +682,27 @@ public class IntegrationTestBase
         Console.WriteLine($"Console runner path: {consoleRunnerPath}");
 
         VsTestConsoleWrapper vstestConsoleWrapper;
-        if (_testEnvironment.DebugInfo.DebugVSTestConsole || _testEnvironment.DebugInfo.DebugTesthost || _testEnvironment.DebugInfo.DebugDataCollector)
+
+        // Providing any environment variable to vstest.console will clear all existing environment variables,
+        // this works around it by copying all existing variables, and adding debug. But we only want to do that
+        // when we are setting any debug variables.
+        // TODO: This is scheduled to be fixed in 17.3, where it will start working normally. We will just add those
+        // variables, unless we explicitly say to clean them. https://github.com/microsoft/vstest/pull/3433
+        // Remove this code later, and just pass the variables you want to add.
+        var debugEnvironmentVariables = AddDebugEnvironmentVariables(new Dictionary<string, string>());
+        Dictionary<string, string> environmentVariables = new();
+        if (debugEnvironmentVariables.Count > 0)
         {
-            var environmentVariables = new Dictionary<string, string>();
             Environment.GetEnvironmentVariables().OfType<DictionaryEntry>().ToList().ForEach(e => environmentVariables.Add(e.Key.ToString(), e.Value.ToString()));
-
-            if (_testEnvironment.DebugInfo.DebugVSTestConsole)
+            foreach (var pair in debugEnvironmentVariables)
             {
-                environmentVariables.Add("VSTEST_RUNNER_DEBUG_ATTACHVS", "1");
+                environmentVariables[pair.Key] = pair.Value;
             }
+        }
 
-            if (_testEnvironment.DebugInfo.DebugTesthost)
-            {
-                environmentVariables.Add("VSTEST_HOST_DEBUG_ATTACHVS", "1");
-            }
-
-            if (_testEnvironment.DebugInfo.DebugDataCollector)
-            {
-                environmentVariables.Add("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS", "1");
-            }
-
-            if (_testEnvironment.DebugInfo.NoDefaultBreakpoints)
-            {
-                environmentVariables.Add("VSTEST_DEBUG_NOBP", "1");
-            }
-
-            // This clears all variables
+        if (environmentVariables.Count > 0)
+        {
+            // This clears all variables, so we copy all environment variables, and add the debug ones to them.   
             vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath, EnvironmentVariables = environmentVariables });
         }
         else
@@ -904,24 +911,8 @@ public class IntegrationTestBase
 
     protected string BuildMultipleAssemblyPath(params string[] assetNames)
     {
-        var assetFullPaths = new string[assetNames.Length];
-        for (var i = 0; i < assetNames.Length; i++)
-        {
-            var path = GetAssetFullPath(assetNames[i]);
-            if (_testEnvironment.DllInfos.Count > 0)
-            {
-                foreach (var dllInfo in _testEnvironment.DllInfos)
-                {
-                    path = dllInfo.UpdatePath(path);
-                }
-
-                Assert.IsTrue(File.Exists(path), "GetTestAsset: Path not found: \"{0}\". Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", path);
-            }
-
-            assetFullPaths[i] = path.AddDoubleQuote();
-        }
-
-        return string.Join(" ", assetFullPaths);
+        // Double quoted sources sepearated by space.
+        return string.Join(" ", GetTestDlls(assetNames).Select(a => a.AddDoubleQuote()));
     }
 
     protected static string GetDiagArg(string rootDir)
