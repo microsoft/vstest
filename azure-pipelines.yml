@@ -144,6 +144,14 @@ jobs:
       modifyEnvironment: false
       failOnStandardError: true
 
+  - task: BatchScript@1
+    displayName: 'Run Performance Tests'
+    inputs:
+      filename: test.cmd
+      arguments: '-verbose -configuration $(buildConfiguration) -p Performance -f net48'
+      modifyEnvironment: false
+      failOnStandardError: true
+
   - task: PublishTestResults@2
     displayName: 'Publish Test Results **\*.trx'
     inputs:

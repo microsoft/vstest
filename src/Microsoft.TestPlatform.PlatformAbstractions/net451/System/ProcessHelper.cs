@@ -52,9 +52,14 @@ public partial class ProcessHelper : IProcessHelper
                 return IsArm64Executable(currentProcess.MainModule.FileName);
             }
         }
-        catch (Exception ex)
+        catch
         {
-            PlatformEqtTrace.Verbose($"ProcessHelper.IsArm64: Exception during ARM64 process evaluation, {ex}\n");
+            // At the moment we cannot log messages inside the Microsoft.TestPlatform.PlatformAbstractions.
+            // We did an attempt in https://github.com/microsoft/vstest/pull/3422 - 17.2.0-preview-20220301-01 - but we reverted after
+            // because we broke a scenario where for .NET Framework application inside the test host
+            // we loaded runner version of Microsoft.TestPlatform.PlatformAbstractions but newer version Microsoft.TestPlatform.ObjectModel(the one close
+            // to the test container) and the old PlatformAbstractions doesn't contain the methods expected by the new ObjectModel throwing
+            // a MissedMethodException.
         }
 
         return false;

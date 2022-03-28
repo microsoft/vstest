@@ -5,6 +5,9 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
+using FluentAssertions;
+using FluentAssertions.Extensions;
+
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,6 +19,7 @@ using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 namespace Microsoft.TestPlatform.PerformanceTests;
 
 [TestClass]
+[Ignore("The timing can vary significantly based on the system running the test. Convert them to report the results and not fail.")]
 public class ProtocolV2Tests
 {
     private static readonly TestCase TestCase = new(
@@ -49,76 +53,74 @@ public class ProtocolV2Tests
     [TestMethod]
     public void TestCaseSerialize2()
     {
-        Serialize(TestCase, 2);
+        SerializeV2(TestCase);
         Stopwatch sw = Stopwatch.StartNew();
         for (int i = 0; i < 10000; i++)
         {
-            Serialize(TestCase, 2);
+            SerializeV2(TestCase);
         }
         sw.Stop();
 
-        VerifyPerformanceResult("TestCaseSerialize2", 2000, sw.ElapsedMilliseconds);
+        var actualDuration = sw.Elapsed;
+        actualDuration.Should().BeLessOrEqualTo(2.Seconds(), $"when serializing 10k test cases");
     }
 
     [TestMethod]
     public void TestCaseDeserialize2()
     {
-        var json = Serialize(TestCase, 2);
-        Deserialize<TestCase>(json, 2);
+        var json = SerializeV2(TestCase);
+        DeserializeV2<TestCase>(json);
 
         Stopwatch sw = Stopwatch.StartNew();
         for (int i = 0; i < 10000; i++)
         {
-            Deserialize<TestCase>(json, 2);
+            DeserializeV2<TestCase>(json);
         }
         sw.Stop();
 
-        VerifyPerformanceResult("TestCaseDeserialize2", 2000, sw.ElapsedMilliseconds);
+        var actualDuration = sw.Elapsed;
+        actualDuration.Should().BeLessOrEqualTo(2.Seconds(), $"when de-serializing 10k test cases");
     }
 
     [TestMethod]
     public void TestResultSerialize2()
     {
-        Serialize(TestResult, 2);
+        SerializeV2(TestResult);
         Stopwatch sw = Stopwatch.StartNew();
         for (int i = 0; i < 10000; i++)
         {
-            Serialize(TestResult, 2);
+            SerializeV2(TestResult);
         }
         sw.Stop();
 
-        VerifyPerformanceResult("TestResultSerialize2", 2000, sw.ElapsedMilliseconds);
+        var actualDuration = sw.Elapsed;
+        actualDuration.Should().BeLessOrEqualTo(2.Seconds(), $"when serializing 10k test results");
     }
 
     [TestMethod]
     public void TestResultDeserialize2()
     {
-        var json = Serialize(TestResult, 2);
-        Deserialize<TestResult>(json, 2);
+        var json = SerializeV2(TestResult);
+        DeserializeV2<TestResult>(json);
 
         Stopwatch sw = Stopwatch.StartNew();
         for (int i = 0; i < 10000; i++)
         {
-            Deserialize<TestResult>(json, 2);
+            DeserializeV2<TestResult>(json);
         }
         sw.Stop();
 
-        VerifyPerformanceResult("TestResultDeserialize2", 2000, sw.ElapsedMilliseconds);
+        var actualDuration = sw.Elapsed;
+        actualDuration.Should().BeLessOrEqualTo(2.Seconds(), $"when de-serializing 10k test results");
     }
 
-    private static string Serialize<T>(T data, int version = 1)
+    private static string SerializeV2<T>(T data)
     {
-        return JsonDataSerializer.Instance.Serialize(data, version);
+        return JsonDataSerializer.Instance.Serialize(data, version: 2);
     }
 
-    private static T Deserialize<T>(string json, int version = 1)
+    private static T DeserializeV2<T>(string json)
     {
-        return JsonDataSerializer.Instance.Deserialize<T>(json, version);
-    }
-
-    private static void VerifyPerformanceResult(string scenario, long expectedElapsedTime, long elapsedTime)
-    {
-        Assert.IsTrue(elapsedTime < expectedElapsedTime, $"Scenario '{scenario}' doesn't match with expected elapsed time.");
-        File.AppendAllText(@"E:\ProtocolPerf.txt", $" {scenario} : " + elapsedTime);
+        return JsonDataSerializer.Instance.Deserialize<T>(json, version: 2);
     }
 }
