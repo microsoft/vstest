@@ -124,7 +124,7 @@ jobs:
     displayName: 'Run Performance Tests'
     inputs:
       filename: test.cmd
-      arguments: '-verbose -configuration $(buildConfiguration) -p Performance'
+      arguments: '-verbose -configuration $(buildConfiguration) -p Performance -f net48'
       modifyEnvironment: false
       failOnStandardError: true
 
