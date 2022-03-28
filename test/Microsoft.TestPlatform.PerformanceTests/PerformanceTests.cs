@@ -74,7 +74,7 @@ public class PerformanceTests : TelemetryPerfTestBase
 
         var actualTestHostTime = GetTestHostTime();
 
-        actualTestHostTime.Should().BeLessOrEqualTo(1000.Milliseconds());
+        actualTestHostTime.Should().BeLessOrEqualTo(2000.Milliseconds());
     }
 
     [TestMethod]
