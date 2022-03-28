@@ -1,8 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.TestPlatform.TestUtilities.PerfInstrumentation;
+using System.Linq;
 
+using FluentAssertions;
+using FluentAssertions.Extensions;
+
+using Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable disable
@@ -13,23 +17,20 @@ namespace Microsoft.TestPlatform.PerformanceTests;
 /// The performance tests.
 /// </summary>
 [TestClass]
-public class PerformanceTests : PerformanceTestBase
+[Ignore("The timing can vary significantly based on the system running the test. Convert them to report the results and not fail.")]
+public class PerformanceTests : TelemetryPerfTestBase
 {
     [TestMethod]
-    public void ExecutionPerformanceTest()
+    [DataRow("MSTest1Passing", 1, 500)]
+    public void ExecutionPerformanceTest(string projectName, int expectedTestCount, int thresholdInMs)
     {
-        RunExecutionPerformanceTests(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty);
+        RunExecutionPerformanceTests(GetPerfAssetFullPath(projectName).Single(), GetTestAdapterPath(), string.Empty);
 
-        ValidateSummaryStatus(1, 1, 1);
-        ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
-        ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
-        ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
+        ValidateSummaryStatus(expectedTestCount, 0, 0);
 
-        AnalyzePerfData();
         var actualExecutionTime = GetExecutionTime();
 
-        // Sample Assert statement to verify the performance. 500 will be replaced by the actual threshold value.
-        Assert.IsTrue(actualExecutionTime < 500);
+        actualExecutionTime.Should().BeLessOrEqualTo(thresholdInMs.Milliseconds());
     }
 
     [TestMethod]
@@ -42,11 +43,9 @@ public class PerformanceTests : PerformanceTestBase
             "SampleUnitTestProject.UnitTest1.FailingTest",
             "SampleUnitTestProject.UnitTest1.SkippingTest");
 
-        AnalyzePerfData();
         var actualDiscoveryTime = GetDiscoveryTime();
 
-        // Sample Assert statement to verify the performance. 500 will be replaced by the actual threshold value.
-        Assert.IsTrue(actualDiscoveryTime < 500);
+        actualDiscoveryTime.Should().BeLessOrEqualTo(500.Milliseconds());
     }
 
     [TestMethod]
@@ -59,11 +58,9 @@ public class PerformanceTests : PerformanceTestBase
         ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
         ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
 
-        AnalyzePerfData();
         var actualVsTestTime = GetVsTestTime();
 
-        // Sample Assert statement to verify the performance. 1500 will be replaced by the actual threshold value.
-        Assert.IsTrue(actualVsTestTime < 1500);
+        actualVsTestTime.Should().BeLessOrEqualTo(2500.Milliseconds());
     }
 
     [TestMethod]
@@ -76,11 +73,9 @@ public class PerformanceTests : PerformanceTestBase
         ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
         ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
 
-        AnalyzePerfData();
         var actualTestHostTime = GetTestHostTime();
 
-        // Sample Assert statement to verify the performance. 1000 will be replaced by the actual threshold value.
-        Assert.IsTrue(actualTestHostTime < 1000);
+        actualTestHostTime.Should().BeLessOrEqualTo(2000.Milliseconds());
     }
 
     [TestMethod]
@@ -93,11 +88,8 @@ public class PerformanceTests : PerformanceTestBase
         ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
         ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
 
-        AnalyzePerfData();
-
         var actualAdapterTimeTaken = GetAdapterExecutionTime("executor://mstestadapter/v2");
 
-        // Sample Assert statement to verify the performance. 300 will be replaced by the actual threshold value.
-        Assert.IsTrue(actualAdapterTimeTaken < 300);
+        actualAdapterTimeTaken.Should().BeLessOrEqualTo(1500.Milliseconds());
     }
 }

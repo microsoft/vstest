@@ -2,19 +2,18 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.IO;
 
-#if NETFRAMEWORK
 using System;
 using System.Linq;
 
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
-#endif
 
 #nullable disable
 
-namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation;
+namespace Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 
 /// <summary>
 /// The performance analyzer.
@@ -26,51 +25,58 @@ public class PerfAnalyzer
     /// </summary>
     private const string EtwSessionProviderName = "TestPlatform";
 
-#if NETFRAMEWORK
     private readonly string _perfDataFileName;
     private readonly TraceEventSession _traceEventSession;
     private readonly Dictionary<string, List<TestPlatformTask>> _testPlatformTaskMap;
-#endif
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PerfAnalyzer"/> class.
     /// </summary>
     public PerfAnalyzer()
     {
-#if NETFRAMEWORK
-        _perfDataFileName = "TestPlatformEventsData.etl";
+        // It is important to make the file and session name random,
+        // otherwise there are a lot of errors from wmi that are "random".
+        var name = $"TestPlatform{Guid.NewGuid()}";
+        _perfDataFileName = $"{name}.etl";
         _testPlatformTaskMap = new Dictionary<string, List<TestPlatformTask>>();
-        _traceEventSession = new TraceEventSession("TestPlatformSession", _perfDataFileName);
-#endif
+        _traceEventSession = new TraceEventSession(name, _perfDataFileName);
     }
+
+    /// <summary>
+    /// Returns disposable wrapper that starts and stops performance tracing, and analyzes the data up on dispose.
+    /// </summary>
+    /// <returns></returns>
+    public PerfTracker Start()
+    {
+        return new PerfTracker(this);
+    }
+
+    public List<TestPlatformEvent> Events { get; } = new();
 
     /// <summary>
     /// The enable provider.
     /// </summary>
-    public void EnableProvider()
+    private void EnableProvider()
     {
-#if NETFRAMEWORK
         _traceEventSession.StopOnDispose = true;
         _traceEventSession.EnableProvider(EtwSessionProviderName);
-#endif
     }
 
     /// <summary>
     /// The disable provider.
     /// </summary>
-    public void DisableProvider()
+    private void DisableProvider()
     {
-#if NETFRAMEWORK
+        Console.WriteLine($"Lost events: {_traceEventSession.EventsLost}");
+        _traceEventSession.Flush();
         _traceEventSession.Dispose();
-#endif
     }
 
     /// <summary>
     /// The analyze events data.
     /// </summary>
-    public void AnalyzeEventsData()
+    private void AnalyzeEventsData()
     {
-#if NETFRAMEWORK
         using var source = new ETWTraceEventSource(_perfDataFileName);
         // Open the file
         var parser = new DynamicTraceEventParser(source);
@@ -82,6 +88,7 @@ public class PerfAnalyzer
                 {
                     Console.WriteLine("Received Event : {0}", data.ToString());
                     var key = data.ProcessID + "_" + data.ThreadID.ToString() + "_" + data.TaskName;
+                    Events.Add(new TestPlatformEvent(data.EventName, data.TimeStampRelativeMSec));
 
                     if (!_testPlatformTaskMap.ContainsKey(key))
                     {
@@ -107,7 +114,9 @@ public class PerfAnalyzer
             }
         };
         source.Process(); // Read the file, processing the callbacks.
-#endif
+
+        source.StopProcessing();
+        File.Delete(_perfDataFileName);
     }
 
     /// <summary>
@@ -122,7 +131,6 @@ public class PerfAnalyzer
     public double GetElapsedTimeByTaskName(string taskName)
     {
         var timeTaken = 0.0;
-#if NETFRAMEWORK
         var key = GetEventKey(taskName);
 
         if (key != null)
@@ -130,7 +138,6 @@ public class PerfAnalyzer
             var task = _testPlatformTaskMap[key].First();
             timeTaken = task.EventStopped - task.EventStarted;
         }
-#endif
         return timeTaken;
     }
 
@@ -146,21 +153,19 @@ public class PerfAnalyzer
     public IDictionary<string, string> GetEventDataByTaskName(string taskName)
     {
         IDictionary<string, string> properties = new Dictionary<string, string>();
-#if NETFRAMEWORK
         var key = GetEventKey(taskName);
 
         if (key != null)
         {
             properties = _testPlatformTaskMap[key].First().PayLoadProperties;
         }
-#endif
+
         return properties;
     }
 
     public double GetAdapterExecutionTime(string executorUri)
     {
         var timeTaken = 0.0;
-#if NETFRAMEWORK
         var key = GetEventKey(Constants.AdapterExecutionTask);
 
         if (key != null)
@@ -168,14 +173,13 @@ public class PerfAnalyzer
             var task = _testPlatformTaskMap[key].Find(t => t.PayLoadProperties["executorUri"].Equals(executorUri));
             timeTaken = task.EventStopped - task.EventStarted;
         }
-#endif
+
         return timeTaken;
     }
 
     public long GetAdapterExecutedTests(string executorUri)
     {
         long totalTestsExecuted = 0;
-#if NETFRAMEWORK
         var key = GetEventKey(Constants.AdapterExecutionTask);
 
         if (key != null)
@@ -183,11 +187,10 @@ public class PerfAnalyzer
             var task = _testPlatformTaskMap[key].Find(t => t.PayLoadProperties["executorUri"].Equals(executorUri));
             _ = long.TryParse(task.PayLoadProperties["numberOfTests"], out totalTestsExecuted);
         }
-#endif
+
         return totalTestsExecuted;
     }
 
-#if NETFRAMEWORK
 
     private string GetEventKey(string taskName)
     {
@@ -239,5 +242,21 @@ public class PerfAnalyzer
 
         return payLoadProperties;
     }
-#endif
+
+    public class PerfTracker : IDisposable
+    {
+        private readonly PerfAnalyzer _perfAnalyzer;
+
+        public PerfTracker(PerfAnalyzer perfAnalyzer)
+        {
+            _perfAnalyzer = perfAnalyzer;
+            _perfAnalyzer.EnableProvider();
+        }
+
+        public void Dispose()
+        {
+            _perfAnalyzer.DisableProvider();
+            _perfAnalyzer.AnalyzeEventsData();
+        }
+    }
 }

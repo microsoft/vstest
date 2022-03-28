@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!-- Package dependency versions -->
   <Import Project="..\..\..\..\scripts\build\TestAssets.props" />
+
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <TargetFrameworks>net6.0;net48</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <IsPackable>false</IsPackable>
@@ -10,14 +11,14 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(NETTestSdkVersion)" />
-    <PackageReference Include="MSTest.TestAdapter" Version="$(MSTestFrameworkVersion)" />
-    <PackageReference Include="MSTest.TestFramework" Version="$(MSTestAdapterVersion)" />
+    <PackageReference Include="xunit" Version="$(XUnitFrameworkVersion)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="$(XUnitAdapterVersion)" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="MSTests.tt">
+    <None Update="XunitTests.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>MSTests.cs</LastGenOutput>
+      <LastGenOutput>XunitTests.cs</LastGenOutput>
     </None>
   </ItemGroup>
 
@@ -26,11 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="MSTests.cs">
+    <Compile Update="XunitTests.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>MSTests.tt</DependentUpon>
+      <DependentUpon>XunitTests.tt</DependentUpon>
     </Compile>
   </ItemGroup>
-
 </Project>

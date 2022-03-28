@@ -4,11 +4,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
-using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -17,26 +17,35 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 
 [TestClass]
-public class TelemetryPerfTestbase
+public class TelemetryPerfTestBase : PerformanceTestBase
 {
-    private const string TelemetryInstrumentationKey = "76b373ba-8a55-45dd-b6db-7f1a83288691";
+    private const string TelemetryInstrumentationKey = "08de1ac5-2db8-4c30-97c6-2e12695fa610";
     private readonly TelemetryClient _client;
-    private readonly DirectoryInfo _currentDirectory = new DirectoryInfo(typeof(DiscoveryPerfTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent;
+    private readonly string _rootDirectory = new DirectoryInfo(typeof(DiscoveryPerfTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent.Parent.Parent.Parent.Parent.Parent.FullName;
 
-    public TelemetryPerfTestbase()
+    public TelemetryPerfTestBase()
     {
-        _client = new TelemetryClient();
-        TelemetryConfiguration.Active.InstrumentationKey = TelemetryInstrumentationKey;
+        var telemetryConfiguration = TelemetryConfiguration.CreateDefault();
+        telemetryConfiguration.InstrumentationKey = TelemetryInstrumentationKey;
+
+        _client = new TelemetryClient(telemetryConfiguration);
     }
 
     /// <summary>
     /// Used for posting the telemetry to AppInsights
     /// </summary>
-    /// <param name="perfScenario"></param>
     /// <param name="handlerMetrics"></param>
-    public void PostTelemetry(string perfScenario, IDictionary<string, object> handlerMetrics)
+    /// <param name="scenario"></param>
+    public void PostTelemetry(IDictionary<string, object> handlerMetrics, PerfAnalyzer perfAnalyzer, string projectName, [CallerMemberName] string scenario = null)
     {
-        var properties = new Dictionary<string, string>();
+        var properties = new Dictionary<string, string>
+        {
+            ["Version"] = "1.0.1",
+            ["Project"] = projectName,
+            ["Scenario"] = scenario,
+            ["Configuration"] = BuildConfiguration,
+        };
+
         var metrics = new Dictionary<string, double>();
 
         foreach (var entry in handlerMetrics)
@@ -51,7 +60,13 @@ public class TelemetryPerfTestbase
                 properties.Add(entry.Key, stringValue);
             }
         }
-        _client.TrackEvent(perfScenario, properties, metrics);
+
+        foreach (var entry in perfAnalyzer.Events)
+        {
+            metrics.Add(entry.Name, entry.TimeSinceStart);
+        }
+
+        _client.TrackEvent($"{scenario}{projectName}", properties, metrics);
         _client.Flush();
     }
 
@@ -59,57 +74,24 @@ public class TelemetryPerfTestbase
     /// Returns the full path to the test asset dll
     /// </summary>
     /// <param name="dllDirectory">Name of the directory of the test dll</param>
-    /// <param name="dllName">Name of the test dll</param>
+    /// <param name="name">Name of the test project without extension</param>
     /// <returns></returns>
-    public string GetPerfAssetFullPath(string dllDirectory, string dllName)
+    public string[] GetPerfAssetFullPath(string name, string framework = "net6.0")
     {
-        return Path.Combine(_currentDirectory.FullName, "TestAssets\\PerfAssets", dllDirectory, dllName);
-    }
-
-    /// <summary>
-    /// Returns the VsTestConsole Wrapper.
-    /// </summary>
-    /// <returns></returns>
-    public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
-    {
-        var vstestConsoleWrapper = new VsTestConsoleWrapper(GetConsoleRunnerPath());
-        vstestConsoleWrapper.StartSession();
-
-        return vstestConsoleWrapper;
-    }
-
-    private string BuildConfiguration
-    {
-        get
+        var dllPath = Path.Combine(_rootDirectory, "test", "TestAssets", "performance", name, "bin", BuildConfiguration, framework, $"{name}.dll");
+        if (!File.Exists(dllPath))
         {
-#if DEBUG
-            return "Debug";
-#else
-            return "Release";
-#endif
+            throw new FileNotFoundException(null, dllPath);
         }
-    }
 
-    private string GetConsoleRunnerPath()
-    {
-        // Find the root
-        var root = _currentDirectory.Parent.Parent.Parent;
-        // Path to artifacts vstest.console
-        return Path.Combine(root.FullName, BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
+        return new[] { dllPath };
     }
 
     /// <summary>
     /// Returns the default runsettings xml
     /// </summary>
     /// <returns></returns>
-    public string GetDefaultRunSettings()
-    {
-        string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
-                                    <RunSettings>
-                                        <RunConfiguration>
-                                        <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
-                                        </RunConfiguration>
-                                    </RunSettings>";
-        return runSettingsXml;
-    }
+
+    // DONT make this just <RunSettings></RunSettings> it makes Translation layer hang... https://github.com/microsoft/vstest/issues/3519
+    public string GetDefaultRunSettings() => "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
 }
