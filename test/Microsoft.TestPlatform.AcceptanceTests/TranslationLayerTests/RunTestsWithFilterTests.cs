@@ -50,7 +50,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
         vstestConsoleWrapper.RunTests(
             sources,
             GetDefaultRunSettings(),
-            new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName=SampleUnitTestProject.UnitTest1.PassingTest" },
+            new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName=MSTestProject1.UnitTest1.PassingTest" },
             _runEventHandler);
 
         // Assert
