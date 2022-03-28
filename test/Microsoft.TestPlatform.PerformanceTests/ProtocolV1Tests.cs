@@ -32,7 +32,7 @@ public class ProtocolV1Tests
         Traits = { new Trait("Priority", "0"), new Trait("Category", "unit") }
     };
 
-    private static readonly DateTimeOffset s_startTime = new(new DateTime(2007, 3, 10, 0, 0, 0, DateTimeKind.Utc));
+    private static readonly DateTimeOffset StartTime = new(new DateTime(2007, 3, 10, 0, 0, 0, DateTimeKind.Utc));
 
     private static readonly TestResult TestResult = new(TestCase)
     {
@@ -45,7 +45,7 @@ public class ProtocolV1Tests
         DisplayName = "sampleTestResult",
         ComputerName = "sampleComputerName",
         Duration = TimeSpan.MaxValue,
-        StartTime = s_startTime,
+        StartTime = StartTime,
         EndTime = DateTimeOffset.MaxValue
     };
 
