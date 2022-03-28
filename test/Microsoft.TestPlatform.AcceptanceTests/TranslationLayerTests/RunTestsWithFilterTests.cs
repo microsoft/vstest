@@ -45,7 +45,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
         _runEventHandler = new RunEventHandler();
 
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
-        var sources = new List<string> { GetAssetFullPath("SimpleTestProject.dll") };
+        var sources = new List<string> { GetAssetFullPath("MSTestProject1.dll") };
 
         vstestConsoleWrapper.RunTests(
             sources,
