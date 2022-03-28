@@ -8,6 +8,9 @@ jobs:
   variables:
     buildConfiguration: 'Release'
   steps:
+  - checkout: self
+    fetchDepth: 1
+    clean: true
   - task: BatchScript@1
     displayName: 'Run script build.cmd'
     inputs:
@@ -57,6 +60,9 @@ jobs:
   variables:
     buildConfiguration: 'Release'
   steps:
+  - checkout: self
+    fetchDepth: 1
+    clean: true
   - task: DownloadPipelineArtifact@2
     inputs:
       buildType: 'current'
@@ -145,6 +151,9 @@ jobs:
       buildConfiguration: 'Release'
       VSTestRTMBuild: 'false'
   steps:
+  - checkout: self
+    fetchDepth: 1
+    clean: true
   - script: chmod +x ./scripts/vsts-prebuild.sh
     displayName: 'Preparing for set version'
 
