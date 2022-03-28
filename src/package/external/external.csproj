@@ -33,7 +33,7 @@
 
   <ItemGroup Condition=" '$(DotNetBuildFromSource)' != 'true' ">
     <!-- This csproj restore external tools required for build process -->
-    <PackageReference Include="NuGet.CommandLine" Version="5.8.1" PrivateAssets="All" />
+    <PackageReference Include="NuGet.CommandLine" Version="6.0.0" PrivateAssets="All" />
     <PackageReference Include="fmdev.xlftool" Version="0.1.3" PrivateAssets="All" />
     <PackageReference Include="MicroBuild.Core" Version="0.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Sdk.BuildTasks.14.0" Version="14.0.12-pre" PrivateAssets="All" />
