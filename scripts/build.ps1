@@ -197,40 +197,11 @@ function Invoke-TestAssetsBuild {
                 throw "VSTestConsoleVersion for $propertyName is empty."
             }
 
-            $packages = @(
-                "Microsoft.TestPlatform"
-                "Microsoft.TestPlatform.CLI",
-                "Microsoft.TestPlatform.TranslationLayer"
-                "Microsoft.NET.Test.SDK"
-            )
-
-            foreach ($package in $packages) {
-                $packagePath = "$env:TP_ROOT_DIR\packages\$($package.ToLower())"
-                $cachePath = "$packagePath\$vstestConsoleVersion"
-
-                if ((Test-Path -Path $cachePath) -and (Get-ChildItem $cachePath)) { 
-                    "Package $package $vsTestConsoleVersion is already in nuget cache at $cachePath."
-                    continue
-                }
-
-                Invoke-Exe $nugetExe -Arguments "install $package -Version $vsTestConsoleVersion -OutputDirectory $packagePath -ConfigFile ""$nugetConfig"""
-
-                # Install puts it in packages/microsoft.testplatform/Microsoft.TestPlatform.17.1.0, 
-                # because we use that as our output folder. And it also caches it in packages/microsoft.testplatform/17.1.0
-                # unless the package is from local source, then it does not do that. So we need to rename the folder and remove
-                # the original one. 
-                if (-not (Test-Path -Path $cachePath) -or -not (Get-ChildItem $cachePath)) { 
-                    Rename-Item "$packagePath\$package.$vsTestConsoleVersion" $cachePath
-                    # Nuget locks the locally copied package from time to time.
-                    Start-Sleep -Milliseconds 300
-                }
-                if (Test-Path "$packagePath\$package.$vsTestConsoleVersion") {
-                    Remove-Item -Recurse -Force "$packagePath\$package.$vsTestConsoleVersion"
-                }
-            }
+            # We don't use the results of this build anywhere, we just use them to restore the packages to nuget cache
+            # because using nuget.exe install errors out in various weird ways.
+            Invoke-Exe $dotnetExe -Arguments "build $env:TP_ROOT_DIR\test\TestAssets\Tools\Tools.csproj --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:NETTestSdkVersion=$vsTestConsoleVersion"
         }
 
-        
         # Build with multiple versions of MSTest. The projects are directly in the root.
         # The folder structure in VS is not echoed in the TestAssets directory.
         $projects = @(
