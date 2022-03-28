@@ -6,7 +6,6 @@ using System.Linq;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 
-using Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 using Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -28,7 +27,6 @@ public class PerformanceTests : TelemetryPerfTestbase
 
         ValidateSummaryStatus(expectedTestCount, 0, 0);
 
-        AnalyzePerfData();
         var actualExecutionTime = GetExecutionTime();
 
         actualExecutionTime.Should().BeLessOrEqualTo(thresholdInMs.Milliseconds());
@@ -44,7 +42,6 @@ public class PerformanceTests : TelemetryPerfTestbase
             "SampleUnitTestProject.UnitTest1.FailingTest",
             "SampleUnitTestProject.UnitTest1.SkippingTest");
 
-        AnalyzePerfData();
         var actualDiscoveryTime = GetDiscoveryTime();
 
         actualDiscoveryTime.Should().BeLessOrEqualTo(500.Milliseconds());
@@ -60,10 +57,9 @@ public class PerformanceTests : TelemetryPerfTestbase
         ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
         ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
 
-        AnalyzePerfData();
         var actualVsTestTime = GetVsTestTime();
 
-        actualVsTestTime.Should().BeLessOrEqualTo(1500.Milliseconds());
+        actualVsTestTime.Should().BeLessOrEqualTo(2500.Milliseconds());
     }
 
     [TestMethod]
@@ -76,7 +72,6 @@ public class PerformanceTests : TelemetryPerfTestbase
         ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
         ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
 
-        AnalyzePerfData();
         var actualTestHostTime = GetTestHostTime();
 
         actualTestHostTime.Should().BeLessOrEqualTo(1000.Milliseconds());
@@ -92,10 +87,8 @@ public class PerformanceTests : TelemetryPerfTestbase
         ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
         ValidateSkippedTests("SampleUnitTestProject.UnitTest1.SkippingTest");
 
-        AnalyzePerfData();
-
         var actualAdapterTimeTaken = GetAdapterExecutionTime("executor://mstestadapter/v2");
 
-        actualAdapterTimeTaken.Should().BeLessOrEqualTo(300.Milliseconds());
+        actualAdapterTimeTaken.Should().BeLessOrEqualTo(1500.Milliseconds());
     }
 }

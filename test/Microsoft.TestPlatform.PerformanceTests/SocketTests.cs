@@ -6,6 +6,9 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading;
 
+using FluentAssertions;
+using FluentAssertions.Extensions;
+
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
@@ -70,7 +73,7 @@ public class SocketTests
         thread.Join();
         dataTransferred.Wait();
 
-        Assert.IsTrue(watch.Elapsed < TimeSpan.FromSeconds(10), "Elapsed: " + watch.Elapsed);
+        watch.Elapsed.Should().BeLessOrEqualTo(15.Seconds());
     }
 
     [TestMethod]
@@ -101,7 +104,7 @@ public class SocketTests
         watch.Stop();
         clientThread.Join();
 
-        Assert.IsTrue(watch.Elapsed < TimeSpan.FromSeconds(10), "Elapsed: " + watch.Elapsed);
+        watch.Elapsed.Should().BeLessOrEqualTo(20.Seconds());
     }
 
     private static void SendData(ICommunicationChannel channel, Stopwatch watch)

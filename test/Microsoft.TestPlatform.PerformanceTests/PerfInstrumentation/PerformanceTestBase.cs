@@ -45,17 +45,10 @@ public class PerformanceTestBase : IntegrationTestBase
     /// </param>
     public void RunExecutionPerformanceTests(string testAsset, string testAdapterPath, string runSettings)
     {
-        // Start session and listen
-#if NETFRAMEWORK
-        _perfAnalyzer.EnableProvider();
-#endif
-        // Run Test
-        InvokeVsTestForExecution(testAsset, testAdapterPath, ".NETFramework,Version=v4.5.1", runSettings);
-
-        // Stop Listening
-#if NETFRAMEWORK
-        _perfAnalyzer.DisableProvider();
-#endif
+        using(_perfAnalyzer.Start())
+        {
+            InvokeVsTestForExecution(testAsset, testAdapterPath, framework: string.Empty, runSettings);
+        }
     }
 
     /// <summary>
@@ -72,25 +65,10 @@ public class PerformanceTestBase : IntegrationTestBase
     /// </param>
     public void RunDiscoveryPerformanceTests(string testAsset, string testAdapterPath, string runSettings)
     {
-        // Start session and listen
-#if NETFRAMEWORK
-        _perfAnalyzer.EnableProvider();
-#endif
-        // Run Test
-        InvokeVsTestForDiscovery(testAsset, testAdapterPath, runSettings, ".NETFramework,Version=v4.5.1");
-
-        // Stop Listening
-#if NETFRAMEWORK
-        _perfAnalyzer.DisableProvider();
-#endif
-    }
-
-    /// <summary>
-    /// The analyze performance data.
-    /// </summary>
-    public void AnalyzePerfData()
-    {
-        _perfAnalyzer.AnalyzeEventsData();
+        using (_perfAnalyzer.Start())
+        {
+            InvokeVsTestForDiscovery(testAsset, testAdapterPath, runSettings);
+        }
     }
 
     /// <summary>

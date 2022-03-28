@@ -120,6 +120,14 @@ jobs:
       modifyEnvironment: false
       failOnStandardError: true
 
+  - task: BatchScript@1
+    displayName: 'Run Performance Tests'
+    inputs:
+      filename: test.cmd
+      arguments: '-verbose -configuration $(buildConfiguration) -p Performance'
+      modifyEnvironment: false
+      failOnStandardError: true
+
   - task: PublishTestResults@2
     displayName: 'Publish Test Results **\*.trx'
     inputs:

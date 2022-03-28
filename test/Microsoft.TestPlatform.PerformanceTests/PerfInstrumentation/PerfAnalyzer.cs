@@ -49,14 +49,14 @@ public class PerfAnalyzer
     public PerfTracker Start()
     {
         return new PerfTracker(this);
-    } 
+    }
 
     public List<TestPlatformEvent> Events { get; } = new();
 
     /// <summary>
     /// The enable provider.
     /// </summary>
-    public void EnableProvider()
+    private void EnableProvider()
     {
         _traceEventSession.StopOnDispose = true;
         _traceEventSession.EnableProvider(EtwSessionProviderName);
@@ -65,7 +65,7 @@ public class PerfAnalyzer
     /// <summary>
     /// The disable provider.
     /// </summary>
-    public void DisableProvider()
+    private void DisableProvider()
     {
         Console.WriteLine($"Lost events: {_traceEventSession.EventsLost}");
         _traceEventSession.Flush();
@@ -75,7 +75,7 @@ public class PerfAnalyzer
     /// <summary>
     /// The analyze events data.
     /// </summary>
-    public void AnalyzeEventsData()
+    private void AnalyzeEventsData()
     {
         using var source = new ETWTraceEventSource(_perfDataFileName);
         // Open the file
@@ -242,21 +242,21 @@ public class PerfAnalyzer
 
         return payLoadProperties;
     }
-}
 
-public class PerfTracker : IDisposable
-{
-    private readonly PerfAnalyzer _perfAnalyzer;
-
-    public PerfTracker(PerfAnalyzer perfAnalyzer)
+    public class PerfTracker : IDisposable
     {
-        _perfAnalyzer = perfAnalyzer;
-        _perfAnalyzer.EnableProvider();
-    }
+        private readonly PerfAnalyzer _perfAnalyzer;
 
-    public void Dispose()
-    {
-        _perfAnalyzer.DisableProvider();
-        _perfAnalyzer.AnalyzeEventsData();
+        public PerfTracker(PerfAnalyzer perfAnalyzer)
+        {
+            _perfAnalyzer = perfAnalyzer;
+            _perfAnalyzer.EnableProvider();
+        }
+
+        public void Dispose()
+        {
+            _perfAnalyzer.DisableProvider();
+            _perfAnalyzer.AnalyzeEventsData();
+        }
     }
 }
