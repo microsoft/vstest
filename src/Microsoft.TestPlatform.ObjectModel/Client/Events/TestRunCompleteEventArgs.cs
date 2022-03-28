@@ -33,8 +33,21 @@ public class TestRunCompleteEventArgs : EventArgs
     /// <param name="error">Specifies the error encountered during the execution of the test run.</param>
     /// <param name="attachmentSets">Attachment sets associated with the run.</param>
     /// <param name="elapsedTime">Time elapsed in just running tests</param>
-    public TestRunCompleteEventArgs(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSets, TimeSpan elapsedTime)
-        : this(stats, isCanceled, isAborted, error, attachmentSets, null, elapsedTime)
+    public TestRunCompleteEventArgs(
+        ITestRunStatistics stats,
+        bool isCanceled,
+        bool isAborted,
+        Exception error,
+        Collection<AttachmentSet> attachmentSets,
+        TimeSpan elapsedTime)
+        : this(
+              stats,
+              isCanceled,
+              isAborted,
+              error,
+              attachmentSets,
+              null,
+              elapsedTime)
     { }
 
     /// <summary>
@@ -47,7 +60,14 @@ public class TestRunCompleteEventArgs : EventArgs
     /// <param name="attachmentSets">Attachment sets associated with the run.</param>
     /// <param name="InvokedDataCollectors">Invoked data collectors</param>
     /// <param name="elapsedTime">Time elapsed in just running tests</param>
-    public TestRunCompleteEventArgs(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSets, Collection<InvokedDataCollector> invokedDataCollectors, TimeSpan elapsedTime)
+    public TestRunCompleteEventArgs(
+        ITestRunStatistics stats,
+        bool isCanceled,
+        bool isAborted,
+        Exception error,
+        Collection<AttachmentSet> attachmentSets,
+        Collection<InvokedDataCollector> invokedDataCollectors,
+        TimeSpan elapsedTime)
     {
         TestRunStatistics = stats;
         IsCanceled = isCanceled;
@@ -56,6 +76,8 @@ public class TestRunCompleteEventArgs : EventArgs
         AttachmentSets = attachmentSets ?? new Collection<AttachmentSet>(); // Ensuring attachmentSets are not null, so that new attachmentSets can be combined whenever required.
         InvokedDataCollectors = invokedDataCollectors ?? new Collection<InvokedDataCollector>(); // Ensuring that invoked data collectors are not null.
         ElapsedTimeInRunningTests = elapsedTime;
+
+        DiscoveredExtensions = new Dictionary<string, HashSet<string>>();
     }
 
     /// <summary>
@@ -111,5 +133,5 @@ public class TestRunCompleteEventArgs : EventArgs
     /// Gets or sets the collection of discovered extensions.
     /// </summary>
     [DataMember]
-    public IDictionary<string, ISet<string>> DiscoveredExtensions { get; set; }
+    public Dictionary<string, HashSet<string>> DiscoveredExtensions { get; set; }
 }

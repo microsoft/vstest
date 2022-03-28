@@ -4,8 +4,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -90,7 +88,7 @@ internal class ParallelRunEventsHandler : ITestRunEventsHandler2
 
             // Add the map containing discovered extensions to the event args. This map contains
             // only extensions discovered by the testhost processes. Current process extensions
-            // (i.e. vstest.console) are to be added later on.
+            // (i.e. vstest.console) are added later on.
             completedArgs.DiscoveredExtensions = _runDataAggregator.DiscoveredExtensions;
 
             // Collect Aggregated Metrics Data

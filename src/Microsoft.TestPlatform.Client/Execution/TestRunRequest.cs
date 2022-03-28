@@ -407,13 +407,13 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                 // TODO(copoiena): Writing telemetry twice is less than ideal.
                 // We first write telemetry data in the _requestData variable in the ParallelRunEventsHandler
                 // and then we write again here. We should refactor this code and write only once.
-                runCompleteArgs.DiscoveredExtensions = TestExtensions.MergeExtensionMaps(
+                runCompleteArgs.DiscoveredExtensions = TestExtensions.MergeDictionaries(
                     runCompleteArgs.DiscoveredExtensions,
                     TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
 
                 if (_requestData.IsTelemetryOptedIn)
                 {
-                    TestExtensions.WriteExtensionMapToTelemetryData(
+                    TestExtensions.AddExtensionTelemetry(
                         runCompleteArgs.Metrics,
                         runCompleteArgs.DiscoveredExtensions);
                 }
@@ -604,19 +604,19 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                 // Add extensions discovered by vstest.console.
                 //
                 // TODO(copoiena):
-                // Handling of this merging operation (i.e. extensions discovered by testhost with
-                // extensions discovered by vstest.console) is incorrect because in the current
-                // implementation it's tied to telemetry being opted in. We should handle this a
-                // level above where this method is called, but the raw message is only deserialized
-                // when telemetry is opted in which makes better handling impossible for now. We
-                // could deserialize the raw message no matter if telemetry is opted in or not but
-                // that would probably mean a performance hit.
-                testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions = TestExtensions.MergeExtensionMaps(
+                // Doing extension merging here is incorrect because we can end up not merging the
+                // cached extensions for the current process (i.e. vstest.console) and hence have
+                // an incomplete list of discovered extensions. This can happen because this method
+                // is called only if telemetry is opted in (see: HandleRawMessage). We should handle
+                // this merge a level above in order to be consistent, but that means we'd have to
+                // deserialize all raw messages no matter if telemetry is opted in or not and that
+                // would probably mean a performance hit.
+                testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions = TestExtensions.MergeDictionaries(
                     testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions,
                     TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
 
                 // Write extensions to telemetry data.
-                TestExtensions.WriteExtensionMapToTelemetryData(
+                TestExtensions.AddExtensionTelemetry(
                     testRunCompletePayload.TestRunCompleteArgs.Metrics,
                     testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions);
             }

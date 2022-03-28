@@ -38,7 +38,7 @@ internal class ParallelRunDataAggregator
         RunCompleteArgsAttachments = new List<AttachmentSet>();
         InvokedDataCollectors = new Collection<InvokedDataCollector>();
         Exceptions = new List<Exception>();
-        DiscoveredExtensions = new Dictionary<string, ISet<string>>();
+        DiscoveredExtensions = new Dictionary<string, HashSet<string>>();
         _executorUris = new List<string>();
         _testRunStatsList = new List<ITestRunStatistics>();
 
@@ -63,7 +63,7 @@ internal class ParallelRunDataAggregator
     /// <summary>
     /// A collection of aggregated discovered extensions.
     /// </summary>
-    public IDictionary<string, ISet<string>> DiscoveredExtensions { get; set; }
+    public Dictionary<string, HashSet<string>> DiscoveredExtensions { get; private set; }
 
     public bool IsAborted { get; private set; }
 
@@ -144,7 +144,7 @@ internal class ParallelRunDataAggregator
         ICollection<AttachmentSet> runContextAttachments,
         Collection<AttachmentSet> runCompleteArgsAttachments,
         Collection<InvokedDataCollector> invokedDataCollectors,
-        IDictionary<string, ISet<string>> discoveredExtensions)
+        Dictionary<string, HashSet<string>> discoveredExtensions)
     {
         lock (_dataUpdateSyncObject)
         {
@@ -177,7 +177,7 @@ internal class ParallelRunDataAggregator
             }
 
             // Aggregate the discovered extensions.
-            AggregateDiscoveredExtensions(discoveredExtensions);
+            DiscoveredExtensions = TestExtensions.MergeDictionaries(DiscoveredExtensions, discoveredExtensions);
         }
     }
 
@@ -209,10 +209,5 @@ internal class ParallelRunDataAggregator
                 }
             }
         }
-    }
-
-    private void AggregateDiscoveredExtensions(IDictionary<string, ISet<string>> discoveredExtensions)
-    {
-        DiscoveredExtensions = TestExtensions.MergeExtensionMaps(DiscoveredExtensions, discoveredExtensions);
     }
 }

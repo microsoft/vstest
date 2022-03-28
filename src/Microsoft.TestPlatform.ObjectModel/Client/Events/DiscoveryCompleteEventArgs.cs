@@ -36,7 +36,7 @@ public class DiscoveryCompleteEventArgs : EventArgs
               fullyDiscoveredSources,
               partiallyDiscoveredSources,
               notDiscoveredSources,
-              null)
+              new Dictionary<string, HashSet<string>>())
     { }
 
     /// <summary>
@@ -54,7 +54,7 @@ public class DiscoveryCompleteEventArgs : EventArgs
         IList<string> fullyDiscoveredSources,
         IList<string> partiallyDiscoveredSources,
         IList<string> notDiscoveredSources,
-        IDictionary<string, ISet<string>> discoveredExtensions)
+        Dictionary<string, HashSet<string>> discoveredExtensions)
     {
         // This event is always raised from the client side, while the total count of tests is maintained
         // only at the testhost end. In case of a discovery abort (various reasons including crash), it is
@@ -121,5 +121,5 @@ public class DiscoveryCompleteEventArgs : EventArgs
     /// Gets or sets the collection of discovered extensions.
     /// </summary>
     [DataMember]
-    public IDictionary<string, ISet<string>> DiscoveredExtensions { get; set; }
+    public Dictionary<string, HashSet<string>> DiscoveredExtensions { get; set; }
 }

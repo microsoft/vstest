@@ -52,5 +52,5 @@ public class DiscoveryCompletePayload
     /// <summary>
     /// Gets or sets the collection of discovered extensions.
     /// </summary>
-    public IDictionary<string, ISet<string>> DiscoveredExtensions { get; set; }
+    public Dictionary<string, HashSet<string>> DiscoveredExtensions { get; set; } = new();
 }

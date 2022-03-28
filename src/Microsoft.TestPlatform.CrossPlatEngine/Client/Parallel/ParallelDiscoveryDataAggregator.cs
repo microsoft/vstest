@@ -28,7 +28,7 @@ internal class ParallelDiscoveryDataAggregator
         IsAborted = false;
         TotalTests = 0;
         _metricsAggregator = new ConcurrentDictionary<string, object>();
-        DiscoveredExtensions = new Dictionary<string, ISet<string>>();
+        DiscoveredExtensions = new Dictionary<string, HashSet<string>>();
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ internal class ParallelDiscoveryDataAggregator
     /// <summary>
     /// A collection of aggregated discovered extensions.
     /// </summary>
-    public IDictionary<string, ISet<string>> DiscoveredExtensions { get; set; }
+    public Dictionary<string, HashSet<string>> DiscoveredExtensions { get; private set; }
 
     /// <summary>
     /// Dictionary which stores source with corresponding discoveryStatus
@@ -93,7 +93,7 @@ internal class ParallelDiscoveryDataAggregator
     public void Aggregate(
         long totalTests,
         bool isAborted,
-        IDictionary<string, ISet<string>> discoveredExtensions)
+        Dictionary<string, HashSet<string>> discoveredExtensions)
     {
         lock (_dataUpdateSyncObject)
         {
@@ -111,7 +111,7 @@ internal class ParallelDiscoveryDataAggregator
             TotalTests += totalTests;
 
             // Aggregate the discovered extensions.
-            AggregateDiscoveredExtensions(discoveredExtensions);
+            DiscoveredExtensions = TestExtensions.MergeDictionaries(DiscoveredExtensions, discoveredExtensions);
         }
     }
 
@@ -168,9 +168,4 @@ internal class ParallelDiscoveryDataAggregator
     /// <returns></returns>
     public List<string> GetSourcesWithStatus(DiscoveryStatus status)
         => DiscoveryManager.GetSourcesWithStatus(status, _sourcesWithDiscoveryStatus);
-
-    private void AggregateDiscoveredExtensions(IDictionary<string, ISet<string>> discoveredExtensions)
-    {
-        DiscoveredExtensions = TestExtensions.MergeExtensionMaps(DiscoveredExtensions, discoveredExtensions);
-    }
 }

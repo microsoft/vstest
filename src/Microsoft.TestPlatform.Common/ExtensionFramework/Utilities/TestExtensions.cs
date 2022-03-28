@@ -92,67 +92,73 @@ public class TestExtensions
     internal bool AreDataCollectorsCached { get; set; }
 
     /// <summary>
-    /// Merge two extension maps.
+    /// Merge two extension dictionaries.
     /// </summary>
     /// 
-    /// <param name="extensionMap1">First extension map.</param>
-    /// <param name="extensionMap2">Second extension map.</param>
+    /// <param name="first">First extension dictionary.</param>
+    /// <param name="second">Second extension dictionary.</param>
     /// 
     /// <returns>
-    /// A map representing the merger between the two input maps.
+    /// A dictionary representing the merger between the two input dictionaries.
     /// </returns>
-    internal static IDictionary<string, ISet<string>> MergeExtensionMaps(
-        IDictionary<string, ISet<string>> extensionMap1,
-        IDictionary<string, ISet<string>> extensionMap2)
+    internal static Dictionary<string, HashSet<string>> MergeDictionaries(
+        Dictionary<string, HashSet<string>> first,
+        Dictionary<string, HashSet<string>> second)
     {
-        var isExtensionMap1Valid = (extensionMap1 != null && extensionMap1.Count > 0);
-        var isExtensionMap2Valid = (extensionMap2 != null && extensionMap2.Count > 0);
+        var isFirstNullOrEmpty = first == null || first.Count == 0;
+        var isSecondNullOrEmpty = second == null || second.Count == 0;
 
         // Sanity checks.
-        if (!isExtensionMap1Valid && !isExtensionMap2Valid) return new Dictionary<string, ISet<string>>();
-        if (!isExtensionMap1Valid) return extensionMap2;
-        if (!isExtensionMap2Valid) return extensionMap1;
-
-        // We don't use an additional map for merging, instead we use the first map as a
-        // destination for the merging operation.
-        foreach (var kvp in extensionMap2)
+        if (isFirstNullOrEmpty && isSecondNullOrEmpty)
         {
-            // If the "source" set is empty there's no reason to continue.
+            return new Dictionary<string, HashSet<string>>();
+        }
+        if (isFirstNullOrEmpty)
+        {
+            return new Dictionary<string, HashSet<string>>(second);
+        }
+        if (isSecondNullOrEmpty)
+        {
+            return new Dictionary<string, HashSet<string>>(first);
+        }
+
+        // Copy all the keys in the first dictionary into the resulting dictionary.
+        var resultMap = new Dictionary<string, HashSet<string>>(first);
+
+        foreach (var kvp in second)
+        {
+            // If the "source" set is empty there's no reason to continue merging for this key.
             if (kvp.Value == null || kvp.Value.Count == 0)
             {
                 continue;
             }
 
-            // If there's no key-value pair entry in the "destination" map for the current key in
-            // the "source" map, we copy the "source" set wholesale.
-            if (!extensionMap1.ContainsKey(kvp.Key))
+            // If there's no key-value pair entry in the "destination" dictionary for the current
+            // key in the "source" dictionary, we copy the "source" set wholesale.
+            if (!resultMap.ContainsKey(kvp.Key))
             {
-                extensionMap1.Add(kvp);
+                resultMap.Add(kvp.Key, kvp.Value);
                 continue;
             }
 
             // Getting here means there's already an entry for the "source" key in the "destination"
-            // map which means we need to copy individual set elements from the "source" set to the
-            // "destination" set.
-            // No need to worry about duplicates as the set implementation handles this already.
-            foreach (var extension in kvp.Value)
-            {
-                extensionMap1[kvp.Key].Add(extension);
-            }
+            // dictionary which means we need to copy individual set elements from the "source" set
+            // to the "destination" set.
+            resultMap[kvp.Key] = MergeSets(resultMap[kvp.Key], kvp.Value);
         }
 
-        return extensionMap1;
+        return resultMap;
     }
 
     /// <summary>
-    /// Write the extension map to the telemetry data.
+    /// Add extension-related telemetry.
     /// </summary>
     /// 
     /// <param name="metrics">A collection representing the telemetry data.</param>
-    /// <param name="extensionMap">The input extension map.</param>
-    internal static void WriteExtensionMapToTelemetryData(
+    /// <param name="extensionMap">The input extension collection.</param>
+    internal static void AddExtensionTelemetry(
         IDictionary<string, object> metrics,
-        IDictionary<string, ISet<string>> extensionMap)
+        Dictionary<string, HashSet<string>> extensionMap)
     {
         metrics.Add(
             TelemetryDataConstants.DiscoveredExtensions,
@@ -380,9 +386,9 @@ public class TestExtensions
     /// </summary>
     /// 
     /// <returns>A map representing the cached extensions for the current process.</returns>
-    internal IDictionary<string, ISet<string>> GetCachedExtensions()
+    internal Dictionary<string, HashSet<string>> GetCachedExtensions()
     {
-        var extensionMap = new Dictionary<string, ISet<string>>();
+        var extensionMap = new Dictionary<string, HashSet<string>>();
 
         // Write all "known" cached extension.
         AddCachedExtensionToExtensionMap(extensionMap, "TestDiscoverers", TestDiscoverers?.Values.ToList());
@@ -480,34 +486,41 @@ public class TestExtensions
     }
 
     private void AddCachedExtensionToExtensionMap<T>(
-        IDictionary<string, ISet<string>> extensionMap,
+        Dictionary<string, HashSet<string>> extensionMap,
         string extensionType,
         IList<T> extensions) where T : TestPluginInformation
     {
-        if (extensions == null) return;
-
-        extensionMap.Add(extensionType, new HashSet<string>());
-        foreach (var extension in extensions)
+        if (extensions == null)
         {
-            extensionMap[extensionType].Add(extension.IdentifierData);
+            return;
         }
+
+        extensionMap.Add(extensionType, new HashSet<string>(extensions.Select(e => e.IdentifierData)));
     }
 
-    private static string SerializeExtensionMap(IDictionary<string, ISet<string>> extensionMap)
+    private static string SerializeExtensionMap(IDictionary<string, HashSet<string>> extensionMap)
     {
         StringBuilder sb = new();
 
         foreach (var kvp in extensionMap)
         {
-            sb.Append(
-                kvp.Value?.Count == 0
-                ? string.Empty
-                : string.Format(
-                    "{0}=[{1}];",
-                    kvp.Key,
-                    string.Join(",", kvp.Value.ToArray())));
+            if (kvp.Value?.Count > 0)
+            {
+                sb.AppendFormat("{0}=[{1}];", kvp.Key, string.Join(",", kvp.Value));
+            }
         }
 
         return sb.ToString();
+    }
+
+    private static HashSet<string> MergeSets(HashSet<string> firstSet, HashSet<string> secondSet)
+    {
+        // No need to worry about duplicates as the set implementation handles this already.
+        foreach (var key in secondSet)
+        {
+            firstSet.Add(key);
+        }
+
+        return firstSet;
     }
 }

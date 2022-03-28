@@ -118,7 +118,8 @@ public class TestPluginCache
     /// The <see cref="Dictionary"/>. of test plugin info.
     /// </returns>
     public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(
-        string endsWithPattern) where TPluginInfo : TestPluginInformation
+        string endsWithPattern)
+        where TPluginInfo : TestPluginInformation
     {
         EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: finding test extensions in assemblies ends with: {0} TPluginInfo: {1} TExtension: {2}", endsWithPattern, typeof(TPluginInfo), typeof(TExtension));
         // Return the cached value if cache is valid.
@@ -311,7 +312,8 @@ public class TestPluginCache
     /// </returns>
     internal Dictionary<string, TPluginInfo> GetTestExtensions<TPluginInfo, TExtension>(
         string extensionAssembly,
-        bool skipCache = false) where TPluginInfo : TestPluginInformation
+        bool skipCache = false)
+        where TPluginInfo : TestPluginInformation
     {
         if (skipCache)
         {
