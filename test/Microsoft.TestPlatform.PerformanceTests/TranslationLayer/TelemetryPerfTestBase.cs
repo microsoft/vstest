@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -36,14 +37,16 @@ public class TelemetryPerfTestbase : PerformanceTestBase
     /// </summary>
     /// <param name="handlerMetrics"></param>
     /// <param name="scenario"></param>
-    public void PostTelemetry(IDictionary<string, object> handlerMetrics, string projectName = null, [CallerMemberName] string scenario = null)
+    public void PostTelemetry(IDictionary<string, object> handlerMetrics, PerfAnalyzer perfAnalyzer, string projectName, [CallerMemberName] string scenario = null)
     {
         var properties = new Dictionary<string, string>
         {
+            ["Version"] = "1.0.1",
             ["Project"] = projectName,
             ["Scenario"] = scenario,
             ["Configuration"] = BuildConfiguration,
         };
+
 
         var metrics = new Dictionary<string, double>();
 
@@ -59,6 +62,12 @@ public class TelemetryPerfTestbase : PerformanceTestBase
                 properties.Add(entry.Key, stringValue);
             }
         }
+
+        foreach (var entry in perfAnalyzer.Events)
+        {
+            metrics.Add(entry.Name, entry.TimeSinceStart);
+        }
+
         _client.TrackEvent($"{scenario}{projectName}", properties, metrics);
         _client.Flush();
     }
@@ -69,7 +78,7 @@ public class TelemetryPerfTestbase : PerformanceTestBase
     /// <param name="dllDirectory">Name of the directory of the test dll</param>
     /// <param name="name">Name of the test project without extension</param>
     /// <returns></returns>
-    public string[] GetPerfAssetFullPath(string name, string framework = "net451")
+    public string[] GetPerfAssetFullPath(string name, string framework = "net6.0")
     {
         var dllPath = Path.Combine(_rootDirectory, "test", "TestAssets", "performance", name, "bin", BuildConfiguration, framework, $"{name}.dll");
         if (!File.Exists(dllPath))

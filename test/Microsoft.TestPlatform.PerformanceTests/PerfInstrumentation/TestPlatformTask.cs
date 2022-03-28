@@ -27,3 +27,15 @@ public class TestPlatformTask
         PayLoadProperties = new Dictionary<string, string>();
     }
 }
+
+public class TestPlatformEvent
+{
+    public TestPlatformEvent(string eventName, double timeSinceStart)
+    {
+        Name = eventName;
+        TimeSinceStart = timeSinceStart;
+    }
+
+    public string Name { get; }
+    public double TimeSinceStart { get; }
+}
