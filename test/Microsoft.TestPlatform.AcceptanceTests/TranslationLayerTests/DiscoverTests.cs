@@ -3,8 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+
+using FluentAssertions;
+using FluentAssertions.Extensions;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
@@ -207,6 +211,7 @@ public class DiscoverTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public async Task CancelTestDiscovery(RunnerInfo runnerInfo)
     {
+        var sw = Stopwatch.StartNew();
         // Setup
         var testAssemblies = new List<string>
         {
@@ -219,11 +224,20 @@ public class DiscoverTests : AcceptanceTestBase
 
         var discoveredTests = new List<TestCase>();
         var discoveryEvents = new Mock<ITestDiscoveryEventsHandler>();
+        var alreadyCancelled = false;
+        TimeSpan cancellationCalled = TimeSpan.Zero;
         discoveryEvents.Setup(events => events.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
             .Callback((IEnumerable<TestCase> testcases) =>
             {
+                // As soon as we get first test call cancel. That way we know there is discovery in progress.
                 discoveredTests.AddRange(testcases);
-                _vstestConsoleWrapper.CancelDiscovery();
+                if (!alreadyCancelled)
+                {
+                    cancellationCalled = sw.Elapsed;
+                    // Calling cancel many times crashes. https://github.com/microsoft/vstest/issues/3526
+                    alreadyCancelled = true;
+                    _vstestConsoleWrapper.CancelDiscovery();
+                }
             });
         var isTestCancelled = false;
         discoveryEvents.Setup(events => events.HandleDiscoveryComplete(It.IsAny<long>(), It.IsAny<IEnumerable<TestCase>>(), It.IsAny<bool>()))
@@ -236,11 +250,23 @@ public class DiscoverTests : AcceptanceTestBase
                 }
             });
 
+        string runSettingsXml =
+             $@"<?xml version=""1.0"" encoding=""utf-8""?>
+            <RunSettings>
+                <RunConfiguration>
+                    <TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion>
+                    <BatchSize>1</BatchSize>
+                </RunConfiguration>
+            </RunSettings>";
+
         // Act
-        await Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), discoveryEvents.Object));
+        await Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, runSettingsXml, discoveryEvents.Object));
 
         // Assert.
         Assert.IsTrue(isTestCancelled);
+        var done = sw.Elapsed;
+        var timeTillCancelled = done - cancellationCalled;
+        timeTillCancelled.Should().BeLessThan(2.Seconds());
         int discoveredSourcesCount = discoveredTests.Select(testcase => testcase.Source).Distinct().Count();
         Assert.AreNotEqual(testAssemblies.Count, discoveredSourcesCount, "All test assemblies discovered");
     }
