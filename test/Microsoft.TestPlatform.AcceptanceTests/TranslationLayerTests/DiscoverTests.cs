@@ -260,7 +260,7 @@ public class DiscoverTests : AcceptanceTestBase
         await Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, runSettingsXml, discoveryEvents.Object));
 
         // Assert.
-        Assert.IsTrue(isTestCancelled);
+        Assert.IsTrue(isTestCancelled, "Discovery was not cancelled");
 
         // TODO: Review how much time it takes to actually cancel. It is not 2s on CI server. Are we waiting for anything?
         //var done = sw.Elapsed;
