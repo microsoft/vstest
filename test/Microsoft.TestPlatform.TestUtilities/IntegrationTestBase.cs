@@ -652,16 +652,26 @@ public class IntegrationTestBase
     /// Returns the VsTestConsole Wrapper.
     /// </summary>
     /// <returns></returns>
-    public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
+    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(TraceLevel traceLevel = TraceLevel.Verbose)
     {
-        // Temp directory is already unique so there is no need to have a unique file name.
-        var logFilePath = Path.Combine(TempDirectory.Path, "log.txt");
-        if (!File.Exists(logFilePath))
+        ConsoleParameters consoleParameters = new();
+        if (traceLevel != TraceLevel.Off)
         {
-            File.Create(logFilePath).Close();
-        }
+            if (!Directory.Exists(TempDirectory.Path))
+            {
+                Directory.CreateDirectory(TempDirectory.Path);
+            }
 
-        Console.WriteLine($"Logging diagnostics in {logFilePath}");
+            // Directory is already unique so there is no need to have a unique file name.
+            var logFilePath = Path.Combine(TempDirectory.Path, "log.txt");
+            if (!File.Exists(logFilePath))
+            {
+                File.Create(logFilePath).Close();
+            }
+
+            Console.WriteLine($"Logging diagnostics in {logFilePath}");
+            consoleParameters.LogFilePath = logFilePath;
+        }
 
         var consoleRunnerPath = IsNetCoreRunner()
                 ? GetDotnetRunnerPath()
@@ -702,13 +712,11 @@ public class IntegrationTestBase
 
         if (environmentVariables.Count > 0)
         {
-            // This clears all variables, so we copy all environment variables, and add the debug ones to them.   
-            vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath, EnvironmentVariables = environmentVariables });
+            // This clears all variables, so we copy all environment variables, and add the debug ones to them.
+            consoleParameters.EnvironmentVariables = environmentVariables;
         }
-        else
-        {
-            vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath });
-        }
+
+        vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, consoleParameters);
         vstestConsoleWrapper.StartSession();
 
         return vstestConsoleWrapper;

@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 ///       We pass through exceptions thrown due to incorrect arguments to <c>EqtTrace</c> methods.
 /// Usage: <c>EqtTrace.Info("Here's how to trace info");</c>
 /// </summary>
-public partial class PlatformEqtTrace : IPlatformEqtTrace
+public class PlatformEqtTrace : IPlatformEqtTrace
 {
     private PlatformTraceLevel _traceLevel = PlatformTraceLevel.Off;
 
