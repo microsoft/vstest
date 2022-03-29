@@ -3,7 +3,7 @@
 
 #nullable disable
 
-namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation;
+namespace Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 
 /// <summary>
 /// The constants.

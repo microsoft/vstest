@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation;
+namespace Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 
 /// <summary>
 /// The test platform task.
@@ -26,4 +26,16 @@ public class TestPlatformTask
         TaskName = taskName;
         PayLoadProperties = new Dictionary<string, string>();
     }
+}
+
+public class TestPlatformEvent
+{
+    public TestPlatformEvent(string eventName, double timeSinceStart)
+    {
+        Name = eventName;
+        TimeSinceStart = timeSinceStart;
+    }
+
+    public string Name { get; }
+    public double TimeSinceStart { get; }
 }

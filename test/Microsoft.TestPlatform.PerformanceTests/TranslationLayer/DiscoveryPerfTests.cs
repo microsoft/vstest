@@ -1,9 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Collections.Generic;
-
-using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -12,98 +11,72 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 
 [TestClass]
-public class DiscoveryPerfTests : TelemetryPerfTestbase
+public class DiscoveryPerfTests : TelemetryPerfTestBase
 {
-    private readonly IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private readonly DiscoveryEventHandler2 _discoveryEventHandler2;
-
-    public DiscoveryPerfTests()
+    [TestMethod]
+    [TestCategory("TelemetryPerf")]
+    [DataRow("MSTest1Passing", 1)]
+    [DataRow("MSTest100Passing", 100)]
+    [DataRow("MSTest1000Passing", 1000)]
+    [DataRow("MSTest10kPassing", 10_000)]
+    [DataRow("NUnit1Passing", 1)]
+    [DataRow("NUnit100Passing", 100)]
+    [DataRow("NUnit1000Passing", 1000)]
+    [DataRow("NUnit10kPassing", 10_000)]
+    [DataRow("XUnit1Passing", 1)]
+    [DataRow("XUnit100Passing", 100)]
+    [DataRow("XUnit1000Passing", 1000)]
+    [DataRow("XUnit10kPassing", 10_000)]
+    public void DiscoverTests(string projectName, double expectedNumberOfTests)
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
-        _discoveryEventHandler2 = new DiscoveryEventHandler2();
+        var discoveryEventHandler2 = new DiscoveryEventHandler2();
+        TestPlatformOptions options = new() { CollectMetrics = true };
+
+        var perfAnalyzer = new PerfAnalyzer();
+        using (perfAnalyzer.Start())
+        {
+            var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+            vstestConsoleWrapper.DiscoverTests(GetPerfAssetFullPath(projectName), GetDefaultRunSettings(), options, discoveryEventHandler2);
+            vstestConsoleWrapper.EndSession();
+        }
+        Assert.AreEqual(expectedNumberOfTests, discoveryEventHandler2.Metrics[TelemetryDataConstants.TotalTestsDiscovered]);
+        PostTelemetry(discoveryEventHandler2.Metrics, perfAnalyzer, projectName);
     }
 
     [TestMethod]
     [TestCategory("TelemetryPerf")]
-    public void DiscoverMsTest10K()
-    {
-        var testAssemblies = new List<string>
-        {
-            GetPerfAssetFullPath("MSTestAdapterPerfTestProject", "MSTestAdapterPerfTestProject.dll"),
-        };
-
-        _vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _discoveryEventHandler2);
-
-        PostTelemetry("DiscoverMsTest10K", _discoveryEventHandler2.Metrics);
-    }
-
-    [TestMethod]
     [TestCategory("TelemetryPerf")]
-    public void DiscoverXunit10K()
+    [DataRow("MSTest1Passing", 1)]
+    [DataRow("MSTest100Passing", 100)]
+    [DataRow("MSTest1000Passing", 1000)]
+    [DataRow("MSTest10kPassing", 10_000)]
+    [DataRow("NUnit1Passing", 1)]
+    [DataRow("NUnit100Passing", 100)]
+    [DataRow("NUnit1000Passing", 1000)]
+    [DataRow("NUnit10kPassing", 10_000)]
+    [DataRow("XUnit1Passing", 1)]
+    [DataRow("XUnit100Passing", 100)]
+    [DataRow("XUnit1000Passing", 1000)]
+    [DataRow("XUnit10kPassing", 10_000)]
+    public void DiscoverTestsWithDefaultAdaptersSkipped(string projectName, double expectedNumberOfTests)
     {
-        var testAssemblies = new List<string>
+
+        var discoveryEventHandler2 = new DiscoveryEventHandler2();
+        TestPlatformOptions options = new()
         {
-            GetPerfAssetFullPath("XunitAdapterPerfTestProject", "XunitAdapterPerfTestProject.dll"),
+            CollectMetrics = true,
+            SkipDefaultAdapters = true, // <-- skipping adapters
         };
 
-        _vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _discoveryEventHandler2);
-
-        PostTelemetry("DiscoverXunit10K", _discoveryEventHandler2.Metrics);
-    }
-
-    [TestMethod]
-    [TestCategory("TelemetryPerf")]
-    public void DiscoverNunit10K()
-    {
-        var testAssemblies = new List<string>
+        var perfAnalyzer = new PerfAnalyzer();
+        using (perfAnalyzer.Start())
         {
-            GetPerfAssetFullPath("NunitAdapterPerfTestProject", "NunitAdapterPerfTestProject.dll"),
-        };
+            var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+            vstestConsoleWrapper.DiscoverTests(GetPerfAssetFullPath(projectName), GetDefaultRunSettings(), options, discoveryEventHandler2);
+            vstestConsoleWrapper.EndSession();
+        }
 
-        _vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _discoveryEventHandler2);
-
-        PostTelemetry("DiscoverNunit10K", _discoveryEventHandler2.Metrics);
-    }
-
-    [TestMethod]
-    [TestCategory("TelemetryPerf")]
-    public void DiscoverMsTest10KWithDefaultAdaptersSkipped()
-    {
-        var testAssemblies = new List<string>
-        {
-            GetPerfAssetFullPath("MSTestAdapterPerfTestProject", "MSTestAdapterPerfTestProject.dll"),
-        };
-
-        _vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, _discoveryEventHandler2);
-
-        PostTelemetry("DiscoverMsTest10KWithDefaultAdaptersSkipped", _discoveryEventHandler2.Metrics);
-    }
-
-    [TestMethod]
-    [TestCategory("TelemetryPerf")]
-    public void DiscoverXunit10KWithDefaultAdaptersSkipped()
-    {
-        var testAssemblies = new List<string>
-        {
-            GetPerfAssetFullPath("XunitAdapterPerfTestProject", "XunitAdapterPerfTestProject.dll"),
-        };
-
-        _vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, _discoveryEventHandler2);
-
-        PostTelemetry("DiscoverXunit10KWithDefaultAdaptersSkipped", _discoveryEventHandler2.Metrics);
-    }
-
-    [TestMethod]
-    [TestCategory("TelemetryPerf")]
-    public void DiscoverNunit10KWithDefaultAdaptersSkipped()
-    {
-        var testAssemblies = new List<string>
-        {
-            GetPerfAssetFullPath("NunitAdapterPerfTestProject", "NunitAdapterPerfTestProject.dll"),
-        };
-
-        _vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, _discoveryEventHandler2);
-
-        PostTelemetry("DiscoverNunit10KWithDefaultAdaptersSkipped", _discoveryEventHandler2.Metrics);
+        Assert.AreEqual(expectedNumberOfTests, discoveryEventHandler2.Metrics[TelemetryDataConstants.TotalTestsDiscovered]);
+        PostTelemetry(discoveryEventHandler2.Metrics, perfAnalyzer, projectName);
     }
 }

@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
+
+using FluentAssertions;
+using FluentAssertions.Extensions;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -16,6 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.PerformanceTests;
 
 [TestClass]
+[Ignore("The timing can vary significantly based on the system running the test. Convert them to report the results and not fail.")]
 public class SocketTests
 {
     [TestMethod]
@@ -70,7 +73,7 @@ public class SocketTests
         thread.Join();
         dataTransferred.Wait();
 
-        Assert.IsTrue(watch.Elapsed < TimeSpan.FromSeconds(4), "Elapsed: " + watch.Elapsed);
+        watch.Elapsed.Should().BeLessOrEqualTo(15.Seconds());
     }
 
     [TestMethod]
@@ -101,7 +104,7 @@ public class SocketTests
         watch.Stop();
         clientThread.Join();
 
-        Assert.IsTrue(watch.Elapsed < TimeSpan.FromSeconds(4), "Elapsed: " + watch.Elapsed);
+        watch.Elapsed.Should().BeLessOrEqualTo(20.Seconds());
     }
 
     private static void SendData(ICommunicationChannel channel, Stopwatch watch)

@@ -1,11 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
+
+using Microsoft.TestPlatform.TestUtilities;
 
 #nullable disable
 
-namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation;
+namespace Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 
 /// <summary>
 /// The performance test base.
@@ -20,7 +23,11 @@ public class PerformanceTestBase : IntegrationTestBase
     public PerformanceTestBase()
         : base()
     {
+#if NET
+        throw new InvalidOperationException("Perf tests are not supported on .NET");
+#else
         _perfAnalyzer = new PerfAnalyzer();
+#endif
     }
 
     /// <summary>
@@ -37,17 +44,10 @@ public class PerformanceTestBase : IntegrationTestBase
     /// </param>
     public void RunExecutionPerformanceTests(string testAsset, string testAdapterPath, string runSettings)
     {
-        // Start session and listen
-#if NETFRAMEWORK
-        _perfAnalyzer.EnableProvider();
-#endif
-        // Run Test
-        InvokeVsTestForExecution(testAsset, testAdapterPath, ".NETFramework,Version=v4.5.1", runSettings);
-
-        // Stop Listening
-#if NETFRAMEWORK
-        _perfAnalyzer.DisableProvider();
-#endif
+        using(_perfAnalyzer.Start())
+        {
+            InvokeVsTestForExecution(testAsset, testAdapterPath, framework: string.Empty, runSettings);
+        }
     }
 
     /// <summary>
@@ -64,25 +64,10 @@ public class PerformanceTestBase : IntegrationTestBase
     /// </param>
     public void RunDiscoveryPerformanceTests(string testAsset, string testAdapterPath, string runSettings)
     {
-        // Start session and listen
-#if NETFRAMEWORK
-        _perfAnalyzer.EnableProvider();
-#endif
-        // Run Test
-        InvokeVsTestForDiscovery(testAsset, testAdapterPath, runSettings, ".NETFramework,Version=v4.5.1");
-
-        // Stop Listening
-#if NETFRAMEWORK
-        _perfAnalyzer.DisableProvider();
-#endif
-    }
-
-    /// <summary>
-    /// The analyze performance data.
-    /// </summary>
-    public void AnalyzePerfData()
-    {
-        _perfAnalyzer.AnalyzeEventsData();
+        using (_perfAnalyzer.Start())
+        {
+            InvokeVsTestForDiscovery(testAsset, testAdapterPath, runSettings);
+        }
     }
 
     /// <summary>
@@ -91,29 +76,29 @@ public class PerformanceTestBase : IntegrationTestBase
     /// <returns>
     /// The <see cref="double"/>.
     /// </returns>
-    public double GetExecutionTime()
+    public TimeSpan GetExecutionTime()
     {
-        return _perfAnalyzer.GetElapsedTimeByTaskName(Constants.ExecutionTask);
+        return TimeSpan.FromMilliseconds(_perfAnalyzer.GetElapsedTimeByTaskName(Constants.ExecutionTask));
     }
 
-    public double GetDiscoveryTime()
+    public TimeSpan GetDiscoveryTime()
     {
-        return _perfAnalyzer.GetElapsedTimeByTaskName(Constants.DiscoveryTask);
+        return TimeSpan.FromMilliseconds(_perfAnalyzer.GetElapsedTimeByTaskName(Constants.DiscoveryTask));
     }
 
-    public double GetVsTestTime()
+    public TimeSpan GetVsTestTime()
     {
-        return _perfAnalyzer.GetElapsedTimeByTaskName(Constants.VsTestConsoleTask);
+        return TimeSpan.FromMilliseconds(_perfAnalyzer.GetElapsedTimeByTaskName(Constants.VsTestConsoleTask));
     }
 
-    public double GetTestHostTime()
+    public TimeSpan GetTestHostTime()
     {
-        return _perfAnalyzer.GetElapsedTimeByTaskName(Constants.TestHostTask);
+        return TimeSpan.FromMilliseconds(_perfAnalyzer.GetElapsedTimeByTaskName(Constants.TestHostTask));
     }
 
-    public double GetAdapterSearchTime()
+    public TimeSpan GetAdapterSearchTime()
     {
-        return _perfAnalyzer.GetElapsedTimeByTaskName(Constants.AdapterSearchTask);
+        return TimeSpan.FromMilliseconds(_perfAnalyzer.GetElapsedTimeByTaskName(Constants.AdapterSearchTask));
     }
 
     public IDictionary<string, string> GetDiscoveryData()
@@ -126,8 +111,8 @@ public class PerformanceTestBase : IntegrationTestBase
         return _perfAnalyzer.GetEventDataByTaskName(Constants.AdapterExecutionTask);
     }
 
-    public double GetAdapterExecutionTime(string executorUri)
+    public TimeSpan GetAdapterExecutionTime(string executorUri)
     {
-        return _perfAnalyzer.GetAdapterExecutionTime(executorUri);
+        return TimeSpan.FromMilliseconds(_perfAnalyzer.GetAdapterExecutionTime(executorUri));
     }
 }
