@@ -35,7 +35,7 @@ public class ExecutionPerfTests : TelemetryPerfTestBase
         var perfAnalyzer = new PerfAnalyzer();
         using (perfAnalyzer.Start())
         {
-            var vstestConsoleWrapper = GetVsTestConsoleWrapper(logFileDir: null, traceLevel: System.Diagnostics.TraceLevel.Off);
+            var vstestConsoleWrapper = GetVsTestConsoleWrapper(traceLevel: System.Diagnostics.TraceLevel.Off);
 
             vstestConsoleWrapper.RunTests(GetPerfAssetFullPath(projectName), GetDefaultRunSettings(), options, runEventHandler);
             vstestConsoleWrapper.EndSession();
@@ -71,7 +71,7 @@ public class ExecutionPerfTests : TelemetryPerfTestBase
         var perfAnalyzer = new PerfAnalyzer();
         using (perfAnalyzer.Start())
         {
-            var vstestConsoleWrapper = GetVsTestConsoleWrapper(logFileDir: null, traceLevel: System.Diagnostics.TraceLevel.Off);
+            var vstestConsoleWrapper = GetVsTestConsoleWrapper(traceLevel: System.Diagnostics.TraceLevel.Off);
             vstestConsoleWrapper.RunTests(GetPerfAssetFullPath(projectName), GetDefaultRunSettings(), options, runEventHandler);
             vstestConsoleWrapper.EndSession();
         }

@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 using Castle.Core.Internal;
 
-using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -28,13 +27,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 {
     private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private TempDirectory _tempDirectory;
     private RunEventHandler _runEventHandler;
     private TestRunAttachmentsProcessingEventHandler _testRunAttachmentsProcessingEventHandler;
 
     private void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _tempDirectory);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _runEventHandler = new RunEventHandler();
         _testRunAttachmentsProcessingEventHandler = new TestRunAttachmentsProcessingEventHandler();
     }
@@ -185,6 +183,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingNoMetrics(RunnerInfo runnerInfo)
     {
+        // System.Environment.SetEnvironmentVariable("VSTEST_RUNNER_DEBUG_ATTACHVS", "1");
         // arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
@@ -493,7 +492,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         {
             foreach (var attachment in attachmentSet.Attachments)
             {
-                var xmlCoverage = GetXmlCoverage(attachments.First().Attachments.First().Uri.LocalPath, _tempDirectory);
+                var xmlCoverage = GetXmlCoverage(attachments.First().Attachments.First().Uri.LocalPath, TempDirectory);
 
                 foreach (var project in GetProjects())
                 {
