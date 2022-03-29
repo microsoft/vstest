@@ -263,7 +263,7 @@ public class DiscoverTests : AcceptanceTestBase
         await Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, runSettingsXml, discoveryEvents.Object));
 
         // Assert.
-        Assert.IsTrue(isTestCancelled);
+        Assert.IsTrue(isTestCancelled, "Discovery was not cancelled");
         var done = sw.Elapsed;
         var timeTillCancelled = done - cancellationCalled;
         timeTillCancelled.Should().BeLessThan(2.Seconds());
