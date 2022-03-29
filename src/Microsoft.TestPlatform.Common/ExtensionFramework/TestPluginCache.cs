@@ -325,7 +325,7 @@ public class TestPluginCache
             TestExtensions.GetTestExtensionCache<TPluginInfo>(),
             extensionAssembly);
 
-        if (extensions != null && extensions.Count > 0)
+        if (extensions?.Count > 0)
         {
             return extensions;
         }

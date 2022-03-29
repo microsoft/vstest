@@ -28,7 +28,7 @@ internal class ParallelDiscoveryDataAggregator
         IsAborted = false;
         TotalTests = 0;
         _metricsAggregator = new ConcurrentDictionary<string, object>();
-        DiscoveredExtensions = new Dictionary<string, HashSet<string>>();
+        DiscoveredExtensions = new();
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ internal class ParallelDiscoveryDataAggregator
             TotalTests += totalTests;
 
             // Aggregate the discovered extensions.
-            DiscoveredExtensions = TestExtensions.MergeDictionaries(DiscoveredExtensions, discoveredExtensions);
+            DiscoveredExtensions = TestExtensions.CreateMergedDictionary(DiscoveredExtensions, discoveredExtensions);
         }
     }
 

@@ -255,7 +255,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 // TODO(copoiena): Writing telemetry twice is less than ideal.
                 // We first write telemetry data in the _requestData variable in the ParallelRunEventsHandler
                 // and then we write again here. We should refactor this code and write only once.
-                discoveryCompleteEventArgs.DiscoveredExtensions = TestExtensions.MergeDictionaries(
+                discoveryCompleteEventArgs.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
                     discoveryCompleteEventArgs.DiscoveredExtensions,
                     TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
 
@@ -435,7 +435,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 // this merge a level above in order to be consistent, but that means we'd have to
                 // deserialize all raw messages no matter if telemetry is opted in or not and that
                 // would probably mean a performance hit.
-                discoveryCompletePayload.DiscoveredExtensions = TestExtensions.MergeDictionaries(
+                discoveryCompletePayload.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
                     discoveryCompletePayload.DiscoveredExtensions,
                     TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
 

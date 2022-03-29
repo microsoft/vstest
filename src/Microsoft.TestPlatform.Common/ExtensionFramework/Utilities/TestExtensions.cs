@@ -101,7 +101,7 @@ public class TestExtensions
     /// <returns>
     /// A dictionary representing the merger between the two input dictionaries.
     /// </returns>
-    internal static Dictionary<string, HashSet<string>> MergeDictionaries(
+    internal static Dictionary<string, HashSet<string>> CreateMergedDictionary(
         Dictionary<string, HashSet<string>> first,
         Dictionary<string, HashSet<string>> second)
     {
@@ -123,7 +123,7 @@ public class TestExtensions
         }
 
         // Copy all the keys in the first dictionary into the resulting dictionary.
-        var resultMap = new Dictionary<string, HashSet<string>>(first);
+        var result = new Dictionary<string, HashSet<string>>(first);
 
         foreach (var kvp in second)
         {
@@ -135,19 +135,19 @@ public class TestExtensions
 
             // If there's no key-value pair entry in the "destination" dictionary for the current
             // key in the "source" dictionary, we copy the "source" set wholesale.
-            if (!resultMap.ContainsKey(kvp.Key))
+            if (!result.ContainsKey(kvp.Key))
             {
-                resultMap.Add(kvp.Key, kvp.Value);
+                result.Add(kvp.Key, kvp.Value);
                 continue;
             }
 
             // Getting here means there's already an entry for the "source" key in the "destination"
             // dictionary which means we need to copy individual set elements from the "source" set
             // to the "destination" set.
-            resultMap[kvp.Key] = MergeSets(resultMap[kvp.Key], kvp.Value);
+            result[kvp.Key] = MergeSets(result[kvp.Key], kvp.Value);
         }
 
-        return resultMap;
+        return result;
     }
 
     /// <summary>
@@ -155,14 +155,14 @@ public class TestExtensions
     /// </summary>
     /// 
     /// <param name="metrics">A collection representing the telemetry data.</param>
-    /// <param name="extensionMap">The input extension collection.</param>
+    /// <param name="extensions">The input extension collection.</param>
     internal static void AddExtensionTelemetry(
         IDictionary<string, object> metrics,
-        Dictionary<string, HashSet<string>> extensionMap)
+        Dictionary<string, HashSet<string>> extensions)
     {
         metrics.Add(
             TelemetryDataConstants.DiscoveredExtensions,
-            SerializeExtensionMap(extensionMap));
+            SerializeExtensionDictionary(extensions));
     }
 
     /// <summary>
@@ -385,21 +385,21 @@ public class TestExtensions
     /// Gets the cached extensions for the current process.
     /// </summary>
     /// 
-    /// <returns>A map representing the cached extensions for the current process.</returns>
+    /// <returns>A dictionary representing the cached extensions for the current process.</returns>
     internal Dictionary<string, HashSet<string>> GetCachedExtensions()
     {
-        var extensionMap = new Dictionary<string, HashSet<string>>();
+        var extensions = new Dictionary<string, HashSet<string>>();
 
         // Write all "known" cached extension.
-        AddCachedExtensionToExtensionMap(extensionMap, "TestDiscoverers", TestDiscoverers?.Values.ToList());
-        AddCachedExtensionToExtensionMap(extensionMap, "TestExecutors", TestExecutors?.Values.ToList());
-        AddCachedExtensionToExtensionMap(extensionMap, "TestExecutors2", TestExecutors2?.Values.ToList());
-        AddCachedExtensionToExtensionMap(extensionMap, "TestSettingsProviders", TestSettingsProviders?.Values.ToList());
-        AddCachedExtensionToExtensionMap(extensionMap, "TestLoggers", TestLoggers?.Values.ToList());
-        AddCachedExtensionToExtensionMap(extensionMap, "TestHosts", TestHosts?.Values.ToList());
-        AddCachedExtensionToExtensionMap(extensionMap, "DataCollectors", DataCollectors?.Values.ToList());
+        AddCachedExtensionToDictionary(extensions, "TestDiscoverers", TestDiscoverers?.Values.ToList());
+        AddCachedExtensionToDictionary(extensions, "TestExecutors", TestExecutors?.Values.ToList());
+        AddCachedExtensionToDictionary(extensions, "TestExecutors2", TestExecutors2?.Values.ToList());
+        AddCachedExtensionToDictionary(extensions, "TestSettingsProviders", TestSettingsProviders?.Values.ToList());
+        AddCachedExtensionToDictionary(extensions, "TestLoggers", TestLoggers?.Values.ToList());
+        AddCachedExtensionToDictionary(extensions, "TestHosts", TestHosts?.Values.ToList());
+        AddCachedExtensionToDictionary(extensions, "DataCollectors", DataCollectors?.Values.ToList());
 
-        return extensionMap;
+        return extensions;
     }
 
     /// <summary>
@@ -485,24 +485,25 @@ public class TestExtensions
         }
     }
 
-    private void AddCachedExtensionToExtensionMap<T>(
-        Dictionary<string, HashSet<string>> extensionMap,
+    private void AddCachedExtensionToDictionary<T>(
+        Dictionary<string, HashSet<string>> extensionDict,
         string extensionType,
-        IList<T> extensions) where T : TestPluginInformation
+        IEnumerable<T> extensions)
+        where T : TestPluginInformation
     {
         if (extensions == null)
         {
             return;
         }
 
-        extensionMap.Add(extensionType, new HashSet<string>(extensions.Select(e => e.IdentifierData)));
+        extensionDict.Add(extensionType, new HashSet<string>(extensions.Select(e => e.IdentifierData)));
     }
 
-    private static string SerializeExtensionMap(IDictionary<string, HashSet<string>> extensionMap)
+    private static string SerializeExtensionDictionary(IDictionary<string, HashSet<string>> extensions)
     {
         StringBuilder sb = new();
 
-        foreach (var kvp in extensionMap)
+        foreach (var kvp in extensions)
         {
             if (kvp.Value?.Count > 0)
             {
@@ -515,12 +516,14 @@ public class TestExtensions
 
     private static HashSet<string> MergeSets(HashSet<string> firstSet, HashSet<string> secondSet)
     {
+        var mergedSet = new HashSet<string>(firstSet);
+
         // No need to worry about duplicates as the set implementation handles this already.
         foreach (var key in secondSet)
         {
-            firstSet.Add(key);
+            mergedSet.Add(key);
         }
 
-        return firstSet;
+        return mergedSet;
     }
 }

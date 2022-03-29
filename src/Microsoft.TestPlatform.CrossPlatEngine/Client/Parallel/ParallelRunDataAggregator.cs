@@ -177,7 +177,7 @@ internal class ParallelRunDataAggregator
             }
 
             // Aggregate the discovered extensions.
-            DiscoveredExtensions = TestExtensions.MergeDictionaries(DiscoveredExtensions, discoveredExtensions);
+            DiscoveredExtensions = TestExtensions.CreateMergedDictionary(DiscoveredExtensions, discoveredExtensions);
         }
     }
 

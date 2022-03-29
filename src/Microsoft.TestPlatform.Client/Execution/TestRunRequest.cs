@@ -407,7 +407,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                 // TODO(copoiena): Writing telemetry twice is less than ideal.
                 // We first write telemetry data in the _requestData variable in the ParallelRunEventsHandler
                 // and then we write again here. We should refactor this code and write only once.
-                runCompleteArgs.DiscoveredExtensions = TestExtensions.MergeDictionaries(
+                runCompleteArgs.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
                     runCompleteArgs.DiscoveredExtensions,
                     TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
 
@@ -611,7 +611,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                 // this merge a level above in order to be consistent, but that means we'd have to
                 // deserialize all raw messages no matter if telemetry is opted in or not and that
                 // would probably mean a performance hit.
-                testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions = TestExtensions.MergeDictionaries(
+                testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
                     testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions,
                     TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
 
