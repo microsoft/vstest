@@ -391,13 +391,13 @@ public class TestExtensions
         var extensions = new Dictionary<string, HashSet<string>>();
 
         // Write all "known" cached extension.
-        AddCachedExtensionToDictionary(extensions, "TestDiscoverers", TestDiscoverers?.Values.ToList());
-        AddCachedExtensionToDictionary(extensions, "TestExecutors", TestExecutors?.Values.ToList());
-        AddCachedExtensionToDictionary(extensions, "TestExecutors2", TestExecutors2?.Values.ToList());
-        AddCachedExtensionToDictionary(extensions, "TestSettingsProviders", TestSettingsProviders?.Values.ToList());
-        AddCachedExtensionToDictionary(extensions, "TestLoggers", TestLoggers?.Values.ToList());
-        AddCachedExtensionToDictionary(extensions, "TestHosts", TestHosts?.Values.ToList());
-        AddCachedExtensionToDictionary(extensions, "DataCollectors", DataCollectors?.Values.ToList());
+        AddCachedExtensionToDictionary(extensions, "TestDiscoverers", TestDiscoverers?.Values);
+        AddCachedExtensionToDictionary(extensions, "TestExecutors", TestExecutors?.Values);
+        AddCachedExtensionToDictionary(extensions, "TestExecutors2", TestExecutors2?.Values);
+        AddCachedExtensionToDictionary(extensions, "TestSettingsProviders", TestSettingsProviders?.Values);
+        AddCachedExtensionToDictionary(extensions, "TestLoggers", TestLoggers?.Values);
+        AddCachedExtensionToDictionary(extensions, "TestHosts", TestHosts?.Values);
+        AddCachedExtensionToDictionary(extensions, "DataCollectors", DataCollectors?.Values);
 
         return extensions;
     }
