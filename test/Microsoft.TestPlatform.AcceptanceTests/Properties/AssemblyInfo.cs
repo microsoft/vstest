@@ -23,4 +23,4 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 [assembly: Guid("755996fa-672a-4272-9776-7f707a520058")]
 
 // Enable IAP at class level with as many threads as possible based on CPU and core count.
-[assembly: Parallelize(Workers = 0, Scope = ExecutionScope.ClassLevel)]
+[assembly: Parallelize(Workers = 0, Scope = ExecutionScope.MethodLevel)]

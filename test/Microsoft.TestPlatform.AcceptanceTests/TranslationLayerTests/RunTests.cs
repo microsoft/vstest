@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
+using FluentAssertions;
+
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -55,6 +57,51 @@ public class RunTests : AcceptanceTestBase
         Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
         Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
         Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+    }
+
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [RunnerCompatibilityDataSource(BeforeFeature = Features.MULTI_TFM)]
+    public void RunAllTestsWithMixedTFMsWillFailToRunTestsFromTheIncompatibleTFMDll(RunnerInfo runnerInfo)
+    {
+        // Arrange
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        var runEventHandler = new RunEventHandler();
+        var compatibleDll = GetTestDllForFramework("MSTestProject1.dll", "net451");
+        var incompatibleDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
+
+        // Act
+        // We have no preference around what TFM is used. It will be autodetected.
+        var runsettingsXml = "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+        vstestConsoleWrapper.RunTests(new[] { compatibleDll, incompatibleDll }, runsettingsXml, runEventHandler);
+
+        // Assert
+        runEventHandler.TestResults.Should().HaveCount(3, "we failed to run those tests because they are not compatible.");
+    }
+
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [RunnerCompatibilityDataSource(AfterFeature = Features.MULTI_TFM, DebugVSTestConsole = true, JustRow = 1)]
+    public void RunAllTestsWithMixedTFMsWillRunTestsFromAllProvidedDllEvenWhenTheyMixTFMs(RunnerInfo runnerInfo)
+    {
+        // Arrange
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        var runEventHandler = new RunEventHandler();
+        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", "net451");
+        var netDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
+
+        // Act
+        // We have no preference around what TFM is used. It will be autodetected.
+        var runsettingsXml = "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+        vstestConsoleWrapper.RunTests(new[] { netFrameworkDll, netDll }, runsettingsXml, runEventHandler);
+
+        // Assert
+        runEventHandler.Errors.Should().BeEmpty();
+        runEventHandler.TestResults.Should().HaveCount(6, "we run all tests from both assemblies");
     }
 
     [TestMethod]

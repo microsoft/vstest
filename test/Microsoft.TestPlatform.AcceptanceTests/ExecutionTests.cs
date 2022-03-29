@@ -251,7 +251,7 @@ public class ExecutionTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
-    public void IncompatibleSourcesWarningShouldBeDisplayedInTheConsole(RunnerInfo runnerInfo)
+    public void IncompatibleSourcesWarningShouldBeDisplayedInTheConsoleWhenGivenIncompatibleX86andX64Dll(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
@@ -273,7 +273,7 @@ public class ExecutionTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
-    public void NoIncompatibleSourcesWarningShouldBeDisplayedInTheConsole(RunnerInfo runnerInfo)
+    public void NoIncompatibleSourcesWarningShouldBeDisplayedInTheConsoleWhenGivenSingleX86Dll(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
@@ -312,6 +312,7 @@ public class ExecutionTests : AcceptanceTestBase
         {
             StdOutputDoesNotContains(expectedWarningContains);
         }
+
         // If we are running this test on 32 bit OS, it should output warning message
         else
         {
