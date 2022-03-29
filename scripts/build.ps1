@@ -186,7 +186,6 @@ function Invoke-TestAssetsBuild {
             if ("VSTestConsoleLatestVersion" -eq $propertyName) { 
                 # NETTestSdkVersion has the version of the locally built package.
                 $vsTestConsoleVersion = $dependenciesXml.Project.PropertyGroup."NETTestSdkVersion"
-                continue
             }
             else { 
                 $vsTestConsoleVersion = $dependenciesXml.Project.PropertyGroup.$propertyName

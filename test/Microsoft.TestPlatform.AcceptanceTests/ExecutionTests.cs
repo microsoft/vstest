@@ -65,6 +65,40 @@ public class ExecutionTests : AcceptanceTestBase
 
         ValidateSummaryStatus(2, 2, 2);
         ExitCodeEquals(1); // failing tests
+        StdErrHasTestRunFailedMessageButNoOtherError();
+        StdOutHasNoWarnings();
+    }
+
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [TestPlatformCompatibilityDataSource()]
+    public void RunTestsFromMultipleMSTestAssemblies(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPaths = BuildMultipleAssemblyPath("MSTestProject1.dll", "MSTestProject2.dll");
+
+        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
+
+        ValidateSummaryStatus(passed: 2, failed: 2, skipped: 2);
+        ExitCodeEquals(1); // failing tests
+        StdErrHasTestRunFailedMessageButNoOtherError();
+        StdOutHasNoWarnings();
+    }
+
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [TestHostCompatibilityDataSource]
+    public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPaths = BuildMultipleAssemblyPath("MSTestProject1.dll", "MSTestProject2.dll");
+
+        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
+
+        ValidateSummaryStatus(2, 2, 2);
+        ExitCodeEquals(1); // failing tests
     }
 
     [TestMethod]
@@ -75,6 +109,8 @@ public class ExecutionTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPaths = BuildMultipleAssemblyPath("MSTestProject1.dll", "MSTestProject2.dll");
+
+        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 
