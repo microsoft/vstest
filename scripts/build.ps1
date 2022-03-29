@@ -3,47 +3,47 @@
 
 [CmdletBinding()]
 Param(
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [ValidateSet("Debug", "Release")]
     [Alias("c")]
     [System.String] $Configuration = "Debug",
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [Alias("r")]
     [System.String] $TargetRuntime = "win7-x64",
 
     # Versioning scheme = Major(15).Minor(RTW, Updates).SubUpdates(preview4, preview5, RC etc)
     # E.g. VS 2017 Update 1 Preview will have version 15.1.1
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [Alias("v")]
     [System.String] $Version, # Will set this later by reading TestPlatform.Settings.targets file.
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [Alias("vs")]
     [System.String] $VersionSuffix = "dev",
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [Alias("bn")]
     [System.String] $BuildNumber = "20991231-99",
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [Alias("ff")]
     [System.Boolean] $FailFast = $true,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [Alias("noloc")]
     [Switch] $DisableLocalizedBuild,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [Alias("ci")]
     [Switch] $CIBuild,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [Alias("pt")]
     [Switch] $PublishTestArtifacts,
 
     # Build specific projects
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [Alias("p")]
     [System.String[]] $ProjectNamePatterns = @(),
 
@@ -61,11 +61,10 @@ $ErrorView = 'Normal'
 
 # Set Version from scripts/build/TestPlatform.Settings.targets, when we are running locally and not providing the version as the parameter
 # or when the build is done directly in VS
-if([string]::IsNullOrWhiteSpace($Version))
-{
+if ([string]::IsNullOrWhiteSpace($Version)) {
     $Version = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup[0].TPVersionPrefix |
-        ForEach-Object { $_.Trim() } |
-        Select-Object -First 1
+    ForEach-Object { $_.Trim() } |
+    Select-Object -First 1
 
     Write-Verbose "Version was not provided using version '$Version' from TestPlatform.Settings.targets"
 }
@@ -128,21 +127,18 @@ if ($env:PATH -notlike "*$attachVsPath") {
 # so nuget restores it correctly.
 $vsSdkBuildToolsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.VSSdkBuildToolsVersion
 $vsixUtilDir = "$env:TP_ROOT_DIR\packages\microsoft.vssdk.buildtools"
-if ((Test-Path $vsixUtilDir) -and -not (Test-Path "$vsixUtilDir\$vsSdkBuildToolsVersion\tools\vssdk\bin\VsixUtil.exe"))
-{
+if ((Test-Path $vsixUtilDir) -and -not (Test-Path "$vsixUtilDir\$vsSdkBuildToolsVersion\tools\vssdk\bin\VsixUtil.exe")) {
     Remove-Item -Recurse -Force $vsixUtilDir
 }
 
 # Procdump gets regularly eaten by antivirus or something. Remove the package dir if it gets broken
 # so nuget restores it correctly.
 $procdumpDir = "$env:TP_ROOT_DIR\packages\procdump"
-if ((Test-Path $procdumpDir) -and 2 -ne @(Get-Item "$procdumpDir\0.0.1\bin").Length)
-{
+if ((Test-Path $procdumpDir) -and 2 -ne @(Get-Item "$procdumpDir\0.0.1\bin").Length) {
     Remove-Item -Recurse -Force $procdumpDir
 }
 
-function Invoke-Build
-{
+function Invoke-Build {
     $timer = Start-Timer
     Write-Log "Invoke-Build: Start build."
     $dotnetExe = Get-DotNetPath
@@ -157,8 +153,7 @@ function Invoke-Build
     Write-Log "Invoke-Build: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
-function Invoke-TestAssetsBuild
-{
+function Invoke-TestAssetsBuild {
     $timer = Start-Timer
     Write-Log "Invoke-TestAssetsBuild: Start test assets build."
     $dotnetExe = Get-DotNetPath
@@ -170,6 +165,94 @@ function Invoke-TestAssetsBuild
         Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution -- add NuGet source"
         Invoke-Exe -IgnoreExitCode 1 $nugetExe -Arguments "sources add -Name ""locally-built-testplatform-packages"" -Source $env:TP_TESTARTIFACTS\packages\ -ConfigFile ""$nugetConfig"""
         Invoke-Exe $dotnetExe -Arguments "build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$env:TP_OUT_DIR\log\$Configuration\TestAssets.binlog"""
+
+        # Compatibility matrix build.
+        $dependenciesPath = "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props"
+        $dependenciesXml = [xml](Get-Content -Raw -Encoding UTF8 $dependenciesPath)
+
+        # Restore previous versions of TestPlatform (for vstest.console.exe), and TestPlatform.CLI (for vstest.console.dll).
+        # These properties are coming from TestPlatform.Dependencies.props.
+        $vstestConsoleVersionProperties = @(
+            "VSTestConsoleLatestVersion"
+            "VSTestConsoleLatestPreviewVersion"
+            "VSTestConsoleLatestStableVersion" 
+            "VSTestConsoleRecentStableVersion" 
+            "VSTestConsoleMostDownloadedVersion"
+            "VSTestConsolePreviousStableVersion"
+            "VSTestConsoleLegacyStableVersion"
+        )
+
+        foreach ($propertyName in $vstestConsoleVersionProperties) {
+            if ("VSTestConsoleLatestVersion" -eq $propertyName) { 
+                # NETTestSdkVersion has the version of the locally built package.
+                $vsTestConsoleVersion = $dependenciesXml.Project.PropertyGroup."NETTestSdkVersion"
+            }
+            else { 
+                $vsTestConsoleVersion = $dependenciesXml.Project.PropertyGroup.$propertyName
+            }
+            
+            # The command line tool does not like the package ranges.
+            $vsTestConsoleVersion = $vsTestConsoleVersion -replace "(\[|\])"
+            if (-not $vsTestConsoleVersion) {
+                throw "VSTestConsoleVersion for $propertyName is empty."
+            }
+
+            # We don't use the results of this build anywhere, we just use them to restore the packages to nuget cache
+            # because using nuget.exe install errors out in various weird ways.
+            Invoke-Exe $dotnetExe -Arguments "build $env:TP_ROOT_DIR\test\TestAssets\Tools\Tools.csproj --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:NETTestSdkVersion=$vsTestConsoleVersion"
+        }
+
+        # Build with multiple versions of MSTest. The projects are directly in the root.
+        # The folder structure in VS is not echoed in the TestAssets directory.
+        $projects = @(
+            "$env:TP_ROOT_DIR\test\TestAssets\MSTestProject1\MSTestProject1.csproj"
+            "$env:TP_ROOT_DIR\test\TestAssets\MSTestProject2\MSTestProject2.csproj"
+            # Don't use this one, it does not use the variables for mstest and test sdk.
+            # "$env:TP_ROOT_DIR\test\TestAssets\SimpleTestProject2\SimpleTestProject2.csproj"
+        )
+
+        $msTestVersionProperties = @(
+            "MSTestFrameworkLatestPreviewVersion"
+            "MSTestFrameworkLatestStableVersion"
+            "MSTestFrameworkRecentStableVersion"
+            "MSTestFrameworkMostDownloadedVersion"
+            "MSTestFrameworkPreviousStableVersion"
+            "MSTestFrameworkLegacyStableVersion"
+        )
+        
+        foreach ($project in $projects) {
+            # We use the same version properties for NET.Test.Sdk as for VSTestConsole, for now.
+            foreach ($sdkPropertyName in $vstestConsoleVersionProperties) {
+                if ("VSTestConsoleLatestVersion" -eq $sdkPropertyName) { 
+                    # NETTestSdkVersion has the version of the locally built package.
+                    $netTestSdkVersion = $dependenciesXml.Project.PropertyGroup."NETTestSdkVersion"
+                }
+                else { 
+                    $netTestSdkVersion = $dependenciesXml.Project.PropertyGroup.$sdkPropertyName
+                }
+            
+                if (-not $netTestSdkVersion) {
+                    throw "NetTestSdkVersion for $sdkPropertyName is empty."
+                }
+            
+                $dirNetTestSdkVersion = $netTestSdkVersion -replace "\[|\]" 
+                $dirNetTestSdkPropertyName = $sdkPropertyName -replace "Framework" -replace "Version" -replace "VSTestConsole", "NETTestSdk"
+                
+                foreach ($propertyName in $msTestVersionProperties) {  
+                    $mstestVersion = $dependenciesXml.Project.PropertyGroup.$propertyName
+
+                    if (-not $mstestVersion) {
+                        throw "MSTestVersion for $propertyName is empty."
+                    }
+                
+                    $dirMSTestVersion = $mstestVersion -replace "\[|\]" 
+                    $dirMSTestPropertyName = $propertyName -replace "Framework" -replace "Version"
+                    Invoke-Exe $dotnetExe -Arguments "build $project --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:MSTestFrameworkVersion=$mstestVersion -p:MSTestAdapterVersion=$mstestVersion -p:NETTestSdkVersion=$netTestSdkVersion -p:BaseOutputPath=""bin\$dirNetTestSdkPropertyName-$dirNetTestSdkVersion\$dirMSTestPropertyName-$dirMSTestVersion\\"" -bl:""$env:TP_OUT_DIR\log\$Configuration\perm.binlog"""
+                }
+            }
+        }
+
+        # end 
     }
     finally {
         Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution -- remove NuGet source"
@@ -208,8 +291,7 @@ function Publish-PatchedDotnet {
     Copy-Item $buildArtifactsPath $dotnetTestArtifactsSdkPath -Force
 }
 
-function Publish-Package
-{
+function Publish-Package {
     $timer = Start-Timer
     Write-Log "Publish-Package: Started."
     $fullCLRPackage451Dir = Get-FullCLRPackageDirectory
@@ -358,73 +440,73 @@ function Publish-Package
     # into the output folder (for some reason), and we overwrite it with actual uap10.0 version below
 
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.ObjectModel\bin\$TPB_Configuration") `
-              -files @{
-                $TPB_TargetFramework45      = $fullCLRPackage45Dir           # net45
-                $TPB_TargetFramework451     = $fullCLRPackage451Dir          # net451
-                $TPB_TargetFrameworkCore10  = $coreCLR10PackageDir           # netcoreapp1.0
-                $TPB_TargetFrameworkCore20  = $coreCLR20PackageDir           # netcoreapp2.1
-                $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
-                $TPB_TargetFrameworkNS13    = $netstandard13PackageDir       # netstandard1_3
-                $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
-                $TPB_TargetFrameworkUap100  = $uap100PackageDir              # uap10.0
-              }
+        -files @{
+        $TPB_TargetFramework45     = $fullCLRPackage45Dir           # net45
+        $TPB_TargetFramework451    = $fullCLRPackage451Dir          # net451
+        $TPB_TargetFrameworkCore10 = $coreCLR10PackageDir           # netcoreapp1.0
+        $TPB_TargetFrameworkCore20 = $coreCLR20PackageDir           # netcoreapp2.1
+        $TPB_TargetFrameworkNS10   = $netstandard10PackageDir       # netstandard1_0
+        $TPB_TargetFrameworkNS13   = $netstandard13PackageDir       # netstandard1_3
+        $TPB_TargetFrameworkNS20   = $netstandard20PackageDir       # netstandard2_0
+        $TPB_TargetFrameworkUap100 = $uap100PackageDir              # uap10.0
+    }
 
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.ObjectModel\bin\$TPB_Configuration") `
-              -files @{
-                $TPB_TargetFrameworkUap100  = $testhostUapPackageDir         # uap10.0 - testhost
-              }
+        -files @{
+        $TPB_TargetFrameworkUap100 = $testhostUapPackageDir         # uap10.0 - testhost
+    }
 
     ################################################################################
     # Publish Microsoft.TestPlatform.PlatformAbstractions
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration") `
-              -files @{
-                $TPB_TargetFramework45     = $fullCLRPackage45Dir          # net45
-                $TPB_TargetFramework451    = $fullCLRPackage451Dir         # net451
-                $TPB_TargetFrameworkCore20 = $coreCLR20PackageDir          # netcoreapp2.1
-                $TPB_TargetFrameworkNS10   = $netstandard10PackageDir      # netstandard1_0
-                $TPB_TargetFrameworkNS13   = $netstandard13PackageDir      # netstandard1_3
-                $TPB_TargetFrameworkNS20   = $netstandard20PackageDir      # netstandard2_0
-                $TPB_TargetFrameworkUap100 = $uap100PackageDir             # uap10.0
-              }
+        -files @{
+        $TPB_TargetFramework45     = $fullCLRPackage45Dir          # net45
+        $TPB_TargetFramework451    = $fullCLRPackage451Dir         # net451
+        $TPB_TargetFrameworkCore20 = $coreCLR20PackageDir          # netcoreapp2.1
+        $TPB_TargetFrameworkNS10   = $netstandard10PackageDir      # netstandard1_0
+        $TPB_TargetFrameworkNS13   = $netstandard13PackageDir      # netstandard1_3
+        $TPB_TargetFrameworkNS20   = $netstandard20PackageDir      # netstandard2_0
+        $TPB_TargetFrameworkUap100 = $uap100PackageDir             # uap10.0
+    }
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration") `
-              -files @{
-                $TPB_TargetFrameworkUap100 = $testhostUapPackageDir        # uap10.0 - testhost
-              }
+        -files @{
+        $TPB_TargetFrameworkUap100 = $testhostUapPackageDir        # uap10.0 - testhost
+    }
 
     ################################################################################
     # Publish Microsoft.TestPlatform.CoreUtilities
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.CoreUtilities\bin\$TPB_Configuration") `
-              -files @{
-                $TPB_TargetFramework45      = $fullCLRPackage45Dir           # net45
-                $TPB_TargetFramework451     = $fullCLRPackage451Dir          # net451
-                $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
-                $TPB_TargetFrameworkNS13    = $netstandard13PackageDir       # netstandard1_3
-                $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
-                $TPB_TargetFrameworkUap100  = $uap100PackageDir              # uap10.0
-              }
+        -files @{
+        $TPB_TargetFramework45     = $fullCLRPackage45Dir           # net45
+        $TPB_TargetFramework451    = $fullCLRPackage451Dir          # net451
+        $TPB_TargetFrameworkNS10   = $netstandard10PackageDir       # netstandard1_0
+        $TPB_TargetFrameworkNS13   = $netstandard13PackageDir       # netstandard1_3
+        $TPB_TargetFrameworkNS20   = $netstandard20PackageDir       # netstandard2_0
+        $TPB_TargetFrameworkUap100 = $uap100PackageDir              # uap10.0
+    }
 
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.CoreUtilities\bin\$TPB_Configuration") `
-              -files @{
-                $TPB_TargetFrameworkUap100  = $testhostUapPackageDir         # uap10.0 - testhost
-              }
+        -files @{
+        $TPB_TargetFrameworkUap100 = $testhostUapPackageDir         # uap10.0 - testhost
+    }
 
     ################################################################################
     # Publish Microsoft.TestPlatform.AdapterUtilities
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.AdapterUtilities\bin\$TPB_Configuration") `
-            -files @{
-              # "net20"                     = $net20PackageDir               # net20
-                "net45/any"                 = $net45PackageDir               # $net4
-                $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
-                $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
-                $TPB_TargetFrameworkUap100  = $uap100PackageDir              # uap10.0
-            }
+        -files @{
+        # "net20"                     = $net20PackageDir               # net20
+        "net45/any"                = $net45PackageDir               # $net4
+        $TPB_TargetFrameworkNS10   = $netstandard10PackageDir       # netstandard1_0
+        $TPB_TargetFrameworkNS20   = $netstandard20PackageDir       # netstandard2_0
+        $TPB_TargetFrameworkUap100 = $uap100PackageDir              # uap10.0
+    }
 
     ################################################################################
     # Publish Microsoft.TestPlatform.CrossPlatEngine
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.CrossPlatEngine\bin\$TPB_Configuration") `
-            -files @{
-                $TPB_TargetFrameworkNS13    = $netstandard13PackageDir       # netstandard1_3
-            }
+        -files @{
+        $TPB_TargetFrameworkNS13 = $netstandard13PackageDir       # netstandard1_3
+    }
 
     ################################################################################
     # Publish msdia
@@ -455,7 +537,7 @@ function Publish-Package
         "Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.pdb"
     )
 
-    foreach($file in $loggers) {
+    foreach ($file in $loggers) {
         Write-Verbose "Move-Item $fullCLRPackage451Dir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackage451Dir\$file $fullCLRExtensionsDir -Force
 
@@ -464,7 +546,7 @@ function Publish-Package
     }
 
     # Move logger resource dlls
-    if($TPB_LocalizedBuild) {
+    if ($TPB_LocalizedBuild) {
         Move-Loc-Files $fullCLRPackage451Dir $fullCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"
         Move-Loc-Files $coreCLR20PackageDir $coreCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"
         Move-Loc-Files $fullCLRPackage451Dir $fullCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"
@@ -505,7 +587,7 @@ function Publish-Package
     # Copy-Item $blameDataCollectorNetStandard\procdump $coreCLRExtensionsDir\procdump -Force
 
     # Copy blame data collector resource dlls
-    if($TPB_LocalizedBuild) {
+    if ($TPB_LocalizedBuild) {
         Copy-Loc-Files $blameDataCollectorNetFull $fullCLRExtensionsDir "Microsoft.TestPlatform.Extensions.BlameDataCollector.resources.dll"
         Copy-Loc-Files $blameDataCollectorNetStandard $coreCLRExtensionsDir "Microsoft.TestPlatform.Extensions.BlameDataCollector.resources.dll"
     }
@@ -519,7 +601,7 @@ function Publish-Package
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.pdb $coreCLRExtensionsDir -Force
 
     # Copy EventLogCollector resource dlls
-    if($TPB_LocalizedBuild) {
+    if ($TPB_LocalizedBuild) {
         Copy-Loc-Files $eventLogDataCollectorNetFull $fullCLRExtensionsDir "Microsoft.TestPlatform.Extensions.EventLogCollector.resources.dll"
         Copy-Loc-Files $eventLogDataCollectorNetFull $coreCLRExtensionsDir "Microsoft.TestPlatform.Extensions.EventLogCollector.resources.dll"
     }
@@ -528,13 +610,13 @@ function Publish-Package
     $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftInternalCodeCoverageVersion
     $codeCoverageIOPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.io\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkStandard"
     Copy-Item $codeCoverageIOPackagesDir\Microsoft.VisualStudio.Coverage.IO.dll $coreCLR20PackageDir -Force
-    if($TPB_LocalizedBuild) {
+    if ($TPB_LocalizedBuild) {
         Copy-Loc-Files $codeCoverageIOPackagesDir $coreCLR20PackageDir "Microsoft.VisualStudio.Coverage.IO.resources.dll"
     }
 
     # If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
     $runtimeproviders = @("Microsoft.TestPlatform.TestHostRuntimeProvider.dll", "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
-    foreach($file in $runtimeproviders) {
+    foreach ($file in $runtimeproviders) {
         Write-Verbose "Move-Item $fullCLRPackage451Dir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackage451Dir\$file $fullCLRExtensionsDir -Force
 
@@ -573,8 +655,8 @@ function Publish-Package
     Copy-Item $testhostCore20PackageDir\testhost.pdb $coreCLR20PackageDir -Force
 
     Get-Item "$testhostCore20PackageDir\*" |
-        Where-Object { $_.Name -notin ("x64", "x86", "win7-x64", "win7-x86", "testhost.deps.json", "testhost.runtimeconfig.json")} |
-        Copy-Item -Recurse -Destination $fullCLRTestHostDir -Force
+    Where-Object { $_.Name -notin ("x64", "x86", "win7-x64", "win7-x86", "testhost.deps.json", "testhost.runtimeconfig.json") } |
+    Copy-Item -Recurse -Destination $fullCLRTestHostDir -Force
     Copy-Item $standaloneTesthost $fullCLRTestHostDir -Force
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
@@ -620,10 +702,8 @@ function Publish-Package
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
-function Publish-Tests
-{
-    if($TPB_PublishTests)
-    {
+function Publish-Tests {
+    if ($TPB_PublishTests) {
         Write-Log "Publish-Tests: Started."
 
         # Adding only Perf project for now
@@ -647,21 +727,18 @@ function Publish-Tests
     }
 }
 
-function Publish-PackageInternal($packagename, $framework, $output)
-{
+function Publish-PackageInternal($packagename, $framework, $output) {
     $dotnetExe = Get-DotNetPath
     Invoke-Exe $dotnetExe -Arguments "publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
 }
 
-function Publish-PackageWithRuntimeInternal($packagename, $framework, $runtime, $selfcontained, $output)
-{
+function Publish-PackageWithRuntimeInternal($packagename, $framework, $runtime, $selfcontained, $output) {
     $dotnetExe = Get-DotNetPath
     Invoke-Exe $dotnetExe -Arguments "publish $packagename --configuration $TPB_Configuration --framework $framework --runtime $runtime --self-contained $selfcontained --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
 }
 
-function Copy-Loc-Files($sourceDir, $destinationDir, $dllName)
-{
-    foreach($lang in $language) {
+function Copy-Loc-Files($sourceDir, $destinationDir, $dllName) {
+    foreach ($lang in $language) {
         $dllToCopy = Join-Path $sourceDir\$lang $dllName
         $destinationFolder = Join-Path $destinationDir $lang
         if (-not (Test-Path $destinationFolder)) {
@@ -671,9 +748,8 @@ function Copy-Loc-Files($sourceDir, $destinationDir, $dllName)
     }
 }
 
-function Move-Loc-Files($sourceDir, $destinationDir, $dllName)
-{
-    foreach($lang in $language) {
+function Move-Loc-Files($sourceDir, $destinationDir, $dllName) {
+    foreach ($lang in $language) {
         $dllToCopy = Join-Path $sourceDir\$lang $dllName
         $destinationFolder = Join-Path $destinationDir $lang
         if (-not (Test-Path $destinationFolder)) {
@@ -683,8 +759,7 @@ function Move-Loc-Files($sourceDir, $destinationDir, $dllName)
     }
 }
 
-function Create-VsixPackage
-{
+function Create-VsixPackage {
     Write-Log "Create-VsixPackage: Started."
     $timer = Start-Timer
 
@@ -703,7 +778,7 @@ function Create-VsixPackage
     # Copy Microsoft.VisualStudio.TraceDataCollector to Extensions
     $traceDataCollectorPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.TraceDataCollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework472"
     Copy-Item $traceDataCollectorPackageDirectory\Microsoft.VisualStudio.TraceDataCollector.dll $extensionsPackageDir -Force
-    if($TPB_LocalizedBuild) {
+    if ($TPB_LocalizedBuild) {
         Copy-Loc-Files $traceDataCollectorPackageDirectory $extensionsPackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
     }
 
@@ -724,7 +799,7 @@ function Create-VsixPackage
     # Copy Microsoft.VisualStudio.IO to root
     $codeCoverageIOPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Coverage.IO\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework451"
     Copy-Item $codeCoverageIOPackageDirectory\Microsoft.VisualStudio.Coverage.IO.dll $packageDir -Force
-    if($TPB_LocalizedBuild) {
+    if ($TPB_LocalizedBuild) {
         Copy-Loc-Files $codeCoverageIOPackageDirectory $packageDir "Microsoft.VisualStudio.Coverage.IO.resources.dll"
     }
 
@@ -777,8 +852,7 @@ function Create-VsixPackage
     $msbuildPath = Locate-MSBuildPath
 
     # Create vsix only when msbuild is installed.
-    if(![string]::IsNullOrEmpty($msbuildPath))
-    {
+    if (![string]::IsNullOrEmpty($msbuildPath)) {
         # Copy the vsix project to artifacts directory to modify manifest
         New-Item $vsixProjectDir -Type Directory -Force
         Copy-Item -Recurse $vsixSourceDir\* $vsixProjectDir -Force
@@ -789,16 +863,14 @@ function Create-VsixPackage
         # Build vsix project to get TestPlatform.vsix
         Invoke-Exe $msbuildPath -Arguments """$vsixProjectDir\TestPlatform.csproj"" -p:Configuration=$Configuration"
     }
-    else
-    {
+    else {
         throw ".. Create-VsixPackage: Cannot generate vsix as msbuild.exe not found at '$msbuildPath'."
     }
 
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
-function Create-NugetPackages
-{
+function Create-NugetPackages {
     $timer = Start-Timer
 
     Write-Log "Create-NugetPackages: Started."
@@ -807,9 +879,14 @@ function Create-NugetPackages
 
     Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "Icon.png") $stagingDir -Force
 
+    # Remove all locally built nuget packages before we start creating them
+    # we are leaving them in the folder after uzipping them for easier review.
+    if (Test-Path $packageOutputDir) {
+        Remove-Item $packageOutputDir -Recurse -Force
+    }
 
     if (-not (Test-Path $packageOutputDir)) {
-        New-Item $packageOutputDir -type directory -Force
+        New-Item $packageOutputDir -Type directory -Force
     }
 
     $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
@@ -927,8 +1004,7 @@ function Create-NugetPackages
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
-function Copy-CodeCoverage-Package-Artifacts
-{
+function Copy-CodeCoverage-Package-Artifacts {
     # Copy TraceDataCollector to Microsoft.CodeCoverage folder.
     $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftInternalCodeCoverageVersion
     $traceDataCollectorPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.tracedatacollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
@@ -963,13 +1039,12 @@ function Copy-CodeCoverage-Package-Artifacts
     Copy-Item $codeCoverageImMacosPackagesDir\x64 $microsoftCodeCoveragePackageDir\InstrumentationEngine\macos\ -Force -Recurse
 
     # Copy TraceDataCollector resource dlls
-    if($TPB_LocalizedBuild) {
+    if ($TPB_LocalizedBuild) {
         Copy-Loc-Files $traceDataCollectorPackagesDir $microsoftCodeCoveragePackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
     }
 }
 
-function Copy-PackageItems($packageName)
-{
+function Copy-PackageItems($packageName) {
     # Packages published separately are copied into their own artifacts directory
     # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net451\* is copied
     # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net451
@@ -984,8 +1059,7 @@ function Copy-PackageItems($packageName)
     Copy-Item -Path $binariesDirectory -Destination $publishDirectory -Recurse -Force
 }
 
-function Update-LocalizedResources
-{
+function Update-LocalizedResources {
     $timer = Start-Timer
     $dotnetExe = Get-DotNetPath
 
@@ -1003,8 +1077,7 @@ function Update-LocalizedResources
 #
 # Helper functions
 #
-function Get-DotNetPath
-{
+function Get-DotNetPath {
     $dotnetPath = Join-Path $env:TP_TOOLS_DIR "dotnet\dotnet.exe"
     if (-not (Test-Path $dotnetPath)) {
         Write-Error "Dotnet.exe not found at $dotnetPath. Did the dotnet cli installation succeed?"
@@ -1013,33 +1086,27 @@ function Get-DotNetPath
     return $dotnetPath
 }
 
-function Get-FullCLRPackageDirectory
-{
+function Get-FullCLRPackageDirectory {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework451\$TPB_TargetRuntime")
 }
 
-function Get-FullCLRPackageDirectory45
-{
+function Get-FullCLRPackageDirectory45 {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework45\$TPB_TargetRuntime")
 }
 
-function Get-CoreCLR20PackageDirectory
-{
+function Get-CoreCLR20PackageDirectory {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore20")
 }
 
-function Get-CoreCLR10PackageDirectory
-{
+function Get-CoreCLR10PackageDirectory {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore10")
 }
 
-function Get-CoreCLR20TestHostPackageDirectory
-{
+function Get-CoreCLR20TestHostPackageDirectory {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore20\TestHost")
 }
 
-function Locate-MSBuildPath
-{
+function Locate-MSBuildPath {
     $vsInstallPath = Locate-VsInstallPath
     $msbuildPath = Get-ChildItem (Join-Path -path $vsInstallPath -childPath "MSBuild\*\Bin\MSBuild.exe")
 
@@ -1054,66 +1121,61 @@ function Locate-MSBuildPath
     return $msBuild.FullName
 }
 
-function Locate-VsInstallPath
-{
-   $vswhere = Join-Path -path $env:TP_PACKAGES_DIR -ChildPath "vswhere\$env:VSWHERE_VERSION\tools\vswhere.exe"
-   if (!(Test-Path -path $vswhere)) {
-       throw "Unable to locate vswhere in path '$vswhere'."
-   }
+function Locate-VsInstallPath {
+    $vswhere = Join-Path -path $env:TP_PACKAGES_DIR -ChildPath "vswhere\$env:VSWHERE_VERSION\tools\vswhere.exe"
+    if (!(Test-Path -path $vswhere)) {
+        throw "Unable to locate vswhere in path '$vswhere'."
+    }
 
-   Write-Verbose "Using '$vswhere' to locate VS installation path."
+    Write-Verbose "Using '$vswhere' to locate VS installation path."
 
-   $requiredPackageIds = @("Microsoft.Component.MSBuild", "Microsoft.Net.Component.4.6.TargetingPack", "Microsoft.VisualStudio.Component.VSSDK")
-   Write-Verbose "VSInstallation requirements : $requiredPackageIds"
+    $requiredPackageIds = @("Microsoft.Component.MSBuild", "Microsoft.Net.Component.4.6.TargetingPack", "Microsoft.VisualStudio.Component.VSSDK")
+    Write-Verbose "VSInstallation requirements : $requiredPackageIds"
 
-   Try
-   {
-       if ($TPB_CIBuild) {
-           $vsInstallPath = Invoke-Exe $vswhere -CaptureOutput -Arguments "-version (15.0 -products * -requires $requiredPackageIds -property installationPath"
-       }
-       else {
-           # Allow using pre release versions of VS for dev builds
-           $vsInstallPath = Invoke-Exe $vswhere -CaptureOutput -Arguments "-version (15.0 -prerelease -products * -requires $requiredPackageIds -property installationPath"
-       }
-   }
-   Catch [System.Management.Automation.MethodInvocationException]
-   {
-       throw "Failed to find VS installation with requirements: $requiredPackageIds"
-   }
-
-   if ($null -eq $vsInstallPath -or 0 -eq @($vsInstallPath).Count) {
+    Try {
+        if ($TPB_CIBuild) {
+            $vsInstallPath = Invoke-Exe $vswhere -CaptureOutput -Arguments "-version (15.0 -products * -requires $requiredPackageIds -property installationPath"
+        }
+        else {
+            # Allow using pre release versions of VS for dev builds
+            $vsInstallPath = Invoke-Exe $vswhere -CaptureOutput -Arguments "-version (15.0 -prerelease -products * -requires $requiredPackageIds -property installationPath"
+        }
+    }
+    Catch [System.Management.Automation.MethodInvocationException] {
         throw "Failed to find VS installation with requirements: $requiredPackageIds"
-   }
-   else {
-        Write-Verbose "Found VS installation with requirements '$($requiredPackageIds -join "','")'  : '$($vsInstallPath -join "','")'."
-   }
+    }
 
-   $vsPath = $vsInstallPath | Select-Object -First 1
-   Write-Verbose "VSInstallPath is : $vsPath"
-   return $vsPath
+    if ($null -eq $vsInstallPath -or 0 -eq @($vsInstallPath).Count) {
+        throw "Failed to find VS installation with requirements: $requiredPackageIds"
+    }
+    else {
+        Write-Verbose "Found VS installation with requirements '$($requiredPackageIds -join "','")'  : '$($vsInstallPath -join "','")'."
+    }
+
+    $vsPath = $vsInstallPath | Select-Object -First 1
+    Write-Verbose "VSInstallPath is : $vsPath"
+    return $vsPath
 }
 
-function Update-VsixVersion($vsixProjectDir)
-{
+function Update-VsixVersion($vsixProjectDir) {
     Write-Log "Update-VsixVersion: Started."
     $vsixVersion = $Version
 
     # Build number comes in the form 20170111-01(yyyymmdd-buildNoOfThatDay)
     # So Version of the vsix will be 15.1.0.2017011101
     $vsixVersionSuffix = $BuildNumber.Split("-");
-    if($vsixVersionSuffix.Length -ige 2) {
+    if ($vsixVersionSuffix.Length -ige 2) {
         $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[0])$($vsixVersionSuffix[1])"
     }
 
-    $manifestContentWithVersion = Get-Content "$vsixProjectDir\source.extension.vsixmanifest" -raw | ForEach-Object {$_.ToString().Replace("`$version`$", "$vsixVersion") }
+    $manifestContentWithVersion = Get-Content "$vsixProjectDir\source.extension.vsixmanifest" -raw | ForEach-Object { $_.ToString().Replace("`$version`$", "$vsixVersion") }
     Set-Content -path "$vsixProjectDir\source.extension.vsixmanifest" -value $manifestContentWithVersion
 
     Write-Log "Update-VsixVersion: Completed."
 }
 
-function Generate-Manifest ($PackageFolder)
-{
-    $packagesFolderName =  [System.IO.Path]::GetFileName($PackageFolder)
+function Generate-Manifest ($PackageFolder) {
+    $packagesFolderName = [System.IO.Path]::GetFileName($PackageFolder)
     Write-Log "Generate-Manifest ($packagesFolderName): Started."
 
     $generateManifestPath = Join-Path $env:TP_ROOT_DIR "scripts\build\GenerateManifest.proj"
@@ -1124,8 +1186,7 @@ function Generate-Manifest ($PackageFolder)
     Write-Log "Generate-Manifest ($packagesFolderName): Completed."
 }
 
-function Build-SpecificProjects
-{
+function Build-SpecificProjects {
     Write-Log "Build-SpecificProjects: Started for pattern: $ProjectNamePatterns"
     # FrameworksAndOutDirs format ("<target_framework>", "<output_dir>").
     $FrameworksAndOutDirs = (
@@ -1141,18 +1202,18 @@ function Build-SpecificProjects
     # Get projects to build.
     Get-ChildItem -Recurse -Path $env:TP_ROOT_DIR -Include *.csproj | ForEach-Object {
         foreach ($ProjectNamePattern in $ProjectNamePatterns) {
-            if($_.FullName -match  $ProjectNamePattern) {
-                $ProjectsToBuild += ,"$_"
+            if ($_.FullName -match $ProjectNamePattern) {
+                $ProjectsToBuild += , "$_"
             }
         }
     }
 
-    if( $null -eq $ProjectsToBuild){
+    if ( $null -eq $ProjectsToBuild) {
         Write-Error "No csproj name match for given pattern: $ProjectNamePatterns"
     }
 
     # Build Projects.
-    foreach($ProjectToBuild in $ProjectsToBuild) {
+    foreach ($ProjectToBuild in $ProjectsToBuild) {
         Write-Log "Building Project $ProjectToBuild"
         # Restore and Build
         $output = Invoke-Exe $dotnetPath -Arguments "restore $ProjectToBuild"
@@ -1167,13 +1228,13 @@ function Build-SpecificProjects
 
         # Copy artifacts
         $ProjectDir = [System.IO.Path]::GetDirectoryName($ProjectToBuild)
-        foreach($FrameworkAndOutDir in $FrameworksAndOutDirs) {
+        foreach ($FrameworkAndOutDir in $FrameworksAndOutDirs) {
             $fromDir = $([System.IO.Path]::Combine($ProjectDir, "bin", $TPB_Configuration, $FrameworkAndOutDir[0]))
             $toDir = $([System.IO.Path]::Combine($env:TP_OUT_DIR, $TPB_Configuration, $FrameworkAndOutDir[1]))
-            if ( Test-Path $fromDir){
+            if ( Test-Path $fromDir) {
                 Write-Log "Copying artifacts from $fromDir to $toDir"
                 Get-ChildItem $fromDir | ForEach-Object {
-                    if(-not ($_.PSIsContainer)) {
+                    if (-not ($_.PSIsContainer)) {
                         Copy-Item $_.FullName $toDir
                     }
                 }
@@ -1182,8 +1243,7 @@ function Build-SpecificProjects
     }
 }
 
-if ($ProjectNamePatterns.Count -ne 0)
-{
+if ($ProjectNamePatterns.Count -ne 0) {
     # Build Specific projects.
     Build-SpecificProjects
     Exit
@@ -1238,7 +1298,8 @@ if ($Force -or $Steps -contains "PrepareAcceptanceTests") {
 if ($Script:ScriptFailed) {
     Write-Log "Build failed. {$(Get-ElapsedTime($timer))}" -Level "Error"
     Exit 1
-} else {
+}
+else {
     Write-Log "Build succeeded. {$(Get-ElapsedTime($timer))}"
     Exit 0
 }

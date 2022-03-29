@@ -24,7 +24,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
 
     private void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _runEventHandler = new RunEventHandler();
     }
 
@@ -35,22 +35,22 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [TestCategory("Windows-Review")]
+    [RunnerCompatibilityDataSource]
     public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
+        // Setup();
 
-        var sources = new List<string>
-                              {
-                                  GetAssetFullPath("SimpleTestProject.dll")
-                              };
+        _runEventHandler = new RunEventHandler();
 
-        _vstestConsoleWrapper.RunTests(
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        var sources = new List<string> { GetAssetFullPath("MSTestProject1.dll") };
+
+        vstestConsoleWrapper.RunTests(
             sources,
             GetDefaultRunSettings(),
-            new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName=SampleUnitTestProject.UnitTest1.PassingTest" },
+            new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName=MSTestProject1.UnitTest1.PassingTest" },
             _runEventHandler);
 
         // Assert
@@ -66,10 +66,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
-        var sources = new List<string>
-                              {
-                                  GetAssetFullPath("SimpleTestProject.dll")
-                              };
+        var sources = new List<string> { GetAssetFullPath("SimpleTestProject.dll") };
 
         _vstestConsoleWrapper.RunTests(
             sources,

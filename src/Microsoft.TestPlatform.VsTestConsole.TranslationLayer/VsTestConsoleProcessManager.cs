@@ -121,7 +121,6 @@ internal class VsTestConsoleProcessManager : IProcessManager
 
         EqtTrace.Verbose("VsTestCommandLineWrapper: Process Start Info {0} {1}", info.FileName, info.Arguments);
 
-#if NETFRAMEWORK
         if (consoleParameters.EnvironmentVariables != null)
         {
             info.EnvironmentVariables.Clear();
@@ -133,7 +132,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
                 }
             }
         }
-#endif
+
         try
         {
             _process = Process.Start(info);

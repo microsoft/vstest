@@ -29,7 +29,7 @@ public class DiscoverTests : AcceptanceTestBase
 
     public void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _discoveryEventHandler = new DiscoveryEventHandler();
         _discoveryEventHandler2 = new DiscoveryEventHandler2();
     }
@@ -41,30 +41,37 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [TestCategory("Windows-Review")]
+    [RunnerCompatibilityDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        Setup();
+        // Setup();
+        _discoveryEventHandler = new DiscoveryEventHandler();
+        _discoveryEventHandler2 = new DiscoveryEventHandler2();
 
-        _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), _discoveryEventHandler);
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        vstestConsoleWrapper.DiscoverTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), _discoveryEventHandler);
 
         // Assert.
         Assert.AreEqual(6, _discoveryEventHandler.DiscoveredTestCases.Count);
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [TestCategory("Windows-Review")]
+    [RunnerCompatibilityDataSource()]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
+        // Setup();
 
-        _vstestConsoleWrapper.DiscoverTests(
-            GetTestAssemblies(),
+        _discoveryEventHandler = new DiscoveryEventHandler();
+        _discoveryEventHandler2 = new DiscoveryEventHandler2();
+
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        vstestConsoleWrapper.DiscoverTests(
+            GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"),
             GetDefaultRunSettings(),
             new TestPlatformOptions() { CollectMetrics = false },
             _discoveryEventHandler2);

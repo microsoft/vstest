@@ -47,7 +47,7 @@ Write-Verbose "Setup dotnet configuration."
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
-$env:NUGET_EXE_Version = "5.8.1"
+$env:NUGET_EXE_Version = "6.0.0"
 $env:DOTNET_CLI_VERSION = $GlobalJson.tools.dotnet
 # $env:DOTNET_RUNTIME_VERSION = "LATEST"
 $env:VSWHERE_VERSION = "2.0.2"

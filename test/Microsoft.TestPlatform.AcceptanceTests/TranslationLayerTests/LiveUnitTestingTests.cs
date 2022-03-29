@@ -21,7 +21,7 @@ public class LiveUnitTestingTests : AcceptanceTestBase
 
     public void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _discoveryEventHandler = new DiscoveryEventHandler();
         _runEventHandler = new RunEventHandler();
     }

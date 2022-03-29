@@ -64,7 +64,7 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll");
 
         var arguments = CreateCodeCoverageArguments(runnerInfo, assemblyPaths, out var trxFilePath);
         InvokeVsTest(arguments);
@@ -85,7 +85,7 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
             consoleRunnerPath = Path.Combine(s_nugetPackageFolder, "tools", "net451", "Common7", "IDE", "Extensions", "TestPlatform", "vstest.console.exe");
         }
 
-        Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
+        Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: \"{0}\"", consoleRunnerPath);
         return consoleRunnerPath;
     }
 

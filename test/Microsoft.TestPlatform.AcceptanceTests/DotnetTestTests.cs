@@ -36,7 +36,7 @@ public class DotnetTestTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPath = GetAssetFullPath("SimpleTestProject.dll");
+        var assemblyPath = BuildMultipleAssemblyPath("SimpleTestProject.dll");
         InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal""");
 
         // ensure our dev version is used
@@ -68,7 +68,7 @@ public class DotnetTestTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPath = GetAssetFullPath("ParametrizedTestProject.dll");
+        var assemblyPath = BuildMultipleAssemblyPath("ParametrizedTestProject.dll");
         InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name=\""weburl\"", value=\""http://localhost//def\"")");
 
         ValidateSummaryStatus(1, 0, 0);

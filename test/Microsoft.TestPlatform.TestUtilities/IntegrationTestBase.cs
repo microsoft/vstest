@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,6 +10,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+
+using FluentAssertions;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
@@ -59,6 +62,10 @@ public class IntegrationTestBase
         _testEnvironment = new IntegrationTestEnvironment();
         BuildConfiguration = IntegrationTestEnvironment.BuildConfiguration;
         TempDirectory = new TempDirectory();
+
+        var drive = new DriveInfo(Directory.GetDirectoryRoot(TempDirectory.Path));
+        Console.WriteLine($"Available space for TEMP: {drive.Name} {drive.AvailableFreeSpace / (1024 * 1024)} MB");
+
         IsCI = IntegrationTestEnvironment.IsCI;
     }
 
@@ -79,8 +86,11 @@ public class IntegrationTestBase
     [TestCleanup]
     public void TempDirectoryCleanup()
     {
-        // Delete the directory only when the test succeeded, so we can look at results and logs of failed tests.
-        if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+        // In CI always delete the results, because we have limited disk space there.
+        //
+        // Locally delete the directory only when the test succeeded, so we can look 
+        // at results and logs of failed tests.
+        if (IsCI || TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
         {
             TempDirectory.Dispose();
         }
@@ -101,7 +111,17 @@ public class IntegrationTestBase
         var arguments = "";
         foreach (var path in testAssemblies)
         {
-            arguments += path.AddDoubleQuote() + " ";
+            // The incoming testAssembly path is either a single dll path in quotes or without quotes. 
+            // Or multiple assembly paths in a single string each double quoted and joined by space. 
+            // We trim, and add quotes here to get either:
+            // C:\1.dll -> "C:\1.dll"
+            // "C:\1.dll" -> "C:\1.dll"
+            // "C:\1.dll" "C:\2.dll" -> "C:\1.dll" "C:\2.dll"
+            // 
+            // For unquoted multi path string C:\1.dll C:\2.dll, we will get "C:\1.dll C:\2.dll"
+            // which is wrong and will fail later, but it's the test's fault for doing it wrong
+            // rather than providing an array of strings that this overload takes.
+            arguments += path.Trim('\"').AddDoubleQuote() + " ";
         }
 
         arguments = arguments.Trim();
@@ -128,6 +148,11 @@ public class IntegrationTestBase
 
         if (!string.IsNullOrWhiteSpace(inIsolation))
         {
+            if (inIsolation != "/InIsolation")
+            {
+                // TODO: The whole inIsolation should be just a bool, but it is not, and it's changing in other PR.
+                throw new InvalidOperationException("InIsolation value must be '/InIsolation'");
+            }
             arguments = string.Concat(arguments, " ", inIsolation);
         }
 
@@ -160,7 +185,8 @@ public class IntegrationTestBase
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
     public void InvokeVsTest(string arguments, Dictionary<string, string> environmentVariables = null)
     {
-        ExecuteVsTestConsole(arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, environmentVariables);
+        var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
+        ExecuteVsTestConsole(arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables);
         FormatStandardOutCome();
     }
 
@@ -170,7 +196,7 @@ public class IntegrationTestBase
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
     public void InvokeDotnetTest(string arguments, Dictionary<string, string> environmentVariables = null)
     {
-        environmentVariables ??= new Dictionary<string, string>();
+        var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
 
         var vstestConsolePath = GetDotnetRunnerPath();
 
@@ -181,9 +207,9 @@ public class IntegrationTestBase
 
         // This is used in dotnet/sdk to determine path to vstest.console:
         // https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestForwardingApp.cs#L30-L39
-        environmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
+        debugEnvironmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
 
-        ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, environmentVariables);
+        ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables);
         FormatStandardOutCome();
     }
 
@@ -201,8 +227,37 @@ public class IntegrationTestBase
         Dictionary<string, string> environmentVariables = null)
     {
         var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
-
         InvokeVsTest(arguments, environmentVariables);
+    }
+
+    private Dictionary<string, string> AddDebugEnvironmentVariables(Dictionary<string, string> environmentVariables)
+    {
+        environmentVariables ??= new Dictionary<string, string>();
+
+        if (_testEnvironment.DebugInfo != null)
+        {
+            if (_testEnvironment.DebugInfo.DebugVSTestConsole)
+            {
+                environmentVariables["VSTEST_RUNNER_DEBUG_ATTACHVS"] = "1";
+            }
+
+            if (_testEnvironment.DebugInfo.DebugTestHost)
+            {
+                environmentVariables["VSTEST_HOST_DEBUG_ATTACHVS"] = "1";
+            }
+
+            if (_testEnvironment.DebugInfo.DebugDataCollector)
+            {
+                environmentVariables["VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS"] = "1";
+            }
+
+            if (_testEnvironment.DebugInfo.NoDefaultBreakpoints)
+            {
+                environmentVariables["VSTEST_DEBUG_NOBP"] = "1";
+            }
+        }
+
+        return environmentVariables;
     }
 
     /// <summary>
@@ -235,12 +290,19 @@ public class IntegrationTestBase
     /// <summary>
     /// Validate if the overall test count and results are matching.
     /// </summary>
-    /// <param name="passedTestsCount">Passed test count</param>
-    /// <param name="failedTestsCount">Failed test count</param>
-    /// <param name="skippedTestsCount">Skipped test count</param>
-    public void ValidateSummaryStatus(int passedTestsCount, int failedTestsCount, int skippedTestsCount)
+    /// <param name="passed">Passed test count</param>
+    /// <param name="failed">Failed test count</param>
+    /// <param name="skipped">Skipped test count</param>
+    public void ValidateSummaryStatus(int passed, int failed, int skipped)
     {
-        var totalTestCount = passedTestsCount + failedTestsCount + skippedTestsCount;
+        // TODO: Switch on the actual version of vstest console when we have that set on test environment.
+        if (_testEnvironment.VSTestConsoleInfo != null && _testEnvironment.VSTestConsoleInfo.Path.Contains($"{Path.DirectorySeparatorChar}15."))
+        {
+            ValidateSummaryStatusv15(passed, failed, skipped);
+            return;
+        }
+
+        var totalTestCount = passed + failed + skipped;
         if (totalTestCount == 0)
         {
             // No test should be found/run
@@ -262,19 +324,70 @@ public class IntegrationTestBase
         else
         {
             var summaryStatus = string.Format(TotalTestsMessage, totalTestCount);
-            if (passedTestsCount != 0)
+            if (passed != 0)
             {
-                summaryStatus += string.Format(PassedTestsMessage, passedTestsCount);
+                summaryStatus += string.Format(PassedTestsMessage, passed);
             }
 
-            if (failedTestsCount != 0)
+            if (failed != 0)
             {
-                summaryStatus += string.Format(FailedTestsMessage, failedTestsCount);
+                summaryStatus += string.Format(FailedTestsMessage, failed);
             }
 
-            if (skippedTestsCount != 0)
+            if (skipped != 0)
             {
-                summaryStatus += string.Format(SkippedTestsMessage, skippedTestsCount);
+                summaryStatus += string.Format(SkippedTestsMessage, skipped);
+            }
+
+            Assert.IsTrue(
+                _standardTestOutput.Contains(summaryStatus),
+                "The Test summary does not match.{3}Expected summary: {1}{3}Test Output: {0}{3}Standard Error: {2}{3}Arguments: {4}{3}",
+                _standardTestOutput,
+                summaryStatus,
+                _standardTestError,
+                Environment.NewLine,
+                _arguments);
+        }
+    }
+
+    /// <summary>
+    /// Validate if the overall test count and results are matching.
+    /// </summary>
+    /// <param name="passed">Passed test count</param>
+    /// <param name="failed">Failed test count</param>
+    /// <param name="skipped">Skipped test count</param>
+    public void ValidateSummaryStatusv15(int passed, int failed, int skipped)
+    {
+        // example: Total tests: 6. Passed: 2. Failed: 2. Skipped: 2.
+        var totalTestCount = passed + failed + skipped;
+        if (totalTestCount == 0)
+        {
+            // No test should be found/run
+            StringAssert.DoesNotMatch(
+                _standardTestOutput,
+                new Regex("Total tests\\:"),
+                "Excepted: There should not be test summary{2}Actual: {0}{2}Standard Error: {1}{2}Arguments: {3}{2}",
+                _standardTestOutput,
+                _standardTestError,
+                Environment.NewLine,
+                _arguments);
+        }
+        else
+        {
+            var summaryStatus = $"Total tests: {totalTestCount}.";
+            if (passed != 0)
+            {
+                summaryStatus += $" Passed: {passed}.";
+            }
+
+            if (failed != 0)
+            {
+                summaryStatus += $" Failed: {failed}.";
+            }
+
+            if (skipped != 0)
+            {
+                summaryStatus += $" Skipped: {skipped}.";
             }
 
             Assert.IsTrue(
@@ -427,9 +540,20 @@ public class IntegrationTestBase
         return _testEnvironment.GetTestAsset(assetName);
     }
 
-    protected string GetAssetFullPath(string assetName, string targetFramework)
+    protected string GetTestDllForFramework(string assetName, string targetFramework)
     {
         return _testEnvironment.GetTestAsset(assetName, targetFramework);
+    }
+
+    protected List<string> GetTestDlls(params string[] assetNames)
+    {
+        var assets = new List<string>();
+        foreach (var assetName in assetNames)
+        {
+            assets.Add(GetAssetFullPath(assetName));
+        }
+
+        return assets;
     }
 
     protected string GetProjectFullPath(string projectName)
@@ -478,7 +602,7 @@ public class IntegrationTestBase
     }
 
     /// <summary>
-    /// Gets the path to <c>vstest.console.exe</c>.
+    /// Gets the path to <c>vstest.console.exe</c> or <c>dotnet.exe</c>.
     /// </summary>
     /// <returns>
     /// Full path to test runner
@@ -489,7 +613,14 @@ public class IntegrationTestBase
 
         if (IsDesktopRunner())
         {
-            consoleRunnerPath = Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.exe");
+            if (!string.IsNullOrWhiteSpace(_testEnvironment.VSTestConsoleInfo?.Path))
+            {
+                consoleRunnerPath = _testEnvironment.VSTestConsoleInfo.Path;
+            }
+            else
+            {
+                consoleRunnerPath = Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.exe");
+            }
         }
         else if (IsNetCoreRunner())
         {
@@ -501,13 +632,13 @@ public class IntegrationTestBase
             Assert.Fail("Unknown Runner framework - [{0}]", _testEnvironment.RunnerFramework);
         }
 
-        Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
+        Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: \"{0}\"", consoleRunnerPath);
         return consoleRunnerPath;
     }
 
     protected virtual string SetVSTestConsoleDLLPathInArgs(string args)
     {
-        var vstestConsoleDll = Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll");
+        var vstestConsoleDll = GetDotnetRunnerPath();
         vstestConsoleDll = vstestConsoleDll.AddDoubleQuote();
         args = string.Concat(
             vstestConsoleDll,
@@ -516,50 +647,35 @@ public class IntegrationTestBase
         return args;
     }
 
-    /// <summary>
-    /// Returns the VsTestConsole Wrapper.
-    /// </summary>
-    public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
-    {
-        return GetVsTestConsoleWrapper(TempDirectory);
-    }
-
-    /// <summary>
-    /// Returns the VsTestConsole Wrapper.
-    /// </summary>
-    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(out TempDirectory logFileDir)
-    {
-        logFileDir = new TempDirectory();
-        return GetVsTestConsoleWrapper(logFileDir);
-    }
 
     /// <summary>
     /// Returns the VsTestConsole Wrapper.
     /// </summary>
     /// <returns></returns>
-    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(TempDirectory logFileDir, TraceLevel traceLevel = TraceLevel.Verbose)
+    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(TraceLevel traceLevel = TraceLevel.Verbose)
     {
-        string logFilePath = null;
+        ConsoleParameters consoleParameters = new();
         if (traceLevel != TraceLevel.Off)
         {
-            if (!Directory.Exists(logFileDir.Path))
+            if (!Directory.Exists(TempDirectory.Path))
             {
-                Directory.CreateDirectory(logFileDir.Path);
+                Directory.CreateDirectory(TempDirectory.Path);
             }
 
             // Directory is already unique so there is no need to have a unique file name.
-            logFilePath = Path.Combine(logFileDir.Path, "log.txt");
+            var logFilePath = Path.Combine(TempDirectory.Path, "log.txt");
             if (!File.Exists(logFilePath))
             {
                 File.Create(logFilePath).Close();
             }
 
             Console.WriteLine($"Logging diagnostics in {logFilePath}");
+            consoleParameters.LogFilePath = logFilePath;
         }
 
         var consoleRunnerPath = IsNetCoreRunner()
-            ? Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll")
-            : GetConsoleRunnerPath();
+                ? GetDotnetRunnerPath()
+                : GetConsoleRunnerPath();
         var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
         var dotnetPath = Path.Combine(_testEnvironment.ToolsDirectory, executablePath);
 
@@ -568,8 +684,39 @@ public class IntegrationTestBase
             throw new FileNotFoundException($"File '{dotnetPath}' was not found.");
         }
 
-        ConsoleParameters consoleParameters = traceLevel == TraceLevel.Off ? new() : new() { LogFilePath = logFilePath };
-        var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, consoleParameters);
+        if (!File.Exists(consoleRunnerPath))
+        {
+            throw new FileNotFoundException($"File '{consoleRunnerPath}' was not found.");
+        }
+
+        Console.WriteLine($"Console runner path: {consoleRunnerPath}");
+
+        VsTestConsoleWrapper vstestConsoleWrapper;
+
+        // Providing any environment variable to vstest.console will clear all existing environment variables,
+        // this works around it by copying all existing variables, and adding debug. But we only want to do that
+        // when we are setting any debug variables.
+        // TODO: This is scheduled to be fixed in 17.3, where it will start working normally. We will just add those
+        // variables, unless we explicitly say to clean them. https://github.com/microsoft/vstest/pull/3433
+        // Remove this code later, and just pass the variables you want to add.
+        var debugEnvironmentVariables = AddDebugEnvironmentVariables(new Dictionary<string, string>());
+        Dictionary<string, string> environmentVariables = new();
+        if (debugEnvironmentVariables.Count > 0)
+        {
+            Environment.GetEnvironmentVariables().OfType<DictionaryEntry>().ToList().ForEach(e => environmentVariables.Add(e.Key.ToString(), e.Value.ToString()));
+            foreach (var pair in debugEnvironmentVariables)
+            {
+                environmentVariables[pair.Key] = pair.Value;
+            }
+        }
+
+        if (environmentVariables.Count > 0)
+        {
+            // This clears all variables, so we copy all environment variables, and add the debug ones to them.
+            consoleParameters.EnvironmentVariables = environmentVariables;
+        }
+
+        vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, consoleParameters);
         vstestConsoleWrapper.StartSession();
 
         return vstestConsoleWrapper;
@@ -772,13 +919,8 @@ public class IntegrationTestBase
 
     protected string BuildMultipleAssemblyPath(params string[] assetNames)
     {
-        var assertFullPaths = new string[assetNames.Length];
-        for (var i = 0; i < assetNames.Length; i++)
-        {
-            assertFullPaths[i] = GetAssetFullPath(assetNames[i]).AddDoubleQuote();
-        }
-
-        return string.Join(" ", assertFullPaths);
+        // Double quoted sources sepearated by space.
+        return string.Join(" ", GetTestDlls(assetNames).Select(a => a.AddDoubleQuote()));
     }
 
     protected static string GetDiagArg(string rootDir)
@@ -817,5 +959,15 @@ public class IntegrationTestBase
         return path;
     }
 
-    protected static string GetDotnetRunnerPath() => Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
+    protected string GetDotnetRunnerPath() => _testEnvironment.VSTestConsoleInfo?.Path ?? Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll");
+
+    protected void StdOutHasNoWarnings()
+    {
+        StdOut.Should().NotContainEquivalentOf("warning");
+    }
+
+    protected void StdErrHasTestRunFailedMessageButNoOtherError()
+    {
+        StdErr?.Trim().Should().Be("Test Run Failed.");
+    }
 }
