@@ -15,8 +15,9 @@ public class DiaSessionTests : IntegrationTestBase
 {
 #if NETFRAMEWORK
     private const string NET451 = "net451";
-#endif
+#else
     private const string NETCOREAPP21 = "netcoreapp2.1";
+#endif
 
     public static string? GetAndSetTargetFrameWork(IntegrationTestEnvironment testEnvironment)
     {
