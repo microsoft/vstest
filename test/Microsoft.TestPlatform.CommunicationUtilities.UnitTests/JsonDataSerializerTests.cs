@@ -13,8 +13,6 @@ using Newtonsoft.Json.Serialization;
 
 using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests;
 
 [TestClass]
@@ -40,7 +38,7 @@ public class JsonDataSerializerTests
 
         var classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(null);
         classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(classWithSelfReferencingLoop);
-        classWithSelfReferencingLoop.InfiniteRefernce.InfiniteRefernce = classWithSelfReferencingLoop;
+        classWithSelfReferencingLoop.InfiniteRefernce!.InfiniteRefernce = classWithSelfReferencingLoop;
 
         string serializedPayload = _jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop);
         Assert.AreEqual("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteRefernce\":{}}}", serializedPayload);
@@ -66,7 +64,7 @@ public class JsonDataSerializerTests
     {
         var classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(null);
         classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(classWithSelfReferencingLoop);
-        classWithSelfReferencingLoop.InfiniteRefernce.InfiniteRefernce = classWithSelfReferencingLoop;
+        classWithSelfReferencingLoop.InfiniteRefernce!.InfiniteRefernce = classWithSelfReferencingLoop;
 
         // This line should not throw exception
         _jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop);
@@ -77,7 +75,7 @@ public class JsonDataSerializerTests
     {
         var classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(null);
         classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(classWithSelfReferencingLoop);
-        classWithSelfReferencingLoop.InfiniteRefernce.InfiniteRefernce = classWithSelfReferencingLoop;
+        classWithSelfReferencingLoop.InfiniteRefernce!.InfiniteRefernce = classWithSelfReferencingLoop;
 
         var json = _jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop);
 
@@ -91,7 +89,7 @@ public class JsonDataSerializerTests
     [TestMethod]
     public void CloneShouldReturnNullForNull()
     {
-        var clonedTestCase = _jsonDataSerializer.Clone<TestCase>(null);
+        var clonedTestCase = _jsonDataSerializer.Clone<TestCase>(null!);
 
         Assert.IsNull(clonedTestCase);
     }
@@ -169,15 +167,11 @@ public class JsonDataSerializerTests
 
     public class ClassWithSelfReferencingLoop
     {
-        public ClassWithSelfReferencingLoop(ClassWithSelfReferencingLoop ir)
+        public ClassWithSelfReferencingLoop(ClassWithSelfReferencingLoop? ir)
         {
             InfiniteRefernce = ir;
         }
 
-        public ClassWithSelfReferencingLoop InfiniteRefernce
-        {
-            get;
-            set;
-        }
+        public ClassWithSelfReferencingLoop? InfiniteRefernce { get; set; }
     }
 }

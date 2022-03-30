@@ -27,8 +27,6 @@ using Moq;
 
 using Newtonsoft.Json.Linq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests;
 
 [TestClass]
