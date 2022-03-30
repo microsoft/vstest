@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
 
@@ -51,6 +52,17 @@ public class AcceptanceTestBase : IntegrationTestBase
     public const string NETCORE21_50 = "netcoreapp2.1;netcoreapp3.1;net5.0";
     public const string NETFX452_NET50 = "net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0";
     public const string NETFX452_NET31 = "net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1";
+    public const string DEFAULT_RUNNER_NETFX = "net451";
+    /// <summary>
+    /// Our current defaults for .NET and .NET Framework.
+    /// </summary>
+    public const string DEFAULT_RUNNER_NETFX_AND_NET = $"{DEFAULT_RUNNER_NETFX};netcoreapp2.1";
+    public const string DEFAULT_HOST_NETFX_AND_NET = "net451;netcoreapp2.1";
+    public const string LATEST_TO_LEGACY = "Latest;LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
+    public const string LATESTPREVIEW_TO_LEGACY = "LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
+    public const string LATEST = "Latest";
+    public const string LATESTSTABLE= "LatestStable";
+    internal const string MSTEST = "MSTest";
 
     public static string And(string left, string right)
     {
@@ -61,6 +73,11 @@ public class AcceptanceTestBase : IntegrationTestBase
 
     protected static void SetTestEnvironment(IntegrationTestEnvironment testEnvironment, RunnerInfo runnerInfo)
     {
+        testEnvironment.VSTestConsoleInfo = runnerInfo.VSTestConsoleInfo;
+        // The order here matters, it changes how the resulting path is built when we resolve test dlls and other assets.
+        testEnvironment.DllInfos = new[] { runnerInfo.AdapterInfo, runnerInfo.TestHostInfo }.Where(d => d != null).ToList();
+        testEnvironment.DebugInfo = runnerInfo.DebugInfo;
+
         testEnvironment.RunnerFramework = runnerInfo.RunnerFramework;
         testEnvironment.TargetFramework = runnerInfo.TargetFramework;
         testEnvironment.InIsolationValue = runnerInfo.InIsolationValue;
@@ -96,17 +113,37 @@ public class AcceptanceTestBase : IntegrationTestBase
     }
 
     /// <summary>
-    /// Default RunSettings
+    /// Empty runsettings, just with the RunSettings tag that we require.
     /// </summary>
     /// <returns></returns>
+    public string GetEmptyRunsettings()
+    {
+        return "<RunSettings></RunSettings>";
+    }
+
+    /// <summary>
+    /// Almost empty runsettings, just specifying the target framework from the currently set test environment.
+    /// </summary>
     public string GetDefaultRunSettings()
     {
-        string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
-                                    <RunSettings>
-                                        <RunConfiguration>
-                                        <TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion>
-                                        </RunConfiguration>
-                                    </RunSettings>";
+        return GetRunSettingsWithTargetFramework(FrameworkArgValue);
+    }
+
+    /// <summary>
+    /// Almost empty runsettings, just specifying the given target framework.
+    /// Use the overload without any parameters to get the target framework from the currently set test environment.
+    /// </summary>
+    /// <returns></returns>
+    public string GetRunSettingsWithTargetFramework(string targetFramework)
+    {
+        string runSettingsXml =
+            $@"<?xml version=""1.0"" encoding=""utf-8""?>
+            <RunSettings>
+                <RunConfiguration>
+                    <TargetFrameworkVersion>{targetFramework}</TargetFrameworkVersion>
+                </RunConfiguration>
+            </RunSettings>";
+
         return runSettingsXml;
     }
 }

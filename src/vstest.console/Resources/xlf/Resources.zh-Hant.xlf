@@ -1174,6 +1174,11 @@
         <target state="translated">指定「{0}」測試介面卡載入策略時，必須提供 /TestAdapterPath 參數！</target>
         <note>{0} is the strategy name, "Explicit" for example.</note>
       </trans-unit>
+      <trans-unit id="WarningEmulatedOnArm64">
+        <source>vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.</source>
+        <target state="translated">vstest.console.exe 正在模擬模式下以 {0} 方式執行。為了獲得較佳效能，請考慮使用原生執行器 vstest.console.arm64.exe。</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

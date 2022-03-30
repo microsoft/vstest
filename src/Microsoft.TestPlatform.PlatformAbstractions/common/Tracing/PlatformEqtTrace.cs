@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Threading;
 
 #nullable disable
 
@@ -445,19 +444,6 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
         LogFile = null;
         TraceLevel = TraceLevel.Off;
         Source.Switch.Level = SourceLevels.Off;
-    }
-
-    /// <summary>
-    /// Trace a verbose message.
-    /// </summary>
-    /// <param name="message">Trace message.</param>
-    [Conditional("TRACE")]
-    internal static void Verbose(string message)
-    {
-        if (Instance.ShouldTrace(PlatformTraceLevel.Verbose))
-        {
-            Instance.WriteLine(PlatformTraceLevel.Verbose, message);
-        }
     }
 }
 

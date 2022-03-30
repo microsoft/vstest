@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -28,7 +29,7 @@ public class DiscoverTests : AcceptanceTestBase
 
     public void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _discoveryEventHandler = new DiscoveryEventHandler();
         _discoveryEventHandler2 = new DiscoveryEventHandler2();
     }
@@ -40,30 +41,37 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [TestCategory("Windows-Review")]
+    [RunnerCompatibilityDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        Setup();
+        // Setup();
+        _discoveryEventHandler = new DiscoveryEventHandler();
+        _discoveryEventHandler2 = new DiscoveryEventHandler2();
 
-        _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), _discoveryEventHandler);
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        vstestConsoleWrapper.DiscoverTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), _discoveryEventHandler);
 
         // Assert.
         Assert.AreEqual(6, _discoveryEventHandler.DiscoveredTestCases.Count);
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [TestCategory("Windows-Review")]
+    [RunnerCompatibilityDataSource()]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
+        // Setup();
 
-        _vstestConsoleWrapper.DiscoverTests(
-            GetTestAssemblies(),
+        _discoveryEventHandler = new DiscoveryEventHandler();
+        _discoveryEventHandler2 = new DiscoveryEventHandler2();
+
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        vstestConsoleWrapper.DiscoverTests(
+            GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"),
             GetDefaultRunSettings(),
             new TestPlatformOptions() { CollectMetrics = false },
             _discoveryEventHandler2);
@@ -196,17 +204,16 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // flaky on the desktop runner, desktop framework combo
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetFullTargetFrameworkDataSource(inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
-    public void CancelTestDiscovery(RunnerInfo runnerInfo)
+    public async Task CancelTestDiscovery(RunnerInfo runnerInfo)
     {
+        var sw = Stopwatch.StartNew();
         // Setup
         var testAssemblies = new List<string>
         {
             GetAssetFullPath("DiscoveryTestProject.dll"),
             GetAssetFullPath("SimpleTestProject.dll"),
-            GetAssetFullPath("SimpleTestProject2.dll")
         };
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -214,19 +221,53 @@ public class DiscoverTests : AcceptanceTestBase
 
         var discoveredTests = new List<TestCase>();
         var discoveryEvents = new Mock<ITestDiscoveryEventsHandler>();
-        discoveryEvents.Setup((events) => events.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback
-            ((IEnumerable<TestCase> testcases) => discoveredTests.AddRange(testcases));
+        var alreadyCancelled = false;
+        TimeSpan cancellationCalled = TimeSpan.Zero;
+        discoveryEvents.Setup(events => events.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
+            .Callback((IEnumerable<TestCase> testcases) =>
+            {
+                // As soon as we get first test call cancel. That way we know there is discovery in progress.
+                discoveredTests.AddRange(testcases);
+                if (!alreadyCancelled)
+                {
+                    cancellationCalled = sw.Elapsed;
+                    // Calling cancel many times crashes. https://github.com/microsoft/vstest/issues/3526
+                    alreadyCancelled = true;
+                    _vstestConsoleWrapper.CancelDiscovery();
+                }
+            });
+        var isTestCancelled = false;
+        discoveryEvents.Setup(events => events.HandleDiscoveryComplete(It.IsAny<long>(), It.IsAny<IEnumerable<TestCase>>(), It.IsAny<bool>()))
+            .Callback((long _, IEnumerable<TestCase> testcases, bool isAborted) =>
+            {
+                isTestCancelled = isAborted;
+                if (testcases != null)
+                {
+                    discoveredTests.AddRange(testcases);
+                }
+            });
+
+        string runSettingsXml =
+             $@"<?xml version=""1.0"" encoding=""utf-8""?>
+            <RunSettings>
+                <RunConfiguration>
+                    <TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion>
+                    <BatchSize>1</BatchSize>
+                </RunConfiguration>
+            </RunSettings>";
 
         // Act
-        var discoveryTask = Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, GetDefaultRunSettings(), discoveryEvents.Object));
-
-        Task.Delay(2000).Wait();
-        _vstestConsoleWrapper.CancelDiscovery();
-        discoveryTask.Wait();
+        await Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, runSettingsXml, discoveryEvents.Object));
 
         // Assert.
-        int discoveredSources = discoveredTests.Select((testcase) => testcase.Source).Distinct().Count();
-        Assert.AreNotEqual(testAssemblies.Count, discoveredSources, "All test assemblies discovered");
+        Assert.IsTrue(isTestCancelled, "Discovery was not cancelled");
+
+        // TODO: Review how much time it takes to actually cancel. It is not 2s on CI server. Are we waiting for anything?
+        //var done = sw.Elapsed;
+        //var timeTillCancelled = done - cancellationCalled;
+        //timeTillCancelled.Should().BeLessThan(2.Seconds());
+        int discoveredSourcesCount = discoveredTests.Select(testcase => testcase.Source).Distinct().Count();
+        Assert.AreNotEqual(testAssemblies.Count, discoveredSourcesCount, "All test assemblies discovered");
     }
 
     private IList<string> GetTestAssemblies()

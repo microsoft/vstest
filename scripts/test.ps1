@@ -14,7 +14,7 @@ Param(
     [System.String] $TargetRuntime = "win7-x64",
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("net451", "netcoreapp2.1")]
+    [ValidateSet("net48", "net6.0")]
     [Alias("f")]
     [System.String] $TargetFramework,
 
@@ -94,12 +94,14 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 #
 # Test configuration
 #
-$TPT_TargetFrameworkFullCLR = "net451"
-$TPT_TargetFrameworkCore20 = "netcoreapp2.1"
+$TPT_TargetFrameworkNet451 = "net451"
+$TPT_TargetFrameworkNet48 = "net48"
+$TPT_TargetFrameworkCore21 = "netcoreapp2.1"
+$TPT_TargetFrameworkNet60 = "net6.0"
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @("test")
-$Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkFullCLR, $TPT_TargetFrameworkCore20)
+$Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkNet48, $TPT_TargetFrameworkNet60)
 $Script:TPT_TargetFramework = $TargetFramework
 $Script:TPT_TargetRuntime = $TargetRuntime
 $Script:TPT_SkipProjects = @("_none_");
@@ -225,17 +227,17 @@ function Invoke-Test
                 $testFilter = "/testCaseFilter:`"$TPT_TestFilter`""
             }
 
-            if($fx -eq $TPT_TargetFrameworkCore20)
+            if($fx -eq $TPT_TargetFrameworkNet60)
             {
                 $vstestConsoleFileName = "vstest.console.dll"
                 $targetRunTime = ""
-                $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFrameworkCore20 $targetRuntime) $vstestConsoleFileName
+                $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFrameworkCore21 $targetRuntime) $vstestConsoleFileName
             }
             else
             {
                 $vstestConsoleFileName = "vstest.console.exe"
                 $targetRunTime = $Script:TPT_TargetRuntime
-                $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFrameworkFullCLR $targetRuntime) $vstestConsoleFileName
+                $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFrameworkNet451 $targetRuntime) $vstestConsoleFileName
             }
 
             if (!(Test-Path $vstestConsolePath))
@@ -264,7 +266,7 @@ function Invoke-Test
                 }
 
                 Set-TestEnvironment
-                if($fx -eq $TPT_TargetFrameworkFullCLR)
+                if($fx -eq $TPT_TargetFrameworkNet48)
                 {
 
                     Write-Verbose "$vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter $ConsoleLogger"
@@ -305,7 +307,7 @@ function Invoke-Test
 
                     Set-TestEnvironment
 
-                    if($fx -eq $TPT_TargetFrameworkFullCLR)
+                    if($fx -eq $TPT_TargetFrameworkNet48)
                     {
 
                         Write-Verbose "$vstestConsolePath $testContainer /logger:`"trx;LogFileName=$trxLogFileName`" $ConsoleLogger $testFilter"

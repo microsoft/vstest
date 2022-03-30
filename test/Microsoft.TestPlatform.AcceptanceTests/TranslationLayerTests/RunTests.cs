@@ -29,7 +29,7 @@ public class RunTests : AcceptanceTestBase
 
     private void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _runEventHandler = new RunEventHandler();
     }
 
@@ -40,20 +40,21 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [TestCategory("Windows-Review")]
+    [RunnerCompatibilityDataSource]
     public void RunAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
-
-        _vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetDefaultRunSettings(), _runEventHandler);
+        
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        var runEventHandler = new RunEventHandler();
+        vstestConsoleWrapper.RunTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+        Assert.AreEqual(6, runEventHandler.TestResults.Count);
+        Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+        Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
     }
 
     [TestMethod]
@@ -71,6 +72,9 @@ public class RunTests : AcceptanceTestBase
         _vstestConsoleWrapper?.EndSession();
 
         // Assert
+        // TODO: This still works reliably, but it is accidental. Correctly we should look at our "tree" of processes
+        // but there is no such thing on Windows. We can still replicate it quite well. There is code for it in blame
+        // hang collector.
         Assert.AreEqual(numOfProcesses, Process.GetProcessesByName("vstest.console").Length);
 
         _vstestConsoleWrapper = null;
@@ -185,12 +189,10 @@ public class RunTests : AcceptanceTestBase
 
     private IList<string> GetTestAssemblies()
     {
-        var testAssemblies = new List<string>
+        return new List<string>
         {
             GetAssetFullPath("SimpleTestProject.dll"),
             GetAssetFullPath("SimpleTestProject2.dll")
         };
-
-        return testAssemblies;
     }
 }

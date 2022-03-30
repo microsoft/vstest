@@ -142,7 +142,7 @@ public class DefaultTestHostManagerTests
     {
         _testHostManager.Initialize(_mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X86}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{true}</DisableAppDomain> </RunConfiguration> </RunSettings>");
         var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Transport = Transport.Sockets }, RunnerProcessId = 101 };
-        var source = "C:\temp\a.dll";
+        var source = @"C:\temp\a.dll";
 
         var info = _testHostManager.GetTestHostProcessStartInfo(
             new List<string>() { source },
@@ -158,7 +158,7 @@ public class DefaultTestHostManagerTests
         _mockProcessHelper.Setup(p => p.GetCurrentProcessFileName()).Returns("/usr/bin/dotnet");
         _mockEnvironment.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
         _mockDotnetHostHelper.Setup(d => d.GetMonoPath()).Returns("/usr/bin/mono");
-        var source = "C:\temp\a.dll";
+        var source = @"C:\temp\a.dll";
 
         var info = _testHostManager.GetTestHostProcessStartInfo(
             new List<string>() { source },

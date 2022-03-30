@@ -5,8 +5,8 @@ namespace Intent.Console;
 
 public class Program
 {
-    public static void Main(string[] path)
+    public static void Main(string[] paths)
     {
-        Runner.Run(path, new ConsoleLogger());
+        Runner.Run(paths, new ConsoleLogger());
     }
 }

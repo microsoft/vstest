@@ -1238,7 +1238,7 @@ public class ConsoleLoggerTests
         _mockRequestData = new Mock<IRequestData>();
         _mockMetricsCollection = new Mock<IMetricsCollection>();
         _mockFeatureFlag = new Mock<IFeatureFlag>();
-        _mockFeatureFlag.Setup(x => x.IsEnabled(It.IsAny<string>())).Returns(true);
+        _mockFeatureFlag.Setup(x => x.IsSet(It.IsAny<string>())).Returns(false);
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
 
         _mockOutput = new Mock<IOutput>();

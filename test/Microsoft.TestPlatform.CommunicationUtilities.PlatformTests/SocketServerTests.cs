@@ -18,6 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests;
 
 [TestClass]
+[Ignore("Flaky")]
 public class SocketServerTests : SocketTestsBase, IDisposable
 {
     private readonly TcpClient _tcpClient;

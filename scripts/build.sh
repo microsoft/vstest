@@ -151,6 +151,9 @@ TPB_Verbose=$VERBOSE
 TPB_EXTERNALS_VERSION=$(grep TestPlatformExternalsVersion $TP_ROOT_DIR/scripts/build/TestPlatform.Dependencies.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
 TPB_CC_EXTERNALS_VERSION=$(grep MicrosoftInternalCodeCoverageVersion $TP_ROOT_DIR/eng/Versions.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
 
+TPB_BRANCH="$(git -C "." rev-parse --abbrev-ref HEAD 2>/dev/null)" || TPB_BRANCH="LOCALBRANCH" # detached HEAD
+TPB_COMMIT="$(git -C "." rev-parse HEAD 2>/dev/null)"              || TPB_COMMIT="LOCALBUILD" # detached HEAD
+
 if [[ $TP_USE_REPO_API = 1 ]]; then
     TPB_TargetFrameworkCore="net6.0"
 fi
@@ -267,8 +270,6 @@ function invoke_build()
     local start=$SECONDS
     log ".. .. Build: Source: $TPB_Solution"
 
-    # Workaround for https://github.com/dotnet/sdk/issues/335
-    export FrameworkPathOverride=$TP_PACKAGES_DIR/microsoft.targetingpack.netframework.v4.7.2/1.0.0/lib/net472/
     if [ -z "$PROJECT_NAME_PATTERNS" ]
     then
         if [[ $TP_USE_REPO_API = 0 ]]; then
@@ -508,17 +509,19 @@ function create_package()
 
     for i in ${projectFiles[@]}; do
         if [[ $TP_USE_REPO_API = 0 ]]; then
-            log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version"
+            log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version -p:BranchName=$TPB_BRANCH -p:CommitId=$TPB_COMMIT"
 
-            $dotnet restore $stagingDir/${i} \
-                && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version /bl:pack_$i.binlog
+            $dotnet restore $stagingDir/${i} -p:Version=$TPB_Version -p:BranchName="$TPB_BRANCH" -p:CommitId="$TPB_COMMIT" -bl:pack_$i.binlog \
+                && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version -p:BranchName="$TPB_BRANCH" -p:CommitId="$TPB_COMMIT" -bl:pack_$i.binlog
         else
-            log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version (Source Build)"
+            log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version -p:BranchName=$TPB_BRANCH -p:CommitId=$TPB_COMMIT -p:DotNetBuildFromSource=true (Source Build)"
 
-            $dotnet restore $stagingDir/${i} \
-                && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version /bl:pack_$i.binlog -p:DotNetBuildFromSource=true
+            $dotnet restore $stagingDir/${i} -p:Version=$TPB_Version -bl:restore_$i.binlog -p:DotNetBuildFromSource=true -p:BranchName="$TPB_BRANCH" -p:CommitId="$TPB_COMMIT" \
+                && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version -bl:pack_$i.binlog -p:DotNetBuildFromSource=true -p:BranchName="$TPB_BRANCH" -p:CommitId="$TPB_COMMIT"
         fi
     done
+
+
 
     log "Create-NugetPackages: Elapsed $(( SECONDS - start ))s."
 }

@@ -7,7 +7,8 @@
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <!-- TODO: Do we need this for net6.0 as well? -->
+    <TargetFramework>net48</TargetFramework>
     <AssemblyName>SettingsMigrator.UnitTests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>

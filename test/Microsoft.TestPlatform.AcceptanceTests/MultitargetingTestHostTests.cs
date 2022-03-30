@@ -22,10 +22,9 @@ public class MultitargetingTestHostTests : AcceptanceTestBase
     public void TestRunInATesthostThatTargetsTheirChosenNETFramework(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        using var tempDir = new TempDirectory();
 
-        var assemblyPath = BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll").Trim('\"');
-        var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
+        var assemblyPath = BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll");
+        var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
 
         // Tell the test project which target framework we are expecting it to run as.
         // It has this value conditionally compiled, so it can compare it.
@@ -36,6 +35,6 @@ public class MultitargetingTestHostTests : AcceptanceTestBase
 
         InvokeVsTest(arguments, env);
 
-        ValidateSummaryStatus(passedTestsCount: 1, failedTestsCount: 0, 0);
+        ValidateSummaryStatus(passed: 1, failed: 0, 0);
     }
 }

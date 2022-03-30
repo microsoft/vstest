@@ -31,8 +31,8 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
 
     private void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out var logsDir);
-        _logsDir = logsDir;
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _logsDir = TempDirectory;
         _runEventHandler = new RunEventHandler();
     }
 
@@ -108,8 +108,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
         ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
         Setup();
 
-        using var tempDir = new TempDirectory();
-        var testsettingsFile = Path.Combine(tempDir.Path, "tempsettings.testsettings");
+        var testsettingsFile = Path.Combine(TempDirectory.Path, "tempsettings.testsettings");
         string testSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?><TestSettings></TestSettings>";
 
         File.WriteAllText(testsettingsFile, testSettingsXml, Encoding.UTF8);

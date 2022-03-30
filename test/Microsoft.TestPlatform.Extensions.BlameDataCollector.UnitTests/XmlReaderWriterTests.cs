@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -120,7 +121,8 @@ public class XmlReaderWriterTests
     {
         // Setup
         _mockFileHelper.Setup(m => m.Exists(It.IsAny<string>())).Returns(true);
-        _mockFileHelper.Setup(m => m.GetStream("path.xml", FileMode.Create, FileAccess.ReadWrite)).Returns(_mockStream.Object);
+        using var stream = new MemoryStream();
+        _mockFileHelper.Setup(m => m.GetStream("path.xml", FileMode.Create, FileAccess.ReadWrite)).Returns(stream);
         _mockStream.Setup(x => x.CanWrite).Returns(true);
         _mockStream.Setup(x => x.Write(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()));
 
@@ -129,8 +131,9 @@ public class XmlReaderWriterTests
         // Verify Call to fileHelper
         _mockFileHelper.Verify(x => x.GetStream("path.xml", FileMode.Create, FileAccess.ReadWrite));
 
-        // Verify Call to stream write
-        _mockStream.Verify(x => x.Write(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()));
+        // Assert it has some data
+        var data = Encoding.UTF8.GetString(stream.ToArray());
+        Assert.IsTrue(data.Length > 0, "Stream should have some data.");
     }
 
     /// <summary>

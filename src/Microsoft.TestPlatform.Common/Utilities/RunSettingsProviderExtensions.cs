@@ -94,7 +94,7 @@ internal static class RunSettingsProviderExtensions
     /// <param name="runSettingsProvider"></param>
     /// <param name="node"></param>
     /// <returns></returns>
-    public static Match GetTestRunParameterNodeMatch(this IRunSettingsProvider runSettingsProvider, string node)
+    public static Match GetTestRunParameterNodeMatch(this IRunSettingsProvider _, string node)
     {
         var attrName = $"(?<{AttributeNameString}>[\\w.:-]+)";
         var attrValue = $"(?<{AttributeValueString}>.+)";

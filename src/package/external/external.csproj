@@ -33,7 +33,7 @@
 
   <ItemGroup Condition=" '$(DotNetBuildFromSource)' != 'true' ">
     <!-- This csproj restore external tools required for build process -->
-    <PackageReference Include="NuGet.CommandLine" Version="5.8.1" PrivateAssets="All" />
+    <PackageReference Include="NuGet.CommandLine" Version="6.0.0" PrivateAssets="All" />
     <PackageReference Include="fmdev.xlftool" Version="0.1.3" PrivateAssets="All" />
     <PackageReference Include="MicroBuild.Core" Version="0.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Sdk.BuildTasks.14.0" Version="14.0.12-pre" PrivateAssets="All" />
@@ -41,8 +41,8 @@
 	  <PackageReference Include="Microsoft.DiaSymReader.Pdb2Pdb" Version="1.1.0-beta2-21075-01" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Internal.TestPlatform.Remote" Version="$(TestPlatformRemoteExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Internal.TestPlatform.Extensions" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Coverage.IO" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.TraceDataCollector" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.VisualStudio.Coverage.IO" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" />     
     <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.QualityTools" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.QualityTools.DataCollectors" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
@@ -60,11 +60,6 @@
     <PackageReference Include="Microsoft.NETCore.ILAsm" Version="$(ILAsmPackageVersion)" />
     <PackageReference Include="Microsoft.NETCore.ILDAsm" Version="$(ILAsmPackageVersion)" />
     <PackageReference Include="Microsoft.DotNet.Build.Tasks.Feed" Version="$(MicrosoftDotNetBuildTasksFeedVersion)" PrivateAssets="All" />
-
-    <!-- Required for resolution of desktop dependencies in non windows environment.
-         We've to set to net472 since the net451 and other packages have assemblies in wrong case.
-         E.g. System.XML instead of System.Xml. -->
-    <PackageReference Include="Microsoft.TargetingPack.NETFramework.v4.7.2" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 

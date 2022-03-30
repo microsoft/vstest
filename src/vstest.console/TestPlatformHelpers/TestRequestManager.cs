@@ -63,6 +63,7 @@ internal class TestRequestManager : ITestRequestManager
     private readonly InferHelper _inferHelper;
     private readonly IProcessHelper _processHelper;
     private readonly ITestRunAttachmentsProcessingManager _attachmentsProcessingManager;
+    private readonly IEnvironment _environment;
 
     /// <summary>
     /// Maintains the current active execution request.
@@ -96,7 +97,8 @@ internal class TestRequestManager : ITestRequestManager
                 IsTelemetryOptedIn(),
                 CommandLineOptions.Instance.IsDesignMode),
             new ProcessHelper(),
-            new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new DataCollectorAttachmentsProcessorsFactory()))
+            new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new DataCollectorAttachmentsProcessorsFactory()),
+            new PlatformEnvironment())
     {
     }
 
@@ -108,7 +110,8 @@ internal class TestRequestManager : ITestRequestManager
         InferHelper inferHelper,
         Task<IMetricsPublisher> metricsPublisher,
         IProcessHelper processHelper,
-        ITestRunAttachmentsProcessingManager attachmentsProcessingManager)
+        ITestRunAttachmentsProcessingManager attachmentsProcessingManager,
+        IEnvironment environment)
     {
         _testPlatform = testPlatform;
         _commandLineOptions = commandLineOptions;
@@ -118,6 +121,7 @@ internal class TestRequestManager : ITestRequestManager
         _metricsPublisher = metricsPublisher;
         _processHelper = processHelper;
         _attachmentsProcessingManager = attachmentsProcessingManager;
+        _environment = environment;
     }
 
     /// <summary>
@@ -653,12 +657,24 @@ internal class TestRequestManager : ITestRequestManager
                 // it can be specified by user on the command line with --arch or through runsettings.
                 // If it's not specified by user will be filled by current processor architecture;
                 // should be the same as SDK.
-                defaultArchitecture = RunSettingsHelper.Instance.IsDefaultTargetArchitecture ?
-                    TranslateToArchitecture(_processHelper.GetCurrentProcessArchitecture()) :
-                    runConfiguration.TargetPlatform;
-
-                EqtTrace.Verbose($"TestRequestManager.UpdateRunSettingsIfRequired: Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}, Current process architecture: {_processHelper.GetCurrentProcessArchitecture()}.");
+                defaultArchitecture = GetDefaultArchitecture(runConfiguration);
             }
+            else
+            {
+                if (_environment.Architecture == PlatformArchitecture.ARM64 && _environment.OperatingSystem == PlatformOperatingSystem.Windows)
+                {
+                    // For non .NET Core containers only on win ARM64 we want to run AnyCPU using current process architecture as a default
+                    // for both vstest.console.exe and design mode scenario.
+                    // As default architecture we specify the expected test host architecture,
+                    // it can be specified by user on the command line with /Platform or through runsettings.
+                    // If it's not specified by user will be filled by current processor architecture.
+                    defaultArchitecture = GetDefaultArchitecture(runConfiguration);
+                }
+
+                // For all other scenario we keep the old default Architecture.X86.
+            }
+
+            EqtTrace.Verbose($"TestRequestManager.UpdateRunSettingsIfRequired: Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}, Current process architecture: {_processHelper.GetCurrentProcessArchitecture()} OperatingSystem: {_environment.OperatingSystem}.");
 
             settingsUpdated |= UpdatePlatform(
                 document,
@@ -683,6 +699,11 @@ internal class TestRequestManager : ITestRequestManager
         }
 
         return settingsUpdated;
+
+        Architecture GetDefaultArchitecture(RunConfiguration runConfiguration)
+            => RunSettingsHelper.Instance.IsDefaultTargetArchitecture
+                ? TranslateToArchitecture(_processHelper.GetCurrentProcessArchitecture())
+                : runConfiguration.TargetPlatform;
 
         static Architecture TranslateToArchitecture(PlatformArchitecture targetArchitecture)
         {

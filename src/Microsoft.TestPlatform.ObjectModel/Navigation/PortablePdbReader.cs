@@ -55,6 +55,17 @@ internal class PortablePdbReader : IDisposable
     }
 
     /// <summary>
+    /// Reads the pdb using a provided metadata reader, when the pdb is embedded in the dll, or found by
+    /// path that is in the dll metadata.
+    /// </summary>
+    /// <param name="metadataReaderProvider"></param>
+    public PortablePdbReader(MetadataReaderProvider metadataReaderProvider!!)
+    {
+        _provider = metadataReaderProvider;
+        _reader = _provider.GetMetadataReader();
+    }
+
+    /// <summary>
     /// Dispose Metadata reader
     /// </summary>
     public void Dispose()
