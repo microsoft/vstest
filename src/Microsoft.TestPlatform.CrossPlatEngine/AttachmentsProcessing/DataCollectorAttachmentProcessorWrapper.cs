@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -78,11 +79,13 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
 
     public void CancelProcessAttachment() => _processAttachmentCts?.Cancel();
 
-    public void LoadExtension(InvokedDataCollector dataCollector)
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public void LoadExtension(string dataCollectorFilePath, Uri dataCollectorUri)
     {
         DataCollectorAttachmentsProcessorsFactory.TryLoadExtension(
-            dataCollector,
-            filePath => DataCollectorExtensionManager.Create(filePath, true, new MessageLogger(this, nameof(LoadExtension))),
+            dataCollectorFilePath,
+            dataCollectorUri,
+            DataCollectorExtensionManager.Create(dataCollectorFilePath, true, new MessageLogger(this, nameof(LoadExtension))),
             TraceInfo,
             errorMsg =>
             {

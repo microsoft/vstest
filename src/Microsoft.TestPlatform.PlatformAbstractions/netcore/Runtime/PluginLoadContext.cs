@@ -23,13 +23,13 @@ internal sealed class PluginLoadContext : AssemblyLoadContext, IAssemblyLoadCont
     /// <summary>
     /// </summary>
     /// <param name="pluginPath">The path to the component or plugin's managed entry point.</param>
-    public PluginLoadContext(string pluginPath)
-        : this(pluginPath, PlatformEqtTrace.Instance)
+    public PluginLoadContext(string? name, string pluginPath!!)
+        : this(name, pluginPath, PlatformEqtTrace.Instance)
     {
     }
 
-    public PluginLoadContext(string pluginPath, IPlatformEqtTrace platformEqtTrace)
-        : base(isCollectible: true) // Required to enable unloading
+    public PluginLoadContext(string? name, string pluginPath!!, IPlatformEqtTrace platformEqtTrace!!)
+        : base(name, isCollectible: true) // Required to enable unloading
     {
         _resolver = new AssemblyDependencyResolver(pluginPath);
         _platformEqtTrace = platformEqtTrace;

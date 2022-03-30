@@ -25,12 +25,12 @@ internal sealed class DataCollectorAttachmentProcessAssemblyLoadContext : IDataC
 
     public DataCollectorAttachmentProcessAssemblyLoadContext(InvokedDataCollector invokedDataCollector!!, IMessageLogger? logger)
     {
-        var collectorPath = invokedDataCollector.Uri.AbsolutePath;
-        _context = new PluginLoadContext(collectorPath);
+        _context = new PluginLoadContext(invokedDataCollector.Uri.ToString(), invokedDataCollector.FilePath);
 
         DataCollectorAttachmentsProcessorsFactory.TryLoadExtension(
-            invokedDataCollector,
-            filePath => DataCollectorExtensionManager.Create(filePath, true, TestSessionMessageLogger.Instance, new TestPluginCache(_context)),
+            invokedDataCollector.FilePath,
+            invokedDataCollector.Uri,
+            DataCollectorExtensionManager.Create(invokedDataCollector.FilePath, true, TestSessionMessageLogger.Instance, new TestPluginCache(_context)),
             msg => EqtTrace.Info(msg),
             errorMsg =>
             {

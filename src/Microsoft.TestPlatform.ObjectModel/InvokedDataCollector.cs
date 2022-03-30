@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
+[DataContract]
 public sealed class InvokedDataCollector : IEquatable<InvokedDataCollector>
 {
     /// <summary>

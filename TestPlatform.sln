@@ -181,21 +181,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AttachmentProcessorDataColl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vstest.ProgrammerTests", "test\vstest.ProgrammerTests\vstest.ProgrammerTests.csproj", "{B1F84FD8-6150-4ECA-9AD7-C316E04E17D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intent", "test\Intent\Intent.csproj", "{BFBB35C9-6437-480A-8DCC-AE3700110E7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Intent", "test\Intent\Intent.csproj", "{BFBB35C9-6437-480A-8DCC-AE3700110E7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intent.Primitives", "test\Intent.Primitives\Intent.Primitives.csproj", "{29270853-90DC-4C39-9621-F47AE40A79B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Intent.Primitives", "test\Intent.Primitives\Intent.Primitives.csproj", "{29270853-90DC-4C39-9621-F47AE40A79B6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "testhost.arm64", "src\testhost.arm64\testhost.arm64.csproj", "{186069FE-E1E8-4DE1-BEA4-0FF1484D22D1}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{10b6ade1-f808-4612-801d-4452f5b52242}*SharedItemsImports = 5
-		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{186069fe-e1e8-4de1-bea4-0ff1484d22d1}*SharedItemsImports = 5
-		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{27dfbd04-64b2-4f1b-82b2-006620cca6f8}*SharedItemsImports = 5
-		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{2c7ce1f8-e73e-4987-8023-b5a0ebac86e8}*SharedItemsImports = 5
-		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{71cb42ff-e750-4a3b-9c3a-ac938853cc89}*SharedItemsImports = 5
-		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{7f26eda3-c8c4-4b7f-a9b6-d278c2f40a13}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
@@ -960,7 +952,7 @@ Global
 		{10B6ADE1-F808-4612-801D-4452F5B52242} = {ED0C35EB-7F31-4841-A24F-8EB708FFA959}
 		{46250E12-4CF1-4051-B4A7-80C8C06E0068} = {B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}
 		{020E15EA-731F-4667-95AF-226671E0C3AE} = {B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}
-		{595BE9C1-E10F-4E50-938A-E6C248D3F950} = {B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}
+		{595BE9C1-E10F-4E50-938A-E6C248D3F950} = {020E15EA-731F-4667-95AF-226671E0C3AE}
 		{0D59BA81-6279-4650-AEBB-4EA735C28A1A} = {B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}
 		{DE730F17-7D5C-4D9D-B479-025024BF4F1D} = {376C19DE-31E2-4FF6-88FC-0D0D6233C999}
 		{E062FFD6-DEB1-4DB4-8B6E-ADBF04129545} = {376C19DE-31E2-4FF6-88FC-0D0D6233C999}
@@ -1019,5 +1011,13 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0541B30C-FF51-4E28-B172-83F5F3934BCD}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{10b6ade1-f808-4612-801d-4452f5b52242}*SharedItemsImports = 5
+		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{186069fe-e1e8-4de1-bea4-0ff1484d22d1}*SharedItemsImports = 5
+		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{27dfbd04-64b2-4f1b-82b2-006620cca6f8}*SharedItemsImports = 5
+		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{2c7ce1f8-e73e-4987-8023-b5a0ebac86e8}*SharedItemsImports = 5
+		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{71cb42ff-e750-4a3b-9c3a-ac938853cc89}*SharedItemsImports = 5
+		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{7f26eda3-c8c4-4b7f-a9b6-d278c2f40a13}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

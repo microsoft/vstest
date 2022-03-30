@@ -49,7 +49,8 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
 
     public DataCollectorAttachmentProcessorAppDomain(InvokedDataCollector invokedDataCollector!!, IMessageLogger? dataCollectorAttachmentsProcessorsLogger)
     {
-        _appDomain = AppDomain.CreateDomain(invokedDataCollector.Uri.ToString());
+        _appDomain = AppDomain.CreateDomain(invokedDataCollector.Uri.ToString(), Assembly.GetExecutingAssembly().Evidence,
+            Path.GetDirectoryName(invokedDataCollector.FilePath), Path.GetDirectoryName(invokedDataCollector.FilePath), false);
         _dataCollectorAttachmentsProcessorsLogger = dataCollectorAttachmentsProcessorsLogger;
         _wrapper = (DataCollectorAttachmentProcessorRemoteWrapper)_appDomain.CreateInstanceFromAndUnwrap(
             typeof(DataCollectorAttachmentProcessorRemoteWrapper).Assembly.Location,
@@ -68,7 +69,7 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
 
         try
         {
-            _wrapper.LoadExtension(invokedDataCollector);
+            _wrapper.LoadExtension(invokedDataCollector.FilePath, invokedDataCollector.Uri);
             EqtTrace.Verbose($"DataCollectorAttachmentProcessorAppDomain.ctor: Extension '{invokedDataCollector.Uri}' loaded. AssemblyQualifiedName: '{AssemblyQualifiedName}' AttachmentProcessorLoaded: '{AttachmentProcessorLoaded}' FriendlyName: '{FriendlyName}'");
         }
         catch (Exception ex)

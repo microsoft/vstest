@@ -73,8 +73,9 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
 #endif
                     // We cache extension locally by file path
                     var attachmentProcessorLoaded = TryLoadExtension(
-                        invokedDataCollector,
-                        filePath => DataCollectorExtensionManagerCache.GetOrAdd(filePath, DataCollectorExtensionManager.Create(filePath, true, TestSessionMessageLogger.Instance)),
+                        invokedDataCollector.FilePath,
+                        invokedDataCollector.Uri,
+                        DataCollectorExtensionManagerCache.GetOrAdd(invokedDataCollector.FilePath, DataCollectorExtensionManager.Create(invokedDataCollector.FilePath, true, TestSessionMessageLogger.Instance)),
                         msg => EqtTrace.Info(msg),
                         errorMsg =>
                         {
@@ -87,7 +88,7 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
 
                     if (attachmentProcessorLoaded)
                     {
-                        AddAttachmentProcessor(invokedDataCollector, attachmentProcessorLoaded: true, assemblyQualifiedName!, friendlyName, attachmentProcessor!);
+                        AddAttachmentProcessor(invokedDataCollector, attachmentProcessorLoaded: true, assemblyQualifiedName!, friendlyName!, attachmentProcessor!);
                     }
 #if NETFRAMEWORK || NETCOREAPP3_0_OR_GREATER
                 }
@@ -140,29 +141,29 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
         }
     }
 
-    internal static bool TryLoadExtension(InvokedDataCollector dataCollector, Func<string, DataCollectorExtensionManager> createExtensionManager,
-        Action<string> traceInfo, Action<string> onError, out string friendlyName, out string? assemblyQualifiedName,
+    internal static bool TryLoadExtension(string dataCollectorFilePath, Uri dataCollectorUri, DataCollectorExtensionManager dataCollectorExtensionManager,
+        Action<string> traceInfo, Action<string> onError, [NotNullWhen(returnValue: true)] out string? friendlyName, out string? assemblyQualifiedName,
         [NotNullWhen(returnValue: true)] out IDataCollectorAttachmentProcessor? attachmentProcessor)
     {
-        var dataCollectorExtensionManager = createExtensionManager(dataCollector.FilePath);
-        var dataCollectorExtension = dataCollectorExtensionManager.TryGetTestExtension(dataCollector.Uri);
+        var dataCollectorExtension = dataCollectorExtensionManager.TryGetTestExtension(dataCollectorUri);
 
-        friendlyName = dataCollectorExtension.Metadata.FriendlyName;
-        assemblyQualifiedName = null;
         attachmentProcessor = null;
 
         if (dataCollectorExtension?.Metadata.HasAttachmentProcessor != true)
         {
-            traceInfo($"DataCollectorAttachmentsProcessorsFactory.TryLoadExtension: DataCollectorExtension not found for uri '{dataCollector.Uri}'");
+            traceInfo($"DataCollectorAttachmentsProcessorsFactory.TryLoadExtension: DataCollectorExtension not found for uri '{dataCollectorUri}'");
+            assemblyQualifiedName = null;
+            friendlyName = null;
             return false;
         }
 
-        Type attachmentProcessorType = ((DataCollectorConfig)dataCollectorExtension!.TestPluginInfo).AttachmentsProcessorType;
+        Type attachmentProcessorType = ((DataCollectorConfig)dataCollectorExtension.TestPluginInfo).AttachmentsProcessorType;
         assemblyQualifiedName = attachmentProcessorType.AssemblyQualifiedName;
+        friendlyName = dataCollectorExtension.Metadata.FriendlyName;
         try
         {
             attachmentProcessor = TestPluginManager.CreateTestExtension<IDataCollectorAttachmentProcessor>(attachmentProcessorType);
-            traceInfo($"DataCollectorAttachmentsProcessorsFactory.TryLoadExtension: Creation of collector attachment processor '{assemblyQualifiedName}' from file '{dataCollector.FilePath}' succeded.");
+            traceInfo($"DataCollectorAttachmentsProcessorsFactory.TryLoadExtension: Creation of collector attachment processor '{assemblyQualifiedName}' from file '{dataCollectorFilePath}' succeded.");
             return true;
         }
         catch (Exception ex)

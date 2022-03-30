@@ -28,7 +28,7 @@ internal class AssemblyLoadContextEngineInvoker<T> : IEngineInvoker, IDisposable
         // TODO: In the AppDomain counterpart we have an intermediate layer used to setup the
         // correct UI culture to propagate the dotnet or VS culture to the adapters running in the
         // app domain. See how to do so.
-        _context = new PluginLoadContext(testSourcePath);
+        _context = new PluginLoadContext("testhost", testSourcePath);
         var assembly = _context.LoadFromAssemblyName(AssemblyName.GetAssemblyName(testSourcePath));
         _actualInvoker = CreateFirstAssignableType(assembly);
 
