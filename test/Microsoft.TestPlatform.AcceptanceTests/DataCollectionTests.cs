@@ -28,7 +28,7 @@ public class DataCollectionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll");
         string runSettings = GetRunsettingsFilePath(TempDirectory.Path);
         string diagFileName = Path.Combine(TempDirectory.Path, "diaglog.txt");
         var extensionsPath = Path.Combine(
@@ -58,7 +58,7 @@ public class DataCollectionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll");
         string diagFileName = Path.Combine(TempDirectory.Path, "diaglog.txt");
         var extensionsPath = Path.Combine(
             _testEnvironment.TestAssetsPath,
@@ -87,7 +87,7 @@ public class DataCollectionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.1"), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
+        var arguments = PrepareArguments(GetTestDllForFramework("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.1"), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 0, 0);
@@ -113,8 +113,8 @@ public class DataCollectionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPath = BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
-        var secondAssemblyPath = BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+        var assemblyPath = BuildMultipleAssemblyPath("SimpleTestProject.dll");
+        var secondAssemblyPath = BuildMultipleAssemblyPath("SimpleTestProject2.dll");
         string runSettings = GetRunsettingsFilePath(TempDirectory.Path);
         string diagFileName = Path.Combine(TempDirectory.Path, "diaglog.txt");
         var extensionsPath = Path.Combine(

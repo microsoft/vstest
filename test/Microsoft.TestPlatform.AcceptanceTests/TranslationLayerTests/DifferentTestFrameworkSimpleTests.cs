@@ -26,7 +26,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 
     private void Setup()
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper(out _);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _runEventHandler = new RunEventHandler();
     }
 

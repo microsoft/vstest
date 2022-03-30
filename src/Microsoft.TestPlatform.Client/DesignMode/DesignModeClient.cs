@@ -357,7 +357,7 @@ public class DesignModeClient : IDesignModeClient
             var ackPayload = _dataSerializer.DeserializePayload<EditorAttachDebuggerAckPayload>(ackMessage);
             if (!ackPayload.Attached)
             {
-                EqtTrace.Warning(ackPayload.ErrorMessage);
+                EqtTrace.Warning($"DesignModeClient.AttachDebuggerToProcess: Attaching to process failed: {ackPayload.ErrorMessage}");
             }
 
             return ackPayload.Attached;

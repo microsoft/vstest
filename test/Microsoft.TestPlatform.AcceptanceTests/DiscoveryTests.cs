@@ -38,7 +38,7 @@ public class DiscoveryTests : AcceptanceTestBase
     public void MultipleSourcesDiscoverAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll");
         var listOfTests = new[] {
             "SampleUnitTestProject.UnitTest1.PassingTest",
             "SampleUnitTestProject.UnitTest1.FailingTest",

@@ -92,7 +92,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var testAssembly = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+        var testAssembly = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll");
         testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
         testAssembly = testAssembly.Replace("SimpleTestProject2.dll", "*TestProj*.dll");
 

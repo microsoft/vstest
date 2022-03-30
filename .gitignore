@@ -104,14 +104,14 @@ ehthumbs.db
 # ===========================
 # Custom ignores
 # ===========================
-packages
-artifacts
-[tT]ools
+/packages/
+/artifacts/
+/[tT]ools/
 
 *.dmp
 *.nupkg
 *.zip
-src/package/sign/sign.nuget.targets
+/src/package/sign/sign.nuget.targets
 
 # ===========================
 # Localized resx files
@@ -140,5 +140,5 @@ src/package/sign/sign.nuget.targets
 # ===========================
 logs/
 
-.fake
-.ionide
+.fake/
+.ionide/
