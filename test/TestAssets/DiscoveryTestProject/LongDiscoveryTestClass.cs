@@ -146,7 +146,7 @@ namespace DiscoveryTestProject3
         {
             // This will be multiplied by 3 because the framework will internally create this
             // attribute 3 times. And by another 3 because we have 3 slow tests.
-            Thread.Sleep(100);
+            Thread.Sleep(500);
         }
     }
 }
