@@ -20,7 +20,7 @@ public class RunEventHandler : ITestRunEventsHandler2
     /// <summary>
     /// Gets the metrics.
     /// </summary>
-    public IDictionary<string, object>? Metrics { get; private set; }
+    public IDictionary<string, object> Metrics { get; private set; } = new Dictionary<string, object>();
 
     /// <summary>
     /// Gets the log message.

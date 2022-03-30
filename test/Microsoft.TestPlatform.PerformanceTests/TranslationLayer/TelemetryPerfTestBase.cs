@@ -34,9 +34,9 @@ public class TelemetryPerfTestBase : PerformanceTestBase
     /// </summary>
     /// <param name="handlerMetrics"></param>
     /// <param name="scenario"></param>
-    public void PostTelemetry(IDictionary<string, object> handlerMetrics, PerfAnalyzer perfAnalyzer, string projectName, [CallerMemberName] string scenario = null)
+    public void PostTelemetry(IDictionary<string, object> handlerMetrics, PerfAnalyzer perfAnalyzer, string projectName, [CallerMemberName] string? scenario = null)
     {
-        var properties = new Dictionary<string, string>
+        var properties = new Dictionary<string, string?>
         {
             ["Version"] = "1.0.1",
             ["Project"] = projectName,

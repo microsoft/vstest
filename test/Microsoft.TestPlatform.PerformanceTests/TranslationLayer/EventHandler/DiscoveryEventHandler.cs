@@ -15,17 +15,12 @@ public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
     /// <summary>
     /// Gets the discovered test cases.
     /// </summary>
-    public List<TestCase> DiscoveredTestCases { get; }
+    public List<TestCase> DiscoveredTestCases { get; } = new List<TestCase>();
 
     /// <summary>
     /// Gets the metrics.
     /// </summary>
-    public IDictionary<string, object>? Metrics { get; private set; }
-
-    public DiscoveryEventHandler2()
-    {
-        DiscoveredTestCases = new List<TestCase>();
-    }
+    public IDictionary<string, object> Metrics { get; private set; } = new Dictionary<string, object>();
 
     public void HandleRawMessage(string rawMessage)
     {
