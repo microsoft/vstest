@@ -28,13 +28,13 @@ public class IntegrationTestEnvironment
     public IntegrationTestEnvironment()
     {
         // If the variables are not set, valid defaults are assumed.
-        if (string.IsNullOrEmpty(TargetFramework))
+        if (TargetFramework.IsNullOrEmpty())
         {
             // Run integration tests for net451 by default.
             TargetFramework = "net451";
         }
 
-        if (string.IsNullOrEmpty(TestPlatformRootDirectory))
+        if (TestPlatformRootDirectory.IsNullOrEmpty())
         {
             // Running in VS/IDE. Use artifacts directory as root.
             // Get root directory from test assembly output directory
@@ -118,7 +118,7 @@ public class IntegrationTestEnvironment
         {
             if (RunnerFramework == IntegrationTestBase.DesktopRunnerFramework)
             {
-                if (string.IsNullOrEmpty(_targetRuntime))
+                if (_targetRuntime.IsNullOrEmpty())
                 {
                     _targetRuntime = "win7-x64";
                 }
@@ -165,8 +165,8 @@ public class IntegrationTestEnvironment
 
     // A known AzureDevOps env variable meaning we are running in CI.
     public static bool IsCI { get; } = Environment.GetEnvironmentVariable("TF_BUILD") == "True";
-    public DebugInfo DebugInfo { get; set; }
-    public VSTestConsoleInfo VSTestConsoleInfo { get; set; }
+    public DebugInfo? DebugInfo { get; set; }
+    public VSTestConsoleInfo? VSTestConsoleInfo { get; set; }
     public List<DllInfo> DllInfos { get; set; } = new();
 
     /// <summary>
@@ -258,7 +258,7 @@ public class IntegrationTestEnvironment
             props.Read();   // Read thru the PropertyGroup node
             while (!props.EOF)
             {
-                if (props.IsStartElement() && !string.IsNullOrEmpty(props.Name))
+                if (props.IsStartElement() && !props.Name.IsNullOrEmpty())
                 {
                     if (!dependencyProps.ContainsKey(props.Name))
                     {

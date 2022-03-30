@@ -61,7 +61,7 @@ public class AcceptanceTestBase : IntegrationTestBase
     public const string LATEST_TO_LEGACY = "Latest;LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
     public const string LATESTPREVIEW_TO_LEGACY = "LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
     public const string LATEST = "Latest";
-    public const string LATESTSTABLE= "LatestStable";
+    public const string LATESTSTABLE = "LatestStable";
     internal const string MSTEST = "MSTest";
 
     public static string And(string left, string right)
