@@ -292,7 +292,7 @@ function Publish-PatchedDotnet {
 function Publish-Package {
     $timer = Start-Timer
     Write-Log "Publish-Package: Started."
-    $fullCLRPackage472Dir = Get-FullCLRPackageDirectory
+    $fullCLRPackage472Dir = Get-FullCLRPackageDirectory472
     $uap100PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkUap100");
     $netstandard10PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS10");
     $netstandard13PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS13");
@@ -372,15 +372,17 @@ function Publish-Package {
 
     # Copy the .NET multitarget testhost exes to destination folder (except for net472 which is the default)
     foreach ($tfm in "net48" -split ";") {
-        # testhost.tfm
+        # Copy testhost exes
         Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.$tfm.exe" $testhostFullPackageDir\testhost.$tfm.exe -Force
         Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.$tfm.pdb" $testhostFullPackageDir\testhost.$tfm.pdb -Force
         Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.$tfm.exe.config" $testhostFullPackageDir\testhost.$tfm.exe.config -Force
-        # testhost.tfm.x86
+
+        # Copy testhost.x86 exes
         Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.$tfm.x86.exe" $testhostFullPackageDir\testhost.$tfm.x86.exe -Force
         Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.$tfm.x86.pdb" $testhostFullPackageDir\testhost.$tfm.x86.pdb -Force
         Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.$tfm.x86.exe.config" $testhostFullPackageDir\testhost.$tfm.x86.exe.config -Force
-        # testhost.tfm.arm64
+
+        # Copy testhost.arm64 exes
         Copy-Item "$(Split-Path $testHostarm64Project)\bin\$TPB_Configuration\$tfm\$TPB_ARM64_Runtime\testhost.$tfm.arm64.exe" $testhostFullPackageDir\testhost.$tfm.arm64.exe -Force
         Copy-Item "$(Split-Path $testHostarm64Project)\bin\$TPB_Configuration\$tfm\$TPB_ARM64_Runtime\testhost.$tfm.arm64.pdb" $testhostFullPackageDir\testhost.$tfm.arm64.pdb -Force
         Copy-Item "$(Split-Path $testHostarm64Project)\bin\$TPB_Configuration\$tfm\$TPB_ARM64_Runtime\testhost.$tfm.arm64.exe.config" $testhostFullPackageDir\testhost.$tfm.arm64.exe.config -Force
@@ -752,7 +754,7 @@ function Create-VsixPackage {
 
     $vsixSourceDir = Join-Path $env:TP_ROOT_DIR "src\package\VSIXProject"
     $vsixProjectDir = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\VSIX"
-    $packageDir = Get-FullCLRPackageDirectory
+    $packageDir = Get-FullCLRPackageDirectory472
     $extensionsPackageDir = Join-Path $packageDir "Extensions"
     $testImpactComComponentsDir = Join-Path $extensionsPackageDir "TestImpact"
     $legacyTestImpactComComponentsDir = Join-Path $extensionsPackageDir "V1\TestImpact"
@@ -784,25 +786,25 @@ function Create-VsixPackage {
     Copy-Item $codeCoverageInstrumentationPackageDirectory\Mono.Cecil.Pdb.dll $extensionsPackageDir -Force
 
     # Copy Microsoft.VisualStudio.IO to root
-    $codeCoverageIOPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Coverage.IO\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework472"
+    $codeCoverageIOPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Coverage.IO\$codeCoverageExternalsVersion\lib\net451"
     Copy-Item $codeCoverageIOPackageDirectory\Microsoft.VisualStudio.Coverage.IO.dll $packageDir -Force
     if ($TPB_LocalizedBuild) {
         Copy-Loc-Files $codeCoverageIOPackageDirectory $packageDir "Microsoft.VisualStudio.Coverage.IO.resources.dll"
     }
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\$testPlatformExternalsVersion\tools\net472"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\$testPlatformExternalsVersion\tools\net451"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy Microsoft.VisualStudio.ArchitectureTools.PEReader to Extensions
     Copy-Item $legacyDir\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll $extensionsPackageDir -Force
 
     # Copy QtAgent Related depedencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\$testPlatformExternalsVersion\tools\net472"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\$testPlatformExternalsVersion\tools\net451"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy Legacy data collectors Related depedencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools.DataCollectors\$testPlatformExternalsVersion\tools\net472"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools.DataCollectors\$testPlatformExternalsVersion\tools\net451"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy CUIT Related depedencies
@@ -1033,8 +1035,8 @@ function Copy-CodeCoverage-Package-Artifacts {
 
 function Copy-PackageItems($packageName) {
     # Packages published separately are copied into their own artifacts directory
-    # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net451\* is copied
-    # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net451
+    # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net472\* is copied
+    # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net472
     $binariesDirectory = [System.IO.Path]::Combine($env:TP_ROOT_DIR, "src", "$packageName", "bin", "$TPB_Configuration")
     $binariesDirectory = $(Join-Path $binariesDirectory "*")
     $publishDirectory = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$packageName")
@@ -1073,8 +1075,7 @@ function Get-DotNetPath {
     return $dotnetPath
 }
 
-function Get-FullCLRPackageDirectory
-{
+function Get-FullCLRPackageDirectory472 {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework472\$TPB_TargetRuntime")
 }
 
