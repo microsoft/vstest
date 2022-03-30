@@ -6,8 +6,6 @@ using System;
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollectorUnitTests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
 
 [TestClass]

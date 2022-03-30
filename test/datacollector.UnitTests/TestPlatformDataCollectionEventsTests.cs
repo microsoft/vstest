@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
 
 [TestClass]
@@ -17,8 +15,7 @@ public class TestPlatformDataCollectionEventsTests
 {
     private readonly TestPlatformDataCollectionEvents _events;
 
-    private DataCollectionContext _context;
-
+    private DataCollectionContext? _context;
     private bool _isEventRaised;
 
     public TestPlatformDataCollectionEventsTests()
@@ -138,22 +135,22 @@ public class TestPlatformDataCollectionEventsTests
         Assert.IsFalse(_events.AreTestCaseEventsSubscribed());
     }
 
-    private void SessionStartMessageHandler(object sender, SessionStartEventArgs e)
+    private void SessionStartMessageHandler(object? sender, SessionStartEventArgs e)
     {
         _isEventRaised = true;
     }
 
-    private void SessionEndMessageHandler(object sender, SessionEndEventArgs e)
+    private void SessionEndMessageHandler(object? sender, SessionEndEventArgs e)
     {
         _isEventRaised = true;
     }
 
-    private void TestCaseStartMessageHandler(object sender, TestCaseStartEventArgs e)
+    private void TestCaseStartMessageHandler(object? sender, TestCaseStartEventArgs e)
     {
         _isEventRaised = true;
     }
 
-    private void TestCaseEndMessageHandler(object sender, TestCaseEndEventArgs e)
+    private void TestCaseEndMessageHandler(object? sender, TestCaseEndEventArgs e)
     {
         _isEventRaised = true;
     }
