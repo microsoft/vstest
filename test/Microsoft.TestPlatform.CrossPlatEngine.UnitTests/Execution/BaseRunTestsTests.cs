@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -32,8 +33,6 @@ using Moq;
 
 using OMTestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Execution;
 
 [TestClass]
@@ -44,23 +43,18 @@ public class BaseRunTestsTests
 
     private readonly TestExecutionContext _testExecutionContext;
     private readonly Mock<ITestRunEventsHandler> _mockTestRunEventsHandler;
-
-    private TestableBaseRunTests _runTestsInstance;
-
     private readonly Mock<ITestPlatformEventSource> _mockTestPlatformEventSource;
-    private Mock<IThread> _mockThread;
-
     private readonly Mock<IRequestData> _mockRequestData;
-
     private readonly Mock<IMetricsCollection> _mockMetricsCollection;
-
     private readonly Mock<IDataSerializer> _mockDataSerializer;
 
-    private TestRunChangedEventArgs _receivedRunStatusArgs;
-    private TestRunCompleteEventArgs _receivedRunCompleteArgs;
-    private ICollection<AttachmentSet> _receivedattachments;
-    private ICollection<string> _receivedExecutorUris;
-    private TestCase _inProgressTestCase;
+    private Mock<IThread> _mockThread;
+    private TestableBaseRunTests _runTestsInstance;
+    private TestRunChangedEventArgs? _receivedRunStatusArgs;
+    private TestRunCompleteEventArgs? _receivedRunCompleteArgs;
+    private ICollection<AttachmentSet>? _receivedattachments;
+    private ICollection<string>? _receivedExecutorUris;
+    private TestCase? _inProgressTestCase;
 
     public BaseRunTestsTests()
     {
@@ -141,7 +135,7 @@ public class BaseRunTestsTests
     [TestMethod]
     public void RunTestsShouldRaiseTestRunCompleteWithAbortedAsTrueOnException()
     {
-        TestRunCompleteEventArgs receivedCompleteArgs = null;
+        TestRunCompleteEventArgs? receivedCompleteArgs = null;
 
         // Setup mocks.
         _runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => throw new NotImplementedException();
@@ -168,7 +162,7 @@ public class BaseRunTestsTests
     [TestMethod]
     public void RunTestsShouldNotThrowIfExceptionIsAFileNotFoundException()
     {
-        TestRunCompleteEventArgs receivedCompleteArgs = null;
+        TestRunCompleteEventArgs? receivedCompleteArgs = null;
 
         // Setup mocks.
         _runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => throw new FileNotFoundException();
@@ -196,7 +190,7 @@ public class BaseRunTestsTests
     [TestMethod]
     public void RunTestsShouldNotThrowIfExceptionIsAnArgumentException()
     {
-        TestRunCompleteEventArgs receivedCompleteArgs = null;
+        TestRunCompleteEventArgs? receivedCompleteArgs = null;
 
         // Setup mocks.
         _runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => throw new ArgumentException();
@@ -224,7 +218,7 @@ public class BaseRunTestsTests
     [TestMethod]
     public void RunTestsShouldAbortIfExecutorUriExtensionMapIsNull()
     {
-        TestRunCompleteEventArgs receivedCompleteArgs = null;
+        TestRunCompleteEventArgs? receivedCompleteArgs = null;
 
         // Setup mocks.
         _runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => null;
@@ -257,7 +251,7 @@ public class BaseRunTestsTests
         {
             new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
         };
-        LazyExtension<ITestExecutor, ITestExecutorCapabilities> receivedExecutor = null;
+        LazyExtension<ITestExecutor, ITestExecutorCapabilities>? receivedExecutor = null;
 
         // Setup mocks.
         _runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => executorUriExtensionMap;
@@ -277,7 +271,7 @@ public class BaseRunTestsTests
         {
             new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), Constants.UnspecifiedAdapterPath)
         };
-        LazyExtension<ITestExecutor, ITestExecutorCapabilities> receivedExecutor = null;
+        LazyExtension<ITestExecutor, ITestExecutorCapabilities>? receivedExecutor = null;
 
         // Setup mocks.
         _runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => executorUriExtensionMap;
@@ -336,7 +330,7 @@ public class BaseRunTestsTests
         {
             new Tuple<Uri, string>(new Uri("executor://nonexistent/"), assemblyLocation)
         };
-        LazyExtension<ITestExecutor, ITestExecutorCapabilities> receivedExecutor = null;
+        LazyExtension<ITestExecutor, ITestExecutorCapabilities>? receivedExecutor = null;
 
         // Setup mocks.
         _runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => executorUriExtensionMap;
@@ -521,7 +515,7 @@ public class BaseRunTestsTests
 
         // Executor Uris
         var expectedUris = new string[] { BadBaseRunTestsExecutorUri.ToLower(), BaseRunTestsExecutorUri.ToLower() };
-        CollectionAssert.AreEqual(expectedUris, _receivedExecutorUris.ToArray());
+        CollectionAssert.AreEqual(expectedUris, _receivedExecutorUris!.ToArray());
     }
 
     [TestMethod]
@@ -545,7 +539,7 @@ public class BaseRunTestsTests
         _runTestsInstance.RunTests();
 
         // Test run changed event assertions
-        Assert.IsNotNull(_receivedRunStatusArgs.NewTestResults);
+        Assert.IsNotNull(_receivedRunStatusArgs?.NewTestResults);
         Assert.IsTrue(_receivedRunStatusArgs.NewTestResults.Any());
 
         // verify TC.Source is updated with package
@@ -566,7 +560,7 @@ public class BaseRunTestsTests
         // Act.
         _runTestsInstance.RunTests();
 
-        Assert.IsNotNull(_receivedRunStatusArgs.ActiveTests);
+        Assert.IsNotNull(_receivedRunStatusArgs?.ActiveTests);
         Assert.AreEqual(1, _receivedRunStatusArgs.ActiveTests.Count());
 
         foreach (var tc in _receivedRunStatusArgs.ActiveTests)
@@ -585,7 +579,7 @@ public class BaseRunTestsTests
         // Act.
         _runTestsInstance.RunTests();
 
-        Assert.IsNotNull(_receivedRunStatusArgs.ActiveTests);
+        Assert.IsNotNull(_receivedRunStatusArgs?.ActiveTests);
         Assert.AreEqual(1, _receivedRunStatusArgs.ActiveTests.Count());
 
         _mockDataSerializer.Verify(d => d.Clone(It.IsAny<TestCase>()), Times.Exactly(2));
@@ -601,7 +595,7 @@ public class BaseRunTestsTests
         // Act.
         _runTestsInstance.RunTests();
 
-        Assert.IsNotNull(_receivedRunStatusArgs.NewTestResults);
+        Assert.IsNotNull(_receivedRunStatusArgs?.NewTestResults);
         Assert.AreEqual(1, _receivedRunStatusArgs.ActiveTests.Count());
 
         _mockDataSerializer.Verify(d => d.Clone(It.IsAny<OMTestResult>()), Times.Exactly(2));
@@ -656,7 +650,7 @@ public class BaseRunTestsTests
     [TestMethod]
     public void RunTestsShouldSendMetricsOnTestRunComplete()
     {
-        TestRunCompleteEventArgs receivedRunCompleteArgs = null;
+        TestRunCompleteEventArgs? receivedRunCompleteArgs = null;
         var mockMetricsCollector = new Mock<IMetricsCollection>();
 
         var dict = new Dictionary<string, object>
@@ -686,7 +680,7 @@ public class BaseRunTestsTests
         _runTestsInstance.RunTests();
 
         // Assert.
-        Assert.IsNotNull(receivedRunCompleteArgs.Metrics);
+        Assert.IsNotNull(receivedRunCompleteArgs?.Metrics);
         Assert.IsTrue(receivedRunCompleteArgs.Metrics.Any());
         Assert.IsTrue(receivedRunCompleteArgs.Metrics.ContainsKey("DummyMessage"));
     }
@@ -786,7 +780,7 @@ public class BaseRunTestsTests
         {
             new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), Constants.UnspecifiedAdapterPath)
         };
-        LazyExtension<ITestExecutor, ITestExecutorCapabilities> receivedExecutor = null;
+        LazyExtension<ITestExecutor, ITestExecutorCapabilities>? receivedExecutor = null;
 
         // Setup mocks.
         _runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => executorUriExtensionMap;
@@ -823,7 +817,8 @@ public class BaseRunTestsTests
         _runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => executorUriExtensionMap;
     }
 
-    private void SetUpTestRunEvents(string package = null, bool setupHandleTestRunComplete = true)
+    [MemberNotNull(nameof(_runTestsInstance))]
+    private void SetUpTestRunEvents(string? package = null, bool setupHandleTestRunComplete = true)
     {
         if (setupHandleTestRunComplete)
         {
@@ -922,13 +917,13 @@ public class BaseRunTestsTests
     {
         public TestableBaseRunTests(
             IRequestData requestData,
-            string package,
-            string runSettings,
+            string? package,
+            string? runSettings,
             TestExecutionContext testExecutionContext,
-            ITestCaseEventsHandler testCaseEventsHandler,
+            ITestCaseEventsHandler? testCaseEventsHandler,
             ITestRunEventsHandler testRunEventsHandler,
             ITestPlatformEventSource testPlatformEventSource,
-            ITestEventsPublisher testEventsPublisher,
+            ITestEventsPublisher? testEventsPublisher,
             IThread platformThread,
             IDataSerializer dataSerializer)
             : base(
@@ -946,17 +941,13 @@ public class BaseRunTestsTests
             _testCaseEventsHandler = testCaseEventsHandler;
         }
 
-        private readonly ITestCaseEventsHandler _testCaseEventsHandler;
+        private readonly ITestCaseEventsHandler? _testCaseEventsHandler;
 
-        public Action<bool> BeforeRaisingTestRunCompleteCallback { get; set; }
+        public Action<bool>? BeforeRaisingTestRunCompleteCallback { get; set; }
 
-        public Func<IFrameworkHandle, RunContext, IEnumerable<Tuple<Uri, string>>> GetExecutorUriExtensionMapCallback { get; set; }
+        public Func<IFrameworkHandle, RunContext, IEnumerable<Tuple<Uri, string>>?>? GetExecutorUriExtensionMapCallback { get; set; }
 
-        public
-            Action
-            <LazyExtension<ITestExecutor, ITestExecutorCapabilities>, Tuple<Uri, string>, RunContext,
-                IFrameworkHandle> InvokeExecutorCallback
-        { get; set; }
+        public Action<LazyExtension<ITestExecutor, ITestExecutorCapabilities>, Tuple<Uri, string>, RunContext, IFrameworkHandle>? InvokeExecutorCallback { get; set; }
 
         /// <summary>
         /// Gets the run settings.
@@ -991,7 +982,7 @@ public class BaseRunTestsTests
             BeforeRaisingTestRunCompleteCallback?.Invoke(exceptionsHitDuringRunTests);
         }
 
-        protected override IEnumerable<Tuple<Uri, string>> GetExecutorUriExtensionMap(IFrameworkHandle testExecutorFrameworkHandle, RunContext runContext)
+        protected override IEnumerable<Tuple<Uri, string>>? GetExecutorUriExtensionMap(IFrameworkHandle testExecutorFrameworkHandle, RunContext runContext)
         {
             return GetExecutorUriExtensionMapCallback?.Invoke(testExecutorFrameworkHandle, runContext);
         }

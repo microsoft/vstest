@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery;
 
 [TestClass]
@@ -60,7 +58,7 @@ public class DiscoveryResultCacheTests
     [TestMethod]
     public void AddTestShouldReportTestCasesIfMaxCacheSizeIsMet()
     {
-        ICollection<TestCase> reportedTestCases = null;
+        ICollection<TestCase>? reportedTestCases = null;
         var cache = new DiscoveryResultCache(2, TimeSpan.FromHours(1), (tests) => reportedTestCases = tests);
 
         var testCase1 = new TestCase("A.C.M", new Uri("executor://unittest"), "A");
@@ -93,7 +91,7 @@ public class DiscoveryResultCacheTests
     [TestMethod]
     public void AddTestShouldReportTestCasesIfCacheTimeoutIsMet()
     {
-        ICollection<TestCase> reportedTestCases = null;
+        ICollection<TestCase>? reportedTestCases = null;
         var cache = new DiscoveryResultCache(100, TimeSpan.FromMilliseconds(10), (tests) => reportedTestCases = tests);
 
         var testCase = new TestCase("A.C.M", new Uri("executor://unittest"), "A");
@@ -108,7 +106,7 @@ public class DiscoveryResultCacheTests
     [TestMethod]
     public void AddTestShouldResetTestListIfCacheTimeoutIsMet()
     {
-        ICollection<TestCase> reportedTestCases = null;
+        ICollection<TestCase>? reportedTestCases = null;
         var cache = new DiscoveryResultCache(100, TimeSpan.FromMilliseconds(10), (tests) => reportedTestCases = tests);
 
         var testCase = new TestCase("A.C.M", new Uri("executor://unittest"), "A");

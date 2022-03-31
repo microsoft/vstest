@@ -15,19 +15,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
 
 [TestClass]
 public class DotnetDataCollectionLauncherTests
 {
     private readonly Mock<IFileHelper> _mockFileHelper;
-
     private readonly Mock<IProcessHelper> _mockProcessHelper;
-
     private readonly Mock<IMessageLogger> _mockMessageLogger;
-
     private readonly DotnetDataCollectionLauncher _dataCollectionLauncher;
 
     public DotnetDataCollectionLauncherTests()
@@ -51,7 +46,7 @@ public class DotnetDataCollectionLauncherTests
     [TestMethod]
     public void LaunchDataCollectorShouldAppendDoubleQuoteForDataCollectorDllPath()
     {
-        var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation());
+        var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation())!;
         var dataCollectorAssemblyPath = Path.Combine(currentWorkingDirectory, "datacollector.dll");
 
         List<string> arguments = new();

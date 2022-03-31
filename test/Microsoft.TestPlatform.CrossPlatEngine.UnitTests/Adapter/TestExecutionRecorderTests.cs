@@ -13,21 +13,18 @@ using Moq;
 
 using TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter;
 
 [TestClass]
 public class TestExecutionRecorderTests
 {
-    private TestableTestRunCache _testableTestRunCache;
-    private Mock<ITestCaseEventsHandler> _mockTestCaseEventsHandler;
-    private TestExecutionRecorder _testRecorder, _testRecorderWithTestEventsHandler;
-    private TestCase _testCase;
-    private Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult _testResult;
+    private readonly TestableTestRunCache _testableTestRunCache;
+    private readonly Mock<ITestCaseEventsHandler> _mockTestCaseEventsHandler;
+    private readonly TestExecutionRecorder _testRecorder, _testRecorderWithTestEventsHandler;
+    private readonly TestCase _testCase;
+    private readonly Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult _testResult;
 
-    [TestInitialize]
-    public void TestInit()
+    public TestExecutionRecorderTests()
     {
         _testableTestRunCache = new TestableTestRunCache();
         _testRecorder = new TestExecutionRecorder(null, _testableTestRunCache);

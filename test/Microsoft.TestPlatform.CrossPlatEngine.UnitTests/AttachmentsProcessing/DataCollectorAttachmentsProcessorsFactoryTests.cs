@@ -19,8 +19,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachmentsProcessorsFactoryTests;
 
 [TestClass]
@@ -71,7 +69,7 @@ public class DataCollectorAttachmentsProcessorsFactoryTests
     public void Create_EmptyOrNullInvokedDataCollector_ShouldReturnCodeCoverageDataAttachmentsHandler(bool empty)
     {
         // act
-        var dataCollectorAttachmentsProcessors = _dataCollectorAttachmentsProcessorsFactory.Create(empty ? new InvokedDataCollector[0] : null, null);
+        var dataCollectorAttachmentsProcessors = _dataCollectorAttachmentsProcessorsFactory.Create(empty ? Array.Empty<InvokedDataCollector>() : null, null);
 
         //assert
         Assert.AreEqual(1, dataCollectorAttachmentsProcessors.Length);
@@ -140,14 +138,14 @@ public class DataCollectorAttachmentsProcessorsFactoryTests
 
         // assert
         Assert.AreEqual(2, dataCollectorAttachmentsProcessors.Length);
-        Assert.IsTrue(Regex.IsMatch(dataCollectorAttachmentsProcessors[0].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName, @"AttachmentProcessorDataCollector\.SampleDataCollectorAttachmentProcessor, AttachmentProcessorDataCollector, Version=.*, Culture=neutral, PublicKeyToken=null"));
+        Assert.IsTrue(Regex.IsMatch(dataCollectorAttachmentsProcessors[0].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName!, @"AttachmentProcessorDataCollector\.SampleDataCollectorAttachmentProcessor, AttachmentProcessorDataCollector, Version=.*, Culture=neutral, PublicKeyToken=null"));
         Assert.AreEqual(Path.Combine(version2, Path.GetFileName(dataCollectorFilePath)), dataCollectorAttachmentsProcessors[0].DataCollectorAttachmentProcessorInstance.GetType().Assembly.Location);
         Assert.AreEqual(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[1].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
     }
 
-    private string GetTestAssetsFolder()
+    private static string GetTestAssetsFolder()
     {
-        string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         while (true)
         {
             if (File.Exists(Path.Combine(current, "TestPlatform.sln")))
@@ -156,7 +154,7 @@ public class DataCollectorAttachmentsProcessorsFactoryTests
                 Assert.IsTrue(Directory.Exists(testAssetsPath), $"Directory not found '{testAssetsPath}'");
                 return testAssetsPath;
             }
-            current = Path.GetDirectoryName(current);
+            current = Path.GetDirectoryName(current)!;
             if (current == Path.GetPathRoot(current))
             {
                 throw new Exception("Repo root path not tound");
