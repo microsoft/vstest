@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -27,8 +28,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.TestHostProvider.Hosting.UnitTests;
 
 [TestClass]
@@ -40,10 +39,10 @@ public class DefaultTestHostManagerTests
     private readonly Mock<IFileHelper> _mockFileHelper;
     private readonly Mock<IDotnetHostHelper> _mockDotnetHostHelper;
     private readonly Mock<IEnvironment> _mockEnvironment;
-
     private readonly DefaultTestHostManager _testHostManager;
-    private TestableTestHostManager _testableTestHostManager;
-    private string _errorMessage;
+
+    private TestableTestHostManager? _testableTestHostManager;
+    private string? _errorMessage;
     private int _exitCode;
     private int _testHostId;
 
@@ -404,17 +403,17 @@ public class DefaultTestHostManagerTests
     [TestCategory("Windows")]
     public void GetTestSourcesShouldReturnAppropriateSourceIfAppxRecipeIsProvided()
     {
-        var sourcePath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation()), @"..\..\..\..\TestAssets\UWPTestAssets\UnitTestApp8.build.appxrecipe");
+        var sourcePath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation())!, @"..\..\..\..\TestAssets\UWPTestAssets\UnitTestApp8.build.appxrecipe");
         IEnumerable<string> sources = _testHostManager.GetTestSources(new List<string> { sourcePath });
         Assert.IsTrue(sources.Any());
-        Assert.IsTrue(sources.FirstOrDefault().EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+        Assert.IsTrue(sources.First().EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
     }
 
     [TestMethod]
     [TestCategory("Windows")]
     public void AppxManifestFileShouldReturnAppropriateSourceIfAppxManifestIsProvided()
     {
-        var appxManifestPath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation()), @"..\..\..\..\TestAssets\UWPTestAssets\AppxManifest.xml");
+        var appxManifestPath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation())!, @"..\..\..\..\TestAssets\UWPTestAssets\AppxManifest.xml");
         string source = AppxManifestFile.GetApplicationExecutableName(appxManifestPath);
         Assert.AreEqual("UnitTestApp8.exe", source);
     }
@@ -495,13 +494,13 @@ public class DefaultTestHostManagerTests
         Assert.IsTrue(isVerified);
     }
 
-    private void TestableTestHostManagerHostExited(object sender, HostProviderEventArgs e)
+    private void TestableTestHostManagerHostExited(object? sender, HostProviderEventArgs e)
     {
         _errorMessage = e.Data.TrimEnd(Environment.NewLine.ToCharArray());
         _exitCode = e.ErrroCode;
     }
 
-    private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)
+    private void TestHostManagerHostExited(object? sender, HostProviderEventArgs e)
     {
         if (e.ErrroCode != 0)
         {
@@ -509,11 +508,12 @@ public class DefaultTestHostManagerTests
         }
     }
 
-    private void TestHostManagerHostLaunched(object sender, HostProviderEventArgs e)
+    private void TestHostManagerHostLaunched(object? sender, HostProviderEventArgs e)
     {
         _testHostId = e.ProcessId;
     }
 
+    [MemberNotNull(nameof(_testableTestHostManager))]
     private void ErrorCallBackTestHelper(string errorMessage, int exitCode)
     {
         _testableTestHostManager = new TestableTestHostManager(
@@ -547,6 +547,7 @@ public class DefaultTestHostManagerTests
         _mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<object>(), out exitCode)).Returns(true);
     }
 
+    [MemberNotNull(nameof(_testableTestHostManager))]
     private void ExitCallBackTestHelper(int exitCode)
     {
         _testableTestHostManager = new TestableTestHostManager(
@@ -578,7 +579,7 @@ public class DefaultTestHostManagerTests
         _mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<object>(), out exitCode)).Returns(true);
     }
 
-    private TestProcessStartInfo GetDefaultStartInfo()
+    private static TestProcessStartInfo GetDefaultStartInfo()
     {
         return new TestProcessStartInfo();
     }

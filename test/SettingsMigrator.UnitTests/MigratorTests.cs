@@ -6,8 +6,6 @@ using System.Xml;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests;
 
 [TestClass]
@@ -22,13 +20,13 @@ public class MigratorTests
                                           "</MSTest>" +
                                           "</RunSettings>";
 
-    private Migrator _migrator;
-    private string _newRunsettingsPath;
+    private readonly Migrator _migrator;
+    private readonly string _newRunsettingsPath;
+
     private string _oldTestsettingsPath;
     private string _oldRunsettingsPath;
 
-    [TestInitialize]
-    public void TestInit()
+    public MigratorTests()
     {
         _migrator = new Migrator();
         _newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
