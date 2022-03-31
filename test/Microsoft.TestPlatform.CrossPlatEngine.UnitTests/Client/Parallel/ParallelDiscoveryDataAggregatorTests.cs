@@ -19,13 +19,13 @@ public class ParallelDiscoveryDataAggregatorTests
     {
         var aggregator = new ParallelDiscoveryDataAggregator();
 
-        aggregator.Aggregate(totalTests: 5, isAborted: false);
+        aggregator.Aggregate(totalTests: 5, isAborted: false, discoveredExtensions: null);
         Assert.IsFalse(aggregator.IsAborted, "Aborted must be false");
 
-        aggregator.Aggregate(totalTests: 5, isAborted: true);
+        aggregator.Aggregate(totalTests: 5, isAborted: true, discoveredExtensions: null);
         Assert.IsTrue(aggregator.IsAborted, "Aborted must be true");
 
-        aggregator.Aggregate(totalTests: 5, isAborted: false);
+        aggregator.Aggregate(totalTests: 5, isAborted: false, discoveredExtensions: null);
         Assert.IsTrue(aggregator.IsAborted, "Aborted must be true");
 
         Assert.AreEqual(-1, aggregator.TotalTests, "Aggregator shouldn't count tests if one host aborts");
@@ -35,13 +35,13 @@ public class ParallelDiscoveryDataAggregatorTests
     public void AggregateShouldAggregateTotalTestsCorrectly()
     {
         var aggregator = new ParallelDiscoveryDataAggregator();
-        aggregator.Aggregate(totalTests: 2, isAborted: false);
+        aggregator.Aggregate(totalTests: 2, isAborted: false, discoveredExtensions: null);
         Assert.AreEqual(2, aggregator.TotalTests, "Aggregated totalTests count does not match");
 
-        aggregator.Aggregate(totalTests: 5, isAborted: false);
+        aggregator.Aggregate(totalTests: 5, isAborted: false, discoveredExtensions: null);
         Assert.AreEqual(7, aggregator.TotalTests, "Aggregated totalTests count does not match");
 
-        aggregator.Aggregate(totalTests: 3, isAborted: false);
+        aggregator.Aggregate(totalTests: 3, isAborted: false, discoveredExtensions: null);
         Assert.AreEqual(10, aggregator.TotalTests, "Aggregated totalTests count does not match");
     }
 
