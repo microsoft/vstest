@@ -15,8 +15,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests;
 
 [TestClass]
@@ -170,7 +168,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
         // Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
     }
 
-    private void LoadAssemblyIntoMemory(string assemblyPath)
+    private static void LoadAssemblyIntoMemory(string assemblyPath)
     {
         // Load the file into RAM in ahead to avoid performance number(expectedElapsedTime) dependence on disk read time.
         File.ReadAllBytes(assemblyPath);

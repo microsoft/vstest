@@ -7,18 +7,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using vstest.console.UnitTests.Processors;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 [TestClass]
 public class PlatformArgumentProcessorTests
 {
-    private PlatformArgumentExecutor _executor;
-    private TestableRunSettingsProvider _runSettingsProvider;
+    private readonly PlatformArgumentExecutor _executor;
+    private readonly TestableRunSettingsProvider _runSettingsProvider;
 
-    [TestInitialize]
-    public void Init()
+    public PlatformArgumentProcessorTests()
     {
         _runSettingsProvider = new TestableRunSettingsProvider();
         _executor = new PlatformArgumentExecutor(CommandLineOptions.Instance, _runSettingsProvider);

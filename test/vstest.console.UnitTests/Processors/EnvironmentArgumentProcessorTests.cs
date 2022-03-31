@@ -16,8 +16,6 @@ using vstest.console.UnitTests.Processors;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 [TestClass]
@@ -26,12 +24,11 @@ public class EnvironmentArgumentProcessorTests
     private const string DefaultRunSettings =
         "<?xml version=\"1.0\" encoding=\"utf-16\"?><RunSettings></RunSettings>";
 
-    private TestableRunSettingsProvider _settingsProvider;
-    private Mock<IOutput> _mockOutput;
-    private CommandLineOptions _commandLineOptions;
+    private readonly TestableRunSettingsProvider _settingsProvider;
+    private readonly Mock<IOutput> _mockOutput;
+    private readonly CommandLineOptions _commandLineOptions;
 
-    [TestInitialize]
-    public void Initialize()
+    public EnvironmentArgumentProcessorTests()
     {
         _commandLineOptions = CommandLineOptions.Instance;
         _settingsProvider = new TestableRunSettingsProvider();
@@ -73,11 +70,12 @@ public class EnvironmentArgumentProcessorTests
         var result = ParseSettingsXml(_settingsProvider);
         var environmentVariables = result.Variables;
         var inIsolation = result.InIsolation;
-        var variables = environmentVariables?.Elements()?.ToArray();
 
         Assert.IsNotNull(environmentVariables, "Environment variable cannot found in RunSettings.xml.");
         Assert.IsNotNull(inIsolation, "Isolation must be forced, an InIsolation entry was missing!");
-        Assert.AreEqual(1, variables?.Length ?? 0, "Environment variable count mismatched!");
+
+        var variables = environmentVariables.Elements().ToArray();
+        Assert.AreEqual(1, variables.Length, "Environment variable count mismatched!");
 
         Assert.AreEqual("true", inIsolation.Value, "Isolation must be forced, InIsolation is not set to true.");
         Assert.AreEqual("VARIABLE", variables[0].Name.LocalName);
@@ -102,13 +100,13 @@ public class EnvironmentArgumentProcessorTests
         var result = ParseSettingsXml(_settingsProvider);
         var environmentVariables = result.Variables;
         var inIsolation = result.InIsolation;
-        var variables = environmentVariables?.Elements()?.ToArray();
 
         Assert.IsNotNull(environmentVariables, "Environment variable cannot found in RunSettings.xml.");
         Assert.IsNotNull(inIsolation, "Isolation must be forced, an InIsolation entry was missing!");
 
         Assert.AreEqual("true", inIsolation.Value, "Isolation must be forced, InIsolation is not set to true.");
-        Assert.AreEqual(3, variables?.Length ?? 0, "Environment variable count mismatched!");
+        var variables = environmentVariables.Elements().ToArray();
+        Assert.AreEqual(3, variables.Length, "Environment variable count mismatched!");
 
         Assert.AreEqual("VARIABLE_ONE", variables[0].Name.LocalName);
         Assert.AreEqual("VALUE", variables[0].Value);
@@ -135,13 +133,13 @@ public class EnvironmentArgumentProcessorTests
         var result = ParseSettingsXml(_settingsProvider);
         var environmentVariables = result.Variables;
         var inIsolation = result.InIsolation;
-        var variables = environmentVariables?.Elements()?.ToArray();
 
         Assert.IsNotNull(environmentVariables, "Environment variable cannot found in RunSettings.xml.");
         Assert.IsNotNull(inIsolation, "Isolation must be forced, an InIsolation entry was missing!");
 
         Assert.AreEqual("true", inIsolation.Value, "Isolation must be forced, InIsolation is overriden to true.");
-        Assert.AreEqual(1, variables?.Length ?? 0, "Environment variable count mismatched!");
+        var variables = environmentVariables.Elements().ToArray();
+        Assert.AreEqual(1, variables.Length, "Environment variable count mismatched!");
 
         Assert.AreEqual("VARIABLE", variables[0].Name.LocalName);
         Assert.AreEqual("VALUE", variables[0].Value);
@@ -196,13 +194,13 @@ public class EnvironmentArgumentProcessorTests
 
     private class XmlParseResult
     {
-        public XmlParseResult(XElement variables, XElement inIsolation)
+        public XmlParseResult(XElement? variables, XElement? inIsolation)
         {
             Variables = variables;
             InIsolation = inIsolation;
         }
 
-        internal readonly XElement Variables;
-        internal readonly XElement InIsolation;
+        internal readonly XElement? Variables;
+        internal readonly XElement? InIsolation;
     }
 }

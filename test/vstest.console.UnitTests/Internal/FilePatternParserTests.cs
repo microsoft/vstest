@@ -15,19 +15,16 @@ using Moq;
 
 using vstest.console.Internal;
 
-#nullable disable
-
 namespace vstest.console.UnitTests.Internal;
 
 [TestClass]
 public class FilePatternParserTests
 {
-    private FilePatternParser _filePatternParser;
-    private Mock<Matcher> _mockMatcherHelper;
-    private Mock<IFileHelper> _mockFileHelper;
+    private readonly FilePatternParser _filePatternParser;
+    private readonly Mock<Matcher> _mockMatcherHelper;
+    private readonly Mock<IFileHelper> _mockFileHelper;
 
-    [TestInitialize]
-    public void TestInit()
+    public FilePatternParserTests()
     {
         _mockMatcherHelper = new Mock<Matcher>();
         _mockFileHelper = new Mock<IFileHelper>();
@@ -39,11 +36,11 @@ public class FilePatternParserTests
     {
         var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
         _mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-        _filePatternParser.GetMatchingFiles(TranslatePath(@"C:\Users\vanidhi\Desktop\a\c\*bc.dll"));
+        _filePatternParser.GetMatchingFiles(FilePatternParserTests.TranslatePath(@"C:\Users\vanidhi\Desktop\a\c\*bc.dll"));
 
         // Assert
-        _mockMatcherHelper.Verify(x => x.AddInclude(TranslatePath(@"*bc.dll")));
-        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(TranslatePath(@"C:\Users\vanidhi\Desktop\a\c")))));
+        _mockMatcherHelper.Verify(x => x.AddInclude(FilePatternParserTests.TranslatePath(@"*bc.dll")));
+        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(FilePatternParserTests.TranslatePath(@"C:\Users\vanidhi\Desktop\a\c")))));
     }
 
     [TestMethod]
@@ -51,11 +48,11 @@ public class FilePatternParserTests
     {
         var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
         _mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-        _filePatternParser.GetMatchingFiles(TranslatePath(@"C:\Users\vanidhi\**\c\*bc.txt"));
+        _filePatternParser.GetMatchingFiles(FilePatternParserTests.TranslatePath(@"C:\Users\vanidhi\**\c\*bc.txt"));
 
         // Assert
-        _mockMatcherHelper.Verify(x => x.AddInclude(TranslatePath(@"**\c\*bc.txt")));
-        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(TranslatePath(@"C:\Users\vanidhi")))));
+        _mockMatcherHelper.Verify(x => x.AddInclude(FilePatternParserTests.TranslatePath(@"**\c\*bc.txt")));
+        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(FilePatternParserTests.TranslatePath(@"C:\Users\vanidhi")))));
     }
 
     [TestMethod]
@@ -63,11 +60,11 @@ public class FilePatternParserTests
     {
         var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
         _mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-        _filePatternParser.GetMatchingFiles(TranslatePath(@"E:\path\to\project\tests\**.Tests\**\*.Tests.dll"));
+        _filePatternParser.GetMatchingFiles(FilePatternParserTests.TranslatePath(@"E:\path\to\project\tests\**.Tests\**\*.Tests.dll"));
 
         // Assert
-        _mockMatcherHelper.Verify(x => x.AddInclude(TranslatePath(@"**.Tests\**\*.Tests.dll")));
-        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(TranslatePath(@"E:\path\to\project\tests")))));
+        _mockMatcherHelper.Verify(x => x.AddInclude(FilePatternParserTests.TranslatePath(@"**.Tests\**\*.Tests.dll")));
+        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(FilePatternParserTests.TranslatePath(@"E:\path\to\project\tests")))));
     }
 
     [TestMethod]
@@ -75,11 +72,11 @@ public class FilePatternParserTests
     {
         var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
         _mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-        _filePatternParser.GetMatchingFiles(TranslatePath(@"E:\path\to\project\tests\Tests*.Blame*.dll"));
+        _filePatternParser.GetMatchingFiles(FilePatternParserTests.TranslatePath(@"E:\path\to\project\tests\Tests*.Blame*.dll"));
 
         // Assert
-        _mockMatcherHelper.Verify(x => x.AddInclude(TranslatePath(@"Tests*.Blame*.dll")));
-        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(TranslatePath(@"E:\path\to\project\tests")))));
+        _mockMatcherHelper.Verify(x => x.AddInclude(FilePatternParserTests.TranslatePath(@"Tests*.Blame*.dll")));
+        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(FilePatternParserTests.TranslatePath(@"E:\path\to\project\tests")))));
     }
 
     [TestMethod]
@@ -87,37 +84,37 @@ public class FilePatternParserTests
     {
         var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
         _mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-        _filePatternParser.GetMatchingFiles(TranslatePath(@"E:\path\to\project\*tests\Tests*.Blame*.dll"));
+        _filePatternParser.GetMatchingFiles(FilePatternParserTests.TranslatePath(@"E:\path\to\project\*tests\Tests*.Blame*.dll"));
 
         // Assert
-        _mockMatcherHelper.Verify(x => x.AddInclude(TranslatePath(@"*tests\Tests*.Blame*.dll")));
-        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(TranslatePath(@"E:\path\to\project")))));
+        _mockMatcherHelper.Verify(x => x.AddInclude(FilePatternParserTests.TranslatePath(@"*tests\Tests*.Blame*.dll")));
+        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(FilePatternParserTests.TranslatePath(@"E:\path\to\project")))));
     }
 
     [TestMethod]
     public void FilePatternParserShouldCheckIfFileExistsIfFullPathGiven()
     {
         var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
-        _mockFileHelper.Setup(x => x.Exists(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll"))).Returns(true);
+        _mockFileHelper.Setup(x => x.Exists(FilePatternParserTests.TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll"))).Returns(true);
         _mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-        var matchingFiles = _filePatternParser.GetMatchingFiles(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll"));
+        var matchingFiles = _filePatternParser.GetMatchingFiles(FilePatternParserTests.TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll"));
 
         // Assert
-        _mockFileHelper.Verify(x => x.Exists(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll")));
-        Assert.IsTrue(matchingFiles.Contains(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll")));
+        _mockFileHelper.Verify(x => x.Exists(FilePatternParserTests.TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll")));
+        Assert.IsTrue(matchingFiles.Contains(FilePatternParserTests.TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll")));
     }
 
     [TestMethod]
     public void FilePatternParserShouldThrowCommandLineExceptionIfFileDoesNotExist()
     {
         var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
-        _mockFileHelper.Setup(x => x.Exists(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll"))).Returns(false);
+        _mockFileHelper.Setup(x => x.Exists(FilePatternParserTests.TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll"))).Returns(false);
         _mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
 
-        Assert.ThrowsException<TestSourceException>(() => _filePatternParser.GetMatchingFiles(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll")));
+        Assert.ThrowsException<TestSourceException>(() => _filePatternParser.GetMatchingFiles(FilePatternParserTests.TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll")));
     }
 
-    private string TranslatePath(string path)
+    private static string TranslatePath(string path)
     {
         // RuntimeInformation has conflict when used
         return Environment.OSVersion.Platform.ToString().StartsWith("Win")

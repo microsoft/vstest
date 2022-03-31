@@ -7,19 +7,18 @@ using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace vstest.console.UnitTests.TestDoubles;
 
 internal class DummyLoggerEvents : InternalTestLoggerEvents
 {
-    public DummyLoggerEvents(TestSessionMessageLogger testSessionMessageLogger) : base(testSessionMessageLogger)
+    public DummyLoggerEvents(TestSessionMessageLogger testSessionMessageLogger)
+        : base(testSessionMessageLogger)
     {
     }
 
-    public override event EventHandler<TestResultEventArgs> TestResult;
-    public override event EventHandler<TestRunCompleteEventArgs> TestRunComplete;
-    public override event EventHandler<TestRunMessageEventArgs> TestRunMessage;
+    public override event EventHandler<TestResultEventArgs>? TestResult;
+    public override event EventHandler<TestRunCompleteEventArgs>? TestRunComplete;
+    public override event EventHandler<TestRunMessageEventArgs>? TestRunMessage;
 
     public bool EventsSubscribed()
     {

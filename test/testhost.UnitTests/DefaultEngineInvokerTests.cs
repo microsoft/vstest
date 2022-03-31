@@ -14,15 +14,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace testhost.UnitTests;
 
 [TestClass]
 public class DefaultEngineInvokerTests
 {
     private const int ParentProcessId = 27524;
-    private static readonly IDictionary<string, string> ArgsDictionary = new Dictionary<string, string>
+    private static readonly IDictionary<string, string?> ArgsDictionary = new Dictionary<string, string?>
     {
         { "--port", "21291" },
         { "--endpoint", "127.0.0.1:021291"  },

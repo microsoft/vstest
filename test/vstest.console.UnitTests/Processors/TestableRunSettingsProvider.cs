@@ -4,17 +4,11 @@
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 
-#nullable disable
-
 namespace vstest.console.UnitTests.Processors;
 
 internal class TestableRunSettingsProvider : IRunSettingsProvider
 {
-    public RunSettings ActiveRunSettings
-    {
-        get;
-        set;
-    }
+    public RunSettings? ActiveRunSettings { get; set; }
 
     public void SetActiveRunSettings(RunSettings runSettings)
     {

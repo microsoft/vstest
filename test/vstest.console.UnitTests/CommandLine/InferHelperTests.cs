@@ -11,8 +11,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine;
 
 [TestClass]
@@ -53,7 +51,7 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectArchitectureShouldReturnDefaultArchitectureOnNullItemInSources()
     {
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { null }, _sourceArchitectures, _defaultArchitecture));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string?>() { null }, _sourceArchitectures, _defaultArchitecture));
     }
 
     [TestMethod]
@@ -168,13 +166,13 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnDefaultFrameworkOnNullItemInSources()
     {
-        Assert.AreEqual(_defaultFramework, _inferHelper.AutoDetectFramework(new List<string>() { null }, _sourceFrameworks));
+        Assert.AreEqual(_defaultFramework, _inferHelper.AutoDetectFramework(new List<string?>() { null }, _sourceFrameworks));
     }
 
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnDefaultFrameworkOnEmptyItemInSources()
     {
-        Assert.AreEqual(_defaultFramework.Name, _inferHelper.AutoDetectFramework(new List<string>() { string.Empty }, _sourceFrameworks).Name);
+        Assert.AreEqual(_defaultFramework.Name, _inferHelper.AutoDetectFramework(new List<string?>() { string.Empty }, _sourceFrameworks).Name);
     }
 
     [TestMethod]
