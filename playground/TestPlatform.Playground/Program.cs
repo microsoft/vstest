@@ -51,6 +51,7 @@ internal class Program
                 <RunSettings>
                     <RunConfiguration>
                         <InIsolation>true</InIsolation>
+                        <MaxCpuCount>0</MaxCpuCount>
                     </RunConfiguration>
                 </RunSettings>
             ";
@@ -60,6 +61,37 @@ internal class Program
 
         var options = new TestPlatformOptions();
         r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
+
+    public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
+    {
+        public PlaygroundTestDiscoveryHandler()
+        {
+        }
+
+        public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void HandleLogMessage(TestMessageLevel level, string message)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void HandleRawMessage(string rawMessage)
+        {
+            //throw new NotImplementedException();
+        }
     }
 
     public class TestRunHandler : ITestRunEventsHandler

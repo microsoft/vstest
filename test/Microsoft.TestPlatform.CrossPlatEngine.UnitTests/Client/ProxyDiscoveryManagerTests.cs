@@ -16,7 +16,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -32,17 +32,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 [TestClass]
 public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
 {
-    //private const int CLIENTPROCESSEXITWAIT = 10 * 1000;
-
     private readonly DiscoveryCriteria _discoveryCriteria;
-    private readonly DiscoverySourceStatusCache _discoverySourceStatusCache;
+    private readonly ParallelDiscoveryDataAggregator _discoveryDataAggregator;
     private readonly Mock<ITestRequestSender> _mockRequestSender;
     private readonly Mock<IRequestData> _mockRequestData;
     private readonly Mock<IMetricsCollection> _mockMetricsCollection;
     private readonly Mock<IFileHelper> _mockFileHelper;
     private readonly ProxyDiscoveryManager _discoveryManager;
-
-    //private Mock<IDataSerializer> mockDataSerializer;
 
     public ProxyDiscoveryManagerTests()
     {
@@ -51,14 +47,14 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _mockMetricsCollection = new Mock<IMetricsCollection>();
         _mockFileHelper = new Mock<IFileHelper>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
-        _discoverySourceStatusCache = new DiscoverySourceStatusCache();
+        _discoveryDataAggregator = new();
         _discoveryManager = new ProxyDiscoveryManager(
             _mockRequestData.Object,
             _mockRequestSender.Object,
             _mockTestHostManager.Object,
+            _discoveryDataAggregator,
             _mockDataSerializer.Object,
-            _mockFileHelper.Object,
-            _discoverySourceStatusCache);
+            _mockFileHelper.Object);
         _discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
     }
 
@@ -448,9 +444,9 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _discoveryManager.DiscoverTests(localDiscoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
         // Assert
-        CollectionAssert.AreEquivalent(inputSource, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
-        Assert.AreEqual(0, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
-        Assert.AreEqual(0, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count);
+        CollectionAssert.AreEquivalent(inputSource, _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+        Assert.AreEqual(0, _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
+        Assert.AreEqual(0, _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count);
     }
 
     [TestMethod]
@@ -599,13 +595,13 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         });
 
         // Assert
-        Assert.AreEqual(0, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
+        Assert.AreEqual(0, _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
         CollectionAssert.AreEquivalent(
             new List<string> { "d" },
-            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
         CollectionAssert.AreEquivalent(
             new List<string> { "a", "b", "c" },
-            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
     }
 
     [DataTestMethod]
@@ -628,9 +624,9 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         // Assert
         CollectionAssert.AreEquivalent(
             new[] { "a", "b" },
-            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
-        Assert.AreEqual(0, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
-        Assert.AreEqual(0, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count);
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+        Assert.AreEqual(0, _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
+        Assert.AreEqual(0, _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count);
     }
 
     [DataTestMethod]
@@ -658,11 +654,11 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         // Assert
         CollectionAssert.AreEquivalent(
             new[] { "a" },
-            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
         CollectionAssert.AreEquivalent(
             new[] { "b" },
-            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
-        Assert.AreEqual(0, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        Assert.AreEqual(0, _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
     }
 
     [TestMethod]
@@ -684,13 +680,13 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         // Assert
         CollectionAssert.AreEquivalent(
             new[] { "c" },
-            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
         CollectionAssert.AreEquivalent(
             new[] { "d" },
-            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
         CollectionAssert.AreEquivalent(
             new[] { "a", "b" },
-            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
     }
 
     [TestMethod]
@@ -718,11 +714,11 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         // Assert
         CollectionAssert.AreEquivalent(
             new[] { "a", "b", "c" },
-            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
         CollectionAssert.AreEquivalent(
             new[] { "d" },
-            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
-        Assert.AreEqual(0, _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        Assert.AreEqual(0, _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
     }
 
     private void InvokeAndVerifyDiscoverTests(bool skipDefaultAdapters)

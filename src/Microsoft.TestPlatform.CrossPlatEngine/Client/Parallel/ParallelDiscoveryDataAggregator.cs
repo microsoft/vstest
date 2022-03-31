@@ -8,9 +8,7 @@ using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
@@ -48,7 +46,7 @@ internal class ParallelDiscoveryDataAggregator
     /// Returns the Aggregated Metrics.
     /// </summary>
     /// <returns></returns>
-    public IDictionary<string, object> GetAggregatedDiscoveryDataMetrics()
+    public IDictionary<string, object> GetMetrics()
     {
         if (_metricsAggregator == null || _metricsAggregator.IsEmpty)
         {
@@ -78,73 +76,19 @@ internal class ParallelDiscoveryDataAggregator
     /// Aggregate discovery data
     /// Must be thread-safe as this is expected to be called by parallel managers
     /// </summary>
-    public void Aggregate(DiscoveryCompleteEventArgs discoveryCompleteEventArgs!!, Dictionary<string, HashSet<string>> discoveredExtensions)
+    public void Aggregate(long totalTests, bool isAborted, HashSet<string>> discoveredExtensions)
     {
         lock (_dataUpdateSyncObject)
         {
-            IsAborted = IsAborted || discoveryCompleteEventArgs.IsAborted;
+            IsAborted = IsAborted || isAborted;
 
             // Do not aggregate tests count if test discovery is aborted. It is mandated by
             // platform that tests count is negative for discovery abort event.
             // See `DiscoveryCompleteEventArgs`.
-            TotalTests = IsAborted
-                ? -1
-                : TotalTests + discoveryCompleteEventArgs.TotalCount;
+            TotalTests = IsAborted ? -1 : TotalTests + totalTests;
 
             // Aggregate the discovered extensions.
             DiscoveredExtensions = TestExtensions.CreateMergedDictionary(DiscoveredExtensions, discoveredExtensions);
-        }
-
-        AggregateDiscoveryStatus(
-            discoveryCompleteEventArgs.NotDiscoveredSources,
-            discoveryCompleteEventArgs.PartiallyDiscoveredSources,
-            discoveryCompleteEventArgs.FullyDiscoveredSources);
-        AggregateDiscoveryDataMetrics(discoveryCompleteEventArgs.Metrics);
-    }
-
-    private void AggregateDiscoveryStatus(
-        IEnumerable<string> notDiscoveredSources,
-        IEnumerable<string> partiallyDiscoveredSources,
-        IEnumerable<string> fullyDiscoveredSources)
-    {
-        // Only add to our aggregated dictionary sources we were not aware of.
-        foreach (var source in notDiscoveredSources)
-        {
-            _sourcesWithDiscoveryStatus.TryAdd(source, DiscoveryStatus.NotDiscovered);
-        }
-
-        // Update sources from not discovered to partially discovered.
-        foreach (var source in partiallyDiscoveredSources)
-        {
-            _sourcesWithDiscoveryStatus.AddOrUpdate(
-                source,
-                _ =>
-                {
-                    EqtTrace.Warning($"ParallelDiscoveryDataAggregator.AggregateDiscoveryStatus: Source '{source}' was not tracked and is now marked as partially discovered.");
-                    return DiscoveryStatus.PartiallyDiscovered;
-                },
-                (_, previousState) =>
-                {
-                    if (previousState == DiscoveryStatus.FullyDiscovered)
-                    {
-                        EqtTrace.Warning($"ParallelDiscoveryDataAggregator.AggregateDiscoveryStatus: Source '{source}' was known as fully discovered but received request to mark it as partially discovered.");
-                        return DiscoveryStatus.FullyDiscovered;
-                    }
-                    return DiscoveryStatus.PartiallyDiscovered;
-                });
-        }
-
-        // Update sources from not discovered or partially discovered to fully discovered.
-        foreach (var source in fullyDiscoveredSources)
-        {
-            _sourcesWithDiscoveryStatus.AddOrUpdate(
-                source,
-                _ =>
-                {
-                    EqtTrace.Warning($"ParallelDiscoveryDataAggregator.AggregateDiscoveryStatus: Source '{source}' was not tracked and is now marked as fully discovered.");
-                    return DiscoveryStatus.FullyDiscovered;
-                },
-                (_, _) => DiscoveryStatus.FullyDiscovered);
         }
     }
 
@@ -152,7 +96,7 @@ internal class ParallelDiscoveryDataAggregator
     /// Aggregates the metrics from Test Host Process.
     /// </summary>
     /// <param name="metrics"></param>
-    private void AggregateDiscoveryDataMetrics(IDictionary<string, object>? metrics)
+    public void AggregateMetrics(IDictionary<string, object>? metrics)
     {
         if (metrics == null || metrics.Count == 0 || _metricsAggregator == null)
         {
@@ -161,7 +105,11 @@ internal class ParallelDiscoveryDataAggregator
 
         foreach (var metric in metrics)
         {
-            if (metric.Key.Contains(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter) || metric.Key.Contains(TelemetryDataConstants.TimeTakenInSecByAllAdapters) || (metric.Key.Contains(TelemetryDataConstants.TotalTestsDiscovered) || metric.Key.Contains(TelemetryDataConstants.TotalTestsByAdapter) || metric.Key.Contains(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec)))
+            if (metric.Key.Contains(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter)
+                || metric.Key.Contains(TelemetryDataConstants.TimeTakenInSecByAllAdapters)
+                || metric.Key.Contains(TelemetryDataConstants.TotalTestsDiscovered)
+                || metric.Key.Contains(TelemetryDataConstants.TotalTestsByAdapter)
+                || metric.Key.Contains(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec))
             {
                 var newValue = Convert.ToDouble(metric.Value);
 
@@ -188,5 +136,92 @@ internal class ParallelDiscoveryDataAggregator
     }
 
     public List<string> GetSourcesWithStatus(DiscoveryStatus discoveryStatus)
-        => DiscoverySourceStatusCache.GetSourcesWithStatus(discoveryStatus, _sourcesWithDiscoveryStatus);
+        => _sourcesWithDiscoveryStatus.IsEmpty
+            ? new List<string>()
+            : _sourcesWithDiscoveryStatus
+                .Where(source => source.Value == discoveryStatus)
+                .Select(source => source.Key)
+                .ToList();
+
+    public void MarkSourcesWithStatus(IEnumerable<string?>? sources, DiscoveryStatus status)
+    {
+        if (sources is null)
+        {
+            return;
+        }
+
+        foreach (var source in sources)
+        {
+            if (source is null)
+            {
+                continue;
+            }
+
+            _sourcesWithDiscoveryStatus.AddOrUpdate(source,
+                _ =>
+                {
+                    if (status != DiscoveryStatus.NotDiscovered)
+                    {
+                        EqtTrace.Warning($"ParallelDiscoveryDataAggregator.MarkSourcesWithStatus: Undiscovered {source}.");
+                    }
+
+                    return status;
+                },
+                (_, previousStatus) =>
+                {
+                    if (previousStatus == DiscoveryStatus.FullyDiscovered && status != DiscoveryStatus.FullyDiscovered
+                        || previousStatus == DiscoveryStatus.PartiallyDiscovered && status == DiscoveryStatus.NotDiscovered)
+                    {
+                        EqtTrace.Warning($"ParallelDiscoveryDataAggregator.MarkSourcesWithStatus: Downgrading source status from {previousStatus} to {status}.");
+                    }
+
+                    EqtTrace.Info($"ParallelDiscoveryDataAggregator.MarkSourcesWithStatus: Marking {source} with {status} status.");
+                    return status;
+                });
+        }
+    }
+
+    public void MarkSourcesBasedOnDiscoveredTestCases(IEnumerable<TestCase>? testCases, bool isComplete, ref string? previousSource)
+    {
+        // When discovery is complete (i.e.not aborted), then we can assume that all partially
+        // discovered sources are now fully discovered. We should also mark all not discovered
+        // sources as fully discovered because that means that the source is considered as tests
+        // but contains no test so we never received the partially or fully discovered event.
+        if (isComplete)
+        {
+            MarkSourcesWithStatus(testCases?.Select(x => x.Source), DiscoveryStatus.FullyDiscovered);
+            MarkSourcesWithStatus(new[] { previousSource }, DiscoveryStatus.FullyDiscovered);
+            // Reset last source (not mandatory but done for the sake of completness).
+            previousSource = null;
+            return;
+        }
+
+        // When all testcases count in source is dividable by chunk size (e.g. 100 tests and
+        // chunk size of 10) then lastChunk is coming as empty. Otherwise, we receive the
+        // remaining test cases to process.
+        if (testCases is null)
+        {
+            return;
+        }
+
+        foreach (var testCase in testCases)
+        {
+            var currentSource = testCase.Source;
+
+            // We rely on the fact that sources are processed in a sequential way, which
+            // means that when we receive a different source than the previous, we can
+            // assume that the previous source was fully discovered.
+            if (previousSource is null || previousSource == currentSource)
+            {
+                MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
+            }
+            else if (currentSource != previousSource)
+            {
+                MarkSourcesWithStatus(new[] { previousSource }, DiscoveryStatus.FullyDiscovered);
+                MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
+            }
+
+            previousSource = currentSource;
+        }
+    }
 }

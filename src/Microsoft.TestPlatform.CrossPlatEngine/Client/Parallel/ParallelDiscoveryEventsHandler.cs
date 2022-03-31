@@ -56,12 +56,11 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     /// <inheritdoc/>
     public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase>? lastChunk)
     {
-        // Aggregate data for final discovery complete
-        _discoveryDataAggregator.Aggregate(discoveryCompleteEventArgs, discoveryCompleteEventArgs.DiscoveredExtensions);
-
+        // Aggregate for final discovery complete
+        _discoveryDataAggregator.Aggregate(discoveryCompleteEventArgs.TotalCount, discoveryCompleteEventArgs.IsAborted, discoveryCompleteEventArgs.DiscoveredExtensions);
 
         // Aggregate Discovery Data Metrics
-        _discoveryDataAggregator.AggregateDiscoveryDataMetrics(discoveryCompleteEventArgs.Metrics);
+        _discoveryDataAggregator.AggregateMetrics(discoveryCompleteEventArgs.Metrics);
 
         // We get DiscoveryComplete events from each ProxyDiscoveryManager (each testhost) and
         // they contain the last chunk of tests that were discovered in that particular testhost.
@@ -92,7 +91,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         // isAborted = true and totalTests = -1
         if (_parallelProxyDiscoveryManager.IsAbortRequested)
         {
-            _discoveryDataAggregator.Aggregate(new(-1, true), null);
+            _discoveryDataAggregator.Aggregate(-1, true, null);
         }
 
         // Manager said we are ready to publish the test discovery completed.
@@ -119,7 +118,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             discoveryCompleteEventArgs.IsAborted ? "Aborted" : "Completed");
 
         // Collect Aggregated Metrics Data
-        var aggregatedDiscoveryDataMetrics = _discoveryDataAggregator.GetAggregatedDiscoveryDataMetrics();
+        var aggregatedDiscoveryDataMetrics = _discoveryDataAggregator.GetMetrics();
         testDiscoveryCompletePayload.Metrics = aggregatedDiscoveryDataMetrics;
 
         // Sending discovery complete message to IDE

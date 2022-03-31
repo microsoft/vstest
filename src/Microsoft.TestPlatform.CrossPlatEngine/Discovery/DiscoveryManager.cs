@@ -15,6 +15,7 @@ using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -38,7 +39,8 @@ public class DiscoveryManager : IDiscoveryManager
     private ITestDiscoveryEventsHandler2 _testDiscoveryEventsHandler;
     private DiscoveryCriteria _discoveryCriteria;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private readonly DiscoverySourceStatusCache _discoverySourceStatusCache = new();
+    private readonly ParallelDiscoveryDataAggregator _discoveryDataAggregator = new();
+    private string _previousSource;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
@@ -111,7 +113,7 @@ public class DiscoveryManager : IDiscoveryManager
                 {
                     verifiedExtensionSourceMap.Add(kvp.Key, kvp.Value);
                     // Mark all sources as NotDiscovered before actual discovery starts
-                    _discoverySourceStatusCache.MarkSourcesWithStatus(verifiedSources, DiscoveryStatus.NotDiscovered);
+                    _discoveryDataAggregator.MarkSourcesWithStatus(verifiedSources, DiscoveryStatus.NotDiscovered);
                 }
             }
 
@@ -148,16 +150,17 @@ public class DiscoveryManager : IDiscoveryManager
                 // Collecting Total Tests Discovered
                 _requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsDiscovered, totalDiscoveredTestCount);
 
-                _discoverySourceStatusCache.MarkSourcesBasedOnDiscoveredTestCases(
+                _discoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases(
                     lastChunk,
-                    isComplete: !_cancellationTokenSource.IsCancellationRequested);
+                    isComplete: !_cancellationTokenSource.IsCancellationRequested,
+                    ref _previousSource);
 
                 var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(
                     _cancellationTokenSource.IsCancellationRequested ? -1 : totalDiscoveredTestCount,
                     _cancellationTokenSource.IsCancellationRequested,
-                    _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
-                    _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
-                    _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+                    _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
+                    _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
+                    _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
 
                 discoveryCompleteEventsArgs.DiscoveredExtensions = TestPluginCache.Instance.TestExtensions?.GetCachedExtensions();
                 discoveryCompleteEventsArgs.Metrics = _requestData.MetricsCollection.Metrics;
@@ -194,9 +197,9 @@ public class DiscoveryManager : IDiscoveryManager
 
         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
             -1, true,
-            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
-            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
-            _discoverySourceStatusCache.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
 
         eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
     }
@@ -208,7 +211,7 @@ public class DiscoveryManager : IDiscoveryManager
         if (_testDiscoveryEventsHandler != null)
         {
             _testDiscoveryEventsHandler.HandleDiscoveredTests(testCases);
-            _discoverySourceStatusCache.MarkSourcesBasedOnDiscoveredTestCases(testCases, isComplete: false);
+            _discoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases(testCases, isComplete: false, ref _previousSource);
         }
         else
         {
