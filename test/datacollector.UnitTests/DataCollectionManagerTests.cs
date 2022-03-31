@@ -17,8 +17,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
 
 [TestClass]
@@ -492,16 +490,19 @@ public class DataCollectionManagerTests
 
 internal class TestableDataCollectionManager : DataCollectionManager
 {
-    private readonly ObjectModel.DataCollection.DataCollector _dataCollector;
-    private readonly ObjectModel.DataCollection.DataCollector _ccDataCollector;
+    private readonly ObjectModel.DataCollection.DataCollector? _dataCollector;
+    private readonly ObjectModel.DataCollection.DataCollector? _ccDataCollector;
 
-    public TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, ObjectModel.DataCollection.DataCollector dataCollector, ObjectModel.DataCollection.DataCollector ccDataCollector, IDataCollectionTelemetryManager dataCollectionTelemetryManager) : this(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager)
+    public TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink,
+        ObjectModel.DataCollection.DataCollector dataCollector, ObjectModel.DataCollection.DataCollector ccDataCollector,
+        IDataCollectionTelemetryManager dataCollectionTelemetryManager) : this(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager)
     {
         _dataCollector = dataCollector;
         _ccDataCollector = ccDataCollector;
     }
 
-    internal TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectionTelemetryManager dataCollectionTelemetryManager) : base(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager)
+    internal TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink,
+        IDataCollectionTelemetryManager dataCollectionTelemetryManager) : base(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager)
     {
     }
 
@@ -529,7 +530,7 @@ internal class TestableDataCollectionManager : DataCollectionManager
         return uri.Equals("my://custom/datacollector") || uri.Equals("my://custom/ccdatacollector");
     }
 
-    protected override ObjectModel.DataCollection.DataCollector TryGetTestExtension(string extensionUri)
+    protected override ObjectModel.DataCollection.DataCollector? TryGetTestExtension(string extensionUri)
     {
         if (extensionUri.Equals("my://custom/datacollector"))
         {
@@ -544,18 +545,18 @@ internal class TestableDataCollectionManager : DataCollectionManager
         return null;
     }
 
-    protected override DataCollectorConfig TryGetDataCollectorConfig(string extensionUri)
+    protected override DataCollectorConfig? TryGetDataCollectorConfig(string extensionUri)
     {
         if (extensionUri.Equals("my://custom/datacollector"))
         {
-            var dc = new DataCollectorConfig(_dataCollector.GetType());
+            var dc = new DataCollectorConfig(_dataCollector!.GetType());
             dc.FilePath = Path.GetTempFileName();
             return dc;
         }
 
         if (extensionUri.Equals("my://custom/ccdatacollector"))
         {
-            var dc = new DataCollectorConfig(_ccDataCollector.GetType());
+            var dc = new DataCollectorConfig(_ccDataCollector!.GetType());
             dc.FilePath = Path.GetTempFileName();
             return dc;
         }

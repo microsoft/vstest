@@ -15,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests;
 
 [TestClass]
@@ -241,7 +239,7 @@ public class SocketCommunicationManagerTests : IDisposable
         WriteToStream(client.GetStream(), TestDiscoveryStartMessageWithVersionAndPayload);
 
         var message = await _communicationManager.ReceiveMessageAsync(CancellationToken.None);
-        var versionedMessage = message as VersionedMessage;
+        var versionedMessage = (VersionedMessage)message;
         Assert.AreEqual(MessageType.StartDiscovery, versionedMessage.MessageType);
         Assert.AreEqual(DummyPayload, versionedMessage.Payload);
         Assert.AreEqual(2, versionedMessage.Version);
@@ -350,7 +348,7 @@ public class SocketCommunicationManagerTests : IDisposable
         return client;
     }
 
-    private void WriteOnSocket(Socket socket)
+    private static void WriteOnSocket(Socket socket)
     {
         for (int i = 0; i < 10; i++)
         {
@@ -358,13 +356,13 @@ public class SocketCommunicationManagerTests : IDisposable
         }
     }
 
-    private string ReadFromStream(Stream stream)
+    private static string ReadFromStream(Stream stream)
     {
         using var reader = new BinaryReader(stream, Encoding.UTF8, true);
         return reader.ReadString();
     }
 
-    private void WriteToStream(Stream stream, string data)
+    private static void WriteToStream(Stream stream, string data)
     {
         using var writer = new BinaryWriter(stream, Encoding.UTF8, true);
         writer.Write(data);

@@ -107,8 +107,11 @@ public partial class ProcessHelper : IProcessHelper
                             await Task.Run(() => p.WaitForExit(), cts.Token);
 #endif
                         }
-                        catch (Exception ex) when (ex is InvalidOperationException or TaskCanceledException)
+                        catch
                         {
+                            // Ignore all exceptions thrown when asking for process to exit.
+                            // We "expect" TaskCanceledException, COMException (if process was disposed before calling
+                            // the exit) or InvalidOperationException.
                         }
                     }
 
