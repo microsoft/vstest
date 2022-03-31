@@ -226,6 +226,7 @@ public class DiscoverTests : AcceptanceTestBase
         discoveryEvents.Setup(events => events.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
             .Callback((IEnumerable<TestCase> testcases) =>
             {
+                Console.WriteLine($"Received test case {testcases.Single()}");
                 // As soon as we get first test call cancel. That way we know there is discovery in progress.
                 discoveredTests.AddRange(testcases);
                 if (!alreadyCancelled)
@@ -233,6 +234,7 @@ public class DiscoverTests : AcceptanceTestBase
                     cancellationCalled = sw.Elapsed;
                     // Calling cancel many times crashes. https://github.com/microsoft/vstest/issues/3526
                     alreadyCancelled = true;
+                    Console.WriteLine($"Cancelling at {cancellationCalled.TotalMilliseconds} ms.");
                     _vstestConsoleWrapper.CancelDiscovery();
                 }
             });
@@ -240,6 +242,7 @@ public class DiscoverTests : AcceptanceTestBase
         discoveryEvents.Setup(events => events.HandleDiscoveryComplete(It.IsAny<long>(), It.IsAny<IEnumerable<TestCase>>(), It.IsAny<bool>()))
             .Callback((long _, IEnumerable<TestCase> testcases, bool isAborted) =>
             {
+                Console.WriteLine($"Discovery complete at {sw.ElapsedMilliseconds} ms, with isAborted: {isAborted}.");
                 isTestCancelled = isAborted;
                 if (testcases != null)
                 {
@@ -257,7 +260,9 @@ public class DiscoverTests : AcceptanceTestBase
             </RunSettings>";
 
         // Act
+        Console.WriteLine("Starting Discovery.");
         await Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, runSettingsXml, discoveryEvents.Object));
+        Console.WriteLine("Discovery finished.");
 
         // Assert.
         Assert.IsTrue(isTestCancelled, "Discovery was not cancelled");
