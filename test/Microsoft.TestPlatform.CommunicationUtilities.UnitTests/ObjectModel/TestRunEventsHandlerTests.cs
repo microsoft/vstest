@@ -8,18 +8,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.ObjectModel;
 
 [TestClass]
 public class TestRunEventsHandlerTests
 {
-    private Mock<ITestRequestHandler> _mockClient;
-    private TestRunEventsHandler _testRunEventHandler;
+    private readonly Mock<ITestRequestHandler> _mockClient;
+    private readonly TestRunEventsHandler _testRunEventHandler;
 
-    [TestInitialize]
-    public void InitializeTests()
+    public TestRunEventsHandlerTests()
     {
         _mockClient = new Mock<ITestRequestHandler>();
         _testRunEventHandler = new TestRunEventsHandler(_mockClient.Object);

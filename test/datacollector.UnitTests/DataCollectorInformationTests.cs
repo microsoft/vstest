@@ -12,8 +12,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Moq.Protected;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
 
 [TestClass]

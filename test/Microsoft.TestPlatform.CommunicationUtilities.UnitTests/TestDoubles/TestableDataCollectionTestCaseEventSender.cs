@@ -4,8 +4,6 @@
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.TestDoubles;
 
 internal class TestableDataCollectionTestCaseEventSender : DataCollectionTestCaseEventSender

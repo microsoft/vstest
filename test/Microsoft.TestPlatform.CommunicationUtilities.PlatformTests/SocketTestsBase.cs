@@ -9,8 +9,6 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests;
 
 [TestClass]
@@ -19,12 +17,12 @@ public abstract class SocketTestsBase
     protected const string Dummydata = "Dummy Data";
     protected const int Timeout = 10 * 1000;
 
-    protected abstract TcpClient Client { get; }
+    protected abstract TcpClient? Client { get; }
 
     [TestMethod]
     public void SocketEndpointStartShouldRaiseServerConnectedEventOnServerConnection()
     {
-        SetupChannel(out ConnectedEventArgs connectedEventArgs);
+        SetupChannel(out ConnectedEventArgs? connectedEventArgs);
 
         Assert.IsNotNull(connectedEventArgs);
     }
@@ -34,13 +32,13 @@ public abstract class SocketTestsBase
     {
         var message = string.Empty;
         ManualResetEvent waitForMessage = new(false);
-        SetupChannel(out ConnectedEventArgs _).MessageReceived += (s, e) =>
+        SetupChannel(out ConnectedEventArgs? _)!.MessageReceived += (s, e) =>
         {
             message = e.Data;
             waitForMessage.Set();
         };
 
-        WriteData(Client);
+        WriteData(Client!);
 
         waitForMessage.WaitOne();
         Assert.AreEqual(Dummydata, message);
@@ -58,5 +56,5 @@ public abstract class SocketTestsBase
         writer.Write(Dummydata);
     }
 
-    protected abstract ICommunicationChannel SetupChannel(out ConnectedEventArgs connectedEventArgs);
+    protected abstract ICommunicationChannel? SetupChannel(out ConnectedEventArgs? connectedEventArgs);
 }

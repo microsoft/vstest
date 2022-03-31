@@ -7,8 +7,6 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.TestDoubles;
 
 /// <summary>
