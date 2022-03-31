@@ -29,7 +29,7 @@ internal class Program
         // copy of TestPlatform that is similar to what we ship.
         //
         // The copying might trigger only on re-build, if you see outdated dependencies, Rebuild this project instead of just Build.
-        // 
+        //
         // Use this as playground for your debugging of end-to-end scenarios, it will automatically attach vstest.console and teshost
         // sub-processes. It won't stop at entry-point automatically, don't forget to set your breakpoints, or remove VSTEST_DEBUG_NOBP
         // from the environment variables of this project.
@@ -61,6 +61,7 @@ internal class Program
 
         var options = new TestPlatformOptions();
         r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
+    }
 
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
     {
@@ -108,12 +109,12 @@ internal class Program
 
         public void HandleRawMessage(string rawMessage)
         {
-            Console.WriteLine($"[MESSAGE]: { rawMessage}");
+            Console.WriteLine($"[MESSAGE]: {rawMessage}");
         }
 
         public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
         {
-            Console.WriteLine($"[COMPLETE]: err: { testRunCompleteArgs.Error }, lastChunk: {WriteTests(lastChunkArgs?.NewTestResults)}");
+            Console.WriteLine($"[COMPLETE]: err: {testRunCompleteArgs.Error}, lastChunk: {WriteTests(lastChunkArgs?.NewTestResults)}");
         }
 
         public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)

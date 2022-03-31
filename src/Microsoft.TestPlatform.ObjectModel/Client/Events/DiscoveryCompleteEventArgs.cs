@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.Serialization;
 
 #nullable disable
@@ -16,29 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 [DataContract]
 public class DiscoveryCompleteEventArgs : EventArgs
 {
-    /// <summary>
-    /// Constructor for creating event args object
-    /// </summary>
-    /// <param name="totalTests">Total tests which got discovered</param>
-    /// <param name="isAborted">Specifies if discovery has been aborted.</param>
-    /// <param name="fullyDiscoveredSources">List of fully discovered sources</param>
-    /// <param name="partiallyDiscoveredSources">List of partially discovered sources</param>
-    /// <param name="notDiscoveredSources">List of not discovered sources</param>
-    public DiscoveryCompleteEventArgs(
-        long totalTests,
-        bool isAborted,
-        IList<string> fullyDiscoveredSources,
-        IList<string> partiallyDiscoveredSources,
-        IList<string> notDiscoveredSources)
-        : this(
-              totalTests,
-              isAborted,
-              fullyDiscoveredSources,
-              partiallyDiscoveredSources,
-              notDiscoveredSources,
-              new Dictionary<string, HashSet<string>>())
-    { }
-
     /// <summary>
     /// Constructor for creating event args object
     /// </summary>
@@ -63,7 +39,7 @@ public class DiscoveryCompleteEventArgs : EventArgs
         PartiallyDiscoveredSources = partiallyDiscoveredSources ?? new List<string>();
         NotDiscoveredSources = notDiscoveredSources ?? new List<string>();
 
-        DiscoveredExtensions = discoveredExtensions;
+        DiscoveredExtensions = discoveredExtensions ?? new();
     }
 
     /// <summary>
@@ -72,7 +48,7 @@ public class DiscoveryCompleteEventArgs : EventArgs
     /// <param name="totalTests">Total tests which got discovered</param>
     /// <param name="isAborted">Specifies if discovery has been aborted.</param>
     public DiscoveryCompleteEventArgs(long totalTests, bool isAborted)
-        : this(totalTests, isAborted, null, null, null)
+        : this(totalTests, isAborted, null, null, null, null)
     {
     }
 

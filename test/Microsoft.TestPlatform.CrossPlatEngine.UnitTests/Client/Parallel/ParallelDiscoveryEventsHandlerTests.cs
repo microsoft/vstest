@@ -155,7 +155,7 @@ public class ParallelDiscoveryEventsHandlerTests
         _mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.DiscoveryComplete)).Returns(payload);
 
         // Act
-        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted, It.IsAny<List<string>>(), It.IsAny<List<string>>(), It.IsAny<List<string>>());
+        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
         _parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
 
         // Verify

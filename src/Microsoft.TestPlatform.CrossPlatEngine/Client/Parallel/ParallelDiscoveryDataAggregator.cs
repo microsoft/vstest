@@ -9,6 +9,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
@@ -76,20 +77,25 @@ internal class ParallelDiscoveryDataAggregator
     /// Aggregate discovery data
     /// Must be thread-safe as this is expected to be called by parallel managers
     /// </summary>
-    public void Aggregate(long totalTests, bool isAborted, HashSet<string>> discoveredExtensions)
+    public void Aggregate(DiscoveryCompleteEventArgs discoveryCompleteEventArgs)
     {
         lock (_dataUpdateSyncObject)
         {
-            IsAborted = IsAborted || isAborted;
+            IsAborted = IsAborted || discoveryCompleteEventArgs.IsAborted;
 
             // Do not aggregate tests count if test discovery is aborted. It is mandated by
             // platform that tests count is negative for discovery abort event.
             // See `DiscoveryCompleteEventArgs`.
-            TotalTests = IsAborted ? -1 : TotalTests + totalTests;
+            TotalTests = IsAborted ? -1 : TotalTests + discoveryCompleteEventArgs.TotalCount;
 
             // Aggregate the discovered extensions.
-            DiscoveredExtensions = TestExtensions.CreateMergedDictionary(DiscoveredExtensions, discoveredExtensions);
+            DiscoveredExtensions = TestExtensions.CreateMergedDictionary(DiscoveredExtensions, discoveryCompleteEventArgs.DiscoveredExtensions);
         }
+
+        AggregateMetrics(discoveryCompleteEventArgs.Metrics);
+
+        // Do not aggregate NotDiscovered, PartiallyDiscovered, FullyDiscovered sources here
+        // because this aggregator is shared with proxies so the state is already up-to-date.
     }
 
     /// <summary>

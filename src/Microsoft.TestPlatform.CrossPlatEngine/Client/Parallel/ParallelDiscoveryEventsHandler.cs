@@ -57,10 +57,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase>? lastChunk)
     {
         // Aggregate for final discovery complete
-        _discoveryDataAggregator.Aggregate(discoveryCompleteEventArgs.TotalCount, discoveryCompleteEventArgs.IsAborted, discoveryCompleteEventArgs.DiscoveredExtensions);
-
-        // Aggregate Discovery Data Metrics
-        _discoveryDataAggregator.AggregateMetrics(discoveryCompleteEventArgs.Metrics);
+        _discoveryDataAggregator.Aggregate(discoveryCompleteEventArgs);
 
         // We get DiscoveryComplete events from each ProxyDiscoveryManager (each testhost) and
         // they contain the last chunk of tests that were discovered in that particular testhost.
@@ -91,7 +88,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         // isAborted = true and totalTests = -1
         if (_parallelProxyDiscoveryManager.IsAbortRequested)
         {
-            _discoveryDataAggregator.Aggregate(-1, true, null);
+            _discoveryDataAggregator.Aggregate(new(-1, true));
         }
 
         // Manager said we are ready to publish the test discovery completed.

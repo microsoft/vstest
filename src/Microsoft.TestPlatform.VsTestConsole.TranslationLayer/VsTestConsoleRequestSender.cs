@@ -1097,8 +1097,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 TestMessageLevel.Error,
                 TranslationLayerResources.AbortedTestsDiscovery);
 
-            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true, new List<string>(), new List<string>(), new List<string>());
-            eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
+            eventHandler.HandleDiscoveryComplete(new(-1, true), null);
 
             // Earlier we were closing the connection with vstest.console in case of exceptions.
             // Removing that code because vstest.console might be in a healthy state and letting
