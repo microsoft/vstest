@@ -212,8 +212,10 @@ public class DiscoverTests : AcceptanceTestBase
         // Setup
         var testAssemblies = new List<string>
         {
-            GetAssetFullPath("DiscoveryTestProject.dll"),
+            // This is fast to discover.
             GetAssetFullPath("SimpleTestProject.dll"),
+            // This is slow to discover to keep us discovering while we cancel.
+            GetAssetFullPath("DiscoveryTestProject.dll"),
         };
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -264,7 +266,7 @@ public class DiscoverTests : AcceptanceTestBase
         await Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, runSettingsXml, discoveryEvents.Object));
         Console.WriteLine("Discovery finished.");
 
-        // Assert.
+        // Assert
         Assert.IsTrue(isTestCancelled, "Discovery was not cancelled");
 
         // TODO: Review how much time it takes to actually cancel. It is not 2s on CI server. Are we waiting for anything?
