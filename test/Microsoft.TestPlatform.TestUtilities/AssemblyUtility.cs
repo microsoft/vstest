@@ -6,8 +6,6 @@ using System.Reflection;
 using System.Runtime.Loader;
 #endif
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.TestUtilities;
 
 /// <summary>
