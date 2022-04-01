@@ -180,10 +180,8 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// Raises a test result event to the enabled loggers.
     /// </summary>
     /// <param name="args">Arguments to be raised.</param>
-    internal void RaiseTestResult(TestResultEventArgs args)
+    internal void RaiseTestResult(TestResultEventArgs args!!)
     {
-        ValidateArg.NotNull(args, nameof(args));
-
         CheckDisposed();
 
         // find the approx size of test result
@@ -200,10 +198,8 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// Raises the test run start event to enabled loggers.
     /// </summary>
     /// <param name="args">Arguments to be raised.</param>
-    internal void RaiseTestRunStart(TestRunStartEventArgs args)
+    internal void RaiseTestRunStart(TestRunStartEventArgs args!!)
     {
-        ValidateArg.NotNull(args, nameof(args));
-
         CheckDisposed();
 
         SafeInvokeAsync(() => TestRunStart, args, 0, "InternalTestLoggerEvents.SendTestRunStart");
@@ -213,10 +209,8 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// Raises a discovery start event to the enabled loggers.
     /// </summary>
     /// <param name="args">Arguments to be raised.</param>
-    internal void RaiseDiscoveryStart(DiscoveryStartEventArgs args)
+    internal void RaiseDiscoveryStart(DiscoveryStartEventArgs args!!)
     {
-        ValidateArg.NotNull(args, nameof(args));
-
         CheckDisposed();
 
         SafeInvokeAsync(() => DiscoveryStart, args, 0, "InternalTestLoggerEvents.SendDiscoveryStart");
@@ -226,10 +220,8 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// Raises a discovery message event to the enabled loggers.
     /// </summary>
     /// <param name="args">Arguments to be raised.</param>
-    internal void RaiseDiscoveryMessage(TestRunMessageEventArgs args)
+    internal void RaiseDiscoveryMessage(TestRunMessageEventArgs args!!)
     {
-        ValidateArg.NotNull(args, nameof(args));
-
         CheckDisposed();
 
         // Sending 0 size as this event is not expected to contain any data.
@@ -240,10 +232,8 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// Raises discovered tests event to the enabled loggers.
     /// </summary>
     /// <param name="args"> Arguments to be raised. </param>
-    internal void RaiseDiscoveredTests(DiscoveredTestsEventArgs args)
+    internal void RaiseDiscoveredTests(DiscoveredTestsEventArgs args!!)
     {
-        ValidateArg.NotNull(args, nameof(args));
-
         CheckDisposed();
 
         SafeInvokeAsync(() => DiscoveredTests, args, 0, "InternalTestLoggerEvents.SendDiscoveredTests");
@@ -253,10 +243,8 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// Raises discovery complete event to the enabled loggers.
     /// </summary>
     /// <param name="args"> Arguments to be raised. </param>
-    internal void RaiseDiscoveryComplete(DiscoveryCompleteEventArgs args)
+    internal void RaiseDiscoveryComplete(DiscoveryCompleteEventArgs args!!)
     {
-        ValidateArg.NotNull(args, nameof(args));
-
         CheckDisposed();
 
         // Sending 0 size as this event is not expected to contain any data.
@@ -270,10 +258,8 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// Raises test run complete to the enabled loggers
     /// </summary>
     /// <param name="args"> Arguments to be raised </param>
-    internal void RaiseTestRunComplete(TestRunCompleteEventArgs args)
+    internal void RaiseTestRunComplete(TestRunCompleteEventArgs args!!)
     {
-        ValidateArg.NotNull(args, nameof(args));
-
         CheckDisposed();
 
         // Size is being send as 0. (It is good to send the size as the job queue uses it)
@@ -321,11 +307,8 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// ensuring that each handler is invoked even if one throws.
     /// The actual calling of the subscribers is done on a background thread.
     /// </summary>
-    private void SafeInvokeAsync(Func<MulticastDelegate> eventHandlersFactory, EventArgs args, int size, string traceDisplayName)
+    private void SafeInvokeAsync(Func<MulticastDelegate> eventHandlersFactory!!, EventArgs args!!, int size, string traceDisplayName)
     {
-        ValidateArg.NotNull(eventHandlersFactory, nameof(eventHandlersFactory));
-        ValidateArg.NotNull(args, nameof(args));
-
         // Invoke the handlers on a background thread.
         _loggerEventQueue.QueueJob(
             () =>

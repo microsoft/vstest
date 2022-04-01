@@ -27,11 +27,8 @@ public static class MSTestSettingsUtilities
     /// </param>
     /// <param name="defaultRunSettings"> Input RunSettings document to which settings file need to be imported. </param>
     /// <returns> Updated RunSetting Xml document with imported settings. </returns>
-    public static XmlDocument Import(string settingsFile, XmlDocument defaultRunSettings)
+    public static XmlDocument Import(string settingsFile!!, XmlDocument defaultRunSettings!!)
     {
-        ValidateArg.NotNull(settingsFile, nameof(settingsFile));
-        ValidateArg.NotNull(defaultRunSettings, nameof(defaultRunSettings));
-
         if (IsLegacyTestSettingsFile(settingsFile) == false)
         {
             throw new XmlException(string.Format(CultureInfo.CurrentCulture, UtilitiesResources.UnExpectedSettingsFile));

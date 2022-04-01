@@ -172,10 +172,8 @@ public sealed class TestResult : TestObject
     /// Return TestProperty's value
     /// </summary>
     /// <returns></returns>
-    protected override object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
+    protected override object ProtectedGetPropertyValue(TestProperty property!!, object defaultValue)
     {
-        ValidateArg.NotNull(property, nameof(property));
-
         switch (property.Id)
         {
             case "TestResult.ComputerName":
@@ -202,10 +200,8 @@ public sealed class TestResult : TestObject
     /// <summary>
     /// Set TestProperty's value
     /// </summary>
-    protected override void ProtectedSetPropertyValue(TestProperty property, object value)
+    protected override void ProtectedSetPropertyValue(TestProperty property!!, object value)
     {
-        ValidateArg.NotNull(property, nameof(property));
-
         switch (property.Id)
         {
             case "TestResult.ComputerName":

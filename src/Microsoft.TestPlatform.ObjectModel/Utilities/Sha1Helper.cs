@@ -116,10 +116,8 @@ internal static class Sha1Helper
         /// Ensures that given bytes are in big endian notation.
         /// </summary>
         /// <param name="array">An array of bytes</param>
-        private static void EnsureBigEndian(ref byte[] array)
+        private static void EnsureBigEndian(ref byte[] array!!)
         {
-            ValidateArg.NotNull(array, nameof(array));
-
             if (BitConverter.IsLittleEndian)
             {
                 Array.Reverse(array);
@@ -138,10 +136,8 @@ internal static class Sha1Helper
             _h[4] = 0xC3D2E1F0u;
         }
 
-        public byte[] ComputeHash(byte[] message)
+        public byte[] ComputeHash(byte[] message!!)
         {
-            ValidateArg.NotNull(message, nameof(message));
-
             Reset();
             PadMessage(ref message);
 

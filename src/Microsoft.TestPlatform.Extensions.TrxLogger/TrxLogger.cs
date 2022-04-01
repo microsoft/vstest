@@ -188,11 +188,8 @@ public class TrxLogger : ITestLoggerWithParameters
     /// <param name="e">
     /// Event args
     /// </param>
-    internal void TestMessageHandler(object sender, TestRunMessageEventArgs e)
+    internal void TestMessageHandler(object sender!!, TestRunMessageEventArgs e!!)
     {
-        ValidateArg.NotNull(sender, nameof(sender));
-        ValidateArg.NotNull(e, nameof(e));
-
         RunInfo runMessage;
 
         switch (e.Level)
