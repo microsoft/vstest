@@ -98,7 +98,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
 
         // In case of sequential discovery - RawMessage would have contained a 'DiscoveryCompletePayload' object
         // To send a raw message - we need to create raw message from an aggregated payload object
-        var testDiscoveryCompletePayload = new DiscoveryCompletePayload()
+        var testDiscoveryCompletePayload = new DiscoveryCompletePayload
         {
             TotalTests = _discoveryDataAggregator.TotalTests,
             IsAborted = _discoveryDataAggregator.IsAborted,
@@ -121,13 +121,15 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         // Sending discovery complete message to IDE
         ConvertToRawMessageAndSend(testDiscoveryCompletePayload);
 
-        var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
-            _discoveryDataAggregator.TotalTests,
-            _discoveryDataAggregator.IsAborted,
-            fullyDiscovered,
-            partiallyDiscovered,
-            notDiscovered,
-            _discoveryDataAggregator.DiscoveredExtensions);
+        var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs
+        {
+            TotalCount = _discoveryDataAggregator.TotalTests,
+            IsAborted = _discoveryDataAggregator.IsAborted,
+            FullyDiscoveredSources = fullyDiscovered,
+            PartiallyDiscoveredSources = partiallyDiscovered,
+            NotDiscoveredSources = notDiscovered,
+            DiscoveredExtensions = _discoveryDataAggregator.DiscoveredExtensions,
+        };
 
         finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
 

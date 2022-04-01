@@ -15,32 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 [DataContract]
 public class DiscoveryCompleteEventArgs : EventArgs
 {
-    /// <summary>
-    /// Constructor for creating event args object
-    /// </summary>
-    /// <param name="totalTests">Total tests which got discovered</param>
-    /// <param name="isAborted">Specifies if discovery has been aborted.</param>
-    /// <param name="fullyDiscoveredSources">List of fully discovered sources</param>
-    /// <param name="partiallyDiscoveredSources">List of partially discovered sources</param>
-    /// <param name="notDiscoveredSources">List of not discovered sources</param>
-    /// <param name="discoveredExtensions">Map containing discovered extensions.</param>
-    public DiscoveryCompleteEventArgs(
-        long totalTests,
-        bool isAborted,
-        IList<string> fullyDiscoveredSources,
-        IList<string> partiallyDiscoveredSources,
-        IList<string> notDiscoveredSources,
-        Dictionary<string, HashSet<string>> discoveredExtensions)
-    {
-        TotalCount = totalTests;
-        IsAborted = isAborted;
-
-        FullyDiscoveredSources = fullyDiscoveredSources ?? new List<string>();
-        PartiallyDiscoveredSources = partiallyDiscoveredSources ?? new List<string>();
-        NotDiscoveredSources = notDiscoveredSources ?? new List<string>();
-
-        DiscoveredExtensions = discoveredExtensions ?? new();
-    }
+    public DiscoveryCompleteEventArgs() { }
 
     /// <summary>
     /// Constructor for creating event args object
@@ -48,21 +23,22 @@ public class DiscoveryCompleteEventArgs : EventArgs
     /// <param name="totalTests">Total tests which got discovered</param>
     /// <param name="isAborted">Specifies if discovery has been aborted.</param>
     public DiscoveryCompleteEventArgs(long totalTests, bool isAborted)
-        : this(totalTests, isAborted, null, null, null, null)
     {
+        TotalCount = totalTests;
+        IsAborted = isAborted;
     }
 
     /// <summary>
     ///   Indicates the total tests which got discovered in this request.
     /// </summary>
     [DataMember]
-    public long TotalCount { get; private set; }
+    public long TotalCount { get; set; }
 
     /// <summary>
     /// Specifies if discovery has been aborted. If true TotalCount is also set to -1.
     /// </summary>
     [DataMember]
-    public bool IsAborted { get; private set; }
+    public bool IsAborted { get; set; }
 
     /// <summary>
     /// Metrics
@@ -74,23 +50,23 @@ public class DiscoveryCompleteEventArgs : EventArgs
     /// Gets the list of sources which were fully discovered.
     /// </summary>
     [DataMember]
-    public IList<string> FullyDiscoveredSources { get; set; }
+    public IList<string> FullyDiscoveredSources { get; set; } = new List<string>();
 
     /// <summary>
     /// Gets the list of sources which were partially discovered (started discover tests, but then discovery aborted).
     /// </summary>
     [DataMember]
-    public IList<string> PartiallyDiscoveredSources { get; set; }
+    public IList<string> PartiallyDiscoveredSources { get; set; } = new List<string>();
 
     /// <summary>
     /// Gets the list of sources which were not discovered at all.
     /// </summary>
     [DataMember]
-    public IList<string> NotDiscoveredSources { get; set; }
+    public IList<string> NotDiscoveredSources { get; set; } = new List<string>();
 
     /// <summary>
     /// Gets or sets the collection of discovered extensions.
     /// </summary>
     [DataMember]
-    public Dictionary<string, HashSet<string>> DiscoveredExtensions { get; set; }
+    public Dictionary<string, HashSet<string>> DiscoveredExtensions { get; set; } = new();
 }
