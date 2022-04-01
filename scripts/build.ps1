@@ -759,12 +759,10 @@ function Move-Loc-Files($sourceDir, $destinationDir, $dllName) {
     }
 }
 
-function Create-VsixPackage {
-    Write-Log "Create-VsixPackage: Started."
+function Publish-VsixPackage {
+    Write-Log "Publish-VsixPackage: Started."
     $timer = Start-Timer
 
-    $vsixSourceDir = Join-Path $env:TP_ROOT_DIR "src\package\VSIXProject"
-    $vsixProjectDir = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\VSIX"
     $packageDir = Get-FullCLRPackageDirectory
     $extensionsPackageDir = Join-Path $packageDir "Extensions"
     $testImpactComComponentsDir = Join-Path $extensionsPackageDir "TestImpact"
@@ -847,9 +845,19 @@ function Create-VsixPackage {
     Copy-Item -Recurse $comComponentsDirectoryTIA\* $legacyTestImpactComComponentsDir -Force
 
     Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt") $packageDir -Force
+    
+    Write-Log "Publish-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Create-VsixPackage {
+    Write-Log "Create-VsixPackage: Started."
+    $timer = Start-Timer
 
     Write-Verbose "Locating MSBuild install path..."
     $msbuildPath = Locate-MSBuildPath
+
+    $vsixSourceDir = Join-Path $env:TP_ROOT_DIR "src\package\VSIXProject"
+    $vsixProjectDir = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\VSIX"
 
     # Create vsix only when msbuild is installed.
     if (![string]::IsNullOrEmpty($msbuildPath)) {
@@ -1276,6 +1284,7 @@ if ($Force -or $Steps -contains "Build") {
 
 if ($Force -or $Steps -contains "Publish") {
     Publish-Package
+    Publish-VsixPackage
 }
 
 if ($Force -or $Steps -contains "Pack") { 
