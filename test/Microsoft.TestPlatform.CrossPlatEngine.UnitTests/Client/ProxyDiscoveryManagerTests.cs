@@ -33,7 +33,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
 {
     private readonly DiscoveryCriteria _discoveryCriteria;
-    private readonly ParallelDiscoveryDataAggregator _discoveryDataAggregator;
+    private readonly DiscoveryDataAggregator _discoveryDataAggregator;
     private readonly Mock<ITestRequestSender> _mockRequestSender;
     private readonly Mock<IRequestData> _mockRequestData;
     private readonly Mock<IMetricsCollection> _mockMetricsCollection;

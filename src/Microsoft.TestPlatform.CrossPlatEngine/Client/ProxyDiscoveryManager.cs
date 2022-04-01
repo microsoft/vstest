@@ -30,7 +30,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
 {
     private readonly TestSessionInfo _testSessionInfo;
     private readonly Func<string, ProxyDiscoveryManager, ProxyOperationManager> _proxyOperationManagerCreator;
-    private readonly ParallelDiscoveryDataAggregator _discoveryDataAggregator;
+    private readonly DiscoveryDataAggregator _discoveryDataAggregator;
     private readonly IFileHelper _fileHelper;
     private readonly IDataSerializer _dataSerializer;
 
@@ -57,7 +57,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     internal ProxyDiscoveryManager(
         TestSessionInfo testSessionInfo,
         Func<string, ProxyDiscoveryManager, ProxyOperationManager> proxyOperationManagerCreator,
-        ParallelDiscoveryDataAggregator discoveryDataAggregator)
+        DiscoveryDataAggregator discoveryDataAggregator)
     {
         // Filling in test session info and proxy information.
         _testSessionInfo = testSessionInfo;
@@ -102,7 +102,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         IRequestData requestData,
         ITestRequestSender requestSender,
         ITestRuntimeProvider testHostManager,
-        ParallelDiscoveryDataAggregator discoveryDataAggregator = null,
+        DiscoveryDataAggregator discoveryDataAggregator = null,
         IDataSerializer dataSerializer = null,
         IFileHelper fileHelper = null)
     {
@@ -216,9 +216,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
             _proxyOperationManager.RequestSender.SendDiscoveryAbort();
         }
 
-        // Cancel fast, try to stop testhost deployment/launch
-        _proxyOperationManager.CancellationTokenSource.Cancel();
-        Close();
+        Abort();
     }
 
     /// <inheritdoc/>
@@ -251,14 +249,26 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         // Currently, TestRequestSender always passes null for lastChunk in case of an aborted
         // discovery but we are not making this assumption here to ease potential future
         // evolution.
-        _discoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases(lastChunk, isComplete: !discoveryCompleteEventArgs.IsAborted, ref _previousSource);
+        // When discovery is complete and not aborted, we can simply mark all given test cases and
+        // the latest discovered source as fully discovered. Otherwise we still want to process
+        // the last chunk as if it was a normal discovery notification.
+        if (discoveryCompleteEventArgs.IsAborted)
+        {
+            _previousSource = _discoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases(_previousSource, lastChunk);
+        }
+        else
+        {
+            _discoveryDataAggregator.MarkSourcesWithStatus(lastChunk?.Select(x => x.Source), DiscoveryStatus.FullyDiscovered);
+            _discoveryDataAggregator.MarkSourcesWithStatus(new[] { _previousSource }, DiscoveryStatus.FullyDiscovered);
+            _previousSource = null;
+        }
         _baseTestDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, lastChunk);
     }
 
     /// <inheritdoc/>
     public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
     {
-        _discoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases(discoveredTestCases, isComplete: false, ref _previousSource);
+        _previousSource = _discoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases(_previousSource, discoveredTestCases);
         _baseTestDiscoveryEventsHandler.HandleDiscoveredTests(discoveredTestCases);
     }
 

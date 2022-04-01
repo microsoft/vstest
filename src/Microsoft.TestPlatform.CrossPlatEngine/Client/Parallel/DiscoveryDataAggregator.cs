@@ -15,9 +15,9 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 /// <summary>
-/// ParallelDiscoveryDataAggregator aggregates discovery data from parallel discovery managers
+/// DiscoveryDataAggregator aggregates discovery data from multiple sources running in parallel or in series.
 /// </summary>
-internal class ParallelDiscoveryDataAggregator
+internal class DiscoveryDataAggregator
 {
     private readonly object _dataUpdateSyncObject = new();
     private readonly ConcurrentDictionary<string, object> _metricsAggregator = new();
@@ -176,7 +176,7 @@ internal class ParallelDiscoveryDataAggregator
                 {
                     if (status != DiscoveryStatus.NotDiscovered)
                     {
-                        EqtTrace.Warning($"ParallelDiscoveryDataAggregator.MarkSourcesWithStatus: Undiscovered {source}.");
+                        EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourcesWithStatus: Undiscovered {source}.");
                     }
 
                     return status;
@@ -186,34 +186,29 @@ internal class ParallelDiscoveryDataAggregator
                     if (previousStatus == DiscoveryStatus.FullyDiscovered && status != DiscoveryStatus.FullyDiscovered
                         || previousStatus == DiscoveryStatus.PartiallyDiscovered && status == DiscoveryStatus.NotDiscovered)
                     {
-                        EqtTrace.Warning($"ParallelDiscoveryDataAggregator.MarkSourcesWithStatus: Downgrading source status from {previousStatus} to {status}.");
+                        EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourcesWithStatus: Downgrading source status from {previousStatus} to {status}.");
                     }
 
-                    EqtTrace.Info($"ParallelDiscoveryDataAggregator.MarkSourcesWithStatus: Marking {source} with {status} status.");
+                    EqtTrace.Info($"DiscoveryDataAggregator.MarkSourcesWithStatus: Marking {source} with {status} status.");
                     return status;
                 });
         }
     }
 
-    public void MarkSourcesBasedOnDiscoveredTestCases(IEnumerable<TestCase>? testCases, bool isComplete, ref string? previousSource)
+    /// <summary>
+    /// Updates the discovery status of the source based on the discovered test cases.
+    /// </summary>
+    /// <param name="previousSource">The last discovered sources or null.</param>
+    /// <param name="testCases">The discovered sources.</param>
+    /// <returns>The last discovered source or null.</returns>
+    public string? MarkSourcesBasedOnDiscoveredTestCases(string? previousSource, IEnumerable<TestCase>? testCases)
     {
-        // When discovery is complete and not aborted, we can simply mark all given test cases and
-        // the latest discovered source as fully discovered.
-        if (isComplete)
-        {
-            MarkSourcesWithStatus(testCases?.Select(x => x.Source), DiscoveryStatus.FullyDiscovered);
-            MarkSourcesWithStatus(new[] { previousSource }, DiscoveryStatus.FullyDiscovered);
-            // Reset last source (not mandatory but done for the sake of completness).
-            previousSource = null;
-            return;
-        }
-
         // When all testcases count in source is dividable by chunk size (e.g. 100 tests and
         // chunk size of 10) then lastChunk is coming as empty. Otherwise, we receive the
         // remaining test cases to process.
         if (testCases is null)
         {
-            return;
+            return previousSource;
         }
 
         foreach (var testCase in testCases)
@@ -235,5 +230,7 @@ internal class ParallelDiscoveryDataAggregator
 
             previousSource = currentSource;
         }
+
+        return previousSource;
     }
 }

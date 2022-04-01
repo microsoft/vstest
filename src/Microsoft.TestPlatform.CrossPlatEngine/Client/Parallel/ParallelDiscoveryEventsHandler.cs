@@ -24,7 +24,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     private readonly IProxyDiscoveryManager _proxyDiscoveryManager;
     private readonly ITestDiscoveryEventsHandler2 _actualDiscoveryEventsHandler;
     private readonly IParallelProxyDiscoveryManager _parallelProxyDiscoveryManager;
-    private readonly ParallelDiscoveryDataAggregator _discoveryDataAggregator;
+    private readonly DiscoveryDataAggregator _discoveryDataAggregator;
     private readonly IDataSerializer _dataSerializer;
     private readonly IRequestData _requestData;
     private readonly object _sendMessageLock = new();
@@ -33,7 +33,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         IProxyDiscoveryManager proxyDiscoveryManager,
         ITestDiscoveryEventsHandler2 actualDiscoveryEventsHandler,
         IParallelProxyDiscoveryManager parallelProxyDiscoveryManager,
-        ParallelDiscoveryDataAggregator discoveryDataAggregator) :
+        DiscoveryDataAggregator discoveryDataAggregator) :
         this(requestData, proxyDiscoveryManager, actualDiscoveryEventsHandler, parallelProxyDiscoveryManager, discoveryDataAggregator, JsonDataSerializer.Instance)
     {
     }
@@ -42,7 +42,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         IProxyDiscoveryManager proxyDiscoveryManager,
         ITestDiscoveryEventsHandler2 actualDiscoveryEventsHandler,
         IParallelProxyDiscoveryManager parallelProxyDiscoveryManager,
-        ParallelDiscoveryDataAggregator discoveryDataAggregator,
+        DiscoveryDataAggregator discoveryDataAggregator,
         IDataSerializer dataSerializer)
     {
         _proxyDiscoveryManager = proxyDiscoveryManager;

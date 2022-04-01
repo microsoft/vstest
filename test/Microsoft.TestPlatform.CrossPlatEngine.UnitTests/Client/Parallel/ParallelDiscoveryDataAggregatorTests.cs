@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
@@ -14,12 +13,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel;
 
 [TestClass]
-public class ParallelDiscoveryDataAggregatorTests
+public class DiscoveryDataAggregatorTests
 {
     [TestMethod]
     public void AggregateShouldAggregateAbortedCorrectly()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
         aggregator.Aggregate(new(totalTests: 5, isAborted: false));
         Assert.IsFalse(aggregator.IsAborted, "Aborted must be false");
@@ -36,7 +35,7 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void AggregateShouldAggregateTotalTestsCorrectly()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
         aggregator.Aggregate(new(totalTests: 2, isAborted: false));
         Assert.AreEqual(2, aggregator.TotalTests, "Aggregated totalTests count does not match");
 
@@ -50,7 +49,7 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void AggregateDiscoveryDataMetricsShouldAggregateMetricsCorrectly()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
         aggregator.AggregateMetrics(null);
 
@@ -61,7 +60,7 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void AggregateDiscoveryDataMetricsShouldAddTotalTestsDiscovered()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
         var metrics = new Dictionary<string, object>
         {
@@ -80,7 +79,7 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void AggregateDiscoveryDataMetricsShouldAddTimeTakenToDiscoverTests()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
         var metrics = new Dictionary<string, object>
         {
@@ -99,7 +98,7 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void AggregateDiscoveryDataMetricsShouldAddTimeTakenByAllAdapters()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
         var metrics = new Dictionary<string, object>
         {
@@ -118,7 +117,7 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void AggregateDiscoveryDataMetricsShouldAddTimeTakenToLoadAdapters()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
         var metrics = new Dictionary<string, object>
         {
@@ -137,7 +136,7 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void AggregateDiscoveryDataMetricsShouldNotAggregateDiscoveryState()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
         var metrics = new Dictionary<string, object>
         {
@@ -154,7 +153,7 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void GetAggregatedDiscoveryDataMetricsShouldReturnEmptyIfMetricAggregatorIsEmpty()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
         aggregator.AggregateMetrics(new Dictionary<string, object>());
         var runMetrics = aggregator.GetMetrics();
@@ -165,7 +164,7 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void GetAggregatedDiscoveryDataMetricsShouldReturnEmptyIfMetricsIsNull()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
         aggregator.AggregateMetrics(null);
         var runMetrics = aggregator.GetMetrics();
@@ -176,7 +175,7 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void GetDiscoveryDataMetricsShouldAddTotalAdaptersUsedIfMetricsIsNotEmpty()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
         var metrics = new Dictionary<string, object>
         {
@@ -195,7 +194,7 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void GetDiscoveryDataMetricsShouldAddNumberOfAdapterDiscoveredIfMetricsIsEmpty()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
         var metrics = new Dictionary<string, object>
         {
@@ -214,7 +213,7 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void GetDiscoveryDataMetricsShouldNotAddTotalAdaptersUsedIfMetricsIsEmpty()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
         aggregator.AggregateMetrics(new Dictionary<string, object>());
 
@@ -225,7 +224,7 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void GetDiscoveryDataMetricsShouldNotAddNumberOfAdapterDiscoveredIfMetricsIsEmpty()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
         aggregator.AggregateMetrics(new Dictionary<string, object>());
 
@@ -236,7 +235,7 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void AggregateShouldAggregateMessageSentCorrectly()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
         aggregator.AggregateIsMessageSent(isMessageSent: false);
         Assert.IsFalse(aggregator.IsMessageSent, "Aborted must be false");
@@ -255,7 +254,7 @@ public class ParallelDiscoveryDataAggregatorTests
     public void MarkSourcesWithStatusWhenSourcesIsNullDoesNothing(DiscoveryStatus discoveryStatus)
     {
         // Arrange
-        var dataAggregator = new ParallelDiscoveryDataAggregator();
+        var dataAggregator = new DiscoveryDataAggregator();
 
         // Act
         dataAggregator.MarkSourcesWithStatus(null, discoveryStatus);
@@ -273,7 +272,7 @@ public class ParallelDiscoveryDataAggregatorTests
     public void MarkSourcesWithStatusIgnoresNullSources(DiscoveryStatus discoveryStatus)
     {
         // Arrange
-        var dataAggregator = new ParallelDiscoveryDataAggregator();
+        var dataAggregator = new DiscoveryDataAggregator();
         var sources = new[] { "a", null, "b" };
 
         // Sanity check
@@ -292,7 +291,7 @@ public class ParallelDiscoveryDataAggregatorTests
     public void MarkSourcesWithStatusWhenSourceAddedAndStatusDifferentFromNotDiscoveredLogsWarning(DiscoveryStatus discoveryStatus)
     {
         // Arrange
-        var dataAggregator = new ParallelDiscoveryDataAggregator();
+        var dataAggregator = new DiscoveryDataAggregator();
 
         // Act
         dataAggregator.MarkSourcesWithStatus(new[] { "a" }, discoveryStatus);
@@ -307,7 +306,7 @@ public class ParallelDiscoveryDataAggregatorTests
     public void MarkSourcesWithStatusWhenSourceStatusWasFullyDiscoveredAndIsDowngradedLogsWarning(DiscoveryStatus discoveryStatus)
     {
         // Arrange
-        var dataAggregator = new ParallelDiscoveryDataAggregator();
+        var dataAggregator = new DiscoveryDataAggregator();
         dataAggregator.MarkSourcesWithStatus(new[] { "a" }, DiscoveryStatus.FullyDiscovered);
 
         // Act
@@ -321,7 +320,7 @@ public class ParallelDiscoveryDataAggregatorTests
     public void MarkSourcesWithStatusWhenSourceStatusWasPartiallyDiscoveredAndIsDowngradedLogsWarning()
     {
         // Arrange
-        var dataAggregator = new ParallelDiscoveryDataAggregator();
+        var dataAggregator = new DiscoveryDataAggregator();
         dataAggregator.MarkSourcesWithStatus(new[] { "a" }, DiscoveryStatus.PartiallyDiscovered);
 
         // Act
@@ -335,8 +334,7 @@ public class ParallelDiscoveryDataAggregatorTests
     public void MarkSourcesBasedOnDiscoveredTestCasesHandlesTestCasesFromMultipleSources()
     {
         // Arrange
-        var dataAggregator = new ParallelDiscoveryDataAggregator();
-        string? previousSource = null;
+        var dataAggregator = new DiscoveryDataAggregator();
         var testCases = new TestCase[]
         {
             new() { Source = "a" },
@@ -347,7 +345,7 @@ public class ParallelDiscoveryDataAggregatorTests
         };
 
         // Act
-        dataAggregator.MarkSourcesBasedOnDiscoveredTestCases(testCases, false, ref previousSource);
+        dataAggregator.MarkSourcesBasedOnDiscoveredTestCases(null, testCases);
 
         // Assert
         CollectionAssert.AreEquivalent(new[] { "a", "b" }, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
@@ -358,63 +356,16 @@ public class ParallelDiscoveryDataAggregatorTests
     public void MarkSourcesBasedOnDiscoveredTestCasesReuseLastDiscoveredSource()
     {
         // Arrange
-        var dataAggregator = new ParallelDiscoveryDataAggregator();
+        var dataAggregator = new DiscoveryDataAggregator();
         string? previousSource = null;
-        dataAggregator.MarkSourcesBasedOnDiscoveredTestCases(new TestCase[] { new() { Source = "a" } }, false, ref previousSource);
+        previousSource = dataAggregator.MarkSourcesBasedOnDiscoveredTestCases(previousSource, new TestCase[] { new() { Source = "a" } });
 
         // Act
-        dataAggregator.MarkSourcesBasedOnDiscoveredTestCases(new TestCase[] { new() { Source = "b" }, }, false, ref previousSource);
+        _ = dataAggregator.MarkSourcesBasedOnDiscoveredTestCases(previousSource, new TestCase[] { new() { Source = "b" }, });
 
         // Assert
         CollectionAssert.AreEquivalent(new[] { "a" }, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
         CollectionAssert.AreEquivalent(new[] { "b" }, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
-    }
-
-    [DataTestMethod]
-    [DataRow(true)]
-    [DataRow(false)]
-    public void MarkSourcesBasedOnDiscoveredTestCasesWhenCompleteMarksLastSourceAsFullyDiscovered(bool trueIsEmptyFalseIsNull)
-    {
-        // Arrange
-        var dataAggregator = new ParallelDiscoveryDataAggregator();
-        string? previousSource = null;
-        dataAggregator.MarkSourcesBasedOnDiscoveredTestCases(new TestCase[] { new() { Source = "a" } }, false, ref previousSource);
-
-        // Sanity check
-        CollectionAssert.AreEquivalent(new[] { "a" }, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
-        Assert.AreEqual(0, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count);
-
-        // Act
-        dataAggregator.MarkSourcesBasedOnDiscoveredTestCases(trueIsEmptyFalseIsNull ? Enumerable.Empty<TestCase>() : null, true, ref previousSource);
-
-        // Assert
-        CollectionAssert.AreEquivalent(new[] { "a" }, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
-        Assert.AreEqual(0, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
-    }
-
-    [TestMethod]
-    public void MarkSourcesBasedOnDiscoveredTestCasesWhenCompleteMarksAllSourcesAsFullyDiscovered()
-    {
-        // Arrange
-        var dataAggregator = new ParallelDiscoveryDataAggregator();
-        string? previousSource = null;
-        dataAggregator.MarkSourcesBasedOnDiscoveredTestCases(new TestCase[] { new() { Source = "a" } }, false, ref previousSource);
-
-        // Sanity check
-        CollectionAssert.AreEquivalent(new[] { "a" }, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
-        Assert.AreEqual(0, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count);
-
-        // Act
-        dataAggregator.MarkSourcesBasedOnDiscoveredTestCases(new TestCase[]
-            {
-                new() { Source = "b" },
-                new() { Source = "c" },
-            }, true,
-            ref previousSource);
-
-        // Assert
-        CollectionAssert.AreEquivalent(new[] { "a", "b", "c" }, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
-        Assert.AreEqual(0, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
     }
 
     [DataTestMethod]
@@ -423,7 +374,7 @@ public class ParallelDiscoveryDataAggregatorTests
     [DataRow(DiscoveryStatus.NotDiscovered)]
     public void GetSourcesWithStatusWhenEmptyDictionaryReturnsEmptyList(DiscoveryStatus discoveryStatus)
     {
-        var instanceSources = new ParallelDiscoveryDataAggregator().GetSourcesWithStatus(discoveryStatus);
+        var instanceSources = new DiscoveryDataAggregator().GetSourcesWithStatus(discoveryStatus);
         Assert.AreEqual(0, instanceSources.Count);
     }
 
@@ -431,7 +382,7 @@ public class ParallelDiscoveryDataAggregatorTests
     public void GetSourcesWithStatusCorrectlyFiltersSources()
     {
         // Arrange
-        var dataAggregator = new ParallelDiscoveryDataAggregator();
+        var dataAggregator = new DiscoveryDataAggregator();
         var notDiscoveredSources = new[]
         {
             "not1",

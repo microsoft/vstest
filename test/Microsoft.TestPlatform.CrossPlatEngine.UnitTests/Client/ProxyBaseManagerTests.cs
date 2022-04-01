@@ -35,7 +35,7 @@ public class ProxyBaseManagerTests
     protected Mock<IDataSerializer> _mockDataSerializer;
     protected Mock<ICommunicationChannel> _mockChannel;
     private readonly Mock<IFileHelper> _mockFileHelper;
-    private readonly ParallelDiscoveryDataAggregator _discoveryDataAggregator;
+    private readonly DiscoveryDataAggregator _discoveryDataAggregator;
 
     public ProxyBaseManagerTests()
     {

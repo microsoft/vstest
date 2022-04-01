@@ -39,7 +39,7 @@ public class DiscoveryManager : IDiscoveryManager
     private ITestDiscoveryEventsHandler2 _testDiscoveryEventsHandler;
     private DiscoveryCriteria _discoveryCriteria;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private readonly ParallelDiscoveryDataAggregator _discoveryDataAggregator = new();
+    private readonly DiscoveryDataAggregator _discoveryDataAggregator = new();
     private string _previousSource;
 
     /// <summary>
@@ -150,14 +150,23 @@ public class DiscoveryManager : IDiscoveryManager
                 // Collecting Total Tests Discovered
                 _requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsDiscovered, totalDiscoveredTestCount);
 
-                _discoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases(
-                    lastChunk,
-                    isComplete: !_cancellationTokenSource.IsCancellationRequested,
-                    ref _previousSource);
+                var isAborted = _cancellationTokenSource.IsCancellationRequested;
 
-                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(
-                    _cancellationTokenSource.IsCancellationRequested ? -1 : totalDiscoveredTestCount,
-                    _cancellationTokenSource.IsCancellationRequested)
+                // When discovery is complete and not aborted, we can simply mark all given test
+                // cases and the latest discovered source as fully discovered. Otherwise we still
+                // want to process the last chunk as if it was a normal discovery notification.
+                if (isAborted)
+                {
+                    _previousSource = _discoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases(_previousSource, lastChunk);
+                }
+                else
+                {
+                    _discoveryDataAggregator.MarkSourcesWithStatus(lastChunk?.Select(x => x.Source), DiscoveryStatus.FullyDiscovered);
+                    _discoveryDataAggregator.MarkSourcesWithStatus(new[] { _previousSource }, DiscoveryStatus.FullyDiscovered);
+                    _previousSource = null;
+                }
+
+                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(isAborted ? -1 : totalDiscoveredTestCount, isAborted)
                 {
                     FullyDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
                     PartiallyDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
@@ -212,7 +221,7 @@ public class DiscoveryManager : IDiscoveryManager
         if (_testDiscoveryEventsHandler != null)
         {
             _testDiscoveryEventsHandler.HandleDiscoveredTests(testCases);
-            _discoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases(testCases, isComplete: false, ref _previousSource);
+            _previousSource = _discoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases(_previousSource, testCases);
         }
         else
         {

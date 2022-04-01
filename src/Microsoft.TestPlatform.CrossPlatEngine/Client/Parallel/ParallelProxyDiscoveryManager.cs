@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDiscoveryManager, ITestDiscoveryEventsHandler2>, IParallelProxyDiscoveryManager
 {
     private readonly IDataSerializer _dataSerializer;
-    private readonly ParallelDiscoveryDataAggregator _dataAggregator;
+    private readonly DiscoveryDataAggregator _dataAggregator;
     private readonly IRequestData _requestData;
 
     private int _discoveryCompletedClients;
@@ -40,12 +40,12 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     /// </summary>
     private readonly object _discoveryStatusLockObject = new();
 
-    public ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, ParallelDiscoveryDataAggregator dataAggregator, int parallelLevel, bool sharedHosts)
+    public ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, DiscoveryDataAggregator dataAggregator, int parallelLevel, bool sharedHosts)
         : this(requestData, actualProxyManagerCreator, dataAggregator, JsonDataSerializer.Instance, parallelLevel, sharedHosts)
     {
     }
 
-    internal ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, ParallelDiscoveryDataAggregator dataAggregator, IDataSerializer dataSerializer, int parallelLevel, bool sharedHosts)
+    internal ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, DiscoveryDataAggregator dataAggregator, IDataSerializer dataSerializer, int parallelLevel, bool sharedHosts)
         : base(actualProxyManagerCreator, parallelLevel, sharedHosts)
     {
         _requestData = requestData;

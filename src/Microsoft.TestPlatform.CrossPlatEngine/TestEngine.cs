@@ -90,7 +90,7 @@ public class TestEngine : ITestEngine
         // and so the first manager replying with the discovery complete (aborted) event arg will cause the parallel
         // discovery manager to publish its current state. But doing so we are losing the collected state of all the
         // other managers.
-        var discoveryDataAggregator = new ParallelDiscoveryDataAggregator();
+        var discoveryDataAggregator = new DiscoveryDataAggregator();
         Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = () =>
         {
             var hostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);

@@ -65,44 +65,54 @@ internal class Program
 
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
     {
-        public PlaygroundTestDiscoveryHandler()
-        {
-        }
+        private int _testCasesCount;
 
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
-            Console.WriteLine($"[DISCOVERY.PROGRESS]: {WriteTests(discoveredTestCases)}");
+            Console.WriteLine($"[DISCOVERY.PROGRESS]");
+            Console.WriteLine(WriteTests(discoveredTestCases));
+            _testCasesCount += discoveredTestCases.Count();
         }
 
         public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
         {
-            Console.WriteLine($"[DISCOVERY.COMPLETE]: aborted? {isAborted}, tests count: {totalTests}" +
-                $"lastChunk: {WriteTests(lastChunk)}");
+            Console.WriteLine($"[DISCOVERY.COMPLETE] aborted? {isAborted}, tests count: {totalTests}");
+            Console.WriteLine("Last chunk:");
+            Console.WriteLine(WriteTests(lastChunk));
         }
 
         public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
-            Console.WriteLine($"[DISCOVERY.COMPLETE]: aborted? {discoveryCompleteEventArgs.IsAborted}, tests count: {discoveryCompleteEventArgs.TotalCount}" +
-                $"lastChunk: {WriteTests(lastChunk)}" +
-                $"fully: {discoveryCompleteEventArgs.FullyDiscoveredSources}" +
-                $"partially: {discoveryCompleteEventArgs.PartiallyDiscoveredSources}" +
-                $"not: {discoveryCompleteEventArgs.NotDiscoveredSources}");
+            Console.WriteLine($"[DISCOVERY.COMPLETE] aborted? {discoveryCompleteEventArgs.IsAborted}, tests count: {discoveryCompleteEventArgs.TotalCount}, discovered count: {_testCasesCount}");
+            Console.WriteLine("Last chunk:");
+            Console.WriteLine(WriteTests(lastChunk));
+            Console.WriteLine("Fully discovered:");
+            Console.WriteLine(WriteSources(discoveryCompleteEventArgs.FullyDiscoveredSources));
+            Console.WriteLine("Partially discovered:");
+            Console.WriteLine(WriteSources(discoveryCompleteEventArgs.PartiallyDiscoveredSources));
+            Console.WriteLine("Not discovered:");
+            Console.WriteLine(WriteSources(discoveryCompleteEventArgs.NotDiscoveredSources));
         }
 
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            Console.WriteLine($"[DISCOVERY.{level.ToString().ToUpper()}]: {message}");
+            Console.WriteLine($"[DISCOVERY.{level.ToString().ToUpper()}] {message}");
         }
 
         public void HandleRawMessage(string rawMessage)
         {
-            Console.WriteLine($"[DISCOVERY.MESSAGE]: {rawMessage}");
+            Console.WriteLine($"[DISCOVERY.MESSAGE] {rawMessage}");
         }
 
         private static string WriteTests(IEnumerable<TestCase> testCases)
-        {
-            return testCases == null ? null : "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName));
-        }
+            => testCases?.Any() == true
+                ? "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName))
+                : "\t<empty>";
+
+        private static string WriteSources(IEnumerable<string> sources)
+            => sources?.Any() == true
+                ? "\t" + string.Join("\n\t", sources)
+                : "\t<empty>";
     }
 
     public class TestRunHandler : ITestRunEventsHandler
@@ -124,12 +134,14 @@ internal class Program
 
         public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
         {
-            Console.WriteLine($"[RUN.COMPLETE]: err: {testRunCompleteArgs.Error}, lastChunk: {WriteTests(lastChunkArgs?.NewTestResults)}");
+            Console.WriteLine($"[RUN.COMPLETE]: err: {testRunCompleteArgs.Error}, lastChunk:");
+            Console.WriteLine(WriteTests(lastChunkArgs?.NewTestResults));
         }
 
         public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
         {
-            Console.WriteLine($"[RUN.PROGRESS - NEW RESULTS]: {WriteTests(testRunChangedArgs.NewTestResults)}");
+            Console.WriteLine($"[RUN.PROGRESS]");
+            Console.WriteLine(WriteTests(testRunChangedArgs.NewTestResults));
         }
 
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
@@ -138,14 +150,12 @@ internal class Program
         }
 
         private static string WriteTests(IEnumerable<TestResult> testResults)
-        {
-            return WriteTests(testResults?.Select(t => t.TestCase));
-        }
+            => WriteTests(testResults?.Select(t => t.TestCase));
 
         private static string WriteTests(IEnumerable<TestCase> testCases)
-        {
-            return testCases == null ? null : "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName));
-        }
+            => testCases?.Any() == true
+                ? "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName))
+                : "\t<empty>";
     }
 
     internal class DebuggerTestHostLauncher : ITestHostLauncher2
