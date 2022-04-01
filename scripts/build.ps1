@@ -51,7 +51,7 @@ Param(
     [Switch] $Force,
 
     [Alias("s")]
-    [String[]] $Steps = @("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "PrepareAcceptanceTests")
+    [String[]] $Steps = @("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "Pack", "PrepareAcceptanceTests")
 )
 
 $ErrorActionPreference = 'Stop'
@@ -1276,6 +1276,9 @@ if ($Force -or $Steps -contains "Build") {
 
 if ($Force -or $Steps -contains "Publish") {
     Publish-Package
+}
+
+if ($Force -or $Steps -contains "Pack") { 
     Create-VsixPackage
     Create-NugetPackages
 }

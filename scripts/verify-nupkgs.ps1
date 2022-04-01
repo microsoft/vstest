@@ -58,7 +58,7 @@ function Verify-Nuget-Packages($packageDirectory, $version)
 
         # Don't remove the directories after you unpacked them
         # they are useful for reviewing what is in the package.
-        # Remove-Item -Force -Recurse $unzipNugetPackageDir | Out-Null
+        Remove-Item -Force -Recurse $unzipNugetPackageDir | Out-Null
     }
 
     Write-Log "Completed Verify-Nuget-Packages."
