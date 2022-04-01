@@ -53,7 +53,14 @@
   <ItemGroup>
     <PackageReference Condition=" '$(OS)' != 'Windows_NT' " Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="All" />
   </ItemGroup>
-  
+
+  <ItemGroup Condition=" '$(UseBannedApiAnalyzers)' == 'true' ">
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="$(RoslynBannedApiAnalyzersVersion)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
   <!-- Include PublicApi analyzers into all projects that are in our src directory, this can't use TestProject == true
   because some projects in test and playground are not tests, but we don't want to analyze those for public apis, because
   we don't ship them.

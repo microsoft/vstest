@@ -85,7 +85,7 @@ internal class AssemblyResolver : IDisposable
     /// </returns>
     private Assembly OnResolve(object sender, AssemblyResolveEventArgs args)
     {
-        if (string.IsNullOrEmpty(args?.Name))
+        if (StringUtils.IsNullOrEmpty(args?.Name))
         {
             Debug.Fail("AssemblyResolver.OnResolve: args.Name is null or empty.");
             return null;
@@ -122,11 +122,11 @@ internal class AssemblyResolver : IDisposable
                 return null;
             }
 
-            Debug.Assert(requestedName != null && !string.IsNullOrEmpty(requestedName.Name), "AssemblyResolver.OnResolve: requested is null or name is empty!");
+            TPDebug.Assert(requestedName != null && !requestedName.Name.IsNullOrEmpty(), "AssemblyResolver.OnResolve: requested is null or name is empty!");
 
             foreach (var dir in _searchDirectories)
             {
-                if (string.IsNullOrEmpty(dir))
+                if (dir.IsNullOrEmpty())
                 {
                     continue;
                 }
@@ -196,8 +196,8 @@ internal class AssemblyResolver : IDisposable
     /// </returns>
     private bool RequestedAssemblyNameMatchesFound(AssemblyName requestedName, AssemblyName foundName)
     {
-        Debug.Assert(requestedName != null);
-        Debug.Assert(foundName != null);
+        TPDebug.Assert(requestedName != null);
+        TPDebug.Assert(foundName != null);
 
         var requestedPublicKey = requestedName.GetPublicKeyToken();
         if (requestedPublicKey != null)

@@ -204,7 +204,7 @@ internal class TestPluginManager
         var testPlugins = TestPluginManager.GetValuesFromDictionary(testPluginInfo);
         foreach (var plugin in testPlugins)
         {
-            if (!string.IsNullOrEmpty(plugin.IdentifierData))
+            if (!plugin.IdentifierData.IsNullOrEmpty())
             {
                 var testExtension = new LazyExtension<TExtension, IMetadata>(plugin, typeof(TMetadata));
                 filteredExtensions.Add(testExtension);

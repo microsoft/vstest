@@ -79,7 +79,7 @@ public class TempDirectory : IDisposable
     {
         var destination = IO.Path.Combine(Path, IO.Path.GetFileName(filePath));
         File.Copy(filePath, destination);
-        return destination; 
+        return destination;
     }
 
     /// <summary>

@@ -43,7 +43,7 @@ public static class RunSettingsUtilities
         string resultsDirectory = null;
         if (runConfiguration != null)
         {
-            // It will try to get path from runsettings, if not found then it will return default path. 
+            // It will try to get path from runsettings, if not found then it will return default path.
             resultsDirectory = Environment.ExpandEnvironmentVariables(runConfiguration.ResultsDirectory);
         }
 
@@ -77,7 +77,7 @@ public static class RunSettingsUtilities
         string solutionDirectory = null;
         if (runConfiguration != null)
         {
-            if (!string.IsNullOrEmpty(runConfiguration.SolutionDirectory))
+            if (!runConfiguration.SolutionDirectory.IsNullOrEmpty())
             {
                 // Env var is expanded in run configuration
                 solutionDirectory = runConfiguration.SolutionDirectory;
@@ -96,7 +96,7 @@ public static class RunSettingsUtilities
     {
         int cpuCount = Constants.DefaultCpuCount;
 
-        if (string.IsNullOrEmpty(settingXml))
+        if (settingXml.IsNullOrEmpty())
         {
             return cpuCount;
         }
