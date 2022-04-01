@@ -7,17 +7,14 @@ using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter;
 
 [TestClass]
 public class RunContextTests
 {
-    private RunContext _runContext;
+    private readonly RunContext _runContext;
 
-    [TestInitialize]
-    public void TestInit()
+    public RunContextTests()
     {
         _runContext = new RunContext();
     }

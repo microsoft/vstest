@@ -8,17 +8,18 @@ using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.ObjectModel.PlatformTests;
 
 [TestClass]
 public class DiaSessionTests : IntegrationTestBase
 {
+#if NETFRAMEWORK
     private const string NET451 = "net451";
+#else
     private const string NETCOREAPP21 = "netcoreapp2.1";
+#endif
 
-    public static string GetAndSetTargetFrameWork(IntegrationTestEnvironment testEnvironment)
+    public static string? GetAndSetTargetFrameWork(IntegrationTestEnvironment testEnvironment)
     {
         var currentTargetFrameWork = testEnvironment.TargetFramework;
         testEnvironment.TargetFramework =
@@ -125,7 +126,7 @@ public class DiaSessionTests : IntegrationTestBase
         _testEnvironment.TargetFramework = currentTargetFrameWork;
     }
 
-    private void ValidateLineNumbers(int min, int max)
+    private static void ValidateLineNumbers(int min, int max)
     {
         // Release builds optimize code, hence min line numbers are different.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
@@ -149,7 +150,7 @@ public class DiaSessionTests : IntegrationTestBase
         }
     }
 
-    private void ValidateMinLineNumber(int expected, int actual)
+    private static void ValidateMinLineNumber(int expected, int actual)
     {
         // Release builds optimize code, hence min line numbers are different.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))

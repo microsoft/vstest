@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Xml.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,38 +17,35 @@ public class EventLogXmlWriterTests
 {
     private const string FileName = "Event Log.xml";
 
-    private readonly EventLog _eventLog;
-    private readonly EventLogEntry _eventLogEntry;
-    private readonly List<EventLogEntry> _eventLogEntries;
-    private readonly Mock<IFileHelper> _mockFileHelper;
-
-    public EventLogXmlWriterTests()
-    {
-        _eventLog = new EventLog("Application");
-        var count = _eventLog.Entries.Count;
-        _eventLogEntry = _eventLog.Entries[count - 1];
-        _eventLogEntries = new List<EventLogEntry>();
-        _mockFileHelper = new Mock<IFileHelper>();
-    }
-
     [TestMethod]
     public void WriteEventLogEntriesToXmlFileShouldWriteToXmlFile()
     {
+        var mockFileHelper = new Mock<IFileHelper>();
+        var eventLogEntries = new List<EventLogEntry>();
         EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
             FileName,
-            _eventLogEntries,
-            _mockFileHelper.Object);
+            eventLogEntries,
+            mockFileHelper.Object);
 
-        _mockFileHelper.Verify(x => x.WriteAllTextToFile(FileName, It.IsAny<string>()), Times.Once);
+        mockFileHelper.Verify(x => x.WriteAllTextToFile(FileName, It.IsAny<string>()), Times.Once);
     }
 
     [TestMethod]
     public void WriteEventLogEntriesToXmlFileShouldWriteLogEntryIfPresent()
     {
-        _eventLogEntries.Add(_eventLogEntry);
+        var eventLog = new EventLog("Application");
+        var eventLogEntry = eventLog.Entries[eventLog.Entries.Count - 1];
+        var eventLogEntries = new List<EventLogEntry> { eventLogEntry };
 
-        EventLogXmlWriter.WriteEventLogEntriesToXmlFile(FileName, _eventLogEntries, _mockFileHelper.Object);
+        var mockFileHelper = new Mock<IFileHelper>();
+        EventLogXmlWriter.WriteEventLogEntriesToXmlFile(FileName, eventLogEntries, mockFileHelper.Object);
 
-        _mockFileHelper.Verify(x => x.WriteAllTextToFile(FileName, It.Is<string>(str => str.Contains(_eventLogEntry.Message))));
+        // Serialize the message in case it contains any special character such as <, >, &, which the XML writer would escape
+        // because otherwise the raw message and the message used to call WriteAllTextToFile won't match. E.g.
+        // api-version=2020-07-01&format=json in raw message, becomes
+        // api-version=2020-07-01&amp;format=json in the xml file.
+        var serializedMessage = new XElement("t", eventLogEntry.Message).LastNode.ToString();
+
+        mockFileHelper.Verify(x => x.WriteAllTextToFile(FileName, It.Is<string>(str => str.Contains(serializedMessage))));
     }
 }

@@ -8,18 +8,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using vstest.console.UnitTests.Processors;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 [TestClass]
 public class FrameworkArgumentProcessorTests
 {
-    private FrameworkArgumentExecutor _executor;
-    private TestableRunSettingsProvider _runSettingsProvider;
+    private readonly FrameworkArgumentExecutor _executor;
+    private readonly TestableRunSettingsProvider _runSettingsProvider;
 
-    [TestInitialize]
-    public void Init()
+    public FrameworkArgumentProcessorTests()
     {
         _runSettingsProvider = new TestableRunSettingsProvider();
         _executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance, _runSettingsProvider);

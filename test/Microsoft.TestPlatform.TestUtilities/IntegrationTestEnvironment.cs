@@ -8,8 +8,6 @@ using System.Xml;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.TestUtilities;
 
 /// <summary>
@@ -23,20 +21,20 @@ public class IntegrationTestEnvironment
         Environment.GetEnvironmentVariable("TP_ROOT_DIR")
         ?? Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
 
-    private static Dictionary<string, string> s_dependencyVersions;
+    private static Dictionary<string, string>? s_dependencyVersions;
 
-    private string _targetRuntime;
+    private string? _targetRuntime;
 
     public IntegrationTestEnvironment()
     {
         // If the variables are not set, valid defaults are assumed.
-        if (string.IsNullOrEmpty(TargetFramework))
+        if (TargetFramework.IsNullOrEmpty())
         {
             // Run integration tests for net451 by default.
             TargetFramework = "net451";
         }
 
-        if (string.IsNullOrEmpty(TestPlatformRootDirectory))
+        if (TestPlatformRootDirectory.IsNullOrEmpty())
         {
             // Running in VS/IDE. Use artifacts directory as root.
             // Get root directory from test assembly output directory
@@ -74,11 +72,7 @@ public class IntegrationTestEnvironment
     /// <summary>
     /// Gets the nuget packages directory for enlistment.
     /// </summary>
-    public string PackageDirectory
-    {
-        get;
-        private set;
-    }
+    public string PackageDirectory { get; private set; }
 
     /// <summary>
     /// Gets the publish directory for <c>vstest.console</c> package.
@@ -95,7 +89,7 @@ public class IntegrationTestEnvironment
                 "artifacts",
                 BuildConfiguration,
                 RunnerFramework,
-                TargetRuntime);
+                TargetRuntime!);
 
             return !Directory.Exists(publishDirectory)
                 ? throw new InvalidOperationException($"Path '{publishDirectory}' does not exist, did you build the solution via build.cmd?")
@@ -112,23 +106,19 @@ public class IntegrationTestEnvironment
     /// Gets the target framework.
     /// Supported values = <c>net451</c>, <c>netcoreapp1.0</c>.
     /// </summary>
-    public string TargetFramework
-    {
-        get;
-        set;
-    }
+    public string? TargetFramework { get; set; }
 
     /// <summary>
     /// Gets the target runtime.
     /// Supported values = <c>win7-x64</c>.
     /// </summary>
-    public string TargetRuntime
+    public string? TargetRuntime
     {
         get
         {
             if (RunnerFramework == IntegrationTestBase.DesktopRunnerFramework)
             {
-                if (string.IsNullOrEmpty(_targetRuntime))
+                if (_targetRuntime.IsNullOrEmpty())
                 {
                     _targetRuntime = "win7-x64";
                 }
@@ -150,51 +140,33 @@ public class IntegrationTestEnvironment
     /// Gets the inIsolation.
     /// Supported values = <c>/InIsolation</c>.
     /// </summary>
-    public string InIsolationValue
-    {
-        get; set;
-    }
+    public string? InIsolationValue { get; set; }
 
     /// <summary>
     /// Gets the root directory for test assets.
     /// </summary>
-    public string TestAssetsPath
-    {
-        get;
-    }
+    public string TestAssetsPath { get; }
 
     /// <summary>
     /// Gets the tools directory for dependent tools
     /// </summary>
-    public string ToolsDirectory
-    {
-        get;
-        private set;
-    }
+    public string ToolsDirectory { get; private set; }
 
     /// <summary>
     /// Gets the test artifacts directory.
     /// </summary>
-    public string TestArtifactsDirectory
-    {
-        get;
-        private set;
-    }
+    public string TestArtifactsDirectory { get; private set; }
 
     /// <summary>
     /// Gets the application type.
     /// Supported values = <c>net451</c>, <c>netcoreapp1.0</c>.
     /// </summary>
-    public string RunnerFramework
-    {
-        get;
-        set;
-    }
+    public string RunnerFramework { get; set; }
 
     // A known AzureDevOps env variable meaning we are running in CI.
     public static bool IsCI { get; } = Environment.GetEnvironmentVariable("TF_BUILD") == "True";
-    public DebugInfo DebugInfo { get; set; }
-    public VSTestConsoleInfo VSTestConsoleInfo { get; set; }
+    public DebugInfo? DebugInfo { get; set; }
+    public VSTestConsoleInfo? VSTestConsoleInfo { get; set; }
     public List<DllInfo> DllInfos { get; set; } = new();
 
     /// <summary>
@@ -211,7 +183,7 @@ public class IntegrationTestEnvironment
     /// </remarks>
     public string GetTestAsset(string assetName)
     {
-        return GetTestAsset(assetName, TargetFramework);
+        return GetTestAsset(assetName, TargetFramework!);
     }
 
     /// <summary>
@@ -286,7 +258,7 @@ public class IntegrationTestEnvironment
             props.Read();   // Read thru the PropertyGroup node
             while (!props.EOF)
             {
-                if (props.IsStartElement() && !string.IsNullOrEmpty(props.Name))
+                if (props.IsStartElement() && !props.Name.IsNullOrEmpty())
                 {
                     if (!dependencyProps.ContainsKey(props.Name))
                     {

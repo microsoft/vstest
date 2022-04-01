@@ -29,9 +29,8 @@ using Moq;
 using vstest.console.Internal;
 using vstest.console.UnitTests.Processors;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
+
 // <summary>
 // Tests for ListTestsArgumentProcessor
 // </summary>
@@ -49,7 +48,7 @@ public class ListTestsArgumentProcessorTests
     private readonly Mock<ITestRunAttachmentsProcessingManager> _mockAttachmentsProcessingManager;
     private readonly Mock<IEnvironment> _mockEnvironment;
 
-    private static ListTestsArgumentExecutor GetExecutor(ITestRequestManager testRequestManager, IOutput output)
+    private static ListTestsArgumentExecutor GetExecutor(ITestRequestManager testRequestManager, IOutput? output)
     {
         var runSettingsProvider = new TestableRunSettingsProvider();
 

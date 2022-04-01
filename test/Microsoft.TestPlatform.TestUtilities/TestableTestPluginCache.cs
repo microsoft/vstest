@@ -7,13 +7,12 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.TestUtilities;
 
 public class TestableTestPluginCache : TestPluginCache
 {
-    public Action Action;
+    public Action? Action;
+
     public TestableTestPluginCache(List<string> extensionsPath)
     {
         TestDiscoveryExtensionManager.Destroy();

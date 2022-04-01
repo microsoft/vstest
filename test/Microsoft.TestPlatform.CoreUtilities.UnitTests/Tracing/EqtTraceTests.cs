@@ -1,35 +1,23 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
+using System;
 #if NETFRAMEWORK
 using System.Diagnostics;
 #endif
-using System;
 using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-/* Unmerged change from project 'Microsoft.TestPlatform.CoreUtilities.UnitTests (net451)'
-Before:
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using System;
-After:
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-using System;
-*/
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-#nullable disable
 
 namespace TestPlatform.CoreUtilities.UnitTests;
 
 [TestClass]
 public class EqtTraceTests
 {
-    private static string s_dirPath;
-    private static string s_logFile;
+    private static string? s_dirPath;
+    private static string? s_logFile;
 
     [ClassInitialize]
     public static void Init(TestContext _)
@@ -177,12 +165,12 @@ public class EqtTraceTests
         Assert.IsFalse(ReadLogFile().Contains("Dummy Info Message: TraceShouldNotWriteIfDoNotInitializationIsSetToTrue"), "Did not expect Dummy Info message");
     }
 
-    private string ReadLogFile()
+    private static string ReadLogFile()
     {
-        string log = null;
+        string? log = null;
         try
         {
-            using var fs = new FileStream(s_logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var fs = new FileStream(s_logFile!, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             using var sr = new StreamReader(fs);
             log = sr.ReadToEnd();
         }
@@ -191,6 +179,7 @@ public class EqtTraceTests
             Console.WriteLine(ex.Message);
         }
 
+        Assert.IsNotNull(log);
         return log;
     }
 }

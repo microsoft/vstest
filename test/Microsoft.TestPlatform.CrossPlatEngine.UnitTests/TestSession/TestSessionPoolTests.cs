@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestSession;
 
 [TestClass]
@@ -28,6 +26,7 @@ public class TestSessionPoolTests
             1,
             () => null);
 
+        Assert.IsNotNull(TestSessionPool.Instance);
         Assert.IsTrue(TestSessionPool.Instance.AddSession(testSessionInfo, proxyTestSessionManager));
         Assert.IsFalse(TestSessionPool.Instance.AddSession(testSessionInfo, proxyTestSessionManager));
     }
@@ -41,13 +40,14 @@ public class TestSessionPoolTests
         var mockProxyTestSessionManager = new Mock<ProxyTestSessionManager>(
             new StartTestSessionCriteria(),
             1,
-            (Func<ProxyOperationManager>)(() => null));
+            (Func<ProxyOperationManager?>)(() => null));
         var mockRequestData = new Mock<IRequestData>();
 
         mockProxyTestSessionManager.SetupSequence(tsm => tsm.StopSession(It.IsAny<IRequestData>()))
             .Returns(true)
             .Returns(false);
 
+        Assert.IsNotNull(TestSessionPool.Instance);
         Assert.IsFalse(TestSessionPool.Instance.KillSession(testSessionInfo, mockRequestData.Object));
         mockProxyTestSessionManager.Verify(tsm => tsm.StopSession(It.IsAny<IRequestData>()), Times.Never);
 
@@ -69,12 +69,13 @@ public class TestSessionPoolTests
         var mockProxyTestSessionManager = new Mock<ProxyTestSessionManager>(
             new StartTestSessionCriteria(),
             1,
-            (Func<ProxyOperationManager>)(() => null));
+            (Func<ProxyOperationManager?>)(() => null));
 
         mockProxyTestSessionManager.SetupSequence(tsm => tsm.DequeueProxy(It.IsAny<string>(), It.IsAny<string>()))
             .Throws(new InvalidOperationException("Test Exception"))
             .Returns(new ProxyOperationManager(null, null, null));
 
+        Assert.IsNotNull(TestSessionPool.Instance);
         // Take proxy fails because test session is invalid.
         Assert.IsNull(TestSessionPool.Instance.TryTakeProxy(new TestSessionInfo(), string.Empty, string.Empty));
         mockProxyTestSessionManager.Verify(tsm => tsm.DequeueProxy(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
@@ -99,13 +100,14 @@ public class TestSessionPoolTests
         var mockProxyTestSessionManager = new Mock<ProxyTestSessionManager>(
             new StartTestSessionCriteria(),
             1,
-            (Func<ProxyOperationManager>)(() => null));
+            (Func<ProxyOperationManager?>)(() => null));
 
         mockProxyTestSessionManager.SetupSequence(tsm => tsm.EnqueueProxy(It.IsAny<int>()))
             .Throws(new ArgumentException("Test Exception"))
             .Throws(new InvalidOperationException("Test Exception"))
             .Returns(true);
 
+        Assert.IsNotNull(TestSessionPool.Instance);
         Assert.IsFalse(TestSessionPool.Instance.ReturnProxy(new TestSessionInfo(), 0));
         mockProxyTestSessionManager.Verify(tsm => tsm.EnqueueProxy(It.IsAny<int>()), Times.Never);
 

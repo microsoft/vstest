@@ -7,8 +7,6 @@ using System.Xml.Serialization;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 
 [TestClass]
@@ -28,10 +26,10 @@ public class RunSettingsTests
         {
         }
 
-        public override XmlElement ToXml()
+        public override XmlElement? ToXml()
         {
             var document = new XmlDocument();
-            using (XmlWriter writer = document.CreateNavigator().AppendChild())
+            using (XmlWriter writer = document.CreateNavigator()!.AppendChild())
             {
                 new XmlSerializer(typeof(ChildRunSettings)).Serialize(writer, this);
             }

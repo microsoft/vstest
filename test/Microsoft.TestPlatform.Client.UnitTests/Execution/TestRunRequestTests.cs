@@ -21,17 +21,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution;
 
 [TestClass]
 public class TestRunRequestTests
 {
-    TestRunRequest _testRunRequest;
-    Mock<IProxyExecutionManager> _executionManager;
+    private TestRunRequest _testRunRequest;
+    private Mock<IProxyExecutionManager> _executionManager;
     private readonly Mock<ITestLoggerManager> _loggerManager;
-    TestRunCriteria _testRunCriteria;
+    private TestRunCriteria _testRunCriteria;
     private readonly Mock<IRequestData> _mockRequestData;
 
     private readonly Mock<IDataSerializer> _mockDataSerializer;
@@ -89,7 +87,7 @@ public class TestRunRequestTests
         }
         catch (Exception ex)
         {
-            Assert.IsTrue(ex is Exception);
+            Assert.IsTrue(ex is not null);
             Assert.AreEqual("DummyException", ex.Message);
             Assert.AreEqual(TestRunState.Pending, _testRunRequest.State);
         }
@@ -173,9 +171,9 @@ public class TestRunRequestTests
             .Setup(s => s.SerializePayload(It.IsAny<string>(), It.IsAny<Object>()))
             .Returns("non-empty rawMessage");
 
-        _testRunRequest.TestRunMessage += (object sender, TestRunMessageEventArgs e) => handleLogMessageCalled = true;
+        _testRunRequest.TestRunMessage += (object? sender, TestRunMessageEventArgs e) => handleLogMessageCalled = true;
 
-        _testRunRequest.OnRawMessageReceived += (object sender, string message) => handleRawMessageCalled = true;
+        _testRunRequest.OnRawMessageReceived += (object? sender, string message) => handleRawMessageCalled = true;
 
         _testRunRequest.OnTestSessionTimeout(null);
 
@@ -254,9 +252,9 @@ public class TestRunRequestTests
                 "A")
         };
         var testRunChangedEventArgs = new TestRunChangedEventArgs(mockStats.Object, testResults, activeTestCases);
-        TestRunChangedEventArgs receivedArgs = null;
+        TestRunChangedEventArgs? receivedArgs = null;
 
-        _testRunRequest.OnRunStatsChange += (object sender, TestRunChangedEventArgs e) => receivedArgs = e;
+        _testRunRequest.OnRunStatsChange += (object? sender, TestRunChangedEventArgs e) => receivedArgs = e;
 
         // Act.
         _testRunRequest.HandleTestRunStatsChange(testRunChangedEventArgs);
@@ -274,7 +272,7 @@ public class TestRunRequestTests
     public void HandleRawMessageShouldCallOnRawMessageReceived()
     {
         string rawMessage = "HelloWorld";
-        string messageReceived = null;
+        string? messageReceived = null;
 
         // Call should NOT fail even if on raw message received is not registered.
         _testRunRequest.HandleRawMessage(rawMessage);
@@ -293,7 +291,7 @@ public class TestRunRequestTests
     {
         bool onDiscoveryCompleteInvoked = true;
         _mockRequestData.Setup(x => x.IsTelemetryOptedIn).Returns(true);
-        _testRunRequest.OnRawMessageReceived += (object sender, string e) => onDiscoveryCompleteInvoked = true;
+        _testRunRequest.OnRawMessageReceived += (object? sender, string e) => onDiscoveryCompleteInvoked = true;
 
         _mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
             .Returns(new Message() { MessageType = MessageType.ExecutionComplete });

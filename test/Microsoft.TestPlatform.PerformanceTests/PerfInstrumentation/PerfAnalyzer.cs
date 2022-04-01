@@ -11,8 +11,6 @@ using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 
 /// <summary>
@@ -192,9 +190,9 @@ public class PerfAnalyzer
     }
 
 
-    private string GetEventKey(string taskName)
+    private string? GetEventKey(string taskName)
     {
-        string key = null;
+        string? key = null;
 
         key = _testPlatformTaskMap.Keys.FirstOrDefault(k => k.Split('_')[2].Equals(taskName));
 

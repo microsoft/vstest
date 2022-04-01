@@ -18,17 +18,14 @@ using Moq;
 
 using vstest.console.UnitTests.Processors;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 [TestClass]
 public class RunSettingsArgumentProcessorTests
 {
-    private TestableRunSettingsProvider _settingsProvider;
+    private readonly TestableRunSettingsProvider _settingsProvider;
 
-    [TestInitialize]
-    public void Init()
+    public RunSettingsArgumentProcessorTests()
     {
         _settingsProvider = new TestableRunSettingsProvider();
     }
@@ -326,7 +323,7 @@ public class RunSettingsArgumentProcessorTests
             null);
 
         executor.Initialize(runsettingsFile);
-        Assert.IsTrue(_settingsProvider.ActiveRunSettings.SettingsXml.Contains(@"C:\新しいフォルダー"));
+        Assert.IsTrue(_settingsProvider.ActiveRunSettings!.SettingsXml.Contains(@"C:\新しいフォルダー"));
         File.Delete(runsettingsFile);
     }
 
@@ -412,12 +409,12 @@ public class RunSettingsArgumentProcessorTests
 
     private class TestableRunSettingsArgumentExecutor : RunSettingsArgumentExecutor
     {
-        private readonly string _runSettingsString;
+        private readonly string? _runSettingsString;
 
         internal TestableRunSettingsArgumentExecutor(
             CommandLineOptions commandLineOptions,
             IRunSettingsProvider runSettingsManager,
-            string runSettings)
+            string? runSettings)
             : base(commandLineOptions, runSettingsManager)
 
         {

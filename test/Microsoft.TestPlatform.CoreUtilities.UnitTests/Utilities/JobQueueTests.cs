@@ -8,8 +8,6 @@ using System.Threading;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.CoreUtilities.UnitTests;
 
 [TestClass]
@@ -18,7 +16,7 @@ public class JobQueueTests
     [TestMethod]
     public void ConstructorThrowsWhenNullProcessHandlerIsProvided()
     {
-        JobQueue<string> jobQueue = null;
+        JobQueue<string>? jobQueue = null;
         Assert.ThrowsException<ArgumentNullException>(() => jobQueue = new JobQueue<string>(null, "dp", int.MaxValue, int.MaxValue, false, (message) => { }));
 
         if (jobQueue != null)
@@ -30,7 +28,7 @@ public class JobQueueTests
     [TestMethod]
     public void ThrowsWhenNullEmptyOrWhiteSpaceDisplayNameIsProvided()
     {
-        JobQueue<string> jobQueue = null;
+        JobQueue<string>? jobQueue = null;
         Assert.ThrowsException<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), null, int.MaxValue, int.MaxValue, false, (message) => { }));
         Assert.ThrowsException<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "", int.MaxValue, int.MaxValue, false, (message) => { }));
         Assert.ThrowsException<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "    ", int.MaxValue, int.MaxValue, false, (message) => { }));

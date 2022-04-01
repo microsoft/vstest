@@ -4,9 +4,8 @@
 using System;
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace TestClasses;
+
 #pragma warning disable IDE0060 // Remove unused parameter
 #pragma warning disable CA1822 // Mark members as static
 internal class Outer

@@ -8,8 +8,6 @@ using Microsoft.TestPlatform.Build.Tasks;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Build.UnitTests;
 
 [TestClass]

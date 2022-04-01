@@ -14,8 +14,6 @@ using Moq;
 
 using vstest.console.Internal;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine;
 
 [TestClass]

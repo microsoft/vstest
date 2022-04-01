@@ -8,21 +8,16 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
 
 [TestClass]
 public class InProcDataCollectionSinkTests
 {
-    private IDataCollectionSink _dataCollectionSink;
+    private readonly IDataCollectionSink _dataCollectionSink;
+    private readonly DataCollectionContext _dataCollectionContext;
+    private readonly TestCase _testCase;
 
-    private DataCollectionContext _dataCollectionContext;
-
-    private TestCase _testCase;
-
-    [TestInitialize]
-    public void InitializeTest()
+    public InProcDataCollectionSinkTests()
     {
         _dataCollectionSink = new InProcDataCollectionSink();
         _testCase = new TestCase("DummyNS.DummyC.DummyM", new Uri("executor://mstest/v1"), "Dummy.dll");

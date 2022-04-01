@@ -13,8 +13,6 @@ using System.Xml.Linq;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace testhost.UnitTests;
 
 [TestClass]
@@ -69,7 +67,7 @@ public class AppDomainEngineInvokerTests
         Assert.IsNotNull(newAppDomain, "New AppDomain must be created.");
         Assert.IsNotNull(appDomainInvoker.ActualInvoker, "Invoker must be created.");
         Assert.AreNotEqual(AppDomain.CurrentDomain.FriendlyName,
-            (appDomainInvoker.ActualInvoker as MockEngineInvoker).DomainFriendlyName,
+            (appDomainInvoker.ActualInvoker as MockEngineInvoker)?.DomainFriendlyName,
             "Engine must be invoked in new domain.");
 
         Assert.AreEqual(newAppDomain.SetupInformation.ConfigurationFile, AppDomain.CurrentDomain.SetupInformation.ConfigurationFile,
@@ -221,9 +219,9 @@ public class AppDomainEngineInvokerTests
 
     private class MockEngineInvoker : MarshalByRefObject, IEngineInvoker
     {
-        public string DomainFriendlyName { get; private set; }
+        public string DomainFriendlyName { get; private set; } = "";
 
-        public void Invoke(IDictionary<string, string> argsDictionary)
+        public void Invoke(IDictionary<string, string?> argsDictionary)
         {
             DomainFriendlyName = AppDomain.CurrentDomain.FriendlyName;
         }

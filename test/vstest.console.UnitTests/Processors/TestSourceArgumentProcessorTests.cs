@@ -13,8 +13,6 @@ using Moq;
 
 using vstest.console.Internal;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 // <summary>
 // Tests for TestSourceArgumentProcessor

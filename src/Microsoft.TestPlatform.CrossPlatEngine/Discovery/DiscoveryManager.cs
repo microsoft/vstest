@@ -165,6 +165,7 @@ public class DiscoveryManager : IDiscoveryManager
                     GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered, _sourcesWithDiscoveryStatus),
                     GetSourcesWithStatus(DiscoveryStatus.NotDiscovered, _sourcesWithDiscoveryStatus));
 
+                discoveryCompleteEventsArgs.DiscoveredExtensions = TestPluginCache.Instance.TestExtensions?.GetCachedExtensions();
                 discoveryCompleteEventsArgs.Metrics = _requestData.MetricsCollection.Metrics;
 
                 eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, lastChunk);

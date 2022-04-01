@@ -27,8 +27,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.TestHostProvider.UnitTests.Hosting;
 
 [TestClass]
@@ -37,35 +35,21 @@ public class DotnetTestHostManagerTests
     private const string DefaultDotnetPath = "c:\\tmp\\dotnet.exe";
 
     private readonly Mock<ITestHostLauncher> _mockTestHostLauncher;
-
     private readonly Mock<IProcessHelper> _mockProcessHelper;
-
     private readonly Mock<IFileHelper> _mockFileHelper;
-
     private readonly Mock<IWindowsRegistryHelper> _mockWindowsRegistry;
-
     private readonly Mock<IMessageLogger> _mockMessageLogger;
-
     private readonly Mock<IEnvironment> _mockEnvironment;
-
     private readonly Mock<IRunSettingsHelper> _mockRunsettingHelper;
-
     private readonly TestRunnerConnectionInfo _defaultConnectionInfo;
-
     private readonly string[] _testSource = { "test.dll" };
-
     private readonly string _defaultTestHostPath;
-
     private readonly TestProcessStartInfo _defaultTestProcessStartInfo;
-
     private readonly TestableDotnetTestHostManager _dotnetHostManager;
-
     private readonly Mock<IEnvironmentVariableHelper> _mockEnvironmentVariable;
 
-    private string _errorMessage;
-
+    private string? _errorMessage;
     private int _exitCode;
-
     private int _testHostId;
 
     private readonly string _temp = Path.GetTempPath();
@@ -102,7 +86,7 @@ public class DotnetTestHostManagerTests
         _mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns(DefaultDotnetPath);
         _mockProcessHelper.Setup(ph => ph.GetTestEngineDirectory()).Returns(DefaultDotnetPath);
         _mockProcessHelper.Setup(ph => ph.GetCurrentProcessArchitecture()).Returns(PlatformArchitecture.X64);
-        _mockEnvironmentVariable.Setup(ev => ev.GetEnvironmentVariable(It.IsAny<string>())).Returns(Path.GetDirectoryName(DefaultDotnetPath));
+        _mockEnvironmentVariable.Setup(ev => ev.GetEnvironmentVariable(It.IsAny<string>())).Returns(Path.GetDirectoryName(DefaultDotnetPath)!);
         _mockFileHelper.Setup(ph => ph.Exists(_defaultTestHostPath)).Returns(true);
         _mockFileHelper.Setup(ph => ph.Exists(DefaultDotnetPath)).Returns(true);
 
@@ -514,7 +498,7 @@ public class DotnetTestHostManagerTests
             dotnetExeName = "dotnet";
         }
 
-        var paths = Environment.GetEnvironmentVariable("PATH").Split(separator);
+        var paths = Environment.GetEnvironmentVariable("PATH")!.Split(separator);
 
         foreach (string path in paths)
         {
@@ -629,7 +613,7 @@ public class DotnetTestHostManagerTests
         string testhostNextToTestDll = Path.Combine(_temp, "testhost.dll");
         _mockFileHelper.Setup(ph => ph.Exists(testhostNextToTestDll)).Returns(false);
 
-        var here = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        var here = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
         var expectedTestHostPath = Path.Combine(here, "testhost.dll");
         _mockFileHelper.Setup(ph => ph.Exists(expectedTestHostPath)).Returns(true);
 
@@ -671,7 +655,7 @@ public class DotnetTestHostManagerTests
         string testhostNextToTestDll = Path.Combine(_temp, "testhost.dll");
         _mockFileHelper.Setup(ph => ph.Exists(testhostNextToTestDll)).Returns(false);
 
-        var here = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        var here = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
         var testhostNextToRunner = Path.Combine(here, "testhost.dll");
         _mockFileHelper.Setup(ph => ph.Exists(testhostNextToRunner)).Returns(true);
 
@@ -1003,13 +987,13 @@ public class DotnetTestHostManagerTests
         Assert.IsTrue(isVerified);
     }
 
-    private void DotnetHostManagerExitCodeTesterHostExited(object sender, HostProviderEventArgs e)
+    private void DotnetHostManagerExitCodeTesterHostExited(object? sender, HostProviderEventArgs e)
     {
         _errorMessage = e.Data.TrimEnd(Environment.NewLine.ToCharArray());
         _exitCode = e.ErrroCode;
     }
 
-    private void DotnetHostManagerHostExited(object sender, HostProviderEventArgs e)
+    private void DotnetHostManagerHostExited(object? sender, HostProviderEventArgs e)
     {
         if (e.ErrroCode != 0)
         {
@@ -1017,7 +1001,7 @@ public class DotnetTestHostManagerTests
         }
     }
 
-    private void DotnetHostManagerHostLaunched(object sender, HostProviderEventArgs e)
+    private void DotnetHostManagerHostLaunched(object? sender, HostProviderEventArgs e)
     {
         _testHostId = e.ProcessId;
     }

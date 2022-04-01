@@ -9,8 +9,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests;
 
 [TestClass]
@@ -18,10 +16,9 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
 public partial class ManagedNameRoundTripTests
 {
     private const BindingFlags PrivateBindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-    private Compilation _compilation;
+    private readonly Compilation _compilation;
 
-    [TestInitialize]
-    public void Initialize()
+    public ManagedNameRoundTripTests()
         => _compilation = CSharpCompilation.Create(
             "Test.dll",
             new[] { CSharpSyntaxTree.ParseText(File.ReadAllText("TestClasses.cs")) },
@@ -30,12 +27,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Simple1()
     {
-        var outer = _compilation.GetTypeByMetadataName("TestClasses.Outer");
+        var outer = _compilation.GetTypeByMetadataName("TestClasses.Outer")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer).GetMethod("Method0"),
+            methodInfo: typeof(TestClasses.Outer).GetMethod("Method0")!,
             containingTypeSymbol: outer,
-            methodSymbol: outer.FindMethod("Method0"),
+            methodSymbol: outer.FindMethod("Method0")!,
             managedTypeName: "TestClasses.Outer",
             managedMethodName: "Method0");
     }
@@ -43,12 +40,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Simple2()
     {
-        var outer = _compilation.GetTypeByMetadataName("TestClasses.Outer");
+        var outer = _compilation.GetTypeByMetadataName("TestClasses.Outer")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer).GetMethod("Method1"),
+            methodInfo: typeof(TestClasses.Outer).GetMethod("Method1")!,
             containingTypeSymbol: outer,
-            methodSymbol: outer.FindMethod("Method1"),
+            methodSymbol: outer.FindMethod("Method1")!,
             managedTypeName: "TestClasses.Outer",
             managedMethodName: "Method1(System.Int32)");
     }
@@ -56,12 +53,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Simple3()
     {
-        var outer = _compilation.GetTypeByMetadataName("TestClasses.Outer");
+        var outer = _compilation.GetTypeByMetadataName("TestClasses.Outer")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer).GetMethod("Method2"),
+            methodInfo: typeof(TestClasses.Outer).GetMethod("Method2")!,
             containingTypeSymbol: outer,
-            methodSymbol: outer.FindMethod("Method2"),
+            methodSymbol: outer.FindMethod("Method2")!,
             managedTypeName: "TestClasses.Outer",
             managedMethodName: "Method2(System.Collections.Generic.List`1<System.String>)");
     }
@@ -69,12 +66,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Simple4()
     {
-        var outer = _compilation.GetTypeByMetadataName("TestClasses.Outer");
+        var outer = _compilation.GetTypeByMetadataName("TestClasses.Outer")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer).GetMethod("Method3"),
+            methodInfo: typeof(TestClasses.Outer).GetMethod("Method3")!,
             containingTypeSymbol: outer,
-            methodSymbol: outer.FindMethod("Method3"),
+            methodSymbol: outer.FindMethod("Method3")!,
             managedTypeName: "TestClasses.Outer",
             managedMethodName: "Method3(System.String,System.Int32)");
     }
@@ -82,12 +79,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Nested1()
     {
-        var outerInner = _compilation.GetTypeByMetadataName("TestClasses.Outer+Inner");
+        var outerInner = _compilation.GetTypeByMetadataName("TestClasses.Outer+Inner")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer.Inner).GetMethod("Method0"),
+            methodInfo: typeof(TestClasses.Outer.Inner).GetMethod("Method0")!,
             containingTypeSymbol: outerInner,
-            methodSymbol: outerInner.FindMethod("Method0"),
+            methodSymbol: outerInner.FindMethod("Method0")!,
             managedTypeName: "TestClasses.Outer+Inner",
             managedMethodName: "Method0");
     }
@@ -95,12 +92,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Nested2()
     {
-        var outerInner = _compilation.GetTypeByMetadataName("TestClasses.Outer+Inner");
+        var outerInner = _compilation.GetTypeByMetadataName("TestClasses.Outer+Inner")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer.Inner).GetMethod("Method1"),
+            methodInfo: typeof(TestClasses.Outer.Inner).GetMethod("Method1")!,
             containingTypeSymbol: outerInner,
-            methodSymbol: outerInner.FindMethod("Method1"),
+            methodSymbol: outerInner.FindMethod("Method1")!,
             managedTypeName: "TestClasses.Outer+Inner",
             managedMethodName: "Method1(System.Int32)");
     }
@@ -108,12 +105,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void OpenGeneric1()
     {
-        var outerT = _compilation.GetTypeByMetadataName("TestClasses.Outer`1");
+        var outerT = _compilation.GetTypeByMetadataName("TestClasses.Outer`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<>).GetMethod("Method0"),
+            methodInfo: typeof(TestClasses.Outer<>).GetMethod("Method0")!,
             containingTypeSymbol: outerT,
-            methodSymbol: outerT.FindMethod("Method0"),
+            methodSymbol: outerT.FindMethod("Method0")!,
             managedTypeName: "TestClasses.Outer`1",
             managedMethodName: "Method0");
     }
@@ -121,12 +118,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void OpenGeneric2()
     {
-        var outerT = _compilation.GetTypeByMetadataName("TestClasses.Outer`1");
+        var outerT = _compilation.GetTypeByMetadataName("TestClasses.Outer`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<>).GetMethod("Method1"),
+            methodInfo: typeof(TestClasses.Outer<>).GetMethod("Method1")!,
             containingTypeSymbol: outerT,
-            methodSymbol: outerT.FindMethod("Method1"),
+            methodSymbol: outerT.FindMethod("Method1")!,
             managedTypeName: "TestClasses.Outer`1",
             managedMethodName: "Method1(!0)");
     }
@@ -134,12 +131,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void OpenGeneric3()
     {
-        var outerT = _compilation.GetTypeByMetadataName("TestClasses.Outer`1");
+        var outerT = _compilation.GetTypeByMetadataName("TestClasses.Outer`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<>).GetMethod("Method2"),
+            methodInfo: typeof(TestClasses.Outer<>).GetMethod("Method2")!,
             containingTypeSymbol: outerT,
-            methodSymbol: outerT.FindMethod("Method2"),
+            methodSymbol: outerT.FindMethod("Method2")!,
             managedTypeName: "TestClasses.Outer`1",
             managedMethodName: "Method2`1(!!0[])");
     }
@@ -147,12 +144,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void OpenGeneric4()
     {
-        var outerT = _compilation.GetTypeByMetadataName("TestClasses.Outer`1");
+        var outerT = _compilation.GetTypeByMetadataName("TestClasses.Outer`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<>).GetMethod("Method3"),
+            methodInfo: typeof(TestClasses.Outer<>).GetMethod("Method3")!,
             containingTypeSymbol: outerT,
-            methodSymbol: outerT.FindMethod("Method3"),
+            methodSymbol: outerT.FindMethod("Method3")!,
             managedTypeName: "TestClasses.Outer`1",
             managedMethodName: "Method3`1(!0,!!0)");
     }
@@ -160,12 +157,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void OpenGenericNested1()
     {
-        var outerTInnterV = _compilation.GetTypeByMetadataName("TestClasses.Outer`1+Inner`1");
+        var outerTInnterV = _compilation.GetTypeByMetadataName("TestClasses.Outer`1+Inner`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<>.Inner<>).GetMethod("Method0"),
+            methodInfo: typeof(TestClasses.Outer<>.Inner<>).GetMethod("Method0")!,
             containingTypeSymbol: outerTInnterV,
-            methodSymbol: outerTInnterV.FindMethod("Method0"),
+            methodSymbol: outerTInnterV.FindMethod("Method0")!,
             managedTypeName: "TestClasses.Outer`1+Inner`1",
             managedMethodName: "Method0");
     }
@@ -173,12 +170,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void OpenGenericNested2()
     {
-        var outerTInnterV = _compilation.GetTypeByMetadataName("TestClasses.Outer`1+Inner`1");
+        var outerTInnterV = _compilation.GetTypeByMetadataName("TestClasses.Outer`1+Inner`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<>.Inner<>).GetMethod("Method1"),
+            methodInfo: typeof(TestClasses.Outer<>.Inner<>).GetMethod("Method1")!,
             containingTypeSymbol: outerTInnterV,
-            methodSymbol: outerTInnterV.FindMethod("Method1"),
+            methodSymbol: outerTInnterV.FindMethod("Method1")!,
             managedTypeName: "TestClasses.Outer`1+Inner`1",
             managedMethodName: "Method1(!0)");
     }
@@ -186,12 +183,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void OpenGenericNested3()
     {
-        var outerTInnterV = _compilation.GetTypeByMetadataName("TestClasses.Outer`1+Inner`1");
+        var outerTInnterV = _compilation.GetTypeByMetadataName("TestClasses.Outer`1+Inner`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<>.Inner<>).GetMethod("Method2"),
+            methodInfo: typeof(TestClasses.Outer<>.Inner<>).GetMethod("Method2")!,
             containingTypeSymbol: outerTInnterV,
-            methodSymbol: outerTInnterV.FindMethod("Method2"),
+            methodSymbol: outerTInnterV.FindMethod("Method2")!,
             managedTypeName: "TestClasses.Outer`1+Inner`1",
             managedMethodName: "Method2(!1)");
     }
@@ -199,12 +196,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void OpenGenericNested4()
     {
-        var outerTInnterV = _compilation.GetTypeByMetadataName("TestClasses.Outer`1+Inner`1");
+        var outerTInnterV = _compilation.GetTypeByMetadataName("TestClasses.Outer`1+Inner`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<>.Inner<>).GetMethod("Method3"),
+            methodInfo: typeof(TestClasses.Outer<>.Inner<>).GetMethod("Method3")!,
             containingTypeSymbol: outerTInnterV,
-            methodSymbol: outerTInnterV.FindMethod("Method3"),
+            methodSymbol: outerTInnterV.FindMethod("Method3")!,
             managedTypeName: "TestClasses.Outer`1+Inner`1",
             managedMethodName: "Method3`1(!0,!!0,!1)");
     }
@@ -212,12 +209,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void OpenGenericNested5()
     {
-        var outerTInnterV = _compilation.GetTypeByMetadataName("TestClasses.Outer`1+Inner`1");
+        var outerTInnterV = _compilation.GetTypeByMetadataName("TestClasses.Outer`1+Inner`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<>.Inner<>).GetMethod("Method4"),
+            methodInfo: typeof(TestClasses.Outer<>.Inner<>).GetMethod("Method4")!,
             containingTypeSymbol: outerTInnterV,
-            methodSymbol: outerTInnterV.FindMethod("Method4"),
+            methodSymbol: outerTInnterV.FindMethod("Method4")!,
             managedTypeName: "TestClasses.Outer`1+Inner`1",
             managedMethodName: "Method4`2(!!1,!!0)");
     }
@@ -225,12 +222,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void OpenGenericNested6()
     {
-        var outerTInnerVMoreInnerI = _compilation.GetTypeByMetadataName("TestClasses.Outer`1+Inner`1+MoreInner`1");
+        var outerTInnerVMoreInnerI = _compilation.GetTypeByMetadataName("TestClasses.Outer`1+Inner`1+MoreInner`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<>.Inner<>.MoreInner<>).GetMethod("Method0"),
+            methodInfo: typeof(TestClasses.Outer<>.Inner<>.MoreInner<>).GetMethod("Method0")!,
             containingTypeSymbol: outerTInnerVMoreInnerI,
-            methodSymbol: outerTInnerVMoreInnerI.FindMethod("Method0"),
+            methodSymbol: outerTInnerVMoreInnerI.FindMethod("Method0")!,
             managedTypeName: "TestClasses.Outer`1+Inner`1+MoreInner`1",
             managedMethodName: "Method0`1(!0,!1,!2,!!0)");
     }
@@ -239,12 +236,12 @@ public partial class ManagedNameRoundTripTests
     public void ClosedGeneric1()
     {
         var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
-        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1").Construct(@int);
+        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1")!.Construct(@int);
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<int>).GetMethod("Method0"),
+            methodInfo: typeof(TestClasses.Outer<int>).GetMethod("Method0")!,
             containingTypeSymbol: outerTInt,
-            methodSymbol: outerTInt.FindMethod("Method0"),
+            methodSymbol: outerTInt.FindMethod("Method0")!,
             managedTypeName: "TestClasses.Outer`1",
             managedMethodName: "Method0");
     }
@@ -253,12 +250,12 @@ public partial class ManagedNameRoundTripTests
     public void ClosedGeneric2()
     {
         var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
-        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1").Construct(@int);
+        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1")!.Construct(@int);
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<int>).GetMethod("Method1"),
+            methodInfo: typeof(TestClasses.Outer<int>).GetMethod("Method1")!,
             containingTypeSymbol: outerTInt,
-            methodSymbol: outerTInt.FindMethod("Method1"),
+            methodSymbol: outerTInt.FindMethod("Method1")!,
             managedTypeName: "TestClasses.Outer`1",
             managedMethodName: "Method1(!0)");
     }
@@ -267,12 +264,12 @@ public partial class ManagedNameRoundTripTests
     public void ClosedGeneric3()
     {
         var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
-        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1").Construct(@int);
+        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1")!.Construct(@int);
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<int>).GetMethod("Method2"),
+            methodInfo: typeof(TestClasses.Outer<int>).GetMethod("Method2")!,
             containingTypeSymbol: outerTInt,
-            methodSymbol: outerTInt.FindMethod("Method2"),
+            methodSymbol: outerTInt.FindMethod("Method2")!,
             managedTypeName: "TestClasses.Outer`1",
             managedMethodName: "Method2`1(!!0[])");
     }
@@ -281,12 +278,12 @@ public partial class ManagedNameRoundTripTests
     public void ClosedGeneric4()
     {
         var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
-        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1").Construct(@int);
+        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1")!.Construct(@int);
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<int>).GetMethod("Method3"),
+            methodInfo: typeof(TestClasses.Outer<int>).GetMethod("Method3")!,
             containingTypeSymbol: outerTInt,
-            methodSymbol: outerTInt.FindMethod("Method3"),
+            methodSymbol: outerTInt.FindMethod("Method3")!,
             managedTypeName: "TestClasses.Outer`1",
             managedMethodName: "Method3`1(!0,!!0)");
     }
@@ -296,13 +293,13 @@ public partial class ManagedNameRoundTripTests
     {
         var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
         var @string = _compilation.GetSpecialType(SpecialType.System_String);
-        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1").Construct(@int);
+        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1")!.Construct(@int);
         var outerTIntInnerVString = outerTInt.GetTypeMembers().Single().Construct(@string);
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<int>.Inner<string>).GetMethod("Method0"),
+            methodInfo: typeof(TestClasses.Outer<int>.Inner<string>).GetMethod("Method0")!,
             containingTypeSymbol: outerTIntInnerVString,
-            methodSymbol: outerTIntInnerVString.FindMethod("Method0"),
+            methodSymbol: outerTIntInnerVString.FindMethod("Method0")!,
             managedTypeName: "TestClasses.Outer`1+Inner`1",
             managedMethodName: "Method0");
     }
@@ -312,13 +309,13 @@ public partial class ManagedNameRoundTripTests
     {
         var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
         var @string = _compilation.GetSpecialType(SpecialType.System_String);
-        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1").Construct(@int);
+        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1")!.Construct(@int);
         var outerTIntInnerVString = outerTInt.GetTypeMembers().Single().Construct(@string);
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<int>.Inner<string>).GetMethod("Method1"),
+            methodInfo: typeof(TestClasses.Outer<int>.Inner<string>).GetMethod("Method1")!,
             containingTypeSymbol: outerTIntInnerVString,
-            methodSymbol: outerTIntInnerVString.FindMethod("Method1"),
+            methodSymbol: outerTIntInnerVString.FindMethod("Method1")!,
             managedTypeName: "TestClasses.Outer`1+Inner`1",
             managedMethodName: "Method1(!0)");
     }
@@ -328,13 +325,13 @@ public partial class ManagedNameRoundTripTests
     {
         var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
         var @string = _compilation.GetSpecialType(SpecialType.System_String);
-        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1").Construct(@int);
+        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1")!.Construct(@int);
         var outerTIntInnerVString = outerTInt.GetTypeMembers().Single().Construct(@string);
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<int>.Inner<string>).GetMethod("Method2"),
+            methodInfo: typeof(TestClasses.Outer<int>.Inner<string>).GetMethod("Method2")!,
             containingTypeSymbol: outerTIntInnerVString,
-            methodSymbol: outerTIntInnerVString.FindMethod("Method2"),
+            methodSymbol: outerTIntInnerVString.FindMethod("Method2")!,
             managedTypeName: "TestClasses.Outer`1+Inner`1",
             managedMethodName: "Method2(!1)");
     }
@@ -344,13 +341,13 @@ public partial class ManagedNameRoundTripTests
     {
         var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
         var @string = _compilation.GetSpecialType(SpecialType.System_String);
-        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1").Construct(@int);
+        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1")!.Construct(@int);
         var outerTIntInnerVString = outerTInt.GetTypeMembers().Single().Construct(@string);
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<int>.Inner<string>).GetMethod("Method3"),
+            methodInfo: typeof(TestClasses.Outer<int>.Inner<string>).GetMethod("Method3")!,
             containingTypeSymbol: outerTIntInnerVString,
-            methodSymbol: outerTIntInnerVString.FindMethod("Method3"),
+            methodSymbol: outerTIntInnerVString.FindMethod("Method3")!,
             managedTypeName: "TestClasses.Outer`1+Inner`1",
             managedMethodName: "Method3`1(!0,!!0,!1)");
     }
@@ -360,13 +357,13 @@ public partial class ManagedNameRoundTripTests
     {
         var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
         var @string = _compilation.GetSpecialType(SpecialType.System_String);
-        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1").Construct(@int);
+        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1")!.Construct(@int);
         var outerTIntInnerVString = outerTInt.GetTypeMembers().Single().Construct(@string);
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<int>.Inner<string>).GetMethod("Method4"),
+            methodInfo: typeof(TestClasses.Outer<int>.Inner<string>).GetMethod("Method4")!,
             containingTypeSymbol: outerTIntInnerVString,
-            methodSymbol: outerTIntInnerVString.FindMethod("Method4"),
+            methodSymbol: outerTIntInnerVString.FindMethod("Method4")!,
             managedTypeName: "TestClasses.Outer`1+Inner`1",
             managedMethodName: "Method4`2(!!1,!!0)");
     }
@@ -376,12 +373,12 @@ public partial class ManagedNameRoundTripTests
     {
         var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
         var @string = _compilation.GetSpecialType(SpecialType.System_String);
-        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1").Construct(@int);
+        var outerTInt = _compilation.GetTypeByMetadataName("TestClasses.Outer`1")!.Construct(@int);
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer<int>).GetMethod("Method3").MakeGenericMethod(typeof(string)),
+            methodInfo: typeof(TestClasses.Outer<int>).GetMethod("Method3")!.MakeGenericMethod(typeof(string)),
             containingTypeSymbol: outerTInt,
-            methodSymbol: outerTInt.FindMethod("Method3").Construct(@string),
+            methodSymbol: outerTInt.FindMethod("Method3")!.Construct(@string),
             managedTypeName: "TestClasses.Outer`1",
             managedMethodName: "Method3`1(!0,!!0)");
     }
@@ -390,12 +387,12 @@ public partial class ManagedNameRoundTripTests
     public void ClosedGenericMethod2()
     {
         var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
-        var outerInner = _compilation.GetTypeByMetadataName("TestClasses.Outer+Inner");
+        var outerInner = _compilation.GetTypeByMetadataName("TestClasses.Outer+Inner")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer.Inner).GetMethod("Method2").MakeGenericMethod(typeof(int)),
+            methodInfo: typeof(TestClasses.Outer.Inner).GetMethod("Method2")!.MakeGenericMethod(typeof(int)),
             containingTypeSymbol: outerInner,
-            methodSymbol: outerInner.FindMethod("Method2").Construct(@int),
+            methodSymbol: outerInner.FindMethod("Method2")!.Construct(@int),
             managedTypeName: "TestClasses.Outer+Inner",
             managedMethodName: "Method2`1(System.Int32)");
     }
@@ -406,12 +403,12 @@ public partial class ManagedNameRoundTripTests
         _ = _compilation.GetSpecialType(SpecialType.System_Int32);
         var @float = _compilation.GetSpecialType(SpecialType.System_Single);
         var @string = _compilation.GetSpecialType(SpecialType.System_String);
-        var outerInner = _compilation.GetTypeByMetadataName("TestClasses.Outer+Inner");
+        var outerInner = _compilation.GetTypeByMetadataName("TestClasses.Outer+Inner")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Outer.Inner).GetMethod("Method3").MakeGenericMethod(typeof(float), typeof(string)),
+            methodInfo: typeof(TestClasses.Outer.Inner).GetMethod("Method3")!.MakeGenericMethod(typeof(float), typeof(string)),
             containingTypeSymbol: outerInner,
-            methodSymbol: outerInner.FindMethod("Method3").Construct(@float, @string),
+            methodSymbol: outerInner.FindMethod("Method3")!.Construct(@float, @string),
             managedTypeName: "TestClasses.Outer+Inner",
             managedMethodName: "Method3`2(System.Int32)");
     }
@@ -419,12 +416,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void ExplicitInterfaceImplementation1()
     {
-        var impl = _compilation.GetTypeByMetadataName("TestClasses.Impl");
+        var impl = _compilation.GetTypeByMetadataName("TestClasses.Impl")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Impl).GetMethod("TestClasses.IImplementation.ImplMethod0", PrivateBindingFlags),
+            methodInfo: typeof(TestClasses.Impl).GetMethod("TestClasses.IImplementation.ImplMethod0", PrivateBindingFlags)!,
             containingTypeSymbol: impl,
-            methodSymbol: impl.FindMethod("TestClasses.IImplementation.ImplMethod0"),
+            methodSymbol: impl.FindMethod("TestClasses.IImplementation.ImplMethod0")!,
             managedTypeName: "TestClasses.Impl",
             managedMethodName: "TestClasses.IImplementation.ImplMethod0");
     }
@@ -432,12 +429,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void ExplicitInterfaceImplementation2()
     {
-        var impl = _compilation.GetTypeByMetadataName("TestClasses.Impl");
+        var impl = _compilation.GetTypeByMetadataName("TestClasses.Impl")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Impl).GetMethod("TestClasses.IImplementation.ImplMethod1", PrivateBindingFlags),
+            methodInfo: typeof(TestClasses.Impl).GetMethod("TestClasses.IImplementation.ImplMethod1", PrivateBindingFlags)!,
             containingTypeSymbol: impl,
-            methodSymbol: impl.FindMethod("TestClasses.IImplementation.ImplMethod1"),
+            methodSymbol: impl.FindMethod("TestClasses.IImplementation.ImplMethod1")!,
             managedTypeName: "TestClasses.Impl",
             managedMethodName: "TestClasses.IImplementation.ImplMethod1(System.Int32)");
     }
@@ -445,12 +442,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void GenericExplicitInterfaceImplementation1()
     {
-        var implT = _compilation.GetTypeByMetadataName("TestClasses.Impl`1");
+        var implT = _compilation.GetTypeByMetadataName("TestClasses.Impl`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Impl<>).GetMethod("TestClasses.IImplementation<T>.ImplMethod0", PrivateBindingFlags),
+            methodInfo: typeof(TestClasses.Impl<>).GetMethod("TestClasses.IImplementation<T>.ImplMethod0", PrivateBindingFlags)!,
             containingTypeSymbol: implT,
-            methodSymbol: implT.FindMethod("TestClasses.IImplementation<T>.ImplMethod0"),
+            methodSymbol: implT.FindMethod("TestClasses.IImplementation<T>.ImplMethod0")!,
             managedTypeName: "TestClasses.Impl`1",
             managedMethodName: "'TestClasses.IImplementation<T>.ImplMethod0'");
     }
@@ -458,12 +455,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void GenericExplicitInterfaceImplementation2()
     {
-        var implT = _compilation.GetTypeByMetadataName("TestClasses.Impl`1");
+        var implT = _compilation.GetTypeByMetadataName("TestClasses.Impl`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Impl<>).GetMethod("TestClasses.IImplementation<T>.ImplMethod1", PrivateBindingFlags),
+            methodInfo: typeof(TestClasses.Impl<>).GetMethod("TestClasses.IImplementation<T>.ImplMethod1", PrivateBindingFlags)!,
             containingTypeSymbol: implT,
-            methodSymbol: implT.FindMethod("TestClasses.IImplementation<T>.ImplMethod1"),
+            methodSymbol: implT.FindMethod("TestClasses.IImplementation<T>.ImplMethod1")!,
             managedTypeName: "TestClasses.Impl`1",
             managedMethodName: "'TestClasses.IImplementation<T>.ImplMethod1'(!0)");
     }
@@ -471,12 +468,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void GenericExplicitInterfaceImplementation3()
     {
-        var implT = _compilation.GetTypeByMetadataName("TestClasses.Impl`1");
+        var implT = _compilation.GetTypeByMetadataName("TestClasses.Impl`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Impl<>).GetMethod("TestClasses.IImplementation<T>.ImplMethod2", PrivateBindingFlags),
+            methodInfo: typeof(TestClasses.Impl<>).GetMethod("TestClasses.IImplementation<T>.ImplMethod2", PrivateBindingFlags)!,
             containingTypeSymbol: implT,
-            methodSymbol: implT.FindMethod("TestClasses.IImplementation<T>.ImplMethod2"),
+            methodSymbol: implT.FindMethod("TestClasses.IImplementation<T>.ImplMethod2")!,
             managedTypeName: "TestClasses.Impl`1",
             managedMethodName: "'TestClasses.IImplementation<T>.ImplMethod2'`1(!0,!!0,System.String)");
     }
@@ -484,12 +481,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Inheritance1()
     {
-        var outerPrime = _compilation.GetTypeByMetadataName("TestClasses.OuterPrime");
+        var outerPrime = _compilation.GetTypeByMetadataName("TestClasses.OuterPrime")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.OuterPrime).GetMethod("Method3"),
+            methodInfo: typeof(TestClasses.OuterPrime).GetMethod("Method3")!,
             containingTypeSymbol: outerPrime,
-            methodSymbol: outerPrime.FindMethod("Method3"),
+            methodSymbol: outerPrime.FindMethod("Method3")!,
             managedTypeName: "TestClasses.OuterPrime",
             managedMethodName: "Method3(System.String,System.Int32)");
     }
@@ -497,12 +494,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Inheritance2()
     {
-        var outerPrimeZ = _compilation.GetTypeByMetadataName("TestClasses.OuterPrime`1");
+        var outerPrimeZ = _compilation.GetTypeByMetadataName("TestClasses.OuterPrime`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.OuterPrime<>).GetMethod("Method3"),
+            methodInfo: typeof(TestClasses.OuterPrime<>).GetMethod("Method3")!,
             containingTypeSymbol: outerPrimeZ,
-            methodSymbol: outerPrimeZ.FindMethod("Method3"),
+            methodSymbol: outerPrimeZ.FindMethod("Method3")!,
             managedTypeName: "TestClasses.OuterPrime`1",
             managedMethodName: "Method3`1(!0,!!0)");
     }
@@ -510,12 +507,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Inheritance3()
     {
-        var outerPrimeYz = _compilation.GetTypeByMetadataName("TestClasses.OuterPrime`2");
+        var outerPrimeYz = _compilation.GetTypeByMetadataName("TestClasses.OuterPrime`2")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.OuterPrime<,>).GetMethod("Method3"),
+            methodInfo: typeof(TestClasses.OuterPrime<,>).GetMethod("Method3")!,
             containingTypeSymbol: outerPrimeYz,
-            methodSymbol: outerPrimeYz.FindMethod("Method3"),
+            methodSymbol: outerPrimeYz.FindMethod("Method3")!,
             managedTypeName: "TestClasses.OuterPrime`2",
             managedMethodName: "Method3`1(!1,!!0)");
     }
@@ -523,12 +520,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Inheritance4()
     {
-        var outerString = _compilation.GetTypeByMetadataName("TestClasses.OuterString");
+        var outerString = _compilation.GetTypeByMetadataName("TestClasses.OuterString")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.OuterString).GetMethod("Method3"),
+            methodInfo: typeof(TestClasses.OuterString).GetMethod("Method3")!,
             containingTypeSymbol: outerString,
-            methodSymbol: outerString.FindMethod("Method3"),
+            methodSymbol: outerString.FindMethod("Method3")!,
             managedTypeName: "TestClasses.OuterString",
             managedMethodName: "Method3`1(System.String,!!0)");
     }
@@ -536,10 +533,10 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads1()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0()"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0()")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 0),
             managedTypeName: "TestClasses.Overloads",
@@ -549,11 +546,11 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads2()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
         var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(Int32)"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(Int32)")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 0, @int),
             managedTypeName: "TestClasses.Overloads",
@@ -563,11 +560,11 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads3()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
         var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(Int32, TestClasses.Overloads)"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(Int32, TestClasses.Overloads)")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 0, @int, overloads),
             managedTypeName: "TestClasses.Overloads",
@@ -577,12 +574,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads4()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
         var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
         var intptr = _compilation.CreatePointerTypeSymbol(@int);
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(Int32*)"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(Int32*)")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 0, intptr),
             managedTypeName: "TestClasses.Overloads",
@@ -592,11 +589,11 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads5()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
         var dynamic = _compilation.DynamicType;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(System.Object)"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(System.Object)")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 0, dynamic),
             managedTypeName: "TestClasses.Overloads",
@@ -606,10 +603,10 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads6()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](U)"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](U)")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 1, 1, m => m.Parameters.Single().Type == m.TypeParameters.Single()),
             managedTypeName: "TestClasses.Overloads",
@@ -619,10 +616,10 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads7()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U]()"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U]()")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 1),
             managedTypeName: "TestClasses.Overloads",
@@ -632,10 +629,10 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads8()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U,T]()"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U,T]()")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 2),
             managedTypeName: "TestClasses.Overloads",
@@ -645,10 +642,10 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads9()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](U[])"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](U[])")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 1, 1,
                 m => m.Parameters.Single().Type is IArrayTypeSymbol arrayType &&
@@ -661,10 +658,10 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads10()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](U[][])"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](U[][])")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 1, 1,
                 m => m.Parameters.Single().Type is IArrayTypeSymbol arrayType &&
@@ -679,10 +676,10 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads11()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](U[,])"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](U[,])")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 1, 1,
                 m => m.Parameters.Single().Type is IArrayTypeSymbol arrayType &&
@@ -695,10 +692,10 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads12()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](U[,,])"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](U[,,])")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 1, 1,
                 m => m.Parameters.Single().Type is IArrayTypeSymbol arrayType &&
@@ -711,12 +708,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads13()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
         var @int = _compilation.GetSpecialType(SpecialType.System_Int32);
-        var listInt = _compilation.GetTypeByMetadataName("System.Collections.Generic.List`1").Construct(@int);
+        var listInt = _compilation.GetTypeByMetadataName("System.Collections.Generic.List`1")!.Construct(@int);
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](System.Collections.Generic.List`1[System.Int32])"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](System.Collections.Generic.List`1[System.Int32])")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 1, listInt),
             managedTypeName: "TestClasses.Overloads",
@@ -726,11 +723,11 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads14()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
-        var list = _compilation.GetTypeByMetadataName("System.Collections.Generic.List`1");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
+        var list = _compilation.GetTypeByMetadataName("System.Collections.Generic.List`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](System.Collections.Generic.List`1[U])"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](System.Collections.Generic.List`1[U])")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 1, 1,
                 m =>
@@ -744,11 +741,11 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads15()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
-        var tuple2 = _compilation.GetTypeByMetadataName("System.Tuple`2");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
+        var tuple2 = _compilation.GetTypeByMetadataName("System.Tuple`2")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U,V](System.Tuple`2[U,V], System.Tuple`2[V,U])"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U,V](System.Tuple`2[U,V], System.Tuple`2[V,U])")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 2, 2,
                 m =>
@@ -765,12 +762,12 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads16()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
-        var tuple1 = _compilation.GetTypeByMetadataName("System.Tuple`1");
-        var tuple2 = _compilation.GetTypeByMetadataName("System.Tuple`2");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
+        var tuple1 = _compilation.GetTypeByMetadataName("System.Tuple`1")!;
+        var tuple2 = _compilation.GetTypeByMetadataName("System.Tuple`2")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(System.Tuple`1[System.Tuple`2[System.String[,],System.Int32]])"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(System.Tuple`1[System.Tuple`2[System.String[,],System.Int32]])")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 0, 1,
                 m =>
@@ -785,18 +782,18 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads17()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
-        var tuple1 = _compilation.GetTypeByMetadataName("System.Tuple`1");
-        var tuple2 = _compilation.GetTypeByMetadataName("System.Tuple`2");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
+        var tuple1 = _compilation.GetTypeByMetadataName("System.Tuple`1")!;
+        var tuple2 = _compilation.GetTypeByMetadataName("System.Tuple`2")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(System.Tuple`2[System.Tuple`1[System.String],System.Tuple`1[System.Int32]])"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(System.Tuple`2[System.Tuple`1[System.String],System.Tuple`1[System.Int32]])")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 0, 1,
                 m =>
                     m.Parameters.Single().Type is INamedTypeSymbol p &&
                     p.OriginalDefinition == tuple2 &&
-                    p.TypeArguments.All(t => t.OriginalDefinition == tuple1)),
+                    p.TypeArguments.All(t => t.OriginalDefinition == tuple1))!,
             managedTypeName: "TestClasses.Overloads",
             managedMethodName: "Overload0(System.Tuple`2<System.Tuple`1<System.String>,System.Tuple`1<System.Int32>>)");
     }
@@ -804,24 +801,24 @@ public partial class ManagedNameRoundTripTests
     [TestMethod]
     public void Overloads18()
     {
-        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads");
-        var tuple1 = _compilation.GetTypeByMetadataName("System.Tuple`1");
+        var overloads = _compilation.GetTypeByMetadataName("TestClasses.Overloads")!;
+        var tuple1 = _compilation.GetTypeByMetadataName("System.Tuple`1")!;
 
         VerifyRoundTrip(
-            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](System.Tuple`1[System.Tuple`1[TestClasses.Outer`1+Inner`1[U,U]]])"),
+            methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](System.Tuple`1[System.Tuple`1[TestClasses.Outer`1+Inner`1[U,U]]])")!,
             containingTypeSymbol: overloads,
             methodSymbol: overloads.FindMethod("Overload0", 1, 1,
                 m =>
                     m.Parameters.Single().Type is INamedTypeSymbol p &&
                     p.OriginalDefinition == tuple1 &&
                     p.TypeArguments.Single() is INamedTypeSymbol t &&
-                    t.OriginalDefinition == tuple1),
+                    t.OriginalDefinition == tuple1)!,
             managedTypeName: "TestClasses.Overloads",
             managedMethodName: "Overload0`1(System.Tuple`1<System.Tuple`1<TestClasses.Outer`1+Inner`1<!!0,!!0>>>)");
     }
 
     #region Helpers
-    private void VerifyRoundTrip(
+    private static void VerifyRoundTrip(
         MethodInfo methodInfo,
         INamedTypeSymbol containingTypeSymbol,
         IMethodSymbol methodSymbol,
@@ -834,7 +831,7 @@ public partial class ManagedNameRoundTripTests
         // VerifyRoundTripFromName(managedTypeName, managedMethodName, containingTypeSymbol, methodSymbol);
     }
 
-    private void VerifyRoundTripFromMethodInfo(
+    private static void VerifyRoundTripFromMethodInfo(
         MethodInfo methodInfo,
         string expectedManagedTypeName,
         string expectedManagedMethodName)
@@ -854,7 +851,7 @@ public partial class ManagedNameRoundTripTests
         Assert.AreEqual(methodInfo.MetadataToken, roundTrippedMethodInfo.MetadataToken);
     }
 
-    private void VerifyRoundTripFromName(
+    private static void VerifyRoundTripFromName(
         string managedTypeName,
         string managedMethodName,
         MethodInfo expectedMethodInfo)
@@ -914,23 +911,23 @@ public partial class ManagedNameRoundTripTests
     // {
     //     // Lookup the Roslyn ITypeSymbol and IMethodSymbol using fullTypeName and fullMethodName
     //     var containingTypeSymbol = _compilation.GetTypeByMetadataName(fullTypeName);
-    // 
+    //
     //     Assert.AreEqual(expectedContainingTypeSymbol.OriginalDefinition, containingTypeSymbol.OriginalDefinition);
-    // 
+    //
     //     var methodSymbol = FullyQualifiedNameHelper.GetMethodFromFullyQualifiedName(
     //         _compilation,
     //         fullTypeName,
     //         fullMethodName);
-    // 
+    //
     //     Assert.AreEqual(expectedMethodSymbol.OriginalDefinition, methodSymbol.OriginalDefinition);
-    // 
+    //
     //     // Generate the fqn for the Roslyn IMethodSymbol
     //     FullyQualifiedNameHelper.GetFullyQualifiedName(
     //         containingTypeSymbol,
     //         methodSymbol,
     //         out var roundTrippedFullTypeName,
     //         out var roundTrippedFullMethodName);
-    // 
+    //
     //     Assert.AreEqual(fullTypeName, roundTrippedFullTypeName);
     //     Assert.AreEqual(fullMethodName, roundTrippedFullMethodName);
     // }

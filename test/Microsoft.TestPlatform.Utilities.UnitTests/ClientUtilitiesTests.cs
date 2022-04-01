@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Utilities.Tests;
 
 [TestClass]
@@ -66,7 +64,7 @@ public class ClientUtilitiesTests
         var finalSettingsXml = doc.OuterXml;
 
         var expectedPath = Path.GetFullPath(Path.Combine(
-            Path.GetDirectoryName(currentAssemblyLocation), "..\\remote.testsettings"));
+            Path.GetDirectoryName(currentAssemblyLocation)!, "..\\remote.testsettings"));
         var expectedSettingsXml = string.Concat(
             "<RunSettings><MSTest><SettingsFile>",
             expectedPath,
@@ -135,7 +133,7 @@ public class ClientUtilitiesTests
         var finalSettingsXml = doc.OuterXml;
 
         var expectedPath = Path.GetFullPath(Path.Combine(
-            Path.GetDirectoryName(currentAssemblyLocation), "..\\results"));
+            Path.GetDirectoryName(currentAssemblyLocation)!, "..\\results"));
         var expectedSettingsXml = string.Concat(
             "<RunSettings><RunConfiguration><ResultsDirectory>",
             expectedPath,

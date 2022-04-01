@@ -16,27 +16,19 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ParallelDiscoveryEventsHandlerTests
 {
-    private ParallelDiscoveryEventsHandler _parallelDiscoveryEventsHandler;
+    private readonly ParallelDiscoveryEventsHandler _parallelDiscoveryEventsHandler;
+    private readonly Mock<IProxyDiscoveryManager> _mockProxyDiscoveryManager;
+    private readonly Mock<ITestDiscoveryEventsHandler2> _mockTestDiscoveryEventsHandler;
+    private readonly Mock<IParallelProxyDiscoveryManager> _mockParallelProxyDiscoveryManager;
+    private readonly Mock<IDataSerializer> _mockDataSerializer;
+    private readonly Mock<IRequestData> _mockRequestData;
 
-    private Mock<IProxyDiscoveryManager> _mockProxyDiscoveryManager;
-
-    private Mock<ITestDiscoveryEventsHandler2> _mockTestDiscoveryEventsHandler;
-
-    private Mock<IParallelProxyDiscoveryManager> _mockParallelProxyDiscoveryManager;
-
-    private Mock<IDataSerializer> _mockDataSerializer;
-
-    private Mock<IRequestData> _mockRequestData;
-
-    [TestInitialize]
-    public void TestInit()
+    public ParallelDiscoveryEventsHandlerTests()
     {
         _mockProxyDiscoveryManager = new Mock<IProxyDiscoveryManager>();
         _mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();

@@ -11,8 +11,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations;
 
 [ExtensionUri("executor://TestableTestHost")]
@@ -28,9 +26,9 @@ public class TestableRuntimeProvider : ITestRuntimeProvider
         Shared = shared;
     }
 
-    public event EventHandler<HostProviderEventArgs> HostLaunched;
+    public event EventHandler<HostProviderEventArgs?>? HostLaunched;
 
-    public event EventHandler<HostProviderEventArgs> HostExited;
+    public event EventHandler<HostProviderEventArgs?>? HostExited;
 
     public bool Shared { get; }
 
@@ -54,11 +52,11 @@ public class TestableRuntimeProvider : ITestRuntimeProvider
 
     public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
     {
-        HostLaunched(this, null);
+        HostLaunched?.Invoke(this, null);
         return Task.FromResult(true);
     }
 
-    public TestProcessStartInfo GetTestHostProcessStartInfo(
+    public TestProcessStartInfo? GetTestHostProcessStartInfo(
         IEnumerable<string> sources,
         IDictionary<string, string> environmentVariables,
         TestRunnerConnectionInfo connectionInfo)
@@ -78,7 +76,7 @@ public class TestableRuntimeProvider : ITestRuntimeProvider
 
     public Task CleanTestHostAsync(CancellationToken cancellationToken)
     {
-        HostExited(this, null);
+        HostExited?.Invoke(this, null);
         return Task.FromResult(true);
     }
 }

@@ -3,8 +3,6 @@
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
 
-#nullable disable
-
 namespace vstest.console.UnitTests.TestDoubles;
 
 internal class DummyTestRunResultAggregator : TestRunResultAggregator

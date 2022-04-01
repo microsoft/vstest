@@ -39,3 +39,9 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StopTestSessionCompleteEv
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StopTestSessionCompleteEventArgs.StopTestSessionCompleteEventArgs(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo testSessionInfo) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StopTestSessionCompleteEventArgs.TestSessionInfo.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StopTestSessionCompleteEventArgs.TestSessionInfo.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.DiscoveredExtensions.get -> System.Collections.Generic.Dictionary<string, System.Collections.Generic.HashSet<string>>
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.DiscoveredExtensions.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.DiscoveryCompleteEventArgs(long totalTests, bool isAborted, System.Collections.Generic.IList<string> fullyDiscoveredSources, System.Collections.Generic.IList<string> partiallyDiscoveredSources, System.Collections.Generic.IList<string> notDiscoveredSources, System.Collections.Generic.Dictionary<string, System.Collections.Generic.HashSet<string>> discoveredExtensions) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.DiscoveredExtensions.get -> System.Collections.Generic.Dictionary<string, System.Collections.Generic.HashSet<string>>
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.DiscoveredExtensions.set -> void
+

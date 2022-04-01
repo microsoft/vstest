@@ -24,29 +24,28 @@ using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.C
 using TrxLoggerObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests;
 
 [TestClass]
 public class TrxLoggerTests
 {
-    private Mock<TestLoggerEvents> _events;
-    private TestableTrxLogger _testableTrxLogger;
-    private Dictionary<string, string> _parameters;
-    private static readonly string DefaultTestRunDirectory = Path.GetTempPath();
-    private static readonly string DefaultLogFileNameParameterValue = "logfilevalue.trx";
     private const string DefaultLogFilePrefixParameterValue = "log_prefix";
-
     private const int MultipleLoggerInstanceCount = 2;
 
-    [TestInitialize]
-    public void Initialize()
+    private static readonly string DefaultTestRunDirectory = Path.GetTempPath();
+    private static readonly string DefaultLogFileNameParameterValue = "logfilevalue.trx";
+
+    private readonly Mock<TestLoggerEvents> _events;
+    private readonly Dictionary<string, string?> _parameters;
+
+    private TestableTrxLogger _testableTrxLogger;
+
+    public TrxLoggerTests()
     {
         _events = new Mock<TestLoggerEvents>();
 
         _testableTrxLogger = new TestableTrxLogger();
-        _parameters = new Dictionary<string, string>(2)
+        _parameters = new Dictionary<string, string?>(2)
         {
             [DefaultLoggerParameterNames.TestRunDirectory] = DefaultTestRunDirectory,
             [TrxLoggerConstants.LogFileNameKey] = DefaultLogFileNameParameterValue
@@ -57,7 +56,7 @@ public class TrxLoggerTests
     [TestCleanup]
     public void Cleanup()
     {
-        if (!string.IsNullOrEmpty(_testableTrxLogger?.TrxFile) && File.Exists(_testableTrxLogger.TrxFile))
+        if (!string.IsNullOrEmpty(_testableTrxLogger?.TrxFile) && File.Exists(_testableTrxLogger!.TrxFile))
         {
             File.Delete(_testableTrxLogger.TrxFile);
         }
@@ -620,7 +619,7 @@ public class TrxLoggerTests
 
         MakeTestRunComplete();
 
-        bool trxFileNameContainsWhiteSpace = Path.GetFileName(_testableTrxLogger.TrxFile).Contains(' ');
+        bool trxFileNameContainsWhiteSpace = Path.GetFileName(_testableTrxLogger.TrxFile)!.Contains(' ');
         Assert.IsFalse(trxFileNameContainsWhiteSpace, $"\"{_testableTrxLogger.TrxFile}\": Trx file name should not have white spaces");
     }
 
@@ -685,9 +684,9 @@ public class TrxLoggerTests
         Assert.AreEqual(MultipleLoggerInstanceCount, files.Length, "All logger instances should get different file names!");
     }
 
-    private string[] TestMultipleTrxLoggers()
+    private string?[] TestMultipleTrxLoggers()
     {
-        var files = new string[2];
+        var files = new string?[2];
 
         try
         {
@@ -793,7 +792,7 @@ public class TrxLoggerTests
 
         Assert.IsTrue(File.Exists(_testableTrxLogger.TrxFile), string.Format("TRX file: {0}, should have got created.", _testableTrxLogger.TrxFile));
 
-        string actualMessage = GetElementValueFromTrx(_testableTrxLogger.TrxFile, "StdOut");
+        string? actualMessage = GetElementValueFromTrx(_testableTrxLogger.TrxFile!, "StdOut");
 
         Assert.IsNotNull(actualMessage);
         Assert.IsTrue(string.Equals(message, actualMessage), string.Format("StdOut messages do not match. Expected:{0}, Actual:{1}", message, actualMessage));
@@ -803,20 +802,20 @@ public class TrxLoggerTests
     public void TestRunInformationShouldContainUtcDateTime()
     {
         MakeTestRunComplete();
-        ValidateDateTimeInTrx(_testableTrxLogger.TrxFile);
+        ValidateDateTimeInTrx(_testableTrxLogger.TrxFile!);
     }
 
-    private void ValidateDateTimeInTrx(string trxFileName)
+    private static void ValidateDateTimeInTrx(string trxFileName)
     {
         using FileStream file = File.OpenRead(trxFileName);
         using XmlReader reader = XmlReader.Create(file);
         XDocument document = XDocument.Load(reader);
-        var timesNode = document.Descendants(document.Root.GetDefaultNamespace() + "Times").FirstOrDefault();
-        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("creation").FirstOrDefault().Value));
-        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("start").FirstOrDefault().Value));
-        var resultNode = document.Descendants(document.Root.GetDefaultNamespace() + "UnitTestResult").FirstOrDefault();
-        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("endTime").FirstOrDefault().Value));
-        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("startTime").FirstOrDefault().Value));
+        var timesNode = document.Descendants(document.Root!.GetDefaultNamespace() + "Times").First();
+        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("creation").First().Value));
+        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("start").First().Value));
+        var resultNode = document.Descendants(document.Root.GetDefaultNamespace() + "UnitTestResult").First();
+        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("endTime").First().Value));
+        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("startTime").First().Value));
     }
 
     [TestMethod]
@@ -830,7 +829,7 @@ public class TrxLoggerTests
 
         MakeTestRunComplete();
 
-        string actualFileNameWithoutTimestamp = _testableTrxLogger.TrxFile.Substring(0, _testableTrxLogger.TrxFile.LastIndexOf('_'));
+        string actualFileNameWithoutTimestamp = _testableTrxLogger.TrxFile!.Substring(0, _testableTrxLogger.TrxFile.LastIndexOf('_'));
 
         Assert.AreNotEqual(Path.Combine(DefaultTestRunDirectory, "results.trx"), _testableTrxLogger.TrxFile, "Expected framework name to appear in file name");
         Assert.AreNotEqual(Path.Combine(DefaultTestRunDirectory, "results_net451.trx"), _testableTrxLogger.TrxFile, "Expected time stamp to appear in file name");
@@ -848,7 +847,7 @@ public class TrxLoggerTests
 
         MakeTestRunComplete();
 
-        string actualFileNameWithoutTimestamp = _testableTrxLogger.TrxFile.Substring(0, _testableTrxLogger.TrxFile.LastIndexOf('_'));
+        string actualFileNameWithoutTimestamp = _testableTrxLogger.TrxFile!.Substring(0, _testableTrxLogger.TrxFile.LastIndexOf('_'));
 
         Assert.AreEqual(trxPrefix + "_net451", actualFileNameWithoutTimestamp);
 
@@ -883,7 +882,7 @@ public class TrxLoggerTests
         var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
         _testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
 
-        ValidateResultAttributesInTrx(_testableTrxLogger.TrxFile, testCase.Id, testCase.DisplayName, isMstestAdapter);
+        ValidateResultAttributesInTrx(_testableTrxLogger.TrxFile!, testCase.Id, testCase.DisplayName, isMstestAdapter);
     }
 
     private void ValidateResultAttributesInTrx(string trxFileName, Guid testId, string testName, bool isMstestAdapter)
@@ -891,25 +890,25 @@ public class TrxLoggerTests
         using FileStream file = File.OpenRead(trxFileName);
         using XmlReader reader = XmlReader.Create(file);
         XDocument document = XDocument.Load(reader);
-        var resultNode = document.Descendants(document.Root.GetDefaultNamespace() + "UnitTestResult").FirstOrDefault();
+        var resultNode = document.Descendants(document.Root!.GetDefaultNamespace() + "UnitTestResult").First();
         if (isMstestAdapter)
         {
-            Assert.AreNotEqual(resultNode.Attributes("testId").FirstOrDefault().Value, testId.ToString());
-            Assert.AreNotEqual(resultNode.Attributes("testName").FirstOrDefault().Value, testName);
+            Assert.AreNotEqual(resultNode.Attributes("testId").First().Value, testId.ToString());
+            Assert.AreNotEqual(resultNode.Attributes("testName").First().Value, testName);
         }
         else
         {
-            Assert.AreEqual(resultNode.Attributes("testId").FirstOrDefault().Value, testId.ToString());
-            Assert.AreEqual(resultNode.Attributes("testName").FirstOrDefault().Value, testName);
+            Assert.AreEqual(resultNode.Attributes("testId").First().Value, testId.ToString());
+            Assert.AreEqual(resultNode.Attributes("testName").First().Value, testName);
         }
     }
 
-    private void ValidateTimeWithinUtcLimits(DateTimeOffset dateTime)
+    private static void ValidateTimeWithinUtcLimits(DateTimeOffset dateTime)
     {
         Assert.IsTrue(dateTime.UtcDateTime.Subtract(DateTime.UtcNow) < new TimeSpan(0, 0, 0, 60));
     }
 
-    private string GetElementValueFromTrx(string trxFileName, string fieldName)
+    private static string? GetElementValueFromTrx(string trxFileName, string fieldName)
     {
         using (FileStream file = File.OpenRead(trxFileName))
         using (XmlReader reader = XmlReader.Create(file))
@@ -938,7 +937,7 @@ public class TrxLoggerTests
         return testRunCompleteEventArgs;
     }
 
-    private static Mock<TestResultEventArgs> CreatePassTestResultEventArgsMock(string testCaseName = "Pass1", List<TestResultMessage> testResultMessages = null)
+    private static Mock<TestResultEventArgs> CreatePassTestResultEventArgsMock(string testCaseName = "Pass1", List<TestResultMessage>? testResultMessages = null)
     {
         TestCase passTestCase = CreateTestCase(testCaseName);
         var passResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(passTestCase);
@@ -968,10 +967,12 @@ public class TrxLoggerTests
 
 internal class TestableTrxLogger : VisualStudio.TestPlatform.Extensions.TrxLogger.TrxLogger
 {
-    public TestableTrxLogger() : base() { }
-    public TestableTrxLogger(IFileHelper fileHelper, TrxFileHelper trxFileHelper) : base(fileHelper, trxFileHelper) { }
+    public TestableTrxLogger()
+        : base() { }
+    public TestableTrxLogger(IFileHelper fileHelper, TrxFileHelper trxFileHelper)
+        : base(fileHelper, trxFileHelper) { }
 
-    public string TrxFile;
+    public string? TrxFile;
     internal override void PopulateTrxFile(string trxFileName, XmlElement rootElement)
     {
         TrxFile = trxFileName;
