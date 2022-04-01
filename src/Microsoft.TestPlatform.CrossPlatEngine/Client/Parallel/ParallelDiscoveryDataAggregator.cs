@@ -97,12 +97,13 @@ internal class ParallelDiscoveryDataAggregator
         // Do not aggregate NotDiscovered, PartiallyDiscovered, FullyDiscovered sources here
         // because this aggregator is shared with proxies so the state is already up-to-date.
         //
-        // The reason to share the aggregator is that we only get 1 notification for completed discovery
-        // when discovery is done Instead of 1 notification per discovery manager. And we also don't get 
-        // any notification for discovery of sources that did not start discovering yet. So we need the state
-        // in the aggregator to start with all the sources that we were requested to discover in NotDiscovered
-        // state. And then as we discover them, we need to update that directly. So when any discovery is cancelled
-        // we can just take the current state in the aggregator and report it.
+        // The reason to share the aggregator is that we only get 1 notification for completed
+        // discovery when discovery is done. Instead of 1 notification per discovery manager.
+        // And we also don't get any notification for discovery of sources that did not start
+        // discovering yet. So we need the state in the aggregator to start with all the sources
+        // that we were requested to discover in NotDiscovered state. And then as we discover them,
+        // we need to update that directly. So when any discovery is cancelled we can just take the
+        // current state in the aggregator and report it.
     }
 
     /// <summary>
@@ -196,10 +197,8 @@ internal class ParallelDiscoveryDataAggregator
 
     public void MarkSourcesBasedOnDiscoveredTestCases(IEnumerable<TestCase>? testCases, bool isComplete, ref string? previousSource)
     {
-        // When discovery is complete (i.e.not aborted), then we can assume that all partially
-        // discovered sources are now fully discovered. We should also mark all not discovered
-        // sources as fully discovered because that means that the source is considered as tests
-        // but contains no test so we never received the partially or fully discovered event.
+        // When discovery is complete and not aborted, we can simply mark all given test cases and
+        // the latest discovered source as fully discovered.
         if (isComplete)
         {
             MarkSourcesWithStatus(testCases?.Select(x => x.Source), DiscoveryStatus.FullyDiscovered);
