@@ -206,7 +206,7 @@ internal static class RunSettingsProviderExtensions
     {
         var doc = new XmlDocument();
 
-        if (!StringUtils.IsNullOrEmpty(runSettingsProvider?.ActiveRunSettings.SettingsXml))
+        if (!StringUtils.IsNullOrEmpty(runSettingsProvider.ActiveRunSettings?.SettingsXml))
         {
             var settingsXml = runSettingsProvider.ActiveRunSettings.SettingsXml;
 
