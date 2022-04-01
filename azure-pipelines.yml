@@ -15,7 +15,7 @@ jobs:
     displayName: 'Run script build.cmd'
     inputs:
       filename: build.cmd
-      arguments: '-verbose -configuration $(buildConfiguration) -ci -steps "InstallDotnet, Restore, UpdateLocalization, Build, Publish"'
+      arguments: '-verbose -configuration $(buildConfiguration) -ci -steps "InstallDotnet, Restore, UpdateLocalization, Build, Publish, Pack, Manifest"'
       modifyEnvironment: false
       failOnStandardError: true
 
