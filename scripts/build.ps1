@@ -51,7 +51,7 @@ Param(
     [Switch] $Force,
 
     [Alias("s")]
-    [String[]] $Steps = @("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "Pack", "PrepareAcceptanceTests")
+    [String[]] $Steps = @("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "Pack", "Manifest", "PrepareAcceptanceTests")
 )
 
 $ErrorActionPreference = 'Stop'
@@ -1292,7 +1292,7 @@ if ($Force -or $Steps -contains "Pack") {
     Create-NugetPackages
 }
 
-if ($Force -or $Steps -contains "Pack" -or $Steps -contains "Manifest") {
+if ($Force -or $Steps -contains "Manifest") {
     Generate-Manifest -PackageFolder $TPB_PackageOutDir
     if (Test-Path $TPB_SourceBuildPackageOutDir)
     {
