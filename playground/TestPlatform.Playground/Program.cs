@@ -71,27 +71,37 @@ internal class Program
 
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
-            //throw new NotImplementedException();
+            Console.WriteLine($"[DISCOVERY.PROGRESS]: {WriteTests(discoveredTestCases)}");
         }
 
         public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
         {
-            //throw new NotImplementedException();
+            Console.WriteLine($"[DISCOVERY.COMPLETE]: aborted? {isAborted}, tests count: {totalTests}" +
+                $"lastChunk: {WriteTests(lastChunk)}");
         }
 
         public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
-            //throw new NotImplementedException();
+            Console.WriteLine($"[DISCOVERY.COMPLETE]: aborted? {discoveryCompleteEventArgs.IsAborted}, tests count: {discoveryCompleteEventArgs.TotalCount}" +
+                $"lastChunk: {WriteTests(lastChunk)}" +
+                $"fully: {discoveryCompleteEventArgs.FullyDiscoveredSources}" +
+                $"partially: {discoveryCompleteEventArgs.PartiallyDiscoveredSources}" +
+                $"not: {discoveryCompleteEventArgs.NotDiscoveredSources}");
         }
 
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            //throw new NotImplementedException();
+            Console.WriteLine($"[DISCOVERY.{level.ToString().ToUpper()}]: {message}");
         }
 
         public void HandleRawMessage(string rawMessage)
         {
-            //throw new NotImplementedException();
+            Console.WriteLine($"[DISCOVERY.MESSAGE]: {rawMessage}");
+        }
+
+        private static string WriteTests(IEnumerable<TestCase> testCases)
+        {
+            return testCases == null ? null : "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName));
         }
     }
 
@@ -109,17 +119,17 @@ internal class Program
 
         public void HandleRawMessage(string rawMessage)
         {
-            Console.WriteLine($"[MESSAGE]: {rawMessage}");
+            Console.WriteLine($"[RUN.MESSAGE]: {rawMessage}");
         }
 
         public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
         {
-            Console.WriteLine($"[COMPLETE]: err: {testRunCompleteArgs.Error}, lastChunk: {WriteTests(lastChunkArgs?.NewTestResults)}");
+            Console.WriteLine($"[RUN.COMPLETE]: err: {testRunCompleteArgs.Error}, lastChunk: {WriteTests(lastChunkArgs?.NewTestResults)}");
         }
 
         public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
         {
-            Console.WriteLine($"[PROGRESS - NEW RESULTS]: {WriteTests(testRunChangedArgs.NewTestResults)}");
+            Console.WriteLine($"[RUN.PROGRESS - NEW RESULTS]: {WriteTests(testRunChangedArgs.NewTestResults)}");
         }
 
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
@@ -127,12 +137,12 @@ internal class Program
             throw new NotImplementedException();
         }
 
-        private string WriteTests(IEnumerable<TestResult> testResults)
+        private static string WriteTests(IEnumerable<TestResult> testResults)
         {
             return WriteTests(testResults?.Select(t => t.TestCase));
         }
 
-        private string WriteTests(IEnumerable<TestCase> testCases)
+        private static string WriteTests(IEnumerable<TestCase> testCases)
         {
             return testCases == null ? null : "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName));
         }
