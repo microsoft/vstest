@@ -1292,7 +1292,7 @@ if ($Force -or $Steps -contains "Pack") {
     Create-NugetPackages
 }
 
-if ($Force -or $Steps -contains "Publish" -or $Steps -contains "Manifest") {
+if ($Force -or $Steps -contains "Pack" -or $Steps -contains "Manifest") {
     Generate-Manifest -PackageFolder $TPB_PackageOutDir
     if (Test-Path $TPB_SourceBuildPackageOutDir)
     {
