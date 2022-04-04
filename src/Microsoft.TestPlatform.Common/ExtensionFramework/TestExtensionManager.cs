@@ -7,7 +7,6 @@ using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
@@ -42,14 +41,10 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
     /// The logger.
     /// </param>
     protected TestExtensionManager(
-        IEnumerable<LazyExtension<TExtension, Dictionary<string, object>>> unfilteredTestExtensions,
-        IEnumerable<LazyExtension<TExtension, TMetadata>> testExtensions,
-        IMessageLogger logger)
+        IEnumerable<LazyExtension<TExtension, Dictionary<string, object>>> unfilteredTestExtensions!!,
+        IEnumerable<LazyExtension<TExtension, TMetadata>> testExtensions!!,
+        IMessageLogger logger!!)
     {
-        ValidateArg.NotNull(unfilteredTestExtensions, nameof(unfilteredTestExtensions));
-        ValidateArg.NotNull(testExtensions, nameof(testExtensions));
-        ValidateArg.NotNull(logger, nameof(logger));
-
         _logger = logger;
         TestExtensions = testExtensions;
         UnfilteredTestExtensions = unfilteredTestExtensions;
@@ -101,10 +96,8 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
     /// </summary>
     /// <param name="extensionUri">The URI of the test extension to be looked up.</param>
     /// <returns>The test extension or null if one was not found.</returns>
-    public LazyExtension<TExtension, TMetadata> TryGetTestExtension(Uri extensionUri)
+    public LazyExtension<TExtension, TMetadata> TryGetTestExtension(Uri extensionUri!!)
     {
-        ValidateArg.NotNull(extensionUri, nameof(extensionUri));
-
         TestExtensionByUri.TryGetValue(extensionUri, out var testExtension);
 
         return testExtension;
@@ -115,10 +108,8 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
     /// </summary>
     /// <param name="extensionUri">The URI of the test extension to be looked up.</param>
     /// <returns>The test extension or null if one was not found.</returns>
-    public LazyExtension<TExtension, TMetadata> TryGetTestExtension(string extensionUri)
+    public LazyExtension<TExtension, TMetadata> TryGetTestExtension(string extensionUri!!)
     {
-        ValidateArg.NotNull(extensionUri, nameof(extensionUri));
-
         LazyExtension<TExtension, TMetadata> testExtension = null;
         foreach (var availableExtensionUri in TestExtensionByUri.Keys)
         {

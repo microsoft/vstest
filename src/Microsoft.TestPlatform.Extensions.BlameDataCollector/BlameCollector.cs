@@ -111,11 +111,9 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         XmlElement configurationElement,
         DataCollectionEvents events,
         DataCollectionSink dataSink,
-        DataCollectionLogger logger,
+        DataCollectionLogger logger!!,
         DataCollectionEnvironmentContext environmentContext)
     {
-        ValidateArg.NotNull(logger, nameof(logger));
-
         _events = events;
         _dataCollectionSink = dataSink;
         _context = environmentContext;
