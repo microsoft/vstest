@@ -163,10 +163,8 @@ internal class FullSymbolReader : ISymbolReader
         return true;
     }
 
-    private DiaNavigationData GetSymbolNavigationData(IDiaSymbol symbol)
+    private DiaNavigationData GetSymbolNavigationData(IDiaSymbol symbol!!)
     {
-        ValidateArg.NotNull(symbol, nameof(symbol));
-
         DiaNavigationData navigationData = new(null, int.MaxValue, int.MinValue);
 
         IDiaEnumLineNumbers lines = null;
@@ -369,9 +367,8 @@ internal class FullSymbolReader : ISymbolReader
         return typeSymbol;
     }
 
-    private IDiaSymbol GetMethodSymbol(IDiaSymbol typeSymbol, string methodName)
+    private IDiaSymbol GetMethodSymbol(IDiaSymbol typeSymbol!!, string methodName)
     {
-        ValidateArg.NotNull(typeSymbol, nameof(typeSymbol));
         ValidateArg.NotNullOrEmpty(methodName, nameof(methodName));
 
         IDiaEnumSymbols enumSymbols = null;

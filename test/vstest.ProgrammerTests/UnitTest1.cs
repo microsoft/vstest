@@ -17,7 +17,6 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 #if DEBUG
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;

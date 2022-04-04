@@ -90,9 +90,8 @@ internal class Condition
     /// <summary>
     /// Evaluate this condition for testObject.
     /// </summary>
-    internal bool Evaluate(Func<string, object> propertyValueProvider)
+    internal bool Evaluate(Func<string, object> propertyValueProvider!!)
     {
-        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
         var result = false;
         var multiValue = GetPropertyValue(propertyValueProvider);
         switch (Operation)

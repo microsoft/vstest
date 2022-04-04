@@ -72,10 +72,8 @@ public class LoggerRunSettings : TestRunSettings
     /// <exception cref="SettingsException">
     /// Settings exception
     /// </exception>
-    internal static LoggerRunSettings FromXml(XmlReader reader)
+    internal static LoggerRunSettings FromXml(XmlReader reader!!)
     {
-        ValidateArg.NotNull(reader, nameof(reader));
-
         return FromXml(reader,
             Constants.LoggersSettingName,
             Constants.LoggerSettingName);

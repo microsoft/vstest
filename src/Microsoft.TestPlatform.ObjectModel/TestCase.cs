@@ -46,10 +46,9 @@ public sealed class TestCase : TestObject
     /// <param name="source">
     /// Test container source from which the test is discovered.
     /// </param>
-    public TestCase(string fullyQualifiedName, Uri executorUri, string source)
+    public TestCase(string fullyQualifiedName, Uri executorUri!!, string source)
     {
         ValidateArg.NotNullOrEmpty(fullyQualifiedName, nameof(fullyQualifiedName));
-        ValidateArg.NotNull(executorUri, nameof(executorUri));
         ValidateArg.NotNullOrEmpty(source, nameof(source));
 
         FullyQualifiedName = fullyQualifiedName;
@@ -229,10 +228,8 @@ public sealed class TestCase : TestObject
     /// Return TestProperty's value
     /// </summary>
     /// <returns></returns>
-    protected override object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
+    protected override object ProtectedGetPropertyValue(TestProperty property!!, object defaultValue)
     {
-        ValidateArg.NotNull(property, nameof(property));
-
         return property.Id switch
         {
             "TestCase.CodeFilePath" => CodeFilePath,
@@ -250,10 +247,8 @@ public sealed class TestCase : TestObject
     /// <summary>
     /// Set TestProperty's value
     /// </summary>
-    protected override void ProtectedSetPropertyValue(TestProperty property, object value)
+    protected override void ProtectedSetPropertyValue(TestProperty property!!, object value)
     {
-        ValidateArg.NotNull(property, nameof(property));
-
         switch (property.Id)
         {
             case "TestCase.CodeFilePath":

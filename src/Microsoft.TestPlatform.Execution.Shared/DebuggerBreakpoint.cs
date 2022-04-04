@@ -8,7 +8,6 @@ using System.IO;
 using System.Reflection;
 #endif
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;

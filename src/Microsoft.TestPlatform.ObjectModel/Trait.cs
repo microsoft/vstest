@@ -33,10 +33,8 @@ public class Trait
     {
     }
 
-    public Trait(string name, string value)
+    public Trait(string name!!, string value)
     {
-        ValidateArg.NotNull(name, nameof(name));
-
         Name = name;
         Value = value;
     }
