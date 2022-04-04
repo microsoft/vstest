@@ -773,27 +773,6 @@ function Publish-VsixPackage {
     $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftInternalCodeCoverageVersion
     $interopExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.InteropExternalsVersion
 
-    # Copy Microsoft.VisualStudio.TraceDataCollector to Extensions
-    $traceDataCollectorPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.TraceDataCollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework472"
-    Copy-Item $traceDataCollectorPackageDirectory\Microsoft.VisualStudio.TraceDataCollector.dll $extensionsPackageDir -Force
-    if ($TPB_LocalizedBuild) {
-        Copy-Loc-Files $traceDataCollectorPackageDirectory $extensionsPackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
-    }
-
-    # Copy Microsoft.VisualStudio.Core to Extensions
-    $codeCoverageCorePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.core\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
-    Copy-Item $codeCoverageCorePackagesDir\Microsoft.VisualStudio.Coverage.Core.dll $extensionsPackageDir -Force
-
-    # Copy Microsoft.VisualStudio.Interprocess to Extensions
-    $codeCoverageInterprocessPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Coverage.Interprocess\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
-    Copy-Item $codeCoverageInterprocessPackageDirectory\Microsoft.VisualStudio.Coverage.Interprocess.dll $extensionsPackageDir -Force
-
-    # Copy Microsoft.VisualStudio.Instrumentation to Extensions
-    $codeCoverageInstrumentationPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Coverage.Instrumentation\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
-    Copy-Item $codeCoverageInstrumentationPackageDirectory\Microsoft.VisualStudio.Coverage.Instrumentation.dll $extensionsPackageDir -Force
-    Copy-Item $codeCoverageInstrumentationPackageDirectory\Mono.Cecil.dll $extensionsPackageDir -Force
-    Copy-Item $codeCoverageInstrumentationPackageDirectory\Mono.Cecil.Pdb.dll $extensionsPackageDir -Force
-
     # Copy Microsoft.VisualStudio.IO to root
     $codeCoverageIOPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Coverage.IO\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework451"
     Copy-Item $codeCoverageIOPackageDirectory\Microsoft.VisualStudio.Coverage.IO.dll $packageDir -Force
