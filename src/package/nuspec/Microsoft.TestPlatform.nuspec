@@ -477,6 +477,10 @@
     <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\msdia140.dll" target="tools\net451\Team Tools\Dynamic Code Coverage Tools\amd64\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\VanguardInstrumentationProfiler_x64.config" target="tools\net451\Team Tools\Dynamic Code Coverage Tools\amd64\" />
 
+    <file src="Microsoft.CodeCoverage\CodeCoverage\arm64\covrunarm64.dll" target="tools\net451\Team Tools\Dynamic Code Coverage Tools\arm64\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\arm64\msdia140.dll" target="tools\net451\Team Tools\Dynamic Code Coverage Tools\arm64\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\arm64\VanguardInstrumentationProfiler_arm64.config" target="tools\net451\Team Tools\Dynamic Code Coverage Tools\arm64\" />
+
     <file src="Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Telemetry.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Telemetry.dll" />
     <file src="Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll" />
     <file src="Microsoft.CodeCoverage\Shim\net45\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.CodeCoverage.Shim.dll" />
