@@ -61,10 +61,9 @@ public class TestPlatformFormatException : Exception
     /// <summary>
     /// Serialization constructor.
     /// </summary>
-    protected TestPlatformFormatException(SerializationInfo info, StreamingContext context)
+    protected TestPlatformFormatException(SerializationInfo info!!, StreamingContext context)
         : base(info, context)
     {
-        ValidateArg.NotNull(info, nameof(info));
         // Save the basic properties.
         FilterValue = info.GetString("FilterValue");
     }

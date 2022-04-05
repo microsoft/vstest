@@ -3,8 +3,6 @@
 
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common;
@@ -65,9 +63,8 @@ internal class RunSettingsManager : IRunSettingsProvider
     /// Set the active run settings.
     /// </summary>
     /// <param name="runSettings">RunSettings to make the active Run Settings.</param>
-    public void SetActiveRunSettings(RunSettings runSettings)
+    public void SetActiveRunSettings(RunSettings runSettings!!)
     {
-        ValidateArg.NotNull(runSettings, nameof(runSettings));
         ActiveRunSettings = runSettings;
     }
 

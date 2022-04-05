@@ -50,10 +50,8 @@ internal sealed class FastFilter
             : FilterProperties.Keys.Where(name => !properties.Contains(name)).ToArray();
     }
 
-    internal bool Evaluate(Func<string, Object> propertyValueProvider)
+    internal bool Evaluate(Func<string, Object> propertyValueProvider!!)
     {
-        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
-
         bool matched = false;
         foreach (var name in FilterProperties.Keys)
         {

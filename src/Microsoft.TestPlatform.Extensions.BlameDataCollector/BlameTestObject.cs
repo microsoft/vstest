@@ -31,10 +31,9 @@ public class BlameTestObject
     /// <param name="source">
     /// Test container source from which the test is discovered.
     /// </param>
-    public BlameTestObject(string fullyQualifiedName, Uri executorUri, string source)
+    public BlameTestObject(string fullyQualifiedName, Uri executorUri!!, string source)
     {
         ValidateArg.NotNullOrEmpty(fullyQualifiedName, nameof(fullyQualifiedName));
-        ValidateArg.NotNull(executorUri, nameof(executorUri));
         ValidateArg.NotNullOrEmpty(source, nameof(source));
 
         Id = Guid.Empty;

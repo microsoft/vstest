@@ -148,11 +148,8 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void TestMessageHandler(object sender, TestRunMessageEventArgs e)
+    public void TestMessageHandler(object sender!!, TestRunMessageEventArgs e!!)
     {
-        ValidateArg.NotNull(sender, nameof(sender));
-        ValidateArg.NotNull(e, nameof(e));
-
         switch (e.Level)
         {
             case TestMessageLevel.Informational:
@@ -184,11 +181,8 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void TestResultHandler(object sender, TestResultEventArgs e)
+    public void TestResultHandler(object sender!!, TestResultEventArgs e!!)
     {
-        ValidateArg.NotNull(sender, nameof(sender));
-        ValidateArg.NotNull(e, nameof(e));
-
         var testResult = new ObjectModel.TestResult
         {
             DisplayName = e.Result.DisplayName ?? e.Result.TestCase.FullyQualifiedName,

@@ -43,10 +43,8 @@ internal class TestRunResultAggregator
     /// These events will then be broadcast to any registered loggers.
     /// </summary>
     /// <param name="testRunRequest">The run request to register for events on.</param>
-    public void RegisterTestRunEvents(ITestRunRequest testRunRequest)
+    public void RegisterTestRunEvents(ITestRunRequest testRunRequest!!)
     {
-        ValidateArg.NotNull(testRunRequest, nameof(testRunRequest));
-
         // Register for the events.
         testRunRequest.TestRunMessage += TestRunMessageHandler;
         testRunRequest.OnRunCompletion += TestRunCompletionHandler;
@@ -56,10 +54,8 @@ internal class TestRunResultAggregator
     /// Unregisters from the provided test run request to stop receiving events.
     /// </summary>
     /// <param name="testRunRequest">The run request from which events should be unregistered.</param>
-    public void UnregisterTestRunEvents(ITestRunRequest testRunRequest)
+    public void UnregisterTestRunEvents(ITestRunRequest testRunRequest!!)
     {
-        ValidateArg.NotNull(testRunRequest, nameof(testRunRequest));
-
         testRunRequest.TestRunMessage -= TestRunMessageHandler;
         testRunRequest.OnRunCompletion -= TestRunCompletionHandler;
     }

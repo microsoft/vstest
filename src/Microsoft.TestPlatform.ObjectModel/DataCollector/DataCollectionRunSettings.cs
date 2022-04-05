@@ -126,13 +126,9 @@ public class DataCollectionRunSettings : TestRunSettings
     }
 
     public static DataCollectionRunSettings CreateDataCollectionRunSettings(
-        XmlReader reader, string dataCollectionName,
-        string dataCollectorsName, string dataCollectorName)
+        XmlReader reader!!, string dataCollectionName,
+        string dataCollectorsName!!, string dataCollectorName!!)
     {
-        ValidateArg.NotNull(reader, nameof(reader));
-        ValidateArg.NotNull(dataCollectorsName, nameof(dataCollectorsName));
-        ValidateArg.NotNull(dataCollectorName, nameof(dataCollectorName));
-
         DataCollectionRunSettings settings = new(dataCollectionName, dataCollectorsName, dataCollectorName);
         bool empty = reader.IsEmptyElement;
         if (reader.HasAttributes)

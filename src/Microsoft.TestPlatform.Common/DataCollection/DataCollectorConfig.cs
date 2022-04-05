@@ -8,7 +8,6 @@ using System.Linq;
 using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 #nullable disable
@@ -26,11 +25,9 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
     /// <param name="type">
     /// The type.
     /// </param>
-    public DataCollectorConfig(Type type)
+    public DataCollectorConfig(Type type!!)
         : base(type)
     {
-        ValidateArg.NotNull(type, nameof(type));
-
         DataCollectorType = type;
         TypeUri = GetTypeUri(type);
         FriendlyName = GetFriendlyName(type);
