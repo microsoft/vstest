@@ -53,8 +53,13 @@
     <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\msdia140.dll" target="build\netstandard1.0\CodeCoverage\amd64\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\VanguardInstrumentationProfiler_x64.config" target="build\netstandard1.0\CodeCoverage\amd64\" />
 
+    <file src="Microsoft.CodeCoverage\CodeCoverage\arm64\covrunarm64.dll" target="build\netstandard1.0\CodeCoverage\arm64\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\arm64\msdia140.dll" target="build\netstandard1.0\CodeCoverage\arm64\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\arm64\VanguardInstrumentationProfiler_arm64.config" target="build\netstandard1.0\CodeCoverage\arm64\" />
+
     <file src="Microsoft.CodeCoverage\InstrumentationEngine\x86\MicrosoftInstrumentationEngine_x86.dll"	target="build\netstandard1.0\InstrumentationEngine\x86\MicrosoftInstrumentationEngine_x86.dll" />
     <file src="Microsoft.CodeCoverage\InstrumentationEngine\x64\MicrosoftInstrumentationEngine_x64.dll"	target="build\netstandard1.0\InstrumentationEngine\x64\MicrosoftInstrumentationEngine_x64.dll" />
+    <file src="Microsoft.CodeCoverage\InstrumentationEngine\arm64\MicrosoftInstrumentationEngine_arm64.dll"	target="build\netstandard1.0\InstrumentationEngine\arm64\MicrosoftInstrumentationEngine_arm64.dll" />
     
     <file src="Microsoft.CodeCoverage\InstrumentationEngine\ubuntu\x64\libCoverageInstrumentationMethod.so"	target="build\netstandard1.0\InstrumentationEngine\ubuntu\x64\libCoverageInstrumentationMethod.so" />
     <file src="Microsoft.CodeCoverage\InstrumentationEngine\ubuntu\x64\libInstrumentationEngine.so"	target="build\netstandard1.0\InstrumentationEngine\ubuntu\x64\libInstrumentationEngine.so" />
