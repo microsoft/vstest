@@ -72,7 +72,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
     }
 
     /// <inheritdoc/>
-    public void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType, bool collectAlways)
+    public void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType, bool collectAlways, Action<string> logWarning)
     {
         _collectAlways = collectAlways;
         _outputDirectory = outputDirectory;
@@ -89,9 +89,9 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
 
         if (!TryGetProcDumpExecutable(processId, out var procDumpPath))
         {
-            var err = $"{procDumpPath} could not be found, please set PROCDUMP_PATH environment variable to a directory that contains {procDumpPath} executable, or make sure that the executable is available on PATH.";
-            ConsoleOutput.Instance.Warning(false, err);
-            EqtTrace.Error($"ProcDumpDumper.AttachToTargetProcess: {err}");
+            var procdumpNotFound = string.Format(Resources.Resources.ProcDumpNotFound, procDumpPath);
+            logWarning(procdumpNotFound);
+            EqtTrace.Warning($"ProcDumpDumper.AttachToTargetProcess: {procdumpNotFound}");
             return;
         }
 

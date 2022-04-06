@@ -12,7 +12,6 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-using Microsoft.Win32.SafeHandles;
 
 #nullable disable
 
@@ -122,7 +121,7 @@ internal class WindowsHangDumper : IHangDumper
         if (currentProcessArchitecture == targetProcessArchitecture)
         {
             EqtTrace.Verbose($"WindowsHangDumper.CollectDump: Both processes are {currentProcessArchitecture}, using PInvoke dumper directly.");
-            CollectDumpUsingMiniDumpWriteDump(process, outputFile, type);
+            MiniDumpWriteDump.CollectDumpUsingMiniDumpWriteDump(process, outputFile, FromDumpType(type));
         }
         else
         {
@@ -137,7 +136,7 @@ internal class WindowsHangDumper : IHangDumper
             if (dumpMinitoolName == null)
             {
                 EqtTrace.Verbose($"WindowsHangDumper.CollectDump: The target process architecture is {targetProcessArchitecture}, we don't have a DumpMinitool for that, falling back to using PInvoke directly.");
-                CollectDumpUsingMiniDumpWriteDump(process, outputFile, type);
+                MiniDumpWriteDump.CollectDumpUsingMiniDumpWriteDump(process, outputFile, FromDumpType(type));
             }
 
             var args = $"--file \"{outputFile}\" --processId {process.Id} --dumpType {type}";
@@ -165,100 +164,14 @@ internal class WindowsHangDumper : IHangDumper
         EqtTrace.Verbose($"WindowsHangDumper.CollectDump: Finished dumping {process.Id} - {process.ProcessName} in {outputFile}. ");
     }
 
-    private static void CollectDumpUsingMiniDumpWriteDump(Process process, string outputFile, DumpTypeOption type)
+    private static MiniDumpTypeOption FromDumpType(DumpTypeOption type)
     {
-        // Open the file for writing
-        using var stream = new FileStream(outputFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
-        NativeMethods.MinidumpExceptionInformation exceptionInfo = default;
-
-        NativeMethods.MinidumpType dumpType = NativeMethods.MinidumpType.MiniDumpNormal;
-        switch (type)
+        return type switch
         {
-            case DumpTypeOption.Full:
-                dumpType = NativeMethods.MinidumpType.MiniDumpWithFullMemory |
-                           NativeMethods.MinidumpType.MiniDumpWithDataSegs |
-                           NativeMethods.MinidumpType.MiniDumpWithHandleData |
-                           NativeMethods.MinidumpType.MiniDumpWithUnloadedModules |
-                           NativeMethods.MinidumpType.MiniDumpWithFullMemoryInfo |
-                           NativeMethods.MinidumpType.MiniDumpWithThreadInfo |
-                           NativeMethods.MinidumpType.MiniDumpWithTokenInformation;
-                break;
-            case DumpTypeOption.WithHeap:
-                dumpType = NativeMethods.MinidumpType.MiniDumpWithPrivateReadWriteMemory |
-                           NativeMethods.MinidumpType.MiniDumpWithDataSegs |
-                           NativeMethods.MinidumpType.MiniDumpWithHandleData |
-                           NativeMethods.MinidumpType.MiniDumpWithUnloadedModules |
-                           NativeMethods.MinidumpType.MiniDumpWithFullMemoryInfo |
-                           NativeMethods.MinidumpType.MiniDumpWithThreadInfo |
-                           NativeMethods.MinidumpType.MiniDumpWithTokenInformation;
-                break;
-            case DumpTypeOption.Mini:
-                dumpType = NativeMethods.MinidumpType.MiniDumpWithThreadInfo;
-                break;
-        }
-
-        // Retry the write dump on ERROR_PARTIAL_COPY
-        for (int i = 0; i < 5; i++)
-        {
-            // Dump the process!
-            if (NativeMethods.MiniDumpWriteDump(process.Handle, (uint)process.Id, stream.SafeFileHandle, dumpType, ref exceptionInfo, IntPtr.Zero, IntPtr.Zero))
-            {
-                break;
-            }
-            else
-            {
-                int err = Marshal.GetHRForLastWin32Error();
-                if (err != NativeMethods.ErrorPartialCopy)
-                {
-                    Marshal.ThrowExceptionForHR(err);
-                }
-            }
-        }
-    }
-
-    private static class NativeMethods
-    {
-        public const int ErrorPartialCopy = unchecked((int)0x8007012b);
-
-        [DllImport("Dbghelp.dll", SetLastError = true)]
-        public static extern bool MiniDumpWriteDump(IntPtr hProcess, uint processId, SafeFileHandle hFile, MinidumpType dumpType, ref MinidumpExceptionInformation exceptionParam, IntPtr userStreamParam, IntPtr callbackParam);
-
-        [StructLayout(LayoutKind.Sequential, Pack = 4)]
-        public struct MinidumpExceptionInformation
-        {
-            public readonly uint ThreadId;
-            public readonly IntPtr ExceptionPointers;
-            public readonly int ClientPointers;
-        }
-
-        [Flags]
-        public enum MinidumpType : uint
-        {
-            MiniDumpNormal = 0,
-            MiniDumpWithDataSegs = 1 << 0,
-            MiniDumpWithFullMemory = 1 << 1,
-            MiniDumpWithHandleData = 1 << 2,
-            MiniDumpFilterMemory = 1 << 3,
-            MiniDumpScanMemory = 1 << 4,
-            MiniDumpWithUnloadedModules = 1 << 5,
-            MiniDumpWithIndirectlyReferencedMemory = 1 << 6,
-            MiniDumpFilterModulePaths = 1 << 7,
-            MiniDumpWithProcessThreadData = 1 << 8,
-            MiniDumpWithPrivateReadWriteMemory = 1 << 9,
-            MiniDumpWithoutOptionalData = 1 << 10,
-            MiniDumpWithFullMemoryInfo = 1 << 11,
-            MiniDumpWithThreadInfo = 1 << 12,
-            MiniDumpWithCodeSegs = 1 << 13,
-            MiniDumpWithoutAuxiliaryState = 1 << 14,
-            MiniDumpWithFullAuxiliaryState = 1 << 15,
-            MiniDumpWithPrivateWriteCopyMemory = 1 << 16,
-            MiniDumpIgnoreInaccessibleMemory = 1 << 17,
-            MiniDumpWithTokenInformation = 1 << 18,
-            MiniDumpWithModuleHeaders = 1 << 19,
-            MiniDumpFilterTriage = 1 << 20,
-            MiniDumpWithAvxXStateContext = 1 << 21,
-            MiniDumpWithIptTrace = 1 << 22,
-            MiniDumpValidTypeFlags = (-1) ^ ((~1) << 22)
-        }
+            DumpTypeOption.Full => throw new NotImplementedException(),
+            DumpTypeOption.WithHeap => throw new NotImplementedException(),
+            DumpTypeOption.Mini => throw new NotImplementedException(),
+            _ => throw new NotSupportedException($"Dump type {type} is not supported."),
+        };
     }
 }

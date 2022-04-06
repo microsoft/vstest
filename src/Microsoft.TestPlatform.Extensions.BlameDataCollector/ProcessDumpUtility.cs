@@ -95,9 +95,9 @@ internal class ProcessDumpUtility : IProcessDumpUtility
     }
 
     /// <inheritdoc/>
-    public void StartTriggerBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework, bool collectAlways)
+    public void StartTriggerBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework, bool collectAlways, Action<string> logWarning)
     {
-        CrashDump(processId, testResultsDirectory, isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini, targetFramework, collectAlways);
+        CrashDump(processId, testResultsDirectory, isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini, targetFramework, collectAlways, logWarning);
     }
 
     /// <inheritdoc/>
@@ -106,15 +106,15 @@ internal class ProcessDumpUtility : IProcessDumpUtility
         _crashDumper?.DetachFromTargetProcess(targetProcessId);
     }
 
-    private void CrashDump(int processId, string tempDirectory, DumpTypeOption dumpType, string targetFramework, bool collectAlways)
+    private void CrashDump(int processId, string tempDirectory, DumpTypeOption dumpType, string targetFramework, bool collectAlways, Action<string> logWarning)
     {
         var processName = _processHelper.GetProcessName(processId);
-        EqtTrace.Info($"ProcessDumpUtility.CrashDump: Creating {dumpType.ToString().ToLowerInvariant()} dump of process {processName} ({processId}) into temporary path '{tempDirectory}'.");
+        EqtTrace.Info($"ProcessDumpUtility.CrashDump: Creating a crash dumper for process {processName} ({processId}). If crash happens, dumper will try to create '{dumpType}' dump and store it temporarily in path '{tempDirectory}'. Later dumps will become attachments and will be moved to TestResults directory.");
         _crashDumpDirectory = tempDirectory;
 
         _crashDumper = _crashDumperFactory.Create(targetFramework);
         ConsoleOutput.Instance.Information(false, $"Blame: Attaching crash dump utility to process {processName} ({processId}).");
-        _crashDumper.AttachToTargetProcess(processId, tempDirectory, dumpType, collectAlways);
+        _crashDumper.AttachToTargetProcess(processId, tempDirectory, dumpType, collectAlways, logWarning);
     }
 
     private void HangDump(int processId, string tempDirectory, DumpTypeOption dumpType, string targetFramework, Action<string> logWarning = null)

@@ -157,6 +157,10 @@ This test may, or may not be the source of the crash.</value>
   <data name="ProcDumpEnvVarEmpty" xml:space="preserve">
     <value>Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.</value>
   </data>
+  <data name="ProcDumpNotFound" xml:space="preserve">
+    <value>{0} could not be found, please make sure that the executable is available on PATH, or set PROCDUMP_PATH environment variable to a directory that contains {0} executable.</value>
+    <comment>0 is procDumpPath, a name of procdump executable such as procdump64.exe, 0 is used twice on purpose. PROCDUMP_PATH and PATH are literal and should not be localized.</comment>
+  </data>
   <data name="ProcDumpNotGenerated" xml:space="preserve">
     <value>CollectDump was enabled but dump file was not generated.</value>
   </data>

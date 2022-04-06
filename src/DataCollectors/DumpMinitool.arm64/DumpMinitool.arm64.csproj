@@ -18,6 +18,7 @@
   
   <ItemGroup>
     <Compile Include="..\DumpMinitool.x86\Program.cs" Link="Program.cs" />
+    <Compile Include="..\..\Microsoft.TestPlatform.Extensions.BlameDataCollector\MiniDumpWriteDump.cs" Link="MiniDumpWriteDump.cs" />
   </ItemGroup>
 
   <ItemGroup>

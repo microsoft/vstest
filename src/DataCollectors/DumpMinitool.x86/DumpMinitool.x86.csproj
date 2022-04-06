@@ -23,4 +23,8 @@
     <AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\Microsoft.TestPlatform.Extensions.BlameDataCollector\MiniDumpWriteDump.cs" Link="MiniDumpWriteDump.cs" />
+  </ItemGroup>
 </Project>

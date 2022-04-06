@@ -31,7 +31,7 @@ Microsoft.TestPlatform.Extensions.BlameDataCollector.IBlameReaderWriter
 Microsoft.TestPlatform.Extensions.BlameDataCollector.IBlameReaderWriter.ReadTestSequence(string filePath) -> System.Collections.Generic.List<Microsoft.TestPlatform.Extensions.BlameDataCollector.BlameTestObject>
 Microsoft.TestPlatform.Extensions.BlameDataCollector.IBlameReaderWriter.WriteTestSequence(System.Collections.Generic.List<System.Guid> testSequence, System.Collections.Generic.Dictionary<System.Guid, Microsoft.TestPlatform.Extensions.BlameDataCollector.BlameTestObject> testObjectDictionary, string filePath) -> string
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ICrashDumper
-Microsoft.TestPlatform.Extensions.BlameDataCollector.ICrashDumper.AttachToTargetProcess(int processId, string outputDirectory, Microsoft.TestPlatform.Extensions.BlameDataCollector.DumpTypeOption dumpType, bool collectAlways) -> void
+Microsoft.TestPlatform.Extensions.BlameDataCollector.ICrashDumper.AttachToTargetProcess(int processId, string outputDirectory, Microsoft.TestPlatform.Extensions.BlameDataCollector.DumpTypeOption dumpType, bool collectAlways, System.Action<string> logWarning) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ICrashDumper.DetachFromTargetProcess(int processId) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ICrashDumper.GetDumpFiles(bool processCrashed) -> System.Collections.Generic.IEnumerable<string>
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ICrashDumper.WaitForDumpToFinish() -> void
@@ -58,7 +58,7 @@ Microsoft.TestPlatform.Extensions.BlameDataCollector.IProcessDumpUtility
 Microsoft.TestPlatform.Extensions.BlameDataCollector.IProcessDumpUtility.DetachFromTargetProcess(int targetProcessId) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.IProcessDumpUtility.GetDumpFiles(bool warnOnNoDumpFiles, bool processCrashed) -> System.Collections.Generic.IEnumerable<string>
 Microsoft.TestPlatform.Extensions.BlameDataCollector.IProcessDumpUtility.StartHangBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework, System.Action<string> logWarning = null) -> void
-Microsoft.TestPlatform.Extensions.BlameDataCollector.IProcessDumpUtility.StartTriggerBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework, bool collectAlways) -> void
+Microsoft.TestPlatform.Extensions.BlameDataCollector.IProcessDumpUtility.StartTriggerBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework, bool collectAlways, System.Action<string> logWarning) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.NativeMethodsHelper
 Microsoft.TestPlatform.Extensions.BlameDataCollector.NativeMethodsHelper.Is64Bit(System.IntPtr processHandle) -> bool
 Microsoft.TestPlatform.Extensions.BlameDataCollector.NativeMethodsHelper.NativeMethodsHelper() -> void
@@ -67,7 +67,7 @@ Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpArgsBuilder.BuildHa
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpArgsBuilder.BuildTriggerBasedProcDumpArgs(int processId, string filename, System.Collections.Generic.IEnumerable<string> procDumpExceptionsList, bool isFullDump) -> string
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpArgsBuilder.ProcDumpArgsBuilder() -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper
-Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.AttachToTargetProcess(int processId, string outputDirectory, Microsoft.TestPlatform.Extensions.BlameDataCollector.DumpTypeOption dumpType, bool collectAlways) -> void
+Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.AttachToTargetProcess(int processId, string outputDirectory, Microsoft.TestPlatform.Extensions.BlameDataCollector.DumpTypeOption dumpType, bool collectAlways, System.Action<string> logWarning) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.DetachFromTargetProcess(int targetProcessId) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.Dump(int processId, string outputDirectory, Microsoft.TestPlatform.Extensions.BlameDataCollector.DumpTypeOption dumpType) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.GetDumpFiles(bool processCrashed) -> System.Collections.Generic.IEnumerable<string>

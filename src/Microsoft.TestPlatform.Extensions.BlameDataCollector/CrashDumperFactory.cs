@@ -51,13 +51,13 @@ internal class CrashDumperFactory : ICrashDumperFactory
                 return new ProcDumpDumper();
             }
 
-            EqtTrace.Info($"CrashDumperFactory: This is Windows on {targetFramework}, returning the .NETClient dumper which uses env variables to collect crashdumps of testhost and any child process.");
+            EqtTrace.Info($"CrashDumperFactory: This is Windows on {targetFramework}, returning the .NETClient dumper which uses env variables to collect crashdumps of testhost and any child process that is .NET 5 or newer.");
             return new NetClientCrashDumper(new FileHelper());
         }
 
         if (isNet50OrNewer)
         {
-            EqtTrace.Info($"CrashDumperFactory: This is {RuntimeInformation.OSDescription} on {targetFramework} .NETClient dumper which uses env variables to collect crashdumps of testhost and any child process.");
+            EqtTrace.Info($"CrashDumperFactory: This is {RuntimeInformation.OSDescription} on {targetFramework} .NETClient dumper which uses env variables to collect crashdumps of testhost and any child process that is .NET 5 or newer.");
             return new NetClientCrashDumper(new FileHelper());
         }
 

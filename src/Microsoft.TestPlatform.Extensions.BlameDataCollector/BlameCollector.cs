@@ -525,7 +525,8 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         try
         {
             var dumpDirectory = GetDumpDirectory();
-            _processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, dumpDirectory, _processFullDumpEnabled, _targetFramework, _collectDumpAlways);
+            Action<string> logWarning = m => _logger.LogWarning(_context.SessionDataCollectionContext, m);
+            _processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, dumpDirectory, _processFullDumpEnabled, _targetFramework, _collectDumpAlways, logWarning);
         }
         catch (TestPlatformException e)
         {
