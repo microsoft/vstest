@@ -8,7 +8,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 #nullable disable
@@ -27,18 +26,21 @@ public partial class ProcessHelper : IProcessHelper
 
     /// <inheritdoc/>
     public PlatformArchitecture GetCurrentProcessArchitecture()
-        =>
-        IntPtr.Size == 8
-        ? IsArm64()
-            ? PlatformArchitecture.ARM64
-            : PlatformArchitecture.X64
-        : PlatformArchitecture.X86;
+        => GetProcessArchitecture(Process.GetCurrentProcess().Id);
 
-    private static bool IsArm64()
+
+    public PlatformArchitecture GetProcessArchitecture(int processId)
+     => IntPtr.Size * 8 == 64
+       ? IsArm64(processId)
+           ? PlatformArchitecture.ARM64
+           : PlatformArchitecture.X64
+       : PlatformArchitecture.X86;
+
+    private static bool IsArm64(int processId)
     {
         try
         {
-            var currentProcess = Process.GetCurrentProcess();
+            var currentProcess = Process.GetProcessById(processId);
             if (!NativeMethods.IsWow64Process2(currentProcess.Handle, out ushort processMachine, out ushort nativeMachine))
             {
                 throw new Win32Exception();

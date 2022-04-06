@@ -269,10 +269,13 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
         if (_environment.OperatingSystem == PlatformOperatingSystem.Windows)
         {
             // Launch proc dump according to process architecture
-            filename = _environment.Architecture == PlatformArchitecture.X86
-                ? Constants.ProcdumpProcess
-                : _nativeMethodsHelper.Is64Bit(_processHelper.GetProcessHandle(processId)) ?
-                    Constants.Procdump64Process : Constants.ProcdumpProcess;
+            var targetProcessArchitecture = _processHelper.GetProcessArchitecture(processId);
+            filename = targetProcessArchitecture switch
+            {
+                PlatformArchitecture.X86 => "procdump.exe",
+                PlatformArchitecture.ARM64 => "procdump64a.exe",
+                _ => "procdump64.exe",
+            };
         }
         else
         {

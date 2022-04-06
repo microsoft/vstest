@@ -113,3 +113,6 @@ Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ThreadApartmentStateNot
 static Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.ErrorOnInitialization.get -> string
 static Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.ErrorOnInitialization.set -> void
 static Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformAssemblyExtensions.GetAssemblyLocation(this System.Reflection.Assembly assembly) -> string
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetProcessArchitecture(int processId) -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetProcessArchitecture(int processId) -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
+
