@@ -5,6 +5,7 @@ using System;
 using System.Runtime.InteropServices;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 using NuGet.Frameworks;
 
@@ -58,7 +59,7 @@ internal class HangDumperFactory : IHangDumperFactory
             }
 
             EqtTrace.Info($"HangDumperFactory: This is Windows, returning the default WindowsHangDumper that P/Invokes MiniDumpWriteDump.");
-            return new WindowsHangDumper(LogWarning);
+            return new WindowsHangDumper(new ProcessHelper(), LogWarning);
         }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))

@@ -15,12 +15,16 @@
     <RuntimeIdentifier Condition=" '$(DotNetBuildFromSource)' != 'true' ">win10-arm64</RuntimeIdentifier>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Include="..\DumpMinitool.x86\Program.cs" Link="Program.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- API that is common to all frameworks that we build for. -->
     <AdditionalFiles Include="..\DumpMinitool.x86\PublicAPI\PublicAPI.Shipped.txt" Link="PublicAPI\PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="..\DumpMinitool.x86\PublicAPI\PublicAPI.Unshipped.txt" Link="PublicAPI\PublicAPI.Unshipped.txt" />
   </ItemGroup>
-
+  
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
