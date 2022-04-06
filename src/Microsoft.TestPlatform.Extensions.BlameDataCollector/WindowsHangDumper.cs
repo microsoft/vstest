@@ -127,6 +127,7 @@ internal class WindowsHangDumper : IHangDumper
 
             var currentProcessIs64Bit = RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.X64;
 
+                // TODO: fix this to select arm64!
             if (targetProcessIs64Bit && currentProcessIs64Bit)
             {
                 // Both processes are x64 architecture, dump it using the PInvoke call.
@@ -154,7 +155,7 @@ internal class WindowsHangDumper : IHangDumper
                 }
 
                 var args = $"--file \"{outputFile}\" --processId {process.Id} --dumpType {type}";
-                var dumpMinitoolPath = Path.Combine(Path.GetDirectoryName(Assembly.GetCallingAssembly().Location), dumpMinitoolName);
+                var dumpMinitoolPath = Path.Combine(Path.GetDirectoryName(Assembly.GetCallingAssembly().Location),  "dump", dumpMinitoolName);
                 if (!File.Exists(dumpMinitoolPath))
                 {
                     throw new FileNotFoundException("Could not find DumpMinitool", dumpMinitoolPath);

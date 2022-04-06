@@ -14,13 +14,13 @@ function Verify-Nuget-Packages($packageDirectory, $version)
     $expectedNumOfFiles = @{
         "Microsoft.CodeCoverage" = 57;
         "Microsoft.NET.Test.Sdk" = 27;
-        "Microsoft.TestPlatform" = 616;
+        "Microsoft.TestPlatform" = 618;
         "Microsoft.TestPlatform.Build" = 21;
-        "Microsoft.TestPlatform.CLI" = 425;
+        "Microsoft.TestPlatform.CLI" = 427;
         "Microsoft.TestPlatform.Extensions.TrxLogger" = 35;
         "Microsoft.TestPlatform.ObjectModel" = 238;
         "Microsoft.TestPlatform.AdapterUtilities" = 62;
-        "Microsoft.TestPlatform.Portable" = 644;
+        "Microsoft.TestPlatform.Portable" = 648;
         "Microsoft.TestPlatform.TestHost" = 214;
         "Microsoft.TestPlatform.TranslationLayer" = 123;
         "Microsoft.TestPlatform.Internal.Uwp" = 86;
@@ -44,21 +44,29 @@ function Verify-Nuget-Packages($packageDirectory, $version)
     }
 
     Write-VerboseLog "Verify NuGet packages files."
+    $errors = @()
     foreach($unzipNugetPackageDir in $unzipNugetPackageDirs)
     {
-        $actualNumOfFiles = (Get-ChildItem -Recurse -File -Path $unzipNugetPackageDir).Count
-        $versionLen = $version.Length + 1  # +1 for dot
-        $packageKey = (Get-Item $unzipNugetPackageDir).BaseName -replace ".{$versionLen}$"
-        Write-VerboseLog "verifying package $packageKey."
+        try {
+            $actualNumOfFiles = (Get-ChildItem -Recurse -File -Path $unzipNugetPackageDir).Count
+            $versionLen = $version.Length + 1  # +1 for dot
+            $packageKey = (Get-Item $unzipNugetPackageDir).BaseName -replace ".{$versionLen}$"
+            Write-VerboseLog "verifying package $packageKey."
 
-        if($expectedNumOfFiles[$packageKey] -ne $actualNumOfFiles)
-        {
-            Write-Error "Number of files are not equal $unzipNugetPackageDir, expected: $($expectedNumOfFiles[$packageKey]) actual: $actualNumOfFiles"
+            if($expectedNumOfFiles[$packageKey] -ne $actualNumOfFiles)
+            {
+                $errors += "Number of files are not equal $unzipNugetPackageDir, expected: $($expectedNumOfFiles[$packageKey]) actual: $actualNumOfFiles"
+            }
         }
+        finally {
+            if ($null -ne $unzipNugetPackageDir -and (Test-Path $unzipNugetPackageDir)) {
+                Remove-Item -Force -Recurse $unzipNugetPackageDir | Out-Null
+            }
+        }
+    }
 
-        # Don't remove the directories after you unpacked them
-        # they are useful for reviewing what is in the package.
-        Remove-Item -Force -Recurse $unzipNugetPackageDir | Out-Null
+    if ($errors) { 
+        Write-Error "There are $($errors.Count) errors:`n$($errors -join "`n")"
     }
 
     Write-Log "Completed Verify-Nuget-Packages."
