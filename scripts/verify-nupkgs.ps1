@@ -53,8 +53,7 @@ function Verify-Nuget-Packages($packageDirectory, $version)
             $packageKey = (Get-Item $unzipNugetPackageDir).BaseName -replace ".{$versionLen}$"
             Write-VerboseLog "verifying package $packageKey."
 
-            if($expectedNumOfFiles[$packageKey] -ne $actualNumOfFiles)
-            {
+            if ($expectedNumOfFiles[$packageKey] -ne $actualNumOfFiles) {
                 $errors += "Number of files are not equal $unzipNugetPackageDir, expected: $($expectedNumOfFiles[$packageKey]) actual: $actualNumOfFiles"
             }
         }
