@@ -7,8 +7,6 @@ using System.Threading;
 
 using Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
-#nullable disable
-
 namespace DumpMinitool;
 
 internal class Program

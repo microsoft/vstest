@@ -29,30 +29,25 @@ internal class MiniDumpWriteDump
         NativeMethods.MinidumpExceptionInformation exceptionInfo = default;
 
         NativeMethods.MinidumpType dumpType = NativeMethods.MinidumpType.MiniDumpNormal;
-        switch (type)
+        dumpType = type switch
         {
-            case MiniDumpTypeOption.Full:
-                dumpType = NativeMethods.MinidumpType.MiniDumpWithFullMemory |
-                           NativeMethods.MinidumpType.MiniDumpWithDataSegs |
-                           NativeMethods.MinidumpType.MiniDumpWithHandleData |
-                           NativeMethods.MinidumpType.MiniDumpWithUnloadedModules |
-                           NativeMethods.MinidumpType.MiniDumpWithFullMemoryInfo |
-                           NativeMethods.MinidumpType.MiniDumpWithThreadInfo |
-                           NativeMethods.MinidumpType.MiniDumpWithTokenInformation;
-                break;
-            case MiniDumpTypeOption.WithHeap:
-                dumpType = NativeMethods.MinidumpType.MiniDumpWithPrivateReadWriteMemory |
-                           NativeMethods.MinidumpType.MiniDumpWithDataSegs |
-                           NativeMethods.MinidumpType.MiniDumpWithHandleData |
-                           NativeMethods.MinidumpType.MiniDumpWithUnloadedModules |
-                           NativeMethods.MinidumpType.MiniDumpWithFullMemoryInfo |
-                           NativeMethods.MinidumpType.MiniDumpWithThreadInfo |
-                           NativeMethods.MinidumpType.MiniDumpWithTokenInformation;
-                break;
-            case MiniDumpTypeOption.Mini:
-                dumpType = NativeMethods.MinidumpType.MiniDumpWithThreadInfo;
-                break;
-        }
+            MiniDumpTypeOption.Full => NativeMethods.MinidumpType.MiniDumpWithFullMemory |
+                                       NativeMethods.MinidumpType.MiniDumpWithDataSegs |
+                                       NativeMethods.MinidumpType.MiniDumpWithHandleData |
+                                       NativeMethods.MinidumpType.MiniDumpWithUnloadedModules |
+                                       NativeMethods.MinidumpType.MiniDumpWithFullMemoryInfo |
+                                       NativeMethods.MinidumpType.MiniDumpWithThreadInfo |
+                                       NativeMethods.MinidumpType.MiniDumpWithTokenInformation,
+            MiniDumpTypeOption.WithHeap => NativeMethods.MinidumpType.MiniDumpWithPrivateReadWriteMemory |
+                                       NativeMethods.MinidumpType.MiniDumpWithDataSegs |
+                                       NativeMethods.MinidumpType.MiniDumpWithHandleData |
+                                       NativeMethods.MinidumpType.MiniDumpWithUnloadedModules |
+                                       NativeMethods.MinidumpType.MiniDumpWithFullMemoryInfo |
+                                       NativeMethods.MinidumpType.MiniDumpWithThreadInfo |
+                                       NativeMethods.MinidumpType.MiniDumpWithTokenInformation,
+            MiniDumpTypeOption.Mini => NativeMethods.MinidumpType.MiniDumpWithThreadInfo,
+            _ => NativeMethods.MinidumpType.MiniDumpNormal,
+        };
 
         // Retry the write dump on ERROR_PARTIAL_COPY
         for (int i = 0; i < 5; i++)
@@ -62,13 +57,11 @@ internal class MiniDumpWriteDump
             {
                 break;
             }
-            else
+
+            int err = Marshal.GetHRForLastWin32Error();
+            if (err != NativeMethods.ErrorPartialCopy)
             {
-                int err = Marshal.GetHRForLastWin32Error();
-                if (err != NativeMethods.ErrorPartialCopy)
-                {
-                    Marshal.ThrowExceptionForHR(err);
-                }
+                Marshal.ThrowExceptionForHR(err);
             }
         }
     }
