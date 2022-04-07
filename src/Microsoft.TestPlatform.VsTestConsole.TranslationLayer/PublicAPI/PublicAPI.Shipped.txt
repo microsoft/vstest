@@ -199,5 +199,5 @@ static Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resour
 virtual Microsoft.TestPlatform.VsTestConsole.TranslationLayer.TestSession.Dispose(bool disposing) -> void
 Microsoft.TestPlatform.VsTestConsole.TranslationLayer.ConsoleParameters.EnvironmentVariables.get -> System.Collections.Generic.Dictionary<string, string>
 Microsoft.TestPlatform.VsTestConsole.TranslationLayer.ConsoleParameters.EnvironmentVariables.set -> void
-Microsoft.TestPlatform.VsTestConsole.TranslationLayer.ConsoleParameters.ClearEnvironmentVariables.get -> bool
-Microsoft.TestPlatform.VsTestConsole.TranslationLayer.ConsoleParameters.ClearEnvironmentVariables.set -> void
+Microsoft.TestPlatform.VsTestConsole.TranslationLayer.ConsoleParameters.InheritEnvironmentVariables.get -> bool
+Microsoft.TestPlatform.VsTestConsole.TranslationLayer.ConsoleParameters.InheritEnvironmentVariables.set -> void
