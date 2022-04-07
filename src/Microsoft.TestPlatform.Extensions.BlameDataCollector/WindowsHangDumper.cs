@@ -168,9 +168,9 @@ internal class WindowsHangDumper : IHangDumper
     {
         return type switch
         {
-            DumpTypeOption.Full => throw new NotImplementedException(),
-            DumpTypeOption.WithHeap => throw new NotImplementedException(),
-            DumpTypeOption.Mini => throw new NotImplementedException(),
+            DumpTypeOption.Full => MiniDumpTypeOption.Full,
+            DumpTypeOption.WithHeap => MiniDumpTypeOption.WithHeap,
+            DumpTypeOption.Mini => MiniDumpTypeOption.Mini,
             _ => throw new NotSupportedException($"Dump type {type} is not supported."),
         };
     }

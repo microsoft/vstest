@@ -163,7 +163,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} could not be found, please make sure that the executable is available on PATH, or set PROCDUMP_PATH environment variable to a directory that contains {0} executable..
+        ///   Looks up a localized string similar to {0} could not be found, please make sure that the executable is available on PATH. Alternatively set PROCDUMP_PATH environment variable to a directory that contains {0} executable.
         /// </summary>
         internal static string ProcDumpNotFound {
             get {

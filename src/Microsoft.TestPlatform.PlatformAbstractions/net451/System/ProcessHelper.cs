@@ -30,7 +30,7 @@ public partial class ProcessHelper : IProcessHelper
 
 
     public PlatformArchitecture GetProcessArchitecture(int processId)
-     => IntPtr.Size * 8 == 64
+     => IntPtr.Size == 8
        ? IsArm64(processId)
            ? PlatformArchitecture.ARM64
            : PlatformArchitecture.X64
@@ -40,8 +40,8 @@ public partial class ProcessHelper : IProcessHelper
     {
         try
         {
-            var currentProcess = Process.GetProcessById(processId);
-            if (!NativeMethods.IsWow64Process2(currentProcess.Handle, out ushort processMachine, out ushort nativeMachine))
+            var process = Process.GetProcessById(processId);
+            if (!NativeMethods.IsWow64Process2(process.Handle, out ushort processMachine, out ushort nativeMachine))
             {
                 throw new Win32Exception();
             }
@@ -51,7 +51,7 @@ public partial class ProcessHelper : IProcessHelper
             if (processMachine == NativeMethods.IMAGE_FILE_MACHINE_UNKNOWN && nativeMachine == NativeMethods.IMAGE_FILE_MACHINE_ARM64)
             {
                 // To distinguish between ARM64 and x64 emulated on ARM64 we check the PE header of the current running executable.
-                return IsArm64Executable(currentProcess.MainModule.FileName);
+                return IsArm64Executable(process.MainModule.FileName);
             }
         }
         catch

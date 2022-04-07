@@ -474,7 +474,7 @@ public class BlameCollectorTests
         _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
         // Verify StartProcessDumpCall
-        _mockProcessDumpUtility.Verify(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), false, It.IsAny<string>(), false));
+        _mockProcessDumpUtility.Verify(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), false, It.IsAny<string>(), false, It.IsAny<Action<string>>()));
     }
 
     /// <summary>
@@ -495,7 +495,7 @@ public class BlameCollectorTests
         _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
         // Verify StartProcessDumpCall
-        _mockProcessDumpUtility.Verify(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), true, It.IsAny<string>(), false));
+        _mockProcessDumpUtility.Verify(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), true, It.IsAny<string>(), false, It.IsAny<Action<string>>()));
     }
 
     /// <summary>
@@ -524,7 +524,7 @@ public class BlameCollectorTests
         _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
         // Verify StartProcessDumpCall
-        _mockProcessDumpUtility.Verify(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), true, It.IsAny<string>(), false));
+        _mockProcessDumpUtility.Verify(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), true, It.IsAny<string>(), false, It.IsAny<Action<string>>()));
     }
 
     /// <summary>
@@ -644,7 +644,7 @@ public class BlameCollectorTests
 
         // Make StartProcessDump throw exception
         var tpex = new TestPlatformException("env var exception");
-        _mockProcessDumpUtility.Setup(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), false, It.IsAny<string>(), false))
+        _mockProcessDumpUtility.Setup(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), false, It.IsAny<string>(), false, It.IsAny<Action<string>>()))
             .Throws(tpex);
 
         // Raise TestHostLaunched
@@ -670,7 +670,7 @@ public class BlameCollectorTests
 
         // Make StartProcessDump throw exception
         var ex = new Exception("start process failed");
-        _mockProcessDumpUtility.Setup(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), false, It.IsAny<string>(), false))
+        _mockProcessDumpUtility.Setup(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), false, It.IsAny<string>(), false, It.IsAny<Action<string>>()))
             .Throws(ex);
 
         // Raise TestHostLaunched
