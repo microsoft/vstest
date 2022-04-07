@@ -50,7 +50,7 @@ public class ConsoleParameters
     /// and only sets the entries you provided in <see cref="EnvironmentVariables"/>.
     /// This allows you to provide an arbitrary set of environment variables, for example when you
     /// want to skip environment variables that are set in the IDE that starts vstest.console.
-    /// When setting this to true you are responsible for providing a full set of envirionment variables
+    /// When setting this to true you are responsible for providing a full set of environment variables
     /// that allow the process to start.
     /// You most likely want to use <see cref="System.Environment.GetEnvironmentVariables(System.EnvironmentVariableTarget)"/> and combine
     /// <see cref="System.EnvironmentVariableTarget.Machine"/> and <see cref="System.EnvironmentVariableTarget.User"/> responses.
