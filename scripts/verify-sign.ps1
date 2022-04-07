@@ -35,7 +35,7 @@ $TPB_AssembliesPattern = @(
     "*test*.dll", "*qualitytools*.dll", "*test*.exe", "*datacollector*.dll", "*datacollector*.exe",
     "QTAgent*.exe", "Microsoft.VisualStudio*.dll", "Microsoft.TestPlatform.Build.dll", "Microsoft.DiaSymReader.dll",
     "Microsoft.IntelliTrace*.dll", "concrt140.dll", "msvcp140.dll", "vccorlib140.dll", "vcruntime140.dll", "codecoveragemessages.dll",
-    "covrun32.dll", "msdia140.dll", "covrun64.dll", "IntelliTrace.exe", "ProcessSnapshotCleanup.exe", "TDEnvCleanup.exe",
+    "covrun32.dll", "msdia140.dll", "covrun64.dll", "covrunarm64.dll", "IntelliTrace.exe", "ProcessSnapshotCleanup.exe", "TDEnvCleanup.exe",
     "CodeCoverage.exe", "Microsoft.ShDocVw.dll", "UIAComwrapper.dll", "Interop.UIAutomationClient.dll", "SettingsMigrator.exe",
     "Newtonsoft.Json.dll", "DumpMinitool*.exe"
 )
@@ -141,7 +141,7 @@ function Verify-NugetPackages
 function Write-FailLog ([string] $message)
 {
     $script:ErrorCount = $script:ErrorCount + 1
-    Write-ToCI -message $message -type "error"
+    Write-ToCI -message $message -type "task.logissue type=error"
 }
 
 function Write-Debug ([string] $message)
@@ -172,5 +172,6 @@ Verify-Assemblies
 Verify-NugetPackages
 
 if ($script:ErrorCount -gt 0) {
-    Write-ToCI -message "Verification failed, $($script:ErrorCount) errors found!" -type "task.logissue" -vso
+    # Write-ToCI -message "Verification failed, $($script:ErrorCount) errors found!" -type "task.logissue type=error" -vso
+    Write-ToCI -message "Verification failed, $($script:ErrorCount) errors found!" -type "task.complete result=Failed;" -vso
 }

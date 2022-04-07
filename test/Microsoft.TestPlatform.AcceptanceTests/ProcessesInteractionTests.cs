@@ -3,7 +3,6 @@
 
 using System.IO;
 
-using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
@@ -23,12 +22,10 @@ public class ProcessesInteractionTests : AcceptanceTestBase
         // Arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
         const string testAssetProjectName = "SimpleTestProjectMessedUpTargetFramework";
-        var assemblyPath = GetAssetFullPath(testAssetProjectName + ".dll", Core21TargetFramework);
+        var assemblyPath = GetTestDllForFramework(testAssetProjectName + ".dll", Core21TargetFramework);
         UpdateRuntimeConfigJsonWithInvalidFramework(assemblyPath, testAssetProjectName);
-        using var tempDir = new TempDirectory();
 
         // Act
-        var arguments = PrepareArguments(assemblyPath, GetTestAdapterPath(), "", FrameworkArgValue, tempDir.Path);
         InvokeVsTest(assemblyPath);
 
         // Assert
@@ -40,7 +37,7 @@ public class ProcessesInteractionTests : AcceptanceTestBase
             // On the contrary to other tests, we need to modify the test asset we are using to replace
             // the target framework with an invalid framework. This is why we have a specific test asset
             // that's only meant to be used by this project.
-            var runtimeConfigJson = Path.Combine(Path.GetDirectoryName(assemblyPath), testAssetProjectName + ".runtimeconfig.json");
+            var runtimeConfigJson = Path.Combine(Path.GetDirectoryName(assemblyPath)!, testAssetProjectName + ".runtimeconfig.json");
             var fileContent = File.ReadAllText(runtimeConfigJson);
             var updatedContent = fileContent.Replace("\"version\": \"2.1.0\"", "\"version\": \"0.0.0\"");
             File.WriteAllText(runtimeConfigJson, updatedContent);

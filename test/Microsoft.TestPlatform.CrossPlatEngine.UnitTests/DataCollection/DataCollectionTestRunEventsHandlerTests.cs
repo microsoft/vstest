@@ -18,20 +18,17 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
 
 [TestClass]
 public class DataCollectionTestRunEventsHandlerTests
 {
-    private Mock<ITestRunEventsHandler> _baseTestRunEventsHandler;
+    private readonly Mock<ITestRunEventsHandler> _baseTestRunEventsHandler;
     private DataCollectionTestRunEventsHandler _testRunEventHandler;
-    private Mock<IProxyDataCollectionManager> _proxyDataCollectionManager;
-    private Mock<IDataSerializer> _mockDataSerializer;
+    private readonly Mock<IProxyDataCollectionManager> _proxyDataCollectionManager;
+    private readonly Mock<IDataSerializer> _mockDataSerializer;
 
-    [TestInitialize]
-    public void InitializeTests()
+    public DataCollectionTestRunEventsHandlerTests()
     {
         _baseTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
         _proxyDataCollectionManager = new Mock<IProxyDataCollectionManager>();

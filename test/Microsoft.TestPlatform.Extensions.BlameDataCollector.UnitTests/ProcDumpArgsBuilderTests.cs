@@ -5,8 +5,6 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests;
 
 [TestClass]

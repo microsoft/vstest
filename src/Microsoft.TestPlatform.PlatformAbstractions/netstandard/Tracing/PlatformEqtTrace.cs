@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if NETSTANDARD && !NETSTANDARD2_0
+
 using System;
 using System.Diagnostics;
-
-#if NETSTANDARD && !NETSTANDARD2_0
 
 #nullable disable
 
@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 ///       We pass through exceptions thrown due to incorrect arguments to <c>EqtTrace</c> methods.
 /// Usage: <c>EqtTrace.Info("Here's how to trace info");</c>
 /// </summary>
-public partial class PlatformEqtTrace : IPlatformEqtTrace
+public class PlatformEqtTrace : IPlatformEqtTrace
 {
     private PlatformTraceLevel _traceLevel = PlatformTraceLevel.Off;
 
@@ -39,19 +39,32 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
         }
 
         var level = Enum.GetName(typeof(PlatformTraceLevel), traceLevel);
+
         Debug.WriteLine($"[{level}] {message}");
     }
 
     public bool InitializeVerboseTrace(string customLogFile)
     {
+#if DEBUG
+        // We don't have access to System.Diagnostics.Trace on netstandard1.3
+        // so we write to Debug. No need to initialize for non-debug builds.
+        return true;
+#else
         return false;
+#endif
     }
 
     public bool InitializeTrace(string customLogFile, PlatformTraceLevel traceLevel)
     {
         _traceLevel = traceLevel;
 
+#if DEBUG
+        // We don't have access to System.Diagnostics.Trace on netstandard1.3
+        // so we write to Debug. No need to initialize for non-debug builds.
+        return true;
+#else
         return false;
+#endif
     }
 
     public bool ShouldTrace(PlatformTraceLevel traceLevel)

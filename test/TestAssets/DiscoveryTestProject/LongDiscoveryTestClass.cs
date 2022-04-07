@@ -10,18 +10,26 @@ namespace DiscoveryTestProject3
     [TestClass]
     public class LongDiscoveryTestClass
     {
-        [MyTestMethod]
-        public void CustomTestMethod()
+        // This is for discovery cancellation test.
+        // LongDiscoveryTestMethod has attribute attribute that
+        // takes a very long time to create, which prolongs the
+        // discovery time and keeps us discovering while we
+        // are cancelling the discovery from the CancelTestDiscovery test.
+
+        [TestMethodWithDelay]
+        public void LongDiscoveryTestMethod()
         {
 
         }
     }
 
-    internal class MyTestMethodAttribute : TestMethodAttribute
+    internal class TestMethodWithDelayAttribute : TestMethodAttribute
     {
-        public MyTestMethodAttribute()
+        public TestMethodWithDelayAttribute()
         {
-            Thread.Sleep(10000);
+            // This will be multiplied by 3 because the framework will internally create this
+            // attribute 3 times.
+            Thread.Sleep(1000);
         }
     }
 }

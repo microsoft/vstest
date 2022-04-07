@@ -46,9 +46,8 @@ internal static class RunSettingsProviderExtensions
     /// </summary>
     private const string ValueString = "value";
 
-    public static void UpdateRunSettings(this IRunSettingsProvider runSettingsProvider, string runsettingsXml)
+    public static void UpdateRunSettings(this IRunSettingsProvider runSettingsProvider!!, string runsettingsXml)
     {
-        ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
         ValidateArg.NotNullOrWhiteSpace(runsettingsXml, nameof(runsettingsXml));
 
         var runSettings = new RunSettings();
@@ -56,10 +55,8 @@ internal static class RunSettingsProviderExtensions
         runSettingsProvider.SetActiveRunSettings(runSettings);
     }
 
-    public static void AddDefaultRunSettings(this IRunSettingsProvider runSettingsProvider)
+    public static void AddDefaultRunSettings(this IRunSettingsProvider runSettingsProvider!!)
     {
-        ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
-
         var runSettingsXml = runSettingsProvider.ActiveRunSettings?.SettingsXml;
 
         if (string.IsNullOrWhiteSpace(runSettingsXml))
@@ -77,11 +74,9 @@ internal static class RunSettingsProviderExtensions
         node.InnerXml = data;
     }
 
-    public static void UpdateRunSettingsNode(this IRunSettingsProvider runSettingsProvider, string key, string data)
+    public static void UpdateRunSettingsNode(this IRunSettingsProvider runSettingsProvider!!, string key, string data!!)
     {
-        ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
         ValidateArg.NotNullOrWhiteSpace(key, nameof(key));
-        ValidateArg.NotNull(data, nameof(data));
 
         var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
         UpdateRunSettingsXmlDocument(xmlDocument, key, data);
@@ -94,7 +89,7 @@ internal static class RunSettingsProviderExtensions
     /// <param name="runSettingsProvider"></param>
     /// <param name="node"></param>
     /// <returns></returns>
-    public static Match GetTestRunParameterNodeMatch(this IRunSettingsProvider runSettingsProvider, string node)
+    public static Match GetTestRunParameterNodeMatch(this IRunSettingsProvider _, string node)
     {
         var attrName = $"(?<{AttributeNameString}>[\\w.:-]+)";
         var attrValue = $"(?<{AttributeValueString}>.+)";
@@ -108,10 +103,8 @@ internal static class RunSettingsProviderExtensions
     /// </summary>
     /// <param name="runSettingsProvider"></param>
     /// <param name="match"></param>
-    public static void UpdateTestRunParameterSettingsNode(this IRunSettingsProvider runSettingsProvider, Match match)
+    public static void UpdateTestRunParameterSettingsNode(this IRunSettingsProvider runSettingsProvider!!, Match match)
     {
-        ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
-
         var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
         XmlNode testRunParameterNode = GetXmlNode(xmlDocument, Constants.TestRunParametersName) ?? xmlDocument.CreateElement(Constants.TestRunParametersName);
         var attrName = match.Groups[AttributeNameString].Value;
@@ -143,20 +136,17 @@ internal static class RunSettingsProviderExtensions
         return false;
     }
 
-    public static void UpdateRunSettingsNodeInnerXml(this IRunSettingsProvider runSettingsProvider, string key, string xml)
+    public static void UpdateRunSettingsNodeInnerXml(this IRunSettingsProvider runSettingsProvider!!, string key, string xml!!)
     {
-        ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
         ValidateArg.NotNullOrWhiteSpace(key, nameof(key));
-        ValidateArg.NotNull(xml, nameof(xml));
 
         var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
         UpdateRunSettingsXmlDocumentInnerXml(xmlDocument, key, xml);
         runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
     }
 
-    public static string QueryRunSettingsNode(this IRunSettingsProvider runSettingsProvider, string key)
+    public static string QueryRunSettingsNode(this IRunSettingsProvider runSettingsProvider!!, string key)
     {
-        ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
         ValidateArg.NotNullOrWhiteSpace(key, nameof(key));
 
         var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
@@ -212,10 +202,8 @@ internal static class RunSettingsProviderExtensions
         return node;
     }
 
-    private static XmlDocument GetRunSettingXmlDocument(this IRunSettingsProvider runSettingsProvider)
+    private static XmlDocument GetRunSettingXmlDocument(this IRunSettingsProvider runSettingsProvider!!)
     {
-        ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
-
         var doc = new XmlDocument();
 
         if (runSettingsProvider.ActiveRunSettings != null &&

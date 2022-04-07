@@ -6,8 +6,6 @@ using System.Linq;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AdapterUtilities.UnitTests.TestIdProvider;
 
 [TestClass]

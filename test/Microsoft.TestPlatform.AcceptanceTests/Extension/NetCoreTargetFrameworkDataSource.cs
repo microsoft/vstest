@@ -22,7 +22,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// </summary>
 public class NetCoreTargetFrameworkDataSource : Attribute, ITestDataSource
 {
-    private readonly List<object[]> _dataRows = new();
+    private readonly bool _useDesktopRunner;
+    private readonly bool _useCoreRunner;
+    private readonly bool _useNetCore21Target;
+    private readonly bool _useNetCore31Target;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="NetCoreTargetFrameworkDataSource"/> class.
     /// </summary>
@@ -38,45 +42,68 @@ public class NetCoreTargetFrameworkDataSource : Attribute, ITestDataSource
         // all tests to avoid changing all acceptance tests right now
         bool useNetCore31Target = false)
     {
-        var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
-        if (useDesktopRunner && isWindows)
-        {
-            var runnerFramework = IntegrationTestBase.DesktopRunnerFramework;
-            if (useNetCore21Target)
-            {
-                AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core21TargetFramework);
-            }
-
-            if (useNetCore31Target)
-            {
-                AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core31TargetFramework);
-            }
-        }
-
-        if (useCoreRunner)
-        {
-            var runnerFramework = IntegrationTestBase.CoreRunnerFramework;
-            if (useNetCore21Target)
-            {
-                AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core21TargetFramework);
-            }
-
-            if (useNetCore31Target)
-            {
-                AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core31TargetFramework);
-            }
-        }
+        _useDesktopRunner = useDesktopRunner;
+        _useCoreRunner = useCoreRunner;
+        _useNetCore21Target = useNetCore21Target;
+        _useNetCore31Target = useNetCore31Target;
     }
 
-    private void AddRunnerDataRow(string runnerFramework, string targetFramework)
+    public bool DebugVSTestConsole { get; set; }
+    public bool DebugTestHost { get; set; }
+    public bool DebugDataCollector { get; set; }
+    public bool NoDefaultBreakpoints { get; set; } = true;
+
+    private void AddRunnerDataRow(List<object[]> dataRows, string runnerFramework, string targetFramework)
     {
-        var runnerInfo = new RunnerInfo(runnerFramework, targetFramework);
-        _dataRows.Add(new object[] { runnerInfo });
+        var runnerInfo = new RunnerInfo
+        {
+            RunnerFramework = runnerFramework,
+            TargetFramework = targetFramework,
+            InIsolationValue = null
+        };
+        runnerInfo.DebugInfo = new DebugInfo
+        {
+            DebugDataCollector = DebugDataCollector,
+            DebugTestHost = DebugTestHost,
+            DebugVSTestConsole = DebugVSTestConsole,
+            NoDefaultBreakpoints = NoDefaultBreakpoints,
+        };
+        dataRows.Add(new object[] { runnerInfo });
     }
 
     public IEnumerable<object[]> GetData(MethodInfo methodInfo)
     {
-        return _dataRows;
+        var dataRows = new List<object[]>();
+        var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
+        if (_useDesktopRunner && isWindows)
+        {
+            var runnerFramework = IntegrationTestBase.DesktopRunnerFramework;
+            if (_useNetCore21Target)
+            {
+                AddRunnerDataRow(dataRows, runnerFramework, AcceptanceTestBase.Core21TargetFramework);
+            }
+
+            if (_useNetCore31Target)
+            {
+                AddRunnerDataRow(dataRows, runnerFramework, AcceptanceTestBase.Core31TargetFramework);
+            }
+        }
+
+        if (_useCoreRunner)
+        {
+            var runnerFramework = IntegrationTestBase.CoreRunnerFramework;
+            if (_useNetCore21Target)
+            {
+                AddRunnerDataRow(dataRows, runnerFramework, AcceptanceTestBase.Core21TargetFramework);
+            }
+
+            if (_useNetCore31Target)
+            {
+                AddRunnerDataRow(dataRows, runnerFramework, AcceptanceTestBase.Core31TargetFramework);
+            }
+        }
+
+        return dataRows;
     }
 
     public string GetDisplayName(MethodInfo methodInfo, object[] data)

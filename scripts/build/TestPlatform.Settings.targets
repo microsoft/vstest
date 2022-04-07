@@ -5,7 +5,7 @@
     <!-- This version is read by vsts-prebuild.ps1 and is a base for the current version, this should be updated
     at the start of new iteration to the goal number. This is also used to version the local packages. This version needs to be statically
     readable when we read the file as xml, don't move it to a .props file, unless you change the build server process -->
-    <TPVersionPrefix>17.2.0</TPVersionPrefix>
+    <TPVersionPrefix>17.3.0</TPVersionPrefix>
     <LangVersion>preview</LangVersion>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>preview</AnalysisLevel>
@@ -49,6 +49,11 @@
   <!-- Package dependency versions -->
   <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Dependencies.props" Condition=" '$(DependencyVersionsImported)' != 'true' "/>
 
+  <!-- Allows build of .NET Framework assemblies on MacOS and Linux https://github.com/dotnet/designs/pull/33#issuecomment-489264196 -->
+  <ItemGroup>
+    <PackageReference Condition=" '$(OS)' != 'Windows_NT' " Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="All" />
+  </ItemGroup>
+  
   <!-- Include PublicApi analyzers into all projects that are in our src directory, this can't use TestProject == true
   because some projects in test and playground are not tests, but we don't want to analyze those for public apis, because
   we don't ship them.

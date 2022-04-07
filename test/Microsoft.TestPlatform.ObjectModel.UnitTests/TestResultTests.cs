@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 
 [TestClass]

@@ -24,8 +24,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
@@ -34,23 +32,21 @@ public class ParallelProxyExecutionManagerTests
     private static readonly int TaskTimeout = 15 * 1000; // In milliseconds
 
     private readonly List<Mock<IProxyExecutionManager>> _createdMockManagers;
-    private Func<IProxyExecutionManager> _proxyManagerFunc;
     private readonly Mock<ITestRunEventsHandler> _mockHandler;
-    private Mock<ITestRuntimeProvider> _mockTestHostManager;
-
-    private Mock<ITestRequestSender> _mockRequestSender;
-
-    private Mock<IProxyDataCollectionManager> _mockDataCollectionManager;
     private readonly List<string> _sources;
     private readonly List<string> _processedSources;
     private readonly TestRunCriteria _testRunCriteriaWithSources;
     private readonly List<TestCase> _testCases;
     private readonly List<TestCase> _processedTestCases;
     private readonly TestRunCriteria _testRunCriteriaWithTests;
-
-    private bool _proxyManagerFuncCalled;
     private readonly ManualResetEventSlim _executionCompleted;
     private readonly Mock<IRequestData> _mockRequestData;
+
+    private Func<IProxyExecutionManager> _proxyManagerFunc;
+    private Mock<ITestRuntimeProvider>? _mockTestHostManager;
+    private Mock<ITestRequestSender>? _mockRequestSender;
+    private Mock<IProxyDataCollectionManager>? _mockDataCollectionManager;
+    private bool _proxyManagerFuncCalled;
 
     public ParallelProxyExecutionManagerTests()
     {
@@ -358,7 +354,7 @@ public class ParallelProxyExecutionManagerTests
                     });
         }
 
-        Exception assertException = null;
+        Exception? assertException = null;
         _mockHandler.Setup(m => m.HandleTestRunComplete(
             It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(),

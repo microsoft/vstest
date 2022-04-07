@@ -21,19 +21,18 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests;
 
 [TestClass]
 public class TestEngineTests
 {
-    private ITestEngine _testEngine;
+    private readonly ITestEngine _testEngine;
     private readonly Mock<IProcessHelper> _mockProcessHelper;
     private readonly ProtocolConfig _protocolConfig = new() { Version = 1 };
-    private ITestRuntimeProvider _testableTestRuntimeProvider;
     private readonly Mock<IRequestData> _mockRequestData;
     private readonly Mock<IMetricsCollection> _mockMetricsCollection;
+
+    private ITestRuntimeProvider _testableTestRuntimeProvider;
 
     public TestEngineTests()
     {
@@ -44,11 +43,6 @@ public class TestEngineTests
         _mockMetricsCollection = new Mock<IMetricsCollection>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
         _mockRequestData.Setup(rd => rd.ProtocolConfig).Returns(_protocolConfig);
-    }
-
-    [TestInitialize]
-    public void Init()
-    {
         _mockProcessHelper.Setup(o => o.GetCurrentProcessFileName()).Returns("vstest.console");
         _testEngine = new TestableTestEngine(_mockProcessHelper.Object);
     }
@@ -506,7 +500,7 @@ public class TestEngineTests
 
         var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria);
 
-        Assert.IsTrue((executionManager as ProxyExecutionManagerWithDataCollection).ProxyDataCollectionManager.Sources.Contains("1.dll"));
+        Assert.IsTrue(((ProxyExecutionManagerWithDataCollection)executionManager).ProxyDataCollectionManager.Sources.Contains("1.dll"));
     }
 
     [TestMethod]
@@ -519,7 +513,7 @@ public class TestEngineTests
 
         var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria);
 
-        Assert.IsTrue((executionManager as ProxyExecutionManagerWithDataCollection).ProxyDataCollectionManager.Sources.Contains("x.dll"));
+        Assert.IsTrue(((ProxyExecutionManagerWithDataCollection)executionManager).ProxyDataCollectionManager.Sources.Contains("x.dll"));
     }
 
     /// <summary>

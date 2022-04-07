@@ -12,8 +12,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace vstest.console.UnitTests.Processors;
 
 [TestClass]
@@ -125,7 +123,7 @@ public class EnableCodeCoverageArgumentProcessorTests
             "      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\" />",
             "    </DataCollectors>",
             "  </DataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -149,7 +147,7 @@ public class EnableCodeCoverageArgumentProcessorTests
             "      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />",
             "    </DataCollectors>",
             "  </DataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -172,7 +170,7 @@ public class EnableCodeCoverageArgumentProcessorTests
             "      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"False\" />",
             "    </DataCollectors>",
             "  </DataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings.SettingsXml);
+            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     #endregion

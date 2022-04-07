@@ -7,8 +7,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 
 /// <inheritdoc />
@@ -22,17 +20,12 @@ public class RunEventHandler : ITestRunEventsHandler2
     /// <summary>
     /// Gets the metrics.
     /// </summary>
-    public IDictionary<string, object> Metrics { get; private set; }
+    public IDictionary<string, object> Metrics { get; private set; } = new Dictionary<string, object>();
 
     /// <summary>
     /// Gets the log message.
     /// </summary>
-    public string LogMessage { get; private set; }
-
-    /// <summary>
-    /// Gets the test message level.
-    /// </summary>
-    public TestMessageLevel TestMessageLevel { get; private set; }
+    public List<string> LogMessages { get; } = new List<string>();
 
     public RunEventHandler()
     {
@@ -41,8 +34,7 @@ public class RunEventHandler : ITestRunEventsHandler2
 
     public void HandleLogMessage(TestMessageLevel level, string message)
     {
-        LogMessage = message;
-        TestMessageLevel = level;
+        LogMessages.Add($"[{level.ToString().ToUpperInvariant()}]: {message}");
     }
 
     public void HandleTestRunComplete(
@@ -57,6 +49,10 @@ public class RunEventHandler : ITestRunEventsHandler2
         }
 
         Metrics = testRunCompleteArgs.Metrics;
+        if (testRunCompleteArgs.Error != null)
+        {
+            LogMessages.Add($"[ERROR] {testRunCompleteArgs.Error}");
+        }
     }
 
     public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)

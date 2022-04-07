@@ -20,8 +20,6 @@ using Moq;
 
 using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests;
 
 /// <summary>
@@ -1059,7 +1057,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters.Count); // Two additional because of testRunDirectory and targetFramework
+        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters!.Count); // Two additional because of testRunDirectory and targetFramework
         Assert.AreEqual("Value1", ValidLoggerWithParameters.Parameters["Key1"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters["Key2"]);
 
@@ -1099,7 +1097,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.AreEqual(3, ValidLoggerWithParameters.Parameters.Count); // Two additional because of testRunDirectory and targetFramework
+        Assert.AreEqual(3, ValidLoggerWithParameters.Parameters!.Count); // Two additional because of testRunDirectory and targetFramework
         Assert.IsFalse(ValidLoggerWithParameters.Parameters.TryGetValue("Key1", out var key1Value));
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters["Key2"]);
 
@@ -1140,7 +1138,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters.Count); // Two additional because of testRunDirectory and targetFramework
+        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters!.Count); // Two additional because of testRunDirectory and targetFramework
         Assert.AreEqual("Value3", ValidLoggerWithParameters.Parameters["Key1"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters["Key2"]);
 
@@ -1211,7 +1209,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters.Count); // Two additional because of testRunDirectory and targetFramework
+        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters!.Count); // Two additional because of testRunDirectory and targetFramework
         Assert.AreEqual("Value1", ValidLoggerWithParameters.Parameters["Key1"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters["Key2"]);
         mockMetricsCollection.Verify(
@@ -1249,7 +1247,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters.Count); // Two additional because of testRunDirectory and targetFramework
+        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters!.Count); // Two additional because of testRunDirectory and targetFramework
         Assert.AreEqual("Value1", ValidLoggerWithParameters.Parameters["Key1"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters["Key2"]);
         mockMetricsCollection.Verify(
@@ -1287,7 +1285,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters.Count); // Two additional because of testRunDirectory and targetFramework
+        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters!.Count); // Two additional because of testRunDirectory and targetFramework
         Assert.AreEqual("Value1", ValidLoggerWithParameters.Parameters["Key1"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters["Key2"]);
         mockMetricsCollection.Verify(
@@ -1325,7 +1323,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters.Count); // Two additional because of testRunDirectory and targetFramework
+        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters!.Count); // Two additional because of testRunDirectory and targetFramework
         Assert.AreEqual("Value1", ValidLoggerWithParameters.Parameters["Key1"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters["Key2"]);
         mockMetricsCollection.Verify(
@@ -1369,7 +1367,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters.Count); // Two additional because of testRunDirectory and targetFramework
+        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters!.Count); // Two additional because of testRunDirectory and targetFramework
         Assert.AreEqual("Value1", ValidLoggerWithParameters.Parameters["Key1"]);
         Assert.AreEqual("DummyTestResultsFolder", ValidLoggerWithParameters.Parameters["testRunDirectory"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters["Key2"]);
@@ -1413,7 +1411,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters.Count); // Two additional because of testRunDirectory and targetFramework
+        Assert.AreEqual(4, ValidLoggerWithParameters.Parameters!.Count); // Two additional because of testRunDirectory and targetFramework
         Assert.AreEqual("Value1", ValidLoggerWithParameters.Parameters["Key1"]);
         Assert.AreEqual(Constants.DefaultResultsDirectory, ValidLoggerWithParameters.Parameters["testRunDirectory"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters["Key2"]);
@@ -1561,20 +1559,20 @@ public class TestLoggerManagerTests
             events.DiscoveryComplete += DiscoveryCompleteHandler;
         }
 
-        private void Events_TestResult(object sender, TestResultEventArgs e)
+        private void Events_TestResult(object? sender, TestResultEventArgs e)
         {
             s_counter++;
             WaitHandle.Set();
         }
 
-        private void Events_TestRunComplete(object sender, TestRunCompleteEventArgs e)
+        private void Events_TestRunComplete(object? sender, TestRunCompleteEventArgs e)
         {
             s_counter++;
             WaitHandle.Set();
 
         }
 
-        private void TestMessageHandler(object sender, TestRunMessageEventArgs e)
+        private void TestMessageHandler(object? sender, TestRunMessageEventArgs e)
         {
             if (e.Message.Equals("TestRunMessage"))
             {
@@ -1584,31 +1582,31 @@ public class TestLoggerManagerTests
             }
         }
 
-        private void TestRunStartHandler(object sender, TestRunStartEventArgs e)
+        private void TestRunStartHandler(object? sender, TestRunStartEventArgs e)
         {
             s_counter++;
             WaitHandle.Set();
         }
 
-        private void DiscoveryMessageHandler(object sender, TestRunMessageEventArgs e)
+        private void DiscoveryMessageHandler(object? sender, TestRunMessageEventArgs e)
         {
             s_counter++;
             WaitHandle.Set();
         }
 
-        private void DiscoveryStartHandler(object sender, DiscoveryStartEventArgs e)
+        private void DiscoveryStartHandler(object? sender, DiscoveryStartEventArgs e)
         {
             s_counter++;
             WaitHandle.Set();
         }
 
-        private void DiscoveredTestsHandler(object sender, DiscoveredTestsEventArgs e)
+        private void DiscoveredTestsHandler(object? sender, DiscoveredTestsEventArgs e)
         {
             s_counter++;
             WaitHandle.Set();
         }
 
-        private void DiscoveryCompleteHandler(object sender, DiscoveryCompleteEventArgs e)
+        private void DiscoveryCompleteHandler(object? sender, DiscoveryCompleteEventArgs e)
         {
             s_counter++;
             WaitHandle.Set();
@@ -1631,7 +1629,7 @@ public class TestLoggerManagerTests
     {
         public static int Counter;
 
-        public void Initialize(TestLoggerEvents events, string testRunDirectory)
+        public void Initialize(TestLoggerEvents _, string _2)
         {
             Counter++;
         }
@@ -1652,7 +1650,7 @@ public class TestLoggerManagerTests
     [FriendlyName("TestLoggerWithParameterExtension")]
     private class ValidLoggerWithParameters : ITestLoggerWithParameters
     {
-        public static Dictionary<string, string> Parameters;
+        public static Dictionary<string, string>? Parameters;
         public static int Counter;
 
         public void Initialize(TestLoggerEvents events, string testRunDirectory)

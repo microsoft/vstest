@@ -146,11 +146,9 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
     /// The instance of <see cref="DataCollectionRequestHandler"/>.
     /// </returns>
     public static DataCollectionRequestHandler Create(
-        ICommunicationManager communicationManager,
-        IMessageSink messageSink)
+        ICommunicationManager communicationManager!!,
+        IMessageSink messageSink!!)
     {
-        ValidateArg.NotNull(communicationManager, nameof(communicationManager));
-        ValidateArg.NotNull(messageSink, nameof(messageSink));
         // TODO: The MessageSink and DataCollectionRequestHandler have circular dependency.
         // Message sink is injected into this Create method and then into constructor
         // and into the constructor of DataCollectionRequestHandler. Data collection manager

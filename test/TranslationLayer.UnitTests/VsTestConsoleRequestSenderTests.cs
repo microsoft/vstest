@@ -28,19 +28,14 @@ using Newtonsoft.Json.Linq;
 using Payloads = Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
 
 [TestClass]
 public class VsTestConsoleRequestSenderTests
 {
     private readonly ITranslationLayerRequestSender _requestSender;
-
     private readonly Mock<ICommunicationManager> _mockCommunicationManager;
-
     private readonly int _waitTimeout = 2000;
-
     private readonly int _protocolVersion = 6;
     private readonly IDataSerializer _serializer = JsonDataSerializer.Instance;
 
@@ -455,7 +450,7 @@ public class VsTestConsoleRequestSenderTests
             Payload = JToken.FromObject(payload)
         };
 
-        DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
+        DiscoveryCompleteEventArgs? receivedDiscoveryCompleteEventArgs = null;
 
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
         mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
@@ -467,7 +462,7 @@ public class VsTestConsoleRequestSenderTests
         _requestSender.DiscoverTests(sources, null, new TestPlatformOptions(), null, mockHandler.Object);
 
         mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
-        Assert.IsNotNull(receivedDiscoveryCompleteEventArgs.FullyDiscoveredSources);
+        Assert.IsNotNull(receivedDiscoveryCompleteEventArgs!.FullyDiscoveredSources);
         Assert.AreEqual(1, receivedDiscoveryCompleteEventArgs.FullyDiscoveredSources.Count);
     }
 
@@ -495,7 +490,7 @@ public class VsTestConsoleRequestSenderTests
             Payload = JToken.FromObject(payload)
         };
 
-        DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
+        DiscoveryCompleteEventArgs? receivedDiscoveryCompleteEventArgs = null;
 
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
         mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
@@ -510,7 +505,7 @@ public class VsTestConsoleRequestSenderTests
 
         // Assert
         mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
-        Assert.IsNotNull(receivedDiscoveryCompleteEventArgs.FullyDiscoveredSources);
+        Assert.IsNotNull(receivedDiscoveryCompleteEventArgs!.FullyDiscoveredSources);
         Assert.AreEqual(1, receivedDiscoveryCompleteEventArgs.FullyDiscoveredSources.Count);
         Assert.AreEqual(-1, receivedDiscoveryCompleteEventArgs.TotalCount);
         Assert.AreEqual(true, receivedDiscoveryCompleteEventArgs.IsAborted);
@@ -526,7 +521,7 @@ public class VsTestConsoleRequestSenderTests
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         testCase.Traits.Add(new Trait("a", "b"));
 
-        List<TestCase> receivedTestCases = null;
+        List<TestCase>? receivedTestCases = null;
         var testCaseList = new List<TestCase>() { testCase };
         var testsFound = CreateMessage(MessageType.TestCasesFound, testCaseList);
 
@@ -564,7 +559,7 @@ public class VsTestConsoleRequestSenderTests
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         testCase.Traits.Add(new Trait("a", "b"));
 
-        List<TestCase> receivedTestCases = null;
+        List<TestCase>? receivedTestCases = null;
         var testCaseList = new List<TestCase>() { testCase };
         var testsFound = CreateMessage(MessageType.TestCasesFound, testCaseList);
 
@@ -574,7 +569,7 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
         mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
             .Callback(
-                (IEnumerable<TestCase> tests) =>
+                (IEnumerable<TestCase>? tests) =>
                 {
                     receivedTestCases = tests?.ToList();
                     _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult((discoveryComplete)));
@@ -602,7 +597,7 @@ public class VsTestConsoleRequestSenderTests
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         testCase.Traits.Add(new Trait("a", "b"));
 
-        List<TestCase> receivedTestCases = null;
+        List<TestCase>? receivedTestCases = null;
         var testCaseList = new List<TestCase>() { testCase };
 
         var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = testCaseList, IsAborted = false };
@@ -635,7 +630,7 @@ public class VsTestConsoleRequestSenderTests
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         testCase.Traits.Add(new Trait("a", "b"));
 
-        List<TestCase> receivedTestCases = null;
+        List<TestCase>? receivedTestCases = null;
         var testCaseList = new List<TestCase>() { testCase };
 
         var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = testCaseList, IsAborted = false };
@@ -766,7 +761,7 @@ public class VsTestConsoleRequestSenderTests
                 Task.Run(() => _requestSender.OnProcessExited(), c).Wait(c);
 
                 Assert.IsTrue(c.IsCancellationRequested);
-            }).Returns(Task.FromResult((Message)null));
+            }).Returns(Task.FromResult((Message?)null));
 
         mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null)).Callback(() => manualEvent.Set());
 
@@ -793,7 +788,7 @@ public class VsTestConsoleRequestSenderTests
                 Task.Run(() => _requestSender.OnProcessExited(), c).Wait(c);
 
                 Assert.IsTrue(c.IsCancellationRequested);
-            }).Returns(Task.FromResult((Message)null));
+            }).Returns(Task.FromResult((Message?)null));
 
         await _requestSender.DiscoverTestsAsync(sources, null, new TestPlatformOptions(), null, mockHandler.Object);
 
@@ -971,11 +966,11 @@ public class VsTestConsoleRequestSenderTests
     {
         // Arrange.
         var sources = new List<string>() { "1.dll" };
-        TestRunRequestPayload receivedRequest = null;
+        TestRunRequestPayload? receivedRequest = null;
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -994,11 +989,11 @@ public class VsTestConsoleRequestSenderTests
         // Arrange.
         var sources = new List<string>() { "1.dll" };
         var filter = "GivingCampaign";
-        TestRunRequestPayload receivedRequest = null;
+        TestRunRequestPayload? receivedRequest = null;
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -1236,11 +1231,11 @@ public class VsTestConsoleRequestSenderTests
     {
         // Arrange.
         var sources = new List<string>() { "1.dll" };
-        TestRunRequestPayload receivedRequest = null;
+        TestRunRequestPayload? receivedRequest = null;
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -1259,11 +1254,11 @@ public class VsTestConsoleRequestSenderTests
         // Arrange.
         var sources = new List<string>() { "1.dll" };
         var filter = "GivingCampaign";
-        TestRunRequestPayload receivedRequest = null;
+        TestRunRequestPayload? receivedRequest = null;
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
 
-        SetupMockCommunicationForRunRequest(mockHandler);
+        SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
@@ -1447,7 +1442,7 @@ public class VsTestConsoleRequestSenderTests
 
         var testCaseList = new List<TestCase>() { testCase };
 
-        TestRunChangedEventArgs receivedChangeEventArgs = null;
+        TestRunChangedEventArgs? receivedChangeEventArgs = null;
         var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
         var dummyLastRunArgs = new TestRunChangedEventArgs(null, new List<TestResult> { testResult }, null);
 
@@ -1500,7 +1495,7 @@ public class VsTestConsoleRequestSenderTests
 
         var testCaseList = new List<TestCase>() { testCase };
 
-        TestRunChangedEventArgs receivedChangeEventArgs = null;
+        TestRunChangedEventArgs? receivedChangeEventArgs = null;
         var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
         var dummyLastRunArgs = new TestRunChangedEventArgs(null, new List<TestResult> { testResult }, null);
 
@@ -1553,7 +1548,7 @@ public class VsTestConsoleRequestSenderTests
 
         var testCaseList = new List<TestCase>() { testCase };
 
-        TestRunChangedEventArgs receivedChangeEventArgs = null;
+        TestRunChangedEventArgs? receivedChangeEventArgs = null;
         var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
         var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
@@ -1610,7 +1605,7 @@ public class VsTestConsoleRequestSenderTests
 
         var testCaseList = new List<TestCase>() { testCase };
 
-        TestRunChangedEventArgs receivedChangeEventArgs = null;
+        TestRunChangedEventArgs? receivedChangeEventArgs = null;
         var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
         var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
@@ -1905,7 +1900,7 @@ public class VsTestConsoleRequestSenderTests
                 Task.Run(() => _requestSender.OnProcessExited(), c).Wait(c);
 
                 Assert.IsTrue(c.IsCancellationRequested);
-            }).Returns(Task.FromResult((Message)null));
+            }).Returns(Task.FromResult((Message?)null));
 
         mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null)).Callback(() => manualEvent.Set());
 
@@ -1936,7 +1931,7 @@ public class VsTestConsoleRequestSenderTests
                 Task.Run(() => _requestSender.OnProcessExited(), c).Wait(c);
 
                 Assert.IsTrue(c.IsCancellationRequested);
-            }).Returns(Task.FromResult((Message)null));
+            }).Returns(Task.FromResult((Message?)null));
 
         await _requestSender.StartTestRunAsync(sources, null, null, null, mockHandler.Object);
 
@@ -2735,7 +2730,7 @@ public class VsTestConsoleRequestSenderTests
         Assert.IsTrue(connectionSuccess, "Connection must succeed.");
     }
 
-    private void SetupMockCommunicationForRunRequest(Mock<ITestRunEventsHandler> mockHandler)
+    private void SetupMockCommunicationForRunRequest()
     {
         InitializeCommunication();
 

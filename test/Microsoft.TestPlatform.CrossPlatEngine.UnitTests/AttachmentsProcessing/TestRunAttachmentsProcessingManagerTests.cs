@@ -20,8 +20,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsProcessing;
 
 [TestClass]
@@ -76,7 +74,7 @@ public class TestRunAttachmentsProcessingManagerTests
         List<AttachmentSet> inputAttachments = new();
 
         // act
-        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, _cancellationTokenSource.Token);
+        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _mockEventsHandler.Object, _cancellationTokenSource.Token);
 
         // assert
         VerifyCompleteEvent(false, false);
@@ -100,7 +98,7 @@ public class TestRunAttachmentsProcessingManagerTests
         List<AttachmentSet> inputAttachments = new();
 
         // act
-        var result = await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _cancellationTokenSource.Token);
+        var result = await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _cancellationTokenSource.Token);
 
         // assert
         Assert.AreEqual(0, result.Count);
@@ -122,7 +120,7 @@ public class TestRunAttachmentsProcessingManagerTests
         };
 
         // act
-        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, _cancellationTokenSource.Token);
+        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _mockEventsHandler.Object, _cancellationTokenSource.Token);
 
         // assert
         VerifyCompleteEvent(false, false, inputAttachments[0]);
@@ -146,7 +144,7 @@ public class TestRunAttachmentsProcessingManagerTests
         };
 
         // act
-        var result = await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _cancellationTokenSource.Token);
+        var result = await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _cancellationTokenSource.Token);
 
         // assert
         Assert.AreEqual(1, result.Count);
@@ -176,7 +174,7 @@ public class TestRunAttachmentsProcessingManagerTests
         _mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).ReturnsAsync(outputAttachments);
 
         // act
-        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, _cancellationTokenSource.Token);
+        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _mockEventsHandler.Object, _cancellationTokenSource.Token);
 
         // assert
         VerifyCompleteEvent(false, false, outputAttachments[0]);
@@ -207,7 +205,7 @@ public class TestRunAttachmentsProcessingManagerTests
         _mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).ReturnsAsync(outputAttachments);
 
         // act
-        var result = await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _cancellationTokenSource.Token);
+        var result = await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _cancellationTokenSource.Token);
 
         // assert
         Assert.AreEqual(1, result.Count);
@@ -235,7 +233,7 @@ public class TestRunAttachmentsProcessingManagerTests
         _mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Throws(exceptionToThrow);
 
         // act
-        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, _cancellationTokenSource.Token);
+        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _mockEventsHandler.Object, _cancellationTokenSource.Token);
 
         // assert
         VerifyCompleteEvent(false, false, inputAttachments[0]);
@@ -261,7 +259,7 @@ public class TestRunAttachmentsProcessingManagerTests
         _mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Throws(new Exception("exception message"));
 
         // act
-        var result = await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _cancellationTokenSource.Token);
+        var result = await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _cancellationTokenSource.Token);
 
         // assert
         Assert.AreEqual(1, result.Count);
@@ -285,7 +283,7 @@ public class TestRunAttachmentsProcessingManagerTests
         };
 
         // act
-        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, _cancellationTokenSource.Token);
+        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _mockEventsHandler.Object, _cancellationTokenSource.Token);
 
         // assert
         VerifyCompleteEvent(true, false, inputAttachments[0]);
@@ -309,7 +307,7 @@ public class TestRunAttachmentsProcessingManagerTests
         };
 
         // act
-        var result = await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _cancellationTokenSource.Token);
+        var result = await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _cancellationTokenSource.Token);
 
         // assert
         Assert.AreEqual(1, result.Count);
@@ -349,7 +347,7 @@ public class TestRunAttachmentsProcessingManagerTests
         _mockAttachmentHandler2.Setup(h => h.ProcessAttachmentSetsAsync(null, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).ReturnsAsync(outputAttachmentsForHandler2);
 
         // act
-        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, _cancellationTokenSource.Token);
+        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _mockEventsHandler.Object, _cancellationTokenSource.Token);
 
         // assert
         VerifyCompleteEvent(false, false, inputAttachments[4], outputAttachmentsForHandler1.First(), outputAttachmentsForHandler2.First());
@@ -390,7 +388,7 @@ public class TestRunAttachmentsProcessingManagerTests
         _mockAttachmentHandler2.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).ReturnsAsync(outputAttachmentsForHandler2);
 
         // act
-        var result = await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _cancellationTokenSource.Token);
+        var result = await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _cancellationTokenSource.Token);
 
         // assert
         Assert.AreEqual(3, result.Count);
@@ -419,7 +417,7 @@ public class TestRunAttachmentsProcessingManagerTests
             new AttachmentSet(new Uri(Uri1), "uri1_output")
         };
 
-        var innerTaskCompletionSource = new TaskCompletionSource<object>();
+        var innerTaskCompletionSource = new TaskCompletionSource<object?>();
 
         CountdownEvent expectedProgress = new(4);
         _mockEventsHandler.Setup(h => h.HandleTestRunAttachmentsProcessingProgress(It.IsAny<TestRunAttachmentsProcessingProgressEventArgs>())).Callback((TestRunAttachmentsProcessingProgressEventArgs _) => expectedProgress.Signal());
@@ -455,16 +453,23 @@ public class TestRunAttachmentsProcessingManagerTests
         _mockEventsHandler.Setup(h => h.HandleTestRunAttachmentsProcessingComplete(It.IsAny<TestRunAttachmentsProcessingCompleteEventArgs>(), It.IsAny<IEnumerable<AttachmentSet>>()))
             .Callback((TestRunAttachmentsProcessingCompleteEventArgs _, IEnumerable<AttachmentSet> _) => attachmentProcessingComplete.Set());
 
+        ManualResetEventSlim handleLogMessage = new(false);
+        _mockEventsHandler.Setup(h => h.HandleLogMessage(TestMessageLevel.Informational, "Attachments processing was cancelled."))
+            .Callback((TestMessageLevel _, string _) => handleLogMessage.Set());
+
         // act
-        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, _cancellationTokenSource.Token);
+        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _mockEventsHandler.Object, _cancellationTokenSource.Token);
         Console.WriteLine("Attachments processing done");
         await innerTaskCompletionSource.Task;
 
         // Wait to drain all progress events
-        Assert.IsTrue(expectedProgress.Wait(TimeSpan.FromMinutes(1)));
+        Assert.IsTrue(expectedProgress.Wait(TimeSpan.FromMinutes(1)), "expectedProgress not signaled");
 
         // Wait for the HandleTestRunAttachmentsProcessingComplete
-        Assert.IsTrue(attachmentProcessingComplete.Wait(TimeSpan.FromMinutes(1)));
+        Assert.IsTrue(attachmentProcessingComplete.Wait(TimeSpan.FromMinutes(1)), "attachmentProcessingComplete not signaled");
+
+        // Wait for the HandleLogMessage
+        Assert.IsTrue(handleLogMessage.Wait(TimeSpan.FromMinutes(1)), "handleLogMessage not signaled");
 
         // assert
         VerifyCompleteEvent(true, false, inputAttachments[0]);
@@ -496,7 +501,7 @@ public class TestRunAttachmentsProcessingManagerTests
             new AttachmentSet(new Uri(Uri1), "uri1_output")
         };
 
-        var innerTaskCompletionSource = new TaskCompletionSource<object>();
+        var innerTaskCompletionSource = new TaskCompletionSource<object?>();
 
         _mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()))
             .Returns((XmlElement configurationElement, ICollection<AttachmentSet> i1, IProgress<int> p, IMessageLogger logger, CancellationToken cancellation) =>
@@ -527,7 +532,7 @@ public class TestRunAttachmentsProcessingManagerTests
             });
 
         // act
-        var result = await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _cancellationTokenSource.Token);
+        var result = await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _cancellationTokenSource.Token);
         Console.WriteLine("Attachments processing done");
         await innerTaskCompletionSource.Task;
 
@@ -563,7 +568,7 @@ public class TestRunAttachmentsProcessingManagerTests
             new AttachmentSet(new Uri(Uri2), "uri2_output")
         };
 
-        var innerTaskCompletionSource = new TaskCompletionSource<object>();
+        var innerTaskCompletionSource = new TaskCompletionSource<object?>();
 
         int counter = 0;
         _mockEventsHandler.Setup(h => h.HandleTestRunAttachmentsProcessingProgress(It.IsAny<TestRunAttachmentsProcessingProgressEventArgs>())).Callback(() =>
@@ -596,7 +601,7 @@ public class TestRunAttachmentsProcessingManagerTests
             });
 
         // act
-        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, CancellationToken.None);
+        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _mockEventsHandler.Object, CancellationToken.None);
 
         // assert
         await innerTaskCompletionSource.Task;
@@ -641,7 +646,7 @@ public class TestRunAttachmentsProcessingManagerTests
             });
 
         // act
-        await _manager.ProcessTestRunAttachmentsAsync(null, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, _cancellationTokenSource.Token);
+        await _manager.ProcessTestRunAttachmentsAsync(null, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _mockEventsHandler.Object, _cancellationTokenSource.Token);
 
         // assert
         _mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()));
@@ -845,7 +850,7 @@ public class TestRunAttachmentsProcessingManagerTests
         _mockAttachmentHandler1.Setup(x => x.SupportsIncrementalProcessing).Returns(false);
 
         // act
-        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], _mockEventsHandler.Object, _cancellationTokenSource.Token);
+        await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _mockEventsHandler.Object, _cancellationTokenSource.Token);
 
         // assert
         // We expect that first attachment is still returned as-is because not processed.
@@ -877,7 +882,7 @@ public class TestRunAttachmentsProcessingManagerTests
             It.Is<ICollection<AttachmentSet>>(c => c.Count == expectedSets.Length && expectedSets.All(e => c.Contains(e)))));
     }
 
-    private bool VerifyProgressArgs(TestRunAttachmentsProcessingProgressEventArgs args, int progress)
+    private static bool VerifyProgressArgs(TestRunAttachmentsProcessingProgressEventArgs args, int progress)
     {
         Assert.AreEqual(1, args.CurrentAttachmentProcessorIndex);
         Assert.AreEqual(2, args.AttachmentProcessorsCount);
@@ -886,7 +891,7 @@ public class TestRunAttachmentsProcessingManagerTests
         return progress == args.CurrentAttachmentProcessorProgress;
     }
 
-    private bool VerifyProgressArgsForTwoHandlers(TestRunAttachmentsProcessingProgressEventArgs args, long handlerIndex, long progress, string uri)
+    private static bool VerifyProgressArgsForTwoHandlers(TestRunAttachmentsProcessingProgressEventArgs args, long handlerIndex, long progress, string uri)
     {
         return progress == args.CurrentAttachmentProcessorProgress &&
                args.CurrentAttachmentProcessorIndex == handlerIndex &&

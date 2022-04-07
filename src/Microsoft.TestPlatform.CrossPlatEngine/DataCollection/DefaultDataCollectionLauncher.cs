@@ -22,6 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 internal class DefaultDataCollectionLauncher : DataCollectionLauncher
 {
     private const string DataCollectorProcessName = "datacollector.exe";
+    private const string DataCollectorProcessNameArm64 = "datacollector.arm64.exe";
 
     /// <summary>
     /// The constructor.
@@ -58,11 +59,12 @@ internal class DefaultDataCollectionLauncher : DataCollectionLauncher
 
         var currentProcessPath = _processHelper.GetCurrentProcessFileName();
 
-        // If current process is dotnet/dotnet.exe and you are here, datacollector.exe is present in TestHost folder.
+        // If current process is dotnet/dotnet.exe and you are here, datacollector.exe/datacollector.arm64.exe is present in TestHost folder.
+        string dataCollectorProcessName = _processHelper.GetCurrentProcessArchitecture() == PlatformArchitecture.ARM64 ? DataCollectorProcessNameArm64 : DataCollectorProcessName;
         string dataCollectorProcessPath = currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                                           || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase)
-            ? Path.Combine(dataCollectorDirectory, "TestHost", DataCollectorProcessName)
-            : Path.Combine(dataCollectorDirectory, DataCollectorProcessName);
+            ? Path.Combine(dataCollectorDirectory, "TestHost", dataCollectorProcessName)
+            : Path.Combine(dataCollectorDirectory, dataCollectorProcessName);
 
         var argumentsString = string.Join(" ", commandLineArguments);
         var dataCollectorProcess = _processHelper.LaunchProcess(dataCollectorProcessPath, argumentsString, Directory.GetCurrentDirectory(), environmentVariables, ErrorReceivedCallback, ExitCallBack, null);

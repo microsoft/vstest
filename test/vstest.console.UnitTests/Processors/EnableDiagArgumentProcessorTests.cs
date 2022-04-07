@@ -15,8 +15,6 @@ using Moq;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 [TestClass]
@@ -111,8 +109,8 @@ public class EnableDiagArgumentProcessorTests
     [DataRow(";;abc.txt;;;;verbosity=normal;;;;")]
     // Files with no extension are totally valid files.
     // When we delegate to host or datacollector we change the name in GetTimestampedLogFile
-    // Path.ChangeExtension replaces the curent extension with our new one that is timestamp and 
-    // the name of the target (e.g. host). When there is no extension it just adds it, so we do either: 
+    // Path.ChangeExtension replaces the curent extension with our new one that is timestamp and
+    // the name of the target (e.g. host). When there is no extension it just adds it, so we do either:
     // log.txt -> log.host.21-09-10_12-25-41_68765_5.txt
     // log.my.txt -> log.my.host.21-09-10_12-25-50_55183_5.txt
     // log -> log.host.21-09-10_12-25-27_94286_5

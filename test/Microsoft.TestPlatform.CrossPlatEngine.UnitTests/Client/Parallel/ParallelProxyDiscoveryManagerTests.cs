@@ -20,8 +20,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
@@ -130,7 +128,7 @@ public class ParallelProxyDiscoveryManagerTests
         // Since the hosts are aborted, total aggregated tests sent across will be -1
         var discoveryManagerMock = new Mock<IProxyDiscoveryManager>();
         _createdMockManagers.Add(discoveryManagerMock);
-        var parallelDiscoveryManager = SetupDiscoveryManager(() => discoveryManagerMock.Object, 1, true, totalTests: -1);
+        var parallelDiscoveryManager = SetupDiscoveryManager(() => discoveryManagerMock.Object, 1, true);
 
         Task.Run(() =>
         {
@@ -148,7 +146,7 @@ public class ParallelProxyDiscoveryManagerTests
         // Since the hosts are aborted, total aggregated tests sent across will be -1
         var discoveryManagerMock = new Mock<IProxyDiscoveryManager>();
         _createdMockManagers.Add(discoveryManagerMock);
-        var parallelDiscoveryManager = SetupDiscoveryManager(() => discoveryManagerMock.Object, 1, true, totalTests: -1);
+        var parallelDiscoveryManager = SetupDiscoveryManager(() => discoveryManagerMock.Object, 1, true);
 
         Task.Run(() =>
         {
@@ -165,7 +163,7 @@ public class ParallelProxyDiscoveryManagerTests
     {
         // Ensure that second discovery manager never starts. Expect 10 total tests.
         // Override DiscoveryComplete since overall aborted should be true
-        var parallelDiscoveryManager = SetupDiscoveryManager(_proxyManagerFunc, 2, false, totalTests: 10);
+        var parallelDiscoveryManager = SetupDiscoveryManager(_proxyManagerFunc, 2, false);
         _createdMockManagers[1].Reset();
         _createdMockManagers[1].Setup(dm => dm.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()))
             .Throws<NotImplementedException>();
@@ -184,7 +182,7 @@ public class ParallelProxyDiscoveryManagerTests
     {
         // Ensure that second discovery manager never starts. Expect 10 total tests.
         // Override DiscoveryComplete since overall aborted should be true
-        var parallelDiscoveryManager = SetupDiscoveryManager(_proxyManagerFunc, 2, false, totalTests: 10);
+        var parallelDiscoveryManager = SetupDiscoveryManager(_proxyManagerFunc, 2, false);
         _createdMockManagers[1].Reset();
         _createdMockManagers[1].Setup(dm => dm.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()))
             .Throws<NotImplementedException>();
@@ -203,7 +201,7 @@ public class ParallelProxyDiscoveryManagerTests
     {
         // Ensure that second discovery manager never starts. Expect 10 total tests.
         // Override DiscoveryComplete since overall aborted should be true
-        var parallelDiscoveryManager = SetupDiscoveryManager(_proxyManagerFunc, 2, false, totalTests: 10);
+        var parallelDiscoveryManager = SetupDiscoveryManager(_proxyManagerFunc, 2, false);
         _createdMockManagers[1].Reset();
         _createdMockManagers[1].Setup(dm => dm.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()))
             .Throws<NotImplementedException>();
@@ -229,7 +227,7 @@ public class ParallelProxyDiscoveryManagerTests
         Assert.IsTrue(_proxyManagerFuncCalled);
     }
 
-    private IParallelProxyDiscoveryManager SetupDiscoveryManager(Func<IProxyDiscoveryManager> getProxyManager, int parallelLevel, bool abortDiscovery, int totalTests = 20)
+    private IParallelProxyDiscoveryManager SetupDiscoveryManager(Func<IProxyDiscoveryManager> getProxyManager, int parallelLevel, bool abortDiscovery)
     {
         var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(_mockRequestData.Object, getProxyManager, parallelLevel, false);
         SetupDiscoveryTests(_processedSources, abortDiscovery);

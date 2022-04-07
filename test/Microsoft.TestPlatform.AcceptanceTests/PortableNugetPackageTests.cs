@@ -6,7 +6,6 @@ using System.IO.Compression;
 using System.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable disable
@@ -44,7 +43,7 @@ public class PortableNugetPackageTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll");
 
         InvokeVsTestForExecution(assemblyPaths, GetTestAdapterPath(), FrameworkArgValue, string.Empty);
 
@@ -64,38 +63,5 @@ public class PortableNugetPackageTests : AcceptanceTestBase
         var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
         ValidateDiscoveredTests(listOfTests);
         ExitCodeEquals(0);
-    }
-
-    public override string GetConsoleRunnerPath()
-    {
-        string consoleRunnerPath = string.Empty;
-
-        if (IsDesktopRunner())
-        {
-            consoleRunnerPath = Path.Combine(s_portablePackageFolder, "tools", "net451", "vstest.console.exe");
-        }
-        else if (IsNetCoreRunner())
-        {
-            var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
-            consoleRunnerPath = Path.Combine(_testEnvironment.ToolsDirectory, executablePath);
-        }
-        else
-        {
-            Assert.Fail("Unknown Runner framework - [{0}]", _testEnvironment.RunnerFramework);
-        }
-
-        Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
-        return consoleRunnerPath;
-    }
-
-    protected override string SetVSTestConsoleDLLPathInArgs(string args)
-    {
-        var vstestConsoleDll = Path.Combine(s_portablePackageFolder, "tools", "netcoreapp2.1", "vstest.console.dll");
-        vstestConsoleDll = vstestConsoleDll.AddDoubleQuote();
-        args = string.Concat(
-            vstestConsoleDll,
-            " ",
-            args);
-        return args;
     }
 }

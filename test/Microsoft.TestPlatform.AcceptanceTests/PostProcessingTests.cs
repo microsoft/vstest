@@ -14,6 +14,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+# nullable disable
+
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
@@ -22,7 +24,6 @@ public class PostProcessingTests : AcceptanceTestBase
     [TestMethod]
     public void DotnetSDKSimulation_PostProcessing()
     {
-        using var tempDir = new TempDirectory();
 
         var extensionsPath = Path.Combine(
             _testEnvironment.TestAssetsPath,
@@ -32,7 +33,7 @@ public class PostProcessingTests : AcceptanceTestBase
             "netstandard2.0");
         _testEnvironment.RunnerFramework = CoreRunnerFramework;
 
-        string runSettings = GetRunsettingsFilePath(tempDir.Path);
+        string runSettings = GetRunsettingsFilePath(TempDirectory.Path);
         string correlationSessionId = Guid.NewGuid().ToString();
 
         // Set datacollector parameters
@@ -46,7 +47,7 @@ public class PostProcessingTests : AcceptanceTestBase
         // Build and run tests like msbuild
         Parallel.For(0, 5, i =>
         {
-            string projectFolder = Path.Combine(tempDir.Path, i.ToString());
+            string projectFolder = Path.Combine(TempDirectory.Path, i.ToString());
             ExecuteApplication(GetConsoleRunnerPath(), $"new mstest -o {projectFolder}", out string stdOut, out string stdError, out int exitCode);
             Assert.AreEqual(exitCode, 0);
             ExecuteApplication(GetConsoleRunnerPath(), $"build {projectFolder} -c release", out stdOut, out stdError, out exitCode);
@@ -54,14 +55,12 @@ public class PostProcessingTests : AcceptanceTestBase
 
             string testContainer = Directory.GetFiles(Path.Combine(projectFolder, "bin"), $"{i}.dll", SearchOption.AllDirectories).Single();
 
-            ExecuteVsTestConsole($"{testContainer} --Collect:\"SampleDataCollector\" --TestAdapterPath:\"{extensionsPath}\" --ResultsDirectory:\"{Path.GetDirectoryName(testContainer)}\" --Settings:\"{runSettings}\" --ArtifactsProcessingMode-Collect --TestSessionCorrelationId:\"{correlationSessionId}\" --Diag:\"{tempDir.Path + '/'}\"", out stdOut, out stdError, out exitCode,
-                new Dictionary<string, string>() { { "VSTEST_FEATURE_ARTIFACTS_POSTPROCESSING", "1" } });
+            ExecuteVsTestConsole($"{testContainer} --Collect:\"SampleDataCollector\" --TestAdapterPath:\"{extensionsPath}\" --ResultsDirectory:\"{Path.GetDirectoryName(testContainer)}\" --Settings:\"{runSettings}\" --ArtifactsProcessingMode-Collect --TestSessionCorrelationId:\"{correlationSessionId}\" --Diag:\"{TempDirectory.Path + '/'}\"", out stdOut, out stdError, out exitCode);
             Assert.AreEqual(exitCode, 0);
         });
 
         // Post process artifacts
-        ExecuteVsTestConsole($"--ArtifactsProcessingMode-PostProcess --TestSessionCorrelationId:\"{correlationSessionId}\" --Diag:\"{tempDir.Path + '/'}\"", out string stdOut, out string stdError, out int exitCode,
-                new Dictionary<string, string>() { { "VSTEST_FEATURE_ARTIFACTS_POSTPROCESSING", "1" } });
+        ExecuteVsTestConsole($"--ArtifactsProcessingMode-PostProcess --TestSessionCorrelationId:\"{correlationSessionId}\" --Diag:\"{TempDirectory.Path + '/'}\"", out string stdOut, out string stdError, out int exitCode);
         Assert.AreEqual(exitCode, 0);
 
         using StringReader reader = new(stdOut);

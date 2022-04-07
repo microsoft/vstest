@@ -8,11 +8,14 @@ jobs:
   variables:
     buildConfiguration: 'Release'
   steps:
+  - checkout: self
+    fetchDepth: 1
+    clean: true
   - task: BatchScript@1
     displayName: 'Run script build.cmd'
     inputs:
       filename: build.cmd
-      arguments: '-verbose -configuration $(buildConfiguration) -ci -steps "InstallDotnet, Restore, UpdateLocalization, Build, Publish"'
+      arguments: '-verbose -configuration $(buildConfiguration) -ci -steps "InstallDotnet, Restore, UpdateLocalization, Build, Publish, Pack, Manifest"'
       modifyEnvironment: false
       failOnStandardError: true
 
@@ -57,11 +60,26 @@ jobs:
   variables:
     buildConfiguration: 'Release'
   steps:
+  - checkout: self
+    fetchDepth: 1
+    clean: true
+  - task: PowerShell@2
+    displayName: 'Free space'
+    inputs:
+      targetType: 'inline'
+      script: 'Get-PSDrive -PSProvider FileSystem | Out-String'
+
   - task: DownloadPipelineArtifact@2
     inputs:
       buildType: 'current'
       artifactName: 'testArtifacts'
       targetPath: '$(Build.SourcesDirectory)\artifacts'
+
+  - task: PowerShell@2
+    displayName: 'Free space'
+    inputs:
+      targetType: 'inline'
+      script: 'Get-PSDrive -PSProvider FileSystem | Out-String' 
 
   - task: PowerShell@2
     inputs:
@@ -85,6 +103,12 @@ jobs:
       script: 'ls "$(Build.SourcesDirectory)\artifacts\Release\packages"'
 
   - task: PowerShell@2
+    displayName: 'Free space'
+    inputs:
+      targetType: 'inline'
+      script: 'Get-PSDrive -PSProvider FileSystem | Out-String'
+
+  - task: PowerShell@2
     displayName: 'Disable Strong Name Validation'
     inputs:
       targetType: 'inline'
@@ -100,7 +124,7 @@ jobs:
     displayName: 'Run Acceptance Tests'
     inputs:
       filename: test.cmd
-      arguments: '-verbose -configuration $(buildConfiguration) -p AcceptanceTests -f net451'
+      arguments: '-verbose -configuration $(buildConfiguration) -p AcceptanceTests -f net48'
       modifyEnvironment: false
       failOnStandardError: true
 
@@ -117,6 +141,14 @@ jobs:
     inputs:
       filename: test.cmd
       arguments: '-verbose -configuration $(buildConfiguration) -p smoke'
+      modifyEnvironment: false
+      failOnStandardError: true
+
+  - task: BatchScript@1
+    displayName: 'Run Performance Tests'
+    inputs:
+      filename: test.cmd
+      arguments: '-verbose -configuration $(buildConfiguration) -p Performance -f net48'
       modifyEnvironment: false
       failOnStandardError: true
 
@@ -145,6 +177,9 @@ jobs:
       buildConfiguration: 'Release'
       VSTestRTMBuild: 'false'
   steps:
+  - checkout: self
+    fetchDepth: 1
+    clean: true
   - script: chmod +x ./scripts/vsts-prebuild.sh
     displayName: 'Preparing for set version'
 

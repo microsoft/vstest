@@ -230,7 +230,7 @@ internal abstract class BaseRunTests
                 try
                 {
                     // Send the test run complete event.
-                    RaiseTestRunComplete(exception, _isCancellationRequested, isAborted, shutdownAfterRun, elapsedTime);
+                    RaiseTestRunComplete(exception, _isCancellationRequested, isAborted, elapsedTime);
                 }
                 catch (Exception ex2)
                 {
@@ -249,7 +249,7 @@ internal abstract class BaseRunTests
     internal void Abort()
     {
         EqtTrace.Verbose("BaseRunTests.Abort: Calling RaiseTestRunComplete");
-        RaiseTestRunComplete(exception: null, canceled: _isCancellationRequested, aborted: true, adapterHintToShutdownAfterRun: false, elapsedTime: TimeSpan.Zero);
+        RaiseTestRunComplete(exception: null, canceled: _isCancellationRequested, aborted: true, elapsedTime: TimeSpan.Zero);
     }
 
     /// <summary>
@@ -580,7 +580,6 @@ internal abstract class BaseRunTests
         Exception exception,
         bool canceled,
         bool aborted,
-        bool adapterHintToShutdownAfterRun,
         TimeSpan elapsedTime)
     {
         var runStats = TestRunCache?.TestRunStatistics ?? new TestRunStatistics(new Dictionary<TestOutcome, long>());
@@ -615,6 +614,8 @@ internal abstract class BaseRunTests
                 // Today we don't offer an extension to run collectors for test adapters.
                 new Collection<InvokedDataCollector>(),
                 elapsedTime);
+
+            testRunCompleteEventArgs.DiscoveredExtensions = TestPluginCache.Instance.TestExtensions?.GetCachedExtensions();
             testRunCompleteEventArgs.Metrics = _requestData.MetricsCollection.Metrics;
 
             TestRunEventsHandler.HandleTestRunComplete(

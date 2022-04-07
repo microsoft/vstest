@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
@@ -108,11 +109,20 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     /// <inheritdoc />
     public virtual void InitializeCommunication()
     {
-        if (this is IDeploymentAwareTestRequestHandler self
-            && !string.IsNullOrWhiteSpace(self.LocalPath)
-            && !string.IsNullOrWhiteSpace(self.RemotePath))
+        if (this is IDeploymentAwareTestRequestHandler self)
         {
-            _pathConverter = new PathConverter(self.LocalPath, self.RemotePath, _fileHelper);
+            var currentProcessPath = Process.GetCurrentProcess().MainModule.FileName;
+            var currentProcessDirectory = !string.IsNullOrWhiteSpace(currentProcessPath)
+                ? System.IO.Path.GetDirectoryName(currentProcessPath)
+                : null;
+            var remotePath = Environment.GetEnvironmentVariable("VSTEST_UWP_DEPLOY_REMOTE_PATH") ?? self.RemotePath ?? currentProcessDirectory;
+
+            var localPath = Environment.GetEnvironmentVariable("VSTEST_UWP_DEPLOY_LOCAL_PATH") ?? self.LocalPath;
+            if (!string.IsNullOrWhiteSpace(localPath)
+                && !string.IsNullOrWhiteSpace(remotePath))
+            {
+                _pathConverter = new PathConverter(localPath, remotePath, _fileHelper);
+            }
         }
 
         _communicationEndPoint = _communicationEndpointFactory.Create(ConnectionInfo.Role);
@@ -232,6 +242,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
                 FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources,
                 PartiallyDiscoveredSources = discoveryCompleteEventArgs.PartiallyDiscoveredSources,
                 NotDiscoveredSources = discoveryCompleteEventArgs.NotDiscoveredSources,
+                DiscoveredExtensions = discoveryCompleteEventArgs.DiscoveredExtensions,
             },
             _protocolVersion);
         SendData(data);

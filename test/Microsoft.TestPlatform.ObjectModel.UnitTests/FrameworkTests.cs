@@ -5,8 +5,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 
 [TestClass]
@@ -81,7 +79,7 @@ public class FrameworkTests
     [TestMethod]
     public void DefaultFrameworkShouldBeNetCoreApp10OnNonDesktop()
     {
-#if !NET451
+#if !NETFRAMEWORK
         Assert.AreEqual(".NETCoreApp,Version=v1.0", Framework.DefaultFramework.Name);
 #endif
     }

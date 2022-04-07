@@ -12,18 +12,17 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests;
 
 [TestClass]
+[Ignore("Flaky tests")]
 public class SocketClientTests : SocketTestsBase, IDisposable
 {
     private readonly TcpListener _tcpListener;
 
     private readonly ICommunicationEndPoint _socketClient;
 
-    private TcpClient _tcpClient;
+    private TcpClient? _tcpClient;
 
     public SocketClientTests()
     {
@@ -33,7 +32,7 @@ public class SocketClientTests : SocketTestsBase, IDisposable
         _tcpListener = new TcpListener(endpoint);
     }
 
-    protected override TcpClient Client => _tcpClient;
+    protected override TcpClient? Client => _tcpClient;
 
     public void Dispose()
     {
@@ -103,7 +102,7 @@ public class SocketClientTests : SocketTestsBase, IDisposable
         var waitEvent = SetupClientDisconnect(out ICommunicationChannel _);
 
         // Close the communication from server side
-        _tcpClient.GetStream().Dispose();
+        _tcpClient?.GetStream().Dispose();
 #if NETFRAMEWORK
         // tcpClient.Close() calls tcpClient.Dispose().
         _tcpClient?.Close();
@@ -124,24 +123,24 @@ public class SocketClientTests : SocketTestsBase, IDisposable
 
         // Validate that write on server side fails
         waitEvent.WaitOne(Timeout);
-        Assert.ThrowsException<IOException>(() => WriteData(Client));
+        Assert.ThrowsException<IOException>(() => WriteData(Client!));
     }
 
     [TestMethod]
     public void SocketClientStopShouldCloseChannel()
     {
-        var waitEvent = SetupClientDisconnect(out ICommunicationChannel channel);
+        var waitEvent = SetupClientDisconnect(out ICommunicationChannel? channel);
 
         _socketClient.Stop();
 
         waitEvent.WaitOne(Timeout);
-        Assert.ThrowsException<CommunicationException>(() => channel.Send(Dummydata));
+        Assert.ThrowsException<CommunicationException>(() => channel!.Send(Dummydata));
     }
 
-    protected override ICommunicationChannel SetupChannel(out ConnectedEventArgs connectedEvent)
+    protected override ICommunicationChannel? SetupChannel(out ConnectedEventArgs? connectedEvent)
     {
-        ICommunicationChannel channel = null;
-        ConnectedEventArgs serverConnectedEvent = null;
+        ICommunicationChannel? channel = null;
+        ConnectedEventArgs? serverConnectedEvent = null;
         ManualResetEvent waitEvent = new(false);
         _socketClient.Connected += (sender, eventArgs) =>
         {
@@ -164,12 +163,12 @@ public class SocketClientTests : SocketTestsBase, IDisposable
         return channel;
     }
 
-    private ManualResetEvent SetupClientDisconnect(out ICommunicationChannel channel)
+    private ManualResetEvent SetupClientDisconnect(out ICommunicationChannel? channel)
     {
         var waitEvent = new ManualResetEvent(false);
         _socketClient.Disconnected += (s, e) => waitEvent.Set();
         channel = SetupChannel(out ConnectedEventArgs _);
-        channel.MessageReceived += (sender, args) =>
+        channel!.MessageReceived += (sender, args) =>
         {
         };
         return waitEvent;

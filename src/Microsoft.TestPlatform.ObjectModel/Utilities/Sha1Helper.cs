@@ -138,10 +138,8 @@ internal static class Sha1Helper
             _h[4] = 0xC3D2E1F0u;
         }
 
-        public byte[] ComputeHash(byte[] message)
+        public byte[] ComputeHash(byte[] message!!)
         {
-            ValidateArg.NotNull(message, nameof(message));
-
             Reset();
             PadMessage(ref message);
 

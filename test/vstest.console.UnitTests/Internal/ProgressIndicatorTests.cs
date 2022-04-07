@@ -7,19 +7,16 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal;
 
 [TestClass]
 public class ProgressIndicatorTests
 {
-    ProgressIndicator _indicator;
-    Mock<IOutput> _consoleOutput;
-    Mock<IConsoleHelper> _consoleHelper;
+    private readonly ProgressIndicator _indicator;
+    private readonly Mock<IOutput> _consoleOutput;
+    private readonly Mock<IConsoleHelper> _consoleHelper;
 
-    [TestInitialize]
-    public void TestInit()
+    public ProgressIndicatorTests()
     {
         _consoleOutput = new Mock<IOutput>();
         _consoleHelper = new Mock<IConsoleHelper>();

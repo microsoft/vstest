@@ -57,7 +57,6 @@ public class ConsoleParameters
     /// </summary>
     public bool ClearEnvironmentVariables { get; set; }
 
-
     /// <summary>
     /// Trace level for logs.
     /// </summary>

@@ -18,8 +18,6 @@ using Moq;
 
 using Constants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
 
 [TestClass]
@@ -88,7 +86,7 @@ public class ParallelDataCollectionEventsHandlerTests
             new AttachmentSet(new Uri(Uri3), "uri3_input1")
         };
 
-        _mockTestRunAttachmentsProcessingManager.Setup(f => f.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ICollection<InvokedDataCollector>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult((Collection<AttachmentSet>)null));
+        _mockTestRunAttachmentsProcessingManager.Setup(f => f.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ICollection<InvokedDataCollector>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult((Collection<AttachmentSet>?)null));
 
         // act
         _parallelDataCollectionEventsHandler.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromSeconds(1)), null, inputAttachments, null);

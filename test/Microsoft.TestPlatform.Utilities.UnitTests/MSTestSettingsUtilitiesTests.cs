@@ -9,8 +9,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using MSTest.TestFramework.AssertExtensions;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Utilities.Tests;
 
 [TestClass]
@@ -80,7 +78,7 @@ public class MsTestSettingsUtilitiesTests
             "C:\\temp\\r.testsettings",
             xmlDocument);
 
-        var finalSettingsXml = finalxPath.CreateNavigator().OuterXml;
+        var finalSettingsXml = finalxPath.CreateNavigator()!.OuterXml;
 
         var expectedSettingsXml = string.Join(Environment.NewLine,
             "<RunSettings>",
@@ -105,7 +103,7 @@ public class MsTestSettingsUtilitiesTests
             "C:\\temp\\r.testsettings",
             xmlDocument);
 
-        var finalSettingsXml = finalxPath.CreateNavigator().OuterXml;
+        var finalSettingsXml = finalxPath.CreateNavigator()!.OuterXml;
 
         var expectedSettingsXml = string.Join(Environment.NewLine,
             "<RunSettings>",

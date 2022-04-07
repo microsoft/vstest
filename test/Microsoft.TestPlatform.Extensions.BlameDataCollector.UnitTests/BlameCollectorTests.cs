@@ -16,8 +16,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests;
 
 /// <summary>
@@ -37,7 +35,7 @@ public class BlameCollectorTests
     private readonly Mock<IProcessDumpUtility> _mockProcessDumpUtility;
     private readonly Mock<IInactivityTimer> _mockInactivityTimer;
     private readonly Mock<IFileHelper> _mockFileHelper;
-    private readonly XmlElement _configurationElement;
+    private readonly XmlElement? _configurationElement;
     private readonly string _filepath;
 
     /// <summary>
@@ -509,10 +507,10 @@ public class BlameCollectorTests
         var dumpConfig = GetDumpConfigurationElement();
         var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("DuMpType");
         dumpTypeAttribute.Value = "FuLl";
-        dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpTypeAttribute);
+        dumpConfig[Constants.DumpModeKey]!.Attributes.Append(dumpTypeAttribute);
         var dumpOnExitAttribute = dumpConfig.OwnerDocument.CreateAttribute("CollEctAlways");
         dumpOnExitAttribute.Value = "FaLSe";
-        dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpOnExitAttribute);
+        dumpConfig[Constants.DumpModeKey]!.Attributes.Append(dumpOnExitAttribute);
 
         // Initializing Blame Data Collector
         _blameDataCollector.Initialize(
@@ -538,7 +536,7 @@ public class BlameCollectorTests
         var dumpConfig = GetDumpConfigurationElement();
         var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("Xyz");
         dumpTypeAttribute.Value = "FuLl";
-        dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpTypeAttribute);
+        dumpConfig[Constants.DumpModeKey]!.Attributes.Append(dumpTypeAttribute);
 
         // Initializing Blame Data Collector
         _blameDataCollector.Initialize(
@@ -564,7 +562,7 @@ public class BlameCollectorTests
         var dumpConfig = GetDumpConfigurationElement();
         var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("DumpType");
         dumpTypeAttribute.Value = "random";
-        dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpTypeAttribute);
+        dumpConfig[Constants.DumpModeKey]!.Attributes.Append(dumpTypeAttribute);
 
         // Initializing Blame Data Collector
         _blameDataCollector.Initialize(
@@ -578,7 +576,7 @@ public class BlameCollectorTests
         _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
         // Verify
-        _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, "DumpType", BlameDataCollector.Constants.FullConfigurationValue, BlameDataCollector.Constants.MiniConfigurationValue))), Times.Once);
+        _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, "DumpType", Constants.FullConfigurationValue, Constants.MiniConfigurationValue))), Times.Once);
     }
 
     /// <summary>
@@ -590,7 +588,7 @@ public class BlameCollectorTests
         var dumpConfig = GetDumpConfigurationElement();
         var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("DumpType");
         dumpTypeAttribute.Value = "random";
-        dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpTypeAttribute);
+        dumpConfig[Constants.DumpModeKey]!.Attributes.Append(dumpTypeAttribute);
 
         // Initializing Blame Data Collector
         _blameDataCollector.Initialize(
@@ -604,7 +602,7 @@ public class BlameCollectorTests
         _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
         // Verify
-        _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, "DumpType", BlameDataCollector.Constants.FullConfigurationValue, BlameDataCollector.Constants.MiniConfigurationValue))), Times.Once);
+        _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, "DumpType", Constants.FullConfigurationValue, Constants.MiniConfigurationValue))), Times.Once);
     }
 
     /// <summary>
@@ -688,7 +686,7 @@ public class BlameCollectorTests
         File.Delete(_filepath);
     }
 
-    private XmlElement GetDumpConfigurationElement(
+    private static XmlElement GetDumpConfigurationElement(
         bool isFullDump = false,
         bool collectDumpOnExit = false,
         bool colectDumpOnHang = false,
@@ -696,36 +694,36 @@ public class BlameCollectorTests
     {
         var xmldoc = new XmlDocument();
         var outernode = xmldoc.CreateElement("Configuration");
-        var node = xmldoc.CreateElement(BlameDataCollector.Constants.DumpModeKey);
+        var node = xmldoc.CreateElement(Constants.DumpModeKey);
         outernode.AppendChild(node);
         node.InnerText = "Text";
 
         if (isFullDump)
         {
-            var fulldumpAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.DumpTypeKey);
+            var fulldumpAttribute = xmldoc.CreateAttribute(Constants.DumpTypeKey);
             fulldumpAttribute.Value = "full";
             node.Attributes.Append(fulldumpAttribute);
         }
 
         if (collectDumpOnExit)
         {
-            var collectDumpOnExitAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.CollectDumpAlwaysKey);
+            var collectDumpOnExitAttribute = xmldoc.CreateAttribute(Constants.CollectDumpAlwaysKey);
             collectDumpOnExitAttribute.Value = "true";
             node.Attributes.Append(collectDumpOnExitAttribute);
         }
 
         if (colectDumpOnHang)
         {
-            var hangDumpNode = xmldoc.CreateElement(BlameDataCollector.Constants.CollectDumpOnTestSessionHang);
+            var hangDumpNode = xmldoc.CreateElement(Constants.CollectDumpOnTestSessionHang);
             outernode.AppendChild(hangDumpNode);
 
-            var inactivityTimeAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.TestTimeout);
+            var inactivityTimeAttribute = xmldoc.CreateAttribute(Constants.TestTimeout);
             inactivityTimeAttribute.Value = $"{inactivityTimeInMilliseconds}";
             hangDumpNode.Attributes.Append(inactivityTimeAttribute);
 
             if (isFullDump)
             {
-                var fulldumpAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.DumpTypeKey);
+                var fulldumpAttribute = xmldoc.CreateAttribute(Constants.DumpTypeKey);
                 fulldumpAttribute.Value = "full";
                 hangDumpNode.Attributes.Append(fulldumpAttribute);
             }
@@ -754,7 +752,8 @@ public class BlameCollectorTests
         /// <param name="mockFileHelper">
         /// MockFileHelper instance.
         /// </param>
-        internal TestableBlameCollector(IBlameReaderWriter blameReaderWriter, IProcessDumpUtility processDumpUtility, IInactivityTimer inactivityTimer, IFileHelper mockFileHelper)
+        internal TestableBlameCollector(IBlameReaderWriter blameReaderWriter, IProcessDumpUtility processDumpUtility, IInactivityTimer? inactivityTimer,
+            IFileHelper mockFileHelper)
             : base(blameReaderWriter, processDumpUtility, inactivityTimer, mockFileHelper)
         {
         }

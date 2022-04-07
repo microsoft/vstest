@@ -47,7 +47,7 @@ Write-Verbose "Setup dotnet configuration."
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
-$env:NUGET_EXE_Version = "5.8.1"
+$env:NUGET_EXE_Version = "6.0.0"
 $env:DOTNET_CLI_VERSION = $GlobalJson.tools.dotnet
 # $env:DOTNET_RUNTIME_VERSION = "LATEST"
 $env:VSWHERE_VERSION = "2.0.2"
@@ -120,10 +120,10 @@ function Install-DotNetCli
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '3.1.22' -Channel '3.1' -Architecture x86 -NoPath
     ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
 
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '5.0.10' -Channel '5.0' -Architecture x64 -NoPath
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '5.0.14' -Channel '5.0' -Architecture x64 -NoPath
     $env:DOTNET_ROOT= $dotnetInstallPath
 
-    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '5.0.10' -Channel '5.0' -Architecture x86 -NoPath
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '5.0.14' -Channel '5.0' -Architecture x86 -NoPath
     ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
 
     $env:DOTNET_MULTILEVEL_LOOKUP=0

@@ -12,21 +12,17 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
 
 [TestClass]
 public class TestPlatformDataCollectionSinkTests
 {
     private readonly Mock<IDataCollectionAttachmentManager> _attachmentManager;
-
     private readonly DataCollectorConfig _dataCollectorConfig;
+    private static readonly string TempDirectoryPath = Path.GetTempPath();
 
     private TestPlatformDataCollectionSink _dataCollectionSink;
-
     private bool _isEventHandlerInvoked;
-    private static readonly string TempDirectoryPath = Path.GetTempPath();
 
     public TestPlatformDataCollectionSinkTests()
     {
@@ -120,7 +116,7 @@ public class TestPlatformDataCollectionSinkTests
         _attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
     }
 
-    void SendFileCompleted_Handler(object sender, AsyncCompletedEventArgs e)
+    void SendFileCompleted_Handler(object? sender, AsyncCompletedEventArgs e)
     {
         _isEventHandlerInvoked = true;
     }

@@ -12,15 +12,15 @@ function Verify-Nuget-Packages($packageDirectory, $version)
 {
     Write-Log "Starting Verify-Nuget-Packages."
     $expectedNumOfFiles = @{
-        "Microsoft.CodeCoverage" = 53;
+        "Microsoft.CodeCoverage" = 57;
         "Microsoft.NET.Test.Sdk" = 27;
-        "Microsoft.TestPlatform" = 608;
+        "Microsoft.TestPlatform" = 616;
         "Microsoft.TestPlatform.Build" = 21;
-        "Microsoft.TestPlatform.CLI" = 423;
+        "Microsoft.TestPlatform.CLI" = 425;
         "Microsoft.TestPlatform.Extensions.TrxLogger" = 35;
         "Microsoft.TestPlatform.ObjectModel" = 238;
         "Microsoft.TestPlatform.AdapterUtilities" = 62;
-        "Microsoft.TestPlatform.Portable" = 640;
+        "Microsoft.TestPlatform.Portable" = 644;
         "Microsoft.TestPlatform.TestHost" = 214;
         "Microsoft.TestPlatform.TranslationLayer" = 123;
         "Microsoft.TestPlatform.Internal.Uwp" = 86;
@@ -56,6 +56,8 @@ function Verify-Nuget-Packages($packageDirectory, $version)
             Write-Error "Number of files are not equal $unzipNugetPackageDir, expected: $($expectedNumOfFiles[$packageKey]) actual: $actualNumOfFiles"
         }
 
+        # Don't remove the directories after you unpacked them
+        # they are useful for reviewing what is in the package.
         Remove-Item -Force -Recurse $unzipNugetPackageDir | Out-Null
     }
 

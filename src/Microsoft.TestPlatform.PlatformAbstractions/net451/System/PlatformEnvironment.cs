@@ -1,12 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Threading;
-
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-
 #if NETFRAMEWORK || NETSTANDARD2_0
+
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 #nullable disable
 
@@ -20,12 +22,38 @@ public class PlatformEnvironment : IEnvironment
     {
         get
         {
-            // On Mono System.Runtime.InteropServices.RuntimeInformation breaks
-            // See https://github.com/dotnet/corefx/issues/15112
-            // Support just x86 and x64 for now, likely our solution for ARM is going to be
-            // netcore based.
-            return Environment.Is64BitOperatingSystem ? PlatformArchitecture.X64 : PlatformArchitecture.X86;
+            return Environment.Is64BitOperatingSystem
+                ? IsArm64()
+                    ? PlatformArchitecture.ARM64
+                    : PlatformArchitecture.X64
+                : PlatformArchitecture.X86;
         }
+    }
+
+    private static bool IsArm64()
+    {
+        try
+        {
+            var currentProcess = Process.GetCurrentProcess();
+            if (!NativeMethods.IsWow64Process2(currentProcess.Handle, out ushort _, out ushort nativeMachine))
+            {
+                throw new Win32Exception();
+            }
+
+            // If nativeMachine is IMAGE_FILE_MACHINE_ARM64 it means that we're running on ARM64 architecture device.
+            return nativeMachine == NativeMethods.IMAGE_FILE_MACHINE_ARM64;
+        }
+        catch
+        {
+            // At the moment we cannot log messages inside the Microsoft.TestPlatform.PlatformAbstractions.
+            // We did an attempt in https://github.com/microsoft/vstest/pull/3422 - 17.2.0-preview-20220301-01 - but we reverted after
+            // because we broke a scenario where for .NET Framework application inside the test host
+            // we loaded runner version of Microsoft.TestPlatform.PlatformAbstractions but newer version Microsoft.TestPlatform.ObjectModel(the one close
+            // to the test container) and the old PlatformAbstractions doesn't contain the methods expected by the new ObjectModel throwing
+            // a MissedMethodException.
+        }
+
+        return false;
     }
 
     /// <inheritdoc />
@@ -60,9 +88,7 @@ public class PlatformEnvironment : IEnvironment
 
     /// <inheritdoc />
     public int GetCurrentManagedThreadId()
-    {
-        return Thread.CurrentThread.ManagedThreadId;
-    }
+        => Environment.CurrentManagedThreadId;
 }
 
 #endif

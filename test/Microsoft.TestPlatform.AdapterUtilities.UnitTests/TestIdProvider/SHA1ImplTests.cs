@@ -7,8 +7,6 @@ using System.Text;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AdapterUtilities.UnitTests.TestIdProvider;
 
 [TestClass]
@@ -105,7 +103,7 @@ public class Sha1ImplTests
         );
     }
 
-    private void SHA1_TestVector(string message, string expected)
+    private static void SHA1_TestVector(string message, string expected)
     {
         // Arrange
         expected = expected.Replace(" ", "").ToLowerInvariant();
@@ -119,7 +117,7 @@ public class Sha1ImplTests
         Assert.AreEqual(expected, digest1, $"Test vector '{message}' failed!");
     }
 
-    private void SHA1_TestRepetitionVector(char input, int repetition, string expected = null)
+    private static void SHA1_TestRepetitionVector(char input, int repetition, string? expected = null)
     {
         // Arrange
         var shaHasher1 = new AdapterUtilities.TestIdProvider.Sha1Implementation();
@@ -138,7 +136,7 @@ public class Sha1ImplTests
         }
         else
         {
-            expected = expected.Replace(" ", "").ToLowerInvariant();
+            expected = expected!.Replace(" ", "").ToLowerInvariant();
         }
 
         // Act

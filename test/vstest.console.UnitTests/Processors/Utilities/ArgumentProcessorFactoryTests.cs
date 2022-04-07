@@ -12,8 +12,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.Utilities;
 
 [TestClass]
@@ -153,7 +151,7 @@ public class ArgumentProcessorFactoryTests
         }
 
         Mock<IFeatureFlag> featureFlag = new();
-        featureFlag.Setup(x => x.IsEnabled(It.IsAny<string>())).Returns(true);
+        featureFlag.Setup(x => x.IsSet(It.IsAny<string>())).Returns(false);
         ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create(featureFlag.Object);
 
         // Expect command processors to contain both long and short commands.

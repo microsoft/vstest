@@ -69,7 +69,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         var isAborted = discoveryCompleteEventArgs.IsAborted;
 
         // Aggregate for final discovery complete
-        _discoveryDataAggregator.Aggregate(totalTests, isAborted);
+        _discoveryDataAggregator.Aggregate(totalTests, isAborted, discoveryCompleteEventArgs.DiscoveredExtensions);
 
         // Aggregate Discovery Data Metrics
         _discoveryDataAggregator.AggregateDiscoveryDataMetrics(discoveryCompleteEventArgs.Metrics);
@@ -106,7 +106,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             // we need to set isAborted = true and totalTests = -1
             if (_parallelProxyDiscoveryManager.IsAbortRequested)
             {
-                _discoveryDataAggregator.Aggregate(-1, true);
+                _discoveryDataAggregator.Aggregate(-1, true, null);
             }
 
             // In case of sequential discovery - RawMessage would have contained a 'DiscoveryCompletePayload' object
@@ -118,7 +118,8 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
                 LastDiscoveredTests = null,
                 FullyDiscoveredSources = fullyDiscovered,
                 PartiallyDiscoveredSources = partiallyDiscovered,
-                NotDiscoveredSources = notDiscovered
+                NotDiscoveredSources = notDiscovered,
+                DiscoveredExtensions = _discoveryDataAggregator.DiscoveredExtensions,
             };
 
             // Collecting Final Discovery State
@@ -136,7 +137,8 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
                 _discoveryDataAggregator.IsAborted,
                 fullyDiscovered,
                 partiallyDiscovered,
-                notDiscovered);
+                notDiscovered,
+                _discoveryDataAggregator.DiscoveredExtensions);
 
             finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
 

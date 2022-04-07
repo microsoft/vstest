@@ -4,7 +4,6 @@
 using System.ComponentModel;
 
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 #nullable disable
@@ -26,11 +25,8 @@ internal class TestPlatformDataCollectionSink : DataCollectionSink
     /// <param name="dataCollectorConfig">
     /// Data collector info.
     /// </param>
-    internal TestPlatformDataCollectionSink(IDataCollectionAttachmentManager attachmentManager, DataCollectorConfig dataCollectorConfig)
+    internal TestPlatformDataCollectionSink(IDataCollectionAttachmentManager attachmentManager!!, DataCollectorConfig dataCollectorConfig!!)
     {
-        ValidateArg.NotNull(attachmentManager, nameof(attachmentManager));
-        ValidateArg.NotNull(dataCollectorConfig, nameof(dataCollectorConfig));
-
         DataCollectorConfig = dataCollectorConfig;
         AttachmentManager = attachmentManager;
     }
@@ -60,10 +56,8 @@ internal class TestPlatformDataCollectionSink : DataCollectionSink
     /// Sends a file asynchronously.
     /// </summary>
     /// <param name="fileTransferInformation">Information about the file being transferred.</param>
-    public override void SendFileAsync(FileTransferInformation fileTransferInformation)
+    public override void SendFileAsync(FileTransferInformation fileTransferInformation!!)
     {
-        ValidateArg.NotNull(fileTransferInformation, nameof(fileTransferInformation));
-
         AttachmentManager.AddAttachment(fileTransferInformation, SendFileCompleted, DataCollectorConfig.TypeUri, DataCollectorConfig.FriendlyName);
     }
 }

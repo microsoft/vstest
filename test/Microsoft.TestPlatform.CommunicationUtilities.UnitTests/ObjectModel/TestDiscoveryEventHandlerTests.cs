@@ -9,18 +9,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.ObjectModel;
 
 [TestClass]
 public class TestDiscoveryEventHandlerTests
 {
-    private Mock<ITestRequestHandler> _mockClient;
-    private TestDiscoveryEventHandler _testDiscoveryEventHandler;
+    private readonly Mock<ITestRequestHandler> _mockClient;
+    private readonly TestDiscoveryEventHandler _testDiscoveryEventHandler;
 
-    [TestInitialize]
-    public void InitializeTests()
+    public TestDiscoveryEventHandlerTests()
     {
         _mockClient = new Mock<ITestRequestHandler>();
         _testDiscoveryEventHandler = new TestDiscoveryEventHandler(_mockClient.Object);

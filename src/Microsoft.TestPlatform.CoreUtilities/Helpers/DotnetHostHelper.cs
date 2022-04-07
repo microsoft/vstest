@@ -122,19 +122,18 @@ public class DotnetHostHelper : IDotnetHostHelper
 
     public bool TryGetDotnetPathByArchitecture(PlatformArchitecture targetArchitecture, out string muxerPath)
     {
+        // If current process is the same as the target architecture we return the current process filename.
         if (_processHelper.GetCurrentProcessArchitecture() == targetArchitecture)
         {
             string currentProcessFileName = _processHelper.GetCurrentProcessFileName();
-            if (Path.GetFileName(currentProcessFileName) != _muxerName)
-            {
-                EqtTrace.Verbose($"DotnetHostHelper.TryGetDotnetPathByArchitecture: Target architecture is the same as the current process architecture '{targetArchitecture}', but the current process is not a muxer: '{currentProcessFileName}'");
-            }
-            else
+            if (Path.GetFileName(currentProcessFileName) == _muxerName)
             {
                 muxerPath = currentProcessFileName;
                 EqtTrace.Verbose($"DotnetHostHelper.TryGetDotnetPathByArchitecture: Target architecture is the same as the current process architecture '{targetArchitecture}', and the current process is a muxer, using that: '{muxerPath}'");
                 return true;
             }
+
+            EqtTrace.Verbose($"DotnetHostHelper.TryGetDotnetPathByArchitecture: Target architecture is the same as the current process architecture '{targetArchitecture}', but the current process is not a muxer: '{currentProcessFileName}'");
         }
 
         // We used similar approach as the runtime resolver.

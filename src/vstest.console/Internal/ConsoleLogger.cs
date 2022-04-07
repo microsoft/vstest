@@ -401,11 +401,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <summary>
     /// Called when a test run start is received
     /// </summary>
-    private void TestRunStartHandler(object sender, TestRunStartEventArgs e)
+    private void TestRunStartHandler(object sender!!, TestRunStartEventArgs e!!)
     {
-        ValidateArg.NotNull(sender, nameof(sender));
-        ValidateArg.NotNull(e, nameof(e));
-
         // Print all test containers.
         Output.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information);
         if (VerbosityLevel == Verbosity.Detailed)
@@ -420,11 +417,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <summary>
     /// Called when a test message is received.
     /// </summary>
-    private void TestMessageHandler(object sender, TestRunMessageEventArgs e)
+    private void TestMessageHandler(object sender!!, TestRunMessageEventArgs e!!)
     {
-        ValidateArg.NotNull(sender, nameof(sender));
-        ValidateArg.NotNull(e, nameof(e));
-
         switch (e.Level)
         {
             case TestMessageLevel.Informational:
@@ -485,11 +479,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <summary>
     /// Called when a test result is received.
     /// </summary>
-    private void TestResultHandler(object sender, TestResultEventArgs e)
+    private void TestResultHandler(object sender!!, TestResultEventArgs e!!)
     {
-        ValidateArg.NotNull(sender, nameof(sender));
-        ValidateArg.NotNull(e, nameof(e));
-
         var testDisplayName = e.Result.DisplayName;
 
         if (string.IsNullOrWhiteSpace(e.Result.DisplayName))
@@ -665,9 +656,9 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         if (runLevelAttachementCount > 0)
         {
             // If ARTIFACTS_POSTPROCESSING is disabled
-            if (!_featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING) ||
-                // ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX(old UX) is enabled
-                _featureFlag.IsEnabled(FeatureFlag.ARTIFACTS_POSTPROCESSING_SDK_KEEP_OLD_UX) ||
+            if (_featureFlag.IsSet(FeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING) ||
+                // DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX(new UX) is disabled
+                _featureFlag.IsSet(FeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX) ||
                 // TestSessionCorrelationId is null(we're not running through the dotnet SDK).
                 CommandLineOptions.Instance.TestSessionCorrelationId is null)
             {

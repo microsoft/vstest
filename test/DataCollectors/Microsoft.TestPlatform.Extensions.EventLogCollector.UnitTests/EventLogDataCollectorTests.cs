@@ -15,23 +15,16 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests;
 
 [TestClass]
 public class EventLogDataCollectorTests
 {
     private readonly Mock<DataCollectionEvents> _mockDataCollectionEvents;
-
     private readonly TestableDataCollectionSink _mockDataCollectionSink;
-
     private readonly Mock<DataCollectionLogger> _mockDataCollectionLogger;
-
     private readonly DataCollectionEnvironmentContext _dataCollectionEnvironmentContext;
-
     private readonly EventLogDataCollector _eventLogDataCollector;
-
     private readonly Mock<IFileHelper> _mockFileHelper;
 
     public EventLogDataCollectorTests()
@@ -217,11 +210,10 @@ public class EventLogDataCollectorTests
     {
         var testableDataCollectionEvents = new TestableDataCollectionEvents();
         _eventLogDataCollector.Initialize(null, testableDataCollectionEvents, _mockDataCollectionSink, _mockDataCollectionLogger.Object, _dataCollectionEnvironmentContext);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestHostLaunchedInvocationList().Length);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseStartInvocationList().Length);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseEndInvocationList().Length);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionEndInvocationList().Length);
-        Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionStartInvocationList().Length);
+        Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseStartInvocationList()?.Length, "GetTestCaseStartInvocationList");
+        Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseEndInvocationList()?.Length, "GetTestCaseEndInvocationList");
+        Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionEndInvocationList()?.Length, "GetTestSessionEndInvocationList");
+        Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionStartInvocationList()?.Length, "GetTestSessionStartInvocationList");
     }
 
     [TestMethod]
@@ -431,39 +423,35 @@ public class EventLogDataCollectorTests
 /// </summary>
 public class TestableDataCollectionEvents : DataCollectionEvents
 {
-    public override event EventHandler<TestHostLaunchedEventArgs> TestHostLaunched;
-
-    public override event EventHandler<SessionStartEventArgs> SessionStart;
-
-    public override event EventHandler<SessionEndEventArgs> SessionEnd;
-
-    public override event EventHandler<TestCaseStartEventArgs> TestCaseStart;
-
-    public override event EventHandler<TestCaseEndEventArgs> TestCaseEnd;
+    public override event EventHandler<TestHostLaunchedEventArgs>? TestHostLaunched;
+    public override event EventHandler<SessionStartEventArgs>? SessionStart;
+    public override event EventHandler<SessionEndEventArgs>? SessionEnd;
+    public override event EventHandler<TestCaseStartEventArgs>? TestCaseStart;
+    public override event EventHandler<TestCaseEndEventArgs>? TestCaseEnd;
 
     public Delegate[] GetTestHostLaunchedInvocationList()
     {
-        return TestHostLaunched.GetInvocationList();
+        return TestHostLaunched!.GetInvocationList();
     }
 
     public Delegate[] GetTestCaseStartInvocationList()
     {
-        return TestCaseStart.GetInvocationList();
+        return TestCaseStart!.GetInvocationList();
     }
 
     public Delegate[] GetTestCaseEndInvocationList()
     {
-        return TestCaseEnd.GetInvocationList();
+        return TestCaseEnd!.GetInvocationList();
     }
 
     public Delegate[] GetTestSessionStartInvocationList()
     {
-        return SessionStart.GetInvocationList();
+        return SessionStart!.GetInvocationList();
     }
 
     public Delegate[] GetTestSessionEndInvocationList()
     {
-        return SessionEnd.GetInvocationList();
+        return SessionEnd!.GetInvocationList();
     }
 }
 
@@ -475,7 +463,7 @@ public class TestableDataCollectionSink : DataCollectionSink
     /// <summary>
     /// The send file completed.
     /// </summary>
-    public override event AsyncCompletedEventHandler SendFileCompleted;
+    public override event AsyncCompletedEventHandler? SendFileCompleted;
 
     /// <summary>
     /// Gets or sets a value indicating whether is send file async invoked.

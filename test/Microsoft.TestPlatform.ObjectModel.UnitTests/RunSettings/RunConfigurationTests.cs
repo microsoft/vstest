@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using MSTest.TestFramework.AssertExtensions;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 
 [TestClass]
@@ -115,7 +113,7 @@ public class RunConfigurationTests
     }
 
     [TestMethod]
-    [Obsolete]
+    [Obsolete("TargetFrameworkVersion is Obsolete but we want to test its behavior")]
     public void SetTargetFrameworkVersionShouldSetTargetFramework()
     {
         var runConfiguration = new RunConfiguration();
@@ -141,7 +139,7 @@ public class RunConfigurationTests
     }
 
     [TestMethod]
-    [Obsolete]
+    [Obsolete("TargetFrameworkVersion is Obsolete but we want to test its behavior")]
     public void SetTargetFrameworkShouldSetTargetFrameworkVersion()
     {
         var runConfiguration = new RunConfiguration();
