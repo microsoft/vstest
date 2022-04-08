@@ -12,6 +12,8 @@ using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
+using Newtonsoft.Json;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -162,7 +164,7 @@ public class TestExtensions
     {
         metrics.Add(
             TelemetryDataConstants.DiscoveredExtensions,
-            SerializeExtensionDictionary(extensions));
+            JsonConvert.SerializeObject(extensions));
     }
 
     /// <summary>
@@ -497,21 +499,6 @@ public class TestExtensions
         }
 
         extensionDict.Add(extensionType, new HashSet<string>(extensions.Select(e => e.IdentifierData)));
-    }
-
-    private static string SerializeExtensionDictionary(IDictionary<string, HashSet<string>> extensions)
-    {
-        StringBuilder sb = new();
-
-        foreach (var kvp in extensions)
-        {
-            if (kvp.Value?.Count > 0)
-            {
-                sb.AppendFormat("{0}=[{1}];", kvp.Key, string.Join(",", kvp.Value));
-            }
-        }
-
-        return sb.ToString();
     }
 
     private static HashSet<string> MergeSets(HashSet<string> firstSet, HashSet<string> secondSet)
