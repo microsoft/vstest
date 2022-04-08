@@ -59,7 +59,7 @@ internal static class RunSettingsProviderExtensions
     {
         var runSettingsXml = runSettingsProvider.ActiveRunSettings?.SettingsXml;
 
-        if (string.IsNullOrWhiteSpace(runSettingsXml))
+        if (runSettingsXml.IsNullOrWhiteSpace())
         {
             runSettingsXml = EmptyRunSettings;
         }
@@ -206,8 +206,7 @@ internal static class RunSettingsProviderExtensions
     {
         var doc = new XmlDocument();
 
-        if (runSettingsProvider.ActiveRunSettings != null &&
-            !string.IsNullOrEmpty(runSettingsProvider.ActiveRunSettings.SettingsXml))
+        if (!StringUtils.IsNullOrEmpty(runSettingsProvider.ActiveRunSettings?.SettingsXml))
         {
             var settingsXml = runSettingsProvider.ActiveRunSettings.SettingsXml;
 

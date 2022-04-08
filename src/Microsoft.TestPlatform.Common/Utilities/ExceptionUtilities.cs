@@ -43,7 +43,7 @@ public class ExceptionUtilities
 
     private static void AppendStackTrace(StringBuilder stringBuilder, Exception exception)
     {
-        if (!string.IsNullOrEmpty(exception.StackTrace))
+        if (!exception.StackTrace.IsNullOrEmpty())
         {
             stringBuilder
                 .AppendLine()

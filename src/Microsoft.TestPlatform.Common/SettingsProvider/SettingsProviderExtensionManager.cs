@@ -162,7 +162,7 @@ public class SettingsProviderExtensionManager
     /// <returns>Settings provider with the provided name or null if one was not found.</returns>
     internal LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> GetSettingsProvider(string settingsName)
     {
-        if (string.IsNullOrWhiteSpace(settingsName))
+        if (settingsName.IsNullOrWhiteSpace())
         {
             throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(settingsName));
         }

@@ -27,10 +27,10 @@ public class InstallationContext
     public bool TryGetVisualStudioDirectory(out string visualStudioDirectory)
     {
         var vsInstallPath = new DirectoryInfo(typeof(InstallationContext).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent?.Parent?.Parent?.FullName;
-        if (!string.IsNullOrEmpty(vsInstallPath))
+        if (!vsInstallPath.IsNullOrEmpty())
         {
             var pathToDevenv = Path.Combine(vsInstallPath, DevenvExe);
-            if (!string.IsNullOrEmpty(pathToDevenv) && _fileHelper.Exists(pathToDevenv))
+            if (!pathToDevenv.IsNullOrEmpty() && _fileHelper.Exists(pathToDevenv))
             {
                 visualStudioDirectory = vsInstallPath;
                 return true;

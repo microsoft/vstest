@@ -5,7 +5,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -103,7 +102,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     {
         _messageSink = messageSink;
 
-        if (string.IsNullOrEmpty(outputDirectory))
+        if (outputDirectory.IsNullOrEmpty())
         {
             SessionOutputDirectory = Path.Combine(Path.GetTempPath(), DefaultOutputDirectoryName, id.Id.ToString());
         }
@@ -162,7 +161,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     /// <inheritdoc/>
     public void AddAttachment(FileTransferInformation fileTransferInfo!!, AsyncCompletedEventHandler sendFileCompletedCallback, Uri uri, string friendlyName)
     {
-        if (string.IsNullOrEmpty(SessionOutputDirectory))
+        if (SessionOutputDirectory.IsNullOrEmpty())
         {
             EqtTrace.Error("DataCollectionAttachmentManager.AddAttachment: Initialize not invoked.");
             return;
@@ -239,7 +238,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     private void AddNewFileTransfer(FileTransferInformation fileTransferInfo, AsyncCompletedEventHandler sendFileCompletedCallback, Uri uri, string friendlyName)
     {
         var context = fileTransferInfo.Context;
-        Debug.Assert(
+        TPDebug.Assert(
             context != null,
             "DataCollectionManager.AddNewFileTransfer: FileDataHeaderMessage with null context.");
 
