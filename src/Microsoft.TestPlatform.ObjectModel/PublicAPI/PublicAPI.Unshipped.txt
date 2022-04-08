@@ -1,5 +1,4 @@
 ﻿const Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants.MinimumProtocolVersionWithCancelDiscoveryEventHandlerSupport = 6 -> int
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.DiscoveryCompleteEventArgs(long totalTests, bool isAborted, System.Collections.Generic.IList<string> fullyDiscoveredSources, System.Collections.Generic.IList<string> partiallyDiscoveredSources, System.Collections.Generic.IList<string> notDiscoveredSources) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.FullyDiscoveredSources.get -> System.Collections.Generic.IList<string>
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.FullyDiscoveredSources.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.NotDiscoveredSources.get -> System.Collections.Generic.IList<string>
@@ -41,7 +40,9 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StopTestSessionCompleteEv
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StopTestSessionCompleteEventArgs.TestSessionInfo.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.DiscoveredExtensions.get -> System.Collections.Generic.Dictionary<string, System.Collections.Generic.HashSet<string>>
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.DiscoveredExtensions.set -> void
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.DiscoveryCompleteEventArgs(long totalTests, bool isAborted, System.Collections.Generic.IList<string> fullyDiscoveredSources, System.Collections.Generic.IList<string> partiallyDiscoveredSources, System.Collections.Generic.IList<string> notDiscoveredSources, System.Collections.Generic.Dictionary<string, System.Collections.Generic.HashSet<string>> discoveredExtensions) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.DiscoveryCompleteEventArgs() -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.DiscoveredExtensions.get -> System.Collections.Generic.Dictionary<string, System.Collections.Generic.HashSet<string>>
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.DiscoveredExtensions.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.IsAborted.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.TotalCount.set -> void
 

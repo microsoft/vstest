@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Microsoft.TestPlatform;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -13,8 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
@@ -24,19 +23,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDiscoveryManager, ITestDiscoveryEventsHandler2>, IParallelProxyDiscoveryManager
 {
     private readonly IDataSerializer _dataSerializer;
+    private readonly DiscoveryDataAggregator _dataAggregator;
+    private readonly IRequestData _requestData;
 
     private int _discoveryCompletedClients;
     private int _availableTestSources = -1;
 
-    private DiscoveryCriteria _actualDiscoveryCriteria;
-
-    private IEnumerator<string> _sourceEnumerator;
-
-    private ITestDiscoveryEventsHandler2 _currentDiscoveryEventsHandler;
-
-    private ParallelDiscoveryDataAggregator _currentDiscoveryDataAggregator;
-
-    private readonly IRequestData _requestData;
+    private DiscoveryCriteria? _actualDiscoveryCriteria;
+    private IEnumerator<string>? _sourceEnumerator;
+    private ITestDiscoveryEventsHandler2? _currentDiscoveryEventsHandler;
 
     public bool IsAbortRequested { get; private set; }
 
@@ -45,16 +40,17 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     /// </summary>
     private readonly object _discoveryStatusLockObject = new();
 
-    public ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
-        : this(requestData, actualProxyManagerCreator, JsonDataSerializer.Instance, parallelLevel, sharedHosts)
+    public ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, DiscoveryDataAggregator dataAggregator, int parallelLevel, bool sharedHosts)
+        : this(requestData, actualProxyManagerCreator, dataAggregator, JsonDataSerializer.Instance, parallelLevel, sharedHosts)
     {
     }
 
-    internal ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, IDataSerializer dataSerializer, int parallelLevel, bool sharedHosts)
+    internal ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, DiscoveryDataAggregator dataAggregator, IDataSerializer dataSerializer, int parallelLevel, bool sharedHosts)
         : base(actualProxyManagerCreator, parallelLevel, sharedHosts)
     {
         _requestData = requestData;
         _dataSerializer = dataSerializer;
+        _dataAggregator = dataAggregator;
     }
 
     #region IProxyDiscoveryManager
@@ -76,12 +72,6 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         _availableTestSources = discoveryCriteria.Sources.Count();
 
         EqtTrace.Verbose("ParallelProxyDiscoveryManager: Start discovery. Total sources: " + _availableTestSources);
-
-        // One data aggregator per parallel discovery
-        _currentDiscoveryDataAggregator = new ParallelDiscoveryDataAggregator();
-
-        // Marking all sources as not discovered before starting actual discovery
-        _currentDiscoveryDataAggregator.MarkSourcesWithStatus(discoveryCriteria.Sources.ToList(), DiscoveryStatus.NotDiscovered);
 
         DiscoverTestsPrivate(eventHandler);
     }
@@ -137,7 +127,6 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
             // Reset enumerators
             _sourceEnumerator = null;
 
-            _currentDiscoveryDataAggregator = null;
             _currentDiscoveryEventsHandler = null;
 
             // Dispose concurrent executors
@@ -157,12 +146,13 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         RemoveManager(proxyDiscoveryManager);
 
         proxyDiscoveryManager = CreateNewConcurrentManager();
+        Debug.Assert(_currentDiscoveryEventsHandler is not null, "Discovery events handler is null, DiscoverTestsPrivate should have been called before reaching this point.");
         var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
             _requestData,
             proxyDiscoveryManager,
             _currentDiscoveryEventsHandler,
             this,
-            _currentDiscoveryDataAggregator);
+            _dataAggregator);
         AddManager(proxyDiscoveryManager, parallelEventsHandler);
 
         // Second, let's attempt to trigger discovery for the next source.
@@ -187,7 +177,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
                 concurrentManager,
                 discoveryEventsHandler,
                 this,
-                _currentDiscoveryDataAggregator);
+                _dataAggregator);
 
             UpdateHandlerForManager(concurrentManager, parallelEventsHandler);
             DiscoverTestsOnConcurrentManager(concurrentManager);
@@ -201,6 +191,8 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     /// <param name="ProxyDiscoveryManager">Proxy discovery manager instance.</param>
     private void DiscoverTestsOnConcurrentManager(IProxyDiscoveryManager proxyDiscoveryManager)
     {
+        Debug.Assert(_actualDiscoveryCriteria is not null, "Discovery criteria is null, DiscoverTests should have been called before reaching this point.");
+
         // Peek to see if we have sources to trigger a discovery
         if (TryFetchNextSource(_sourceEnumerator, out string nextSource))
         {

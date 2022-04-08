@@ -6,26 +6,27 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel;
 
 [TestClass]
-public class ParallelDiscoveryDataAggregatorTests
+public class DiscoveryDataAggregatorTests
 {
     [TestMethod]
     public void AggregateShouldAggregateAbortedCorrectly()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
-        aggregator.Aggregate(totalTests: 5, isAborted: false, discoveredExtensions: null);
+        aggregator.Aggregate(new(totalTests: 5, isAborted: false));
         Assert.IsFalse(aggregator.IsAborted, "Aborted must be false");
 
-        aggregator.Aggregate(totalTests: 5, isAborted: true, discoveredExtensions: null);
+        aggregator.Aggregate(new(totalTests: 5, isAborted: true));
         Assert.IsTrue(aggregator.IsAborted, "Aborted must be true");
 
-        aggregator.Aggregate(totalTests: 5, isAborted: false, discoveredExtensions: null);
+        aggregator.Aggregate(new(totalTests: 5, isAborted: false));
         Assert.IsTrue(aggregator.IsAborted, "Aborted must be true");
 
         Assert.AreEqual(-1, aggregator.TotalTests, "Aggregator shouldn't count tests if one host aborts");
@@ -34,42 +35,42 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void AggregateShouldAggregateTotalTestsCorrectly()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
-        aggregator.Aggregate(totalTests: 2, isAborted: false, discoveredExtensions: null);
+        var aggregator = new DiscoveryDataAggregator();
+        aggregator.Aggregate(new(totalTests: 2, isAborted: false));
         Assert.AreEqual(2, aggregator.TotalTests, "Aggregated totalTests count does not match");
 
-        aggregator.Aggregate(totalTests: 5, isAborted: false, discoveredExtensions: null);
+        aggregator.Aggregate(new(totalTests: 5, isAborted: false));
         Assert.AreEqual(7, aggregator.TotalTests, "Aggregated totalTests count does not match");
 
-        aggregator.Aggregate(totalTests: 3, isAborted: false, discoveredExtensions: null);
+        aggregator.Aggregate(new(totalTests: 3, isAborted: false));
         Assert.AreEqual(10, aggregator.TotalTests, "Aggregated totalTests count does not match");
     }
 
     [TestMethod]
     public void AggregateDiscoveryDataMetricsShouldAggregateMetricsCorrectly()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
-        aggregator.AggregateDiscoveryDataMetrics(null);
+        aggregator.AggregateMetrics(null);
 
-        var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
+        var runMetrics = aggregator.GetMetrics();
         Assert.AreEqual(0, runMetrics.Count);
     }
 
     [TestMethod]
     public void AggregateDiscoveryDataMetricsShouldAddTotalTestsDiscovered()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
-        var dict = new Dictionary<string, object>
+        var metrics = new Dictionary<string, object>
         {
-            { TelemetryDataConstants.TotalTestsDiscovered, 2 }
+            [TelemetryDataConstants.TotalTestsDiscovered] = 2,
         };
 
-        aggregator.AggregateDiscoveryDataMetrics(dict);
-        aggregator.AggregateDiscoveryDataMetrics(dict);
+        aggregator.AggregateMetrics(metrics);
+        aggregator.AggregateMetrics(metrics);
 
-        var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
+        var runMetrics = aggregator.GetMetrics();
 
         Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TotalTestsDiscovered, out var value));
         Assert.AreEqual(4, Convert.ToInt32(value));
@@ -78,17 +79,17 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void AggregateDiscoveryDataMetricsShouldAddTimeTakenToDiscoverTests()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
-        var dict = new Dictionary<string, object>
+        var metrics = new Dictionary<string, object>
         {
-            { TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, .02091 }
+            [TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter] = .02091,
         };
 
-        aggregator.AggregateDiscoveryDataMetrics(dict);
-        aggregator.AggregateDiscoveryDataMetrics(dict);
+        aggregator.AggregateMetrics(metrics);
+        aggregator.AggregateMetrics(metrics);
 
-        var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
+        var runMetrics = aggregator.GetMetrics();
 
         Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, out var value));
         Assert.AreEqual(.04182, value);
@@ -97,17 +98,17 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void AggregateDiscoveryDataMetricsShouldAddTimeTakenByAllAdapters()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
-        var dict = new Dictionary<string, object>
+        var metrics = new Dictionary<string, object>
         {
-            { TelemetryDataConstants.TimeTakenInSecByAllAdapters, .02091 }
+            [TelemetryDataConstants.TimeTakenInSecByAllAdapters] = .02091,
         };
 
-        aggregator.AggregateDiscoveryDataMetrics(dict);
-        aggregator.AggregateDiscoveryDataMetrics(dict);
+        aggregator.AggregateMetrics(metrics);
+        aggregator.AggregateMetrics(metrics);
 
-        var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
+        var runMetrics = aggregator.GetMetrics();
 
         Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenInSecByAllAdapters, out var value));
         Assert.AreEqual(.04182, value);
@@ -116,17 +117,17 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void AggregateDiscoveryDataMetricsShouldAddTimeTakenToLoadAdapters()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
-        var dict = new Dictionary<string, object>
+        var metrics = new Dictionary<string, object>
         {
-            { TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, .02091 }
+            [TelemetryDataConstants.TimeTakenToLoadAdaptersInSec] = .02091,
         };
 
-        aggregator.AggregateDiscoveryDataMetrics(dict);
-        aggregator.AggregateDiscoveryDataMetrics(dict);
+        aggregator.AggregateMetrics(metrics);
+        aggregator.AggregateMetrics(metrics);
 
-        var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
+        var runMetrics = aggregator.GetMetrics();
 
         Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, out var value));
         Assert.AreEqual(.04182, value);
@@ -135,29 +136,27 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void AggregateDiscoveryDataMetricsShouldNotAggregateDiscoveryState()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
-        var dict = new Dictionary<string, object>
+        var metrics = new Dictionary<string, object>
         {
-            { TelemetryDataConstants.DiscoveryState, "Completed" }
+            [TelemetryDataConstants.DiscoveryState] = "Completed",
         };
 
-        aggregator.AggregateDiscoveryDataMetrics(dict);
-        aggregator.AggregateDiscoveryDataMetrics(dict);
+        aggregator.AggregateMetrics(metrics);
+        aggregator.AggregateMetrics(metrics);
 
-        var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
+        var runMetrics = aggregator.GetMetrics();
         Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.DiscoveryState, out _));
     }
 
     [TestMethod]
     public void GetAggregatedDiscoveryDataMetricsShouldReturnEmptyIfMetricAggregatorIsEmpty()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
-        var dict = new Dictionary<string, object>();
-
-        aggregator.AggregateDiscoveryDataMetrics(dict);
-        var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
+        aggregator.AggregateMetrics(new Dictionary<string, object>());
+        var runMetrics = aggregator.GetMetrics();
 
         Assert.AreEqual(0, runMetrics.Count);
     }
@@ -165,11 +164,10 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void GetAggregatedDiscoveryDataMetricsShouldReturnEmptyIfMetricsIsNull()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
-        _ = new Dictionary<string, object>();
+        var aggregator = new DiscoveryDataAggregator();
 
-        aggregator.AggregateDiscoveryDataMetrics(null);
-        var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
+        aggregator.AggregateMetrics(null);
+        var runMetrics = aggregator.GetMetrics();
 
         Assert.AreEqual(0, runMetrics.Count);
     }
@@ -177,17 +175,17 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void GetDiscoveryDataMetricsShouldAddTotalAdaptersUsedIfMetricsIsNotEmpty()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
-        var dict = new Dictionary<string, object>
+        var metrics = new Dictionary<string, object>
         {
-            { TelemetryDataConstants.TotalTestsByAdapter, 2 }
+            [TelemetryDataConstants.TotalTestsByAdapter] = 2,
         };
 
-        aggregator.AggregateDiscoveryDataMetrics(dict);
-        aggregator.AggregateDiscoveryDataMetrics(dict);
+        aggregator.AggregateMetrics(metrics);
+        aggregator.AggregateMetrics(metrics);
 
-        var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
+        var runMetrics = aggregator.GetMetrics();
 
         Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, out var value));
         Assert.AreEqual(1, value);
@@ -196,17 +194,17 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void GetDiscoveryDataMetricsShouldAddNumberOfAdapterDiscoveredIfMetricsIsEmpty()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
-        var dict = new Dictionary<string, object>
+        var metrics = new Dictionary<string, object>
         {
-            { TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + "executor:MSTestV1", .02091 },
-            { TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + "executor:MSTestV2", .02091 }
+            [TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + "executor:MSTestV1"] = .02091,
+            [TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + "executor:MSTestV2"] = .02091,
         };
 
-        aggregator.AggregateDiscoveryDataMetrics(dict);
+        aggregator.AggregateMetrics(metrics);
 
-        var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
+        var runMetrics = aggregator.GetMetrics();
 
         Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, out var value));
         Assert.AreEqual(2, value);
@@ -215,31 +213,29 @@ public class ParallelDiscoveryDataAggregatorTests
     [TestMethod]
     public void GetDiscoveryDataMetricsShouldNotAddTotalAdaptersUsedIfMetricsIsEmpty()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
-        var dict = new Dictionary<string, object>();
+        var aggregator = new DiscoveryDataAggregator();
 
-        aggregator.AggregateDiscoveryDataMetrics(dict);
+        aggregator.AggregateMetrics(new Dictionary<string, object>());
 
-        var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
+        var runMetrics = aggregator.GetMetrics();
         Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, out _));
     }
 
     [TestMethod]
     public void GetDiscoveryDataMetricsShouldNotAddNumberOfAdapterDiscoveredIfMetricsIsEmpty()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
-        var dict = new Dictionary<string, object>();
+        var aggregator = new DiscoveryDataAggregator();
 
-        aggregator.AggregateDiscoveryDataMetrics(dict);
+        aggregator.AggregateMetrics(new Dictionary<string, object>());
 
-        var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
+        var runMetrics = aggregator.GetMetrics();
         Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, out _));
     }
 
     [TestMethod]
     public void AggregateShouldAggregateMessageSentCorrectly()
     {
-        var aggregator = new ParallelDiscoveryDataAggregator();
+        var aggregator = new DiscoveryDataAggregator();
 
         aggregator.AggregateIsMessageSent(isMessageSent: false);
         Assert.IsFalse(aggregator.IsMessageSent, "Aborted must be false");
@@ -251,25 +247,180 @@ public class ParallelDiscoveryDataAggregatorTests
         Assert.IsTrue(aggregator.IsMessageSent, "Aborted must be true");
     }
 
-    [TestMethod]
-    public void AggregateShouldAggregateSourcesCorrectly()
+    [DataTestMethod]
+    [DataRow(DiscoveryStatus.FullyDiscovered)]
+    [DataRow(DiscoveryStatus.PartiallyDiscovered)]
+    [DataRow(DiscoveryStatus.NotDiscovered)]
+    public void MarkSourcesWithStatusWhenSourcesIsNullDoesNothing(DiscoveryStatus discoveryStatus)
     {
         // Arrange
-        var aggregator = new ParallelDiscoveryDataAggregator();
-        var sources = new List<string>() { "sample.dll" };
+        var dataAggregator = new DiscoveryDataAggregator();
 
         // Act
-        aggregator.MarkSourcesWithStatus(sources, DiscoveryStatus.NotDiscovered);
-        var sourcesWithNotDiscoveredStatus = aggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered);
+        dataAggregator.MarkSourcesWithStatus(null, discoveryStatus);
 
         // Assert
-        Assert.AreEqual(1, sourcesWithNotDiscoveredStatus.Count);
+        Assert.AreEqual(0, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count);
+        Assert.AreEqual(0, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
+        Assert.AreEqual(0, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
+    }
+
+    [DataTestMethod]
+    [DataRow(DiscoveryStatus.FullyDiscovered)]
+    [DataRow(DiscoveryStatus.PartiallyDiscovered)]
+    [DataRow(DiscoveryStatus.NotDiscovered)]
+    public void MarkSourcesWithStatusIgnoresNullSources(DiscoveryStatus discoveryStatus)
+    {
+        // Arrange
+        var dataAggregator = new DiscoveryDataAggregator();
+        var sources = new[] { "a", null, "b" };
+
+        // Sanity check
+        Assert.AreEqual(0, dataAggregator.GetSourcesWithStatus(discoveryStatus).Count);
 
         // Act
-        aggregator.MarkSourcesWithStatus(sources, DiscoveryStatus.FullyDiscovered);
-        var sourcesWithFullyDiscoveryStatus = aggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered);
+        dataAggregator.MarkSourcesWithStatus(sources, discoveryStatus);
 
         // Assert
-        Assert.AreEqual(1, sourcesWithFullyDiscoveryStatus.Count);
+        CollectionAssert.AreEquivalent(new[] { "a", "b" }, dataAggregator.GetSourcesWithStatus(discoveryStatus));
+    }
+
+    [DataTestMethod]
+    [DataRow(DiscoveryStatus.FullyDiscovered)]
+    [DataRow(DiscoveryStatus.PartiallyDiscovered)]
+    public void MarkSourcesWithStatusWhenSourceAddedAndStatusDifferentFromNotDiscoveredLogsWarning(DiscoveryStatus discoveryStatus)
+    {
+        // Arrange
+        var dataAggregator = new DiscoveryDataAggregator();
+
+        // Act
+        dataAggregator.MarkSourcesWithStatus(new[] { "a" }, discoveryStatus);
+
+        // Assert
+        CollectionAssert.AreEquivalent(new[] { "a" }, dataAggregator.GetSourcesWithStatus(discoveryStatus));
+    }
+
+    [DataTestMethod]
+    [DataRow(DiscoveryStatus.NotDiscovered)]
+    [DataRow(DiscoveryStatus.PartiallyDiscovered)]
+    public void MarkSourcesWithStatusWhenSourceStatusWasFullyDiscoveredAndIsDowngradedLogsWarning(DiscoveryStatus discoveryStatus)
+    {
+        // Arrange
+        var dataAggregator = new DiscoveryDataAggregator();
+        dataAggregator.MarkSourcesWithStatus(new[] { "a" }, DiscoveryStatus.FullyDiscovered);
+
+        // Act
+        dataAggregator.MarkSourcesWithStatus(new[] { "a" }, discoveryStatus);
+
+        // Assert
+        CollectionAssert.AreEquivalent(new[] { "a" }, dataAggregator.GetSourcesWithStatus(discoveryStatus));
+    }
+
+    [TestMethod]
+    public void MarkSourcesWithStatusWhenSourceStatusWasPartiallyDiscoveredAndIsDowngradedLogsWarning()
+    {
+        // Arrange
+        var dataAggregator = new DiscoveryDataAggregator();
+        dataAggregator.MarkSourcesWithStatus(new[] { "a" }, DiscoveryStatus.PartiallyDiscovered);
+
+        // Act
+        dataAggregator.MarkSourcesWithStatus(new[] { "a" }, DiscoveryStatus.NotDiscovered);
+
+        // Assert
+        CollectionAssert.AreEquivalent(new[] { "a" }, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+    }
+
+    [TestMethod]
+    public void MarkSourcesBasedOnDiscoveredTestCasesHandlesTestCasesFromMultipleSources()
+    {
+        // Arrange
+        var dataAggregator = new DiscoveryDataAggregator();
+        var testCases = new TestCase[]
+        {
+            new() { Source = "a" },
+            new() { Source = "a" },
+            new() { Source = "a" },
+            new() { Source = "b" },
+            new() { Source = "c" },
+        };
+
+        // Act
+        dataAggregator.MarkSourcesBasedOnDiscoveredTestCases(null, testCases);
+
+        // Assert
+        CollectionAssert.AreEquivalent(new[] { "a", "b" }, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        CollectionAssert.AreEquivalent(new[] { "c" }, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+    }
+
+    [TestMethod]
+    public void MarkSourcesBasedOnDiscoveredTestCasesReuseLastDiscoveredSource()
+    {
+        // Arrange
+        var dataAggregator = new DiscoveryDataAggregator();
+        string? previousSource = null;
+        previousSource = dataAggregator.MarkSourcesBasedOnDiscoveredTestCases(previousSource, new TestCase[] { new() { Source = "a" } });
+
+        // Act
+        _ = dataAggregator.MarkSourcesBasedOnDiscoveredTestCases(previousSource, new TestCase[] { new() { Source = "b" }, });
+
+        // Assert
+        CollectionAssert.AreEquivalent(new[] { "a" }, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        CollectionAssert.AreEquivalent(new[] { "b" }, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+    }
+
+    [DataTestMethod]
+    [DataRow(DiscoveryStatus.FullyDiscovered)]
+    [DataRow(DiscoveryStatus.PartiallyDiscovered)]
+    [DataRow(DiscoveryStatus.NotDiscovered)]
+    public void GetSourcesWithStatusWhenEmptyDictionaryReturnsEmptyList(DiscoveryStatus discoveryStatus)
+    {
+        var instanceSources = new DiscoveryDataAggregator().GetSourcesWithStatus(discoveryStatus);
+        Assert.AreEqual(0, instanceSources.Count);
+    }
+
+    [TestMethod]
+    public void GetSourcesWithStatusCorrectlyFiltersSources()
+    {
+        // Arrange
+        var dataAggregator = new DiscoveryDataAggregator();
+        var notDiscoveredSources = new[]
+        {
+            "not1",
+            "not2",
+            "not3",
+        };
+        var partiallyDiscoveredSources = new[]
+        {
+            "partially1",
+            "partially2",
+            "partially3",
+            "partially4",
+        };
+        var fullyDiscoveredSources = new[]
+        {
+            "fully1",
+            "fully2",
+            "fully3",
+            "fully4",
+            "fully5",
+        };
+
+        dataAggregator.MarkSourcesWithStatus(notDiscoveredSources, DiscoveryStatus.NotDiscovered);
+
+        dataAggregator.MarkSourcesWithStatus(partiallyDiscoveredSources, DiscoveryStatus.NotDiscovered);
+        dataAggregator.MarkSourcesWithStatus(partiallyDiscoveredSources, DiscoveryStatus.PartiallyDiscovered);
+
+        dataAggregator.MarkSourcesWithStatus(fullyDiscoveredSources, DiscoveryStatus.NotDiscovered);
+        dataAggregator.MarkSourcesWithStatus(fullyDiscoveredSources, DiscoveryStatus.FullyDiscovered);
+
+        // Act
+        var actualFullyDiscovered = dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered);
+        var actualPartiallyDiscovered = dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered);
+        var actualNotDiscovered = dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered);
+
+        // Assert
+        CollectionAssert.AreEquivalent(fullyDiscoveredSources, actualFullyDiscovered);
+        CollectionAssert.AreEquivalent(partiallyDiscoveredSources, actualPartiallyDiscovered);
+        CollectionAssert.AreEquivalent(notDiscoveredSources, actualNotDiscovered);
     }
 }

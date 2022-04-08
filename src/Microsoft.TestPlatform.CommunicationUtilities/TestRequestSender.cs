@@ -572,20 +572,21 @@ public class TestRequestSender : ITestRequestSender
                     discoveryEventsHandler.HandleDiscoveredTests(testCases);
                     break;
                 case MessageType.DiscoveryComplete:
-                    var discoveryCompletePayload =
-                        _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(data);
-                    var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
-                        discoveryCompletePayload.TotalTests,
-                        discoveryCompletePayload.IsAborted,
-                        discoveryCompletePayload.FullyDiscoveredSources,
-                        discoveryCompletePayload.PartiallyDiscoveredSources,
-                        discoveryCompletePayload.NotDiscoveredSources,
-                        discoveryCompletePayload.DiscoveredExtensions);
+                    var payload = _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(data);
+                    var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs
+                    {
+                        TotalCount = payload.TotalTests,
+                        IsAborted = payload.IsAborted,
+                        FullyDiscoveredSources = payload.FullyDiscoveredSources,
+                        PartiallyDiscoveredSources = payload.PartiallyDiscoveredSources,
+                        NotDiscoveredSources = payload.NotDiscoveredSources,
+                        DiscoveredExtensions = payload.DiscoveredExtensions,
+                    };
 
-                    discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
+                    discoveryCompleteEventArgs.Metrics = payload.Metrics;
                     discoveryEventsHandler.HandleDiscoveryComplete(
                         discoveryCompleteEventArgs,
-                        discoveryCompletePayload.LastDiscoveredTests);
+                        payload.LastDiscoveredTests);
                     SetOperationComplete();
                     break;
                 case MessageType.TestMessage:

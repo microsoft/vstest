@@ -39,7 +39,7 @@ public class ParallelDiscoveryEventsHandlerTests
 
         _parallelDiscoveryEventsHandler = new ParallelDiscoveryEventsHandler(_mockRequestData.Object, _mockProxyDiscoveryManager.Object,
             _mockTestDiscoveryEventsHandler.Object, _mockParallelProxyDiscoveryManager.Object,
-            new ParallelDiscoveryDataAggregator(), _mockDataSerializer.Object);
+            new DiscoveryDataAggregator(), _mockDataSerializer.Object);
     }
 
     [TestMethod]
@@ -155,7 +155,7 @@ public class ParallelDiscoveryEventsHandlerTests
         _mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.DiscoveryComplete)).Returns(payload);
 
         // Act
-        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted, It.IsAny<List<string>>(), It.IsAny<List<string>>(), It.IsAny<List<string>>());
+        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
         _parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
 
         // Verify
