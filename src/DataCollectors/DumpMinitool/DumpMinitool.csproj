@@ -12,9 +12,14 @@
     <Prefer32Bit>false</Prefer32Bit>
     <OutputType>Exe</OutputType>
     <IsTestProject>false</IsTestProject>
-    <RuntimeIdentifier Condition=" '$(DotNetBuildFromSource)' != 'true' ">win7-x86</RuntimeIdentifier>
+    <RuntimeIdentifier Condition=" '$(DotNetBuildFromSource)' != 'true' ">win7-x64</RuntimeIdentifier>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\DumpMinitool.x86\Program.cs" Link="Program.cs" />
+    <Compile Include="..\..\Microsoft.TestPlatform.Extensions.BlameDataCollector\MiniDumpWriteDump.cs" Link="MiniDumpWriteDump.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- API that is common to all frameworks that we build for. -->

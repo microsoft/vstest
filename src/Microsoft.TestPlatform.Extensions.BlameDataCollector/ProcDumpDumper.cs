@@ -72,7 +72,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
     }
 
     /// <inheritdoc/>
-    public void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType, bool collectAlways)
+    public void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType, bool collectAlways, Action<string> logWarning)
     {
         _collectAlways = collectAlways;
         _outputDirectory = outputDirectory;
@@ -89,9 +89,9 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
 
         if (!TryGetProcDumpExecutable(processId, out var procDumpPath))
         {
-            var err = $"{procDumpPath} could not be found, please set PROCDUMP_PATH environment variable to a directory that contains {procDumpPath} executable, or make sure that the executable is available on PATH.";
-            ConsoleOutput.Instance.Warning(false, err);
-            EqtTrace.Error($"ProcDumpDumper.AttachToTargetProcess: {err}");
+            var procdumpNotFound = string.Format(Resources.Resources.ProcDumpNotFound, procDumpPath);
+            logWarning(procdumpNotFound);
+            EqtTrace.Warning($"ProcDumpDumper.AttachToTargetProcess: {procdumpNotFound}");
             return;
         }
 
@@ -269,10 +269,13 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
         if (_environment.OperatingSystem == PlatformOperatingSystem.Windows)
         {
             // Launch proc dump according to process architecture
-            filename = _environment.Architecture == PlatformArchitecture.X86
-                ? Constants.ProcdumpProcess
-                : _nativeMethodsHelper.Is64Bit(_processHelper.GetProcessHandle(processId)) ?
-                    Constants.Procdump64Process : Constants.ProcdumpProcess;
+            var targetProcessArchitecture = _processHelper.GetProcessArchitecture(processId);
+            filename = targetProcessArchitecture switch
+            {
+                PlatformArchitecture.X86 => "procdump.exe",
+                PlatformArchitecture.ARM64 => "procdump64a.exe",
+                _ => "procdump64.exe",
+            };
         }
         else
         {

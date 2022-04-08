@@ -33,25 +33,24 @@ public partial class ProcessHelper : IProcessHelper
 
     public PlatformArchitecture GetCurrentProcessArchitecture()
     {
-        switch (RuntimeInformation.ProcessArchitecture)
+        return RuntimeInformation.ProcessArchitecture switch
         {
-            case Architecture.X86:
-                return PlatformArchitecture.X86;
-            case Architecture.X64:
-                return PlatformArchitecture.X64;
-            case Architecture.Arm:
-                return PlatformArchitecture.ARM;
-            case Architecture.Arm64:
-                return PlatformArchitecture.ARM64;
-
+            Architecture.X86 => PlatformArchitecture.X86,
+            Architecture.X64 => PlatformArchitecture.X64,
+            Architecture.Arm => PlatformArchitecture.ARM,
+            Architecture.Arm64 => PlatformArchitecture.ARM64,
             // The symbolic value is only available with .NET 6
             // preview 6 or later, so use the numerical value for now.
             // case System.Runtime.InteropServices.Architecture.S390x:
-            case (Architecture)5:
-                return PlatformArchitecture.S390x;
-            default:
-                throw new NotSupportedException();
-        }
+            (Architecture)5 => PlatformArchitecture.S390x,
+            _ => throw new NotSupportedException(),
+        };
+    }
+
+    public PlatformArchitecture GetProcessArchitecture(int processId)
+    {
+        // Return the same as the current process.
+        return GetCurrentProcessArchitecture();
     }
 }
 

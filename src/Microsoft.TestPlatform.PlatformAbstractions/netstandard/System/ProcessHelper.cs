@@ -111,6 +111,11 @@ public class ProcessHelper : IProcessHelper
     {
         throw new NotImplementedException();
     }
+
+    public PlatformArchitecture GetProcessArchitecture(int processId)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 #endif
