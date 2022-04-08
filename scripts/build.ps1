@@ -866,11 +866,12 @@ function Create-NugetPackages {
 
     Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "Icon.png") $stagingDir -Force
 
-    # Remove all locally built nuget packages before we start creating them
-    # we are leaving them in the folder after uzipping them for easier review.
-    # we should exclude "manifest" and "source-build" folders not to break compatibility.
-    if (Test-Path $packageOutputDir) {
-        Remove-Item $packageOutputDir -Recurse -Force -Exclude "manifest","source-build"
+    if (-not $TPB_CIBuild) {
+        # Remove all locally built nuget packages before we start creating them
+        # we are leaving them in the folder after uzipping them for easier review.
+        if (Test-Path $packageOutputDir) {
+            Remove-Item $packageOutputDir -Recurse -Force
+        }
     }
 
     if (-not (Test-Path $packageOutputDir)) {
