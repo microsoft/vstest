@@ -887,6 +887,8 @@ function Create-NugetPackages {
 
     Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "Icon.png") $stagingDir -Force
 
+    # Packages folder should not be cleared on CI.
+    # Artifacts from source-build are downloaded into this directory before the build starts, and this would remove them.
     if (-not $TPB_CIBuild) {
         # Remove all locally built nuget packages before we start creating them
         # we are leaving them in the folder after uzipping them for easier review.
