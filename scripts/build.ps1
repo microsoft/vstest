@@ -890,7 +890,7 @@ function Create-NugetPackages {
     # Remove all locally built nuget packages before we start creating them
     # we are leaving them in the folder after uzipping them for easier review.
     if (Test-Path $packageOutputDir) {
-        Remove-Item $packageOutputDir -Recurse -Force
+        Remove-Item $packageOutputDir -Recurse -Force -Exclude "manifest","source-build"
     }
 
     if (-not (Test-Path $packageOutputDir)) {
