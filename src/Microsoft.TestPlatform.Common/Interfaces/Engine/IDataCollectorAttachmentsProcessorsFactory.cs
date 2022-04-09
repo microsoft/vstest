@@ -41,7 +41,7 @@ internal class DataCollectorAttachmentProcessor : IDisposable
 
     public DataCollectorAttachmentProcessor(string friendlyName, IDataCollectorAttachmentProcessor dataCollectorAttachmentProcessor!!)
     {
-        FriendlyName = string.IsNullOrEmpty(friendlyName) ? throw new ArgumentException("Invalid FriendlyName", nameof(friendlyName)) : friendlyName;
+        FriendlyName = friendlyName.IsNullOrEmpty() ? throw new ArgumentException("Invalid FriendlyName", nameof(friendlyName)) : friendlyName;
         DataCollectorAttachmentProcessorInstance = dataCollectorAttachmentProcessor;
     }
 

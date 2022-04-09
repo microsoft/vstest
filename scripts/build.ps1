@@ -51,6 +51,7 @@ Param(
     [Switch] $Force,
 
     [Alias("s")]
+    [ValidateSet("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "Pack", "Manifest", "PrepareAcceptanceTests")]
     [String[]] $Steps = @("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "Pack", "Manifest", "PrepareAcceptanceTests")
 )
 
@@ -558,23 +559,32 @@ function Publish-Package {
     $blameDataCollector = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.Extensions.BlameDataCollector\bin\$TPB_Configuration"
     $blameDataCollectorNetFull = Join-Path $blameDataCollector $TPB_TargetFramework472
     $blameDataCollectorNetStandard = Join-Path $blameDataCollector $TPB_TargetFrameworkStandard
+    New-Item -ItemType Directory "$fullCLRExtensionsDir/dump" -Force | Out-Null
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $fullCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $fullCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetFull\DumpMinitool.exe $fullCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetFull\DumpMinitool.pdb $fullCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetFull\DumpMinitool.exe.config $fullCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetFull\DumpMinitool.x86.exe $fullCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetFull\DumpMinitool.x86.pdb $fullCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetFull\DumpMinitool.x86.exe.config $fullCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.exe "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.pdb "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.exe.config "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.x86.exe "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.x86.pdb "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.x86.exe.config "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.arm64.exe "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.arm64.pdb "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.arm64.exe.config "$fullCLRExtensionsDir/dump" -Force
 
+    New-Item -ItemType Directory "$coreCLRExtensionsDir/dump" -Force | Out-Null
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $coreCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $coreCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.exe $coreCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.pdb $coreCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.exe.config $coreCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.x86.exe $coreCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.x86.pdb $coreCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.x86.exe.config $coreCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.exe "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.pdb "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.exe.config "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.x86.exe "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.x86.pdb "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.x86.exe.config "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.arm64.exe "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.arm64.pdb "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.arm64.exe.config "$coreCLRExtensionsDir/dump" -Force
+
     # we use this to dump processes on netcore
     Copy-Item $blameDataCollectorNetStandard\Microsoft.Diagnostics.NETCore.Client.dll $coreCLRExtensionsDir -Force
 
@@ -866,10 +876,14 @@ function Create-NugetPackages {
 
     Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "Icon.png") $stagingDir -Force
 
-    # Remove all locally built nuget packages before we start creating them
-    # we are leaving them in the folder after uzipping them for easier review.
-    if (Test-Path $packageOutputDir) {
-        Remove-Item $packageOutputDir -Recurse -Force
+    # Packages folder should not be cleared on CI.
+    # Artifacts from source-build are downloaded into this directory before the build starts, and this would remove them.
+    if (-not $TPB_CIBuild) {
+        # Remove all locally built nuget packages before we start creating them
+        # we are leaving them in the folder after uzipping them for easier review.
+        if (Test-Path $packageOutputDir) {
+            Remove-Item $packageOutputDir -Recurse -Force
+        }
     }
 
     if (-not (Test-Path $packageOutputDir)) {

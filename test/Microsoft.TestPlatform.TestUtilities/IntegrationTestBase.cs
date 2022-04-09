@@ -15,6 +15,7 @@ using FluentAssertions;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.VisualStudio.TestPlatform;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -646,7 +647,7 @@ public class IntegrationTestBase
     /// Returns the VsTestConsole Wrapper.
     /// </summary>
     /// <returns></returns>
-    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(TraceLevel traceLevel = TraceLevel.Verbose)
+    public IVsTestConsoleWrapper GetVsTestConsoleWrapper(Dictionary<string, string?>? environmentVariables = null, TraceLevel traceLevel = TraceLevel.Verbose)
     {
         ConsoleParameters consoleParameters = new();
         if (traceLevel != TraceLevel.Off)
@@ -694,7 +695,7 @@ public class IntegrationTestBase
         // variables, unless we explicitly say to clean them. https://github.com/microsoft/vstest/pull/3433
         // Remove this code later, and just pass the variables you want to add.
         var debugEnvironmentVariables = AddDebugEnvironmentVariables(new Dictionary<string, string>());
-        Dictionary<string, string?> environmentVariables = new();
+        environmentVariables ??= new();
         if (debugEnvironmentVariables.Count > 0)
         {
             Environment.GetEnvironmentVariables().OfType<DictionaryEntry>().ToList().ForEach(e => environmentVariables.Add(e.Key.ToString()!, e.Value?.ToString()));

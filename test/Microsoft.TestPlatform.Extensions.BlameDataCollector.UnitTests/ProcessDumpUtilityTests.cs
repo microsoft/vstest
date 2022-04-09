@@ -60,7 +60,7 @@ public class ProcessDumpUtilityTests
             _mockHangDumperFactory.Object,
             _mockCrashDumperFactory.Object);
 
-        processDumpUtility.StartTriggerBasedProcessDump(processId, testResultsDirectory, false, ".NETCoreApp,Version=v5.0", false);
+        processDumpUtility.StartTriggerBasedProcessDump(processId, testResultsDirectory, false, ".NETCoreApp,Version=v5.0", false, _ => { });
 
         var ex = Assert.ThrowsException<FileNotFoundException>(() => processDumpUtility.GetDumpFiles(true, false));
         Assert.AreEqual(ex.Message, Resources.Resources.DumpFileNotGeneratedErrorMessage);

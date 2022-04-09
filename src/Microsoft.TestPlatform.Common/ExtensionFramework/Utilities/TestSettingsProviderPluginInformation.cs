@@ -75,7 +75,7 @@ internal class TestSettingsProviderPluginInformation : TestPluginInformation
         {
             SettingsNameAttribute settingsNameAttribute = (SettingsNameAttribute)attributes[0];
 
-            if (!string.IsNullOrEmpty(settingsNameAttribute.SettingsName))
+            if (!settingsNameAttribute.SettingsName.IsNullOrEmpty())
             {
                 settingName = settingsNameAttribute.SettingsName;
             }

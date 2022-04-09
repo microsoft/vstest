@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics;
 using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
@@ -114,7 +113,7 @@ internal class TestPlatformDataCollectionLogger : DataCollectionLogger
     /// </exception>
     private void SendTextMessage(DataCollectionContext context!!, string text!!, TestMessageLevel level)
     {
-        Debug.Assert(
+        TPDebug.Assert(
             level is >= TestMessageLevel.Informational and <= TestMessageLevel.Error,
             "Invalid level: " + level);
 

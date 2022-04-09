@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -63,7 +62,7 @@ internal class TestPluginDiscoverer
     /// </returns>
     public Dictionary<string, TPluginInfo> GetTestExtensionsInformation<TPluginInfo, TExtension>(IEnumerable<string> extensionPaths) where TPluginInfo : TestPluginInformation
     {
-        Debug.Assert(extensionPaths != null);
+        TPDebug.Assert(extensionPaths != null);
 
         var pluginInfos = new Dictionary<string, TPluginInfo>();
 
@@ -105,8 +104,8 @@ internal class TestPluginDiscoverer
         string[] files,
         Dictionary<string, TPluginInfo> pluginInfos) where TPluginInfo : TestPluginInformation
     {
-        Debug.Assert(files != null, "null files");
-        Debug.Assert(pluginInfos != null, "null pluginInfos");
+        TPDebug.Assert(files != null, "null files");
+        TPDebug.Assert(pluginInfos != null, "null pluginInfos");
 
         // Scan each of the files for data extensions.
         foreach (var file in files)
@@ -152,8 +151,8 @@ internal class TestPluginDiscoverer
     /// </typeparam>
     private void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos, string filePath) where TPluginInfo : TestPluginInformation
     {
-        Debug.Assert(assembly != null, "null assembly");
-        Debug.Assert(pluginInfos != null, "null pluginInfos");
+        TPDebug.Assert(assembly != null, "null assembly");
+        TPDebug.Assert(pluginInfos != null, "null pluginInfos");
 
         List<Type> types = new();
         Type extension = typeof(TExtension);

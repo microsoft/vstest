@@ -150,7 +150,7 @@ internal class TestDiscovererMetadata : ITestDiscovererCapabilities
             FileExtension = new List<string>(fileExtensions);
         }
 
-        if (!string.IsNullOrWhiteSpace(defaultExecutorUri))
+        if (!defaultExecutorUri.IsNullOrWhiteSpace())
         {
             DefaultExecutorUri = new Uri(defaultExecutorUri);
         }

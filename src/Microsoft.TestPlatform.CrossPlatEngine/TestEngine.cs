@@ -85,6 +85,12 @@ public class TestEngine : ITestEngine
                 new TestHostManagerFactory(newRequestData));
         }
 
+        // Create one data aggregator per parallel discovery and share it with all the proxy discovery managers.
+        // We need to share the aggregator because when cancelling discovery we don't want to await all managers,
+        // and so the first manager replying with the discovery complete (aborted) event arg will cause the parallel
+        // discovery manager to publish its current state. But doing so we are losing the collected state of all the
+        // other managers.
+        var discoveryDataAggregator = new DiscoveryDataAggregator();
         Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = () =>
         {
             var hostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
@@ -129,17 +135,20 @@ public class TestEngine : ITestEngine
             return (discoveryCriteria.TestSessionInfo != null)
                 ? new ProxyDiscoveryManager(
                     discoveryCriteria.TestSessionInfo,
-                    proxyOperationManagerCreator)
+                    proxyOperationManagerCreator,
+                    discoveryDataAggregator)
                 : new ProxyDiscoveryManager(
                     requestData,
                     new TestRequestSender(requestData.ProtocolConfig, hostManager),
-                    hostManager);
+                    hostManager,
+                    discoveryDataAggregator);
         };
 
         return (parallelLevel > 1 || !testHostManager.Shared)
             ? new ParallelProxyDiscoveryManager(
                 requestData,
                 proxyDiscoveryManagerCreator,
+                discoveryDataAggregator,
                 parallelLevel,
                 sharedHosts: testHostManager.Shared)
             : proxyDiscoveryManagerCreator();

@@ -78,6 +78,11 @@ Il test potrebbe essere l'origine dell'arresto anomalo.</target>
         <target state="translated">secondi</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ProcDumpNotFound">
+        <source>{0} could not be found, please make sure that the executable is available on PATH, or set PROCDUMP_PATH environment variable to a directory that contains {0} executable.</source>
+        <target state="new">{0} could not be found, please make sure that the executable is available on PATH, or set PROCDUMP_PATH environment variable to a directory that contains {0} executable.</target>
+        <note>0 is procDumpPath, a name of procdump executable such as procdump64.exe, 0 is used twice on purpose. PROCDUMP_PATH and PATH are literal and should not be localized.</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

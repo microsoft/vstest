@@ -968,20 +968,18 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                     EqtTrace.Info(
                         "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestCases: Discovery complete.");
 
-                    var discoveryCompletePayload =
-                        _dataSerializer
-                            .DeserializePayload<DiscoveryCompletePayload>(message);
+                    var discoveryCompletePayload = _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
 
-                    var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
-                        discoveryCompletePayload.TotalTests,
-                        discoveryCompletePayload.IsAborted,
-                        discoveryCompletePayload.FullyDiscoveredSources,
-                        discoveryCompletePayload.PartiallyDiscoveredSources,
-                        discoveryCompletePayload.NotDiscoveredSources,
-                        discoveryCompletePayload.DiscoveredExtensions);
-
-                    // Adding metrics from vstest.console.
-                    discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
+                    var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs
+                    {
+                        TotalCount = discoveryCompletePayload.TotalTests,
+                        IsAborted = discoveryCompletePayload.IsAborted,
+                        FullyDiscoveredSources = discoveryCompletePayload.FullyDiscoveredSources,
+                        PartiallyDiscoveredSources = discoveryCompletePayload.PartiallyDiscoveredSources,
+                        NotDiscoveredSources = discoveryCompletePayload.NotDiscoveredSources,
+                        DiscoveredExtensions = discoveryCompletePayload.DiscoveredExtensions,
+                        Metrics = discoveryCompletePayload.Metrics,
+                    };
 
                     eventHandler.HandleDiscoveryComplete(
                         discoveryCompleteEventArgs,
@@ -1063,13 +1061,15 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                     var discoveryCompletePayload =
                         _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
 
-                    var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
-                        discoveryCompletePayload.TotalTests,
-                        discoveryCompletePayload.IsAborted,
-                        discoveryCompletePayload.FullyDiscoveredSources,
-                        discoveryCompletePayload.PartiallyDiscoveredSources,
-                        discoveryCompletePayload.NotDiscoveredSources,
-                        discoveryCompletePayload.DiscoveredExtensions);
+                    var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs
+                    {
+                        TotalCount = discoveryCompletePayload.TotalTests,
+                        IsAborted = discoveryCompletePayload.IsAborted,
+                        FullyDiscoveredSources = discoveryCompletePayload.FullyDiscoveredSources,
+                        PartiallyDiscoveredSources = discoveryCompletePayload.PartiallyDiscoveredSources,
+                        NotDiscoveredSources = discoveryCompletePayload.NotDiscoveredSources,
+                        DiscoveredExtensions = discoveryCompletePayload.DiscoveredExtensions,
+                    };
 
                     // Adding Metrics from VsTestConsole
                     discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
@@ -1097,8 +1097,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 TestMessageLevel.Error,
                 TranslationLayerResources.AbortedTestsDiscovery);
 
-            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true, new List<string>(), new List<string>(), new List<string>());
-            eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
+            eventHandler.HandleDiscoveryComplete(new(-1, true), null);
 
             // Earlier we were closing the connection with vstest.console in case of exceptions.
             // Removing that code because vstest.console might be in a healthy state and letting

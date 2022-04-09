@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -85,7 +84,7 @@ internal sealed class FastFilter
     /// <returns>For matching, returns the result of matching, null if no match found. For replacement, returns the result of replacement.</returns>
     private string ApplyRegex(string value)
     {
-        Debug.Assert(PropertyValueRegex != null);
+        TPDebug.Assert(PropertyValueRegex != null);
 
         string result = null;
         if (PropertyValueRegexReplacement == null)

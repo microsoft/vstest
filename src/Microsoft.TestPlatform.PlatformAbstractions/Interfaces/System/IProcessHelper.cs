@@ -57,6 +57,12 @@ public interface IProcessHelper
     PlatformArchitecture GetCurrentProcessArchitecture();
 
     /// <summary>
+    /// Gets process architecture
+    /// </summary>
+    /// <returns>Process Architecture</returns>
+    PlatformArchitecture GetProcessArchitecture(int processId);
+
+    /// <summary>
     /// Gets the process id of test engine.
     /// </summary>
     /// <returns>process id of test engine.</returns>

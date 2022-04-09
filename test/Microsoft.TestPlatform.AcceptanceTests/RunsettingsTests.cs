@@ -8,8 +8,6 @@ using System.IO;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
@@ -363,6 +361,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
         var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
         var testAssemblyDirectory = Path.GetDirectoryName(testAssemblyPath);
+        Assert.IsNotNull(testAssemblyDirectory);
 
         var deploymentItem = Path.Combine(testAssemblyDirectory, "Deployment", "DeploymentFile.xml");
 
@@ -507,7 +506,7 @@ public class RunsettingsTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectName = "ProjectFileRunSettingsTestProject.csproj";
-        var projectPath = GetProjectFullPath(projectName);
+        var projectPath = GetIsolatedTestAsset(projectName);
         InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal""");
         ValidateSummaryStatus(0, 1, 0);
 
@@ -522,7 +521,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
     #endregion
 
-    private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary, TempDirectory tempDirectory)
+    private static string GetRunsettingsFilePath(Dictionary<string, string>? runConfigurationDictionary, TempDirectory tempDirectory)
     {
         var runsettingsPath = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
         if (runConfigurationDictionary != null)
@@ -533,8 +532,8 @@ public class RunsettingsTests : AcceptanceTestBase
         return runsettingsPath;
     }
 
-    private void RunTestWithRunSettings(Dictionary<string, string> runConfigurationDictionary,
-        string runSettingsArgs, string additionalArgs, IEnumerable<string> testhostProcessNames, int expectedNumOfProcessCreated)
+    private void RunTestWithRunSettings(Dictionary<string, string>? runConfigurationDictionary,
+        string? runSettingsArgs, string? additionalArgs, IEnumerable<string> testhostProcessNames, int expectedNumOfProcessCreated)
     {
 
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll");

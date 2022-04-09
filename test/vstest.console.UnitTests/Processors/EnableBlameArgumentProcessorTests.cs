@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
@@ -167,54 +166,6 @@ public class EnableBlameArgumentProcessorTests
                 "  </LoggerRunSettings>",
                 "</RunSettings>"),
             _settingsProvider.ActiveRunSettings.SettingsXml);
-    }
-
-    [TestMethod]
-    public void InitializeShouldWarnIfPlatformNotSupportedForCollectDumpOption()
-    {
-        var runsettingsString = string.Format(_defaultRunSettings, "");
-        var runsettings = new RunSettings();
-        runsettings.LoadSettingsXml(_defaultRunSettings);
-        _settingsProvider.SetActiveRunSettings(runsettings);
-
-        var unsupportedPlatforms = new List<Tuple<PlatformOperatingSystem, PlatformArchitecture>>()
-        {
-            Tuple.Create(PlatformOperatingSystem.Windows, PlatformArchitecture.ARM),
-            Tuple.Create(PlatformOperatingSystem.Windows, PlatformArchitecture.ARM64)
-        };
-
-        foreach (var tuple in unsupportedPlatforms)
-        {
-            _mockEnvronment.SetupGet(s => s.OperatingSystem).Returns(tuple.Item1);
-            _mockEnvronment.SetupGet(s => s.Architecture).Returns(tuple.Item2);
-
-            _executor.Initialize("collectdump");
-            _mockOutput.Verify(x => x.WriteLine(CommandLineResources.BlameCollectDumpNotSupportedForPlatform, OutputLevel.Warning));
-
-            Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
-            Assert.AreEqual(string.Join(Environment.NewLine,
-                    "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
-                    "<RunSettings>",
-                    "  <DataCollectionRunSettings>",
-                    "    <DataCollectors>",
-                    "      <DataCollector friendlyName=\"blame\" enabled=\"True\">",
-                    "        <Configuration>",
-                    "          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
-                    "        </Configuration>",
-                    "      </DataCollector>",
-                    "    </DataCollectors>",
-                    "  </DataCollectionRunSettings>",
-                    "  <RunConfiguration>",
-                    "    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
-                    "  </RunConfiguration>",
-                    "  <LoggerRunSettings>",
-                    "    <Loggers>",
-                    "      <Logger friendlyName=\"blame\" enabled=\"True\" />",
-                    "    </Loggers>",
-                    "  </LoggerRunSettings>",
-                    "</RunSettings>"),
-                _settingsProvider.ActiveRunSettings.SettingsXml);
-        }
     }
 
     [TestMethod]

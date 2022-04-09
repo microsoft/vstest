@@ -119,16 +119,25 @@ internal class VsTestConsoleProcessManager : IProcessManager
             RedirectStandardError = true
         };
 
-        EqtTrace.Verbose("VsTestCommandLineWrapper: Process Start Info {0} {1}", info.FileName, info.Arguments);
+        EqtTrace.Verbose("VsTestCommandLineWrapper.StartProcess: Process Start Info {0} {1}", info.FileName, info.Arguments);
+
+        if (!consoleParameters.InheritEnvironmentVariables)
+        {
+            EqtTrace.Verbose("VsTestCommandLineWrapper.StartProcess: Clearing all environment variables.");
+
+            info.EnvironmentVariables.Clear();
+        }
 
         if (consoleParameters.EnvironmentVariables != null)
         {
-            info.EnvironmentVariables.Clear();
             foreach (var envVariable in consoleParameters.EnvironmentVariables)
             {
                 if (envVariable.Key != null)
                 {
-                    info.EnvironmentVariables.Add(envVariable.Key, envVariable.Value?.ToString());
+                    // Not printing the value on purpose, env variables can contain secrets and we don't need to know the values
+                    // most of the time.
+                    EqtTrace.Verbose("VsTestCommandLineWrapper.StartProcess: Setting environment variable: {0}", envVariable.Key);
+                    info.EnvironmentVariables[envVariable.Key] = envVariable.Value?.ToString();
                 }
             }
         }

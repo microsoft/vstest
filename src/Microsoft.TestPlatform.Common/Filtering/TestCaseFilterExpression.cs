@@ -31,7 +31,7 @@ public class TestCaseFilterExpression : ITestCaseFilterExpression
     public TestCaseFilterExpression(FilterExpressionWrapper filterWrapper!!)
     {
         _filterWrapper = filterWrapper;
-        _validForMatch = string.IsNullOrEmpty(filterWrapper.ParseError);
+        _validForMatch = filterWrapper.ParseError.IsNullOrEmpty();
     }
 
     /// <summary>

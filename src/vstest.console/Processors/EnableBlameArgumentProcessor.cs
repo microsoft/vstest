@@ -138,10 +138,10 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
             var hasCollectHangDumpKey = blameArgumentList.Any(isHangDumpCollect);
 
             // Check if dump should be enabled or not.
-            enableDump = hasCollectDumpKey && IsDumpCollectionSupported();
+            enableDump = hasCollectDumpKey;
 
             // Check if dump should be enabled or not.
-            enableHangDump = hasCollectHangDumpKey && IsHangDumpCollectionSupported();
+            enableHangDump = hasCollectHangDumpKey;
 
             if (!enableDump && !enableHangDump)
             {
@@ -277,43 +277,6 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
         }
 
         return resultsDirectory;
-    }
-
-    /// <summary>
-    /// Checks if crash dump collection is supported.
-    /// </summary>
-    /// <returns>Dump collection supported flag.</returns>
-    private bool IsDumpCollectionSupported()
-    {
-        var dumpCollectionSupported =
-            _environment.OperatingSystem == PlatformOperatingSystem.Unix ||
-            _environment.OperatingSystem == PlatformOperatingSystem.OSX ||
-            (_environment.OperatingSystem == PlatformOperatingSystem.Windows
-             && _environment.Architecture != PlatformArchitecture.ARM64
-             && _environment.Architecture != PlatformArchitecture.ARM);
-
-        if (!dumpCollectionSupported)
-        {
-            Output.Warning(false, CommandLineResources.BlameCollectDumpNotSupportedForPlatform);
-        }
-
-        return dumpCollectionSupported;
-    }
-
-    /// <summary>
-    /// Checks if hang dump collection is supported.
-    /// </summary>
-    /// <returns>Dump collection supported flag.</returns>
-    private bool IsHangDumpCollectionSupported()
-    {
-        var dumpCollectionSupported = true;
-
-        if (!dumpCollectionSupported)
-        {
-            Output.Warning(false, CommandLineResources.BlameCollectDumpTestTimeoutNotSupportedForPlatform);
-        }
-
-        return dumpCollectionSupported;
     }
 
     /// <summary>

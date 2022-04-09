@@ -156,7 +156,7 @@ internal class DataCollectionManager : IDataCollectionManager
     /// <inheritdoc/>
     public IDictionary<string, string> InitializeDataCollectors(string settingsXml!!)
     {
-        if (string.IsNullOrEmpty(settingsXml))
+        if (settingsXml.IsNullOrEmpty())
         {
             EqtTrace.Info("DataCollectionManager.InitializeDataCollectors : Runsettings is null or empty.");
         }
@@ -427,7 +427,7 @@ internal class DataCollectionManager : IDataCollectionManager
 
     protected virtual bool IsUriValid(string uri)
     {
-        if (string.IsNullOrEmpty(uri))
+        if (uri.IsNullOrEmpty())
         {
             return false;
         }
@@ -481,7 +481,7 @@ internal class DataCollectionManager : IDataCollectionManager
             }
 
             ObjectModel.DataCollection.DataCollector dataCollector = null;
-            if (!string.IsNullOrWhiteSpace(dataCollectorUri))
+            if (!dataCollectorUri.IsNullOrWhiteSpace())
             {
                 dataCollector = TryGetTestExtension(dataCollectorUri);
             }

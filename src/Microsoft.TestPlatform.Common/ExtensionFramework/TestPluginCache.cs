@@ -410,7 +410,7 @@ public class TestPluginCache
     /// </returns>
     protected virtual IEnumerable<string> GetFilteredExtensions(List<string> extensions, string endsWithPattern)
     {
-        return string.IsNullOrEmpty(endsWithPattern)
+        return endsWithPattern.IsNullOrEmpty()
             ? extensions
             : extensions.Where(ext => ext.EndsWith(endsWithPattern, StringComparison.OrdinalIgnoreCase));
     }
@@ -469,7 +469,7 @@ public class TestPluginCache
 
     protected void SetupAssemblyResolver(string extensionAssembly)
     {
-        IList<string> resolutionPaths = string.IsNullOrEmpty(extensionAssembly) ? GetDefaultResolutionPaths() : GetResolutionPaths(extensionAssembly);
+        IList<string> resolutionPaths = extensionAssembly.IsNullOrEmpty() ? GetDefaultResolutionPaths() : GetResolutionPaths(extensionAssembly);
 
         // Add assembly resolver which can resolve the extensions from the specified directory.
         if (_assemblyResolver == null)
