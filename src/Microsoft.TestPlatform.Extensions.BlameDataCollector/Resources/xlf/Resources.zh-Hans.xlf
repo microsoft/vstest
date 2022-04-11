@@ -80,7 +80,7 @@ This test may, or may not be the source of the crash.</source>
       </trans-unit>
       <trans-unit id="ProcDumpNotFound">
         <source>{0} could not be found, please make sure that the executable is available on PATH. Alternatively set PROCDUMP_PATH environment variable to a directory that contains {0} executable</source>
-        <target state="new">找不到 {0}，请确保可执行文件在 PATH 上可用，或者将 PROCDUMP_PATH 环境变量设置为包含 {0} 可执行文件的目录。</target>
+        <target state="new">{0} could not be found, please make sure that the executable is available on PATH. Alternatively set PROCDUMP_PATH environment variable to a directory that contains {0} executable</target>
         <note>0 is procDumpPath, a name of procdump executable such as procdump64.exe, 0 is used twice on purpose. PROCDUMP_PATH and PATH are literal and should not be localized.</note>
       </trans-unit>
     </body>
