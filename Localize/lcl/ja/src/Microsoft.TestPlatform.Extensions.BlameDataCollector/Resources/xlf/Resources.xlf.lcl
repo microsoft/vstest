@@ -115,6 +115,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";ProcDumpNotFound" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[{0} could not be found, please make sure that the executable is available on PATH, or set PROCDUMP_PATH environment variable to a directory that contains {0} executable.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[{0} が見つかりませんでした。PATH で実行可能ファイルを使用できることを確認するか、PROCDUMP_PATH 環境変数を {0} 実行可能ファイルが含まれるディレクトリに設定してください。]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";ProcDumpNotGenerated" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[CollectDump was enabled but dump file was not generated.]]></Val>
