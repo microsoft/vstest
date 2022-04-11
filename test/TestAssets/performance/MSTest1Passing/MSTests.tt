@@ -1,41 +1,45 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace MSTestAdapterPerfTests
+namespace Tests
 {
-    [TestClass]
-    public class MSTests
-    {
 <#
+    int classes = 1;
     int passedTests = 1;
     int failedTests = 0;
     String padding = "00";
 
-    int count = 1;
     String testmethodprefix = "Test_";
 #>
-
+<#
+    for(int c=1;c<=classes;c++)
+    {
+    String className = "TestClass_" + c.ToString(padding);
+#>
+    [TestClass]
+    public class <#=className#>
+    {
         #region PassingTests
 <#
-    for(int i=0;i<passedTests;i++)
+    for(int t=1;t<=passedTests;t++)
     {
-    String methodName= testmethodprefix + count.ToString(padding);
+    String methodName= testmethodprefix + c.ToString(padding) + "_" + t.ToString(padding);
 #>
         [TestMethod]
         public void <#=methodName#>()
         {
         }
+
 <#        
-        count++;
     }
 #>
         #endregion
 
         #region FailingTests
 <#
-    for(int i=0;i<failedTests;i++)
+    for(int t=1;t<=failedTests;t++)
     {
-    String methodName= testmethodprefix + count.ToString(padding);
+    String methodName= testmethodprefix + c.ToString(padding) + "_" + t.ToString(padding);
 #>
         [TestMethod]
         public void <#=methodName#>()
@@ -43,10 +47,11 @@ namespace MSTestAdapterPerfTests
             Assert.Fail();
         }
 <#        
-        count++;
     }
 #>
         #endregion
-       
     }
+<#        
+    }
+#> 
 }
