@@ -1,21 +1,21 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace MSTestAdapterPerfTests
+namespace Tests
 {
     [TestClass]
-    public class MSTests
+    public class TestClass_01
     {
-
         #region PassingTests
         [TestMethod]
-        public void Test_01()
+        public void Test_01_01()
         {
         }
+
         #endregion
 
         #region FailingTests
         #endregion
-       
     }
+ 
 }
