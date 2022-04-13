@@ -1,19 +1,20 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
-namespace XUnitAdapterPerfTests
+namespace Tests
 {
-    public class XuniTests
+    public class TestClass_01
     {
-
         #region PassingTests
         [Fact]
-        public void Test_01()
+        public void Test_01_01()
         {
         }
+
         #endregion
 
         #region FailingTests
         #endregion
-       
     }
+ 
 }

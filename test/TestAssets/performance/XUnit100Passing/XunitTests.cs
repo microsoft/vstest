@@ -1,415 +1,547 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
-namespace XUnitAdapterPerfTests
+namespace Tests
 {
-    public class XuniTests
+    public class TestClass_01
     {
-
         #region PassingTests
         [Fact]
-        public void Test_01()
+        public void Test_01_01()
         {
         }
+
         [Fact]
-        public void Test_02()
+        public void Test_01_02()
         {
         }
+
         [Fact]
-        public void Test_03()
+        public void Test_01_03()
         {
         }
+
         [Fact]
-        public void Test_04()
+        public void Test_01_04()
         {
         }
+
         [Fact]
-        public void Test_05()
+        public void Test_01_05()
         {
         }
+
         [Fact]
-        public void Test_06()
+        public void Test_01_06()
         {
         }
+
         [Fact]
-        public void Test_07()
+        public void Test_01_07()
         {
         }
+
         [Fact]
-        public void Test_08()
+        public void Test_01_08()
         {
         }
+
         [Fact]
-        public void Test_09()
+        public void Test_01_09()
         {
         }
+
         [Fact]
-        public void Test_10()
+        public void Test_01_10()
         {
         }
+
         [Fact]
-        public void Test_11()
+        public void Test_01_11()
         {
         }
+
         [Fact]
-        public void Test_12()
+        public void Test_01_12()
         {
         }
+
         [Fact]
-        public void Test_13()
+        public void Test_01_13()
         {
         }
+
         [Fact]
-        public void Test_14()
+        public void Test_01_14()
         {
         }
+
         [Fact]
-        public void Test_15()
+        public void Test_01_15()
         {
         }
+
         [Fact]
-        public void Test_16()
+        public void Test_01_16()
         {
         }
+
         [Fact]
-        public void Test_17()
+        public void Test_01_17()
         {
         }
+
         [Fact]
-        public void Test_18()
+        public void Test_01_18()
         {
         }
+
         [Fact]
-        public void Test_19()
+        public void Test_01_19()
         {
         }
+
         [Fact]
-        public void Test_20()
+        public void Test_01_20()
         {
         }
-        [Fact]
-        public void Test_21()
-        {
-        }
-        [Fact]
-        public void Test_22()
-        {
-        }
-        [Fact]
-        public void Test_23()
-        {
-        }
-        [Fact]
-        public void Test_24()
-        {
-        }
-        [Fact]
-        public void Test_25()
-        {
-        }
-        [Fact]
-        public void Test_26()
-        {
-        }
-        [Fact]
-        public void Test_27()
-        {
-        }
-        [Fact]
-        public void Test_28()
-        {
-        }
-        [Fact]
-        public void Test_29()
-        {
-        }
-        [Fact]
-        public void Test_30()
-        {
-        }
-        [Fact]
-        public void Test_31()
-        {
-        }
-        [Fact]
-        public void Test_32()
-        {
-        }
-        [Fact]
-        public void Test_33()
-        {
-        }
-        [Fact]
-        public void Test_34()
-        {
-        }
-        [Fact]
-        public void Test_35()
-        {
-        }
-        [Fact]
-        public void Test_36()
-        {
-        }
-        [Fact]
-        public void Test_37()
-        {
-        }
-        [Fact]
-        public void Test_38()
-        {
-        }
-        [Fact]
-        public void Test_39()
-        {
-        }
-        [Fact]
-        public void Test_40()
-        {
-        }
-        [Fact]
-        public void Test_41()
-        {
-        }
-        [Fact]
-        public void Test_42()
-        {
-        }
-        [Fact]
-        public void Test_43()
-        {
-        }
-        [Fact]
-        public void Test_44()
-        {
-        }
-        [Fact]
-        public void Test_45()
-        {
-        }
-        [Fact]
-        public void Test_46()
-        {
-        }
-        [Fact]
-        public void Test_47()
-        {
-        }
-        [Fact]
-        public void Test_48()
-        {
-        }
-        [Fact]
-        public void Test_49()
-        {
-        }
-        [Fact]
-        public void Test_50()
-        {
-        }
-        [Fact]
-        public void Test_51()
-        {
-        }
-        [Fact]
-        public void Test_52()
-        {
-        }
-        [Fact]
-        public void Test_53()
-        {
-        }
-        [Fact]
-        public void Test_54()
-        {
-        }
-        [Fact]
-        public void Test_55()
-        {
-        }
-        [Fact]
-        public void Test_56()
-        {
-        }
-        [Fact]
-        public void Test_57()
-        {
-        }
-        [Fact]
-        public void Test_58()
-        {
-        }
-        [Fact]
-        public void Test_59()
-        {
-        }
-        [Fact]
-        public void Test_60()
-        {
-        }
-        [Fact]
-        public void Test_61()
-        {
-        }
-        [Fact]
-        public void Test_62()
-        {
-        }
-        [Fact]
-        public void Test_63()
-        {
-        }
-        [Fact]
-        public void Test_64()
-        {
-        }
-        [Fact]
-        public void Test_65()
-        {
-        }
-        [Fact]
-        public void Test_66()
-        {
-        }
-        [Fact]
-        public void Test_67()
-        {
-        }
-        [Fact]
-        public void Test_68()
-        {
-        }
-        [Fact]
-        public void Test_69()
-        {
-        }
-        [Fact]
-        public void Test_70()
-        {
-        }
-        [Fact]
-        public void Test_71()
-        {
-        }
-        [Fact]
-        public void Test_72()
-        {
-        }
-        [Fact]
-        public void Test_73()
-        {
-        }
-        [Fact]
-        public void Test_74()
-        {
-        }
-        [Fact]
-        public void Test_75()
-        {
-        }
-        [Fact]
-        public void Test_76()
-        {
-        }
-        [Fact]
-        public void Test_77()
-        {
-        }
-        [Fact]
-        public void Test_78()
-        {
-        }
-        [Fact]
-        public void Test_79()
-        {
-        }
-        [Fact]
-        public void Test_80()
-        {
-        }
-        [Fact]
-        public void Test_81()
-        {
-        }
-        [Fact]
-        public void Test_82()
-        {
-        }
-        [Fact]
-        public void Test_83()
-        {
-        }
-        [Fact]
-        public void Test_84()
-        {
-        }
-        [Fact]
-        public void Test_85()
-        {
-        }
-        [Fact]
-        public void Test_86()
-        {
-        }
-        [Fact]
-        public void Test_87()
-        {
-        }
-        [Fact]
-        public void Test_88()
-        {
-        }
-        [Fact]
-        public void Test_89()
-        {
-        }
-        [Fact]
-        public void Test_90()
-        {
-        }
-        [Fact]
-        public void Test_91()
-        {
-        }
-        [Fact]
-        public void Test_92()
-        {
-        }
-        [Fact]
-        public void Test_93()
-        {
-        }
-        [Fact]
-        public void Test_94()
-        {
-        }
-        [Fact]
-        public void Test_95()
-        {
-        }
-        [Fact]
-        public void Test_96()
-        {
-        }
-        [Fact]
-        public void Test_97()
-        {
-        }
-        [Fact]
-        public void Test_98()
-        {
-        }
-        [Fact]
-        public void Test_99()
-        {
-        }
-        [Fact]
-        public void Test_100()
-        {
-        }
+
         #endregion
 
         #region FailingTests
         #endregion
-       
     }
+    public class TestClass_02
+    {
+        #region PassingTests
+        [Fact]
+        public void Test_02_01()
+        {
+        }
+
+        [Fact]
+        public void Test_02_02()
+        {
+        }
+
+        [Fact]
+        public void Test_02_03()
+        {
+        }
+
+        [Fact]
+        public void Test_02_04()
+        {
+        }
+
+        [Fact]
+        public void Test_02_05()
+        {
+        }
+
+        [Fact]
+        public void Test_02_06()
+        {
+        }
+
+        [Fact]
+        public void Test_02_07()
+        {
+        }
+
+        [Fact]
+        public void Test_02_08()
+        {
+        }
+
+        [Fact]
+        public void Test_02_09()
+        {
+        }
+
+        [Fact]
+        public void Test_02_10()
+        {
+        }
+
+        [Fact]
+        public void Test_02_11()
+        {
+        }
+
+        [Fact]
+        public void Test_02_12()
+        {
+        }
+
+        [Fact]
+        public void Test_02_13()
+        {
+        }
+
+        [Fact]
+        public void Test_02_14()
+        {
+        }
+
+        [Fact]
+        public void Test_02_15()
+        {
+        }
+
+        [Fact]
+        public void Test_02_16()
+        {
+        }
+
+        [Fact]
+        public void Test_02_17()
+        {
+        }
+
+        [Fact]
+        public void Test_02_18()
+        {
+        }
+
+        [Fact]
+        public void Test_02_19()
+        {
+        }
+
+        [Fact]
+        public void Test_02_20()
+        {
+        }
+
+        #endregion
+
+        #region FailingTests
+        #endregion
+    }
+    public class TestClass_03
+    {
+        #region PassingTests
+        [Fact]
+        public void Test_03_01()
+        {
+        }
+
+        [Fact]
+        public void Test_03_02()
+        {
+        }
+
+        [Fact]
+        public void Test_03_03()
+        {
+        }
+
+        [Fact]
+        public void Test_03_04()
+        {
+        }
+
+        [Fact]
+        public void Test_03_05()
+        {
+        }
+
+        [Fact]
+        public void Test_03_06()
+        {
+        }
+
+        [Fact]
+        public void Test_03_07()
+        {
+        }
+
+        [Fact]
+        public void Test_03_08()
+        {
+        }
+
+        [Fact]
+        public void Test_03_09()
+        {
+        }
+
+        [Fact]
+        public void Test_03_10()
+        {
+        }
+
+        [Fact]
+        public void Test_03_11()
+        {
+        }
+
+        [Fact]
+        public void Test_03_12()
+        {
+        }
+
+        [Fact]
+        public void Test_03_13()
+        {
+        }
+
+        [Fact]
+        public void Test_03_14()
+        {
+        }
+
+        [Fact]
+        public void Test_03_15()
+        {
+        }
+
+        [Fact]
+        public void Test_03_16()
+        {
+        }
+
+        [Fact]
+        public void Test_03_17()
+        {
+        }
+
+        [Fact]
+        public void Test_03_18()
+        {
+        }
+
+        [Fact]
+        public void Test_03_19()
+        {
+        }
+
+        [Fact]
+        public void Test_03_20()
+        {
+        }
+
+        #endregion
+
+        #region FailingTests
+        #endregion
+    }
+    public class TestClass_04
+    {
+        #region PassingTests
+        [Fact]
+        public void Test_04_01()
+        {
+        }
+
+        [Fact]
+        public void Test_04_02()
+        {
+        }
+
+        [Fact]
+        public void Test_04_03()
+        {
+        }
+
+        [Fact]
+        public void Test_04_04()
+        {
+        }
+
+        [Fact]
+        public void Test_04_05()
+        {
+        }
+
+        [Fact]
+        public void Test_04_06()
+        {
+        }
+
+        [Fact]
+        public void Test_04_07()
+        {
+        }
+
+        [Fact]
+        public void Test_04_08()
+        {
+        }
+
+        [Fact]
+        public void Test_04_09()
+        {
+        }
+
+        [Fact]
+        public void Test_04_10()
+        {
+        }
+
+        [Fact]
+        public void Test_04_11()
+        {
+        }
+
+        [Fact]
+        public void Test_04_12()
+        {
+        }
+
+        [Fact]
+        public void Test_04_13()
+        {
+        }
+
+        [Fact]
+        public void Test_04_14()
+        {
+        }
+
+        [Fact]
+        public void Test_04_15()
+        {
+        }
+
+        [Fact]
+        public void Test_04_16()
+        {
+        }
+
+        [Fact]
+        public void Test_04_17()
+        {
+        }
+
+        [Fact]
+        public void Test_04_18()
+        {
+        }
+
+        [Fact]
+        public void Test_04_19()
+        {
+        }
+
+        [Fact]
+        public void Test_04_20()
+        {
+        }
+
+        #endregion
+
+        #region FailingTests
+        #endregion
+    }
+    public class TestClass_05
+    {
+        #region PassingTests
+        [Fact]
+        public void Test_05_01()
+        {
+        }
+
+        [Fact]
+        public void Test_05_02()
+        {
+        }
+
+        [Fact]
+        public void Test_05_03()
+        {
+        }
+
+        [Fact]
+        public void Test_05_04()
+        {
+        }
+
+        [Fact]
+        public void Test_05_05()
+        {
+        }
+
+        [Fact]
+        public void Test_05_06()
+        {
+        }
+
+        [Fact]
+        public void Test_05_07()
+        {
+        }
+
+        [Fact]
+        public void Test_05_08()
+        {
+        }
+
+        [Fact]
+        public void Test_05_09()
+        {
+        }
+
+        [Fact]
+        public void Test_05_10()
+        {
+        }
+
+        [Fact]
+        public void Test_05_11()
+        {
+        }
+
+        [Fact]
+        public void Test_05_12()
+        {
+        }
+
+        [Fact]
+        public void Test_05_13()
+        {
+        }
+
+        [Fact]
+        public void Test_05_14()
+        {
+        }
+
+        [Fact]
+        public void Test_05_15()
+        {
+        }
+
+        [Fact]
+        public void Test_05_16()
+        {
+        }
+
+        [Fact]
+        public void Test_05_17()
+        {
+        }
+
+        [Fact]
+        public void Test_05_18()
+        {
+        }
+
+        [Fact]
+        public void Test_05_19()
+        {
+        }
+
+        [Fact]
+        public void Test_05_20()
+        {
+        }
+
+        #endregion
+
+        #region FailingTests
+        #endregion
+    }
+ 
 }
