@@ -15,6 +15,7 @@
     <!-- CVE-2019-0981 -->
     <PackageReference Include="System.Private.Uri" Version="4.3.2" />
     <!-- / CVE-2019-0981 -->
+
     <PackageReference Include="MSTest.TestFramework" Version="$(MSTestFrameworkVersion)" />
     <PackageReference Include="MSTest.TestAdapter" Version="$(MSTestAdapterVersion)" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(NETTestSdkVersion)" />
