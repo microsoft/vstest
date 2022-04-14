@@ -311,9 +311,7 @@ public class HtmlLogger : ITestLoggerWithParameters
 
             HtmlFilePath = string.IsNullOrEmpty(HtmlFilePath)
                 ? GetFilePathAndCreateFile(HtmlLoggerConstants.HtmlFileExtension, fileName)
-                : GetFilePathAndCreateFile(HtmlLoggerConstants.HtmlFileExtension, Path.GetFileNameWithoutExtension(HtmlFilePath));
-
-            HtmlFilePath = GetFilePathAndCreateFile(HtmlLoggerConstants.HtmlFileExtension, Path.GetFileNameWithoutExtension(HtmlFilePath));
+                : HtmlFilePath;
 
             _htmlTransformer.Transform(XmlFilePath, HtmlFilePath);
         }
