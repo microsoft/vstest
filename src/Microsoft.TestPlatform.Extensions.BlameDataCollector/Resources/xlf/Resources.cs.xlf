@@ -80,7 +80,7 @@ Tento test může a nemusí být příčinou chybového ukončení.</target>
       </trans-unit>
       <trans-unit id="ProcDumpNotFound">
         <source>{0} could not be found, please make sure that the executable is available on PATH. Alternatively set PROCDUMP_PATH environment variable to a directory that contains {0} executable</source>
-        <target state="new">{0} could not be found, please make sure that the executable is available on PATH. Alternatively set PROCDUMP_PATH environment variable to a directory that contains {0} executable</target>
+        <target state="translated">{0} nelze najít. Zkontrolujte, zda je spustitelný soubor k dispozici v cestě PATH, případně nastavte proměnnou prostředí PROCDUMP_PATH na adresář, který obsahuje spustitelný soubor {0}.</target>
         <note>0 is procDumpPath, a name of procdump executable such as procdump64.exe, 0 is used twice on purpose. PROCDUMP_PATH and PATH are literal and should not be localized.</note>
       </trans-unit>
     </body>
