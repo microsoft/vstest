@@ -120,10 +120,13 @@
       </Item>
       <Item ItemId=";ProcDumpNotFound" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[{0} could not be found, please make sure that the executable is available on PATH, or set PROCDUMP_PATH environment variable to a directory that contains {0} executable.]]></Val>
+          <Val><![CDATA[{0} could not be found, please make sure that the executable is available on PATH. Alternatively set PROCDUMP_PATH environment variable to a directory that contains {0} executable]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} non è stato trovato, verificare che il file eseguibile sia disponibile in PATH o impostare la variabile di ambiente PROCDUMP_PATH su una directory che contiene {0} eseguibile.]]></Val>
+            <Val><![CDATA[{0} non è stato trovato, verificare che il file eseguibile sia disponibile in PATH. In alternativa, impostare la variabile di ambiente PROCDUMP_PATH su una directory che contiene {0} eseguibile]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} could not be found, please make sure that the executable is available on PATH, or set PROCDUMP_PATH environment variable to a directory that contains {0} executable.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
