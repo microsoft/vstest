@@ -40,14 +40,18 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     private XmlElement _configurationElement;
     private int _testStartCount;
     private int _testEndCount;
-    private bool _collectProcessDumpOnTrigger;
-    private bool _collectProcessDumpOnTestHostHang;
+    private bool _collectProcessDumpOnCrash;
+    private bool _collectProcessDumpOnHang;
     private bool _collectDumpAlways;
-    private bool _processFullDumpEnabled;
-    private bool _inactivityTimerAlreadyFired;
     private string _attachmentGuid;
+
+    private CrashDumpType _crashDumpType;
+    private HangDumpType? _hangDumpType;
+
+    private bool _inactivityTimerAlreadyFired;
     private IInactivityTimer _inactivityTimer;
     private TimeSpan _inactivityTimespan = TimeSpan.FromMinutes(DefaultInactivityTimeInMinutes);
+
     private int _testHostProcessId;
     private string _targetFramework;
     private readonly List<KeyValuePair<string, string>> _environmentVariables = new();
@@ -131,11 +135,11 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         if (_configurationElement != null)
         {
             var collectDumpNode = _configurationElement[Constants.DumpModeKey];
-            _collectProcessDumpOnTrigger = collectDumpNode != null;
+            _collectProcessDumpOnCrash = collectDumpNode != null;
 
-            if (_collectProcessDumpOnTrigger)
+            if (_collectProcessDumpOnCrash)
             {
-                ValidateAndAddTriggerBasedProcessDumpParameters(collectDumpNode);
+                ValidateAndAddCrashProcessDumpParameters(collectDumpNode);
 
                 // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
                 _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
@@ -144,20 +148,20 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                 // https://github.com/dotnet/coreclr/blob/master/Documentation/botr/xplat-minidump-generation.md
                 // 2   MiniDumpWithPrivateReadWriteMemory
                 // 4   MiniDumpWithFullMemory
-                _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpType", _processFullDumpEnabled ? "4" : "2"));
+                _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpType", _crashDumpType == CrashDumpType.Full ? "4" : "2"));
                 var dumpDirectory = GetDumpDirectory();
                 var dumpPath = Path.Combine(dumpDirectory, $"%e_%p_%t_crashdump.dmp");
                 _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpName", dumpPath));
             }
 
             var collectHangBasedDumpNode = _configurationElement[Constants.CollectDumpOnTestSessionHang];
-            _collectProcessDumpOnTestHostHang = collectHangBasedDumpNode != null;
-            if (_collectProcessDumpOnTestHostHang)
+            _collectProcessDumpOnHang = collectHangBasedDumpNode != null;
+            if (_collectProcessDumpOnHang)
             {
                 // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
                 _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
 
-                ValidateAndAddHangBasedProcessDumpParameters(collectHangBasedDumpNode);
+                ValidateAndAddHangProcessDumpParameters(collectHangBasedDumpNode);
             }
 
             var tfm = _configurationElement[Constants.TargetFramework]?.InnerText;
@@ -169,7 +173,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
         _attachmentGuid = Guid.NewGuid().ToString("N");
 
-        if (_collectProcessDumpOnTestHostHang)
+        if (_collectProcessDumpOnHang)
         {
             _inactivityTimer ??= new InactivityTimer(CollectDumpAndAbortTesthost);
             ResetInactivityTimer();
@@ -178,7 +182,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
     /// <summary>
     /// Disposes of the timer when called to prevent further calls.
-    /// Kills the other instance of proc dump if launched for collecting trigger based dumps.
+    /// Kills the other instance of proc dump if launched for collecting crash dumps.
     /// Starts and waits for a new proc dump process to collect a single dump and then
     /// kills the testhost process.
     /// </summary>
@@ -215,7 +219,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
             EqtTrace.Verbose("Inactivity timer is already disposed.");
         }
 
-        if (_collectProcessDumpOnTrigger)
+        if (_collectProcessDumpOnCrash)
         {
             // Detach procdump from the testhost process to prevent testhost process from crashing
             // if/when we try to kill the existing proc dump process.
@@ -223,54 +227,58 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
             _processDumpUtility.DetachFromTargetProcess(_testHostProcessId);
         }
 
-        var hangDumpSuccess = false;
-        try
+        // Skip creating the dump if the option is set to none, and just kill the process.
+        if ((_hangDumpType ?? HangDumpType.Full) != HangDumpType.None)
         {
-            Action<string> logWarning = m => _logger.LogWarning(_context.SessionDataCollectionContext, m);
-            var dumpDirectory = GetDumpDirectory();
-            _processDumpUtility.StartHangBasedProcessDump(_testHostProcessId, dumpDirectory, _processFullDumpEnabled, _targetFramework, logWarning);
-            hangDumpSuccess = true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(_context.SessionDataCollectionContext, $"Blame: Creating hang dump failed with error.", ex);
-        }
-
-        if (_uploadDumpFiles)
-        {
+            var hangDumpSuccess = false;
             try
             {
-                var dumpFiles = _processDumpUtility.GetDumpFiles(true, /* if we killed it by hang dumper, we already have our dump, otherwise it might have crashed, and we want all dumps */ !hangDumpSuccess);
-                foreach (var dumpFile in dumpFiles)
-                {
-                    try
-                    {
-                        if (!string.IsNullOrEmpty(dumpFile))
-                        {
-                            var fileTransferInformation = new FileTransferInformation(_context.SessionDataCollectionContext, dumpFile, true, _fileHelper);
-                            _dataCollectionSink.SendFileAsync(fileTransferInformation);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        // Eat up any exception here and log it but proceed with killing the test host process.
-                        EqtTrace.Error(ex);
-                    }
-
-                    if (!dumpFiles.Any())
-                    {
-                        EqtTrace.Error("BlameCollector.CollectDumpAndAbortTesthost: blame:CollectDumpOnHang was enabled but dump file was not generated.");
-                    }
-                }
+                Action<string> logWarning = m => _logger.LogWarning(_context.SessionDataCollectionContext, m);
+                var dumpDirectory = GetDumpDirectory();
+                _processDumpUtility.StartHangBasedProcessDump(_testHostProcessId, dumpDirectory, _hangDumpType == HangDumpType.Full, _targetFramework, logWarning);
+                hangDumpSuccess = true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(_context.SessionDataCollectionContext, $"Blame: Collecting hang dump failed with error.", ex);
+                _logger.LogError(_context.SessionDataCollectionContext, $"Blame: Creating hang dump failed with error.", ex);
             }
-        }
-        else
-        {
-            EqtTrace.Info("BlameCollector.CollectDumpAndAbortTesthost: Custom path to dump directory was provided via VSTEST_DUMP_PATH. Skipping attachment upload, the caller is responsible for collecting and uploading the dumps themselves.");
+
+            if (_uploadDumpFiles)
+            {
+                try
+                {
+                    var dumpFiles = _processDumpUtility.GetDumpFiles(true, /* if we killed it by hang dumper, we already have our dump, otherwise it might have crashed, and we want all dumps */ !hangDumpSuccess);
+                    foreach (var dumpFile in dumpFiles)
+                    {
+                        try
+                        {
+                            if (!string.IsNullOrEmpty(dumpFile))
+                            {
+                                var fileTransferInformation = new FileTransferInformation(_context.SessionDataCollectionContext, dumpFile, true, _fileHelper);
+                                _dataCollectionSink.SendFileAsync(fileTransferInformation);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // Eat up any exception here and log it but proceed with killing the test host process.
+                            EqtTrace.Error(ex);
+                        }
+
+                        if (!dumpFiles.Any())
+                        {
+                            EqtTrace.Error("BlameCollector.CollectDumpAndAbortTesthost: blame:CollectDumpOnHang was enabled but dump file was not generated.");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(_context.SessionDataCollectionContext, $"Blame: Collecting hang dump failed with error.", ex);
+                }
+            }
+            else
+            {
+                EqtTrace.Info("BlameCollector.CollectDumpAndAbortTesthost: Custom path to dump directory was provided via VSTEST_DUMP_PATH. Skipping attachment upload, the caller is responsible for collecting and uploading the dumps themselves.");
+            }
         }
 
         try
@@ -293,7 +301,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         }
     }
 
-    private void ValidateAndAddTriggerBasedProcessDumpParameters(XmlElement collectDumpNode)
+    private void ValidateAndAddCrashProcessDumpParameters(XmlElement collectDumpNode)
     {
         foreach (XmlAttribute blameAttribute in collectDumpNode.Attributes)
         {
@@ -312,9 +320,9 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
                 case XmlAttribute attribute when string.Equals(attribute.Name, Constants.DumpTypeKey, StringComparison.OrdinalIgnoreCase):
 
-                    if (string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.MiniConfigurationValue, StringComparison.OrdinalIgnoreCase))
+                    if (Enum.TryParse(attribute.Value, ignoreCase: true, out CrashDumpType value) && Enum.IsDefined(typeof(CrashDumpType), value))
                     {
-                        _processFullDumpEnabled = string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase);
+                        _crashDumpType = value;
                     }
                     else
                     {
@@ -331,7 +339,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         }
     }
 
-    private void ValidateAndAddHangBasedProcessDumpParameters(XmlElement collectDumpNode)
+    private void ValidateAndAddHangProcessDumpParameters(XmlElement collectDumpNode)
     {
         foreach (XmlAttribute blameAttribute in collectDumpNode.Attributes)
         {
@@ -353,9 +361,9 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                 // allow HangDumpType attribute to be used on the hang dump this is the prefered way
                 case XmlAttribute attribute when string.Equals(attribute.Name, Constants.HangDumpTypeKey, StringComparison.OrdinalIgnoreCase):
 
-                    if (string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.MiniConfigurationValue, StringComparison.OrdinalIgnoreCase))
+                    if (Enum.TryParse(attribute.Value, ignoreCase: true, out HangDumpType value) && Enum.IsDefined(typeof(HangDumpType), value))
                     {
-                        _processFullDumpEnabled = string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase);
+                        _hangDumpType = value;
                     }
                     else
                     {
@@ -369,7 +377,11 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
                     if (string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.MiniConfigurationValue, StringComparison.OrdinalIgnoreCase))
                     {
-                        _processFullDumpEnabled = string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase);
+                        // DumpType and HangDumpType are both valid ways to define the dump type. In case we get HangDumpType and DumpType in the command we want HangDumpType to win.
+                        if (Enum.TryParse(attribute.Value, ignoreCase: true, out HangDumpType value2) && Enum.IsDefined(typeof(HangDumpType), value2))
+                        {
+                            _hangDumpType = value2;
+                        }
                     }
                     else
                     {
@@ -456,7 +468,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
             }
             else
             {
-                if (_collectProcessDumpOnTestHostHang)
+                if (_collectProcessDumpOnHang)
                 {
                     _logger.LogWarning(_context.SessionDataCollectionContext, Resources.Resources.NotGeneratingSequenceFile);
                 }
@@ -498,7 +510,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         finally
         {
             // Attempt to terminate the proc dump process if proc dump was enabled
-            if (_collectProcessDumpOnTrigger)
+            if (_collectProcessDumpOnCrash)
             {
                 _processDumpUtility.DetachFromTargetProcess(_testHostProcessId);
             }
@@ -517,7 +529,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         ResetInactivityTimer();
         _testHostProcessId = args.TestHostProcessId;
 
-        if (!_collectProcessDumpOnTrigger)
+        if (!_collectProcessDumpOnCrash)
         {
             return;
         }
@@ -526,7 +538,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         {
             var dumpDirectory = GetDumpDirectory();
             Action<string> logWarning = m => _logger.LogWarning(_context.SessionDataCollectionContext, m);
-            _processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, dumpDirectory, _processFullDumpEnabled, _targetFramework, _collectDumpAlways, logWarning);
+            _processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, dumpDirectory, _crashDumpType == CrashDumpType.Full, _targetFramework, _collectDumpAlways, logWarning);
         }
         catch (TestPlatformException e)
         {
@@ -545,7 +557,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// </summary>
     private void ResetInactivityTimer()
     {
-        if (!_collectProcessDumpOnTestHostHang || _inactivityTimerAlreadyFired)
+        if (!_collectProcessDumpOnHang || _inactivityTimerAlreadyFired)
         {
             return;
         }

@@ -123,6 +123,11 @@ internal static class Constants
     public const string MiniConfigurationValue = "Mini";
 
     /// <summary>
+    /// Configuration value for none
+    /// </summary>
+    public const string NoneConfigurationValue = "None";
+
+    /// <summary>
     /// The target framework of test host.
     /// </summary>
     public const string TargetFramework = "Framework";
