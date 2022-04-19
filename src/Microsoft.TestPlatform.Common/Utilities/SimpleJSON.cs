@@ -1,4 +1,5 @@
-﻿/* * * * *
+﻿#pragma warning disable IDE0073 // The file header does not match the required text
+/* * * * *
  * A simple JSON Parser / builder
  * ------------------------------
  * 
@@ -36,6 +37,7 @@
  * SOFTWARE.
  * 
  * * * * */
+#pragma warning restore IDE0073 // The file header does not match the required text
 
 using System;
 using System.Collections;
@@ -43,6 +45,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+
+using Microsoft.VisualStudio.TestPlatform;
 
 #nullable disable
 
@@ -308,7 +312,7 @@ internal abstract partial class JSONNode
     {
         get
         {
-            return bool.TryParse(Value, out bool v) ? v : !string.IsNullOrEmpty(Value);
+            return bool.TryParse(Value, out bool v) ? v : !StringUtils.IsNullOrEmpty(Value);
         }
         set
         {
@@ -624,7 +628,9 @@ internal abstract partial class JSONNode
                     }
                     if (token.Length > 0 || tokenIsQuoted)
                         ctx.Add(tokenName, ParseElement(token.ToString(), tokenIsQuoted));
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
                     tokenIsQuoted = false;
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
                     tokenName = "";
                     token.Length = 0;
                     tokenIsQuoted = false;
