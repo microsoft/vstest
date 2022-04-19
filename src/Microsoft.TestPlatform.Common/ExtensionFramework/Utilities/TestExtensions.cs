@@ -5,14 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-using Newtonsoft.Json;
+using SimpleJSON;
 
 #nullable disable
 
@@ -164,7 +163,7 @@ public class TestExtensions
     {
         metrics.Add(
             TelemetryDataConstants.DiscoveredExtensions,
-            JsonConvert.SerializeObject(extensions));
+            SerializeExtensionDictionary(extensions));
     }
 
     /// <summary>
@@ -499,6 +498,26 @@ public class TestExtensions
         }
 
         extensionDict.Add(extensionType, new HashSet<string>(extensions.Select(e => e.IdentifierData)));
+    }
+
+    private static string SerializeExtensionDictionary(IDictionary<string, HashSet<string>> extensions)
+    {
+        var jsonObject = new JSONObject();
+        foreach (var kvp in extensions)
+        {
+            if (kvp.Value?.Count > 0)
+            {
+                var jsonArray = new JSONArray();
+                foreach (var extension in kvp.Value)
+                {
+                    jsonArray.Add(new JSONString(extension));
+                }
+
+                jsonObject.Add(kvp.Key, jsonArray);
+            }
+        }
+
+        return jsonObject.ToString();
     }
 
     private static HashSet<string> MergeSets(HashSet<string> firstSet, HashSet<string> secondSet)
