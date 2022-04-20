@@ -42,17 +42,6 @@
         <target state="translated">テスト セッションの停止操作が中止されました。</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="CannotFindConsoleRunner">
-        <source>Cannot find the console runner {0}.</source>
-        <target state="translated">コンソール ランナー {0}が見つかりません。</target>
-        <note>{0}: the console runner path</note>
-      </trans-unit>
-      <trans-unit id="ProcessStartWin32Failure">
-        <source>An error occurred when opening the file {0} with arguments {1}.</source>
-        <target state="translated">引数 {1} でファイル {0} を開くときにエラーが発生しました。</target>
-        <note>{0}: process path
-{1}: arguments passed to the process invocation.</note>
-      </trans-unit>
     </body>
   </file>
 </xliff>

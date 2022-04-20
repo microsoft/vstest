@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -107,15 +107,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot find the console runner {0}..
-        /// </summary>
-        public static string CannotFindConsoleRunner {
-            get {
-                return ResourceManager.GetString("CannotFindConsoleRunner", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Failed to receive message from vstest.console process.
         /// </summary>
         public static string FailedToReceiveMessage {
@@ -130,15 +121,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         public static string InvalidFilePath {
             get {
                 return ResourceManager.GetString("InvalidFilePath", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An error occurred when opening the file {0} with arguments {1}..
-        /// </summary>
-        public static string ProcessStartWin32Failure {
-            get {
-                return ResourceManager.GetString("ProcessStartWin32Failure", resourceCulture);
             }
         }
         
