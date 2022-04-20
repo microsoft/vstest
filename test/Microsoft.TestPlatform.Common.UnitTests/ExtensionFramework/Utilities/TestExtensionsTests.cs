@@ -2,12 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using FluentAssertions;
 
 #nullable disable
 
@@ -250,15 +251,15 @@ public class TestExtensionsTests
         var merged = TestExtensions.CreateMergedDictionary(first, second);
 
         // Merging two empty dictionaries should result in an empty dictionary.
-        Assert.IsTrue(merged.Count == 0);
+        merged.Should().HaveCount(0);
 
         // Make sure the method is "pure" and returns a new reference.
-        Assert.IsFalse(ReferenceEquals(merged, first));
-        Assert.IsFalse(ReferenceEquals(merged, second));
+        merged.Should().NotBeSameAs(first);
+        merged.Should().NotBeSameAs(second);
     }
 
     [TestMethod]
-    public void MergedDictionaryOfOneEmptyAndOneNotEmptyDictionaryShouldBeNotEmpty()
+    public void MergedDictionaryOfOneEmptyAndOneNonEmptyDictionaryShouldContainAllTheItemsOfTheNonEmptyDictionary()
     {
         var first = new Dictionary<string, HashSet<string>>();
         var second = new Dictionary<string, HashSet<string>>
@@ -271,21 +272,21 @@ public class TestExtensionsTests
 
         // Merging one empty dictionary with a not empty one should result in a not empty
         // dictionary.
-        Assert.IsTrue(merged1.Count == 1);
-        Assert.IsTrue(merged2.Count == 1);
-        Assert.IsTrue(merged1.ContainsKey("aaa"));
-        Assert.IsTrue(merged2.ContainsKey("aaa"));
+        merged1.Should().HaveCount(1);
+        merged2.Should().HaveCount(1);
+        merged1.Should().ContainKey("aaa");
+        merged2.Should().ContainKey("aaa");
 
         // Make sure the method stays "pure" and returns a new reference regardless of the input.
-        Assert.IsFalse(ReferenceEquals(merged1, first));
-        Assert.IsFalse(ReferenceEquals(merged1, second));
-        Assert.IsFalse(ReferenceEquals(merged2, first));
-        Assert.IsFalse(ReferenceEquals(merged2, second));
-        Assert.IsFalse(ReferenceEquals(merged1, merged2));
+        merged1.Should().NotBeSameAs(first);
+        merged1.Should().NotBeSameAs(second);
+        merged2.Should().NotBeSameAs(first);
+        merged2.Should().NotBeSameAs(second);
+        merged1.Should().NotBeSameAs(merged2);
     }
 
     [TestMethod]
-    public void MergedDictionaryShouldBeSuccessful()
+    public void MergedDictionaryShouldBeEquivalentToTheExpectedDictionary()
     {
         var first = new Dictionary<string, HashSet<string>>
         {
@@ -318,16 +319,16 @@ public class TestExtensionsTests
         var merged = TestExtensions.CreateMergedDictionary(first, second);
 
         // Make sure the merged dictionary has the exact same keys as the expected dictionary.
-        Assert.IsTrue(merged.Count == expected.Count);
-        Assert.IsFalse(merged.Where(kvp => !expected.ContainsKey(kvp.Key)).Any());
-        Assert.IsFalse(expected.Where(kvp => !merged.ContainsKey(kvp.Key)).Any());
+        merged.Should().HaveCount(expected.Count);
+        merged.Should().ContainKeys(expected.Keys);
+        expected.Should().ContainKeys(merged.Keys);
 
         // Make sure the hashsets for each key are equal.
-        Assert.IsFalse(merged.Where(kvp => !kvp.Value.SequenceEqual(expected[kvp.Key])).Any());
+        merged.Values.Should().BeEquivalentTo(expected.Values);
     }
 
     [TestMethod]
-    public void AddExtensionTelemetryShouldBeSuccessful()
+    public void AddExtensionTelemetryShouldAddJsonFormattedDiscoveredExtensionsTelemetry()
     {
         var telemetryData = new Dictionary<string, object>();
         var extensions = new Dictionary<string, HashSet<string>>
@@ -338,13 +339,13 @@ public class TestExtensionsTests
         };
 
         var expectedTelemetry =
-            "{\"key1\":[\"ext1\",\"ext2\",\"ext3\",\"ext4\",\"ext5\"],"
-            + "\"key4\":[\"ext1\"],"
-            + "\"key5\":[\"ext1\",\"ext2\"]}";
+            @"{""key1"":[""ext1"",""ext2"",""ext3"",""ext4"",""ext5""],"
+            + @"""key4"":[""ext1""],"
+            + @"""key5"":[""ext1"",""ext2""]}";
 
         TestExtensions.AddExtensionTelemetry(telemetryData, extensions);
 
-        Assert.IsTrue(telemetryData.ContainsKey(TelemetryDataConstants.DiscoveredExtensions));
-        Assert.AreEqual(expectedTelemetry, telemetryData[TelemetryDataConstants.DiscoveredExtensions]);
+        telemetryData.Should().ContainKey(TelemetryDataConstants.DiscoveredExtensions);
+        telemetryData[TelemetryDataConstants.DiscoveredExtensions].Should().BeEquivalentTo(expectedTelemetry);
     }
 }

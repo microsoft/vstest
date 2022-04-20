@@ -124,9 +124,8 @@ public class TestExtensions
         }
 
         // Copy all the keys in the first dictionary into the resulting dictionary.
-        var result = new Dictionary<string, HashSet<string>>(
-            first.Where(kvp => (kvp.Value != null && kvp.Value.Count > 0))
-            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
+        var result = first.Where(kvp => (kvp.Value != null && kvp.Value.Count > 0))
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
         foreach (var kvp in second)
         {
