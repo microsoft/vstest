@@ -128,7 +128,8 @@ This test may, or may not be the source of the crash.</value>
     <value>The blame parameter key specified {0} is not valid. Ignoring this key.</value>
   </data>
   <data name="BlameParameterValueIncorrect" xml:space="preserve">
-    <value>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</value>
+    <value>The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}</value>
+    <comment>{0} and {1} are single values referring to parameters such as BlameHang and Full. {2} is comma separated list of valid values, e.g. Full, Mini, None.</comment>
   </data>
   <data name="DumpFileNotGeneratedErrorMessage" xml:space="preserve">
     <value>Collect dump was enabled but no dump file was generated.</value>
