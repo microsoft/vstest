@@ -2,9 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable disable
@@ -238,5 +240,111 @@ public class TestExtensionsTests
             { "tl", new TestLoggerPluginInformation(typeof(TestExtensionsTests)) }
         };
         CollectionAssert.AreEqual(expectedLoggers.Keys, extensions.TestLoggers.Keys);
+    }
+
+    [TestMethod]
+    public void MergedDictionaryOfEmptyDictionariesShouldBeAnEmptyDictionary()
+    {
+        var first = new Dictionary<string, HashSet<string>>();
+        var second = new Dictionary<string, HashSet<string>>();
+        var merged = TestExtensions.CreateMergedDictionary(first, second);
+
+        // Merging two empty dictionaries should result in an empty dictionary.
+        Assert.IsTrue(merged.Count == 0);
+
+        // Make sure the method is "pure" and returns a new reference.
+        Assert.IsFalse(ReferenceEquals(merged, first));
+        Assert.IsFalse(ReferenceEquals(merged, second));
+    }
+
+    [TestMethod]
+    public void MergedDictionaryOfOneEmptyAndOneNotEmptyDictionaryShouldBeNotEmpty()
+    {
+        var first = new Dictionary<string, HashSet<string>>();
+        var second = new Dictionary<string, HashSet<string>>
+        {
+            { "aaa", new HashSet<string>() }
+        };
+
+        var merged1 = TestExtensions.CreateMergedDictionary(first, second);
+        var merged2 = TestExtensions.CreateMergedDictionary(second, first);
+
+        // Merging one empty dictionary with a not empty one should result in a not empty
+        // dictionary.
+        Assert.IsTrue(merged1.Count == 1);
+        Assert.IsTrue(merged2.Count == 1);
+        Assert.IsTrue(merged1.ContainsKey("aaa"));
+        Assert.IsTrue(merged2.ContainsKey("aaa"));
+
+        // Make sure the method stays "pure" and returns a new reference regardless of the input.
+        Assert.IsFalse(ReferenceEquals(merged1, first));
+        Assert.IsFalse(ReferenceEquals(merged1, second));
+        Assert.IsFalse(ReferenceEquals(merged2, first));
+        Assert.IsFalse(ReferenceEquals(merged2, second));
+        Assert.IsFalse(ReferenceEquals(merged1, merged2));
+    }
+
+    [TestMethod]
+    public void MergedDictionaryShouldBeSuccessful()
+    {
+        var first = new Dictionary<string, HashSet<string>>
+        {
+            // Merged with "key1" from the next set.
+            { "key1", new HashSet<string>(new List<string>() { "ext1", "ext2", "ext3" }) },
+            // Empty hashset, will be removed from the result.
+            { "key2", new HashSet<string>() },
+            // Added as is.
+            { "key5", new HashSet<string>(new List<string>() { "ext1", "ext2" }) }
+        };
+        var second = new Dictionary<string, HashSet<string>>
+        {
+            // Merged with "key1" from the previous set.
+            { "key1", new HashSet<string>(new List<string>() { "ext2", "ext3", "ext3", "ext4", "ext5" }) },
+            // Empty hashset, will be removed from the result.
+            { "key2", new HashSet<string>() },
+            // Empty hashset, will be removed from the result.
+            { "key3", new HashSet<string>() },
+            // Added as is.
+            { "key4", new HashSet<string>(new List<string>() { "ext1" }) }
+        };
+        var expected = new Dictionary<string, HashSet<string>>
+        {
+            { "key1", new HashSet<string>(new List<string>() { "ext1", "ext2", "ext3", "ext4", "ext5" }) },
+            { "key4", new HashSet<string>(new List<string>() { "ext1" }) },
+            { "key5", new HashSet<string>(new List<string>() { "ext1", "ext2" }) }
+        };
+
+        // Merge the two dictionaries.
+        var merged = TestExtensions.CreateMergedDictionary(first, second);
+
+        // Make sure the merged dictionary has the exact same keys as the expected dictionary.
+        Assert.IsTrue(merged.Count == expected.Count);
+        Assert.IsFalse(merged.Where(kvp => !expected.ContainsKey(kvp.Key)).Any());
+        Assert.IsFalse(expected.Where(kvp => !merged.ContainsKey(kvp.Key)).Any());
+
+        // Make sure the hashsets for each key are equal.
+        Assert.IsFalse(merged.Where(kvp => !kvp.Value.SequenceEqual(expected[kvp.Key])).Any());
+    }
+
+    [TestMethod]
+    public void AddExtensionTelemetryShouldBeSuccessful()
+    {
+        var telemetryData = new Dictionary<string, object>();
+        var extensions = new Dictionary<string, HashSet<string>>
+        {
+            { "key1", new HashSet<string>(new List<string>() { "ext1", "ext2", "ext3", "ext4", "ext5" }) },
+            { "key4", new HashSet<string>(new List<string>() { "ext1" }) },
+            { "key5", new HashSet<string>(new List<string>() { "ext1", "ext2" }) }
+        };
+
+        var expectedTelemetry =
+            "{\"key1\":[\"ext1\",\"ext2\",\"ext3\",\"ext4\",\"ext5\"],"
+            + "\"key4\":[\"ext1\"],"
+            + "\"key5\":[\"ext1\",\"ext2\"]}";
+
+        TestExtensions.AddExtensionTelemetry(telemetryData, extensions);
+
+        Assert.IsTrue(telemetryData.ContainsKey(TelemetryDataConstants.DiscoveredExtensions));
+        Assert.AreEqual(expectedTelemetry, telemetryData[TelemetryDataConstants.DiscoveredExtensions]);
     }
 }
