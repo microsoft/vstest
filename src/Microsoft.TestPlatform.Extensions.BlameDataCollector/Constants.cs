@@ -113,21 +113,6 @@ internal static class Constants
     public const string FalseConfigurationValue = "False";
 
     /// <summary>
-    /// Configuration value for full
-    /// </summary>
-    public const string FullConfigurationValue = "Full";
-
-    /// <summary>
-    /// Configuration value for mini
-    /// </summary>
-    public const string MiniConfigurationValue = "Mini";
-
-    /// <summary>
-    /// Configuration value for none
-    /// </summary>
-    public const string NoneConfigurationValue = "None";
-
-    /// <summary>
     /// The target framework of test host.
     /// </summary>
     public const string TargetFramework = "Framework";

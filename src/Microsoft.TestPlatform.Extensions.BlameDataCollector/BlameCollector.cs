@@ -313,7 +313,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                         && !string.Equals(attribute.Value, Constants.FalseConfigurationValue, StringComparison.OrdinalIgnoreCase))
                         || !bool.TryParse(attribute.Value, out _collectDumpAlways))
                     {
-                        _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.TrueConfigurationValue, Constants.FalseConfigurationValue));
+                        _logger.LogWarning(_context.SessionDataCollectionContext, FormatBlameParameterValueIncorrectMessage(attribute, new[] { Constants.TrueConfigurationValue, Constants.FalseConfigurationValue }));
                     }
 
                     break;
@@ -326,7 +326,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                     }
                     else
                     {
-                        _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.FullConfigurationValue, Constants.MiniConfigurationValue));
+                        _logger.LogWarning(_context.SessionDataCollectionContext, FormatBlameParameterValueIncorrectMessage(attribute, Enum.GetNames(typeof(CrashDumpType))));
                     }
 
                     break;
@@ -337,6 +337,11 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                     break;
             }
         }
+    }
+
+    internal static string FormatBlameParameterValueIncorrectMessage(XmlAttribute attribute, params string[] validValues)
+    {
+        return string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, attribute.Value, string.Join(", ", validValues));
     }
 
     private void ValidateAndAddHangProcessDumpParameters(XmlElement collectDumpNode)
@@ -367,25 +372,23 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                     }
                     else
                     {
-                        _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.FullConfigurationValue, Constants.MiniConfigurationValue));
+                        _logger.LogWarning(_context.SessionDataCollectionContext, FormatBlameParameterValueIncorrectMessage(attribute, Enum.GetNames(typeof(HangDumpType))));
                     }
 
                     break;
 
                 // allow DumpType attribute to be used on the hang dump for backwards compatibility
                 case XmlAttribute attribute when string.Equals(attribute.Name, Constants.DumpTypeKey, StringComparison.OrdinalIgnoreCase):
-
-                    if (string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.MiniConfigurationValue, StringComparison.OrdinalIgnoreCase))
+                    // DumpType and HangDumpType are both valid ways to define the dump type. In case we get HangDumpType and DumpType in the command we want HangDumpType to win.
+                    if (Enum.TryParse(attribute.Value, ignoreCase: true, out HangDumpType value2) && Enum.IsDefined(typeof(HangDumpType), value2))
                     {
-                        // DumpType and HangDumpType are both valid ways to define the dump type. In case we get HangDumpType and DumpType in the command we want HangDumpType to win.
-                        if (Enum.TryParse(attribute.Value, ignoreCase: true, out HangDumpType value2) && Enum.IsDefined(typeof(HangDumpType), value2))
-                        {
-                            _hangDumpType = value2;
-                        }
+                        _hangDumpType = value2;
                     }
                     else
                     {
-                        _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.FullConfigurationValue, Constants.MiniConfigurationValue));
+                        // This error is using CrashDumpType on purpose, because the option we are providing is actually supposed to take only CrashDumpType values. We are parsing it into
+                        // HangDumpType to have easier time converting.
+                        _logger.LogWarning(_context.SessionDataCollectionContext, FormatBlameParameterValueIncorrectMessage(attribute, Enum.GetNames(typeof(CrashDumpType))));
                     }
 
                     break;
