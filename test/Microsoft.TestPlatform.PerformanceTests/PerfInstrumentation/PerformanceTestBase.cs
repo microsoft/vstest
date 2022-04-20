@@ -42,7 +42,7 @@ public class PerformanceTestBase : IntegrationTestBase
     /// </param>
     public void RunExecutionPerformanceTests(string testAsset, string testAdapterPath, string runSettings)
     {
-        using(_perfAnalyzer.Start())
+        using (_perfAnalyzer.Start())
         {
             InvokeVsTestForExecution(testAsset, testAdapterPath, framework: string.Empty, runSettings);
         }

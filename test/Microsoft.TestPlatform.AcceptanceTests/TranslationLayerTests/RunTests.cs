@@ -45,7 +45,7 @@ public class RunTests : AcceptanceTestBase
     public void RunAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        
+
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
         vstestConsoleWrapper.RunTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), runEventHandler);

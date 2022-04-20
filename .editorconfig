@@ -265,7 +265,7 @@ csharp_style_prefer_parameter_null_checking = true # not default, increased seve
 #### .NET Formatting Rules ####
 
 # IDE0055: Fix formatting
-dotnet_diagnostic.IDE0055.severity = suggestion # Downgraded to suggestion due to https://github.com/dotnet/roslyn/issues/59414
+dotnet_diagnostic.IDE0055.severity = warning
 
 #### C# Formatting Rules ####
 
