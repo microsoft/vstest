@@ -5,12 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+using SimpleJSON;
 
 #nullable disable
 
@@ -123,7 +124,8 @@ public class TestExtensions
         }
 
         // Copy all the keys in the first dictionary into the resulting dictionary.
-        var result = new Dictionary<string, HashSet<string>>(first);
+        var result = first.Where(kvp => (kvp.Value != null && kvp.Value.Count > 0))
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
         foreach (var kvp in second)
         {
@@ -501,17 +503,22 @@ public class TestExtensions
 
     private static string SerializeExtensionDictionary(IDictionary<string, HashSet<string>> extensions)
     {
-        StringBuilder sb = new();
-
+        var jsonObject = new JSONObject();
         foreach (var kvp in extensions)
         {
             if (kvp.Value?.Count > 0)
             {
-                sb.AppendFormat("{0}=[{1}];", kvp.Key, string.Join(",", kvp.Value));
+                var jsonArray = new JSONArray();
+                foreach (var extension in kvp.Value)
+                {
+                    jsonArray.Add(new JSONString(extension));
+                }
+
+                jsonObject.Add(kvp.Key, jsonArray);
             }
         }
 
-        return sb.ToString();
+        return jsonObject.ToString();
     }
 
     private static HashSet<string> MergeSets(HashSet<string> firstSet, HashSet<string> secondSet)
