@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -16,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging;
 /// <summary>
 /// The test session message logger.
 /// </summary>
-internal class TestSessionMessageLogger : IMessageLogger
+internal class TestSessionMessageLogger : OverheadLogger, IMessageLogger
 {
     private static TestSessionMessageLogger s_instance;
 
@@ -64,22 +65,38 @@ internal class TestSessionMessageLogger : IMessageLogger
     /// <param name="message">The message to be sent.</param>
     public void SendMessage(TestMessageLevel testMessageLevel, string message)
     {
-        if (message.IsNullOrWhiteSpace())
+        try
         {
-            throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(message));
-        }
+            CallbackOverhead.Start();
+            if (message.IsNullOrWhiteSpace())
+            {
+                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(message));
+            }
 
-        if (TreatTestAdapterErrorsAsWarnings
-            && testMessageLevel == TestMessageLevel.Error)
-        {
-            // Downgrade the message severity to Warning...
-            testMessageLevel = TestMessageLevel.Warning;
-        }
+            if (TreatTestAdapterErrorsAsWarnings
+                && testMessageLevel == TestMessageLevel.Error)
+            {
+                // Downgrade the message severity to Warning...
+                testMessageLevel = TestMessageLevel.Warning;
+            }
 
-        if (TestRunMessage != null)
+            if (TestRunMessage != null)
+            {
+                var args = new TestRunMessageEventArgs(testMessageLevel, message);
+                TestRunMessage.SafeInvoke(this, args, "TestRunMessageLoggerProxy.SendMessage");
+            }
+        }
+        finally
         {
-            var args = new TestRunMessageEventArgs(testMessageLevel, message);
-            TestRunMessage.SafeInvoke(this, args, "TestRunMessageLoggerProxy.SendMessage");
+            CallbackOverhead.Stop();
         }
     }
+}
+
+internal class OverheadLogger
+{
+    /// <summary>
+    /// Measures time spent in callbacks to TestPlatform. It should not include time spent in constructors, because it is TP that is constructing this object, so we are already accounting for that time.
+    /// </summary>
+    public Stopwatch CallbackOverhead { get; } = new();
 }

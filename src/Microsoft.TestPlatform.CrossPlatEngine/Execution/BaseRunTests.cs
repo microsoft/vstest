@@ -433,6 +433,7 @@ internal abstract class BaseRunTests
                     "BaseRunTests.RunTestInternalWithExecutors: Running tests for {0}",
                     executor.Metadata.ExtensionUri);
 
+                FrameworkHandle.CallbackOverhead.Reset();
                 // set the active executor
                 _activeExecutor = executor.Value;
 
@@ -491,8 +492,9 @@ internal abstract class BaseRunTests
                     "BaseRunTests.RunTestInternalWithExecutors: Completed running tests for {0}",
                     executor.Metadata.ExtensionUri);
 
-                // Collecting Time Taken by each executor Uri
-                _requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, executorUri), totalTimeTaken.TotalSeconds);
+                // Collecting Time Taken by each executor Uri, this takes the whole time spent in adapter, and removes the time we spent in callbacks to test platform.
+                double totalTime = totalTimeTaken.TotalSeconds - FrameworkHandle.CallbackOverhead.Elapsed.TotalSeconds;
+                _requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, executorUri), totalTime);
                 totalTimeTakenByAdapters += totalTimeTaken.TotalSeconds;
             }
             catch (Exception e)

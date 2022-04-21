@@ -72,34 +72,50 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     /// <returns>Process ID of the started process.</returns>
     public int LaunchProcessWithDebuggerAttached(string filePath, string workingDirectory, string arguments, IDictionary<string, string> environmentVariables)
     {
-        // If an adapter attempts to launch a process after the run is complete (=> this object is disposed)
-        // throw an error. 
-        if (_isDisposed)
+        try
         {
-            throw new ObjectDisposedException("IFrameworkHandle");
+            CallbackOverhead.Start();
+            // If an adapter attempts to launch a process after the run is complete (=> this object is disposed)
+            // throw an error. 
+            if (_isDisposed)
+            {
+                throw new ObjectDisposedException("IFrameworkHandle");
+            }
+
+            // If it is not a debug run, then throw an error
+            if (!_testExecutionContext.IsDebug)
+            {
+                throw new InvalidOperationException(CrossPlatEngineResources.LaunchDebugProcessNotAllowedForANonDebugRun);
+            }
+
+            var processInfo = new TestProcessStartInfo()
+            {
+                Arguments = arguments,
+                EnvironmentVariables = environmentVariables,
+                FileName = filePath,
+                WorkingDirectory = workingDirectory
+            };
+
+            return _testRunEventsHandler.LaunchProcessWithDebuggerAttached(processInfo);
         }
-
-        // If it is not a debug run, then throw an error
-        if (!_testExecutionContext.IsDebug)
+        finally
         {
-            throw new InvalidOperationException(CrossPlatEngineResources.LaunchDebugProcessNotAllowedForANonDebugRun);
+            CallbackOverhead.Stop();
         }
-
-        var processInfo = new TestProcessStartInfo()
-        {
-            Arguments = arguments,
-            EnvironmentVariables = environmentVariables,
-            FileName = filePath,
-            WorkingDirectory = workingDirectory
-        };
-
-        return _testRunEventsHandler.LaunchProcessWithDebuggerAttached(processInfo);
     }
 
     /// <inheritdoc />
     public bool AttachDebuggerToProcess(int pid)
     {
-        return ((ITestRunEventsHandler2)_testRunEventsHandler).AttachDebuggerToProcess(pid);
+        try
+        {
+            CallbackOverhead.Start();
+            return ((ITestRunEventsHandler2)_testRunEventsHandler).AttachDebuggerToProcess(pid);
+        }
+        finally
+        {
+            CallbackOverhead.Stop();
+        }
     }
 
     public void Dispose()

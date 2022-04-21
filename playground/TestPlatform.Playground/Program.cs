@@ -42,7 +42,7 @@ internal class Program
         var consoleOptions = new ConsoleParameters
         {
             LogFilePath = Path.Combine(here, "logs", "log.txt"),
-            TraceLevel = TraceLevel.Verbose,
+            TraceLevel = TraceLevel.Off,
         };
 
         var r = new VsTestConsoleWrapper(console, consoleOptions);
@@ -56,7 +56,7 @@ internal class Program
                 </RunSettings>
             ";
         var sources = new[] {
-            Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll")
+            @"C:\p\vstest3\test\TestAssets\performance\Perfy.TestAdapter\bin\Debug\net472\Perfy.TestAdapter.dll"
         };
 
         var options = new TestPlatformOptions();

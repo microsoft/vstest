@@ -39,7 +39,7 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     /// <param name="testRunCache"> The test run cache.  </param>
     public TestExecutionRecorder(ITestCaseEventsHandler testCaseEventsHandler, ITestRunCache testRunCache)
     {
-        _testRunCache = testRunCache;
+         _testRunCache = testRunCache;
         _testCaseEventsHandler = testCaseEventsHandler;
         _attachmentSets = new List<AttachmentSet>();
 
@@ -70,20 +70,28 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     /// <param name="testCase">test case which will be started.</param>
     public void RecordStart(TestCase testCase)
     {
-        EqtTrace.Verbose("TestExecutionRecorder.RecordStart: Starting test: {0}.", testCase?.FullyQualifiedName);
-        _testRunCache.OnTestStarted(testCase);
-
-        if (_testCaseEventsHandler != null)
+        try
         {
-            lock (_testCaseInProgressSyncObject)
+            CallbackOverhead.Start();
+            EqtTrace.Verbose("TestExecutionRecorder.RecordStart: Starting test: {0}.", testCase?.FullyQualifiedName);
+            _testRunCache.OnTestStarted(testCase);
+
+            if (_testCaseEventsHandler != null)
             {
-                // Do not send TestCaseStart for a test in progress
-                if (!_testCaseInProgressMap.Contains(testCase.Id))
+                lock (_testCaseInProgressSyncObject)
                 {
-                    _testCaseInProgressMap.Add(testCase.Id);
-                    _testCaseEventsHandler.SendTestCaseStart(testCase);
+                    // Do not send TestCaseStart for a test in progress
+                    if (!_testCaseInProgressMap.Contains(testCase.Id))
+                    {
+                        _testCaseInProgressMap.Add(testCase.Id);
+                        _testCaseEventsHandler.SendTestCaseStart(testCase);
+                    }
                 }
             }
+        }
+        finally
+        {
+            CallbackOverhead.Stop();
         }
     }
 
@@ -95,16 +103,24 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     /// test result to the framework when the test(s) is canceled. </exception>
     public void RecordResult(TestResult testResult)
     {
-        EqtTrace.Verbose("TestExecutionRecorder.RecordResult: Received result for test: {0}.", testResult?.TestCase?.FullyQualifiedName);
-        if (_testCaseEventsHandler != null)
+        try
         {
-            // Send TestCaseEnd in case RecordEnd was not called.
-            SendTestCaseEnd(testResult.TestCase, testResult.Outcome);
-            _testCaseEventsHandler.SendTestResult(testResult);
-        }
+            CallbackOverhead.Start();
+            EqtTrace.Verbose("TestExecutionRecorder.RecordResult: Received result for test: {0}.", testResult?.TestCase?.FullyQualifiedName);
+            if (_testCaseEventsHandler != null)
+            {
+                // Send TestCaseEnd in case RecordEnd was not called.
+                SendTestCaseEnd(testResult.TestCase, testResult.Outcome);
+                _testCaseEventsHandler.SendTestResult(testResult);
+            }
 
-        // Test Result should always be flushed, even if datacollecter attachment is missing
-        _testRunCache.OnNewTestResult(testResult);
+            // Test Result should always be flushed, even if datacollecter attachment is missing
+            _testRunCache.OnNewTestResult(testResult);
+        }
+        finally
+        {
+            CallbackOverhead.Stop();
+        }
     }
 
     /// <summary>
@@ -115,9 +131,17 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     /// <param name="outcome">outcome of the test case.</param>
     public void RecordEnd(TestCase testCase, TestOutcome outcome)
     {
-        EqtTrace.Verbose("TestExecutionRecorder.RecordEnd: test: {0} execution completed.", testCase?.FullyQualifiedName);
-        _testRunCache.OnTestCompletion(testCase);
-        SendTestCaseEnd(testCase, outcome);
+        try
+        {
+            CallbackOverhead.Start();
+            EqtTrace.Verbose("TestExecutionRecorder.RecordEnd: test: {0} execution completed.", testCase?.FullyQualifiedName);
+            _testRunCache.OnTestCompletion(testCase);
+            SendTestCaseEnd(testCase, outcome);
+        }
+        finally
+        {
+            CallbackOverhead.Stop();
+        }
     }
 
     /// <summary>
@@ -150,6 +174,14 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     /// <param name="attachments"> The attachment sets. </param>
     public void RecordAttachments(IList<AttachmentSet> attachments)
     {
-        _attachmentSets.AddRange(attachments);
+        try
+        {
+            CallbackOverhead.Start();
+            _attachmentSets.AddRange(attachments);
+        }
+        finally
+        {
+            CallbackOverhead.Stop();
+        }
     }
 }
