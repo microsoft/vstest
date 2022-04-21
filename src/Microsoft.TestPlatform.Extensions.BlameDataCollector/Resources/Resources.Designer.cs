@@ -82,7 +82,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key..
+        ///   Looks up a localized string similar to The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}.
         /// </summary>
         internal static string BlameParameterValueIncorrect {
             get {

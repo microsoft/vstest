@@ -576,7 +576,8 @@ public class BlameCollectorTests
         _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
         // Verify
-        _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, "DumpType", Constants.FullConfigurationValue, Constants.MiniConfigurationValue))), Times.Once);
+        var expectedMessage = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, "DumpType", "random", string.Join(", ", Enum.GetNames(typeof(CrashDumpType))));
+        _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == expectedMessage)), Times.Once);
     }
 
     /// <summary>
@@ -586,7 +587,7 @@ public class BlameCollectorTests
     public void TriggerTestHostLaunchedHandlerShouldLogWarningForNonBooleanCollectAlwaysValue()
     {
         var dumpConfig = GetDumpConfigurationElement();
-        var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("DumpType");
+        var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("CollectAlways");
         dumpTypeAttribute.Value = "random";
         dumpConfig[Constants.DumpModeKey]!.Attributes.Append(dumpTypeAttribute);
 
@@ -602,7 +603,8 @@ public class BlameCollectorTests
         _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
         // Verify
-        _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, "DumpType", Constants.FullConfigurationValue, Constants.MiniConfigurationValue))), Times.Once);
+        var expectedMessage = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, "CollectAlways", "random", string.Join(", ", new object[] { Constants.TrueConfigurationValue, Constants.FalseConfigurationValue }));
+        _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == expectedMessage)), Times.Once);
     }
 
     /// <summary>
