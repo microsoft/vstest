@@ -71,7 +71,15 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         _sourceEnumerator = discoveryCriteria.Sources.GetEnumerator();
         _availableTestSources = discoveryCriteria.Sources.Count();
 
-        EqtTrace.Verbose("ParallelProxyDiscoveryManager: Start discovery. Total sources: " + _availableTestSources);
+        EqtTrace.Verbose($"ParallelProxyDiscoveryManager: Start discovery. Total sources: {_availableTestSources}");
+
+        // Mark all sources as not discovered here because if we get an early cancellation it's
+        // possible that we won't have started all the proxy manager and so we won't have marked
+        // all sources as not discovered.
+        // For example, let's assume we have 10 sources, a batch size of 10 but only 8 cores, we
+        // will then spawn 8 instances of this and if we now cancel, we will have 2 sources not
+        // marked as not discovered.
+        _dataAggregator.MarkSourcesWithStatus(discoveryCriteria.Sources, DiscoveryStatus.NotDiscovered);
 
         DiscoverTestsPrivate(eventHandler);
     }
