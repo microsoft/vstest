@@ -165,3 +165,4 @@ static Microsoft.VisualStudio.TestPlatform.Utilities.MulticastDelegateUtilities.
 static Microsoft.VisualStudio.TestPlatform.Utilities.TimeSpanParser.Parse(string time) -> System.TimeSpan
 static Microsoft.VisualStudio.TestPlatform.Utilities.TimeSpanParser.TryParse(string time, out System.TimeSpan result) -> bool
 virtual Microsoft.VisualStudio.TestPlatform.Utilities.JobQueue<T>.WaitForQueueToGetEmpty() -> bool
+static Microsoft.VisualStudio.TestPlatform.Utilities.MulticastDelegateUtilities.SafeInvoke(this System.Delegate delegates, object sender, object args, string traceDisplayName) -> void

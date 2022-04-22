@@ -377,3 +377,13 @@ static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Reso
 static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources.UnexpectedMessage.get -> string
 static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources.VersionCheckFailed.get -> string
 static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources.VersionCheckTimedout.get -> string
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.ITestRequestSender.SendDiscoveryAbort() -> void
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.DiscoveryCompletePayload.FullyDiscoveredSources.get -> System.Collections.Generic.IList<string>
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.DiscoveryCompletePayload.FullyDiscoveredSources.set -> void
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.DiscoveryCompletePayload.NotDiscoveredSources.get -> System.Collections.Generic.IList<string>
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.DiscoveryCompletePayload.NotDiscoveredSources.set -> void
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.DiscoveryCompletePayload.PartiallyDiscoveredSources.get -> System.Collections.Generic.IList<string>
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.DiscoveryCompletePayload.PartiallyDiscoveredSources.set -> void
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestSender.SendDiscoveryAbort() -> void
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.DiscoveryCompletePayload.DiscoveredExtensions.get -> System.Collections.Generic.Dictionary<string, System.Collections.Generic.HashSet<string>>
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.DiscoveryCompletePayload.DiscoveredExtensions.set -> void

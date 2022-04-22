@@ -117,28 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AbortedStartTestSession" xml:space="preserve">
-    <value>The Start Test Session operation was aborted.</value>
+  <data name="CannotFindConsoleRunner" xml:space="preserve">
+    <value>Cannot find the console runner {0}.</value>
+    <comment>{0}: the console runner path</comment>
   </data>
-  <data name="AbortedStopTestSession" xml:space="preserve">
-    <value>The Stop Test Session operation was aborted.</value>
-  </data>
-  <data name="AbortedTestRunAttachmentsProcessing" xml:space="preserve">
-    <value>The active Test Run Attachments Processing was aborted.</value>
-  </data>
-  <data name="AbortedTestsDiscovery" xml:space="preserve">
-    <value>The active Tests Discovery was aborted.</value>
-  </data>
-  <data name="AbortedTestsRun" xml:space="preserve">
-    <value>The active Tests Run was aborted.</value>
-  </data>
-  <data name="FailedToReceiveMessage" xml:space="preserve">
-    <value>Failed to receive message from vstest.console process</value>
-  </data>
-  <data name="InvalidFilePath" xml:space="preserve">
-    <value>File {0} does not exists</value>
-  </data>
-  <data name="VsTestProcessExitedAbnormally" xml:space="preserve">
-    <value>vstest.console process exited abnormally</value>
+  <data name="ProcessStartWin32Failure" xml:space="preserve">
+    <value>An error occurred when opening the file {0} with arguments {1}.</value>
+    <comment>{0}: process path
+{1}: arguments passed to the process invocation</comment>
   </data>
 </root>

@@ -1,1 +1,0 @@
-Microsoft.VisualStudio.TestPlatform.Client.RequestHelper.ITestRequestManager.StopTestSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StopTestSessionPayload payload, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler eventsHandler, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ProtocolConfig protocolConfig) -> void
