@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -36,4 +38,25 @@ public class Message
         // and this might be happening in multiple places that are not the edge of our process.
         return "(" + MessageType + ") -> " + (Payload == null ? "null" : Payload.ToString(Formatting.Indented));
     }
+}
+
+public class MessageHeader
+{
+    public string MessageType { get; set; }
+    public int Version { get; set; }
+}
+
+public class PayloadedMessage<T> : VersionedMessage
+{
+    /// <summary>
+    /// Gets or sets the version of the message
+    /// </summary>
+    public int Version { get; set; }
+
+    /// <summary>
+    /// Gets or sets the message type.
+    /// </summary>
+    public string MessageType { get; set; }
+
+    public new T Payload { get; set; }
 }

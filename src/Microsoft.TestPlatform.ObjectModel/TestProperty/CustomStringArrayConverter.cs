@@ -2,9 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Runtime.Serialization.Json;
 using System.Text;
 
 #nullable disable
@@ -13,6 +15,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 internal class CustomStringArrayConverter : TypeConverter
 {
+    private readonly DataContractJsonSerializer _serializer;
+
+    private readonly Dictionary<string, string[]> _memoization = new();
+    public CustomStringArrayConverter ()
+    {
+        _serializer = new DataContractJsonSerializer(typeof(string[]));
+    }
+
     /// <inheritdoc/>
     public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
     {
@@ -31,10 +41,14 @@ internal class CustomStringArrayConverter : TypeConverter
         // String[] are used by adapters. E.g. TestCategory[]
         if (value is string data)
         {
-            using var stream = new MemoryStream(Encoding.Unicode.GetBytes(data));
-            var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(string[]));
-            var strings = serializer.ReadObject(stream) as string[];
+            if (_memoization.TryGetValue(data, out string[] str))
+            {
+                return str;
+            }
 
+            using var stream = new MemoryStream(Encoding.Unicode.GetBytes(data));
+            var strings = _serializer.ReadObject(stream) as string[];
+            _memoization[data] = strings;
             return strings;
         }
 

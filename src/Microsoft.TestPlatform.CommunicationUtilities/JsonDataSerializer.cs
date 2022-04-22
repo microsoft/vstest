@@ -21,8 +21,11 @@ public class JsonDataSerializer : IDataSerializer
 {
     private static JsonDataSerializer s_instance;
 
+    public static int Version { get; set; } = 7;
+
     private static JsonSerializer s_payloadSerializer; // payload serializer for version <= 1
     private static JsonSerializer s_payloadSerializer2; // payload serializer for version >= 2
+    public static JsonSerializerSettings s_jsonSettings7; // payload serializer for version >= 7
     private static JsonSerializer s_serializer; // generic serializer
 
     /// <summary>
@@ -36,13 +39,29 @@ public class JsonDataSerializer : IDataSerializer
             DateParseHandling = DateParseHandling.DateTimeOffset,
             DateTimeZoneHandling = DateTimeZoneHandling.Utc,
             TypeNameHandling = TypeNameHandling.None,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
         };
 
         s_serializer = JsonSerializer.Create();
         s_payloadSerializer = JsonSerializer.Create(jsonSettings);
         s_payloadSerializer2 = JsonSerializer.Create(jsonSettings);
 
+        var jsonSettings7 = new JsonSerializerSettings
+        {
+            DateFormatHandling = DateFormatHandling.IsoDateFormat,
+            DateParseHandling = DateParseHandling.DateTimeOffset,
+            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+            TypeNameHandling = TypeNameHandling.None,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            // Has only minimal impact
+            // NullValueHandling = NullValueHandling.Ignore,
+
+            ContractResolver = new DefaultTestPlatformContractResolver7(),
+
+        };
+
+        s_jsonSettings7 = jsonSettings7;
+        
         s_payloadSerializer.ContractResolver = new TestPlatformContractResolver1();
         s_payloadSerializer2.ContractResolver = new DefaultTestPlatformContractResolver();
 
@@ -69,6 +88,11 @@ public class JsonDataSerializer : IDataSerializer
     public Message DeserializeMessage(string rawMessage)
     {
         return Deserialize<VersionedMessage>(s_serializer, rawMessage);
+    }
+
+    public PayloadedMessage<T> DeserializeMessage<T>(string rawMessage)
+    {
+        return JsonConvert.DeserializeObject<PayloadedMessage<T>>(rawMessage, s_jsonSettings7);
     }
 
     /// <summary>
@@ -127,12 +151,19 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>Serialized message.</returns>
     public string SerializePayload(string messageType, object payload, int version)
     {
-        var payloadSerializer = GetPayloadSerializer(version);
-        var serializedPayload = JToken.FromObject(payload, payloadSerializer);
+        if (version != 7)
+        {
+            var payloadSerializer = GetPayloadSerializer(version);
+            var serializedPayload = JToken.FromObject(payload, payloadSerializer);
 
-        return version > 1 ?
-            Serialize(s_serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
-            Serialize(s_serializer, new Message { MessageType = messageType, Payload = serializedPayload });
+            return version > 1 ?
+                Serialize(s_serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
+                Serialize(s_serializer, new Message { MessageType = messageType, Payload = serializedPayload });
+        }
+        else
+        {
+            return JsonConvert.SerializeObject(new VersionedMessage2 { MessageType = messageType, Version = version, Payload = payload });
+        }
     }
 
     /// <summary>
@@ -226,6 +257,7 @@ public class JsonDataSerializer : IDataSerializer
             // env variable.
             0 or 1 or 3 => s_payloadSerializer,
             2 or 4 or 5 or 6 => s_payloadSerializer2,
+            
             _ => throw new NotSupportedException($"Protocol version {version} is not supported. "
                 + "Ensure it is compatible with the latest serializer or add a new one."),
         };

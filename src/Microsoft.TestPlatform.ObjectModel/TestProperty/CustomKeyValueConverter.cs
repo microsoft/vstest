@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Runtime.Serialization.Json;
 
 #nullable disable
 
@@ -18,6 +19,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 /// </summary>
 internal class CustomKeyValueConverter : TypeConverter
 {
+    private readonly DataContractJsonSerializer _serializer;
+
+    private readonly Dictionary<string, KeyValuePair<string, string>[]> _memoization = new();
+
+    public CustomKeyValueConverter()
+    {
+        _serializer = new DataContractJsonSerializer(typeof(TraitObject[]));
+    }
+
     /// <inheritdoc/>
     public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
     {
@@ -38,11 +48,15 @@ internal class CustomKeyValueConverter : TypeConverter
         // KeyValuePairs are used for traits. 
         if (value is string data)
         {
+            if (_memoization.TryGetValue(data, out KeyValuePair<string, string>[] traits))
+            {
+                return traits;
+            }
+
             using var stream = new MemoryStream(Encoding.Unicode.GetBytes(data));
             // Converting Json data to array of KeyValuePairs with duplicate keys.
-            var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(TraitObject[]));
-            var listOfTraitObjects = serializer.ReadObject(stream) as TraitObject[];
-
+            var listOfTraitObjects = _serializer.ReadObject(stream) as TraitObject[];
+            _memoization[data] = traits;
             return listOfTraitObjects.Select(i => new KeyValuePair<string, string>(i.Key, i.Value)).ToArray();
         }
 

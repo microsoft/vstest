@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -82,5 +83,90 @@ public class TestObjectConverter : JsonConverter
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         // Create an array of <Property, Value> dictionary
+    }
+}
+
+
+/// <summary>
+/// JSON converter for the <see cref="TestObject"/> and derived entities.
+/// </summary>
+public class TestObjectConverter7 : JsonConverter
+{
+    private static object[] EmptyObjectArray = new object[0];
+
+    public TestObjectConverter7()
+    {
+#if !NETSTANDARD1_3
+        TestPropertyCtor = typeof(TestProperty).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[0], null);
+#endif
+    }
+
+    /// <inheritdoc/>
+    public override bool CanRead => true;
+
+    /// <inheritdoc/>
+    public override bool CanWrite => false;
+
+    public ConstructorInfo TestPropertyCtor { get; }
+
+    /// <inheritdoc/>
+    public override bool CanConvert(Type objectType)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc/>
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    {
+        if (objectType != typeof(List<KeyValuePair<TestProperty, object>>))
+        {
+            // Support only deserialization of KeyValuePair list
+            throw new ArgumentException("the objectType was not a KeyValuePair list", nameof(objectType));
+        }
+
+        if (reader.TokenType == JsonToken.StartArray)
+        {
+            var deserializedProperties = serializer.Deserialize<List<KeyValuePair<TestPropertyTemplate, object>>>(reader);
+            // Initialize the list capacity to be the number of properties we might add.
+            var propertyList = new List<KeyValuePair<TestProperty, object>>(deserializedProperties.Count);
+
+            // Every class that inherits from TestObject uses a properties store for <Property, Object>
+            // key value pairs.
+            foreach (var property in deserializedProperties)
+            {
+                var testProperty = (TestProperty)TestPropertyCtor.Invoke(EmptyObjectArray);
+                testProperty.Id = property.Key.Id;
+                testProperty.Label = property.Key.Label;
+                testProperty.Category = property.Key.Category;
+                testProperty.Description = property.Key.Description;
+                testProperty.Attributes = (TestPropertyAttributes)property.Key.Attributes;
+                testProperty.ValueType = property.Key.ValueType;
+
+
+                string propertyData = property.Value.ToString();
+
+                propertyList.Add(new KeyValuePair<TestProperty, object>(testProperty, propertyData));
+            }
+
+            return propertyList;
+        }
+
+        return new List<KeyValuePair<TestProperty, object>>();
+    }
+
+    /// <inheritdoc/>
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    {
+        // Create an array of <Property, Value> dictionary
+    }
+
+    private class TestPropertyTemplate
+    {
+        public string Id { get; set; }
+        public string Label { get; set; }
+        public string Category { get; set; }
+        public string Description { get; set; }
+        public int Attributes { get; set; }
+        public string ValueType { get; set; }
     }
 }

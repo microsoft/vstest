@@ -16,3 +16,21 @@ public class VersionedMessage : Message
     /// </summary>
     public int Version { get; set; }
 }
+
+internal class VersionedMessage2
+{
+    /// <summary>
+    /// Gets or sets the version of the message
+    /// </summary>
+    public int Version { get; set; }
+
+    /// <summary>
+    /// Gets or sets the message type.
+    /// </summary>
+    public string MessageType { get; set; }
+
+    /// <summary>
+    /// Gets or sets the payload.
+    /// </summary>
+    public object Payload { get; set; }
+}

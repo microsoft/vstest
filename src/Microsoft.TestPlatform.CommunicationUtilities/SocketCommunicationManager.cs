@@ -298,6 +298,10 @@ public class SocketCommunicationManager : ICommunicationManager
         return null;
     }
 
+
+    private static int Counter = 0;
+    private static long session = Stopwatch.GetTimestamp();
+
     /// <summary>
     /// Reads message from the binary reader using read timeout
     /// </summary>
@@ -312,7 +316,12 @@ public class SocketCommunicationManager : ICommunicationManager
         var rawMessage = await ReceiveRawMessageAsync(cancellationToken);
         if (!string.IsNullOrEmpty(rawMessage))
         {
+            //var dir = $@"C:\temp\tp-serialization\{session}";
+            //System.IO.Directory.CreateDirectory(dir);
+            //System.IO.File.WriteAllText(@$"{dir}\{Counter.ToString("D7")}.txt", rawMessage);
+            //Counter++;
             return _dataSerializer.DeserializeMessage(rawMessage);
+
         }
 
         return null;

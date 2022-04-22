@@ -26,7 +26,7 @@ namespace PerfyPassing
         {
             // No meaning to the number, it is just easy to find when it breaks. Better than returning 1000 or 0 which are both
             // less suspicious. It could throw, but that is bad for interactive debugging.
-            Count = int.TryParse(Environment.GetEnvironmentVariable("TEST_COUNT") ?? "356", out var count) ? count : 356;
+            Count = int.TryParse(Environment.GetEnvironmentVariable("TEST_COUNT") ?? "10000", out var count) ? count : 356;
         }
 
         public const string Id = "executor://perfy.testadapter";

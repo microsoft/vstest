@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -1369,12 +1370,15 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         }
     }
 
+
     private Message TryReceiveMessage()
     {
         var receiverMessageTask = _communicationManager.ReceiveMessageAsync(
             _processExitCancellationTokenSource.Token);
         receiverMessageTask.Wait();
         Message message = receiverMessageTask.Result;
+
+        
 
         return message ?? throw new TransationLayerException(
             TranslationLayerResources.FailedToReceiveMessage);
