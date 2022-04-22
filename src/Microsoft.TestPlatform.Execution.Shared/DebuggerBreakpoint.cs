@@ -4,9 +4,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-#if !NETCOREAPP1_0 && DEBUG
-using System.Reflection;
-#endif
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 

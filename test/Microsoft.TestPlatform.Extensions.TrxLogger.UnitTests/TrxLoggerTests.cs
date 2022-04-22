@@ -782,7 +782,7 @@ public class TrxLoggerTests
         _parameters.Remove(TrxLoggerConstants.LogFileNameKey);
         _testableTrxLogger.Initialize(_events.Object, _parameters);
 
-        string message = $"one line{ Environment.NewLine }second line\r\nthird line";
+        string message = $"one line{Environment.NewLine}second line\r\nthird line";
         var pass = CreatePassTestResultEventArgsMock("Pass1", new List<TestResultMessage> { new TestResultMessage(TestResultMessage.StandardOutCategory, message) });
 
         _testableTrxLogger.TestResultHandler(new object(), pass.Object);

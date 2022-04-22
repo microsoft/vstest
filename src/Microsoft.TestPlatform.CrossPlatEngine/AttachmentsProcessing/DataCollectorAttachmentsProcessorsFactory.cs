@@ -14,9 +14,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-#if NETFRAMEWORK
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-#endif
 
 #nullable disable
 
@@ -48,10 +46,17 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
 
                 EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Analyzing data collector attachment processor Uri: {invokedDataCollector.Uri} AssemblyQualifiedName: {invokedDataCollector.AssemblyQualifiedName} FilePath: {invokedDataCollector.FilePath} HasAttachmentProcessor: {invokedDataCollector.HasAttachmentProcessor}");
 
+                var canUseAppDomains =
 #if NETFRAMEWORK
+                    true;
+#else
+                    false;
+#endif
+
                 // If we're in design mode we need to load the extension inside a different AppDomain to avoid to lock extension file containers.
-                if (RunSettingsHelper.Instance.IsDesignMode)
+                if (canUseAppDomains && RunSettingsHelper.Instance.IsDesignMode)
                 {
+#if NETFRAMEWORK
                     try
                     {
                         var wrapper = new DataCollectorAttachmentProcessorAppDomain(invokedDataCollector, logger);
@@ -79,10 +84,10 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
                         EqtTrace.Error($"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{invokedDataCollector.AssemblyQualifiedName}'\n{ex}");
                         logger?.SendMessage(TestMessageLevel.Error, $"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{invokedDataCollector.AssemblyQualifiedName}'\n{ex}");
                     }
+#endif
                 }
                 else
                 {
-#endif
                     // We cache extension locally by file path
                     var dataCollectorExtensionManager = DataCollectorExtensionManagerCache.GetOrAdd(invokedDataCollector.FilePath, DataCollectorExtensionManager.Create(invokedDataCollector.FilePath, true, TestSessionMessageLogger.Instance));
                     var dataCollectorExtension = dataCollectorExtensionManager.TryGetTestExtension(invokedDataCollector.Uri);
@@ -111,9 +116,7 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
                     {
                         EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: DataCollectorExtension not found for uri '{invokedDataCollector.Uri}'");
                     }
-#if NETFRAMEWORK
                 }
-#endif
             }
         }
 
