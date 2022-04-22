@@ -139,8 +139,14 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
 
         _baseTestDiscoveryEventsHandler = eventHandler;
 
-        // Mark all sources as NotDiscovered before actual discovery starts
-        _discoveryDataAggregator.MarkSourcesWithStatus(discoverySources, DiscoveryStatus.NotDiscovered);
+        // Do not mark sources as not discovered, this is already done in the
+        // ParallelProxyDiscoveryManager or the DiscoveryManager. We don't want to make the
+        // initialization only here because we might receive a cancellation request before we have
+        // had all ProxyDiscoveryManager newed up.
+        // Consider the first source as the previous source so that if we are discovering a source
+        // with no tests, we will always consider the source as fully discovered when reaching the
+        // discovery complete event.
+        _previousSource = discoverySources[0];
 
         try
         {
