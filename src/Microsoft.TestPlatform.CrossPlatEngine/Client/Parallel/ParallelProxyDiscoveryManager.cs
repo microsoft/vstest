@@ -111,6 +111,15 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     /// <inheritdoc/>
     public bool HandlePartialDiscoveryComplete(IProxyDiscoveryManager proxyDiscoveryManager, long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
     {
+        // Ensures that the total count of sources remains the same between each discovery
+        // completion of the same initial discovery request.
+        Debug.Assert(
+            _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count
+            + _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count
+            + _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count
+            == _actualDiscoveryCriteria?.Sources.Count(),
+            "Total count of sources should match the count of sources with status not discovered, partially discovered and fully discovered.");
+
         var allDiscoverersCompleted = false;
         lock (_discoveryStatusLockObject)
         {

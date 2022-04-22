@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -96,6 +97,20 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         var partiallyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered);
         var notDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered);
 
+        if (!_parallelProxyDiscoveryManager.IsAbortRequested)
+        {
+            Debug.Assert(notDiscovered.Count == 0 && partiallyDiscovered.Count == 0,
+               "All sources should be discovered upon discovery completion.");
+        }
+
+        // Collecting Final Discovery State
+        _requestData.MetricsCollection.Add(
+            TelemetryDataConstants.DiscoveryState,
+            discoveryCompleteEventArgs.IsAborted ? "Aborted" : "Completed");
+
+        // Collect Aggregated Metrics Data
+        var aggregatedDiscoveryDataMetrics = _discoveryDataAggregator.GetMetrics();
+
         // In case of sequential discovery - RawMessage would have contained a 'DiscoveryCompletePayload' object
         // To send a raw message - we need to create raw message from an aggregated payload object
         var testDiscoveryCompletePayload = new DiscoveryCompletePayload
@@ -107,16 +122,8 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             PartiallyDiscoveredSources = partiallyDiscovered,
             NotDiscoveredSources = notDiscovered,
             DiscoveredExtensions = _discoveryDataAggregator.DiscoveredExtensions,
+            Metrics = aggregatedDiscoveryDataMetrics,
         };
-
-        // Collecting Final Discovery State
-        _requestData.MetricsCollection.Add(
-            TelemetryDataConstants.DiscoveryState,
-            discoveryCompleteEventArgs.IsAborted ? "Aborted" : "Completed");
-
-        // Collect Aggregated Metrics Data
-        var aggregatedDiscoveryDataMetrics = _discoveryDataAggregator.GetMetrics();
-        testDiscoveryCompletePayload.Metrics = aggregatedDiscoveryDataMetrics;
 
         // Sending discovery complete message to IDE
         ConvertToRawMessageAndSend(testDiscoveryCompletePayload);
@@ -129,9 +136,8 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             PartiallyDiscoveredSources = partiallyDiscovered,
             NotDiscoveredSources = notDiscovered,
             DiscoveredExtensions = _discoveryDataAggregator.DiscoveredExtensions,
+            Metrics = aggregatedDiscoveryDataMetrics,
         };
-
-        finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
 
         // send actual test discovery complete to clients
         _actualDiscoveryEventsHandler.HandleDiscoveryComplete(finalDiscoveryCompleteEventArgs, null);
