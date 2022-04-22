@@ -177,6 +177,13 @@
                     "Languages": "",
                     "OutputPath": "src\\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\\Resources\\xlf",
                     "SourceFile": "src\\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\\Resources\\xlf\\Resources.xlf"
+                },
+                {
+                    "LclFile": "Localize\\lcl\\{Lang}\\src\\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\\Resources\\xlf\\InternalResources.xlf.lcl",
+                    "CopyOption": "LangIDOnName",
+                    "Languages": "",
+                    "OutputPath": "src\\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\\Resources\\xlf",
+                    "SourceFile": "src\\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\\Resources\\xlf\\InternalResources.xlf"
                 }
             ]
         },
