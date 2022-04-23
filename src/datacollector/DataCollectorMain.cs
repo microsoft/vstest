@@ -107,7 +107,7 @@ public class DataCollectorMain
                 .GetTypeInfo()
                 .Assembly
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-            EqtTrace.Verbose($"Version: { version }");
+            EqtTrace.Verbose($"Version: {version}");
         }
 
         UiLanguageOverride.SetCultureSpecifiedByUser();
