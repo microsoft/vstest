@@ -30,7 +30,7 @@ Ten test może, ale nie musi być źródłem awarii.</target>
       </trans-unit>
       <trans-unit id="BlameParameterValueIncorrect">
         <source>The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}</source>
-        <target state="new">The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}</target>
+        <target state="translated">Klucz parametru blame {0} ma niepoprawną wartość: {1}. Obsługiwane wartości to: {2}</target>
         <note>{0} and {1} are single values referring to parameters such as BlameHang and Full. {2} is comma separated list of valid values, e.g. Full, Mini, None.</note>
       </trans-unit>
       <trans-unit id="ProcDumpCouldNotStart">
