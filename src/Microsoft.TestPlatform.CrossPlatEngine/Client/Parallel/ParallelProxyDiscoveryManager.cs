@@ -71,7 +71,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         _sourceEnumerator = discoveryCriteria.Sources.GetEnumerator();
         _availableTestSources = discoveryCriteria.Sources.Count();
 
-        EqtTrace.Verbose($"ParallelProxyDiscoveryManager: Start discovery. Total sources: {_availableTestSources}");
+        EqtTrace.Verbose($"ParallelProxyDiscoveryManager.DiscoverTests: Start discovery. Total sources: {_availableTestSources}");
 
         // Mark all sources as not discovered here because if we get an early cancellation it's
         // possible that we won't have started all the proxy manager and so we won't have marked
@@ -130,15 +130,13 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
             // If there are no more sources/testcases, a parallel executor is truly done with discovery
             allDiscoverersCompleted = _discoveryCompletedClients == _availableTestSources;
 
-            EqtTrace.Verbose("ParallelProxyDiscoveryManager: HandlePartialDiscoveryComplete: Total completed clients = {0}, Discovery complete = {1}.", _discoveryCompletedClients, allDiscoverersCompleted);
+            EqtTrace.Verbose("ParallelProxyDiscoveryManager.HandlePartialDiscoveryComplete: Total completed clients = {0}, Discovery complete = {1}, Aborted = {2}, Abort requested: {3}.", _discoveryCompletedClients, allDiscoverersCompleted, isAborted, IsAbortRequested);
         }
 
-        /*
-         If discovery is complete or discovery aborting was requsted by testPlatfrom(user)
-         we need to stop all ongoing discoveries, because we want to separate aborting request
-         when testhost crashed by itself and when user requested it (f.e. through TW)
-         Schedule the clean up for managers and handlers.
-        */
+        // If discovery is complete or discovery aborting was requested by testPlatfrom(user)
+        // we need to stop all ongoing discoveries, because we want to separate aborting request
+        // when testhost crashed by itself and when user requested it (e.g. through TW).
+        // Schedule the clean up for managers and handlers.
         if (allDiscoverersCompleted || IsAbortRequested)
         {
             // Reset enumerators
@@ -158,7 +156,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
             Otherwise `proxyDiscoveryManager` instance is alredy closed by now and it will give exception
             when trying to do some operation on it.
         */
-        EqtTrace.Verbose("ParallelProxyDiscoveryManager: HandlePartialDiscoveryComplete: Replace discovery manager. Shared: {0}, Aborted: {1}.", SharedHosts, isAborted);
+        EqtTrace.Verbose("ParallelProxyDiscoveryManager.HandlePartialDiscoveryComplete: Replace discovery manager. Shared: {0}, Aborted: {1}.", SharedHosts, isAborted);
 
         RemoveManager(proxyDiscoveryManager);
 
@@ -213,14 +211,14 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         // Peek to see if we have sources to trigger a discovery
         if (TryFetchNextSource(_sourceEnumerator, out string nextSource))
         {
-            EqtTrace.Verbose("ProxyParallelDiscoveryManager: Triggering test discovery for next source: {0}", nextSource);
+            EqtTrace.Verbose("ProxyParallelDiscoveryManager.DiscoverTestsOnConcurrentManager: Triggering test discovery for next source: {0}", nextSource);
 
             // Kick off another discovery task for the next source
             var discoveryCriteria = new DiscoveryCriteria(new[] { nextSource }, _actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent, _actualDiscoveryCriteria.DiscoveredTestEventTimeout, _actualDiscoveryCriteria.RunSettings);
             discoveryCriteria.TestCaseFilter = _actualDiscoveryCriteria.TestCaseFilter;
             Task.Run(() =>
                 {
-                    EqtTrace.Verbose("ParallelProxyDiscoveryManager: Discovery started.");
+                    EqtTrace.Verbose("ParallelProxyDiscoveryManager.DiscoverTestsOnConcurrentManager: Discovery started.");
 
                     proxyDiscoveryManager.DiscoverTests(discoveryCriteria, GetHandlerForGivenManager(proxyDiscoveryManager));
                 })
@@ -229,7 +227,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
                         // Just in case, the actual discovery couldn't start for an instance. Ensure that
                         // we call discovery complete since we have already fetched a source. Otherwise
                         // discovery will not terminate
-                        EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
+                        EqtTrace.Error("ParallelProxyDiscoveryManager.DiscoverTestsOnConcurrentManager: Failed to trigger discovery. Exception: " + t.Exception);
 
                         var handler = GetHandlerForGivenManager(proxyDiscoveryManager);
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
@@ -247,6 +245,6 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
                     TaskContinuationOptions.OnlyOnFaulted);
         }
 
-        EqtTrace.Verbose("ProxyParallelDiscoveryManager: No sources available for discovery.");
+        EqtTrace.Verbose("ProxyParallelDiscoveryManager.DiscoverTestsOnConcurrentManager: No sources available for discovery.");
     }
 }

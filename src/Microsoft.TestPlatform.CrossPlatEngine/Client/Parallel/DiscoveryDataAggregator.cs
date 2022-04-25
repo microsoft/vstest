@@ -176,7 +176,11 @@ internal class DiscoveryDataAggregator
                 {
                     if (status != DiscoveryStatus.NotDiscovered)
                     {
-                        EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourcesWithStatus: Undiscovered {source}.");
+                        EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourcesWithStatus: Undiscovered {source} added with status: '{status}'.");
+                    }
+                    else
+                    {
+                        EqtTrace.Verbose($"DiscoveryDataAggregator.MarkSourcesWithStatus: Adding {source} with status: '{status}'.");
                     }
 
                     return status;
@@ -186,10 +190,12 @@ internal class DiscoveryDataAggregator
                     if (previousStatus == DiscoveryStatus.FullyDiscovered && status != DiscoveryStatus.FullyDiscovered
                         || previousStatus == DiscoveryStatus.PartiallyDiscovered && status == DiscoveryStatus.NotDiscovered)
                     {
-                        EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourcesWithStatus: Downgrading source status from {previousStatus} to {status}.");
+                        EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourcesWithStatus: Downgrading source {source} status from '{previousStatus}' to '{status}'.");
                     }
-
-                    EqtTrace.Info($"DiscoveryDataAggregator.MarkSourcesWithStatus: Marking {source} with {status} status.");
+                    else
+                    {
+                        EqtTrace.Verbose($"DiscoveryDataAggregator.MarkSourcesWithStatus: Upgrading {source} status from '{previousStatus}' to '{status}'.");
+                    }
                     return status;
                 });
         }
@@ -224,6 +230,7 @@ internal class DiscoveryDataAggregator
             }
             else if (currentSource != previousSource)
             {
+                EqtTrace.Verbose($"DiscoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases: Discovered test source changed from {previousSource} to {currentSource}.");
                 MarkSourcesWithStatus(new[] { previousSource }, DiscoveryStatus.FullyDiscovered);
                 MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
             }

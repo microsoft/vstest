@@ -216,21 +216,20 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <inheritdoc/>
     public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
     {
-        EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete: Starting. Aborted:{0}, TotalTests:{1}", discoveryCompleteEventArgs.IsAborted, discoveryCompleteEventArgs.TotalCount);
+        EqtTrace.Verbose("DiscoveryRequest.HandleDiscoveryComplete: Starting. Aborted:{0}, TotalTests:{1}", discoveryCompleteEventArgs.IsAborted, discoveryCompleteEventArgs.TotalCount);
 
         lock (_syncObject)
         {
             if (_disposed)
             {
-                EqtTrace.Warning("DiscoveryRequest.DiscoveryComplete: Ignoring as the object is disposed.");
-
+                EqtTrace.Warning("DiscoveryRequest.HandleDiscoveryComplete: Ignoring as the object is disposed.");
                 return;
             }
 
             // If discovery event is already raised, ignore current one.
             if (_discoveryCompleted.WaitOne(0))
             {
-                EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete:Ignoring duplicate DiscoveryComplete. Aborted:{0}, TotalTests:{1}", discoveryCompleteEventArgs.IsAborted, discoveryCompleteEventArgs.TotalCount);
+                EqtTrace.Verbose("DiscoveryRequest.HandleDiscoveryComplete: Ignoring duplicate DiscoveryComplete.");
                 return;
             }
 
@@ -247,7 +246,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 {
                     var discoveredTestsEvent = new DiscoveredTestsEventArgs(lastChunk);
                     LoggerManager.HandleDiscoveredTests(discoveredTestsEvent);
-                    OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.DiscoveryComplete");
+                    OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.HandleDiscoveryComplete");
                 }
 
                 // Add extensions discovered by vstest.console.
@@ -267,7 +266,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 }
 
                 LoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs);
-                OnDiscoveryComplete.SafeInvoke(this, discoveryCompleteEventArgs, "DiscoveryRequest.DiscoveryComplete");
+                OnDiscoveryComplete.SafeInvoke(this, discoveryCompleteEventArgs, "DiscoveryRequest.HandleDiscoveryComplete");
             }
             finally
             {
@@ -275,11 +274,11 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 if (_discoveryCompleted != null)
                 {
                     _discoveryCompleted.Set();
-                    EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete: Notified the discovery complete event.");
+                    EqtTrace.Verbose("DiscoveryRequest.HandleDiscoveryComplete: Notified the discovery complete event.");
                 }
                 else
                 {
-                    EqtTrace.Warning("DiscoveryRequest.DiscoveryComplete: Discovery complete event was null.");
+                    EqtTrace.Warning("DiscoveryRequest.HandleDiscoveryComplete: Discovery complete event was null.");
                 }
 
                 DiscoveryInProgress = false;
@@ -301,19 +300,19 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             }
         }
 
-        EqtTrace.Info("DiscoveryRequest.DiscoveryComplete: Completed.");
+        EqtTrace.Info("DiscoveryRequest.HandleDiscoveryComplete: Completed.");
     }
 
     /// <inheritdoc/>
     public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
     {
-        EqtTrace.Verbose("DiscoveryRequest.SendDiscoveredTests: Starting.");
+        EqtTrace.Verbose("DiscoveryRequest.HandleDiscoveredTests: Starting.");
 
         lock (_syncObject)
         {
             if (_disposed)
             {
-                EqtTrace.Warning("DiscoveryRequest.SendDiscoveredTests: Ignoring as the object is disposed.");
+                EqtTrace.Warning("DiscoveryRequest.HandleDiscoveredTests: Ignoring as the object is disposed.");
                 return;
             }
 
@@ -322,7 +321,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.OnDiscoveredTests");
         }
 
-        EqtTrace.Info("DiscoveryRequest.SendDiscoveredTests: Completed.");
+        EqtTrace.Info("DiscoveryRequest.HandleDiscoveredTests: Completed.");
     }
 
     /// <summary>
@@ -332,13 +331,13 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <param name="message">Actual contents of the message</param>
     public void HandleLogMessage(TestMessageLevel level, string message)
     {
-        EqtTrace.Verbose("DiscoveryRequest.SendDiscoveryMessage: Starting.");
+        EqtTrace.Verbose("DiscoveryRequest.HandleLogMessage: Starting.");
 
         lock (_syncObject)
         {
             if (_disposed)
             {
-                EqtTrace.Warning("DiscoveryRequest.SendDiscoveryMessage: Ignoring as the object is disposed.");
+                EqtTrace.Warning("DiscoveryRequest.HandleLogMessage: Ignoring as the object is disposed.");
                 return;
             }
 
@@ -347,7 +346,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             OnDiscoveryMessage.SafeInvoke(this, testRunMessageEvent, "DiscoveryRequest.OnTestMessageRecieved");
         }
 
-        EqtTrace.Info("DiscoveryRequest.SendDiscoveryMessage: Completed.");
+        EqtTrace.Info("DiscoveryRequest.HandleLogMessage: Completed.");
     }
 
     /// <summary>

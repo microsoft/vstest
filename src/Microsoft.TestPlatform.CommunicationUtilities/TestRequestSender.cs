@@ -640,22 +640,22 @@ public class TestRequestSender : ITestRequestSender
     {
         if (IsOperationComplete())
         {
-            EqtTrace.Verbose("TestRequestSender: OnDiscoveryAbort: Operation is already complete. Skip error message.");
+            EqtTrace.Verbose("TestRequestSender.OnDiscoveryAbort: Operation is already complete. Skip error message.");
             return;
         }
 
-        EqtTrace.Verbose("TestRequestSender: OnDiscoveryAbort: Set operation complete.");
+        EqtTrace.Verbose("TestRequestSender.OnDiscoveryAbort: Set operation complete.");
         SetOperationComplete();
 
         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
         if (GetAbortErrorMessage(exception, getClientError) is string reason)
         {
-            EqtTrace.Error("TestRequestSender: Aborting test discovery because {0}.", reason);
+            EqtTrace.Error("TestRequestSender.OnDiscoveryAbort: Aborting test discovery because {0}.", reason);
             LogErrorMessage(string.Format(CommonResources.AbortedTestDiscoveryWithReason, reason));
         }
         else
         {
-            EqtTrace.Error("TestRequestSender: Aborting test discovery.");
+            EqtTrace.Error("TestRequestSender.OnDiscoveryAbort: Aborting test discovery.");
             LogErrorMessage(CommonResources.AbortedTestDiscovery);
         }
 
