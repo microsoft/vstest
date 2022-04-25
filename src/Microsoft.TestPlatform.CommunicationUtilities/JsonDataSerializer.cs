@@ -6,6 +6,7 @@ using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -21,11 +22,13 @@ public class JsonDataSerializer : IDataSerializer
 {
     private static JsonDataSerializer s_instance;
 
-    public static int Version { get; set; } = 7;
+    private static int Version { get; } = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_FASTER_JSON_SERIALIZATION) ? 6 : 7;
 
     private static JsonSerializer s_payloadSerializer; // payload serializer for version <= 1
     private static JsonSerializer s_payloadSerializer2; // payload serializer for version >= 2
-    public static JsonSerializerSettings s_jsonSettings7; // payload serializer for version >= 7
+    // [DONT MERGE]: public just for custom serialization test in playground
+    public static JsonSerializerSettings s_jsonSettings7; // serializer settings for faster json
+    private static JsonSerializerSettings s_jsonSettings; // serializer settings for serializer v1, which should be used to deserialize message headers
     private static JsonSerializer s_serializer; // generic serializer
 
     /// <summary>
@@ -42,6 +45,8 @@ public class JsonDataSerializer : IDataSerializer
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
         };
 
+        s_jsonSettings = jsonSettings;
+
         s_serializer = JsonSerializer.Create();
         s_payloadSerializer = JsonSerializer.Create(jsonSettings);
         s_payloadSerializer2 = JsonSerializer.Create(jsonSettings);
@@ -53,15 +58,13 @@ public class JsonDataSerializer : IDataSerializer
             DateTimeZoneHandling = DateTimeZoneHandling.Utc,
             TypeNameHandling = TypeNameHandling.None,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            // Has only minimal impact
-            // NullValueHandling = NullValueHandling.Ignore,
 
             ContractResolver = new DefaultTestPlatformContractResolver7(),
 
         };
 
         s_jsonSettings7 = jsonSettings7;
-        
+
         s_payloadSerializer.ContractResolver = new TestPlatformContractResolver1();
         s_payloadSerializer2.ContractResolver = new DefaultTestPlatformContractResolver();
 
@@ -87,7 +90,24 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>A <see cref="Message"/> instance.</returns>
     public Message DeserializeMessage(string rawMessage)
     {
-        return Deserialize<VersionedMessage>(s_serializer, rawMessage);
+        if (Version == 7)
+        {
+            // not sure if we need ot use this one of new one, it probably does not matter we deserialize 2 fields of normal pure json
+            var header = JsonConvert.DeserializeObject<MessageHeader>(rawMessage, s_jsonSettings);
+
+            var message = new MessageWithRawMessage
+            {
+                MessageType = header.MessageType,
+                Version = header.Version,
+                RawMessage = rawMessage,
+            };
+
+            return message;
+        }
+        else
+        {
+            return Deserialize<VersionedMessage>(rawMessage);
+        }
     }
 
     public PayloadedMessage<T> DeserializeMessage<T>(string rawMessage)
@@ -103,9 +123,18 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>The deserialized payload.</returns>
     public T DeserializePayload<T>(Message message)
     {
-        var versionedMessage = message as VersionedMessage;
-        var payloadSerializer = GetPayloadSerializer(versionedMessage?.Version);
-        return Deserialize<T>(payloadSerializer, message.Payload);
+        if (Version == 7)
+        {
+            var messageWithRawMessage = message as MessageWithRawMessage;
+            var messageWithPayload = JsonConvert.DeserializeObject<PayloadedMessage<T>>(messageWithRawMessage.RawMessage, s_jsonSettings7);
+            return messageWithPayload.Payload;
+        }
+        else
+        {
+            var versionedMessage = message as VersionedMessage;
+            var payloadSerializer = GetPayloadSerializer(versionedMessage?.Version);
+            return Deserialize<T>(payloadSerializer, message.Payload);
+        }
     }
 
     /// <summary>
@@ -257,7 +286,7 @@ public class JsonDataSerializer : IDataSerializer
             // env variable.
             0 or 1 or 3 => s_payloadSerializer,
             2 or 4 or 5 or 6 => s_payloadSerializer2,
-            
+
             _ => throw new NotSupportedException($"Protocol version {version} is not supported. "
                 + "Ensure it is compatible with the latest serializer or add a new one."),
         };

@@ -30,7 +30,7 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        var step = "dd";
+        var step = "run";
         var versions = new[] { 7, 6 };
 
         if (step == "d")
@@ -48,9 +48,8 @@ internal class Program
             var json = JsonDataSerializer.Instance;
             foreach (var v in versions)
             {
-                // Cirmumvent normal version detection
-                JsonDataSerializer.Version = v;
-                TestProperty.Version = v;
+                // For 6 disable the faster json path
+                Environment.SetEnvironmentVariable("VSTEST_DISABLE_FASTER_JSON_SERIALIZATION", v == 6 ? "1" : "0");
 
                 foreach (var attempt in Enumerable.Range(1, 2))
                 {
@@ -70,8 +69,11 @@ internal class Program
                         }
                         else
                         {
-                            var m = json.DeserializeMessage<TestRunChangedEventArgs>(rawMessage);
-                            payload = m.Payload;
+                            Message message = json.DeserializeMessage(rawMessage);
+                            MessageWithRawMessage versionedMessage = (MessageWithRawMessage)message;
+                            versionedMessage.Version = v;
+                            lastMessage = versionedMessage;
+                            payload = json.DeserializePayload<TestRunChangedEventArgs>(versionedMessage);
                         }
                         testCount += payload.NewTestResults.Count();
                     }
@@ -101,9 +103,8 @@ internal class Program
             TestRunChangedEventArgs payload7 = null;
             foreach (var v in versions)
             {
-                // Cirmumvent normal version detection
-                JsonDataSerializer.Version = v;
-                TestProperty.Version = v;
+                // For 6 disable the faster json path
+                Environment.SetEnvironmentVariable("VSTEST_DISABLE_FASTER_JSON_SERIALIZATION", v == 6 ? "1" : "0");
 
 
                 foreach (var attempt in Enumerable.Range(1, 2))
@@ -158,7 +159,7 @@ internal class Program
             // Make sure we kept the same data.
             //if (versions.Distinct().Count() > 1)
             //{
-                json.SerializePayload("a", payload7).Should().BeEquivalentTo(json.SerializePayload("a", payload6));
+            json.SerializePayload("a", payload7).Should().BeEquivalentTo(json.SerializePayload("a", payload6));
             //}
 
         }
@@ -183,10 +184,8 @@ internal class Program
             Dictionary<int, string> mmmm = new Dictionary<int, string>();
             foreach (var v in versions)
             {
-
-                // Cirmumvent normal version detection
-                JsonDataSerializer.Version = v;
-                TestProperty.Version = v;
+                // For 6 disable the faster json path
+                Environment.SetEnvironmentVariable("VSTEST_DISABLE_FASTER_JSON_SERIALIZATION", v == 6 ? "1" : "0");
 
                 foreach (var attempt in Enumerable.Range(1, 2))
                 {
@@ -222,21 +221,27 @@ internal class Program
             // sub-processes. It won't stop at entry-point automatically, don't forget to set your breakpoints, or remove VSTEST_DEBUG_NOBP
             // from the environment variables of this project.
 
-            var sw = Stopwatch.StartNew();
-            var thisAssemblyPath = Assembly.GetEntryAssembly().Location;
-            var here = Path.GetDirectoryName(thisAssemblyPath);
-            var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
-
-            var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
-            var consoleOptions = new ConsoleParameters
+            foreach (var v in versions)
             {
-                LogFilePath = Path.Combine(here, "logs", "log.txt"),
-                TraceLevel = TraceLevel.Off,
-            };
+                foreach (var attempt in Enumerable.Range(1, 2))
+                {
+                    // For 6 disable the faster json path
+                    Environment.SetEnvironmentVariable("VSTEST_DISABLE_FASTER_JSON_SERIALIZATION", v == 6 ? "1" : "0");
+                    var sw = Stopwatch.StartNew();
+                    var thisAssemblyPath = Assembly.GetEntryAssembly().Location;
+                    var here = Path.GetDirectoryName(thisAssemblyPath);
+                    var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
 
-            var r = new VsTestConsoleWrapper(console, consoleOptions);
+                    var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
+                    var consoleOptions = new ConsoleParameters
+                    {
+                        LogFilePath = Path.Combine(here, "logs", "log.txt"),
+                        TraceLevel = TraceLevel.Off,
+                    };
 
-            var sourceSettings = @"
+                    var r = new VsTestConsoleWrapper(console, consoleOptions);
+
+                    var sourceSettings = @"
                 <RunSettings>
                     <RunConfiguration>
                         <InIsolation>true</InIsolation>
@@ -246,15 +251,18 @@ internal class Program
                 </RunSettings>
             ";
 
-            Environment.SetEnvironmentVariable("TEST_COUNT", "10000");
-            var sources = new[] {
+                    Environment.SetEnvironmentVariable("TEST_COUNT", "10000");
+                    var sources = new[] {
                 @"C:\p\vstest3\playground\MSTest1\bin\Debug\net472\MSTest1.dll"
             };
 
-            var options = new TestPlatformOptions();
-            r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
+                    var options = new TestPlatformOptions();
+                    r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
 
-            Console.WriteLine($"Done in {sw.ElapsedMilliseconds} ms");
+                    Console.WriteLine($"Try {attempt}, version {v}.");
+                    Console.WriteLine($"Done in {sw.ElapsedMilliseconds} ms");
+                }
+            }
         }
     }
 

@@ -129,7 +129,7 @@
           <Version>$(MSTestAssertExtensionVersion)</Version>
         </PackageReference>
         <PackageReference Include="Microsoft.CodeCoverage">
-          <Version>1.0.3</Version>
+          <Version>17.1.0</Version>
         </PackageReference>
       </ItemGroup>
     </When>

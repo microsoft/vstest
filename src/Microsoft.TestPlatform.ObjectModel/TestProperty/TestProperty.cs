@@ -3,10 +3,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
+
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 #nullable disable
 
@@ -18,9 +19,13 @@ public delegate bool ValidateValueCallback(object value);
 public class TestProperty : IEquatable<TestProperty>
 {
     private Type _valueType;
-    private static Dictionary<string, Type> s_typeCache = new();
+    private static readonly Dictionary<string, Type> TypeCache = new();
 
-    public static int Version { get; set; } = 7;
+#if NETSTANDARD1_0
+    private static int Version { get; set; } = 6;
+#else
+    private static int Version { get; set; } = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_FASTER_JSON_SERIALIZATION) ? 6 : 7;
+#endif
 
     //public static Stopwatch 
 
@@ -159,7 +164,7 @@ public class TestProperty : IEquatable<TestProperty>
     public string ValueType { get; set; }
 
 
-    #region IEquatable
+#region IEquatable
 
     /// <inheritdoc/>
     public override int GetHashCode()
@@ -179,7 +184,7 @@ public class TestProperty : IEquatable<TestProperty>
         return (other != null) && (Id == other.Id);
     }
 
-    #endregion IEquatable
+#endregion IEquatable
 
     /// <inheritdoc/>
     public override string ToString()
@@ -206,7 +211,7 @@ public class TestProperty : IEquatable<TestProperty>
     {
         if (Version == 7)
         {
-            if (s_typeCache.TryGetValue(typeName, out var t))
+            if (TypeCache.TryGetValue(typeName, out var t))
             {
                 return t;
             }
@@ -220,7 +225,7 @@ public class TestProperty : IEquatable<TestProperty>
 
                 if (type != null)
                 {
-                    s_typeCache[typeName] = type;
+                    TypeCache[typeName] = type;
                     return type;
                 }
 
@@ -286,7 +291,7 @@ public class TestProperty : IEquatable<TestProperty>
             }
 
 
-            s_typeCache[typeName] = type;
+            TypeCache[typeName] = type;
             return type;
         }
         else

@@ -126,7 +126,7 @@ public class TestObjectConverter7 : JsonConverter
 
         if (reader.TokenType == JsonToken.StartArray)
         {
-            var deserializedProperties = serializer.Deserialize<List<KeyValuePair<TestPropertyTemplate, object>>>(reader);
+            var deserializedProperties = serializer.Deserialize<List<KeyValuePair<TestPropertyTemplate, JToken>>>(reader);
             // Initialize the list capacity to be the number of properties we might add.
             var propertyList = new List<KeyValuePair<TestProperty, object>>(deserializedProperties.Count);
 
@@ -143,7 +143,22 @@ public class TestObjectConverter7 : JsonConverter
                 testProperty.ValueType = property.Key.ValueType;
 
 
-                string propertyData = property.Value.ToString();
+                object propertyData = null;
+                JToken token = property.Value;
+                if (token.Type != JTokenType.Null)
+                {
+                    // If the property is already a string. No need to convert again.
+                    if (token.Type == JTokenType.String)
+                    {
+                        propertyData = token.ToObject(typeof(string), serializer);
+                    }
+                    else
+                    {
+                        // On deserialization, the value for each TestProperty is always a string. It is up
+                        // to the consumer to deserialize it further as appropriate.
+                        propertyData = token.ToString(Formatting.None).Trim('"');
+                    }
+                }
 
                 propertyList.Add(new KeyValuePair<TestProperty, object>(testProperty, propertyData));
             }
