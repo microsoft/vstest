@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -24,7 +25,12 @@ internal class DiscoveryDataAggregator
     private readonly ConcurrentDictionary<string, DiscoveryStatus> _sourcesWithDiscoveryStatus = new();
 
     /// <summary>
-    /// Set to true if any of the request is aborted
+    /// Atomic boolean used to detect if message was already sent.
+    /// </summary>
+    private int _isMessageSent;
+
+    /// <summary>
+    /// Set to initialized if any of the request is aborted
     /// </summary>
     public bool IsAborted { get; private set; }
 
@@ -38,10 +44,6 @@ internal class DiscoveryDataAggregator
     /// </summary>
     public Dictionary<string, HashSet<string>> DiscoveredExtensions { get; private set; } = new();
 
-    /// <summary>
-    /// Indicates if discovery complete payload already sent back to IDE
-    /// </summary>
-    internal bool IsMessageSent { get; private set; }
 
     /// <summary>
     /// Returns the Aggregated Metrics.
@@ -141,13 +143,15 @@ internal class DiscoveryDataAggregator
     }
 
     /// <summary>
-    /// Aggregates the value indicating if we already sent message to IDE.
+    /// Determines if we should send the message to the client.
     /// </summary>
-    /// <param name="isMessageSent">Boolean value if we already sent message to IDE</param>
-    public void AggregateIsMessageSent(bool isMessageSent)
-    {
-        IsMessageSent = IsMessageSent || isMessageSent;
-    }
+    /// <remarks>
+    /// Handles race conditions as this aggregator is shared across various event handler for the
+    /// same discovery request but we want to notify only once.
+    /// </remarks>
+    /// <returns><c>initialized</c> if first to send the message; <c>false</c> otherwise.</returns>
+    public bool TryAggregateIsMessageSent()
+        => Interlocked.CompareExchange(ref _isMessageSent, 1, 0) == 0;
 
     public List<string> GetSourcesWithStatus(DiscoveryStatus discoveryStatus)
         => _sourcesWithDiscoveryStatus.IsEmpty

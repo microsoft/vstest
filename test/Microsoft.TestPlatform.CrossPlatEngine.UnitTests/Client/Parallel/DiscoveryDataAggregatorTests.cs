@@ -2,7 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
@@ -232,21 +234,6 @@ public class DiscoveryDataAggregatorTests
         Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, out _));
     }
 
-    [TestMethod]
-    public void AggregateShouldAggregateMessageSentCorrectly()
-    {
-        var aggregator = new DiscoveryDataAggregator();
-
-        aggregator.AggregateIsMessageSent(isMessageSent: false);
-        Assert.IsFalse(aggregator.IsMessageSent, "Aborted must be false");
-
-        aggregator.AggregateIsMessageSent(isMessageSent: true);
-        Assert.IsTrue(aggregator.IsMessageSent, "Aborted must be true");
-
-        aggregator.AggregateIsMessageSent(isMessageSent: false);
-        Assert.IsTrue(aggregator.IsMessageSent, "Aborted must be true");
-    }
-
     [DataTestMethod]
     [DataRow(DiscoveryStatus.FullyDiscovered)]
     [DataRow(DiscoveryStatus.PartiallyDiscovered)]
@@ -422,5 +409,19 @@ public class DiscoveryDataAggregatorTests
         CollectionAssert.AreEquivalent(fullyDiscoveredSources, actualFullyDiscovered);
         CollectionAssert.AreEquivalent(partiallyDiscoveredSources, actualPartiallyDiscovered);
         CollectionAssert.AreEquivalent(notDiscoveredSources, actualNotDiscovered);
+    }
+
+    [TestMethod]
+    public void TryAggregateIsMessageSentIsAvoidRaceConditions()
+    {
+        // Arrange
+        var dataAggregator = new DiscoveryDataAggregator();
+        var concurrentBag = new ConcurrentBag<bool>();
+
+        // Act
+        System.Threading.Tasks.Parallel.For(0, 100, _ => concurrentBag.Add(dataAggregator.TryAggregateIsMessageSent()));
+
+        // Assert
+        Assert.AreEqual(1, concurrentBag.Count(b => b));
     }
 }
