@@ -189,29 +189,4 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         var rawMessage = _dataSerializer.SerializePayload(messageType, payload, _requestData.ProtocolConfig.Version);
         _actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
     }
-
-    ///// <summary>
-    ///// Sending discovery complete message to IDE
-    ///// </summary>
-    ///// <param name="discoveryDataAggregator">Discovery aggregator to know if we already sent this message</param>
-    ///// <param name="testDiscoveryCompletePayload">Discovery complete payload to send</param>
-    //private void ConvertToRawMessageAndSend(DiscoveryCompletePayload testDiscoveryCompletePayload)
-    //{
-    //    // When we abort we should send raw message to IDE only once.
-    //    // All other testhosts which will finish after shouldn't send abort raw message.
-    //    if (_discoveryDataAggregator._isMessageSent)
-    //    {
-    //        return;
-    //    }
-
-    //    lock (_discoveryDataAggregator._sendMessageLock)
-    //    {
-    //        if (!_discoveryDataAggregator._isMessageSent)
-    //        {
-    //            // we have to send raw messages as we block the discovery complete actual raw messages
-    //            ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
-    //            _discoveryDataAggregator.AggregateIsMessageSent();
-    //        }
-    //    }
-    //}
 }
