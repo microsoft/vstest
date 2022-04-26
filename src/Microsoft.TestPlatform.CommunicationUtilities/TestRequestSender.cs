@@ -281,8 +281,8 @@ public class TestRequestSender : ITestRequestSender
     public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 discoveryEventsHandler)
     {
         _messageEventHandler = discoveryEventsHandler;
-        // In case of a disconnection event following a discovery abort request, we do not want
-        // to consider the client error as we know it was aborted on purpose.
+        // When testhost disconnects, it normally means there was an error in the testhost and it exited unexpectedly.
+        // But when it was us who aborted the run and killed the testhost, we don't want to wait for it to report error, because there won't be any.
         _onDisconnected = (disconnectedEventArgs) => OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, getClientError: !_isDiscoveryAborted);
         _onMessageReceived = (sender, args) => OnDiscoveryMessageReceived(discoveryEventsHandler, args);
 
