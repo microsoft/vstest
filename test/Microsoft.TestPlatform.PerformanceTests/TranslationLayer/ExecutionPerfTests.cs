@@ -15,18 +15,18 @@ public class ExecutionPerfTests : TelemetryPerfTestBase
 {
     [TestMethod]
     [TestCategory("TelemetryPerf")]
-    //[DataRow("MSTest1Passing", 1)]
-    //[DataRow("MSTest100Passing", 100)]
-    //[DataRow("MSTest1000Passing", 1000)]
-    //[DataRow("MSTest10kPassing", 10_000)]
-    //[DataRow("NUnit1Passing", 1)]
-    //[DataRow("NUnit100Passing", 100)]
-    //[DataRow("NUnit1000Passing", 1000)]
-    //[DataRow("NUnit10kPassing", 10_000)]
-    //[DataRow("XUnit1Passing", 1)]
-    //[DataRow("XUnit100Passing", 100)]
-    //[DataRow("XUnit1000Passing", 1000)]
-    // [DataRow("XUnit10kPassing", 10_000)]
+    [DataRow("MSTest1Passing", 1)]
+    [DataRow("MSTest100Passing", 100)]
+    [DataRow("MSTest1000Passing", 1000)]
+    [DataRow("MSTest10kPassing", 10_000)]
+    [DataRow("NUnit1Passing", 1)]
+    [DataRow("NUnit100Passing", 100)]
+    [DataRow("NUnit1000Passing", 1000)]
+    [DataRow("NUnit10kPassing", 10_000)]
+    [DataRow("XUnit1Passing", 1)]
+    [DataRow("XUnit100Passing", 100)]
+    [DataRow("XUnit1000Passing", 1000)]
+    [DataRow("XUnit10kPassing", 10_000)]
     [DataRow("Perfy.TestAdapter", 1)]
     [DataRow("Perfy.TestAdapter", 100)]
     [DataRow("Perfy.TestAdapter", 1000)]
@@ -41,13 +41,12 @@ public class ExecutionPerfTests : TelemetryPerfTestBase
         {
             // This tells to PerfyTestAdapter how many tests it should return, this is our overhead baseline.
             var perfyTestAdapterEnv = new Dictionary<string, string?> { ["TEST_COUNT"] = expectedNumberOfTests.ToString() };
-            var vstestConsoleWrapper = GetVsTestConsoleWrapper(perfyTestAdapterEnv, traceLevel: System.Diagnostics.TraceLevel.Verbose);
+            var vstestConsoleWrapper = GetVsTestConsoleWrapper(perfyTestAdapterEnv, traceLevel: System.Diagnostics.TraceLevel.Off);
             vstestConsoleWrapper.RunTests(GetPerfAssetFullPath(projectName), GetDefaultRunSettings(), options, runEventHandler);
             vstestConsoleWrapper.EndSession();
         }
 
         Assert.AreEqual(expectedNumberOfTests, runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
-        //Assert.Fail("fail");
         PostTelemetry(runEventHandler.Metrics, perfAnalyzer, projectName);
     }
 

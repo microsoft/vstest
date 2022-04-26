@@ -13,8 +13,6 @@ using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using System.Threading;
-using System.Diagnostics;
 
 namespace PerfyPassing
 {
@@ -47,30 +45,15 @@ namespace PerfyPassing
 
         public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
-            var sw = Stopwatch.StartNew();
             var location = typeof(Perfy).Assembly.Location;
-            var results = new List<TestResult>(Count);
             for (var i = 0; i < Count; i++)
             {
-                var tc = new TestCase($"Test{i}", Uri, location)
+                var tc = new TestCase($"Test{i}", Uri, location);
+                frameworkHandle.RecordResult(new TestResult(tc)
                 {
-                    Id = Guid.NewGuid(),
-                };
-                var result = new TestResult(tc)
-                {
-                    Outcome = TestOutcome.Passed,
-
-                };
-
-                results.Add(result);
+                    Outcome = TestOutcome.Passed
+                });
             }
-            System.IO.File.AppendAllText(@"C:\temp\rr.txt", $"Creating results took: {sw.ElapsedMilliseconds} ms\n");
-            sw.Restart();
-            for (var i = 0; i < Count; i++)
-            {
-                frameworkHandle.RecordResult(results[i]);
-            }
-            System.IO.File.AppendAllText(@"C:\temp\rr.txt", $"Reporting results took: {sw.ElapsedMilliseconds} ms\n");
         }
 
         public void DiscoverTests(IEnumerable<string> _, IDiscoveryContext _2,
