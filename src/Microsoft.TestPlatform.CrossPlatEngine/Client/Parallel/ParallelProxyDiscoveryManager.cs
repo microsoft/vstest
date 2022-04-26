@@ -74,7 +74,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
         EqtTrace.Verbose($"ParallelProxyDiscoveryManager.DiscoverTests: Start discovery. Total sources: {_availableTestSources}");
 
         // Mark all sources as NotDiscovered here because if we get an early cancellation it's
-        // possible that we didn't yet start all the proxy managers and so we didn't mark all sources 
+        // possible that we didn't yet start all the proxy managers and so we didn't mark all sources
         // as NotDiscovered.
         // For example, let's assume we have 10 sources, a batch size of 10 but only 8 cores, we
         // will then spawn 8 instances of this and if we now cancel, we will have 2 sources not
@@ -111,14 +111,16 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
     /// <inheritdoc/>
     public bool HandlePartialDiscoveryComplete(IProxyDiscoveryManager proxyDiscoveryManager, long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
     {
+#if DEBUG
         // Ensures that the total count of sources remains the same between each discovery
         // completion of the same initial discovery request.
-        Debug.Assert(
-            _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count
-            + _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count
-            + _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count
-            == (_actualDiscoveryCriteria?.Sources.Count() ?? 0),
-            "Total count of sources should match the count of sources with status not discovered, partially discovered and fully discovered.");
+        var notDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count;
+        var partiallyDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count;
+        var fullyDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count;
+        var expectedCount = _actualDiscoveryCriteria?.Sources.Count() ?? 0;
+        Debug.Assert(notDiscoveredCount + partiallyDiscoveredCount + fullyDiscoveredCount == expectedCount,
+            $"Total count of sources ({expectedCount}) should match the count of sources with status not discovered ({notDiscoveredCount}), partially discovered ({partiallyDiscoveredCount}) and fully discovered ({fullyDiscoveredCount}).");
+#endif
 
         var allDiscoverersCompleted = false;
         lock (_discoveryStatusLockObject)
